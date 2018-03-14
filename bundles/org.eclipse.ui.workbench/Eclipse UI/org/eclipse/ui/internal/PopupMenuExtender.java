@@ -90,7 +90,7 @@ public class PopupMenuExtender implements IMenuListener2,
      */
 	private int bitSet = 0;
 
-	private ArrayList<PluginActionContributionItem> actionContributionCache = new ArrayList<PluginActionContributionItem>();
+	private ArrayList<PluginActionContributionItem> actionContributionCache = new ArrayList<>();
 	private boolean cleanupNeeded = false;
 
 	private MPart modelPart;
@@ -386,7 +386,7 @@ public class PopupMenuExtender implements IMenuListener2,
             mgr = menuWrapper;
             menuWrapper.removeAll();
         }
-		Set<IObjectActionContributor> contributedItems = new HashSet<IObjectActionContributor>();
+		Set<IObjectActionContributor> contributedItems = new HashSet<>();
         if ((bitSet & INCLUDE_EDITOR_INPUT) != 0) {
 			addEditorActions(mgr, contributedItems);
         }
@@ -517,7 +517,7 @@ public class PopupMenuExtender implements IMenuListener2,
 		}
 
 		if (staticActionBuilders == null) {
-			staticActionBuilders = new HashMap<String, ViewerActionBuilder>();
+			staticActionBuilders = new HashMap<>();
 		}
 
 		Object object = staticActionBuilders.get(menuId);

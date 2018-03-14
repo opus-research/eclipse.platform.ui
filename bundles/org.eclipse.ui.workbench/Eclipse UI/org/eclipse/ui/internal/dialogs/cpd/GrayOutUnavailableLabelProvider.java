@@ -40,7 +40,7 @@ class GrayOutUnavailableLabelProvider extends TreeManager.TreeItemLabelProvider 
 	public GrayOutUnavailableLabelProvider(ViewerFilter filter) {
 		this.display = PlatformUI.getWorkbench().getDisplay();
 		this.filter = filter;
-		toDispose = new HashSet<Image>();
+		toDispose = new HashSet<>();
 	}
 
 	@Override

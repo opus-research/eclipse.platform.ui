@@ -31,7 +31,7 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 public class WizardProvider extends QuickAccessProvider {
 
 	private QuickAccessElement[] cachedElements;
-	private Map<String, WizardElement> idToElement = new HashMap<String, WizardElement>();
+	private Map<String, WizardElement> idToElement = new HashMap<>();
 
 	@Override
 	public QuickAccessElement getElementForId(String id) {
@@ -44,7 +44,7 @@ public class WizardProvider extends QuickAccessProvider {
 		if (cachedElements == null) {
 			IWizardCategory rootCategory = WorkbenchPlugin.getDefault()
 					.getNewWizardRegistry().getRootCategory();
-			List<IWizardDescriptor> result = new ArrayList<IWizardDescriptor>();
+			List<IWizardDescriptor> result = new ArrayList<>();
 			collectWizards(rootCategory, result);
 			IWizardDescriptor[] wizards = result
 					.toArray(new IWizardDescriptor[result.size()]);

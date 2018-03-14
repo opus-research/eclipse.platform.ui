@@ -456,7 +456,7 @@ public class EditorSelectionDialog extends Dialog {
 			return editors;
 		}
 
-		List<IEditorDescriptor> filteredList = new ArrayList<IEditorDescriptor>();
+		List<IEditorDescriptor> filteredList = new ArrayList<>();
 		for (int i = 0; i < editors.length; i++) {
 			boolean add = true;
 			for (int j = 0; j < editorsToFilter.length; j++) {
@@ -575,7 +575,7 @@ public class EditorSelectionDialog extends Dialog {
 		}
 		// bug 468906: always re-set editor mappings: this is needed to rebuild
 		// internal editors map after setting the default editor
-		List<IFileEditorMapping> newMappings = new ArrayList<IFileEditorMapping>();
+		List<IFileEditorMapping> newMappings = new ArrayList<>();
 		newMappings.addAll(Arrays.asList(reg.getFileEditorMappings()));
 		reg.setFileEditorMappings(newMappings.toArray(new FileEditorMapping[newMappings.size()]));
 		reg.saveAssociations();
@@ -611,7 +611,7 @@ public class EditorSelectionDialog extends Dialog {
 		} else {
 			mapping = new FileEditorMapping(null, fileType);
 		}
-		List<IFileEditorMapping> newMappings = new ArrayList<IFileEditorMapping>();
+		List<IFileEditorMapping> newMappings = new ArrayList<>();
 		newMappings.addAll(Arrays.asList(mappings));
 		newMappings.add(mapping);
 		FileEditorMapping[] array = newMappings.toArray(new FileEditorMapping[newMappings.size()]);

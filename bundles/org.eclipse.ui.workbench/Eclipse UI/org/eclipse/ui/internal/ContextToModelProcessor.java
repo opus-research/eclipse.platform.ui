@@ -29,7 +29,7 @@ import org.eclipse.ui.internal.contexts.ContextPersistence;
  *
  */
 public class ContextToModelProcessor {
-	private Map<String, MBindingContext> contexts = new HashMap<String, MBindingContext>();
+	private Map<String, MBindingContext> contexts = new HashMap<>();
 
 
 	@Execute

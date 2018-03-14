@@ -27,7 +27,7 @@ import org.eclipse.ui.internal.WorkbenchImages;
 public class PerspectiveProvider extends QuickAccessProvider {
 
 	private QuickAccessElement[] cachedElements;
-	private Map<String, PerspectiveElement> idToElement = new HashMap<String, PerspectiveElement>();
+	private Map<String, PerspectiveElement> idToElement = new HashMap<>();
 
 	@Override
 	public String getId() {

@@ -69,7 +69,7 @@ public class ModeledPageLayout implements IPageLayout {
 		if (model == null) {
 			return Collections.emptyList();
 		}
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		for (String tag : model.getTags()) {
 			if (tag.startsWith(tagPrefix)) {
 				result.add(tag.substring(tagPrefix.length()));

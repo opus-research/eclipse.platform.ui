@@ -73,9 +73,9 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 	private String defaultPerspectiveId;
 
-	private ArrayList<IPerspectiveDescriptor> perspToDelete = new ArrayList<IPerspectiveDescriptor>();
+	private ArrayList<IPerspectiveDescriptor> perspToDelete = new ArrayList<>();
 
-	private ArrayList<IPerspectiveDescriptor> perspToRevert = new ArrayList<IPerspectiveDescriptor>();
+	private ArrayList<IPerspectiveDescriptor> perspToRevert = new ArrayList<>();
 
 	private Table perspectivesTable;
 
@@ -246,7 +246,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		// Populate the perspectivesTable
 		IPerspectiveDescriptor[] persps = perspectiveRegistry.getPerspectives();
-		perspectives = new ArrayList<IPerspectiveDescriptor>(persps.length);
+		perspectives = new ArrayList<>(persps.length);
 		for (int i = 0; i < persps.length; i++) {
 			perspectives.add(i, persps[i]);
 		}

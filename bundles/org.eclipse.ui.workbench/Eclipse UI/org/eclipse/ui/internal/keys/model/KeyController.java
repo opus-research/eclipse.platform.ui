@@ -160,7 +160,7 @@ public class KeyController {
 		bindingManager.setLocale(bindingService.getLocale());
 		bindingManager.setPlatform(bindingService.getPlatform());
 
-		Set<Binding> bindings = new HashSet<Binding>();
+		Set<Binding> bindings = new HashSet<>();
 		EBindingService eBindingService = locator
 				.getService(EBindingService.class);
 		bindings.addAll(eBindingService.getActiveBindings());

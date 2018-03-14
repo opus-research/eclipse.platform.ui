@@ -37,10 +37,10 @@ import org.eclipse.ui.internal.keys.BindingService;
 
 public class BindingToModelProcessor {
 
-	private Map<String, MBindingContext> contexts = new HashMap<String, MBindingContext>();
-	private Map<String, MCommand> commands = new HashMap<String, MCommand>();
-	private Map<String, MBindingTable> tables = new HashMap<String, MBindingTable>();
-	private Set<MKeyBinding> keys = new HashSet<MKeyBinding>();
+	private Map<String, MBindingContext> contexts = new HashMap<>();
+	private Map<String, MCommand> commands = new HashMap<>();
+	private Map<String, MBindingTable> tables = new HashMap<>();
+	private Set<MKeyBinding> keys = new HashSet<>();
 
 	@Execute
 	void process(final MApplication application, IEclipseContext context) {

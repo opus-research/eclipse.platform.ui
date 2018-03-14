@@ -52,8 +52,8 @@ public class TabBehaviourMRU extends TabBehaviour {
 		if (length < page.getEditorReuseThreshold()) {
 			return null;
 		} else if (length > page.getEditorReuseThreshold()) {
-			List<IEditorReference> refs = new ArrayList<IEditorReference>();
-			List<IEditorReference> keep = new ArrayList<IEditorReference>(Arrays.asList(editors));
+			List<IEditorReference> refs = new ArrayList<>();
+			List<IEditorReference> keep = new ArrayList<>(Arrays.asList(editors));
 			int extra = length - page.getEditorReuseThreshold();
 			// look for extra editors that should be closed
 			for (int i = 0; i < editors.length; i++) {

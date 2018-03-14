@@ -315,14 +315,14 @@ public abstract class QuickAccessContents {
 			for (int i = 0; i < providers.length
 					&& (showAllMatches || countTotal < maxCount); i++) {
 				if (entries[i] == null) {
-					entries[i] = new ArrayList<QuickAccessEntry>();
+					entries[i] = new ArrayList<>();
 					indexPerProvider[i] = 0;
 				}
 				int count = 0;
 				QuickAccessProvider provider = providers[i];
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
-					List<QuickAccessEntry> poorFilterMatches = new ArrayList<QuickAccessEntry>();
+					List<QuickAccessEntry> poorFilterMatches = new ArrayList<>();
 
 					int j = indexPerProvider[i];
 					while (j < sortedElements.length
@@ -389,7 +389,7 @@ public abstract class QuickAccessContents {
 			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
 			if (entryEnabled(providers[0], entry)) {
 				if (entries[0] == null) {
-					entries[0] = new ArrayList<QuickAccessEntry>();
+					entries[0] = new ArrayList<>();
 					indexPerProvider[0] = 0;
 				}
 				entries[0].add(entry);

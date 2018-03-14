@@ -36,7 +36,7 @@ public class ViewProvider extends QuickAccessProvider {
 
 	private MApplication application;
 	private MWindow window;
-	private Map<String, QuickAccessElement> idToElement = new HashMap<String, QuickAccessElement>();
+	private Map<String, QuickAccessElement> idToElement = new HashMap<>();
 	private IViewRegistry viewRegistry;
 
 	public ViewProvider(MApplication application, MWindow window) {

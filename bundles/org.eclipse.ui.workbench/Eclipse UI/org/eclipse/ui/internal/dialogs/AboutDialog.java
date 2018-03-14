@@ -75,7 +75,7 @@ public class AboutDialog extends TrayDialog {
 
     private AboutBundleGroupData[] bundleGroupInfos;
 
-    private ArrayList<Image> images = new ArrayList<Image>();
+    private ArrayList<Image> images = new ArrayList<>();
 
     private AboutFeaturesButtonManager buttonManager = new AboutFeaturesButtonManager();
 
@@ -100,7 +100,7 @@ public class AboutDialog extends TrayDialog {
 
         // create a descriptive object for each BundleGroup
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-		LinkedList<AboutBundleGroupData> groups = new LinkedList<AboutBundleGroupData>();
+		LinkedList<AboutBundleGroupData> groups = new LinkedList<>();
         if (providers != null) {
 			for (IBundleGroupProvider provider : providers) {
                 IBundleGroup[] bundleGroups = provider.getBundleGroups();
