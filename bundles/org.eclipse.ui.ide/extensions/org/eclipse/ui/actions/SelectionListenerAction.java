@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
  *******************************************************************************/
 
 package org.eclipse.ui.actions;
@@ -218,7 +218,7 @@ public abstract class SelectionListenerAction extends
 	 *
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
-	protected List<IResource> getSelectedResources() {
+	protected List<? extends IResource> getSelectedResources() {
 		// recompute if selection has changed.
 		if (selectionDirty) {
 			computeResources();
