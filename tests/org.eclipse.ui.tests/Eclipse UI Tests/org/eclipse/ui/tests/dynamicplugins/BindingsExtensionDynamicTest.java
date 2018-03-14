@@ -80,7 +80,8 @@ public final class BindingsExtensionDynamicTest extends DynamicTestCase {
 	 *             If "M1+W" can't be parsed by the extension point.
 	 */
 	public void testBindings() throws ParseException {
-		final IBindingService bindingService = getWorkbench().getAdapter(IBindingService.class);
+		final IBindingService bindingService = (IBindingService) getWorkbench()
+				.getAdapter(IBindingService.class);
 		final TriggerSequence triggerSequence = KeySequence.getInstance("M1+W");
 		Binding[] bindings;
 		Scheme scheme;
