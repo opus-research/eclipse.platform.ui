@@ -105,6 +105,7 @@ public class ApplicationSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseToolBarContributions(application);
 				if (result == null) result = caseTrimContributions(application);
 				if (result == null) result = caseSnippetContainer(application);
+				if (result == null) result = caseLifecycleAware(application);
 				if (result == null) result = caseUIElement(application);
 				if (result == null) result = caseApplicationElement(application);
 				if (result == null) result = caseLocalizable(application);
@@ -135,6 +136,20 @@ public class ApplicationSwitch<T1> extends Switch<T1> {
 			case ApplicationPackageImpl.STRING_TO_OBJECT_MAP: {
 				@SuppressWarnings("unchecked") Map.Entry<String, Object> stringToObjectMap = (Map.Entry<String, Object>)theEObject;
 				T1 result = caseStringToObjectMap(stringToObjectMap);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ApplicationPackageImpl.LIFECYCLE_AWARE: {
+				MLifecycleAware lifecycleAware = (MLifecycleAware)theEObject;
+				T1 result = caseLifecycleAware(lifecycleAware);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ApplicationPackageImpl.LIFECYCLE_CONTRIBUTION: {
+				MLifecycleContribution lifecycleContribution = (MLifecycleContribution)theEObject;
+				T1 result = caseLifecycleContribution(lifecycleContribution);
+				if (result == null) result = caseContribution(lifecycleContribution);
+				if (result == null) result = caseApplicationElement(lifecycleContribution);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -229,6 +244,36 @@ public class ApplicationSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public T1 caseStringToObjectMap(Map.Entry<String, Object> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Lifecycle Aware</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Lifecycle Aware</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseLifecycleAware(MLifecycleAware object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Lifecycle Contribution</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Lifecycle Contribution</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseLifecycleContribution(MLifecycleContribution object) {
 		return null;
 	}
 

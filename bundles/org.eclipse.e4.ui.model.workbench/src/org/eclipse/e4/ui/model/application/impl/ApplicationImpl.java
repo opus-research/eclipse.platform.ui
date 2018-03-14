@@ -16,6 +16,8 @@ import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.MLifecycleAware;
+import org.eclipse.e4.ui.model.application.MLifecycleContribution;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MBindingTableContainer;
@@ -76,6 +78,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getToolBarContributions <em>Tool Bar Contributions</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getTrimContributions <em>Trim Contributions</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getSnippets <em>Snippets</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getLifeCycleHandlers <em>Life Cycle Handlers</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCommands <em>Commands</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getAddons <em>Addons</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCategories <em>Categories</em>}</li>
@@ -215,6 +218,16 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * @ordered
 	 */
 	protected EList<MUIElement> snippets;
+
+	/**
+	 * The cached value of the '{@link #getLifeCycleHandlers() <em>Life Cycle Handlers</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLifeCycleHandlers()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<MLifecycleContribution> lifeCycleHandlers;
 
 	/**
 	 * The cached value of the '{@link #getCommands() <em>Commands</em>}' containment reference list.
@@ -458,6 +471,18 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public List<MLifecycleContribution> getLifeCycleHandlers() {
+		if (lifeCycleHandlers == null) {
+			lifeCycleHandlers = new EObjectContainmentEList<MLifecycleContribution>(MLifecycleContribution.class, this, ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS);
+		}
+		return lifeCycleHandlers;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public List<MCommand> getCommands() {
 		if (commands == null) {
 			commands = new EObjectContainmentEList<MCommand>(MCommand.class, this, ApplicationPackageImpl.APPLICATION__COMMANDS);
@@ -527,6 +552,8 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return ((InternalEList<?>)getTrimContributions()).basicRemove(otherEnd, msgs);
 			case ApplicationPackageImpl.APPLICATION__SNIPPETS:
 				return ((InternalEList<?>)getSnippets()).basicRemove(otherEnd, msgs);
+			case ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS:
+				return ((InternalEList<?>)getLifeCycleHandlers()).basicRemove(otherEnd, msgs);
 			case ApplicationPackageImpl.APPLICATION__COMMANDS:
 				return ((InternalEList<?>)getCommands()).basicRemove(otherEnd, msgs);
 			case ApplicationPackageImpl.APPLICATION__ADDONS:
@@ -570,6 +597,8 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return getTrimContributions();
 			case ApplicationPackageImpl.APPLICATION__SNIPPETS:
 				return getSnippets();
+			case ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS:
+				return getLifeCycleHandlers();
 			case ApplicationPackageImpl.APPLICATION__COMMANDS:
 				return getCommands();
 			case ApplicationPackageImpl.APPLICATION__ADDONS:
@@ -637,6 +666,10 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				getSnippets().clear();
 				getSnippets().addAll((Collection<? extends MUIElement>)newValue);
 				return;
+			case ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS:
+				getLifeCycleHandlers().clear();
+				getLifeCycleHandlers().addAll((Collection<? extends MLifecycleContribution>)newValue);
+				return;
 			case ApplicationPackageImpl.APPLICATION__COMMANDS:
 				getCommands().clear();
 				getCommands().addAll((Collection<? extends MCommand>)newValue);
@@ -701,6 +734,9 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 			case ApplicationPackageImpl.APPLICATION__SNIPPETS:
 				getSnippets().clear();
 				return;
+			case ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS:
+				getLifeCycleHandlers().clear();
+				return;
 			case ApplicationPackageImpl.APPLICATION__COMMANDS:
 				getCommands().clear();
 				return;
@@ -749,6 +785,8 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return trimContributions != null && !trimContributions.isEmpty();
 			case ApplicationPackageImpl.APPLICATION__SNIPPETS:
 				return snippets != null && !snippets.isEmpty();
+			case ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS:
+				return lifeCycleHandlers != null && !lifeCycleHandlers.isEmpty();
 			case ApplicationPackageImpl.APPLICATION__COMMANDS:
 				return commands != null && !commands.isEmpty();
 			case ApplicationPackageImpl.APPLICATION__ADDONS:
@@ -825,6 +863,12 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				default: return -1;
 			}
 		}
+		if (baseClass == MLifecycleAware.class) {
+			switch (derivedFeatureID) {
+				case ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS: return ApplicationPackageImpl.LIFECYCLE_AWARE__LIFE_CYCLE_HANDLERS;
+				default: return -1;
+			}
+		}
 		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
 	}
 
@@ -889,6 +933,12 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 		if (baseClass == MSnippetContainer.class) {
 			switch (baseFeatureID) {
 				case UiPackageImpl.SNIPPET_CONTAINER__SNIPPETS: return ApplicationPackageImpl.APPLICATION__SNIPPETS;
+				default: return -1;
+			}
+		}
+		if (baseClass == MLifecycleAware.class) {
+			switch (baseFeatureID) {
+				case ApplicationPackageImpl.LIFECYCLE_AWARE__LIFE_CYCLE_HANDLERS: return ApplicationPackageImpl.APPLICATION__LIFE_CYCLE_HANDLERS;
 				default: return -1;
 			}
 		}

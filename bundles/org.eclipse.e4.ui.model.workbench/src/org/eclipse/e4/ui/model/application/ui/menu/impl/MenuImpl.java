@@ -12,6 +12,9 @@ package org.eclipse.e4.ui.model.application.ui.menu.impl;
 
 import java.util.Collection;
 import java.util.List;
+import org.eclipse.e4.ui.model.application.MLifecycleAware;
+import org.eclipse.e4.ui.model.application.MLifecycleContribution;
+import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
@@ -24,6 +27,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -36,6 +40,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.MenuImpl#getChildren <em>Children</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.MenuImpl#getSelectedElement <em>Selected Element</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.MenuImpl#getLifeCycleHandlers <em>Life Cycle Handlers</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.menu.impl.MenuImpl#isEnabled <em>Enabled</em>}</li>
  * </ul>
  * </p>
@@ -62,6 +67,16 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 	 * @ordered
 	 */
 	protected MMenuElement selectedElement;
+
+	/**
+	 * The cached value of the '{@link #getLifeCycleHandlers() <em>Life Cycle Handlers</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLifeCycleHandlers()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<MLifecycleContribution> lifeCycleHandlers;
 
 	/**
 	 * The default value of the '{@link #isEnabled() <em>Enabled</em>}' attribute.
@@ -157,6 +172,18 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public List<MLifecycleContribution> getLifeCycleHandlers() {
+		if (lifeCycleHandlers == null) {
+			lifeCycleHandlers = new EObjectContainmentEList<MLifecycleContribution>(MLifecycleContribution.class, this, MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS);
+		}
+		return lifeCycleHandlers;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -198,6 +225,8 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 		switch (featureID) {
 			case MenuPackageImpl.MENU__CHILDREN:
 				return ((InternalEList<?>)getChildren()).basicRemove(otherEnd, msgs);
+			case MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS:
+				return ((InternalEList<?>)getLifeCycleHandlers()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -215,6 +244,8 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 			case MenuPackageImpl.MENU__SELECTED_ELEMENT:
 				if (resolve) return getSelectedElement();
 				return basicGetSelectedElement();
+			case MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS:
+				return getLifeCycleHandlers();
 			case MenuPackageImpl.MENU__ENABLED:
 				return isEnabled();
 		}
@@ -237,6 +268,10 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 			case MenuPackageImpl.MENU__SELECTED_ELEMENT:
 				setSelectedElement((MMenuElement)newValue);
 				return;
+			case MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS:
+				getLifeCycleHandlers().clear();
+				getLifeCycleHandlers().addAll((Collection<? extends MLifecycleContribution>)newValue);
+				return;
 			case MenuPackageImpl.MENU__ENABLED:
 				setEnabled((Boolean)newValue);
 				return;
@@ -258,6 +293,9 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 			case MenuPackageImpl.MENU__SELECTED_ELEMENT:
 				setSelectedElement((MMenuElement)null);
 				return;
+			case MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS:
+				getLifeCycleHandlers().clear();
+				return;
 			case MenuPackageImpl.MENU__ENABLED:
 				setEnabled(ENABLED_EDEFAULT);
 				return;
@@ -277,6 +315,8 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 				return children != null && !children.isEmpty();
 			case MenuPackageImpl.MENU__SELECTED_ELEMENT:
 				return selectedElement != null;
+			case MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS:
+				return lifeCycleHandlers != null && !lifeCycleHandlers.isEmpty();
 			case MenuPackageImpl.MENU__ENABLED:
 				return enabled != ENABLED_EDEFAULT;
 		}
@@ -297,6 +337,12 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 				default: return -1;
 			}
 		}
+		if (baseClass == MLifecycleAware.class) {
+			switch (derivedFeatureID) {
+				case MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS: return ApplicationPackageImpl.LIFECYCLE_AWARE__LIFE_CYCLE_HANDLERS;
+				default: return -1;
+			}
+		}
 		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
 	}
 
@@ -311,6 +357,12 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 			switch (baseFeatureID) {
 				case UiPackageImpl.ELEMENT_CONTAINER__CHILDREN: return MenuPackageImpl.MENU__CHILDREN;
 				case UiPackageImpl.ELEMENT_CONTAINER__SELECTED_ELEMENT: return MenuPackageImpl.MENU__SELECTED_ELEMENT;
+				default: return -1;
+			}
+		}
+		if (baseClass == MLifecycleAware.class) {
+			switch (baseFeatureID) {
+				case ApplicationPackageImpl.LIFECYCLE_AWARE__LIFE_CYCLE_HANDLERS: return MenuPackageImpl.MENU__LIFE_CYCLE_HANDLERS;
 				default: return -1;
 			}
 		}
