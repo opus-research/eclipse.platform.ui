@@ -50,7 +50,7 @@ public abstract class ModelDelta implements IDelta {
 			return delta.getObject();
 		} else if (value instanceof List<?>) {
 			List<?> values = (List<?>) value;
-			List<Object> objects = new ArrayList<>(values.size());
+			List<Object> objects = new ArrayList<Object>(values.size());
 			for (int i = 0; i < values.size(); i++) {
 				Object object = values.get(i);
 				if (object instanceof IDelta) {

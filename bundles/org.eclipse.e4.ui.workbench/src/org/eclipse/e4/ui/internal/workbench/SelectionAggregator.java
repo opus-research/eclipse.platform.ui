@@ -44,9 +44,9 @@ public class SelectionAggregator {
 
 	private ListenerList genericListeners = new ListenerList();
 	private ListenerList genericPostListeners = new ListenerList();
-	private Map<String, ListenerList> targetedListeners = new HashMap<>();
-	private Map<String, ListenerList> targetedPostListeners = new HashMap<>();
-	private Set<IEclipseContext> tracked = new HashSet<>();
+	private Map<String, ListenerList> targetedListeners = new HashMap<String, ListenerList>();
+	private Map<String, ListenerList> targetedPostListeners = new HashMap<String, ListenerList>();
+	private Set<IEclipseContext> tracked = new HashSet<IEclipseContext>();
 
 	private EventHandler eventHandler = new EventHandler() {
 		@Override
