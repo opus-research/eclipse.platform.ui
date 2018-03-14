@@ -733,23 +733,6 @@
          </parameter>
       </key>
       <key
-            locale="jp"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+_"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-      <key
-      		locale="jp"
-            commandId="org.eclipse.ui.window.splitEditor"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+M2+-"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-         <parameter
-               id="Splitter.isHorizontal"
-               value="true">
-         </parameter>
-      </key>
-      <key
             platform="carbon"
             commandId=""
             contextId="org.eclipse.ui.contexts.window"
@@ -1435,16 +1418,16 @@
             icon="$nl$/icons/full/etool16/redo_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.save"
-            disabledIcon="$nl$/icons/full/dtool16/save_edit.png"
-            icon="$nl$/icons/full/etool16/save_edit.png"/>
+            disabledIcon="$nl$/icons/full/dtool16/save_edit.gif"
+            icon="$nl$/icons/full/etool16/save_edit.gif"/>
       <image
             commandId="org.eclipse.ui.file.saveAll"
-            disabledIcon="$nl$/icons/full/dtool16/saveall_edit.png"
-            icon="$nl$/icons/full/etool16/saveall_edit.png"/>
+            disabledIcon="$nl$/icons/full/dtool16/saveall_edit.gif"
+            icon="$nl$/icons/full/etool16/saveall_edit.gif"/>
       <image
             commandId="org.eclipse.ui.file.saveAs"
-            disabledIcon="$nl$/icons/full/dtool16/saveas_edit.png"
-            icon="$nl$/icons/full/etool16/saveas_edit.png"/>
+            disabledIcon="$nl$/icons/full/dtool16/saveas_edit.gif"
+            icon="$nl$/icons/full/etool16/saveas_edit.gif"/>
       <image
             commandId="org.eclipse.ui.file.refresh"
             disabledIcon="$nl$/icons/full/dlcl16/refresh_nav.png"

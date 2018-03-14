@@ -35,7 +35,6 @@ public class Bug200337TableViewerTest extends ViewerTestCase {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TableViewer tableViewer = new TableViewer(parent, SWT.FULL_SELECTION);
 		tableViewer.setContentProvider(new ArrayContentProvider());
@@ -43,17 +42,14 @@ public class Bug200337TableViewerTest extends ViewerTestCase {
 				tableViewer.getTable()) });
 		tableViewer.setColumnProperties(new String[] { "0" });
 		tableViewer.setCellModifier(new ICellModifier() {
-			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
-			@Override
 			public Object getValue(Object element, String property) {
 				return "";
 			}
 
-			@Override
 			public void modify(Object element, String property, Object value) {
 			}
 
@@ -64,13 +60,11 @@ public class Bug200337TableViewerTest extends ViewerTestCase {
 		return tableViewer;
 	}
 
-	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
-	@Override
 	protected void setInput() {
 		String[] ar = new String[100];
 		for( int i = 0; i < ar.length; i++ ) {

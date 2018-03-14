@@ -70,7 +70,6 @@ public class Snippet028DuplexingObservableValue {
 	public void open() {
 		final Display display = Display.getDefault();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				createContents();
 				shell.open();

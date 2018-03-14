@@ -29,23 +29,20 @@ public class TableTreeViewerTest extends AbstractTreeViewerTest {
             implements ITableLabelProvider {
         public boolean fExtended = false;
 
-        @Override
-		public String getText(Object element) {
+        public String getText(Object element) {
             if (fExtended)
                 return providedString((String) element);
 
             return element.toString();
         }
 
-        @Override
-		public String getColumnText(Object element, int index) {
+        public String getColumnText(Object element, int index) {
             if (fExtended)
                 return providedString((TestElement) element);
             return element.toString();
         }
 
-        @Override
-		public Image getColumnImage(Object element, int columnIndex) {
+        public Image getColumnImage(Object element, int columnIndex) {
             return null;
         }
     }
@@ -54,8 +51,7 @@ public class TableTreeViewerTest extends AbstractTreeViewerTest {
         super(name);
     }
 
-    @Override
-	protected StructuredViewer createViewer(Composite parent) {
+    protected StructuredViewer createViewer(Composite parent) {
         TableTreeViewer viewer = new TableTreeViewer(parent);
         viewer.setContentProvider(new TestModelContentProvider());
         viewer.setLabelProvider(new TableTreeTestLabelProvider());
@@ -83,22 +79,19 @@ public class TableTreeViewerTest extends AbstractTreeViewerTest {
         return viewer;
     }
 
-    @Override
-	protected int getItemCount() {
+    protected int getItemCount() {
         TestElement first = fRootElement.getFirstChild();
         TableTreeItem ti = (TableTreeItem) fViewer.testFindItem(first);
         TableTree table = ti.getParent();
         return table.getItemCount();
     }
 
-    @Override
-	protected int getItemCount(TestElement element) {
+    protected int getItemCount(TestElement element) {
         TableTreeItem ti = (TableTreeItem) fViewer.testFindItem(element);
         return ti.getItemCount();
     }
 
-    @Override
-	protected String getItemText(int at) {
+    protected String getItemText(int at) {
         TableTree table = (TableTree) fViewer.getControl();
         return table.getItems()[at].getText();
     }
@@ -107,8 +100,7 @@ public class TableTreeViewerTest extends AbstractTreeViewerTest {
         junit.textui.TestRunner.run(TableTreeViewerTest.class);
     }
 
-    @Override
-	public void testLabelProvider() {
+    public void testLabelProvider() {
         TableTreeViewer viewer = (TableTreeViewer) fViewer;
         TableTreeTestLabelProvider provider = (TableTreeTestLabelProvider) viewer
                 .getLabelProvider();
@@ -123,8 +115,7 @@ public class TableTreeViewerTest extends AbstractTreeViewerTest {
         fViewer.refresh();
     }
 
-    @Override
-	public void testLabelProviderStateChange() {
+    public void testLabelProviderStateChange() {
         TableTreeViewer viewer = (TableTreeViewer) fViewer;
         TableTreeTestLabelProvider provider = (TableTreeTestLabelProvider) viewer
                 .getLabelProvider();

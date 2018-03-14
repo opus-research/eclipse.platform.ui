@@ -106,8 +106,7 @@ public class TestElement implements Cloneable {
         return Integer.parseInt(id);
     }
 
-    @Override
-	public Object clone() {
+    public Object clone() {
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
@@ -150,8 +149,7 @@ public class TestElement implements Cloneable {
                 TestModelChange.STRUCTURE_CHANGE, this));
     }
 
-    @Override
-	public boolean equals(Object arg) {
+    public boolean equals(Object arg) {
         if (!(arg instanceof TestElement))
             return false;
         TestElement element = (TestElement) arg;
@@ -205,8 +203,7 @@ public class TestElement implements Cloneable {
         return fModel;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return fId.hashCode();
     }
 
@@ -228,8 +225,7 @@ public class TestElement implements Cloneable {
         return false;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         return getID() + " " + getLabel();
     }
 }

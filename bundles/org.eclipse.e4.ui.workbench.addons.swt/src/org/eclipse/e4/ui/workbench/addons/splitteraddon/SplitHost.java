@@ -1,18 +1,8 @@
-/*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.splitteraddon;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
@@ -23,6 +13,7 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -94,7 +85,16 @@ public class SplitHost {
 		return parentObj == myPart;
 	}
 
-	void callingAllParts(Class<? extends Annotation> clz) {
+	@Inject
+	void activePartChanged(@Named(IServiceConstants.ACTIVE_PART) MPart newPart) {
+		if (newPart != null && newPart.getObject() == this) {
+			MPart inner = findInnerActive((MCompositePart) newPart);
+			if (inner != null && inner.getContext() != null)
+				ps.activate(inner);
+		}
+	}
+
+	void callingAllParts(Class clz) {
 		List<MPart> parts = ms.findElements(myPart, null, MPart.class, null);
 		for (MPart part : parts) {
 			if (part == myPart)

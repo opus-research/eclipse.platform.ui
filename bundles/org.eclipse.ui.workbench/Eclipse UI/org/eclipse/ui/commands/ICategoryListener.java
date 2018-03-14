@@ -28,8 +28,6 @@ package org.eclipse.ui.commands;
  * @see org.eclipse.core.commands.ICategoryListener
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface ICategoryListener {
 
     /**
@@ -40,6 +38,5 @@ public interface ICategoryListener {
      * @param categoryEvent
      *            the category event. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     void categoryChanged(CategoryEvent categoryEvent);
 }

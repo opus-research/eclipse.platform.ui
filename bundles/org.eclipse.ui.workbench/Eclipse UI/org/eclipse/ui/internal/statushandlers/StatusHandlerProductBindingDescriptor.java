@@ -53,7 +53,6 @@ class StatusHandlerProductBindingDescriptor implements
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
-	@Override
 	public String getLocalId() {
 		return id;
 	}
@@ -63,7 +62,6 @@ class StatusHandlerProductBindingDescriptor implements
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
-	@Override
 	public String getPluginId() {
 		return pluginId;
 	}

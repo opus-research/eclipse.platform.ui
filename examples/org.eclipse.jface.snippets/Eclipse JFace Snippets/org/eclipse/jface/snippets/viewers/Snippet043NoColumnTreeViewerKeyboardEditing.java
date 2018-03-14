@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2010 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,11 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Jeanderson Candido (http://jeandersonbc.github.io) - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
@@ -39,11 +36,10 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * Demonstrates how to use keyboard-editing support in a TreeViewer with no
- * column
- *
+ * Demonstrates how to use keyboard-editing support in a TreeViewer with no column
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet043NoColumnTreeViewerKeyboardEditing {
 	public Snippet043NoColumnTreeViewerKeyboardEditing(final Shell shell) {
@@ -53,16 +49,15 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 				| SWT.FULL_SELECTION);
 		b.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MyModel root = (MyModel) v.getInput();
 				TreePath path = new TreePath(new Object[] { root,
-						root.child.get(1), root.child.get(1).child.get(0) });
+						root.child.get(1),
+						((MyModel) root.child.get(1)).child.get(0) });
 				v.editElement(path, 0);
 			}
 
@@ -72,20 +67,18 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 		v.setColumnProperties(new String[] { "col1" });
 		v.setCellModifier(new ICellModifier() {
 
-			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
-			@Override
 			public Object getValue(Object element, String property) {
 				return ((MyModel) element).counter + "";
 			}
 
-			@Override
 			public void modify(Object element, String property, Object value) {
 				element = ((Item) element).getData();
-				((MyModel) element).counter = Integer.parseInt(value.toString());
+				((MyModel) element).counter = Integer
+						.parseInt(value.toString());
 				v.update(element, null);
 			}
 
@@ -95,7 +88,6 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 				v, new FocusCellOwnerDrawHighlighter(v));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
 				v) {
-			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
@@ -112,59 +104,12 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 
 		v.setContentProvider(new MyContentProvider());
+
 		v.setInput(createModel());
 	}
 
-	public static void main(String[] args) {
-		Display display = new Display();
-		Shell shell = new Shell(display);
-		shell.setLayout(new FillLayout());
-		new Snippet043NoColumnTreeViewerKeyboardEditing(shell);
-		shell.open();
-
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-		display.dispose();
-	}
-
-	private class MyContentProvider implements ITreeContentProvider {
-
-		@Override
-		public Object[] getElements(Object inputElement) {
-			return ((MyModel) inputElement).child.toArray();
-		}
-
-		@Override
-		public void dispose() {
-		}
-
-		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		}
-
-		@Override
-		public Object[] getChildren(Object parentElement) {
-			return getElements(parentElement);
-		}
-
-		@Override
-		public Object getParent(Object element) {
-			if (element == null) {
-				return null;
-			}
-			return ((MyModel) element).parent;
-		}
-
-		@Override
-		public boolean hasChildren(Object element) {
-			return ((MyModel) element).child.size() > 0;
-		}
-
-	}
-
 	private MyModel createModel() {
+
 		MyModel root = new MyModel(0, null);
 		root.counter = 0;
 
@@ -183,10 +128,55 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 		return root;
 	}
 
-	public class MyModel {
+	public static void main(String[] args) {
+		Display display = new Display();
+		Shell shell = new Shell(display);
+		shell.setLayout(new FillLayout());
+		new Snippet043NoColumnTreeViewerKeyboardEditing(shell);
+		shell.open();
 
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
+		}
+
+		display.dispose();
+	}
+
+	private class MyContentProvider implements ITreeContentProvider {
+
+		public Object[] getElements(Object inputElement) {
+			return ((MyModel) inputElement).child.toArray();
+		}
+
+		public void dispose() {
+		}
+
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		}
+
+		public Object[] getChildren(Object parentElement) {
+			return getElements(parentElement);
+		}
+
+		public Object getParent(Object element) {
+			if (element == null) {
+				return null;
+			}
+			return ((MyModel) element).parent;
+		}
+
+		public boolean hasChildren(Object element) {
+			return ((MyModel) element).child.size() > 0;
+		}
+
+	}
+
+	public class MyModel {
 		public MyModel parent;
-		public List<MyModel> child = new ArrayList<MyModel>();
+
+		public ArrayList child = new ArrayList();
+
 		public int counter;
 
 		public MyModel(int counter, MyModel parent) {
@@ -194,12 +184,12 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			String rv = "Item ";
 			if (parent != null) {
 				rv = parent.toString() + ".";
 			}
+
 			rv += counter;
 
 			return rv;

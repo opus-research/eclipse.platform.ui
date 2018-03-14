@@ -51,8 +51,7 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
      * it will be created by loading the class. If loading fails,
      * empty filler page will be created instead.
      */
-    @Override
-	public void createPage() {
+    public void createPage() {
         try {
             page = contributor.createPage(element);
         } catch (CoreException e) {
@@ -68,8 +67,7 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
     /** (non-Javadoc)
      * Method declared on IPreferenceNode.
      */
-    @Override
-	public void disposeResources() {
+    public void disposeResources() {
 
         if (page != null) {
             page.dispose();
@@ -84,8 +82,7 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
     /**
      * Returns page icon, if defined.
      */
-    @Override
-	public Image getLabelImage() {
+    public Image getLabelImage() {
         if (icon == null) {
             ImageDescriptor desc = contributor.getPageIcon();
             if (desc != null) {
@@ -98,8 +95,7 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
     /**
      * Returns page label as defined in the registry.
      */
-    @Override
-	public String getLabelText() {
+    public String getLabelText() {
         return contributor.getPageName();
     }
 

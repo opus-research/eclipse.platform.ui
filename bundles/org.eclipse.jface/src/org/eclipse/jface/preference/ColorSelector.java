@@ -81,8 +81,7 @@ public class ColorSelector extends EventManager {
             }
         });
         fButton.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
+            public void widgetDisposed(DisposeEvent event) {
                 if (fImage != null) {
                     fImage.dispose();
                     fImage = null;

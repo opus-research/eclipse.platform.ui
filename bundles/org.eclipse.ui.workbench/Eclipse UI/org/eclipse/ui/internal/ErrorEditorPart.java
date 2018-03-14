@@ -48,7 +48,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 	}
 
@@ -57,7 +56,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 	}
 
@@ -66,7 +64,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		this.parentControl = parent;
 		if (error != null) {
@@ -80,7 +77,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
 	 *      org.eclipse.ui.IEditorInput)
 	 */
-	@Override
 	public void init(IEditorSite site, IEditorInput input) {
 		setSite(site);
 		setInput(input);
@@ -92,7 +88,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		return false;
 	}
@@ -102,7 +97,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
@@ -112,7 +106,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
-	@Override
 	public void setFocus() {
 		parentControl.setFocus();
 	}
@@ -122,7 +115,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.EditorPart#setPartName(java.lang.String)
 	 */
-	@Override
 	public void setPartName(String newName) {
 		super.setPartName(newName);
 	}
@@ -132,7 +124,6 @@ public class ErrorEditorPart extends EditorPart {
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 		parentControl = null;

@@ -16,7 +16,6 @@ import org.w3c.dom.css.CSSValue;
 
 public abstract class AbstractCSSPropertyPaddingHandler implements ICSSPropertyPaddingHandler {
 
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if ("padding".equals(property))
@@ -32,7 +31,6 @@ public abstract class AbstractCSSPropertyPaddingHandler implements ICSSPropertyP
 		return false;
 	}
 
-	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if ("padding".equals(property)) {

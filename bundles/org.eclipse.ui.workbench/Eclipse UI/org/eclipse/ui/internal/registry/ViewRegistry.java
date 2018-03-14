@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267, 441282
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -24,15 +23,15 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.internal.IWorkbenchConstants;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.views.IStickyViewDescriptor;
@@ -46,16 +45,10 @@ public class ViewRegistry implements IViewRegistry {
 	private MApplication application;
 
 	@Inject
-	private EModelService modelService;
-
-	@Inject
 	private IExtensionRegistry extensionRegistry;
 
 	@Inject
 	private IWorkbench workbench;
-
-	@Inject
-	Logger logger;
 
 	private Map<String, IViewDescriptor> descriptors = new HashMap<String, IViewDescriptor>();
 
@@ -81,7 +74,8 @@ public class ViewRegistry implements IViewRegistry {
 						stickyDescriptors.add(new StickyViewDescriptor(element));
 					} catch (CoreException e) {
 						// log an error since its not safe to open a dialog here
-						logger.error("Unable to create sticky view descriptor.", e.getStatus()); //$NON-NLS-1$
+						WorkbenchPlugin.log(
+								"Unable to create sticky view descriptor.", e.getStatus());//$NON-NLS-1$
 					}
 				}
 			}
@@ -115,7 +109,7 @@ public class ViewRegistry implements IViewRegistry {
 			}
 		}
 		if (descriptor == null) { // create a new descriptor
-			descriptor = modelService.createModelElement(MPartDescriptor.class);
+			descriptor = BasicFactoryImpl.eINSTANCE.createPartDescriptor();
 			descriptor.setElementId(id);
 			application.getDescriptors().add(descriptor);
 		}
@@ -169,7 +163,6 @@ public class ViewRegistry implements IViewRegistry {
 		}
 	}
 
-	@Override
 	public IViewDescriptor find(String id) {
 		IViewDescriptor candidate = descriptors.get(id);
 		if (WorkbenchActivityHelper.restrictUseOf(candidate)) {
@@ -178,19 +171,31 @@ public class ViewRegistry implements IViewRegistry {
 		return candidate;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.IViewRegistry#getCategories()
+	 */
 	public IViewCategory[] getCategories() {
 		return categories.values().toArray(new IViewCategory[categories.size()]);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.IViewRegistry#getViews()
+	 */
 	public IViewDescriptor[] getViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(
 				descriptors.values(), new ArrayList<Object>());
 		return allowedViews.toArray(new IViewDescriptor[allowedViews.size()]);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.IViewRegistry#getStickyViews()
+	 */
 	public IStickyViewDescriptor[] getStickyViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(stickyDescriptors,
 				new ArrayList<Object>());
@@ -198,11 +203,8 @@ public class ViewRegistry implements IViewRegistry {
 	}
 
 	/**
-	 * Method does nothing, should not be called anymore
-	 *
-	 * @deprecated
+	 * 
 	 */
-	@Deprecated
 	public void dispose() {
 
 	}
@@ -210,7 +212,7 @@ public class ViewRegistry implements IViewRegistry {
 	/**
 	 * Returns the {@link ViewCategory} for the given id or <code>null</code> if
 	 * one cannot be found or the id is <code>null</code>
-	 *
+	 * 
 	 * @param id
 	 *            the {@link ViewCategory} id
 	 * @return the {@link ViewCategory} with the given id or <code>null</code>
