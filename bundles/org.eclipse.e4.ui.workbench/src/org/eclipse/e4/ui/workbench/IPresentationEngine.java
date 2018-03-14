@@ -8,16 +8,13 @@
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM - ongoing development
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450187
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 
 /**
  * The presentation engine is used to translate the generic workbench model into widgets.
@@ -217,23 +214,6 @@ public interface IPresentationEngine {
 	 * @since 1.3
 	 */
 	public static final String ACTIVE = "active"; //$NON-NLS-1$
-
-	/**
-	 * Tag for {@link MPart} or {@link MPartDescriptor} objects, which are considered as ViewParts.
-	 *
-	 * @since 1.3
-	 *
-	 */
-	public static final String VIEW_TAG = "View"; //$NON-NLS-1$
-
-	/**
-	 * Tag for {@link MPart} or {@link MPartDescriptor} objects, which are considered as
-	 * EditorParts.
-	 *
-	 * @since 1.3
-	 *
-	 */
-	public static final String EDITOR_TAG = "Editor"; //$NON-NLS-1$
 
 	/**
 	 * Creates and returns the UI element for the given model element.

@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450187
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -18,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -94,7 +92,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 				String category = null;
 				boolean isView = false;
 				for (String tag : tags) {
-					if (IPresentationEngine.VIEW_TAG.equals(tag))
+					if (tag.equals("View"))
 						isView = true;
 					else if (tag.startsWith(CATEGORY_TAG)) {
 						category = tag.substring(CATEGORY_TAG_LENGTH);
