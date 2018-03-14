@@ -26,11 +26,11 @@ import org.eclipse.ui.views.markers.MarkerField;
 
 /**
  * MarkersViewSettingDialog is the dialog for showing marker preferences.
- * 
- * 
+ *
+ *
  * @since 3.7
  * @author Hitesh Soliwal
- * 
+ *
  */
 public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
@@ -38,7 +38,7 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param view
 	 *            - the view this is being launched from
 	 */
@@ -50,11 +50,12 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
 	 * .Shell)
 	 */
+	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(JFaceResources
@@ -63,20 +64,22 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.window.Window#getShellStyle()
 	 */
+	@Override
 	protected int getShellStyle() {
 		return super.getShellStyle() | SWT.RESIZE;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
 	 * .Composite)
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control control = super.createDialogArea(parent);
 		return control;
@@ -84,9 +87,10 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
+	@Override
 	protected void okPressed() {
 		extendedView.setVisibleFields(getVisibleFields(), getNewWidths());
 		super.okPressed();
@@ -118,9 +122,10 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.preferences.ViewSettingsDialog#performDefaults()
 	 */
+	@Override
 	protected void performDefaults() {
 		initialize(true);
 		super.performDefaults();
@@ -177,13 +182,15 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.internal.views.markers.ViewerColumnsDialog#getLabelProvider
 	 * ()
 	 */
+	@Override
 	protected ITableLabelProvider getLabelProvider() {
 		return new TableLabelProvider() {
+			@Override
 			public String getText(Object element) {
 				return ((FieldEntry) element).field.getName();
 			}
@@ -192,17 +199,20 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.views.markers.ViewerColumnsDialog#
 	 * getColumnInfoProvider()
 	 */
+	@Override
 	protected IColumnInfoProvider getColumnInfoProvider() {
 
 		return new IColumnInfoProvider() {
+			@Override
 			public int getColumnIndex(Object columnObj) {
 				return getVisible().indexOf(columnObj);
 			}
 
+			@Override
 			public int getColumnWidth(Object columnObj) {
 				FieldEntry field = (FieldEntry) columnObj;
 				if (field.width <= 0) {
@@ -212,14 +222,17 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 				return field.width;
 			}
 
+			@Override
 			public boolean isColumnVisible(Object columnObj) {
 				return ((FieldEntry) columnObj).visible;
 			}
 
+			@Override
 			public boolean isColumnMovable(Object columnObj) {
 				return true;
 			}
 
+			@Override
 			public boolean isColumnResizable(Object columnObj) {
 				return true;
 			}
@@ -228,30 +241,36 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.internal.views.markers.ViewerColumnsDialog#getColumnUpdater
 	 * ()
 	 */
+	@Override
 	protected IColumnUpdater getColumnUpdater() {
 
 		return new IColumnUpdater() {
+			@Override
 			public void setColumnVisible(Object columnObj, boolean visible) {
 				((FieldEntry) columnObj).visible = visible;
 			}
 
+			@Override
 			public void setColumnMovable(Object columnObj, boolean movable) {
 				// not implemented
 			}
 
+			@Override
 			public void setColumnIndex(Object columnObj, int index) {
 				// ignore
 			}
 
+			@Override
 			public void setColumnResizable(Object columnObj, boolean resizable) {
 				// ignore
 			}
 
+			@Override
 			public void setColumnWidth(Object columnObj, int newWidth) {
 				((FieldEntry) columnObj).width = newWidth;
 			}
@@ -269,6 +288,7 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 			visible = false;
 		}
 
+		@Override
 		public int hashCode() {
 			final int prime = 31;
 			int result = 1;
@@ -276,6 +296,7 @@ public class MarkersViewColumnsDialog extends ViewerColumnsDialog {
 			return result;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			if (this == obj)
 				return true;

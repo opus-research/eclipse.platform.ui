@@ -60,7 +60,7 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 /**
  * The TableView is a view that generically implements views with tables.
- * 
+ *
  */
 public abstract class TableView extends ViewPart {
 
@@ -91,13 +91,14 @@ public abstract class TableView extends ViewPart {
 	/*
 	 * (non-Javadoc) Method declared on IViewPart.
 	 */
+	@Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 		this.memento = memento;
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	// void haltTableUpdates() {
 	// content.cancelPendingChanges();
@@ -113,15 +114,16 @@ public abstract class TableView extends ViewPart {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		parent.setLayout(new FillLayout());
 
 		viewer = new TreeViewer(createTree(parent));
 		createColumns(viewer.getTree());
-		
+
 		viewer.setComparator(buildComparator());
 		setSortIndicators();
 
@@ -130,6 +132,7 @@ public abstract class TableView extends ViewPart {
 		viewer.setContentProvider(contentProvider);
 
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				IStructuredSelection selection = (IStructuredSelection) event
 						.getSelection();
@@ -169,17 +172,18 @@ public abstract class TableView extends ViewPart {
 		registerGlobalActions(getViewSite().getActionBars());
 
 		viewer.addOpenListener(new IOpenListener() {
+			@Override
 			public void open(OpenEvent event) {
 				handleOpenEvent(event);
 			}
 		});
-		
+
 	}
 
 
 	/**
 	 * Create the viewer input for the receiver.
-	 * 
+	 *
 	 * @return Object
 	 */
 	abstract Object createViewerInput();
@@ -187,7 +191,7 @@ public abstract class TableView extends ViewPart {
 	/**
 	 * Set the comparator to be the new comparator. This should only
 	 * be called if the viewer has been created.
-	 * 
+	 *
 	 * @param comparator
 	 */
 	void setComparator(TableComparator comparator) {
@@ -197,7 +201,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Update the viewer for comparator updates
-	 * 
+	 *
 	 * @param comparator
 	 */
 	void updateForNewComparator(TableComparator comparator) {
@@ -208,7 +212,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Create the main tree control
-	 * 
+	 *
 	 * @param parent
 	 * @return Tree
 	 */
@@ -221,7 +225,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Get the pixel data for the columns.
-	 * 
+	 *
 	 * @return ColumnPixelData[]
 	 */
 	public ColumnPixelData[] getSavedColumnData() {
@@ -229,7 +233,7 @@ public abstract class TableView extends ViewPart {
 
 		ColumnPixelData[] result = new ColumnPixelData[defaultData.length];
 		for (int i = 0; i < defaultData.length; i++) {
-			
+
 			ColumnPixelData defaultPixelData = defaultData[i];
 			boolean addTrim = defaultPixelData.addTrim;
 			int width = defaultPixelData.width;
@@ -258,7 +262,7 @@ public abstract class TableView extends ViewPart {
 	 * initialized yet. (Note that TableLayout only initializes the column
 	 * widths after the first layout, so it is possible for the widget to exist
 	 * but have all its columns incorrectly set to zero width - see bug 86329)
-	 * 
+	 *
 	 * @return ColumnPixelData
 	 */
 	public ColumnPixelData[] getColumnData() {
@@ -297,7 +301,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Create the columns in the tree.
-	 * 
+	 *
 	 * @param tree
 	 */
 	protected void createColumns(final Tree tree) {
@@ -340,6 +344,7 @@ public abstract class TableView extends ViewPart {
 		MenuManager mgr = new MenuManager();
 		mgr.setRemoveAllWhenShown(true);
 		mgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager mgr) {
 
 				getViewer().cancelEditing();
@@ -353,7 +358,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Init the menu for the receiver.
-	 * 
+	 *
 	 * @param menu
 	 */
 	protected void initMenu(IMenuManager menu) {
@@ -371,7 +376,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Add any extra contributions to the drop down.
-	 * 
+	 *
 	 * @param menu
 	 */
 	void addDropDownContributions(IMenuManager menu) {
@@ -384,9 +389,10 @@ public abstract class TableView extends ViewPart {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
+	@Override
 	public void setFocus() {
 		Viewer viewer = getViewer();
 		if (viewer != null && !viewer.getControl().isDisposed()) {
@@ -397,7 +403,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Build a comparator from the default settings.
-	 * 
+	 *
 	 * @return ViewerComparator
 	 */
 	protected ViewerComparator buildComparator() {
@@ -407,7 +413,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Create a TableComparator for the receiver.
-	 * 
+	 *
 	 * @return TableComparator
 	 */
 	TableComparator createTableComparator() {
@@ -427,7 +433,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return the viewer.
-	 * 
+	 *
 	 * @return TreeViewer
 	 */
 	protected TreeViewer getViewer() {
@@ -436,7 +442,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return the tree for the receiver.
-	 * 
+	 *
 	 * @return Tree
 	 */
 	protected Tree getTree() {
@@ -448,6 +454,7 @@ public abstract class TableView extends ViewPart {
 			/**
 			 * Handles the case of user selecting the header area.
 			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				final TreeColumn column = (TreeColumn) e.widget;
@@ -460,9 +467,10 @@ public abstract class TableView extends ViewPart {
 								.getDisplay(), new Runnable() {
 							/*
 							 * (non-Javadoc)
-							 * 
+							 *
 							 * @see java.lang.Runnable#run()
 							 */
+							@Override
 							public void run() {
 								resortTable(column, field,
 										new NullProgressMonitor());
@@ -474,9 +482,10 @@ public abstract class TableView extends ViewPart {
 								new IRunnableWithProgress() {
 									/*
 									 * (non-Javadoc)
-									 * 
+									 *
 									 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 									 */
+									@Override
 									public void run(IProgressMonitor monitor) {
 										resortTable(column, field, monitor);
 									}
@@ -492,7 +501,7 @@ public abstract class TableView extends ViewPart {
 
 			/**
 			 * Resort the table based on field.
-			 * 
+			 *
 			 * @param column
 			 *            the column being updated
 			 * @param field
@@ -514,9 +523,10 @@ public abstract class TableView extends ViewPart {
 						new Runnable() {
 							/*
 							 * (non-Javadoc)
-							 * 
+							 *
 							 * @see java.lang.Runnable#run()
 							 */
+							@Override
 							public void run() {
 								viewer.refresh();
 								updateDirectionIndicator(column);
@@ -530,7 +540,7 @@ public abstract class TableView extends ViewPart {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.TableView#getDefaultColumnLayouts()
 	 */
 	protected ColumnPixelData[] getDefaultColumnLayouts() {
@@ -548,7 +558,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return the width of the field to display.
-	 * 
+	 *
 	 * @param field
 	 * @return int
 	 */
@@ -561,7 +571,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return a sort dialog for the receiver.
-	 * 
+	 *
 	 * @return TableSortDialog
 	 */
 	protected TableSortDialog getSortDialog() {
@@ -571,7 +581,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return the table sorter portion of the sorter.
-	 * 
+	 *
 	 * @return TableSorter
 	 */
 	TableComparator getTableSorter() {
@@ -583,9 +593,10 @@ public abstract class TableView extends ViewPart {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.part.ViewPart#saveState(org.eclipse.ui.IMemento)
 	 */
+	@Override
 	public void saveState(IMemento memento) {
 		super.saveState(memento);
 
@@ -653,7 +664,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Get the IWorkbenchSiteProgressService for the receiver.
-	 * 
+	 *
 	 * @return IWorkbenchSiteProgressService or <code>null</code>.
 	 */
 	protected IWorkbenchSiteProgressService getProgressService() {
@@ -668,7 +679,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Set the filters action.
-	 * 
+	 *
 	 * @param action
 	 */
 	void setFilterAction(FiltersAction action) {
@@ -678,7 +689,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return the filter action for the receiver.
-	 * 
+	 *
 	 * @return IAction
 	 */
 	IAction getFilterAction() {
@@ -687,7 +698,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return the preferences action.
-	 * 
+	 *
 	 * @return IAction
 	 */
 	IAction getPreferencesAction() {
@@ -696,7 +707,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Set the preferences action.
-	 * 
+	 *
 	 * @param preferencesAction
 	 */
 	void setPreferencesAction(ViewPreferencesAction preferencesAction) {
@@ -705,7 +716,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Get the content provider
-	 * 
+	 *
 	 * @return MarkerTreeContentProvider
 	 */
 	MarkerTreeContentProvider getContentProvider() {
@@ -714,7 +725,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Return the input to the viewer.
-	 * 
+	 *
 	 * @return Object
 	 */
 	public Object getViewerInput() {
@@ -723,7 +734,7 @@ public abstract class TableView extends ViewPart {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.TableView#setSortIndicators()
 	 */
 	void setSortIndicators() {
@@ -740,7 +751,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Update the direction indicator as column is now the primary column.
-	 * 
+	 *
 	 * @param column
 	 */
 	void updateDirectionIndicator(TreeColumn column) {
@@ -753,7 +764,7 @@ public abstract class TableView extends ViewPart {
 
 	/**
 	 * Set the selection of the receiver.
-	 * 
+	 *
 	 * @param selection
 	 */
 	protected void setSelection(IStructuredSelection selection) {

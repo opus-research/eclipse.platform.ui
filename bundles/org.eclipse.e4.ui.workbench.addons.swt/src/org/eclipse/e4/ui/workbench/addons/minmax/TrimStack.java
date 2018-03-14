@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars.Vogel@vogella.com - Bug 454712
+ *     dirk.fauth@googlemail.com - Bug 446095
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
@@ -799,7 +801,14 @@ public class TrimStack {
 			int index = toolControlId.indexOf('(');
 			String stackId = toolControlId.substring(0, index);
 			String perspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
-			MPerspective persp = (MPerspective) modelService.find(perspId, ps.get(0));
+
+			MPerspective persp = null;
+			List<MPerspective> perspectives = modelService.findElements(ps.get(0), perspId,
+					MPerspective.class, null);
+			if (perspectives != null && !perspectives.isEmpty()) {
+				persp = perspectives.get(0);
+			}
+
 			if (persp != null) {
 				result = modelService.find(stackId, persp);
 			} else {
@@ -880,31 +889,37 @@ public class TrimStack {
 			MGenericStack<?> theStack = (MGenericStack<?>) minimizedElement;
 
 			// check to see if this stack has any valid elements
-			boolean check = false;
+			boolean hasRenderedElements = false;
 			for (MUIElement stackElement : theStack.getChildren()) {
 				if (stackElement.isToBeRendered()) {
-					check = true;
+					hasRenderedElements = true;
 					break;
 				}
 			}
 
-			if (!check) {
+			if (hasRenderedElements) {
+				for (MUIElement stackElement : theStack.getChildren()) {
+					if (!stackElement.isToBeRendered()) {
+						continue;
+					}
+
+					MUILabel labelElement = getLabelElement(stackElement);
+					ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
+					newItem.setData(labelElement);
+					newItem.setImage(getImage(labelElement));
+					newItem.setToolTipText(getLabelText(labelElement));
+					newItem.addSelectionListener(toolItemSelectionListener);
+				}
+			} else if (theStack.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {
+				// OK to be empty and still minimized
+				ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
+				ti.setToolTipText(Messages.TrimStack_EmptyStackTooltip);
+				ti.setImage(getLayoutImage());
+				ti.addSelectionListener(toolItemSelectionListener);
+			} else {
 				// doesn't have any children that's showing, place it back in the presentation
 				restoreStack();
 				return;
-			}
-
-			for (MUIElement stackElement : theStack.getChildren()) {
-				if (!stackElement.isToBeRendered()) {
-					continue;
-				}
-
-				MUILabel labelElement = getLabelElement(stackElement);
-				ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
-				newItem.setData(labelElement);
-				newItem.setImage(getImage(labelElement));
-				newItem.setToolTipText(getLabelText(labelElement));
-				newItem.addSelectionListener(toolItemSelectionListener);
 			}
 		}
 
@@ -917,6 +932,20 @@ public class TrimStack {
 
 		minimizedElement.setVisible(true);
 		minimizedElement.getTags().remove(IPresentationEngine.MINIMIZED);
+
+		// Activate the part that is being brought up...
+		if (minimizedElement instanceof MPartStack) {
+			MPartStack theStack = (MPartStack) minimizedElement;
+			MStackElement curSel = theStack.getSelectedElement();
+			Control ctrl = (Control) minimizedElement.getWidget();
+
+			// Hack for elems that are lazy initialized
+			if (ctrl instanceof CTabFolder && ((CTabFolder) ctrl).getSelection() == null) {
+				theStack.setSelectedElement(null);
+				theStack.setSelectedElement(curSel);
+			}
+		}
+
 		toolControl.setToBeRendered(false);
 
 		if (hostPane != null && !hostPane.isDisposed())
@@ -932,6 +961,7 @@ public class TrimStack {
 	 */
 	public void showStack(boolean show) {
 		Control ctrl = (Control) minimizedElement.getWidget();
+		CTabFolder ctf = ctrl instanceof CTabFolder? (CTabFolder) ctrl: null;
 
 		Composite clientAreaComposite = getCAComposite();
 		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
@@ -945,8 +975,7 @@ public class TrimStack {
 
 				// Hack ! Force a resize of the CTF to make sure the hosted
 				// view is the correct size...see bug 434062 for details
-				if (ctrl instanceof CTabFolder) {
-					CTabFolder ctf = (CTabFolder) ctrl;
+				if (ctf != null) {
 					Rectangle bb = ctf.getBounds();
 					bb.width--;
 					ctf.setBounds(bb);
@@ -982,6 +1011,13 @@ public class TrimStack {
 			if (minimizedElement instanceof MPartStack) {
 				MPartStack theStack = (MPartStack) minimizedElement;
 				MStackElement curSel = theStack.getSelectedElement();
+
+				// Hack for elems that are lazy initialized
+				if (ctf != null && ctf.getSelection() == null) {
+					theStack.setSelectedElement(null);
+					theStack.setSelectedElement(curSel);
+				}
+
 				if (curSel instanceof MPart) {
 					partService.activate((MPart) curSel);
 				} else if (curSel instanceof MPlaceholder) {
@@ -1008,7 +1044,7 @@ public class TrimStack {
 						}
 					} else if (selectedElement instanceof MElementContainer<?>) {
 						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
-						selectedElement = (MElementContainer<?>) container.getSelectedElement();
+						selectedElement = container.getSelectedElement();
 					}
 				}
 

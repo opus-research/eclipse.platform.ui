@@ -26,7 +26,7 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
 
     /**
      * Creates a workbench status for the given status.
-     * 
+     *
      * @param status the status
      */
     public WorkbenchStatus(IStatus status) {
@@ -38,7 +38,8 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
      * associated with this object. Returns <code>null</code> if
      * no such object can be found.
      */
-    public Object getAdapter(Class adapter) {
+    @Override
+	public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
 			return this;
 		}
@@ -48,7 +49,8 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
     /**
      * Returns the children of this element.
      */
-    public Object[] getChildren(Object o) {
+    @Override
+	public Object[] getChildren(Object o) {
         if (children == null) {
             IStatus[] childStatii = status.getChildren();
             children = new Object[childStatii.length];
@@ -62,13 +64,14 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
     /**
      * @see IWorkbenchAdapter#getLabel
      */
-    public String getLabel(Object o) {
+    @Override
+	public String getLabel(Object o) {
         return status.getMessage();
     }
 
     /**
      * Returns the wrapped status object.
-     * 
+     *
      * @return the wrapped status object
      */
     public IStatus getStatus() {

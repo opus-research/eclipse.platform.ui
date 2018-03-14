@@ -33,7 +33,7 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 /**
  * This action displays a list of resolutions for the selected marker
- * 
+ *
  * @since 2.0
  */
 public class ActionResolveMarker extends MarkerSelectionProviderAction {
@@ -42,7 +42,7 @@ public class ActionResolveMarker extends MarkerSelectionProviderAction {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param markerView
 	 * @param provider
 	 */
@@ -60,6 +60,7 @@ public class ActionResolveMarker extends MarkerSelectionProviderAction {
 	/**
 	 * Displays a list of resolutions and performs the selection.
 	 */
+	@Override
 	public void run() {
 
 		IRunnableContext context = new ProgressMonitorDialog(view.getSite()
@@ -67,6 +68,7 @@ public class ActionResolveMarker extends MarkerSelectionProviderAction {
 		final Object[] resolutions = new Object[1];
 
 		IRunnableWithProgress resolutionsRunnable = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				monitor.beginTask(NLS.bind(
 						MarkerMessages.resolveMarkerAction_computationAction,
@@ -117,7 +119,7 @@ public class ActionResolveMarker extends MarkerSelectionProviderAction {
 
 	/**
 	 * Handle the exception.
-	 * 
+	 *
 	 * @param exception
 	 */
 	private void handleException(Exception exception) {
@@ -130,7 +132,7 @@ public class ActionResolveMarker extends MarkerSelectionProviderAction {
 
 	/**
 	 * Return the description of the marker.
-	 * 
+	 *
 	 * @return String
 	 */
 	private String getMarkerDescription() {
@@ -139,9 +141,10 @@ public class ActionResolveMarker extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
+	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 
 		if (Util.isSingleConcreteSelection(selection)) {

@@ -36,6 +36,7 @@ public class FieldDone extends AbstractField {
 	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getDescription()
 	 */
+	@Override
 	public String getDescription() {
 		return description;
 	}
@@ -45,10 +46,11 @@ public class FieldDone extends AbstractField {
 	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getDescriptionImage()
 	 */
+	@Override
 	public Image getDescriptionImage() {
 		return getImage(DESCRIPTION_IMAGE_PATH);
 	}
-	
+
 	/**
 	 * Get the image at path.
 	 * @param path
@@ -58,41 +60,45 @@ public class FieldDone extends AbstractField {
 		return JFaceResources.getResources().createImageWithDefault(
 				IDEWorkbenchPlugin
 						.getIDEImageDescriptor(path));
-		
+
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getColumnHeaderText()
 	 */
+	@Override
 	public String getColumnHeaderText() {
 		return ""; //$NON-NLS-1$
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getColumnHeaderImage()
 	 */
+	@Override
 	public Image getColumnHeaderImage() {
 		return getImage(DESCRIPTION_IMAGE_PATH);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getValue(java.lang.Object)
 	 */
+	@Override
 	public String getValue(Object obj) {
 		return ""; //$NON-NLS-1$
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getImage(java.lang.Object)
 	 */
+	@Override
 	public Image getImage(Object obj) {
 		if (obj == null || !(obj instanceof TaskMarker)) {
 			return null;
@@ -110,10 +116,11 @@ public class FieldDone extends AbstractField {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#compare(java.lang.Object,
 	 *      java.lang.Object)
 	 */
+	@Override
 	public int compare(Object obj1, Object obj2) {
 		if (obj1 == null || obj2 == null || !(obj1 instanceof TaskMarker)
 				|| !(obj2 instanceof TaskMarker)) {
@@ -125,17 +132,19 @@ public class FieldDone extends AbstractField {
 		int value2 = marker2.getDone();
 		return value1 - value2;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.IField#getDefaultDirection()
 	 */
+	@Override
 	public int getDefaultDirection() {
 		return TableComparator.ASCENDING;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.IField#getPreferredWidth()
 	 */
+	@Override
 	public int getPreferredWidth() {
 		return 40;
 	}

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sebastian Davids <sdavids@gmx.de>: 
+ *     Sebastian Davids <sdavids@gmx.de>:
  *         Fix for Bug 77336 [Markers] [Dialogs] TableSortDialog does not use dialog font
  *******************************************************************************/
 
@@ -55,7 +55,8 @@ public class TableSortDialog extends TrayDialog {
     private boolean dirty;
 
     private final Comparator columnComparator = new Comparator() {
-        public int compare(Object arg0, Object arg1) {
+        @Override
+		public int compare(Object arg0, Object arg1) {
             int index0 = -1;
             int index1 = -1;
             for (int i = 0; i < propertyText.length; i++) {
@@ -84,7 +85,8 @@ public class TableSortDialog extends TrayDialog {
     /* (non-Javadoc)
      * Method declared on Window.
      */
-    protected void configureShell(Shell newShell) {
+    @Override
+	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText(MarkerMessages.sortDialog_title);
     }
@@ -92,18 +94,19 @@ public class TableSortDialog extends TrayDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
         if (sorter == null) {
 			return composite;
 		}
 
         initializeDialogUnits(composite);
-        
+
         createPrioritiesArea(composite);
         createRestoreDefaultsButton(composite);
         createSeparatorLine(composite);
-        
+
         Dialog.applyDialogFont(composite);
 
         return composite;
@@ -116,7 +119,7 @@ public class TableSortDialog extends TrayDialog {
     private void createPrioritiesArea(Composite parent) {
         Composite prioritiesArea = new Composite(parent, SWT.NULL);
         prioritiesArea.setLayout(new GridLayout(3, false));
-        
+
         int[] priorities = sorter.getPriorities();
 
         ascendingButtons = new Button[priorities.length];
@@ -126,7 +129,7 @@ public class TableSortDialog extends TrayDialog {
         initPriotityText();
 
         Label sortByLabel = new Label(prioritiesArea, SWT.NULL);
-        sortByLabel.setText(MarkerMessages.sortDialog_label); 
+        sortByLabel.setText(MarkerMessages.sortDialog_label);
         GridData data = new GridData();
         data.horizontalSpan = 3;
         sortByLabel.setLayoutData(data);
@@ -136,7 +139,7 @@ public class TableSortDialog extends TrayDialog {
             Label numberLabel = new Label(prioritiesArea, SWT.NULL);
             numberLabel
                     .setText(NLS
-                            .bind(MarkerMessages.sortDialog_columnLabel,new Integer(i + 1))); 
+                            .bind(MarkerMessages.sortDialog_columnLabel,new Integer(i + 1)));
 
             priorityCombos[i] = new Combo(prioritiesArea, SWT.READ_ONLY);
             priorityCombos[i].setLayoutData(new GridData(
@@ -144,25 +147,28 @@ public class TableSortDialog extends TrayDialog {
 
             Composite directionGroup = new Composite(prioritiesArea, SWT.NONE);
             directionGroup.setLayout(new GridLayout(2, false));
-            
+
             ascendingButtons[i] = new Button(directionGroup, SWT.RADIO);
             ascendingButtons[i].setText(getAscendingText(i));
             ascendingButtons[i].addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     markDirty();
                 }
             });
             descendingButtons[i] = new Button(directionGroup, SWT.RADIO);
             descendingButtons[i].setText(getDescendingText(i));
             descendingButtons[i].addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     markDirty();
                 }
             });
 
             if (i < priorityCombos.length - 1) {
                 priorityCombos[i].addSelectionListener(new SelectionAdapter() {
-                    public void widgetSelected(SelectionEvent e) {
+                    @Override
+					public void widgetSelected(SelectionEvent e) {
                         int oldSelectionDirection = TableComparator.ASCENDING;
                         if (descendingButtons[index].getSelection()) {
 							oldSelectionDirection = TableComparator.DESCENDING;
@@ -234,7 +240,8 @@ public class TableSortDialog extends TrayDialog {
                 });
             } else {
                 priorityCombos[i].addSelectionListener(new SelectionAdapter() {
-                    public void widgetSelected(SelectionEvent e) {
+                    @Override
+					public void widgetSelected(SelectionEvent e) {
                         markDirty();
                     }
                 });
@@ -260,7 +267,7 @@ public class TableSortDialog extends TrayDialog {
 		default:
 			return MarkerMessages.sortDirectionDescending_text;
 	}
-	
+
 }
 
     /**
@@ -280,7 +287,7 @@ public class TableSortDialog extends TrayDialog {
 			default:
 				return MarkerMessages.sortDirectionAscending_text;
 		}
-		
+
 	}
 
     /**
@@ -293,7 +300,8 @@ public class TableSortDialog extends TrayDialog {
         setButtonSize(defaultsButton, new GridData(
                 GridData.HORIZONTAL_ALIGN_END | GridData.FILL_HORIZONTAL));
         defaultsButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 restoreDefaults();
                 markDirty();
             }
@@ -336,7 +344,8 @@ public class TableSortDialog extends TrayDialog {
         }
     }
 
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         if (isDirty()) {
             for (int i = priorityCombos.length - 1; i >= 0; i--) {
                 String column = priorityCombos[i].getItem(priorityCombos[i]
@@ -377,7 +386,7 @@ public class TableSortDialog extends TrayDialog {
     }
 
     /**
-     * Set the layout data of the button to a GridData with 
+     * Set the layout data of the button to a GridData with
      * appropriate heights and widths.
      * @param button
      */

@@ -17,7 +17,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * ActionTaskProperties is the action for setting a tasks properties.
- * 
+ *
  */
 public class ActionTaskProperties extends MarkerSelectionProviderAction {
 
@@ -25,7 +25,7 @@ public class ActionTaskProperties extends MarkerSelectionProviderAction {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param part
 	 * @param provider
 	 */
@@ -37,9 +37,10 @@ public class ActionTaskProperties extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
+	@Override
 	public void run() {
 
 		DialogMarkerProperties dialog = new DialogTaskProperties(part.getSite()
@@ -50,9 +51,10 @@ public class ActionTaskProperties extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
+	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(Util.isSingleConcreteSelection(selection));
 	}

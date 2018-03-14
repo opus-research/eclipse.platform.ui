@@ -76,14 +76,15 @@ public class OpenWithMenu extends ContributionItem {
      * Match both the input and id, so that different types of editor can be opened on the same input.
      */
     private static final int MATCH_BOTH = IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID;
-    
+
     /*
      * Compares the labels from two IEditorDescriptor objects
      */
     private static final Comparator comparer = new Comparator() {
         private Collator collator = Collator.getInstance();
 
-        public int compare(Object arg0, Object arg1) {
+        @Override
+		public int compare(Object arg0, Object arg1) {
             String s1 = ((IEditorDescriptor) arg0).getLabel();
             String s2 = ((IEditorDescriptor) arg1).getLabel();
             return collator.compare(s1, s2);
@@ -98,7 +99,8 @@ public class OpenWithMenu extends ContributionItem {
      * @deprecated As there is no way to set the file with this constructor use a
      * different constructor.
      */
-    public OpenWithMenu(IWorkbenchPage page) {
+    @Deprecated
+	public OpenWithMenu(IWorkbenchPage page) {
         this(page, null);
     }
 
@@ -173,7 +175,8 @@ public class OpenWithMenu extends ContributionItem {
             menuItem.setImage(image);
         }
         Listener listener = new Listener() {
-            public void handleEvent(Event event) {
+            @Override
+			public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Selection:
                     if (menuItem.getSelection()) {
@@ -200,7 +203,8 @@ public class OpenWithMenu extends ContributionItem {
         final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
         menuItem.setText(IDEWorkbenchMessages.OpenWithMenu_Other);
         Listener listener = new Listener() {
-            public void handleEvent(Event event) {
+            @Override
+			public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Selection:
                    	EditorSelectionDialog dialog = new EditorSelectionDialog(
@@ -226,7 +230,8 @@ public class OpenWithMenu extends ContributionItem {
     /* (non-Javadoc)
      * Fills the menu with perspective items.
      */
-    public void fill(Menu menu, int index) {
+    @Override
+	public void fill(Menu menu, int index) {
 		final IFile file= getFileResource();
         if (file == null) {
             return;
@@ -285,11 +290,11 @@ public class OpenWithMenu extends ContributionItem {
             createMenuItem(menu, descriptor, preferredEditor);
         }
 		createDefaultMenuItem(menu, file, preferredEditor == null);
-        
+
         // add Other... menu item
         createOtherMenuItem(menu);
     }
-	
+
 
     /**
      * Converts the IAdaptable file to IFile or null.
@@ -303,14 +308,15 @@ public class OpenWithMenu extends ContributionItem {
         if (resource instanceof IFile) {
             return (IFile) resource;
         }
-       
+
         return null;
     }
 
     /* (non-Javadoc)
      * Returns whether this menu is dynamic.
      */
-    public boolean isDynamic() {
+    @Override
+	public boolean isDynamic() {
         return true;
     }
 
@@ -334,7 +340,7 @@ public class OpenWithMenu extends ContributionItem {
         	} else {
 	            String editorId = editorDescriptor == null ? IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID
 	                    : editorDescriptor.getId();
-	            
+
 	            page.openEditor(new FileEditorInput(file), editorId, true, MATCH_BOTH);
 	            // only remember the default editor if the open succeeds
 	            IDE.setDefaultEditor(file, editorId);
@@ -348,7 +354,7 @@ public class OpenWithMenu extends ContributionItem {
 
     /**
 	 * Creates the menu item for clearing the current selection.
-	 * 
+	 *
 	 * @param menu the menu to add the item to
 	 * @param file the file being edited
 	 * @param markAsSelected <code>true</code> if the item should marked as selected
@@ -359,7 +365,8 @@ public class OpenWithMenu extends ContributionItem {
         menuItem.setText(IDEWorkbenchMessages.DefaultEditorDescription_name);
 
         Listener listener = new Listener() {
-            public void handleEvent(Event event) {
+            @Override
+			public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Selection:
                     if (menuItem.getSelection()) {

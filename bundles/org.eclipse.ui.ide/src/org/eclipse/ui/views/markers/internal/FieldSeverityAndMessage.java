@@ -19,7 +19,7 @@ import org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages;
 /**
  * The FieldSeverityAndMessage is the field that
  * displays severities and messages.
- * 
+ *
  */
 public class FieldSeverityAndMessage extends FieldMessage {
 
@@ -34,18 +34,20 @@ public class FieldSeverityAndMessage extends FieldMessage {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getDescription()
 	 */
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getImage(java.lang.Object)
 	 */
+	@Override
 	public Image getImage(Object obj) {
 		if (obj == null || !(obj instanceof MarkerNode)) {
 			return null;
@@ -72,16 +74,17 @@ public class FieldSeverityAndMessage extends FieldMessage {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#compare(java.lang.Object,
 	 *      java.lang.Object)
 	 */
+	@Override
 	public int compare(Object obj1, Object obj2) {
 		if (obj1 == null || obj2 == null || !(obj1 instanceof ProblemMarker)
 				|| !(obj2 instanceof ProblemMarker)) {
 			return 0;
 		}
-		
+
 		ProblemMarker marker1 = (ProblemMarker) obj1;
 		ProblemMarker marker2 = (ProblemMarker) obj2;
 
@@ -92,12 +95,13 @@ public class FieldSeverityAndMessage extends FieldMessage {
 					marker2.getDescriptionKey());
 		return severity2 - severity1;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.IField#getColumnHeaderImage()
 	 */
+	@Override
 	public Image getColumnHeaderImage() {
 		return getImage(FieldDone.DESCRIPTION_IMAGE_PATH);
 	}

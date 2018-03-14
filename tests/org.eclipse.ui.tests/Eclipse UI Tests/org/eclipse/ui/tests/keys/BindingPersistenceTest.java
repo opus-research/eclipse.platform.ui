@@ -142,8 +142,7 @@ public final class BindingPersistenceTest extends UITestCase {
 		int numAboutBindings = 0;
 
 		Binding[] bindings = bindingService.getBindings();
-		for (int i = 0; i < bindings.length; i++) {
-			final Binding binding = bindings[i];
+		for (final Binding binding : bindings) {
 			if (binding.getType() == Binding.SYSTEM) {
 				String platform = binding.getPlatform();
 				int idx = (platform == null ? -1 : platform.indexOf(','));
@@ -185,8 +184,7 @@ public final class BindingPersistenceTest extends UITestCase {
 		boolean foundDeleteMarker = false;
 		int numOfMarkers = 0;
 		Binding[] bindings = bindingService.getBindings();
-		for (int i = 0; i < bindings.length; i++) {
-			final Binding binding = bindings[i];
+		for (final Binding binding : bindings) {
 			if (binding.getType() == Binding.SYSTEM) {
 				String platform = binding.getPlatform();
 				int idx = (platform == null ? -1 : platform.indexOf(','));
@@ -217,7 +215,7 @@ public final class BindingPersistenceTest extends UITestCase {
 		assertTrue("Unable to find delete marker", foundDeleteMarker);
 
 		// make sure that the proper contexts are currently active
-		IContextService contextService = (IContextService) fWorkbench
+		IContextService contextService = fWorkbench
 				.getService(IContextService.class);
 		contextService
 				.activateContext(IContextService.CONTEXT_ID_DIALOG_AND_WINDOW);
@@ -237,10 +235,10 @@ public final class BindingPersistenceTest extends UITestCase {
 				commandService.getCommand("org.eclipse.ui.file.import"), null);
 		Binding[] bindings = bindingService.getBindings();
 		int numOfMarkers = 0;
-		for (int i = 0; i < bindings.length; i++) {
-			final Binding binding = bindings[i];
-			if (binding.getType() != Binding.SYSTEM)
+		for (final Binding binding : bindings) {
+			if (binding.getType() != Binding.SYSTEM) {
 				continue;
+			}
 
 			if (importCmd.equals(binding.getParameterizedCommand())) {
 				// make sure the modifier is applied
@@ -263,10 +261,10 @@ public final class BindingPersistenceTest extends UITestCase {
 		ParameterizedCommand exportCmd = new ParameterizedCommand(
 				commandService.getCommand("org.eclipse.ui.file.export"), null);
 		Binding[] bindings = bindingService.getBindings();
-		for (int i = 0; i < bindings.length; i++) {
-			final Binding binding = bindings[i];
-			if (binding.getType() != Binding.SYSTEM)
+		for (final Binding binding : bindings) {
+			if (binding.getType() != Binding.SYSTEM) {
 				continue;
+			}
 
 			if (exportCmd.equals(binding.getParameterizedCommand())) {
 				// make sure the modifier is NOT applied
@@ -286,10 +284,10 @@ public final class BindingPersistenceTest extends UITestCase {
 		ParameterizedCommand backCmd = new ParameterizedCommand(
 				commandService.getCommand("org.eclipse.ui.navigate.back"), null);
 		Binding[] bindings = bindingService.getBindings();
-		for (int i = 0; i < bindings.length; i++) {
-			final Binding binding = bindings[i];
-			if (binding.getType() != Binding.SYSTEM)
+		for (final Binding binding : bindings) {
+			if (binding.getType() != Binding.SYSTEM) {
 				continue;
+			}
 
 			if (backCmd.equals(binding.getParameterizedCommand())) {
 				// make sure the modifier is NOT applied
@@ -331,7 +329,7 @@ public final class BindingPersistenceTest extends UITestCase {
 		assertNotNull(editorBinding);
 		assertEquals(activateEditorCmd, editorBinding.getParameterizedCommand());
 
-		EBindingService ebs = (EBindingService) fWorkbench
+		EBindingService ebs = fWorkbench
 				.getService(EBindingService.class);
 		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(EBindingService.TYPE_ATTR_TAG, "user");
@@ -406,7 +404,7 @@ public final class BindingPersistenceTest extends UITestCase {
 		assertNotNull(editorBinding);
 		assertEquals(activateEditorCmd, editorBinding.getParameterizedCommand());
 
-		EBindingService ebs = (EBindingService) fWorkbench
+		EBindingService ebs = fWorkbench
 				.getService(EBindingService.class);
 		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(EBindingService.TYPE_ATTR_TAG, "user");
@@ -462,7 +460,7 @@ public final class BindingPersistenceTest extends UITestCase {
 				findAndReplaceBinding.getParameterizedCommand());
 		assertEquals(EMACS_SCHEME_ID, findAndReplaceBinding.getSchemeId());
 
-		EBindingService ebs = (EBindingService) fWorkbench
+		EBindingService ebs = fWorkbench
 				.getService(EBindingService.class);
 		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(EBindingService.TYPE_ATTR_TAG, "user");
@@ -595,11 +593,6 @@ public final class BindingPersistenceTest extends UITestCase {
 		assertEquals(EMACS_SCHEME_ID, pasteBinding.getSchemeId());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		final IPreferenceStore store = WorkbenchPlugin.getDefault()

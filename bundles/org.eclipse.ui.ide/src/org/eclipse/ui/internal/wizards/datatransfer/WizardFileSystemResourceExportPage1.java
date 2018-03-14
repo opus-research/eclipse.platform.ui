@@ -72,7 +72,7 @@ public class WizardFileSystemResourceExportPage1 extends
     private static final String SELECT_DESTINATION_MESSAGE = DataTransferMessages.FileExport_selectDestinationMessage;
 
     private static final String SELECT_DESTINATION_TITLE = DataTransferMessages.FileExport_selectDestinationTitle;
- 
+
 
     /**
      *	Create an instance of this class
@@ -105,7 +105,8 @@ public class WizardFileSystemResourceExportPage1 extends
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
         super.createControl(parent);
         giveFocusToDestination();
         PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
@@ -117,7 +118,8 @@ public class WizardFileSystemResourceExportPage1 extends
      *
      *	@param parent org.eclipse.swt.widgets.Composite
      */
-    protected void createDestinationGroup(Composite parent) {
+    @Override
+	protected void createDestinationGroup(Composite parent) {
 
         Font font = parent.getFont();
         // destination specification group
@@ -160,7 +162,8 @@ public class WizardFileSystemResourceExportPage1 extends
      * Create the buttons in the options group.
      */
 
-    protected void createOptionsGroupButtons(Group optionsGroup) {
+    @Override
+	protected void createOptionsGroupButtons(Group optionsGroup) {
 
         Font font = optionsGroup.getFont();
         createOverwriteExisting(optionsGroup, font);
@@ -345,7 +348,8 @@ public class WizardFileSystemResourceExportPage1 extends
      * Handle all events and enablements for widgets in this page
      * @param e Event
      */
-    public void handleEvent(Event e) {
+    @Override
+	public void handleEvent(Event e) {
         Widget source = e.widget;
 
         if (source == destinationBrowseButton) {
@@ -359,7 +363,8 @@ public class WizardFileSystemResourceExportPage1 extends
      *	Hook method for saving widget values for restoration by the next instance
      *	of this class.
      */
-    protected void internalSaveWidgetValues() {
+    @Override
+	protected void internalSaveWidgetValues() {
         // update directory names history
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
@@ -386,7 +391,8 @@ public class WizardFileSystemResourceExportPage1 extends
      *	Hook method for restoring widget values to the values that they held
      *	last time this wizard was used to completion.
      */
-    protected void restoreWidgetValues() {
+    @Override
+	protected void restoreWidgetValues() {
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
             String[] directoryNames = settings
@@ -425,7 +431,8 @@ public class WizardFileSystemResourceExportPage1 extends
      *	Answer a boolean indicating whether the receivers destination specification
      *	widgets currently all contain valid values.
      */
-    protected boolean validateDestinationGroup() {
+    @Override
+	protected boolean validateDestinationGroup() {
         String destinationValue = getDestinationValue();
         if (destinationValue.length() == 0) {
             setMessage(destinationEmptyMessage());
@@ -442,7 +449,7 @@ public class WizardFileSystemResourceExportPage1 extends
 				setMessage(
 					NLS.bind(DataTransferMessages.FileExport_damageWarning, threatenedContainer),
 					WARNING);
-			
+
 		} else {
             setErrorMessage(NLS.bind(DataTransferMessages.FileExport_conflictingContainer, conflictingContainer));
             giveFocusToDestination();
@@ -456,7 +463,8 @@ public class WizardFileSystemResourceExportPage1 extends
      * (non-Javadoc)
      * @see org.eclipse.ui.dialogs.WizardDataTransferPage#validateSourceGroup()
      */
-    protected boolean validateSourceGroup() {
+    @Override
+	protected boolean validateSourceGroup() {
     	// there must be some resources selected for Export
     	boolean isValid = true;
         List resourcesToExport = getWhiteCheckedResources();
@@ -479,7 +487,7 @@ public class WizardFileSystemResourceExportPage1 extends
     /**
      * Returns the name of a container with a location that encompasses targetDirectory.
      * Returns null if there is no conflict.
-     * 
+     *
      * @param targetDirectory the path of the directory to check.
      * @return the conflicting container name or <code>null</code>
      */
@@ -490,7 +498,7 @@ public class WizardFileSystemResourceExportPage1 extends
         // cannot export into workspace root
         if(testPath.equals(rootPath))
         	return rootPath.lastSegment();
-        
+
         //Are they the same?
         if(testPath.matchingFirstSegments(rootPath) == rootPath.segmentCount()){
         	String firstSegment = testPath.removeFirstSegments(rootPath.segmentCount()).segment(0);
@@ -501,11 +509,11 @@ public class WizardFileSystemResourceExportPage1 extends
         return null;
 
     }
-    
+
     /**
 	 * Returns the name of a {@link IProject} with a location that includes
 	 * targetDirectory. Returns null if there is no such {@link IProject}.
-	 * 
+	 *
 	 * @param targetDirectory
 	 *            the path of the directory to check.
 	 * @return the overlapping project name or <code>null</code>
@@ -519,6 +527,6 @@ public class WizardFileSystemResourceExportPage1 extends
     	}
     	return null;
     }
-    
+
 
 }

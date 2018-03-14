@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,11 +27,7 @@ import org.eclipse.ui.internal.views.markers.MarkerSupportInternalUtilities;
  */
 public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-	 */
+	@Override
 	public void initializeDefaultPreferences() {
 
 		IEclipsePreferences node= DefaultScope.INSTANCE.getNode(IDEWorkbenchPlugin.getDefault().getBundle().getSymbolicName());
@@ -59,6 +55,8 @@ public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 				IDEInternalPreferences.PSPM_PROMPT);
 		node.putBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS, false);
 
+		node.putBoolean(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY, true);
+
 		// Turning some Help Menu separators on
 		node.putBoolean(getHelpSeparatorKey("group.main"), true); //$NON-NLS-1$
 		node.putBoolean(getHelpSeparatorKey("group.assist"), true); //$NON-NLS-1$
@@ -67,16 +65,16 @@ public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 		// Set up marker limits
 		node.putBoolean(IDEInternalPreferences.LIMIT_PROBLEMS, true);
 		node.putInt(IDEInternalPreferences.PROBLEMS_LIMIT, 100);
-		
+
 		node.putBoolean(IDEInternalPreferences.LIMIT_BOOKMARKS, true);
 		node.putInt(IDEInternalPreferences.BOOKMARKS_LIMIT, 100);
 
 		node.putBoolean(IDEInternalPreferences.LIMIT_TASKS, true);
 		node.putInt(IDEInternalPreferences.TASKS_LIMIT, 100);
-		
+
 		node.putBoolean(IDEInternalPreferences.USE_MARKER_LIMITS, true);
 		node.putInt(IDEInternalPreferences.MARKER_LIMITS_VALUE, 100);
-		
+
 		node.put(IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_TYPE, ""); //$NON-NLS-1$
 		node.putBoolean(IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_RELATIVE, true);
 
@@ -84,7 +82,7 @@ public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 		node.putBoolean(MarkerSupportInternalUtilities.MIGRATE_BOOKMARK_FILTERS, false);
 		node.putBoolean(MarkerSupportInternalUtilities.MIGRATE_TASK_FILTERS, false);
 		node.putBoolean(MarkerSupportInternalUtilities.MIGRATE_PROBLEM_FILTERS, false);
-		
+
 		node.put(IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_MODE, IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_MODE_PROMPT);
 		node.put(IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_VIRTUAL_FOLDER_MODE, IDEInternalPreferences.IMPORT_FILES_AND_FOLDERS_MODE_PROMPT);
 
@@ -93,13 +91,13 @@ public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 
 	/**
 	 * The default command for launching the system explorer on this platform.
-	 * 
+	 *
 	 * @return The default command which launches the system explorer on this system, or an empty
 	 *         string if no default exists
 	 * @see ShowInSystemExplorerHandler#getDefaultCommand()
 	 */
 	public static String getShowInSystemExplorerCommand() {
-		// See https://bugs.eclipse.org/419940 why it is implemented in here and not in ShowInSystemExplorerHandler#getDefaultCommand() 
+		// See https://bugs.eclipse.org/419940 why it is implemented in here and not in ShowInSystemExplorerHandler#getDefaultCommand()
 		if (Util.isGtk()) {
 			return "dbus-send --print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"${selected_resource_uri}\" string:\"\""; //$NON-NLS-1$
 		} else if (Util.isWindows()) {

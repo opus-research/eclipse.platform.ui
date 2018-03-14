@@ -64,6 +64,7 @@ public class TaskView extends MarkerView {
 			new FieldResource(), new FieldFolder(), new FieldLineNumber() };
 
 	private ICellModifier cellModifier = new ICellModifier() {
+		@Override
 		public Object getValue(Object element, String property) {
 			if (element instanceof ConcreteMarker) {
 				IMarker marker = ((ConcreteMarker) element).getMarker();
@@ -86,10 +87,12 @@ public class TaskView extends MarkerView {
 			return null;
 		}
 
+		@Override
 		public boolean canModify(Object element, String property) {
 			return Util.isEditable(((ConcreteMarker) element).getMarker());
 		}
 
+		@Override
 		public void modify(Object element, String property, Object value) {
 			if (element instanceof Item) {
 				Item item = (Item) element;
@@ -123,12 +126,12 @@ public class TaskView extends MarkerView {
 						if (e.getCause() instanceof CoreException) {
 							ErrorDialog.openError(
 									getSite().getShell(),
-									MarkerMessages.errorModifyingTask, null, ((CoreException)e.getCause()).getStatus()); 
+									MarkerMessages.errorModifyingTask, null, ((CoreException)e.getCause()).getStatus());
 						} else {
 							// something rather unexpected occurred.
-							IDEWorkbenchPlugin.log(MarkerMessages.errorModifyingTask, e); 
+							IDEWorkbenchPlugin.log(MarkerMessages.errorModifyingTask, e);
 						}
-					}				
+					}
 				}
 			}
 		}
@@ -142,6 +145,7 @@ public class TaskView extends MarkerView {
 
 	private ActionMarkCompleted markCompletedAction;
 
+	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 
@@ -174,6 +178,7 @@ public class TaskView extends MarkerView {
 
 	}
 
+	@Override
 	public void dispose() {
 		if (cellEditorActionHandler != null) {
 			cellEditorActionHandler.dispose();
@@ -188,9 +193,10 @@ public class TaskView extends MarkerView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.TableView#getDialogSettings()
 	 */
+	@Override
 	protected IDialogSettings getDialogSettings() {
 		IDialogSettings workbenchSettings = IDEWorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -204,6 +210,7 @@ public class TaskView extends MarkerView {
 		return settings;
 	}
 
+	@Override
 	protected void createActions() {
 		super.createActions();
 
@@ -213,12 +220,14 @@ public class TaskView extends MarkerView {
 		propertiesAction = new ActionTaskProperties(this, getViewer());
 	}
 
+	@Override
 	protected void fillContextMenu(IMenuManager manager) {
 		manager.add(addGlobalTaskAction);
 		manager.add(new Separator());
 		super.fillContextMenu(manager);
 	}
 
+	@Override
 	protected void fillContextMenuAdditions(IMenuManager manager) {
 		manager.add(new Separator());
 		manager.add(markCompletedAction);
@@ -227,9 +236,10 @@ public class TaskView extends MarkerView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.TableView#getSortingFields()
 	 */
+	@Override
 	protected IField[] getSortingFields() {
 		IField[] all = new IField[VISIBLE_FIELDS.length + HIDDEN_FIELDS.length];
 
@@ -242,22 +252,26 @@ public class TaskView extends MarkerView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.TableView#getAllFields()
 	 */
+	@Override
 	protected IField[] getAllFields() {
 		return getSortingFields();
 	}
 
+	@Override
 	protected String[] getRootTypes() {
 		return ROOT_TYPES;
 	}
 
+	@Override
 	protected void initToolBar(IToolBarManager toolBarManager) {
 		toolBarManager.add(addGlobalTaskAction);
 		super.initToolBar(toolBarManager);
 	}
 
+	@Override
 	public void setSelection(IStructuredSelection structuredSelection,
 			boolean reveal) {
 		// TODO: added because nick doesn't like public API inherited from
@@ -267,22 +281,25 @@ public class TaskView extends MarkerView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerTypes()
 	 */
+	@Override
 	protected String[] getMarkerTypes() {
 		return new String[] { IMarker.TASK };
 	}
 
+	@Override
 	protected String getStaticContextId() {
 		return PlatformUI.PLUGIN_ID + ".task_list_view_context"; //$NON-NLS-1$
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#createFiltersDialog()
 	 */
+	@Override
 	protected DialogMarkerFilter createFiltersDialog() {
 
 		MarkerFilter[] filters = getUserFilters();
@@ -293,69 +310,77 @@ public class TaskView extends MarkerView {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#createFilter(java.lang.String)
 	 */
+	@Override
 	protected MarkerFilter createFilter(String name) {
 		return new TaskFilter(name);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getSectionTag()
 	 */
+	@Override
 	protected String getSectionTag() {
 		return TAG_DIALOG_SECTION;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerEnablementPreferenceName()
 	 */
+	@Override
 	String getMarkerEnablementPreferenceName() {
 		return IDEInternalPreferences.LIMIT_TASKS;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerLimitPreferenceName()
 	 */
+	@Override
 	String getMarkerLimitPreferenceName() {
 		return IDEInternalPreferences.TASKS_LIMIT;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getFiltersPreferenceName()
 	 */
+	@Override
 	String getFiltersPreferenceName() {
 		return IDEInternalPreferences.TASKS_FILTERS;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.TableView#updateDirectionIndicator(org.eclipse.swt.widgets.TreeColumn)
 	 */
+	@Override
 	void updateDirectionIndicator(TreeColumn column) {
 		// Do nothing due to images being obscured
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerName()
 	 */
+	@Override
 	protected String getMarkerName() {
 		return MarkerMessages.task_title;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getUndoContext()
 	 */
+	@Override
 	protected IUndoContext getUndoContext() {
 		return WorkspaceUndoUtil.getTasksUndoContext();
 	}

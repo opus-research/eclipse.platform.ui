@@ -37,7 +37,8 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * Returns an image descriptor for this object.
      */
-    public ImageDescriptor getImageDescriptor(Object o) {
+    @Override
+	public ImageDescriptor getImageDescriptor(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : getBaseImage(resource);
     }
@@ -45,7 +46,8 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * getLabel method comment.
      */
-    public String getLabel(Object o) {
+    @Override
+	public String getLabel(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : resource.getName();
     }
@@ -54,7 +56,8 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * Returns the parent of the given object.  Returns null if the
      * parent is not available.
      */
-    public Object getParent(Object o) {
+    @Override
+	public Object getParent(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : resource.getParent();
     }
@@ -82,7 +85,8 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * @param value the attribute value
      * @return <code>true</code> if the attribute matches; <code>false</code> otherwise
      */
-    public boolean testAttribute(Object target, String name, String value) {
+    @Override
+	public boolean testAttribute(Object target, String name, String value) {
         if (!(target instanceof IResource)) {
             return false;
         }
@@ -124,7 +128,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * <code>contentTypeId</code>. It is possible that this method call could
      * cause the resource to be read. It is also possible (through poor plug-in
      * design) for this method to load plug-ins.
-     * 
+     *
      * @param resource
      *            The resource for which the content type should be determined;
      *            must not be <code>null</code>.
@@ -164,7 +168,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * Tests whether a session or persistent property on the resource or its project
      * matches the given value.
-     * 
+     *
      * @param resource
      *            the resource to check
      * @param persistentFlag
@@ -211,16 +215,16 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
                     return false;
                 }
                 return expectedVal == null || expectedVal.equals(actualVal);
-            } 
+            }
 
             Object actualVal = resToCheck.getSessionProperty(key);
              if (actualVal == null) {
 				return false;
 			}
-              
+
              return expectedVal == null
                         || expectedVal.equals(actualVal.toString());
-            
+
         } catch (CoreException e) {
             // ignore
         }
