@@ -109,7 +109,7 @@ public class ResourceDragAdapterAssistant extends
 		IResource resource = null;
 		for (Iterator<?> iter = aSelection.iterator(); iter.hasNext();) {
 			Object selected = iter.next();
-			resource = Adapters.adapt(selected, IRESOURCE_TYPE);
+			resource = Adapters.getAdapter(selected, IRESOURCE_TYPE, true);
 			if (resource != null) {
 				resources.add(resource);
 		}

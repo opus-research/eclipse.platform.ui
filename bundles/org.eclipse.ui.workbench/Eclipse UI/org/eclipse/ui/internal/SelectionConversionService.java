@@ -58,7 +58,7 @@ public class SelectionConversionService implements ISelectionConversionService {
 
 		while (elements.hasNext()) {
 			Object currentElement = elements.next();
-			Object resource = Adapters.adapt(currentElement, resourceClass);
+			Object resource = Adapters.getAdapter(currentElement, resourceClass, true);
             if (resource != null) {
             	result.add(resource);
             }

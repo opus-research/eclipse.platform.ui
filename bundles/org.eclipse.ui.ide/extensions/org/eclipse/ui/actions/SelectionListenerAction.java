@@ -111,7 +111,7 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 		for (Iterator<?> e = getStructuredSelection().iterator(); e.hasNext();) {
 			Object next = e.next();
 
-			IResource resource = Adapters.adapt(next, IResource.class);
+			IResource resource = Adapters.getAdapter(next, IResource.class, true);
 
 			if (resource != null) {
 				if (resources == null) {
@@ -123,7 +123,7 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			}
 
 			boolean resourcesFoundForThisSelection = false;
-			ResourceMapping mapping = Adapters.adapt(next, ResourceMapping.class);
+			ResourceMapping mapping = Adapters.getAdapter(next, ResourceMapping.class, true);
 
 			if (mapping != null) {
 				ResourceTraversal[] traversals = null;

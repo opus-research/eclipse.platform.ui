@@ -152,6 +152,6 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 	}
 
 	private static IResource getCorrespondingResource(Object element) {
-		return Adapters.adapt(element, IResource.class);
+		return Adapters.getAdapter(element, IResource.class, true);
 	}
 }
