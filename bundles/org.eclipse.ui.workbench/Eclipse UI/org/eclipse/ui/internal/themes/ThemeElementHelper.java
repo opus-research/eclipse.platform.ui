@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,12 +13,13 @@ package org.eclipse.ui.internal.themes;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -31,6 +32,45 @@ import org.eclipse.ui.themes.IThemeManager;
  * @since 3.0
  */
 public final class ThemeElementHelper {
+
+	public static void populateRegistry(org.eclipse.e4.ui.css.swt.theme.ITheme cssTheme,
+			ITheme theme, FontRegistry registry, FontDefinition[] definitions,
+			IPreferenceStore store) {
+		for (FontDefinition definition : definitions) {
+			String key = createPreferenceKey(cssTheme, theme, definition.getId());
+			FontData[] prefFont = PreferenceConverter.getFontDataArray(store, key);
+
+			if (isFontOverridden(prefFont)) {
+				definition.appendState(ThemeElementDefinition.State.OVERRIDDEN);
+				Font currentFont = registry.get(definition.getId());
+				if (hasToUpdateRegistry(currentFont, prefFont)) {
+					if (isModifiedByUser(definition, currentFont, theme, store)) {
+						definition.appendState(ThemeElementDefinition.State.MODIFIED_BY_USER);
+					}
+					registry.put(definition.getId(), prefFont);
+				}
+			}
+		}
+	}
+
+	private static boolean isFontOverridden(FontData[] prefFont) {
+		return prefFont != null && prefFont != PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT;
+	}
+
+	private static boolean hasToUpdateRegistry(Font currentFont, FontData[] prefFont) {
+		return currentFont == null || currentFont.getFontData() != prefFont;
+	}
+
+	private static boolean isModifiedByUser(FontDefinition definition, Font currentFont,
+			ITheme theme, IPreferenceStore store) {
+		FontData[] defaultFontData = null;
+		if (definition.getDefaultsTo() != null) {
+			String defaultsToKey = createPreferenceKey(theme, definition.getDefaultsTo());
+			defaultFontData = PreferenceConverter.getDefaultFontDataArray(store, defaultsToKey);
+		}
+		return defaultFontData != null && currentFont != null
+				&& !currentFont.getFontData().equals(defaultFontData);
+	}
 
     public static void populateRegistry(ITheme theme,
             FontDefinition[] definitions, IPreferenceStore store) {
@@ -143,6 +183,45 @@ public final class ThemeElementHelper {
             PreferenceConverter.setDefault(store, key, defaultFont);
         }
     }
+
+	public static void populateRegistry(org.eclipse.e4.ui.css.swt.theme.ITheme cssTheme,
+			ITheme theme, ColorRegistry registry, ColorDefinition[] definitions,
+			IPreferenceStore store) {
+		for (ColorDefinition definition : definitions) {
+			String key = createPreferenceKey(cssTheme, theme, definition.getId());
+			RGB prefColor = PreferenceConverter.getColor(store, key);
+
+			if (isColorOverridden(prefColor)) {
+				definition.appendState(ThemeElementDefinition.State.OVERRIDDEN);
+				Color currentColor = registry.get(definition.getId());
+				if (hasToUpdateRegistry(currentColor, prefColor)) {
+					if (isModifiedByUser(definition, currentColor, theme, store)) {
+						definition.appendState(ThemeElementDefinition.State.MODIFIED_BY_USER);
+					}
+					registry.put(definition.getId(), prefColor);
+				}
+			}
+		}
+	}
+
+	private static boolean isColorOverridden(RGB prefColor) {
+		return prefColor != null && prefColor != PreferenceConverter.COLOR_DEFAULT_DEFAULT;
+	}
+
+	private static boolean hasToUpdateRegistry(Color currentColor, RGB prefColor) {
+		return currentColor == null || currentColor.getRGB() != prefColor;
+	}
+
+	private static boolean isModifiedByUser(ColorDefinition definition, Color currentColor,
+			ITheme theme, IPreferenceStore store) {
+		RGB defaultValue = null;
+		if (definition.getDefaultsTo() != null) {
+			String defaultsToKey = createPreferenceKey(theme, definition.getDefaultsTo());
+			defaultValue = PreferenceConverter.getDefaultColor(store, defaultsToKey);
+		}
+		return defaultValue != null && currentColor != null
+				&& !currentColor.getRGB().equals(defaultValue);
+	}
 
     public static void populateRegistry(ITheme theme,
             ColorDefinition[] definitions, IPreferenceStore store) {
@@ -329,6 +408,12 @@ public final class ThemeElementHelper {
 
         return themeId + '.' + id;
     }
+
+	public static String createPreferenceKey(org.eclipse.e4.ui.css.swt.theme.ITheme cssTheme,
+			ITheme theme, String id) {
+		String cssThemePrefix = cssTheme != null ? cssTheme.getId() + '.' : ""; //$NON-NLS-1$
+		return cssThemePrefix + createPreferenceKey(theme, id);
+	}
 
     /**
      * @param theme
