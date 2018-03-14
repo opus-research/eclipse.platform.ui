@@ -27,24 +27,21 @@ public class ZoomedViewCloseTest extends CloseTest {
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.zoom.CloseTest#getStackedPart1()
      */
-    @Override
-	public IWorkbenchPart getStackedPart1() {
+    public IWorkbenchPart getStackedPart1() {
         return stackedView1;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.zoom.CloseTest#getStackedPart2()
      */
-    @Override
-	public IWorkbenchPart getStackedPart2() {
+    public IWorkbenchPart getStackedPart2() {
         return stackedView2;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.zoom.CloseTest#getUnstackedPart()
      */
-    @Override
-	public IWorkbenchPart getUnstackedPart() {
+    public IWorkbenchPart getUnstackedPart() {
         return unstackedView;
     }
 

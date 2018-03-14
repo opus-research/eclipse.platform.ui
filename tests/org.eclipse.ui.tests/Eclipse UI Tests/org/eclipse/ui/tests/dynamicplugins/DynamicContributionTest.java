@@ -28,7 +28,7 @@ public class DynamicContributionTest extends DynamicTestCase {
 
 	public void testMenuContribution() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		IMenuService menus = window
+		IMenuService menus = (IMenuService) window
 				.getService(IMenuService.class);
 		MenuManager manager = new MenuManager();
 		try {
@@ -53,7 +53,6 @@ public class DynamicContributionTest extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
 	 */
-	@Override
 	protected String getExtensionId() {
 		return "menu.dynamic.contribution";
 	}
@@ -64,7 +63,6 @@ public class DynamicContributionTest extends DynamicTestCase {
 	 * @see
 	 * org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
 	 */
-	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_MENUS;
 	}
@@ -75,7 +73,6 @@ public class DynamicContributionTest extends DynamicTestCase {
 	 * @see
 	 * org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
 	 */
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newDynamicMenuContribution";
 	}

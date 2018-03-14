@@ -920,12 +920,8 @@ public interface IWorkbenchRegistryConstants {
 	public static String TAG_CATEGORYDEFINITION = "themeElementCategory"; //$NON-NLS-1$
 
 	/**
-	 * Category presentation tag. Value <code>categoryPresentationBinding</code>
-	 * .
-	 * 
-	 * @deprecated used by the removal presentation API
+	 * Category presentation tag. Value <code>categoryPresentationBinding</code>.
 	 */
-	@Deprecated
 	public static String TAG_CATEGORYPRESENTATIONBINDING = "categoryPresentationBinding"; //$NON-NLS-1$
 
 	/**

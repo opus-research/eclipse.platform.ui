@@ -51,7 +51,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		 * 
 		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
 		 */
-		@Override
 		public Image getImage(Object element) {
 			if (element instanceof IFileStore) {
 				IFileStore curr = (IFileStore) element;
@@ -68,7 +67,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		 * 
 		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 		 */
-		@Override
 		public String getText(Object element) {
 			if (element instanceof IFileStore) {
 				return ((IFileStore) element).getName();
@@ -100,7 +98,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 				 * 
 				 * @see org.eclipse.ui.internal.ide.dialogs.IFileStoreFilter#accept(org.eclipse.core.filesystem.IFileStore)
 				 */
-				@Override
 				public boolean accept(IFileStore file) {
 					if (!file.fetchInfo().isDirectory() && showFiles == false) {
 						return false;
@@ -110,7 +107,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			};
 		}
 
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof IFileStore) {
 				IFileStore[] children = IDEResourceInfoUtils.listFileStores(
@@ -128,7 +124,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		 * 
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 		 */
-		@Override
 		public Object getParent(Object element) {
 			if (element instanceof IFileStore) {
 				return ((IFileStore) element).getParent();
@@ -136,21 +131,17 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 			return null;
 		}
 
-		@Override
 		public boolean hasChildren(Object element) {
 			return getChildren(element).length > 0;
 		}
 
-		@Override
 		public Object[] getElements(Object element) {
 			return getChildren(element);
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}
@@ -164,7 +155,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		 * 
 		 * @see org.eclipse.jface.viewers.ViewerSorter#category(java.lang.Object)
 		 */
-		@Override
 		public int category(Object element) {
 			if (element instanceof IFileStore
 					&& !((IFileStore) element).fetchInfo().isDirectory()) {
@@ -203,7 +193,6 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 		 * 
 		 * @see org.eclipse.ui.dialogs.ISelectionStatusValidator#validate(java.lang.Object[])
 		 */
-		@Override
 		public IStatus validate(Object[] selection) {
 			int nSelected = selection.length;
 			String pluginId = IDEWorkbenchPlugin.IDE_WORKBENCH;
