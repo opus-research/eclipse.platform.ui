@@ -21,6 +21,7 @@ import java.util.Set;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
+import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.TriggerSequence;
@@ -151,8 +152,10 @@ public class BindingModel extends CommonModel {
 		bindingElements = new HashSet();
 		bindingManager = manager;
 
-		Iterator i = manager.getActiveBindingsDisregardingContextFlat()
-				.iterator();
+		EBindingService bindingService = (EBindingService) locator
+				.getService(EBindingService.class);
+
+		Iterator i = bindingService.getActiveBindings().iterator();
 		while (i.hasNext()) {
 			Binding b = (Binding) i.next();
 			BindingElement be = new BindingElement(controller);
