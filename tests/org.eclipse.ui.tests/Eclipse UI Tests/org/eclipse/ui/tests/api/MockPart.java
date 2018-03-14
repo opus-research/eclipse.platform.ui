@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -14,7 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.Platform;
@@ -25,6 +26,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.tests.harness.util.CallHistory;
 import org.osgi.framework.Bundle;
 
@@ -54,10 +56,8 @@ public class MockPart extends EventManager implements IExecutableExtension {
     private Image titleImage;
 
     private DisposeListener disposeListener = new DisposeListener() {
-    	/* (non-Javadoc)
-    	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
-    	 */
-    	public void widgetDisposed(DisposeEvent e) {
+    	@Override
+		public void widgetDisposed(DisposeEvent e) {
     		MockPart.this.widgetDisposed();
     	}
     };
@@ -70,8 +70,9 @@ public class MockPart extends EventManager implements IExecutableExtension {
         return selectionProvider;
     }
 
-    public void setInitializationData(IConfigurationElement config,
-            String propertyName, Object data) throws CoreException {
+    @Override
+	public void setInitializationData(IConfigurationElement config,
+ String propertyName, Object data) {
     	
     	callTrace.add("setInitializationData");
     	

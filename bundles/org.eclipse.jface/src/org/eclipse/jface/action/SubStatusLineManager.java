@@ -61,31 +61,23 @@ public class SubStatusLineManager extends SubContributionManager implements
         return (IStatusLineManager) getParent();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public IProgressMonitor getProgressMonitor() {
+    @Override
+	public IProgressMonitor getProgressMonitor() {
         return getParentStatusLineManager().getProgressMonitor();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public boolean isCancelEnabled() {
+    @Override
+	public boolean isCancelEnabled() {
         return getParentStatusLineManager().isCancelEnabled();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public void setCancelEnabled(boolean enabled) {
+    @Override
+	public void setCancelEnabled(boolean enabled) {
         getParentStatusLineManager().setCancelEnabled(enabled);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public void setErrorMessage(String message) {
+    @Override
+	public void setErrorMessage(String message) {
         this.errorImage = null;
         this.errorMessage = message;
         if (isVisible()) {
@@ -93,10 +85,8 @@ public class SubStatusLineManager extends SubContributionManager implements
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public void setErrorMessage(Image image, String message) {
+    @Override
+	public void setErrorMessage(Image image, String message) {
         this.errorImage = image;
         this.errorMessage = message;
         if (isVisible()) {
@@ -105,10 +95,8 @@ public class SubStatusLineManager extends SubContributionManager implements
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public void setMessage(String message) {
+    @Override
+	public void setMessage(String message) {
         this.messageImage = null;
         this.message = message;
         if (isVisible()) {
@@ -116,10 +104,8 @@ public class SubStatusLineManager extends SubContributionManager implements
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public void setMessage(Image image, String message) {
+    @Override
+	public void setMessage(Image image, String message) {
         this.messageImage = image;
         this.message = message;
         if (isVisible()) {
@@ -127,9 +113,6 @@ public class SubStatusLineManager extends SubContributionManager implements
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on SubContributionManager.
-     */
     @Override
 	public void setVisible(boolean visible) {
         super.setVisible(visible);
@@ -143,10 +126,8 @@ public class SubStatusLineManager extends SubContributionManager implements
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStatusLineManager.
-     */
-    public void update(boolean force) {
+    @Override
+	public void update(boolean force) {
         // This method is not governed by visibility.  The client may
         // call <code>setVisible</code> and then force an update.  At that
         // point we need to update the parent.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.themes;
 
 import java.util.Arrays;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
@@ -20,7 +22,8 @@ import org.eclipse.ui.themes.IThemeManager;
  * @since 3.0
  */
 public abstract class ThemeTest extends UITestCase {
-
+	private static final String MOCK_CSS_THEME = "org.eclipse.e4.ui.css.theme.mock";
+	
     protected static final String BOGUSID = "BOGUSID";
 
     protected static final String THEME1 = "theme1";
@@ -58,17 +61,23 @@ public abstract class ThemeTest extends UITestCase {
         // TODO Auto-generated constructor stub
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
-     */
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         fManager = fWorkbench.getThemeManager();
         fManager.setCurrentTheme(IThemeManager.DEFAULT_THEME);
+        
+        mockCSSTheme();    
     }
 
+    private void mockCSSTheme() {
+		IThemeEngine themeEngine = fWorkbench.getService(IThemeEngine.class);
+        org.eclipse.e4.ui.css.swt.theme.ITheme currentTheme = themeEngine.getActiveTheme(); 
+        if (currentTheme != null && !MOCK_CSS_THEME.equals(currentTheme.getId())) {
+        	themeEngine.setTheme(MOCK_CSS_THEME, false);
+        }
+    }
+    
     /**
      * @return
      */

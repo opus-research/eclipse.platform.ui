@@ -43,17 +43,13 @@ public class Bug397302Tests {
 		public TestListener() {
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProviderListener#sourceChanged(int, java.lang.String, java.lang.Object)
-		 */
+		@Override
 		public void sourceChanged(int sourcePriority, String sourceName,
 				Object sourceValue) {
 			++callCount;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProviderListener#sourceChanged(int, java.util.Map)
-		 */
+		@Override
 		public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
 			++callCount;
 			}
@@ -61,23 +57,17 @@ public class Bug397302Tests {
 
 	private static final class TestSourceProvider extends AbstractSourceProvider {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProvider#dispose()
-		 */
+		@Override
 		public void dispose() {
 			// do nothing
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
-		 */
+		@Override
 		public Map getCurrentState() {
 			return Collections.EMPTY_MAP;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
-		 */
+		@Override
 		public String[] getProvidedSourceNames() {
 			return new String[] {};
 		}
@@ -146,9 +136,6 @@ public class Bug397302Tests {
 	public void testRemoveDuringCallOut() {
 		final TestSourceProvider testSourceProvider = new TestSourceProvider();
 		final TestListener testListener = new TestListener() {
-			/* (non-Javadoc)
-			 * @see org.eclipse.ui.tests.leaks.Bug397302Tests.TestListener#sourceChanged(int, java.util.Map)
-			 */
 			@Override
 			public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
 				testSourceProvider.removeSourceProviderListener(this);

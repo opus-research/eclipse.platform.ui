@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Menu;
@@ -62,14 +62,13 @@ public class SubMenuManager extends SubContributionManager implements
         super(mgr);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#addMenuListener(org.eclipse.jface.action.IMenuListener)
-     */
-    public void addMenuListener(IMenuListener listener) {
+    @Override
+	public void addMenuListener(IMenuListener listener) {
         menuListeners.add(listener);
         if (menuListener == null) {
             menuListener = new IMenuListener() {
-                public void menuAboutToShow(IMenuManager manager) {
+                @Override
+				public void menuAboutToShow(IMenuManager manager) {
                     Object[] listeners = menuListeners.getListeners();
                     for (int i = 0; i < listeners.length; ++i) {
                         ((IMenuListener) listeners[i])
@@ -85,13 +84,11 @@ public class SubMenuManager extends SubContributionManager implements
      * The default implementation of this <code>IContributionItem</code>
      * method does nothing. Subclasses may override.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         // do nothing
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.SubContributionManager#disposeManager()
-     */
     @Override
 	public void disposeManager() {
         if (menuListener != null) {
@@ -116,47 +113,41 @@ public class SubMenuManager extends SubContributionManager implements
         super.disposeManager();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Composite)
-     */
-    public void fill(Composite parent) {
+    @Override
+	public void fill(Composite parent) {
         if (isVisible()) {
 			getParentMenuManager().fill(parent);
 		}
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar, int)
-     */
-    public void fill(CoolBar parent, int index) {
+    @Override
+	public void fill(CoolBar parent, int index) {
         // do nothing
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Menu, int)
-     */
-    public void fill(Menu parent, int index) {
+    @Override
+	public void fill(Menu parent, int index) {
         if (isVisible()) {
 			getParentMenuManager().fill(parent, index);
 		}
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.ToolBar, int)
-     */
-    public void fill(ToolBar parent, int index) {
+    @Override
+	public void fill(ToolBar parent, int index) {
         if (isVisible()) {
 			getParentMenuManager().fill(parent, index);
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     *
-     * Returns the item passed to us, not the wrapper.
-     * In the case of menu's not added by this manager,
-     * ensure that we return a wrapper for the menu.
-     */
+	/**
+	 * Method declared on IContributionManager.
+	 *
+	 * Returns the item passed to us, not the wrapper. In the case of menu's not
+	 * added by this manager, ensure that we return a wrapper for the menu.
+	 *
+	 * @param id
+	 *            of the {@link IContributionItem}
+	 */
     @Override
 	public IContributionItem find(String id) {
         IContributionItem item = getParentMenuManager().find(id);
@@ -181,7 +172,8 @@ public class SubMenuManager extends SubContributionManager implements
      * the visibility of the submenus is also modified.
      * </p>
      */
-    public IMenuManager findMenuUsingPath(String path) {
+    @Override
+	public IMenuManager findMenuUsingPath(String path) {
         IContributionItem item = findUsingPath(path);
         if (item instanceof IMenuManager) {
             return (IMenuManager) item;
@@ -189,15 +181,20 @@ public class SubMenuManager extends SubContributionManager implements
         return null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IMenuManager.
-     *
-     * Returns the item passed to us, not the wrapper.
-     *
-     * We use use the same algorithm as MenuManager.findUsingPath, but unwrap
-     * submenus along so that SubMenuManagers are visible.
-     */
-    public IContributionItem findUsingPath(String path) {
+	/**
+	 * Method declared on IMenuManager.
+	 *
+	 * Returns the item passed to us, not the wrapper.
+	 *
+	 * We use use the same algorithm as MenuManager.findUsingPath, but unwrap
+	 * submenus along so that SubMenuManagers are visible.
+	 *
+	 * @param path
+	 *            which allows to find an {@link IContributionItem} through the
+	 *            menu structure.
+	 */
+    @Override
+	public IContributionItem findUsingPath(String path) {
         String id = path;
         String rest = null;
         int separator = path.indexOf('/');
@@ -213,10 +210,8 @@ public class SubMenuManager extends SubContributionManager implements
         return item;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#getId()
-     */
-    public String getId() {
+    @Override
+	public String getId() {
         return getParentMenuManager().getId();
     }
 
@@ -229,10 +224,8 @@ public class SubMenuManager extends SubContributionManager implements
         return (IMenuManager) getParent();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#getRemoveAllWhenShown()
-     */
-    public boolean getRemoveAllWhenShown() {
+    @Override
+	public boolean getRemoveAllWhenShown() {
         return false;
     }
 
@@ -259,31 +252,23 @@ public class SubMenuManager extends SubContributionManager implements
         return wrapper;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isDynamic()
-     */
-    public boolean isDynamic() {
+    @Override
+	public boolean isDynamic() {
         return getParentMenuManager().isDynamic();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isEnabled()
-     */
-    public boolean isEnabled() {
+    @Override
+	public boolean isEnabled() {
         return isVisible() && getParentMenuManager().isEnabled();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isGroupMarker()
-     */
-    public boolean isGroupMarker() {
+    @Override
+	public boolean isGroupMarker() {
         return getParentMenuManager().isGroupMarker();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isSeparator()
-     */
-    public boolean isSeparator() {
+    @Override
+	public boolean isSeparator() {
         return getParentMenuManager().isSeparator();
     }
 
@@ -304,38 +289,27 @@ public class SubMenuManager extends SubContributionManager implements
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#removeMenuListener(org.eclipse.jface.action.IMenuListener)
-     */
-    public void removeMenuListener(IMenuListener listener) {
+    @Override
+	public void removeMenuListener(IMenuListener listener) {
         menuListeners.remove(listener);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
-     */
-    public void saveWidgetState() {
+    @Override
+	public void saveWidgetState() {
         // do nothing
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
-     */
-    public void setParent(IContributionManager parent) {
+    @Override
+	public void setParent(IContributionManager parent) {
         // do nothing, our "parent manager's" parent 
         // is set when it is added to a manager
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#setRemoveAllWhenShown(boolean)
-     */
-    public void setRemoveAllWhenShown(boolean removeAll) {
+    @Override
+	public void setRemoveAllWhenShown(boolean removeAll) {
         Assert.isTrue(false, "Should not be called on submenu manager"); //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.SubContributionManager#setVisible(boolean)
-     */
     @Override
 	public void setVisible(boolean visible) {
         super.setVisible(visible);
@@ -348,37 +322,29 @@ public class SubMenuManager extends SubContributionManager implements
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#update()
-     */
-    public void update() {
+    @Override
+	public void update() {
         // This method is not governed by visibility.  The client may
         // call <code>setVisible</code> and then force an update.  At that
         // point we need to update the parent.
         getParentMenuManager().update();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionManager#update(boolean)
-     */
-    public void update(boolean force) {
+    @Override
+	public void update(boolean force) {
         // This method is not governed by visibility.  The client may
         // call <code>setVisible</code> and then force an update.  At that
         // point we need to update the parent.
         getParentMenuManager().update(force);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
-     */
-    public void update(String id) {
+    @Override
+	public void update(String id) {
         getParentMenuManager().update(id);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#updateAll(boolean)
-     */
-    public void updateAll(boolean force) {
+    @Override
+	public void updateAll(boolean force) {
         // This method is not governed by visibility.  The client may
         // call <code>setVisible</code> and then force an update.  At that
         // point we need to update the parent.

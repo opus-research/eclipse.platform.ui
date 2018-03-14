@@ -59,37 +59,32 @@ public abstract class ContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * method does nothing. Subclasses may override.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
     }
 
     /**
      * The default implementation of this <code>IContributionItem</code>
      * method does nothing. Subclasses may override.
      */
-    public void fill(Composite parent) {
+    @Override
+	public void fill(Composite parent) {
     }
 
     /**
      * The default implementation of this <code>IContributionItem</code>
      * method does nothing. Subclasses may override.
      */
-    public void fill(Menu menu, int index) {
+    @Override
+	public void fill(Menu menu, int index) {
     }
 
     /**
      * The default implementation of this <code>IContributionItem</code>
      * method does nothing. Subclasses may override.
      */
-    public void fill(ToolBar parent, int index) {
-    }
-
-    /**
-     * The default implementation of this <code>IContributionItem</code>
-     * method does nothing. Subclasses may override.
-     * 
-     * @since 3.0
-     */
-    public void fill(CoolBar parent, int index) {
+    @Override
+	public void fill(ToolBar parent, int index) {
     }
 
     /**
@@ -98,13 +93,22 @@ public abstract class ContributionItem implements IContributionItem {
      * 
      * @since 3.0
      */
-    public void saveWidgetState() {
+    @Override
+	public void fill(CoolBar parent, int index) {
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
+    /**
+     * The default implementation of this <code>IContributionItem</code>
+     * method does nothing. Subclasses may override.
+     * 
+     * @since 3.0
      */
-    public String getId() {
+    @Override
+	public void saveWidgetState() {
+    }
+
+    @Override
+	public String getId() {
         return id;
     }
 
@@ -123,7 +127,8 @@ public abstract class ContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * method returns <code>false</code>. Subclasses may override.
      */
-    public boolean isDirty() {
+    @Override
+	public boolean isDirty() {
         // @issue should this be false instead of calling isDynamic()?
         return isDynamic();
     }
@@ -132,7 +137,8 @@ public abstract class ContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * method returns <code>true</code>. Subclasses may override.
      */
-    public boolean isEnabled() {
+    @Override
+	public boolean isEnabled() {
         return true;
     }
 
@@ -140,7 +146,8 @@ public abstract class ContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * method returns <code>false</code>. Subclasses may override.
      */
-    public boolean isDynamic() {
+    @Override
+	public boolean isDynamic() {
         return false;
     }
 
@@ -148,7 +155,8 @@ public abstract class ContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * method returns <code>false</code>. Subclasses may override.
      */
-    public boolean isGroupMarker() {
+    @Override
+	public boolean isGroupMarker() {
         return false;
     }
 
@@ -156,7 +164,8 @@ public abstract class ContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * method returns <code>false</code>. Subclasses may override.
      */
-    public boolean isSeparator() {
+    @Override
+	public boolean isSeparator() {
         return false;
     }
 
@@ -166,7 +175,8 @@ public abstract class ContributionItem implements IContributionItem {
      * which is <code>true</code> by default. <code>setVisible</code>
      * should be used to change this setting.
      */
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         return visible;
     }
 
@@ -175,7 +185,8 @@ public abstract class ContributionItem implements IContributionItem {
      * method stores the value in an internal state variable,
      * which is <code>true</code> by default.
      */
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         this.visible = visible;
     }
 
@@ -192,13 +203,12 @@ public abstract class ContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * method does nothing. Subclasses may override.
      */
-    public void update() {
+    @Override
+	public void update() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
-    public void setParent(IContributionManager parent) {
+    @Override
+	public void setParent(IContributionManager parent) {
         this.parent = parent;
     }
 
@@ -207,7 +217,8 @@ public abstract class ContributionItem implements IContributionItem {
      * method declared on <code>IContributionItem</code> does nothing.
      * Subclasses should override to update their state.
      */
-    public void update(String id) {
+    @Override
+	public void update(String id) {
     }
     
     /**

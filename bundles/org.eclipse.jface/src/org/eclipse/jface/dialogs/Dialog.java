@@ -387,36 +387,22 @@ public abstract class Dialog extends Window {
 	 * anything.
 	 */
 	public static IDialogBlockedHandler blockedHandler = new IDialogBlockedHandler() {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#clearBlocked()
-		 */
+
+		@Override
 		public void clearBlocked() {
-			// No default behaviour
+			// No default behavior
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#showBlocked(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IStatus, java.lang.String)
-		 */
+		@Override
 		public void showBlocked(IProgressMonitor blocking,
 				IStatus blockingStatus, String blockedName) {
-			// No default behaviour
+			// No default behavior
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#showBlocked(org.eclipse.swt.widgets.Shell,
-		 *      org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IStatus, java.lang.String)
-		 */
+		@Override
 		public void showBlocked(Shell parentShell, IProgressMonitor blocking,
 				IStatus blockingStatus, String blockedName) {
-			// No default behaviour
+			// No default behavior
 		}
 	};
 
@@ -1105,11 +1091,6 @@ public abstract class Dialog extends Window {
 		return Arrays.equals(dialogFontData, defaultFontData);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#create()
-	 */
 	@Override
 	public void create() {
 		super.create();

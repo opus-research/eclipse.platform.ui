@@ -94,13 +94,9 @@ public class MoveResourcesOperation extends
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map execute to moving the resources
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		move(monitor, uiInfo);
@@ -175,13 +171,9 @@ public class MoveResourcesOperation extends
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map undo to moving the resources.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		// We've recorded the original moves atomically, so perform the move
@@ -198,12 +190,7 @@ public class MoveResourcesOperation extends
 		this.destinationPaths = originalDestinationPaths;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
-	 *      int)
-	 */
+	@Override
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
 		for (int i = 0; i < resources.length; i++) {
@@ -214,12 +201,9 @@ public class MoveResourcesOperation extends
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map undo to move status.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeUndoableStatus(monitor);
 		if (status.isOK()) {

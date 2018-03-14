@@ -147,11 +147,6 @@ public class PopupDialog extends Window {
 					IAction.AS_PUSH_BUTTON);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			performTrackerAction(SWT.NONE);
@@ -190,11 +185,6 @@ public class PopupDialog extends Window {
 			setChecked(persistLocation && persistSize);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			persistSize = isChecked();
@@ -214,11 +204,6 @@ public class PopupDialog extends Window {
 			setChecked(persistSize);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			persistSize = isChecked();
@@ -237,11 +222,6 @@ public class PopupDialog extends Window {
 			setChecked(persistLocation);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			persistLocation = isChecked();
@@ -597,17 +577,13 @@ public class PopupDialog extends Window {
 		initializeWidgetState();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#configureShell(Shell)
-	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(5, 5).applyTo(
 				shell);
 
 		shell.addListener(SWT.Deactivate, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				/*
 				 * Close if we are deactivating and have no child shells. If we
@@ -634,6 +610,7 @@ public class PopupDialog extends Window {
 		// Set this true whenever we activate. It may have been turned
 		// off by a menu or secondary popup showing.
 		shell.addListener(SWT.Activate, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				// ignore this event if we have launched a child
 				if (event.widget == getShell()
@@ -650,6 +627,7 @@ public class PopupDialog extends Window {
 
 		if ((getShellStyle() & SWT.ON_TOP) != 0 && shell.getParent() != null) {
 			parentDeactivateListener = new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					if (listenToParentDeactivate) {
 						asyncClose();
@@ -664,6 +642,7 @@ public class PopupDialog extends Window {
 		}
 
 		shell.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent event) {
 				handleDispose();
 			}
@@ -673,6 +652,7 @@ public class PopupDialog extends Window {
 	private void asyncClose() {
 		// workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=152010
 		getShell().getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				close();
 			}
@@ -1273,11 +1253,6 @@ public class PopupDialog extends Window {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#getInitialSize()
-	 */
 	@Override
 	protected Point getInitialSize() {
 		Point result = getDefaultSize();

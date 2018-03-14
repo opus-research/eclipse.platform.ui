@@ -40,10 +40,12 @@ public class PropertiesActionProvider extends CommonActionProvider {
 	private PropertyDialogAction propertiesAction;
 	private ISelectionProvider delegateSelectionProvider;
 
+	@Override
 	public void init(final ICommonActionExtensionSite aSite) {
 		
 		delegateSelectionProvider = new DelegateSelectionProvider( aSite.getViewSite().getSelectionProvider());
 		propertiesAction = new PropertyDialogAction(new IShellProvider() {
+			@Override
 			public Shell getShell() {
 				return aSite.getViewSite().getShell();
 			}
@@ -51,11 +53,7 @@ public class PropertiesActionProvider extends CommonActionProvider {
 		propertiesAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_PROPERTIES); 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.action.IMenuManager)
-	 */
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		super.fillContextMenu(menu);
 
@@ -66,13 +64,7 @@ public class PropertiesActionProvider extends CommonActionProvider {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars
-	 * )
-	 */
+	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		super.fillActionBars(actionBars);
 
@@ -80,11 +72,7 @@ public class PropertiesActionProvider extends CommonActionProvider {
 				propertiesAction);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.actions.ActionGroup#setContext(org.eclipse.ui.actions.ActionContext)
-	 */
+	@Override
 	public void setContext(ActionContext context) {
 		super.setContext(context);
 
@@ -101,11 +89,7 @@ public class PropertiesActionProvider extends CommonActionProvider {
 			delegate = o;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-		 */
+		@Override
 		public Object getAdapter(Class adapter) {
 			if (adapter.isInstance(delegate) || delegate == null) {
 				return delegate;
@@ -122,22 +106,14 @@ public class PropertiesActionProvider extends CommonActionProvider {
 			delegate = s;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
-		 */
+		@Override
 		public void addSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			delegate.addSelectionChangedListener(listener);
 
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
-		 */
+		@Override
 		public ISelection getSelection() {
 			if (delegate.getSelection() instanceof IStructuredSelection) {
 				IStructuredSelection sSel = (IStructuredSelection) delegate
@@ -152,22 +128,14 @@ public class PropertiesActionProvider extends CommonActionProvider {
 			return delegate.getSelection();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
-		 */
+		@Override
 		public void removeSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			delegate.removeSelectionChangedListener(listener);
 
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
-		 */
+		@Override
 		public void setSelection(ISelection selection) {
 			delegate.setSelection(selection);
 

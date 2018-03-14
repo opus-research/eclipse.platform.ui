@@ -68,7 +68,7 @@ public class UIEvents {
 	/**
 	 * Event sent when a enabled update is requested for tool-items.
 	 * <p>
-	 * As a value you can pass:
+	 * As a value you can pass in to the {@link IEventBroker}:
 	 * <ul>
 	 * <li>the {@link MApplicationElement#getElementId()} of the element to check</li>
 	 * <li>the special value {@link #ALL_ELEMENT_ID}</li>
@@ -287,6 +287,14 @@ public class UIEvents {
 		 * Sent when a perspective is opened
 		 */
 		public static final String PERSPECTIVE_OPENED = TOPIC + TOPIC_SEP + "perspOpened"; //$NON-NLS-1$
+
+		/**
+		 * Sent when a perspective is reset
+		 * 
+		 * @since 1.2
+		 */
+		public static final String PERSPECTIVE_RESET = TOPIC + TOPIC_SEP + "perspReset"; //$NON-NLS-1$
+
 		/**
 		 * Sent when application startup is complete
 		 */

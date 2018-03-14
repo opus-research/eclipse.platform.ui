@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> -
  *     		Bug 186522 - [KeyBindings] New Keys preference page does not resort by binding with conflicts
  *     		Bug 226342 - [KeyBindings] Keys preference page conflict table is hard to read
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442215
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
@@ -260,6 +262,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			this.ascending = ascending;
 		}
 
+		@Override
 		public final int compare(final Viewer viewer, final Object a,
 				final Object b) {
 			int result = 0;
@@ -312,6 +315,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			this.column = column;
 		}
 
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 			if (comparator.getSortColumn() == column) {
 				comparator.setAscending(!comparator.isAscending());
@@ -336,6 +340,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		 * 
 		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 		 */
+		@Override
 		public String getText(Object element) {
 			return ((ModelElement) element).getName();
 		}
@@ -349,6 +354,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		private final LocalResourceManager localResourceManager = new LocalResourceManager(
 				JFaceResources.getResources());
 
+		@Override
 		public final void dispose() {
 			super.dispose();
 			localResourceManager.dispose();
@@ -359,10 +365,11 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		 * 
 		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 		 */
+		@Override
 		public String getText(Object element) {
 			String rc = getColumnText(element, 0);
 			if (rc == null) {
-				super.getText(element);
+				rc = super.getText(element);
 			}
 			StringBuffer buf = new StringBuffer(rc);
 			for (int i = 1; i < USER_DELTA_COLUMN; i++) {
@@ -375,6 +382,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			return buf.toString();
 		}
 
+		@Override
 		public String getColumnText(Object element, int index) {
 			BindingElement bindingElement = ((BindingElement) element);
 			switch (index) {
@@ -404,6 +412,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			return null;
 		}
 
+		@Override
 		public Image getColumnImage(Object element, int index) {
 			BindingElement be = (BindingElement) element;
 			switch (index) {
@@ -443,6 +452,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	}
 
 	class ModelContentProvider implements ITreeContentProvider {
+		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof BindingModel) {
 				return ((BindingModel) parentElement).getBindings().toArray();
@@ -456,23 +466,28 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			return new Object[0];
 		}
 
+		@Override
 		public Object getParent(Object element) {
 			return ((ModelElement) element).getParent();
 		}
 
+		@Override
 		public boolean hasChildren(Object element) {
 			return (element instanceof BindingModel)
 					|| (element instanceof ContextModel)
 					|| (element instanceof SchemeModel);
 		}
 
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return getChildren(inputElement);
 		}
 
+		@Override
 		public void dispose() {
 		}
 
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
@@ -483,6 +498,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected Control createContents(Composite parent) {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.KEYS_PREFERENCE_PAGE);
@@ -560,9 +576,11 @@ public class NewKeysPreferencePage extends PreferencePage implements
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		filtersButton.setLayoutData(gridData);
 		filtersButton.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				KeysPreferenceFiltersDialog dialog = new KeysPreferenceFiltersDialog(
 						getShell());
@@ -598,9 +616,11 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		exportButton.setLayoutData(gridData);
 		exportButton.addSelectionListener(new SelectionListener() {
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				keyController.exportCSV(((Button) e.getSource()).getShell());
 			}
@@ -670,15 +690,18 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		fBindingText.setLayoutData(gridData);
 
 		fBindingText.addFocusListener(new FocusListener() {
+			@Override
 			public void focusGained(FocusEvent e) {
 				fBindingService.setKeyFilterEnabled(false);
 			}
 
+			@Override
 			public void focusLost(FocusEvent e) {
 				fBindingService.setKeyFilterEnabled(true);
 			}
 		});
 		fBindingText.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (!fBindingService.isKeyFilterEnabled()) {
 					fBindingService.setKeyFilterEnabled(true);
@@ -690,6 +713,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		fKeySequenceText.setKeyStrokeLimit(4);
 		fKeySequenceText
 				.addPropertyChangeListener(new IPropertyChangeListener() {
+					@Override
 					public final void propertyChange(
 							final PropertyChangeEvent event) {
 						if (!event.getOldValue().equals(event.getNewValue())) {
@@ -742,6 +766,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			menuItem.setText(trappedKey.format());
 			menuItem.addSelectionListener(new SelectionAdapter() {
 
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					fKeySequenceText.insert(trappedKey);
 					fBindingText.setFocus();
@@ -751,6 +776,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		}
 		addKeyButton.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				Point buttonLocation = addKeyButton.getLocation();
 				buttonLocation = dataArea.toDisplay(buttonLocation.x,
@@ -779,6 +805,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		fWhenCombo.setContentProvider(new ModelContentProvider());
 		fWhenCombo.setLabelProvider(new ListLabelProvider());
 		fWhenCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public final void selectionChanged(final SelectionChangedEvent event) {
 				ContextElement context = (ContextElement) ((IStructuredSelection) event
 						.getSelection()).getFirstElement();
@@ -790,6 +817,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		IPropertyChangeListener whenListener = new IPropertyChangeListener() {
 
 			// Sets the combo selection when a new keybinding is selected?
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == keyController.getContextModel()
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -840,6 +868,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		table.setLayout(tableLayout);
 		conflictViewer.setContentProvider(new IStructuredContentProvider() {
 
+			@Override
 			public Object[] getElements(Object inputElement) {
 				if (inputElement instanceof Collection) {
 					return ((Collection) inputElement).toArray();
@@ -847,14 +876,17 @@ public class NewKeysPreferencePage extends PreferencePage implements
 				return new Object[0];
 			}
 
+			@Override
 			public void dispose() {
 			}
 
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 			}
 		});
 		conflictViewer.setLabelProvider(new BindingElementLabelProvider() {
+			@Override
 			public String getColumnText(Object o, int index) {
 				BindingElement element = (BindingElement) o;
 				if (index == 0) {
@@ -868,6 +900,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 
 					// When the conflict viewer's selection changes, update the
 					// model's current selection
+					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						ModelElement binding = (ModelElement) ((IStructuredSelection) event
 								.getSelection()).getFirstElement();
@@ -902,6 +935,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 				});
 
 		IPropertyChangeListener conflictsListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == keyController.getConflictModel()
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -928,6 +962,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 
 		IPropertyChangeListener dataUpdateListener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				BindingElement bindingElement = null;
 				boolean weCare = false;
@@ -1045,6 +1080,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 
 			// When the viewer changes selection, update the model's current
 			// selection
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ModelElement binding = (ModelElement) ((IStructuredSelection) event
 						.getSelection()).getFirstElement();
@@ -1055,6 +1091,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		IPropertyChangeListener treeUpdateListener = new IPropertyChangeListener() {
 
 			// When the model changes a property, update the viewer
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == keyController.getBindingModel()
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -1114,6 +1151,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		addBindingButton.setLayoutData(gridData);
 		addBindingButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetSelected(final SelectionEvent event) {
 				keyController.getBindingModel().copy();
 			}
@@ -1128,6 +1166,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 				.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		removeBindingButton.setLayoutData(gridData);
 		removeBindingButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetSelected(final SelectionEvent event) {
 				keyController.getBindingModel().remove();
 			}
@@ -1141,6 +1180,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		restore.setLayoutData(gridData);
 		restore.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetSelected(final SelectionEvent event) {
 				try {
 					fFilteredTree.setRedraw(false);
@@ -1192,10 +1232,12 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		fSchemeCombo.getCombo().setLayoutData(gridData);
 		fSchemeCombo
 				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
 					public final void selectionChanged(
 							final SelectionChangedEvent event) {
 						BusyIndicator.showWhile(fFilteredTree.getViewer()
 								.getTree().getDisplay(), new Runnable() {
+							@Override
 							public void run() {
 								SchemeElement scheme = (SchemeElement) ((IStructuredSelection) event
 										.getSelection()).getFirstElement();
@@ -1207,6 +1249,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 				});
 		IPropertyChangeListener listener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == keyController.getSchemeModel()
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
@@ -1227,20 +1270,22 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
+	@Override
 	public void init(IWorkbench workbench) {
 		keyController = new KeyController();
 		keyController.init(workbench);
 
-		commandService = (ICommandService) workbench
+		commandService = workbench
 				.getService(ICommandService.class);
 		fDefaultCategory = commandService.getCategory(null);
-		fBindingService = (IBindingService) workbench
+		fBindingService = workbench
 				.getService(IBindingService.class);
 
-		commandImageService = (ICommandImageService) workbench
+		commandImageService = workbench
 				.getService(ICommandImageService.class);
 	}
 
+	@Override
 	public void applyData(Object data) {
 		if (data instanceof ModelElement) {
 			keyController.getBindingModel().setSelectedElement(
@@ -1268,6 +1313,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 	 * 
 	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
+	@Override
 	public boolean performOk() {
 		keyController.saveBindings(fBindingService);
 		saveState(getDialogSettings());
@@ -1302,6 +1348,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		return settings;
 	}
 
+	@Override
 	protected final void performDefaults() {
 
 		// Ask the user to confirm
@@ -1319,6 +1366,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			fFilteredTree.setRedraw(false);
 			BusyIndicator.showWhile(fFilteredTree.getViewer().getTree()
 					.getDisplay(), new Runnable() {
+				@Override
 				public void run() {
 					keyController.setDefaultBindings(fBindingService);
 				}

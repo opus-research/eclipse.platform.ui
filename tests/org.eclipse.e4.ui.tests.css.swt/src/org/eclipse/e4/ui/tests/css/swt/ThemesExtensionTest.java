@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,8 +45,7 @@ public class ThemesExtensionTest extends CSSSWTTestCase {
 		assertEquals(ThemesExtension.DEFAULT_CATEGORY_ID,fontDefinition1.getCategoryId());
 		assertTrue(fontDefinition1.getName().startsWith(FontDefinition.class.getSimpleName()));
 		assertTrue(fontDefinition1.getName().endsWith(fontDefinition1.getId()));
-		assertFalse(fontDefinition1.getDescription().contains(fontDefinition1.getOverriddenLabel()));
-		assertEquals(themesExtention.getDefaultDescription(),fontDefinition1.getDescription());
+		assertNotNull(fontDefinition1.getDescription());
 
 		assertTrue(themesExtention.getDefinitions().get(1) instanceof FontDefinition);
 		FontDefinition fontDefinition2 = (FontDefinition) themesExtention.getDefinitions().get(1);
@@ -56,20 +55,17 @@ public class ThemesExtensionTest extends CSSSWTTestCase {
 		assertEquals(ThemesExtension.DEFAULT_CATEGORY_ID,fontDefinition1.getCategoryId());
 		assertTrue(fontDefinition2.getName().startsWith(FontDefinition.class.getSimpleName()));
 		assertTrue(fontDefinition2.getName().endsWith(fontDefinition2.getId()));
-		assertFalse(fontDefinition2.getDescription().contains(fontDefinition2.getOverriddenLabel()));
-		assertEquals(themesExtention.getDefaultDescription(),fontDefinition2.getDescription());
+		assertNotNull(fontDefinition2.getDescription());
 
 		assertTrue(themesExtention.getDefinitions().get(2) instanceof ColorDefinition);
 		ColorDefinition colorDefinition1 = (ColorDefinition) themesExtention.getDefinitions().get(2);
 		assertTrue(colorDefinition1.isAddedByCss());
 		assertFalse(colorDefinition1.isOverridden());
 		assertEquals("org.eclipse.ui.workbench.COLOR_DEF_1",colorDefinition1.getId());
-		assertFalse(colorDefinition1.getDescription().contains(colorDefinition1.getOverriddenLabel()));
-		assertEquals(themesExtention.getDefaultDescription(),colorDefinition1.getDescription());
+		assertNotNull(colorDefinition1.getDescription());
 		assertEquals(ThemesExtension.DEFAULT_CATEGORY_ID,colorDefinition1.getCategoryId());
 		assertTrue(colorDefinition1.getName().startsWith(ColorDefinition.class.getSimpleName()));
 		assertTrue(colorDefinition1.getName().endsWith(colorDefinition1.getId()));
-		assertFalse(colorDefinition1.getDescription().contains(colorDefinition1.getOverriddenLabel()));
-		assertEquals(themesExtention.getDefaultDescription(),colorDefinition1.getDescription());
+		assertNotNull(colorDefinition1.getDescription());
 	}
 }

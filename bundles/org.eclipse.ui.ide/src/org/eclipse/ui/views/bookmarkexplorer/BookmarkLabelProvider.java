@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 
 package org.eclipse.ui.views.bookmarkexplorer;
@@ -42,14 +43,15 @@ class BookmarkLabelProvider extends LabelProvider implements
     final static int COLUMN_LOCATION = 4;
 
     public BookmarkLabelProvider(BookmarkNavigator view) {
-        desc = IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/bkmrk_tsk.gif"); //$NON-NLS-1$
+        desc = IDEWorkbenchPlugin.getIDEImageDescriptor("obj16/bkmrk_tsk.png"); //$NON-NLS-1$
         image = JFaceResources.getResources().createImageWithDefault(desc);
     }
 
     /* (non-Javadoc)
      * Method declared on LabelProvider.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (image != null) {
             JFaceResources.getResources().destroyImage(desc);
             image = null;
@@ -59,11 +61,13 @@ class BookmarkLabelProvider extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on LabelProvider.
      */
-    public Image getImage(Object element) {
+    @Override
+	public Image getImage(Object element) {
         return image;
     }
 
-    public String getColumnText(Object element, int columnIndex) {
+    @Override
+	public String getColumnText(Object element, int columnIndex) {
         if (!(element instanceof IMarker)) {
 			return ""; //$NON-NLS-1$
 		}
@@ -87,7 +91,8 @@ class BookmarkLabelProvider extends LabelProvider implements
         return ""; //$NON-NLS-1$ 
     }
 
-    public Image getColumnImage(Object element, int index) {
+    @Override
+	public Image getColumnImage(Object element, int index) {
         if (index == COLUMN_ICON) {
 			return image;
 		}

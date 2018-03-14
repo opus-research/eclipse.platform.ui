@@ -33,11 +33,7 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	private IContextManagerListener fContextManagerListener;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -50,7 +46,7 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	private void init(IServiceLocator serviceLocator) {
 		if (fContextManagerListener == null) {
-			IContextService service = (IContextService) serviceLocator
+			IContextService service = serviceLocator
 					.getService(IContextService.class);
 			service.addContextManagerListener(getContextListener());
 		}
@@ -62,6 +58,7 @@ public class ChangeEnablementHandler extends AbstractHandler {
 	private IContextManagerListener getContextListener() {
 		if (fContextManagerListener == null) {
 			fContextManagerListener = new IContextManagerListener() {
+				@Override
 				public void contextManagerChanged(
 						ContextManagerEvent contextManagerEvent) {
 					if (contextManagerEvent.isActiveContextsChanged()) {
@@ -76,11 +73,7 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	boolean fEnabled = true;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
-	 */
+	@Override
 	public boolean isEnabled() {
 		return fEnabled;
 	}
@@ -92,14 +85,10 @@ public class ChangeEnablementHandler extends AbstractHandler {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
-	 */
+	@Override
 	public void dispose() {
 		if (fContextManagerListener != null) {
-			IContextService service = (IContextService) PlatformUI
+			IContextService service = PlatformUI
 					.getWorkbench().getService(IContextService.class);
 			service.removeContextManagerListener(fContextManagerListener);
 			fContextManagerListener = null;

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.util.impl.resources.FileResourcesLocatorImpl;
 import org.eclipse.e4.ui.css.core.util.impl.resources.OSGiResourceLocator;
 import org.eclipse.e4.ui.css.core.util.resources.IResourceLocator;
+import org.eclipse.e4.ui.css.swt.helpers.EclipsePreferencesHelper;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -213,13 +215,16 @@ public class ThemeEngine implements IThemeEngine {
 			}
 		}
 
-		//Resolve to install dir
-		registerResourceLocator(new OSGiResourceLocator("platform:/plugin/org.eclipse.platform/css/"));
+		// register a default resolver for platform uri's
+		registerResourceLocator(new OSGiResourceLocator(
+				"platform:/plugin/org.eclipse.ui.themes/css/"));
+		// register a default resolver for file uri's
 		registerResourceLocator(new FileResourcesLocatorImpl());
 		// FIXME: perhaps ResourcesLocatorManager shouldn't have a default?
 		// registerResourceLocator(new HttpResourcesLocatorImpl());
 	}
 
+	@Override
 	public synchronized ITheme registerTheme(String id, String label,
 			String basestylesheetURI) throws IllegalArgumentException {
 		return  registerTheme(id, label, basestylesheetURI, "");
@@ -242,10 +247,11 @@ public class ThemeEngine implements IThemeEngine {
 		return theme;
 	}
 
+	@Override
 	public synchronized void registerStylesheet(String uri, String... themes) {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
-		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
+		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
 
 		uri = uri.replaceAll("\\$os\\$", osname).replaceAll("\\$ws\\$", wsname);
 
@@ -258,6 +264,7 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
+	@Override
 	public synchronized void registerResourceLocator(IResourceLocator locator,
 			String... themes) {
 		if (themes.length == 0) {
@@ -350,6 +357,7 @@ public class ThemeEngine implements IThemeEngine {
 				.toArray(new IConfigurationElement[matchingElements.size()]);
 	}
 
+	@Override
 	public void setTheme(String themeId, boolean restore) {
 		String osVersion = System.getProperty("os.version");
 		if (osVersion != null) {
@@ -378,6 +386,7 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
+	@Override
 	public void setTheme(ITheme theme, boolean restore) {
 		setTheme(theme, restore, false);
 	}
@@ -445,6 +454,9 @@ public class ThemeEngine implements IThemeEngine {
 
 		if (restore) {
 			IEclipsePreferences pref = getPreferences();
+			EclipsePreferencesHelper.setPreviousThemeId(pref.get(THEMEID_KEY, null));
+			EclipsePreferencesHelper.setCurrentThemeId(theme.getId());
+
 			pref.put(THEMEID_KEY, theme.getId());
 			try {
 				pref.flush();
@@ -493,10 +505,12 @@ public class ThemeEngine implements IThemeEngine {
 		return context.getService(eventAdminRef);
 	}
 
+	@Override
 	public synchronized List<ITheme> getThemes() {
 		return Collections.unmodifiableList(new ArrayList<ITheme>(themes));
 	}
 
+	@Override
 	public void applyStyles(Object widget, boolean applyStylesToChildNodes) {
 		for (CSSEngine engine : cssEngines) {
 			Object element = engine.getElement(widget);
@@ -537,6 +551,7 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
+	@Override
 	public void restore(String alternateTheme) {
 		String prefThemeId = getPreferenceThemeId();
 		boolean flag = true;
@@ -555,10 +570,12 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
+	@Override
 	public ITheme getActiveTheme() {
 		return currentTheme;
 	}
 
+	@Override
 	public CSSStyleDeclaration getStyle(Object widget) {
 		for (CSSEngine engine : cssEngines) {
 			CSSElementContext context = engine.getCSSElementContext(widget);
@@ -597,11 +614,17 @@ public class ThemeEngine implements IThemeEngine {
 		modifiedStylesheets.remove(selection.getId());
 	}
 
+	@Override
 	public void addCSSEngine(CSSEngine cssEngine) {
 		cssEngines.add(cssEngine);
 		resetCurrentTheme();
 	}
 
+	public Collection<CSSEngine> getCSSEngines() {
+		return cssEngines;
+	}
+
+	@Override
 	public void removeCSSEngine(CSSEngine cssEngine) {
 		cssEngines.remove(cssEngine);
 	}

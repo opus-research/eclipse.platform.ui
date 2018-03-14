@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -34,6 +34,7 @@ import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.Policy;
+import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.MContribution;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
@@ -44,7 +45,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -79,6 +79,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 	IEventBroker eventBroker;
 
 	private EventHandler itemUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolItem))
@@ -108,6 +109,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolItem))
@@ -123,6 +125,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler enabledUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolItem))
@@ -205,6 +208,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 		return text;
 	}
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MToolItem) || !(parent instanceof ToolBar))
 			return null;
@@ -241,14 +245,6 @@ public class ToolItemRenderer extends SWTPartRenderer {
 		return newItem;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#hideChild
-	 * (org.eclipse.e4.ui.model.application.MElementContainer,
-	 * org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void hideChild(MElementContainer<MUIElement> parentElement,
 			MUIElement child) {
@@ -261,13 +257,6 @@ public class ToolItemRenderer extends SWTPartRenderer {
 			widget.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#hookControllerLogic
-	 * (org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void hookControllerLogic(MUIElement me) {
 		// If the item is a CHECK or RADIO update the model's state to match
@@ -277,10 +266,12 @@ public class ToolItemRenderer extends SWTPartRenderer {
 					|| item.getType() == ItemType.RADIO) {
 				ToolItem ti = (ToolItem) me.getWidget();
 				ti.addSelectionListener(new SelectionListener() {
+					@Override
 					public void widgetSelected(SelectionEvent e) {
 						item.setSelected(((ToolItem) e.widget).getSelection());
 					}
 
+					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
 						item.setSelected(((ToolItem) e.widget).getSelection());
 					}
@@ -290,6 +281,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 				if (mmenu != null) {
 					final ToolItem ti = (ToolItem) me.getWidget();
 					ti.addSelectionListener(new SelectionAdapter() {
+						@Override
 						public void widgetSelected(SelectionEvent e) {
 							if (e.detail == SWT.ARROW) {
 								Menu menu = getMenu(mmenu, ti);
@@ -322,6 +314,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 			final IEclipseContext lclContext = getContext(me);
 			ToolItem ti = (ToolItem) me.getWidget();
 			ti.addSelectionListener(new SelectionListener() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (contrib.getObject() == null) {
 						IContributionFactory cf = (IContributionFactory) lclContext
@@ -335,6 +328,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 					lclContext.remove(MItem.class.getName());
 				}
 
+				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 				}
 			});
@@ -346,11 +340,13 @@ public class ToolItemRenderer extends SWTPartRenderer {
 			display.timerExec(500, new Runnable() {
 				boolean logged = false;
 
+				@Override
 				public void run() {
 					if (ti.isDisposed()) {
 						return;
 					}
 					SafeRunner.run(new ISafeRunnable() {
+						@Override
 						public void run() throws Exception {
 							EHandlerService service = lclContext
 									.get(EHandlerService.class);
@@ -379,6 +375,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 							}
 						}
 
+						@Override
 						public void handleException(Throwable exception) {
 							if (!logged) {
 								logged = true;
@@ -393,6 +390,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 				}
 			});
 			ti.addSelectionListener(new SelectionListener() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (e.detail != SWT.ARROW) {
 						EHandlerService service = (EHandlerService) lclContext
@@ -415,6 +413,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 					}
 				}
 
+				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 				}
 			});
@@ -432,12 +431,12 @@ public class ToolItemRenderer extends SWTPartRenderer {
 			return (Menu) obj;
 		}
 		// this is a temporary passthrough of the IMenuCreator
-		if (mmenu instanceof MRenderedMenu) {
-			obj = ((MRenderedMenu) mmenu).getContributionManager();
+		if (RenderedElementUtil.isRenderedMenu(mmenu)) {
+			obj = RenderedElementUtil.getContributionManager(mmenu);
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
 				obj = ((IContextFunction) obj).compute(lclContext, null);
-				((MRenderedMenu) mmenu).setContributionManager(obj);
+				RenderedElementUtil.setContributionManager(mmenu, obj);
 			}
 			if (obj instanceof IMenuCreator) {
 				final IMenuCreator creator = (IMenuCreator) obj;
@@ -445,10 +444,11 @@ public class ToolItemRenderer extends SWTPartRenderer {
 						.getShell());
 				if (menu != null) {
 					toolItem.addDisposeListener(new DisposeListener() {
+						@Override
 						public void widgetDisposed(DisposeEvent e) {
 							if (menu != null && !menu.isDisposed()) {
 								creator.dispose();
-								((MRenderedMenu) mmenu).setWidget(null);
+								mmenu.setWidget(null);
 							}
 						}
 					});

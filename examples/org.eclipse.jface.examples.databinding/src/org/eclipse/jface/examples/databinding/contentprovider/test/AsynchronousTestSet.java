@@ -27,13 +27,13 @@ import org.eclipse.swt.widgets.Display;
  * set are randomly generated Integers. Whenever the "recompute" method is
  * called, the set will spin off a job that sleeps for a period of time and then
  * randomly adds and removes elements from the set.
- * 
+ *
  * <p>
  * This simulates a set that wraps a database query or network communication.
  * These would follow the same pattern (report the set as "stale", perform some
  * slow operation, then make changes to the set).
  * </p>
- * 
+ *
  * @since 1.0
  */
 public class AsynchronousTestSet extends ObservableSet {
@@ -70,11 +70,13 @@ public class AsynchronousTestSet extends ObservableSet {
 		recompute();
 	}
 
+	@Override
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 		allSets.add(this);
 	}
 
+	@Override
 	protected void lastListenerRemoved() {
 		allSets.remove(this);
 		super.lastListenerRemoved();
@@ -97,6 +99,7 @@ public class AsynchronousTestSet extends ObservableSet {
 		fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removed));
 	}
 
+	@Override
 	public boolean isStale() {
 		return stale;
 	}
@@ -106,6 +109,7 @@ public class AsynchronousTestSet extends ObservableSet {
 			setStale(true);
 			final int sleepTime = (int) (randomNumberGenerator.nextDouble() * (AVERAGE_BUSY_TIME * 2));
 			Thread newThread = new Thread(new Runnable() {
+				@Override
 				public void run() {
 
 					// Simulate work by sleeping
@@ -117,6 +121,7 @@ public class AsynchronousTestSet extends ObservableSet {
 					// Add and remove some elements -- important: fire all
 					// events in the UI thread
 					display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							final HashSet toAdd = new HashSet();
 							final HashSet toRemove = new HashSet();

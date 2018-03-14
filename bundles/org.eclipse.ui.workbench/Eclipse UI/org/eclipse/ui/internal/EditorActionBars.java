@@ -47,14 +47,17 @@ public class EditorActionBars extends SubActionBars2 {
 
 	private class Overrides implements IContributionManagerOverrides {
 
+		@Override
 		public Integer getAccelerator(IContributionItem item) {
 			return null;
 		}
 
+		@Override
 		public String getAcceleratorText(IContributionItem item) {
 			return null;
 		}
 
+		@Override
 		public Boolean getEnabled(IContributionItem item) {
 			if (((item instanceof ActionContributionItem) && (((ActionContributionItem) item)
 					.getAction() instanceof RetargetAction))
@@ -65,17 +68,12 @@ public class EditorActionBars extends SubActionBars2 {
 			}
 		}
 
+		@Override
 		public String getText(IContributionItem item) {
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.action.IContributionManagerOverrides#getVisible
-		 * (org.eclipse.jface.action.IContributionItem)
-		 */
+		@Override
 		public Boolean getVisible(IContributionItem item) {
 			return null;
 		}
@@ -121,6 +119,7 @@ public class EditorActionBars extends SubActionBars2 {
 	/**
 	 * Activate the contributions.
 	 */
+	@Override
 	public void activate(boolean forceVisibility) {
 		setActive(true, forceVisibility);
 	}
@@ -132,16 +131,12 @@ public class EditorActionBars extends SubActionBars2 {
 		++refCount;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on SubActionBars.
-	 */
+	@Override
 	protected SubMenuManager createSubMenuManager(IMenuManager parent) {
 		return new EditorMenuManager(parent);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on SubActionBars.
-	 */
+	@Override
 	protected SubToolBarManager createSubToolBarManager(IToolBarManager parent) {
 		// return null, editor actions are managed by CoolItemToolBarManagers
 		return null;
@@ -150,6 +145,7 @@ public class EditorActionBars extends SubActionBars2 {
 	/**
 	 * Deactivate the contributions.
 	 */
+	@Override
 	public void deactivate(boolean forceVisibility) {
 		setActive(false, forceVisibility);
 	}
@@ -157,6 +153,7 @@ public class EditorActionBars extends SubActionBars2 {
 	/**
 	 * Dispose the contributions.
 	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		if (editorContributor != null) {
@@ -249,6 +246,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * 
 	 * @return the tool bar manager
 	 */
+	@Override
 	public IToolBarManager getToolBarManager() {
 
 		// by pass the sub coolBar and use the real cool bar.
@@ -334,6 +332,7 @@ public class EditorActionBars extends SubActionBars2 {
 	 * important because the action vector is shared by editors of the same
 	 * type.
 	 */
+	@Override
 	public void partChanged(IWorkbenchPart part) {
 		super.partChanged(part);
 		if (part instanceof IEditorPart) {

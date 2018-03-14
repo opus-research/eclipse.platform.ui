@@ -31,10 +31,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         IResourceChangeListener {
     protected Viewer viewer;
 
-    /* (non-Javadoc)
-     * Method declared on IContentProvider.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (viewer != null) {
             Object obj = viewer.getInput();
             if (obj instanceof IWorkspace) {
@@ -56,10 +54,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         return TestAdaptableWorkbenchAdapter.getInstance();
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITreeContentProvider.
-     */
-    public Object[] getChildren(Object element) {
+    @Override
+	public Object[] getChildren(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter != null) {
             return adapter.getChildren(element);
@@ -67,17 +63,13 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         return new Object[0];
     }
 
-    /* (non-Javadoc)
-     * Method declared on IStructuredContentProvider.
-     */
-    public Object[] getElements(Object element) {
+    @Override
+	public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITreeContentProvider.
-     */
-    public Object getParent(Object element) {
+    @Override
+	public Object getParent(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter != null) {
             return adapter.getParent(element);
@@ -85,17 +77,13 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
         return null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITreeContentProvider.
-     */
-    public boolean hasChildren(Object element) {
+    @Override
+	public boolean hasChildren(Object element) {
         return getChildren(element).length > 0;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContentProvider.
-     */
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    @Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = viewer;
         IWorkspace oldWorkspace = null;
         IWorkspace newWorkspace = null;
@@ -194,7 +182,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
      *
      * @see IResourceChangeListener#resourceChanged
      */
-    public void resourceChanged(final IResourceChangeEvent event) {
+    @Override
+	public void resourceChanged(final IResourceChangeEvent event) {
         final IResourceDelta delta = event.getDelta();
         Control ctrl = viewer.getControl();
         if (ctrl != null && !ctrl.isDisposed()) {
@@ -202,7 +191,8 @@ public class TestAdaptableContentProvider implements ITreeContentProvider,
             // must be traversed in this method.  It is destroyed
             // when this method returns.
             ctrl.getDisplay().syncExec(new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     processDelta(delta);
                 }
             });

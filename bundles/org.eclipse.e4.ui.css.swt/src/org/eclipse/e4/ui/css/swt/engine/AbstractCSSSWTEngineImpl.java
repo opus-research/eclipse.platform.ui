@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.engine;
 
+import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSElementContext;
 import org.eclipse.e4.ui.css.core.impl.engine.CSSEngineImpl;
 import org.eclipse.e4.ui.css.core.resources.IResourcesRegistry;
@@ -25,6 +26,7 @@ import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTRGBConverterIm
 import org.eclipse.e4.ui.css.swt.resources.SWTResourceRegistryKeyFactory;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistry;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Element;
 
 /**
@@ -66,6 +68,7 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 			new CSSSWTApplyStylesListener(display, this);
 		}
 
+		initializeCSSElementProvider();
 		initializeCSSPropertyHandlers();
 		//		SWTElement.setEngine(display, this);
 
@@ -73,6 +76,8 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 	}
 
 	protected abstract void initializeCSSPropertyHandlers();
+
+	protected abstract void initializeCSSElementProvider();
 
 	@Override
 	public IResourcesRegistry getResourcesRegistry() {
@@ -84,16 +89,54 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 	}
 
 	@Override
+	public Element getElement(Object element) {
+		if (element instanceof CSSStylableElement
+				&& ((CSSStylableElement) element).getNativeWidget() instanceof Widget) {
+			return (CSSStylableElement) element;
+		} else if (element instanceof Widget) {
+			if (isStylable((Widget) element)) {
+				return super.getElement(element);
+			}
+		} else {
+			// FIXME: we need to pass through the ThemeElementDefinitions;
+			// perhaps they should be handled by a separate engine
+			return super.getElement(element);
+		}
+		return null;
+	}
+
+	/**
+	 * Return true if the given widget can be styled
+	 *
+	 * @param widget
+	 *            the widget
+	 * @return true if the widget can be styled
+	 */
+	protected boolean isStylable(Widget widget) {
+		// allows widgets to be selectively excluded from styling
+		return !Boolean.TRUE.equals(widget
+				.getData("org.eclipse.e4.ui.css.disabled")); //$NON-NLS-1$
+	}
+
+	@Override
 	public void reset() {
 		for (CSSElementContext elementContext : getElementsContext().values()) {
 			Element element = elementContext.getElement();
-			if (element instanceof WidgetElement) {
+			if (element instanceof WidgetElement
+					&& isApplicableToReset((WidgetElement) element)) {
 				((WidgetElement) element).reset();
 			}
 		}
 
 		getResourcesRegistry().dispose();
 		super.reset();
+	}
+
+	private boolean isApplicableToReset(WidgetElement element) {
+		if (element.getNativeWidget() instanceof Widget) {
+			return !((Widget) element.getNativeWidget()).isDisposed();
+		}
+		return false;
 	}
 
 }

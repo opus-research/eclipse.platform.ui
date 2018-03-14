@@ -25,6 +25,7 @@ import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.ParameterType;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.Parameter;
@@ -119,6 +120,7 @@ public class CommandProcessingAddon {
 
 	private void registerModelListeners() {
 		additionHandler = new EventHandler() {
+			@Override
 			public void handleEvent(Event event) {
 				if (application == event.getProperty(UIEvents.EventTags.ELEMENT)) {
 					if (UIEvents.isADD(event)) {
@@ -144,6 +146,8 @@ public class CommandProcessingAddon {
 
 	private void registerCommandListener() {
 		cmListener = new ICommandManagerListener() {
+			@SuppressWarnings("restriction")
+			@Override
 			public void commandManagerChanged(CommandManagerEvent commandManagerEvent) {
 				if (commandManagerEvent.isCommandChanged()) {
 					if (commandManagerEvent.isCommandDefined()) {
@@ -153,7 +157,9 @@ public class CommandProcessingAddon {
 						}
 						final Command command = commandManagerEvent.getCommandManager().getCommand(
 								commandId);
-
+						if (command.getHandler() == null) {
+							command.setHandler(HandlerServiceImpl.getHandler(commandId));
+						}
 						try {
 							MCategory categoryModel = findCategory(command.getCategory().getId());
 							final MCommand createdCommand = createCommand(command, modelService,

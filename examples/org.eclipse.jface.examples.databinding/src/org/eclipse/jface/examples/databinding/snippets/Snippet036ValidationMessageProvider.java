@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ovidio Mallo and others.
+ * Copyright (c) 2009, 2014 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Ovidio Mallo - initial API and implementation (bug 248877)
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -31,6 +32,7 @@ import org.eclipse.jface.databinding.fieldassist.ControlDecorationSupport;
 import org.eclipse.jface.databinding.fieldassist.ControlDecorationUpdater;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.wizard.WizardPageSupport;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.FieldDecoration;
@@ -57,6 +59,7 @@ public class Snippet036ValidationMessageProvider {
 		Display display = new Display();
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				IWizard wizard = new MessageProviderWizard();
 				WizardDialog wizardDialog = new WizardDialog(null, wizard);
@@ -75,14 +78,17 @@ public class Snippet036ValidationMessageProvider {
 
 	private static final class MessageProviderWizard extends Wizard {
 
+		@Override
 		public void addPages() {
 			addPage(new MessageProviderWizardPage());
 		}
 
+		@Override
 		public String getWindowTitle() {
 			return "Snippet 036 - IValidationMessageProvider";
 		}
 
+		@Override
 		public boolean performFinish() {
 			return true;
 		}
@@ -99,6 +105,7 @@ public class Snippet036ValidationMessageProvider {
 			setDescription("Please fill in the form.");
 		}
 
+		@Override
 		public void createControl(Composite parent) {
 			dbc = new DataBindingContext();
 			bindingMapName = new HashMap();
@@ -138,8 +145,7 @@ public class Snippet036ValidationMessageProvider {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(text);
 
 			// Create the Text observable.
-			ISWTObservableValue textObservable = SWTObservables.observeText(
-					text, SWT.Modify);
+			ISWTObservableValue textObservable = WidgetProperties.text(SWT.Modify).observe(text);
 
 			// Bind the Text to the model and attach a RequiredValidator.
 			Binding binding = dbc.bindValue(textObservable, modelValue,
@@ -150,6 +156,7 @@ public class Snippet036ValidationMessageProvider {
 			// Custom control decoration for "required" validation.
 			ControlDecorationUpdater decorationUpdater = new ControlDecorationUpdater() {
 
+				@Override
 				protected Image getImage(IStatus status) {
 					// For required validations, we do not want to display an
 					// error icon since the user has not done anything wrong.
@@ -191,6 +198,7 @@ public class Snippet036ValidationMessageProvider {
 			this.bindingMapName = bindingMapName;
 		}
 
+		@Override
 		public String getMessage(ValidationStatusProvider statusProvider) {
 			if (statusProvider != null) {
 				String name = (String) bindingMapName.get(statusProvider);
@@ -203,6 +211,7 @@ public class Snippet036ValidationMessageProvider {
 			return super.getMessage(statusProvider);
 		}
 
+		@Override
 		public int getMessageType(ValidationStatusProvider statusProvider) {
 			if (statusProvider instanceof Binding) {
 				Binding binding = (Binding) statusProvider;
@@ -226,6 +235,7 @@ public class Snippet036ValidationMessageProvider {
 
 	private static final class RequiredValidator implements IValidator {
 
+		@Override
 		public IStatus validate(Object value) {
 			if (value == null || "".equals(value)) {
 				return ValidationStatus.error("Please specify a value.");

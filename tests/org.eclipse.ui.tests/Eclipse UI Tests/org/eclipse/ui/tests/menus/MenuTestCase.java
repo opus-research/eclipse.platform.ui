@@ -51,16 +51,12 @@ public class MenuTestCase extends UITestCase {
 	protected IWorkbenchWindow window;
 	protected IContextActivation activeContext;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
 		window = openTestWindow();
-		contextService = (IContextService) window
+		contextService = window
 				.getService(IContextService.class);
 		Context context1 = contextService
 				.getContext(MenuContributionHarness.CONTEXT_TEST1_ID);
@@ -69,14 +65,10 @@ public class MenuTestCase extends UITestCase {
 					IContextService.CONTEXT_ID_DIALOG_AND_WINDOW);
 		}
 
-		menuService = (IMenuService) window.getService(IMenuService.class);
+		menuService = window.getService(IMenuService.class);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		if (activeContext != null) {
 			contextService.deactivateContext(activeContext);

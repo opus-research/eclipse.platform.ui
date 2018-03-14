@@ -58,11 +58,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 	private class TestCellLabelProvider extends CellLabelProvider implements
 			IStyledLabelProvider, IFontProvider {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
-		 */
+		@Override
 		public void update(ViewerCell cell) {
 			Object element = cell.getElement();
 			cell.setText((element == null) ? "" : element.toString());
@@ -74,11 +70,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 					SWT.COLOR_RED));
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getImage(java.lang.Object)
-		 */
+		@Override
 		public Image getImage(Object element) {
 			// create a resource manager that holds onto images
 			// OR create image set, dispose in teardown
@@ -87,21 +79,13 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 					SWT.ICON_WARNING);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
-		 */
+		@Override
 		public StyledString getStyledText(Object element) {
 			return new StyledString(element.toString(),
 					StyledString.COUNTER_STYLER);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-		 */
+		@Override
 		public Font getFont(Object element) {
 			return JFaceResources.getFont(JFaceResources.BANNER_FONT);
 		}
@@ -111,42 +95,40 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 	private class TestLabelDecorator implements ILabelDecorator,
 			IColorDecorator {
 
+		@Override
 		public Image decorateImage(Image image, Object element) {
 			return image;
 		}
 
+		@Override
 		public String decorateText(String text, Object element) {
 			return text;
 		}
 
+		@Override
 		public void addListener(ILabelProviderListener listener) {
 		}
 
+		@Override
 		public void dispose() {
 		}
 
+		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return false;
 		}
 
+		@Override
 		public void removeListener(ILabelProviderListener listener) {
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateBackground(java.lang.Object)
-		 */
+		@Override
 		public Color decorateBackground(Object element) {
 			return fViewer.getControl().getDisplay().getSystemColor(
 					SWT.COLOR_RED);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateForeground(java.lang.Object)
-		 */
+		@Override
 		public Color decorateForeground(Object element) {
 			return fViewer.getControl().getDisplay().getSystemColor(
 					SWT.COLOR_BLUE);
@@ -165,33 +147,21 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 		entries[2] = new EnglandEntry();
 	}
 
+	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		TableViewer viewer = new TableViewer(parent, SWT.FULL_SELECTION);
 
 		viewer.setContentProvider(new IStructuredContentProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
+			@Override
 			public void dispose() {
 			};
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-			 */
+			@Override
 			public Object[] getElements(Object inputElement) {
 				return entries;
 			};
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
+			@Override
 			public void inputChanged(org.eclipse.jface.viewers.Viewer viewer,
 					Object oldInput, Object newInput) {
 			}
@@ -223,10 +193,12 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 	private IDecorationContext getContext() {
 		return new IDecorationContext() {
 
+			@Override
 			public String[] getProperties() {
 				return null;
 			}
 
+			@Override
 			public Object getProperty(String property) {
 				return null;
 			}
@@ -243,6 +215,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 	private ILabelProviderListener getListener() {
 		return new ILabelProviderListener() {
 
+			@Override
 			public void labelProviderChanged(LabelProviderChangedEvent event) {
 				changeMe = "been changed";
 			}
@@ -266,6 +239,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 		}
 	}
 
+	@Override
 	protected void setInput() {
 		fViewer.setInput(this);
 	}
@@ -413,6 +387,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			baseName = englishName;
 		}
 
+		@Override
 		public String toString() {
 			return name + " " + cupYear + " " + baseName;
 		}
@@ -552,11 +527,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			super("Deutschland", "Germany", "1990");
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
-		 */
+		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
@@ -591,11 +562,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			super("\u00D6sterreich", "Austria", "TBD");
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
-		 */
+		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
@@ -628,11 +595,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			super("Blighty", "England", "1966");
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
-		 */
+		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();

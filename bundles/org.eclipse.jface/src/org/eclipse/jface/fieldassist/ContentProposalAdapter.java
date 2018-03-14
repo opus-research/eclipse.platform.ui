@@ -79,6 +79,7 @@ public class ContentProposalAdapter {
 		private final class PopupCloserListener implements Listener {
 			private boolean scrollbarClicked = false;
 
+			@Override
 			public void handleEvent(final Event e) {
 
 				// If focus is leaving an important widget or the field's
@@ -92,6 +93,7 @@ public class ContentProposalAdapter {
 					 * actually switched when this event is received.
 					 */
 					e.display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							if (isValid()) {
 								if (scrollbarClicked || hasFocus()) {
@@ -188,6 +190,7 @@ public class ContentProposalAdapter {
 		 */
 		private final class TargetControlListener implements Listener {
 			// Key events from the control
+			@Override
 			public void handleEvent(Event e) {
 				if (!isValid()) {
 					return;
@@ -503,20 +506,12 @@ public class ContentProposalAdapter {
 				getShell().setBounds(proposedBounds);
 			}
 			
-			/*
-			 * (non-Javadoc)
-			 * @see org.eclipse.jface.dialogs.PopupDialog#getForeground()
-			 */
 			@Override
 			protected Color getForeground() {
 				return control.getDisplay().
 						getSystemColor(SWT.COLOR_INFO_FOREGROUND);
 			}
 			
-			/*
-			 * (non-Javadoc)
-			 * @see org.eclipse.jface.dialogs.PopupDialog#getBackground()
-			 */
 			@Override
 			protected Color getBackground() {
 				return control.getDisplay().
@@ -607,20 +602,12 @@ public class ContentProposalAdapter {
 			this.proposals = proposals;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.PopupDialog#getForeground()
-		 */
 		@Override
 		protected Color getForeground() {
 			return JFaceResources.getColorRegistry().get(
 					JFacePreferences.CONTENT_ASSIST_FOREGROUND_COLOR);
 		}
 		
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.PopupDialog#getBackground()
-		 */
 		@Override
 		protected Color getBackground() {
 			return JFaceResources.getColorRegistry().get(
@@ -643,6 +630,7 @@ public class ContentProposalAdapter {
 						| SWT.VIRTUAL);
 
 				Listener listener = new Listener() {
+					@Override
 					public void handleEvent(Event event) {
 						handleSetData(event);
 					}
@@ -658,6 +646,7 @@ public class ContentProposalAdapter {
 			proposalTable.setHeaderVisible(false);
 			proposalTable.addSelectionListener(new SelectionListener() {
 
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					// If a proposal has been selected, show it in the secondary
 					// popup. Otherwise close the popup.
@@ -671,6 +660,7 @@ public class ContentProposalAdapter {
 				}
 
 				// Default selection was made. Accept the current proposal.
+				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					acceptCurrentProposal();
 				}
@@ -678,11 +668,6 @@ public class ContentProposalAdapter {
 			return proposalTable;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.PopupDialog.adjustBounds()
-		 */
 		@Override
 		protected void adjustBounds() {
 			// Get our control's location in display coordinates.
@@ -724,6 +709,7 @@ public class ContentProposalAdapter {
 
 			// Now set up a listener to monitor any changes in size.
 			getShell().addListener(SWT.Resize, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					popupSize = getShell().getSize();
 					if (infoPopup != null) {
@@ -939,6 +925,7 @@ public class ContentProposalAdapter {
 				// code must be able to run independently of the Eclipse
 				// runtime.
 				Runnable runnable = new Runnable() {
+					@Override
 					public void run() {
 						pendingDescriptionUpdate = true;
 						try {
@@ -949,6 +936,7 @@ public class ContentProposalAdapter {
 							return;
 						}
 						getShell().getDisplay().syncExec(new Runnable() {
+							@Override
 							public void run() {
 								// Query the current selection since we have
 								// been delayed
@@ -964,6 +952,7 @@ public class ContentProposalAdapter {
 													.getShell()
 													.addDisposeListener(
 															new DisposeListener() {
+																@Override
 																public void widgetDisposed(
 																		DisposeEvent event) {
 																	infoPopup = null;
@@ -1029,6 +1018,7 @@ public class ContentProposalAdapter {
 		private void asyncRecomputeProposals(final String filterText) {
 			if (isValid()) {
 				control.getDisplay().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						recordCursorPosition();
 						recomputeProposals(filterText);
@@ -1692,6 +1682,7 @@ public class ContentProposalAdapter {
 			return;
 		}
 		controlListener = new Listener() {
+			@Override
 			public void handleEvent(Event e) {
 				if (!isEnabled) {
 					return;
@@ -1897,6 +1888,7 @@ public class ContentProposalAdapter {
 					popup = new ContentProposalPopup(null, proposals);
 					popup.open();
 					popup.getShell().addDisposeListener(new DisposeListener() {
+						@Override
 						public void widgetDisposed(DisposeEvent event) {
 							popup = null;
 						}
@@ -2053,6 +2045,7 @@ public class ContentProposalAdapter {
 	private void autoActivate() {
 		if (autoActivationDelay > 0) {
 			Runnable runnable = new Runnable() {
+				@Override
 				public void run() {
 					receivedKeyDown = false;
 					try {
@@ -2063,6 +2056,7 @@ public class ContentProposalAdapter {
 						return;
 					}
 					getControl().getDisplay().syncExec(new Runnable() {
+						@Override
 						public void run() {
 							openProposalPopup(true);
 						}
@@ -2079,6 +2073,7 @@ public class ContentProposalAdapter {
 			// other important info to change as a result of this
 			// event occurring.
 			getControl().getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (isValid()) {
 						openProposalPopup(true);

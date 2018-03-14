@@ -41,7 +41,8 @@ public class IWorkingSetTest extends UITestCase {
         super(testName);
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         IWorkingSetManager workingSetManager = fWorkbench
                 .getWorkingSetManager();
@@ -52,6 +53,7 @@ public class IWorkingSetTest extends UITestCase {
         
         workingSetManager.addWorkingSet(fWorkingSet);
     }
+	@Override
 	protected void doTearDown() throws Exception {
 		IWorkingSetManager workingSetManager = fWorkbench
         .getWorkingSetManager();
@@ -208,6 +210,7 @@ public class IWorkingSetTest extends UITestCase {
 		fWorkingSet.setElements(new IAdaptable[] {});
 		assertTrue(fWorkingSet.isEmpty());
 		fWorkingSet.setElements(new IAdaptable[] { new IAdaptable() {
+			@Override
 			public Object getAdapter(Class adapter) {
 				return null;
 			}
@@ -310,9 +313,7 @@ public class IWorkingSetTest extends UITestCase {
     
     public static class Foo implements IAdaptable {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-		 */
+		@Override
 		public Object getAdapter(Class adapter) {
 			// TODO Auto-generated method stub
 			return null;
@@ -325,9 +326,7 @@ public class IWorkingSetTest extends UITestCase {
     
     public class ToFoo implements IAdaptable {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-		 */
+		@Override
 		public Object getAdapter(Class adapter) {
 			if (adapter == Foo.class) {
 				return new Foo() {};
@@ -339,9 +338,7 @@ public class IWorkingSetTest extends UITestCase {
     
     public static class IAImpl implements IA, IAdaptable {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-		 */
+		@Override
 		public Object getAdapter(Class adapter) {
 			// TODO Auto-generated method stub
 			return null;
@@ -350,9 +347,7 @@ public class IWorkingSetTest extends UITestCase {
     
     public static class ModelElement implements IModelElement, IAdaptable {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-		 */
+		@Override
 		public Object getAdapter(Class adapter) {
 			return null;
 		}

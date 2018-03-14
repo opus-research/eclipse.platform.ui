@@ -42,10 +42,8 @@ public class ViewerActionBuilder extends PluginActionBuilder {
     public ViewerActionBuilder() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginActionBuilder.
-     */
-    protected ActionDescriptor createActionDescriptor(
+    @Override
+	protected ActionDescriptor createActionDescriptor(
             IConfigurationElement element) {
         if (part instanceof IViewPart) {
 			return new ActionDescriptor(element, ActionDescriptor.T_VIEW, part);
@@ -53,10 +51,8 @@ public class ViewerActionBuilder extends PluginActionBuilder {
 		return new ActionDescriptor(element, ActionDescriptor.T_EDITOR, part);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginActionBuilder.
-     */
-    protected BasicContribution createContribution() {
+    @Override
+	protected BasicContribution createContribution() {
         return new ViewerContribution(provider);
     }
 
@@ -72,10 +68,8 @@ public class ViewerActionBuilder extends PluginActionBuilder {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginActionBuilder.
-     */
-    protected boolean readElement(IConfigurationElement element) {
+    @Override
+	protected boolean readElement(IConfigurationElement element) {
         String tag = element.getName();
 
         // Found visibility sub-element
@@ -139,10 +133,8 @@ public class ViewerActionBuilder extends PluginActionBuilder {
             visibilityTest = new ActionExpression(element);
         }
 
-        /* (non-Javadoc)
-         * Method declared on BasicContribution.
-         */
-        public void contribute(IMenuManager menu, boolean menuAppendIfMissing,
+        @Override
+		public void contribute(IMenuManager menu, boolean menuAppendIfMissing,
                 IToolBarManager toolbar, boolean toolAppendIfMissing) {
             boolean visible = true;
 
@@ -162,9 +154,7 @@ public class ViewerActionBuilder extends PluginActionBuilder {
 			}
         }
 		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.internal.PluginActionBuilder.BasicContribution#dispose()
-		 */
+		@Override
 		public void dispose() {
 			if (selProvider != null) {
 				selProvider.removeSelectionChangedListener(this);
@@ -182,6 +172,7 @@ public class ViewerActionBuilder extends PluginActionBuilder {
 		 * @see ISelectionChangedListener
 		 * @since 3.1
 		 */
+		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (actions != null) {
 				if (actions != null) {

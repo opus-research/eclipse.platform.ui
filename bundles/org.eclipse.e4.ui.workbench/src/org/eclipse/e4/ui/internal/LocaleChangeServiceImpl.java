@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Dirk Fauth and others.
+ * Copyright (c) 2013, 2014 Dirk Fauth and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    Dirk Fauth <dirk.fauth@googlemail.com> - initial API and implementation
+ *    Fabian Miehe - Bug 440435
  *******************************************************************************/
 package org.eclipse.e4.ui.internal;
 
@@ -23,9 +24,11 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.osgi.service.log.LogService;
 
 /**
@@ -56,11 +59,12 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 		this.application = application;
 	}
 
+	@Override
 	public void changeApplicationLocale(Locale locale) {
 
 		// the TranslationService.LOCALE context parameter is specified as String
 		// so we put the String representation of the given Locale to the context
-		this.application.getContext().set(TranslationService.LOCALE, locale.toString());
+		this.application.getContext().set(TranslationService.LOCALE, locale);
 
 		// update model
 		updateLocalization(this.application.getChildren());
@@ -69,21 +73,24 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 		broker.post(LOCALE_CHANGE, locale);
 	}
 
+	@Override
 	public void changeApplicationLocale(String localeString) {
 		try {
 			Locale locale = ResourceBundleHelper.toLocale(localeString);
 
 			// set the locale to the application context
-			this.application.getContext().set(TranslationService.LOCALE, localeString);
+			// use the resolved locale instead of the given locale string to avoid invalid locales
+			// in context
+			this.application.getContext().set(TranslationService.LOCALE, locale);
 
 			// update model
 			updateLocalization(this.application.getChildren());
 
 			// fire event
 			broker.post(LOCALE_CHANGE, locale);
-		} catch (IllegalArgumentException e) {
-			// parsing the locale String to a Locale failed because of invalid
-			// String - there is no locale change performed
+		} catch (Exception e) {
+			// performing a locale update failed
+			// there is no locale change performed
 			if (logService != null)
 				logService.log(LogService.LOG_ERROR, e.getMessage()
 						+ " - No Locale change will be performed."); //$NON-NLS-1$
@@ -104,7 +111,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 				updateLocalization(((MElementContainer) element).getChildren());
 			}
 
-			if (element instanceof MWindow) {
+			if (element instanceof MWindow && ((MWindow) element).getMainMenu() != null) {
 				((MWindow) element).getMainMenu().updateLocalization();
 				updateLocalization(((MWindow) element).getMainMenu().getChildren());
 			}
@@ -113,6 +120,15 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 				for (MTrimBar trimBar : ((MTrimmedWindow) element).getTrimBars()) {
 					trimBar.updateLocalization();
 					updateLocalization(trimBar.getChildren());
+				}
+			}
+
+			if (element instanceof MPart) {
+				MPart mPart = (MPart) element;
+				MToolBar toolbar = mPart.getToolbar();
+				if (toolbar != null && toolbar.getChildren() != null) {
+					toolbar.updateLocalization();
+					updateLocalization(toolbar.getChildren());
 				}
 			}
 

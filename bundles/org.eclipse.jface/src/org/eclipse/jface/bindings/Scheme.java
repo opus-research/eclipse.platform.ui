@@ -94,12 +94,8 @@ public final class Scheme extends NamedHandleObject implements Comparable {
         listeners.add(schemeListener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    public final int compareTo(final Object object) {
+    @Override
+	public final int compareTo(final Object object) {
         final Scheme scheme = (Scheme) object;
         int compareTo = Util.compare(this.id, scheme.id);
         if (compareTo == 0) {

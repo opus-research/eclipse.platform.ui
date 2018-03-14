@@ -27,10 +27,8 @@ public class DragDropPerspectiveFactory implements IPerspectiveFactory {
 	public static final String dropViewId2 = "org.eclipse.ui.tests.api.MockViewPart2";
 	public static final String dropViewId3 = "org.eclipse.ui.tests.api.MockViewPart3";
 
-	/* (non-Javadoc)
-     * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
-     */
-    public void createInitialLayout(IPageLayout layout) {
+    @Override
+	public void createInitialLayout(IPageLayout layout) {
         String folderId = "org.eclipse.ui.test.dnd.mystack";
 
         IFolderLayout folder = layout.createFolder(folderId,

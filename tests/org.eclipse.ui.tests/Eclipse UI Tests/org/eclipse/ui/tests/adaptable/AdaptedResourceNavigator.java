@@ -86,21 +86,26 @@ public class AdaptedResourceNavigator extends ViewPart {
     private static final String LINK_NAVIGATOR_TO_EDITOR = "LINK_NAVIGATOR_TO_EDITOR"; //$NON-NLS-1$
 
     private IPartListener partListener = new IPartListener() {
-        public void partActivated(IWorkbenchPart part) {
+        @Override
+		public void partActivated(IWorkbenchPart part) {
             if (part instanceof IEditorPart)
                 editorActivated((IEditorPart) part);
         }
 
-        public void partBroughtToTop(IWorkbenchPart part) {
+        @Override
+		public void partBroughtToTop(IWorkbenchPart part) {
         }
 
-        public void partClosed(IWorkbenchPart part) {
+        @Override
+		public void partClosed(IWorkbenchPart part) {
         }
 
-        public void partDeactivated(IWorkbenchPart part) {
+        @Override
+		public void partDeactivated(IWorkbenchPart part) {
         }
 
-        public void partOpened(IWorkbenchPart part) {
+        @Override
+		public void partOpened(IWorkbenchPart part) {
         }
     };
 
@@ -141,10 +146,8 @@ public class AdaptedResourceNavigator extends ViewPart {
         return new StructuredSelection(list);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart.
-     */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         //	initDrillDownAdapter(viewer);
         viewer.setUseHashlookup(true);
@@ -161,7 +164,8 @@ public class AdaptedResourceNavigator extends ViewPart {
         MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
+            @Override
+			public void menuAboutToShow(IMenuManager manager) {
                 AdaptedResourceNavigator.this.fillContextMenu(manager);
             }
         });
@@ -178,21 +182,25 @@ public class AdaptedResourceNavigator extends ViewPart {
         actionGroup.updateGlobalActions(selection);
 
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            public void selectionChanged(SelectionChangedEvent event) {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
                 handleSelectionChanged(event);
             }
         });
         viewer.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
                 handleDoubleClick(event);
             }
         });
         viewer.getControl().addKeyListener(new KeyListener() {
-            public void keyPressed(KeyEvent event) {
+            @Override
+			public void keyPressed(KeyEvent event) {
                 handleKeyPressed(event);
             }
 
-            public void keyReleased(KeyEvent event) {
+            @Override
+			public void keyReleased(KeyEvent event) {
                 handleKeyReleased(event);
             }
         });
@@ -208,10 +216,8 @@ public class AdaptedResourceNavigator extends ViewPart {
         memento = null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         getSite().getPage().removePartListener(partListener);
         super.dispose();
     }
@@ -317,9 +323,8 @@ public class AdaptedResourceNavigator extends ViewPart {
             Object o = selection.getFirstElement();
             if (o instanceof IResource) {
                 return ((IResource) o).getFullPath().makeRelative().toString();
-            } else {
-                return ResourceNavigatorMessages.ResourceNavigator_oneItemSelected;
             }
+			return ResourceNavigatorMessages.ResourceNavigator_oneItemSelected;
         }
         if (selection.size() > 1) {
             return NLS.bind(ResourceNavigatorMessages.ResourceNavigator_statusLine, new Integer(selection.size()));
@@ -335,13 +340,11 @@ public class AdaptedResourceNavigator extends ViewPart {
             IPath path = ((IResource) element).getFullPath();
             if (path.isRoot()) {
                 return ResourceNavigatorMessages.ResourceManager_toolTip;
-            } else {
-                return path.makeRelative().toString();
             }
-        } else {
-            return ((ILabelProvider) getViewer().getLabelProvider())
-                    .getText(element);
+			return path.makeRelative().toString();
         }
+		return ((ILabelProvider) getViewer().getLabelProvider())
+		        .getText(element);
     }
 
     /**
@@ -389,10 +392,8 @@ public class AdaptedResourceNavigator extends ViewPart {
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on IViewPart.
-     */
-    public void init(IViewSite site, IMemento memento) throws PartInitException {
+    @Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -404,7 +405,8 @@ public class AdaptedResourceNavigator extends ViewPart {
         DrillDownAdapter drillDownAdapter = new DrillDownAdapter(viewer) {
             // need to update title whenever input changes;
             // updateNavigationButtons is called whenever any of the drill down buttons are used
-            protected void updateNavigationButtons() {
+            @Override
+			protected void updateNavigationButtons() {
                 super.updateNavigationButtons();
                 updateTitle();
             }
@@ -463,7 +465,8 @@ public class AdaptedResourceNavigator extends ViewPart {
     protected void restoreState(IMemento memento) {
     }
 
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
     }
 
     /**
@@ -479,7 +482,8 @@ public class AdaptedResourceNavigator extends ViewPart {
     /**
      * @see IWorkbenchPart#setFocus()
      */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         getViewer().getTree().setFocus();
     }
 

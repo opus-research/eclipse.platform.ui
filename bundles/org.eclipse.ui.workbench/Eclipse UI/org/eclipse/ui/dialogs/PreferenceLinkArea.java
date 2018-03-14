@@ -69,12 +69,8 @@ public class PreferenceLinkArea extends Object {
             
             //Only add the selection listener if the node is found
             pageLink.addSelectionListener(new SelectionAdapter() {
-                /*
-                 * (non-Javadoc)
-                 * 
-                 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-                 */
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     pageContainer.openPage(pageId, pageData);
                 }
             });

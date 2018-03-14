@@ -464,11 +464,7 @@ public class TrimLayoutTest extends UITestCase {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		
@@ -479,11 +475,7 @@ public class TrimLayoutTest extends UITestCase {
 				IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		PrefUtil.getAPIPreferenceStore().setValue(
 				IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR,

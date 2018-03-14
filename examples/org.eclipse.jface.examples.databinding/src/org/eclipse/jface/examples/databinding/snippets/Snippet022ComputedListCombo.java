@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -21,6 +22,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -36,7 +38,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class Snippet022ComputedListCombo {
 	private static WritableList model;
@@ -47,6 +49,7 @@ public class Snippet022ComputedListCombo {
 		shell.setLayout(new GridLayout(1, false));
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				Snippet022ComputedListCombo snippet = new Snippet022ComputedListCombo();
 				snippet.createModel();
@@ -64,7 +67,7 @@ public class Snippet022ComputedListCombo {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void createModel() {
 		model = new WritableList();
@@ -89,10 +92,8 @@ public class Snippet022ComputedListCombo {
 		male.setText("Male");
 		Button female = new Button(group, SWT.CHECK);
 		female.setText("Female");
-		final IObservableValue femaleObservable = SWTObservables
-				.observeSelection(female);
-		final IObservableValue maleObservable = SWTObservables
-				.observeSelection(male);
+		final IObservableValue femaleObservable = WidgetProperties.selection().observe(female);
+		final IObservableValue maleObservable = WidgetProperties.selection().observe(male);
 		Combo combo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
 		GridDataFactory.defaultsFor(combo).align(SWT.BEGINNING, SWT.BEGINNING)
 				.applyTo(combo);
@@ -100,6 +101,7 @@ public class Snippet022ComputedListCombo {
 		viewer.setContentProvider(new ObservableListContentProvider());
 		// We should really have an out-of-the box filtered list...
 		IObservableList filteredList = new ComputedList() {
+			@Override
 			protected List calculate() {
 				ArrayList result = new ArrayList();
 				for (Iterator it = model.iterator(); it.hasNext();) {
@@ -131,6 +133,7 @@ public class Snippet022ComputedListCombo {
 			this.male = male;
 		}
 
+		@Override
 		public String toString() {
 			return name;
 		}

@@ -71,11 +71,7 @@ public class SubActionBars2 extends SubActionBars implements IActionBars2 {
 		return new SubCoolBarManager(parent);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionBars2#getCoolBarManager()
-	 */
+	@Override
 	public ICoolBarManager getCoolBarManager() {
 		if (coolBarMgr == null) {
 			coolBarMgr = createSubCoolBarManager(getCastedParent()
@@ -85,11 +81,7 @@ public class SubActionBars2 extends SubActionBars implements IActionBars2 {
 		return coolBarMgr;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.SubActionBars#setActive(boolean)
-	 */
+	@Override
 	protected void setActive(boolean value) {
 		super.setActive(value);
 		if (coolBarMgr != null) {
@@ -97,11 +89,7 @@ public class SubActionBars2 extends SubActionBars implements IActionBars2 {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.SubActionBars#dispose()
-	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		if (coolBarMgr != null) {

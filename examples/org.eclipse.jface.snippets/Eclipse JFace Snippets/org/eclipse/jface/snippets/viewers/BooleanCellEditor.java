@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
+ *     Sebastian Sampaoli <seba.sampaoli@gmail.com> - Bug 428355
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -19,7 +20,6 @@ import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -37,20 +37,6 @@ public class BooleanCellEditor extends CellEditor {
 	private int index;
 	private String restoredText;
 	private Image restoredImage;
-	private KeyListener macSelectionListener = new KeyListener(){
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-
-		}
-
-		@Override
-		public void keyPressed(KeyEvent e) {
-			if( e.character == ' ' ) {
-				button.setSelection(!button.getSelection());
-			}
-		}
-	};
 
 	private boolean changeOnActivation;
 
@@ -88,9 +74,6 @@ public class BooleanCellEditor extends CellEditor {
 
 		button.addKeyListener(new KeyAdapter() {
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
-			 */
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if( e.character == SWT.ESC ) {
@@ -161,9 +144,6 @@ public class BooleanCellEditor extends CellEditor {
     	super.activate(activationEvent);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.CellEditor#getDoubleClickTimeout()
-	 */
 	@Override
 	protected int getDoubleClickTimeout() {
 		return 0;

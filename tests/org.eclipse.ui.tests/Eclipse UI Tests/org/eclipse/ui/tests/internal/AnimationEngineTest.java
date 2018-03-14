@@ -47,23 +47,17 @@ public class AnimationEngineTest extends UITestCase {
 		public int renderCalled = -1;
 		public int disposeCalled = -1;
 		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.internal.AnimationFeedbackBase#dispose()
-		 */
+		@Override
 		public void dispose() {
 			disposeCalled = count++;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.internal.AnimationFeedbackBase#initialize(org.eclipse.ui.internal.AnimationEngine)
-		 */
+		@Override
 		public void initialize(AnimationEngine animationEngine) {
 			initCalled = count++;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.internal.AnimationFeedbackBase#renderStep(org.eclipse.ui.internal.AnimationEngine)
-		 */
+		@Override
 		public void renderStep(AnimationEngine engine) {
 			if(renderCalled == -1)
 				renderCalled = count++;
@@ -75,10 +69,12 @@ public class AnimationEngineTest extends UITestCase {
 	TestFeedback feedback;
 	AnimationEngine engine;
 	
+	@Override
 	protected void doSetUp() {
 		shell = new Shell(Display.getCurrent());
 	}
 
+	@Override
 	protected void doTearDown() {
 		shell.dispose();
 		shell = null;

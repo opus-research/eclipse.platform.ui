@@ -37,11 +37,7 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 		super(testName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
@@ -186,11 +182,7 @@ public abstract class DecoratorViewerTest extends AbstractNavigatorTest {
 	 */
 	protected abstract void fontCheck(IViewPart view);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.navigator.AbstractNavigatorTest#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 
 		super.doTearDown();
