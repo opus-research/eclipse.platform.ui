@@ -19,6 +19,7 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -33,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * Snippet that demostrates a simple use case using ComputedValue to format a
  * name as the user enters first and last name.
- * 
+ *
  * @since 3.2
  */
 public class Snippet008ComputedValue {
@@ -42,7 +43,7 @@ public class Snippet008ComputedValue {
 	 */
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				Shell shell = new Shell(display);
@@ -89,7 +90,7 @@ public class Snippet008ComputedValue {
 	 * queried. It then exposes those observables and <code>ComputedValue</code>
 	 * can listen to changes in those objects and react accordingly.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	static class FormattedName extends ComputedValue {
@@ -131,7 +132,7 @@ public class Snippet008ComputedValue {
 
 	/**
 	 * Composite that creates the UI.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	static class UI extends Composite {
