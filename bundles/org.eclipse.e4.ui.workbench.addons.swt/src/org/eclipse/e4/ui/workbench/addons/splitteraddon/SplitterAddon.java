@@ -29,6 +29,7 @@ import org.osgi.service.event.Event;
 /**
  * Listens for the IPresentationEngine's SPLIT_HORIZONTAL and SPLIT_VERTICAL tags being applied to
  * an MPart and takes the appropriate steps to split / unsplit the part
+ * 
  */
 public class SplitterAddon {
 	@Inject
