@@ -19,13 +19,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 /**
- * Validates a number that is to be converted by a {@link NumberFormatConverter}
- * . Validation is comprised of parsing the String and range checks.
+ * Validates a number that is to be converted by a {@link NumberFormatConverter}.
+ * Validation is comprised of parsing the String and range checks.
  *
  * @since 1.0
  */
-public abstract class AbstractStringToNumberValidator implements
-		IValidator<Object> {
+public abstract class AbstractStringToNumberValidator implements IValidator {
 	private final NumberFormatConverter converter;
 	private final boolean toPrimitive;
 
@@ -37,12 +36,9 @@ public abstract class AbstractStringToNumberValidator implements
 	/**
 	 * Constructs a new instance.
 	 *
-	 * @param converter
-	 *            converter and thus formatter to be used in validation
-	 * @param min
-	 *            minimum value, used for reporting a range error to the user
-	 * @param max
-	 *            maximum value, used for reporting a range error to the user
+	 * @param converter converter and thus formatter to be used in validation
+	 * @param min minimum value, used for reporting a range error to the user
+	 * @param max maximum value, used for reporting a range error to the user
 	 */
 	protected AbstractStringToNumberValidator(NumberFormatConverter converter,
 			Number min, Number max) {
@@ -51,7 +47,7 @@ public abstract class AbstractStringToNumberValidator implements
 		this.max = max;
 
 		if (converter.getToType() instanceof Class) {
-			Class<?> clazz = (Class<?>) converter.getToType();
+			Class clazz = (Class) converter.getToType();
 			toPrimitive = clazz.isPrimitive();
 		} else {
 			toPrimitive = false;
@@ -59,8 +55,7 @@ public abstract class AbstractStringToNumberValidator implements
 	}
 
 	/**
-	 * Validates the provided <code>value</code>. An error status is returned
-	 * if:
+	 * Validates the provided <code>value</code>.  An error status is returned if:
 	 * <ul>
 	 * <li>The value cannot be parsed.</li>
 	 * <li>The value is out of range.</li>
@@ -70,23 +65,22 @@ public abstract class AbstractStringToNumberValidator implements
 	 */
 	@Override
 	public final IStatus validate(Object value) {
-		ParseResult result = StringToNumberParser.parse(value,
-				converter.getNumberFormat(), toPrimitive);
+		ParseResult result = StringToNumberParser.parse(value, converter
+				.getNumberFormat(), toPrimitive);
 
 		if (result.getNumber() != null) {
 			if (!isInRange(result.getNumber())) {
 				if (outOfRangeMessage == null) {
 					outOfRangeMessage = StringToNumberParser
-							.createOutOfRangeMessage(min, max,
-									converter.getNumberFormat());
+							.createOutOfRangeMessage(min, max, converter
+									.getNumberFormat());
 				}
 
 				return ValidationStatus.error(outOfRangeMessage);
 			}
 		} else if (result.getPosition() != null) {
-			String parseErrorMessage = StringToNumberParser
-					.createParseErrorMessage((String) value,
-							result.getPosition());
+			String parseErrorMessage = StringToNumberParser.createParseErrorMessage(
+					(String) value, result.getPosition());
 
 			return ValidationStatus.error(parseErrorMessage);
 		}

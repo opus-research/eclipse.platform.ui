@@ -29,8 +29,7 @@ public class NumberToBigIntegerConverter extends NumberToNumberConverter {
 	 * @param numberFormat
 	 * @param fromType
 	 */
-	public NumberToBigIntegerConverter(NumberFormat numberFormat,
-			Class<?> fromType) {
+	public NumberToBigIntegerConverter(NumberFormat numberFormat, Class fromType) {
 		super(numberFormat, fromType, BigInteger.class);
 	}
 

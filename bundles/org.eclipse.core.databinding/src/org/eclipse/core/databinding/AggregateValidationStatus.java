@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.Status;
  * @since 1.0
  *
  */
-public final class AggregateValidationStatus extends ComputedValue<IStatus> {
+public final class AggregateValidationStatus extends ComputedValue {
 	/**
 	 * Constant denoting an aggregation strategy that merges multiple non-OK
 	 * status objects in a {@link MultiStatus}. Returns an OK status result if
@@ -58,7 +58,7 @@ public final class AggregateValidationStatus extends ComputedValue<IStatus> {
 	public static final int MAX_SEVERITY = 2;
 
 	private int strategy;
-	private IObservableCollection<? extends ValidationStatusProvider> validationStatusProviders;
+	private IObservableCollection validationStatusProviders;
 
 	/**
 	 * Creates a new aggregate validation status observable for the given data
@@ -86,8 +86,7 @@ public final class AggregateValidationStatus extends ComputedValue<IStatus> {
 	 * @see DataBindingContext#getValidationStatusProviders()
 	 */
 	public AggregateValidationStatus(
-			final IObservableCollection<? extends ValidationStatusProvider> validationStatusProviders,
-			int strategy) {
+			final IObservableCollection validationStatusProviders, int strategy) {
 		this(Realm.getDefault(), validationStatusProviders, strategy);
 	}
 
@@ -103,17 +102,15 @@ public final class AggregateValidationStatus extends ComputedValue<IStatus> {
 	 * @see DataBindingContext#getValidationStatusProviders()
 	 * @since 1.1
 	 */
-	public AggregateValidationStatus(
-			final Realm realm,
-			final IObservableCollection<? extends ValidationStatusProvider> validationStatusProviders,
-			int strategy) {
+	public AggregateValidationStatus(final Realm realm,
+			final IObservableCollection validationStatusProviders, int strategy) {
 		super(realm, IStatus.class);
 		this.validationStatusProviders = validationStatusProviders;
 		this.strategy = strategy;
 	}
 
 	@Override
-	protected IStatus calculate() {
+	protected Object calculate() {
 		IStatus result;
 		if (strategy == MERGED) {
 			result = getStatusMerged(validationStatusProviders);
@@ -133,27 +130,26 @@ public final class AggregateValidationStatus extends ComputedValue<IStatus> {
 	 *            a collection of validation status providers
 	 * @return a merged status
 	 */
-	public static IStatus getStatusMerged(
-			Collection<? extends ValidationStatusProvider> validationStatusProviders) {
-		List<IStatus> statuses = new ArrayList<IStatus>();
-		for (Iterator<? extends ValidationStatusProvider> it = validationStatusProviders
-				.iterator(); it.hasNext();) {
-			ValidationStatusProvider validationStatusProvider = it.next();
-			IStatus status = validationStatusProvider.getValidationStatus()
-					.getValue();
+	public static IStatus getStatusMerged(Collection validationStatusProviders) {
+		List statuses = new ArrayList();
+		for (Iterator it = validationStatusProviders.iterator(); it.hasNext();) {
+			ValidationStatusProvider validationStatusProvider = (ValidationStatusProvider) it
+					.next();
+			IStatus status = (IStatus) validationStatusProvider
+					.getValidationStatus().getValue();
 			if (!status.isOK()) {
 				statuses.add(status);
 			}
 		}
 		if (statuses.size() == 1) {
-			return statuses.get(0);
+			return (IStatus) statuses.get(0);
 		}
 		if (!statuses.isEmpty()) {
 			MultiStatus result = new MultiStatus(Policy.JFACE_DATABINDING, 0,
 					BindingMessages
 							.getString(BindingMessages.MULTIPLE_PROBLEMS), null);
-			for (Iterator<IStatus> it = statuses.iterator(); it.hasNext();) {
-				IStatus status = it.next();
+			for (Iterator it = statuses.iterator(); it.hasNext();) {
+				IStatus status = (IStatus) it.next();
 				result.merge(status);
 			}
 			return result;
@@ -172,14 +168,14 @@ public final class AggregateValidationStatus extends ComputedValue<IStatus> {
 	 *         validation status providers
 	 */
 	public static IStatus getStatusMaxSeverity(
-			Collection<? extends ValidationStatusProvider> validationStatusProviders) {
+			Collection validationStatusProviders) {
 		int maxSeverity = IStatus.OK;
 		IStatus maxStatus = Status.OK_STATUS;
-		for (Iterator<? extends ValidationStatusProvider> it = validationStatusProviders
-				.iterator(); it.hasNext();) {
-			ValidationStatusProvider validationStatusProvider = it.next();
-			IStatus status = validationStatusProvider.getValidationStatus()
-					.getValue();
+		for (Iterator it = validationStatusProviders.iterator(); it.hasNext();) {
+			ValidationStatusProvider validationStatusProvider = (ValidationStatusProvider) it
+					.next();
+			IStatus status = (IStatus) validationStatusProvider
+					.getValidationStatus().getValue();
 			if (status.getSeverity() > maxSeverity) {
 				maxSeverity = status.getSeverity();
 				maxStatus = status;

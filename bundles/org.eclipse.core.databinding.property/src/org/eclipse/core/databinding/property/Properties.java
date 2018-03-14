@@ -89,7 +89,7 @@ public class Properties {
 	 * Returns an array of observable maps where each map observes the
 	 * corresponding value property on all elements in the given domain set, for
 	 * each property in the given array.
-	 *
+	 * 
 	 * @param domainSet
 	 *            the set of elements whose properties will be observed
 	 * @param properties
@@ -115,7 +115,7 @@ public class Properties {
 	 * corresponding value property on all elements in the given domain map's
 	 * {@link Map#values() values} collection, for each property in the given
 	 * array.
-	 *
+	 * 
 	 * @param domainMap
 	 *            the map of elements whose properties will be observed
 	 * @param properties
@@ -212,7 +212,8 @@ public class Properties {
 	 * @return a value property which observes the value of an
 	 *         {@link IObservableValue}.
 	 */
-	public static <T> IValueProperty<IObservableValue<T>, T> observableValue(Object valueType) {
+	public static <T> IValueProperty<IObservableValue<T>, T> observableValue(
+			Object valueType) {
 		return new ObservableValueProperty<T>(valueType);
 	}
 }
