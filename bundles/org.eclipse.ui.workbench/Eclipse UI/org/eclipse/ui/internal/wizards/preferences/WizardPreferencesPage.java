@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,7 @@ import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -323,10 +324,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	}
 
 	protected void updateDescription() {
-		IStructuredSelection selection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
 		String desc = ""; //$NON-NLS-1$
 		if (!selection.isEmpty()) {
-			Object element = selection.getFirstElement();
+			Object element = ((IStructuredSelection) selection)
+					.getFirstElement();
 			if ((element instanceof PreferenceTransferElement)) {
 				desc = ((PreferenceTransferElement) element).getDescription();
 			}
@@ -546,6 +548,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#saveWidgetValues()
+	 */
 	protected void saveWidgetValues() {
 
 		IDialogSettings settings = getDialogSettings();
@@ -943,12 +950,22 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		destinationNameField.setText(value);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();
 		transfers = null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#allowNewContainerName()
+	 */
 	protected boolean allowNewContainerName() {
 		return true;
 	}

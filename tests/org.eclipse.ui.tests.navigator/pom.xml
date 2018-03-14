@@ -8,33 +8,17 @@
 
   Contributors:
      Igor Fedorenko - initial implementation
-     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457867
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>eclipse.platform.ui.tests</artifactId>
     <groupId>eclipse.platform.ui</groupId>
-    <version>4.5.0-SNAPSHOT</version>
+    <version>4.4.0-SNAPSHOT</version>
   </parent>
   <groupId>org.eclipse.ui</groupId>
   <artifactId>org.eclipse.ui.tests.navigator</artifactId>
-  <version>3.4.300-SNAPSHOT</version>
+  <version>3.4.200-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
-
-   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-compiler-plugin</artifactId>
-        <version>${tycho.version}</version>
-        <configuration>
-          <compilerArgs>
-            <arg>-warn:-raw,unchecked</arg>
-          </compilerArgs>
-        </configuration>
-      </plugin>
-    </plugins>
- </build>
 
 </project>

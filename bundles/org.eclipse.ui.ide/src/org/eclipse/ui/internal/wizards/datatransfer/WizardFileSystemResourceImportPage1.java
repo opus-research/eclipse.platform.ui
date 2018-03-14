@@ -235,8 +235,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 IDialogConstants.SELECT_TYPES_ID, SELECT_TYPES_TITLE, false);
 
         SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 handleTypesEditButtonPressed();
             }
         };
@@ -247,8 +246,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 IDialogConstants.SELECT_ALL_ID, SELECT_ALL_TITLE, false);
 
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setAllSelections(true);
                 updateWidgetEnablements();
             }
@@ -260,8 +258,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 IDialogConstants.DESELECT_ALL_ID, DESELECT_ALL_TITLE, false);
 
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setAllSelections(false);
                 updateWidgetEnablements();
             }
@@ -274,8 +271,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
     /* (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         super.createControl(parent);
         validateSourceGroup();
         PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
@@ -285,8 +281,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
     /**
      *	Create the import options specification widgets.
      */
-    @Override
-	protected void createOptionsGroupButtons(Group optionsGroup) {
+    protected void createOptionsGroupButtons(Group optionsGroup) {
 
         // overwrite... checkbox
         overwriteExistingResourcesCheckbox = new Button(optionsGroup, SWT.CHECK);
@@ -299,8 +294,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         createTopLevelFolderCheckbox.setText(DataTransferMessages.FileImport_createTopLevel);
         createTopLevelFolderCheckbox.setSelection(false);
         createTopLevelFolderCheckbox.addSelectionListener(new SelectionAdapter() {
-        	@Override
-			public void widgetSelected(SelectionEvent e) {
+        	public void widgetSelected(SelectionEvent e) {
         		updateWidgetEnablements();
         	}
         });
@@ -314,7 +308,6 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 			data.horizontalAlignment= GridData.BEGINNING;
 			advancedButton.setLayoutData(data);
 			advancedButton.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleAdvancedButtonSelect();
 				}
@@ -340,8 +333,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         createLinksInWorkspaceButton.setSelection(false);
         
         createLinksInWorkspaceButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
-			public void widgetSelected(SelectionEvent e) {
+        	public void widgetSelected(SelectionEvent e) {
         		updateWidgetEnablements();
         	}
         });
@@ -358,8 +350,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         createVirtualFoldersButton.setSelection(false);
 
         createVirtualFoldersButton.addSelectionListener(new SelectionAdapter() {
-        	@Override
-			public void widgetSelected(SelectionEvent e) {
+        	public void widgetSelected(SelectionEvent e) {
         		updateWidgetEnablements();
         	}
         });
@@ -387,18 +378,15 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 		relativeGroup.setLayout(layout);
 
         relativePathVariableGroup = new RelativePathVariableGroup(new RelativePathVariableGroup.IModel() {
-			@Override
 			public IResource getResource() {
 				IPath path = getContainerFullPath();
 				if (path != null)
 					return ResourcesPlugin.getWorkspace().getRoot().findMember(path);
 				return null;
 			}
-			@Override
 			public void setVariable(String string) {
 				pathVariable = string;
 			}
-			@Override
 			public String getVariable() {
 				return pathVariable;
 			}
@@ -471,8 +459,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         BidiUtils.applyBidiProcessing(sourceNameField, StructuredTextTypeHandlerFactory.FILE);
 
         sourceNameField.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 updateFromSourceField();
             }
         });
@@ -481,8 +468,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
             /*
              * @see KeyListener.keyPressed
              */
-            @Override
-			public void keyPressed(KeyEvent e) {
+            public void keyPressed(KeyEvent e) {
 				if (e.character == SWT.CR) {
 					entryChanged = false;
 					updateFromSourceField();
@@ -492,13 +478,11 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
             /*
              * @see KeyListener.keyReleased
              */
-            @Override
-			public void keyReleased(KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
             }
         });
 
         sourceNameField.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				entryChanged = true;
 			}
@@ -508,16 +492,14 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
             /*
              * @see FocusListener.focusGained(FocusEvent)
              */
-            @Override
-			public void focusGained(FocusEvent e) {
+            public void focusGained(FocusEvent e) {
                 //Do nothing when getting focus
             }
 
             /*
              * @see FocusListener.focusLost(FocusEvent)
              */
-            @Override
-			public void focusLost(FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 //Clear the flag to prevent constant update
                 if (entryChanged) {
                     entryChanged = false;
@@ -578,8 +560,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
     /**
      *	Create the import source specification widgets
      */
-    @Override
-	protected void createSourceGroup(Composite parent) {
+    protected void createSourceGroup(Composite parent) {
 
         createRootDirectoryGroup(parent);
         createFileSelectionGroup(parent);
@@ -671,11 +652,9 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only files as children.
      */
-    @Override
-	protected ITreeContentProvider getFileProvider() {
+    protected ITreeContentProvider getFileProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object o) {
+            public Object[] getChildren(Object o) {
                 if (o instanceof MinimizedFileSystemElement) {
                     MinimizedFileSystemElement element = (MinimizedFileSystemElement) o;
                     return element.getFiles(
@@ -707,11 +686,9 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only folders as children.
      */
-    @Override
-	protected ITreeContentProvider getFolderProvider() {
+    protected ITreeContentProvider getFolderProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object o) {
+            public Object[] getChildren(Object o) {
                 if (o instanceof MinimizedFileSystemElement) {
                     MinimizedFileSystemElement element = (MinimizedFileSystemElement) o;
                     return element.getFolders(
@@ -721,8 +698,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 return new Object[0];
             }
 
-            @Override
-			public boolean hasChildren(Object o) {
+            public boolean hasChildren(Object o) {
                 if (o instanceof MinimizedFileSystemElement) {
                     MinimizedFileSystemElement element = (MinimizedFileSystemElement) o;
                     if (element.isPopulated()) {
@@ -798,8 +774,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      *
      * @param event Event
      */
-    @Override
-	public void handleEvent(Event event) {
+    public void handleEvent(Event event) {
         if (event.widget == sourceBrowseButton) {
 			handleSourceBrowseButtonPressed();
 		}
@@ -839,8 +814,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * in the receivers types-to-export field.,
      * Added here so that inner classes can have access
      */
-    @Override
-	protected void handleTypesEditButtonPressed() {
+    protected void handleTypesEditButtonPressed() {
 
         super.handleTypesEditButtonPressed();
     }
@@ -873,8 +847,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         return executeImportOperation(operation);
     }
 
-    @Override
-	protected void handleContainerBrowseButtonPressed() {
+    protected void handleContainerBrowseButtonPressed() {
     	super.handleContainerBrowseButtonPressed();
     	IPath path = getContainerFullPath();
     	if (path != null && relativePathVariableGroup != null) {
@@ -956,8 +929,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      *	Use the dialog store to restore widget values to the values that they held
      *	last time this wizard was used to completion
      */
-    @Override
-	protected void restoreWidgetValues() {
+    protected void restoreWidgetValues() {
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
             String[] sourceNames = settings.getArray(STORE_SOURCE_NAMES_ID);
@@ -1003,8 +975,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * 	Since Finish was pressed, write widget values to the dialog store so that they
      *	will persist into the next invocation of this wizard page
      */
-    @Override
-	protected void saveWidgetValues() {
+    protected void saveWidgetValues() {
         IDialogSettings settings = getDialogSettings();
         if (settings != null) {
             // update source names history
@@ -1051,8 +1022,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         final MinimizedFileSystemElement[] results = new MinimizedFileSystemElement[1];
 
         BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 //Create the root element from the supplied file system object
                 results[0] = createRootElement(rootFileSystemObject,
                         structureProvider);
@@ -1067,8 +1037,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * to provide access for inner classes.
      * @param value boolean
      */
-    @Override
-	protected void setAllSelections(boolean value) {
+    protected void setAllSelections(boolean value) {
         super.setAllSelections(value);
     }
 
@@ -1107,16 +1076,14 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
     /**
      * Update the tree to only select those elements that match the selected types
      */
-    @Override
-	protected void setupSelectionsBasedOnSelectedTypes() {
+    protected void setupSelectionsBasedOnSelectedTypes() {
         ProgressMonitorDialog dialog = new ProgressMonitorJobsDialog(
                 getContainer().getShell());
         final Map selectionMap = new Hashtable();
 
         final IElementFilter filter = new IElementFilter() {
 
-            @Override
-			public void filterElements(Collection files,
+            public void filterElements(Collection files,
                     IProgressMonitor monitor) throws InterruptedException {
                 if (files == null) {
                     throw new InterruptedException();
@@ -1130,8 +1097,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 }
             }
 
-            @Override
-			public void filterElements(Object[] files, IProgressMonitor monitor)
+            public void filterElements(Object[] files, IProgressMonitor monitor)
                     throws InterruptedException {
                 if (files == null) {
                     throw new InterruptedException();
@@ -1160,8 +1126,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         };
 
         IRunnableWithProgress runnable = new IRunnableWithProgress() {
-            @Override
-			public void run(final IProgressMonitor monitor)
+            public void run(final IProgressMonitor monitor)
                     throws InterruptedException {
                 monitor
                         .beginTask(
@@ -1194,8 +1159,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
     /* (non-Javadoc)
      * Method declared on IDialogPage. Set the selection up when it becomes visible.
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         super.setVisible(visible);
         resetSelection();
         if (visible) {
@@ -1209,8 +1173,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * visibility
      * @param map Map - key tree elements, values Lists of list elements
      */
-    @Override
-	protected void updateSelections(Map map) {
+    protected void updateSelections(Map map) {
         super.updateSelections(map);
     }
 
@@ -1218,8 +1181,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * Check if widgets are enabled or disabled by a change in the dialog.
      * Provided here to give access to inner classes.
      */
-    @Override
-	protected void updateWidgetEnablements() {
+    protected void updateWidgetEnablements() {
         super.updateWidgetEnablements();
         enableButtonGroup(ensureSourceIsValid());
 
@@ -1244,8 +1206,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      *	Answer a boolean indicating whether self's source specification
      *	widgets currently all contain valid values.
      */
-    @Override
-	protected boolean validateSourceGroup() {
+    protected boolean validateSourceGroup() {
         File sourceDirectory = getSourceDirectory();
         if (sourceDirectory == null) {
             setMessage(SOURCE_EMPTY_MESSAGE);
@@ -1294,8 +1255,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * @param sourcePath the path to check
      * @return <code>true</code> if there is a conflict, <code>false</code> if not
      */
-    @Override
-	protected boolean sourceConflictsWithDestination(IPath sourcePath) {
+    protected boolean sourceConflictsWithDestination(IPath sourcePath) {
 
         IContainer container = getSpecifiedContainer();
         if (container == null) {

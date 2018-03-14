@@ -33,12 +33,10 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 		this.project = project;
 	}
 
-	@Override
 	public Image getImage() {
 		return null;
 	}
 
-	@Override
 	public String getLabel() {
 		return determineLabel();
 	}
@@ -60,7 +58,6 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 		return project;
 	}
 
-	@Override
 	public Object[] getChildren(ITreeContentProvider delegateContentProvider) {
 
 		List nonExternalSourceFolders = getNonExternalSourceFolders();
@@ -100,7 +97,6 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 
 	}
 
-	@Override
 	public Object getAdapter(Class adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}

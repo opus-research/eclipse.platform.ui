@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -185,7 +184,9 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
                     if (categoryId.equals(categories[i].getParentId())) {
                         Set bindings = themeRegistry
                                 .getPresentationsBindingsFor(categories[i]);
-						if (bindings == null) {
+                        if (bindings == null
+                                || bindings.contains(workbench
+                                        .getPresentationId())) {
 							list.add(categories[i]);
 						}
                     }
@@ -339,7 +340,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
                 if (categories[i].getParentId() == null) {
                     Set bindings = themeRegistry
                             .getPresentationsBindingsFor(categories[i]);
-					if (bindings == null) {
+                    if (bindings == null
+                            || bindings.contains(workbench.getPresentationId())) {
 						list.add(categories[i]);
 					}
                 }

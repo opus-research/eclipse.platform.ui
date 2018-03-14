@@ -69,7 +69,6 @@ public class MarkersTreeViewer extends TreeViewer {
 	 * org.eclipse.jface.viewers.AbstractTreeViewer#doUpdateItem(org.eclipse
 	 * .swt.widgets.Item, java.lang.Object)
 	 */
-	@Override
 	protected void doUpdateItem(Item item, Object element) {
 		super.doUpdateItem(item, element);
 		/*

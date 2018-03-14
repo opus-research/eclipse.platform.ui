@@ -48,8 +48,7 @@ class BookmarkContentProvider implements IStructuredContentProvider,
      * The visual part that is using this content provider is about
      * to be disposed. Deallocate all allocated SWT resources.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         IResource resource = (IResource) viewer.getInput();
         if (resource != null) {
             resource.getWorkspace().removeResourceChangeListener(this);
@@ -79,8 +78,7 @@ class BookmarkContentProvider implements IStructuredContentProvider,
 		}
     }
 
-    @Override
-	public Object[] getElements(Object element) {
+    public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
@@ -139,8 +137,7 @@ class BookmarkContentProvider implements IStructuredContentProvider,
 		}
     }
 
-    @Override
-	public void inputChanged(Viewer newViewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer newViewer, Object oldInput, Object newInput) {
         if (oldInput == null) {
             IResource resource = (IResource) newInput;
             resource.getWorkspace().addResourceChangeListener(this);
@@ -155,8 +152,7 @@ class BookmarkContentProvider implements IStructuredContentProvider,
      *
      * @see IResourceChangeListener#resourceChanged
      */
-    @Override
-	public void resourceChanged(final IResourceChangeEvent event) {
+    public void resourceChanged(final IResourceChangeEvent event) {
 
         // gather all marker changes from the delta.
         // be sure to do this in the calling thread, 
@@ -174,8 +170,7 @@ class BookmarkContentProvider implements IStructuredContentProvider,
         // update the viewer based on the marker changes, in the UI thread
         if (additions.size() + removals.size() + changes.size() > 0) {
             viewer.getControl().getDisplay().asyncExec(new Runnable() {
-                @Override
-				public void run() {
+                public void run() {
                     // This method runs inside an asyncExec.  The widget may have been destroyed
                     // by the time this is run.  Check for this and do nothing if so.
                     Control ctrl = viewer.getControl();

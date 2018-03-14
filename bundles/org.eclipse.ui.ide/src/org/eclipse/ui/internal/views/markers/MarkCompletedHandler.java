@@ -42,7 +42,6 @@ public class MarkCompletedHandler extends MarkerViewHandler {
 	 * 
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) {
 
 		final ExecutionEvent finalEvent = event;
@@ -54,7 +53,6 @@ public class MarkCompletedHandler extends MarkerViewHandler {
 						 * 
 						 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 						 */
-						@Override
 						public void run(IProgressMonitor monitor) {
 							monitor.beginTask(
 									MarkerMessages.markCompletedHandler_task,

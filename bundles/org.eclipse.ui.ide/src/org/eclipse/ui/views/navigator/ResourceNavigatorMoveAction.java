@@ -34,7 +34,6 @@ import org.eclipse.ui.actions.MoveResourceAction;
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ResourceNavigatorMoveAction extends MoveResourceAction {
     private StructuredViewer viewer;
 
@@ -57,8 +56,7 @@ public class ResourceNavigatorMoveAction extends MoveResourceAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (moveProjectAction.isEnabled()) {
             moveProjectAction.run();
             return;
@@ -84,8 +82,7 @@ public class ResourceNavigatorMoveAction extends MoveResourceAction {
 
     }
 
-    @Override
-	protected boolean updateSelection(IStructuredSelection selection) {
+    protected boolean updateSelection(IStructuredSelection selection) {
         moveProjectAction.selectionChanged(selection);
         return super.updateSelection(selection)
                 || moveProjectAction.isEnabled();

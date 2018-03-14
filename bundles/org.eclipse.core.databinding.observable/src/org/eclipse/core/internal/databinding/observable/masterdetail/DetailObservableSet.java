@@ -41,7 +41,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 	private boolean updating = false;
 
 	private ISetChangeListener innerChangeListener = new ISetChangeListener() {
-		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			if (!updating) {
 				fireSetChange(event.diff);
@@ -73,7 +72,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		this.outerObservableValue = outerObservableValue;
 
 		outerObservableValue.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 				dispose();
 			}
@@ -89,7 +87,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 	}
 
 	IValueChangeListener outerChangeListener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			if (isDisposed())
 				return;
@@ -136,7 +133,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean add(final Object o) {
 		getterCalled();
 		ObservableTracker.setIgnore(true);
@@ -147,7 +143,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean remove(final Object o) {
 		getterCalled();
 		ObservableTracker.setIgnore(true);
@@ -158,7 +153,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean addAll(final Collection c) {
 		getterCalled();
 		ObservableTracker.setIgnore(true);
@@ -169,7 +163,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean removeAll(final Collection c) {
 		getterCalled();
 		ObservableTracker.setIgnore(true);
@@ -180,7 +173,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		}
 	}
 
-	@Override
 	public boolean retainAll(final Collection c) {
 		getterCalled();
 		ObservableTracker.setIgnore(true);
@@ -191,7 +183,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		}
 	}
 
-	@Override
 	public void clear() {
 		getterCalled();
 		ObservableTracker.setIgnore(true);
@@ -202,7 +193,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		}
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 
@@ -221,7 +211,6 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 		innerChangeListener = null;
 	}
 
-	@Override
 	public Object getObserved() {
 		if (innerObservableSet instanceof IObserving) {
 			return ((IObserving) innerObservableSet).getObserved();

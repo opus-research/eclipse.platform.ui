@@ -170,6 +170,9 @@ public class WWinPluginAction extends PluginAction implements
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
@@ -181,6 +184,9 @@ public class WWinPluginAction extends PluginAction implements
                 "Action must implement IWorkbenchWindowActionDelegate"); //$NON-NLS-1$
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected void initDelegate() {
         super.initDelegate();
@@ -222,6 +228,9 @@ public class WWinPluginAction extends PluginAction implements
                 && retargetAction == null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IActionDelegate2.
+     */
     @Override
 	public void runWithEvent(Event event) {
         if (retargetAction == null) {
@@ -255,6 +264,9 @@ public class WWinPluginAction extends PluginAction implements
         localHelpListener = listener;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void setChecked(boolean checked) {
         super.setChecked(checked);
@@ -273,13 +285,4 @@ public class WWinPluginAction extends PluginAction implements
         ISelection selection = window.getSelectionService().getSelection();
         selectionChanged(selection);
     }
-
-	@Override
-	public String toString() {
-		return "WWinPluginAction [" //$NON-NLS-1$
-				+ "id=" + getId() //$NON-NLS-1$
-				+ ", enabled=" + isEnabled() + //$NON-NLS-1$
-				(actionSetId != null ? ", actionSet=" + actionSetId : "") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "]"; //$NON-NLS-1$
-	}
 }
