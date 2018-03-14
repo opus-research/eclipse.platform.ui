@@ -1472,15 +1472,7 @@ public class StackRenderer extends LazyStackRenderer {
 			final List<MPart> toPrompt = new ArrayList<MPart>(others);
 			toPrompt.retainAll(partService.getDirtyParts());
 
-			final Save[] response;
-			if (toPrompt.size() > 1) {
-				response = saveHandler.promptToSave(toPrompt);
-			} else if (toPrompt.size() == 1) {
-				response = new Save[] { saveHandler.promptToSave(toPrompt
-						.get(0)) };
-			} else {
-				response = new Save[] {};
-			}
+			final Save[] response = saveHandler.promptToSave(toPrompt);
 			final List<MPart> toSave = new ArrayList<MPart>(toPrompt.size());
 			for (int i = 0; i < response.length; i++) {
 				final Save save = response[i];
