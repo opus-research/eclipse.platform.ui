@@ -184,19 +184,10 @@ public class E4Application implements IApplication {
 
 	public void saveModel() {
 		try {
-			if (!(handler instanceof ResourceHandler)
-					|| ((ResourceHandler) handler).hasTopLevelWindows()) {
-				handler.save();
-			} else {
-				Logger logger = new WorkbenchLogger(PLUGIN_ID);
-				logger.error(
-						new Exception(), // log a stack trace for debugging
-						"Attempted to save a workbench model that had no top-level windows! " //$NON-NLS-1$
-								+ "Skipped saving the model to avoid corruption."); //$NON-NLS-1$
-			}
+			handler.save();
 		} catch (IOException e) {
-			Logger logger = new WorkbenchLogger(PLUGIN_ID);
-			logger.error(e, "Error saving the workbench model"); //$NON-NLS-1$
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
