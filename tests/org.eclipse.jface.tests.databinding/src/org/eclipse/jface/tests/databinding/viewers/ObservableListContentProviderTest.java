@@ -11,9 +11,6 @@
  ******************************************************************************/
 package org.eclipse.jface.tests.databinding.viewers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,7 +38,7 @@ public class ObservableListContentProviderTest extends AbstractDefaultRealmTestC
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
-		viewer = new TableViewer(shell, SWT.MULTI);
+		viewer = new TableViewer(shell, SWT.NONE);
 
 		contentProvider = new ObservableListContentProvider();
 		viewer.setContentProvider(contentProvider);
@@ -110,36 +107,6 @@ public class ObservableListContentProviderTest extends AbstractDefaultRealmTestC
 		assertEquals(Collections.singleton(element), realizedElements);
 		viewer.setInput(Observables.emptyObservableList());
 		assertEquals(Collections.EMPTY_SET, realizedElements);
-	}
-
-	/**
-	 * Test for Bug 384522. When an element is multiple times in an observable
-	 * list which is the input of a table, then moving one element in the list
-	 * should move the element in the table and preserve the selection.
-	 */
-	public void testMoveElement() {
-		Mutable element1 = new Mutable(1);
-		Mutable element2 = new Mutable(2);
-		Mutable element3 = new Mutable(3);
-		int newIndex_2 = 2;
-		int oldIndex_3 = 3;
-
-		input.add(element1); // 0
-		input.add(element3); // 1
-		input.add(element2); // 2
-		input.add(element1); // 3
-		input.add(element3); // 4
-		viewer.getTable().select(new int[] { 0, 1, oldIndex_3 });
-
-		assertThat(viewer.getTable().getSelectionIndices(), is(new int[] { 0, 1, oldIndex_3 }));
-		assertThat((Mutable) viewer.getElementAt(oldIndex_3), is(element1));
-		assertThat((Mutable) viewer.getElementAt(newIndex_2), is(element2));
-
-		input.move(oldIndex_3, newIndex_2);
-
-		assertThat(viewer.getTable().getSelectionIndices(), is(new int[] { 0, 1, newIndex_2 }));
-		assertThat((Mutable) viewer.getElementAt(oldIndex_3), is(element2));
-		assertThat((Mutable) viewer.getElementAt(newIndex_2), is(element1));
 	}
 
 	static class Mutable {
