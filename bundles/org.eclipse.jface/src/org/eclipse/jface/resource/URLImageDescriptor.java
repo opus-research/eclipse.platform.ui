@@ -49,7 +49,7 @@ class URLImageDescriptor extends ImageDescriptor {
 			URL xUrl = getxURL(url, zoom);
 			if (xUrl == null)
 				return null;
-			return getFilePath(xUrl); // can be null!
+			return getFilePath(xUrl, zoom == 100); // can be null!
 		}
 	}
 
@@ -136,6 +136,12 @@ class URLImageDescriptor extends ImageDescriptor {
 
 	private static InputStream getStream(URL url) {
 		try {
+			if (InternalPolicy.OSGI_AVAILABLE) {
+				URL platformURL = FileLocator.find(url);
+				if (platformURL != null) {
+					url = platformURL;
+				}
+			}
 			return new BufferedInputStream(url.openStream());
 		} catch (IOException e) {
 			return null;
@@ -187,7 +193,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 *
 	 * @return {@link String} or <code>null</code> if the file cannot be found
 	 */
-	private static String getFilePath(URL url) {
+	private static String getFilePath(URL url, boolean logIOException) {
 
 		try {
 			if (!InternalPolicy.OSGI_AVAILABLE) {
@@ -196,13 +202,19 @@ class URLImageDescriptor extends ImageDescriptor {
 				return null;
 			}
 
+			URL platformURL = FileLocator.find(url);
+			if (platformURL != null) {
+				url = platformURL;
+			}
 			URL locatedURL = FileLocator.toFileURL(url);
 			if (FILE_PROTOCOL.equalsIgnoreCase(locatedURL.getProtocol()))
 				return new Path(locatedURL.getPath()).toOSString();
 			return null;
 
 		} catch (IOException e) {
-			Policy.logException(e);
+			if (logIOException) {
+				Policy.logException(e);
+			}
 			return null;
 		}
 	}
@@ -217,15 +229,34 @@ class URLImageDescriptor extends ImageDescriptor {
 		try {
 
 			if (InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x) {
-				if (InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY) {
+				if (!InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY) {
 					try {
 						return new Image(device, new URLImageFileNameProvider(url));
 					} catch (SWTException exception) {
 						// If we fail fall back to the slower input stream method.
+					} catch (IllegalArgumentException exception) {
+						// If we fail fall back to the slower input stream method.
 					}
 				}
 
-				return new Image(device, new URLImageDataProvider(url));
+				Image image = null;
+				try {
+					image = new Image(device, new URLImageDataProvider(url));
+				} catch (SWTException e) {
+					if (e.code != SWT.ERROR_INVALID_IMAGE) {
+						throw e;
+					}
+				} catch (IllegalArgumentException e) {
+					// fall through
+				}
+				if (image == null && returnMissingImageOnError) {
+					try {
+						image = new Image(device, DEFAULT_IMAGE_DATA);
+					} catch (SWTException nextException) {
+						return null;
+					}
+				}
+				return image;
 
 			}
 			if (InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY) {
@@ -233,7 +264,7 @@ class URLImageDescriptor extends ImageDescriptor {
 			}
 
 			// Try to see if we can optimize using SWTs file based image support.
-			String path = getFilePath(url);
+			String path = getFilePath(url, true);
 			if (path != null) {
 				try {
 					return new Image(device, path);
