@@ -402,10 +402,10 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 				}
 			}
 		};
-		// Send notifications asynchronously. This method is often called while
-		// in the middle of updating the object's internal state, and a
-		// synchronous call back to the working set manager can corrupt the
-		// internal state of the working set manager.
+		// Always send them asynchronously. This method is often called while in
+		// the middle of updating the object's internal state, and a synchronous
+		// call back to the working set manager can corrupt the internal state
+		// of the working set manager.
 		Display.getDefault().asyncExec(notifier);
     }
 
