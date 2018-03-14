@@ -17,8 +17,6 @@
 
 package org.eclipse.ui.internal;
 
-import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,6 +160,7 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.internal.commands.SlaveCommandService;
 import org.eclipse.ui.internal.contexts.ContextService;
+import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
@@ -461,11 +460,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	@PostConstruct
 	public void setup() {
+		final IEclipseContext windowContext = model.getContext();
 		try {
 			// if workbench window is opened as a result of command execution,
 			// the context in which the new workbench window's commands are
 			// initialized has to to match the workbench context
-			final IEclipseContext windowContext = model.getContext();
 			HandlerServiceImpl.push(windowContext.getParent(), null);
 
 			// Initialize a previous 'saved' state if applicable. We no longer
@@ -761,7 +760,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			getShell().setData(this);
 			trackShellActivation();
 		} finally {
-			HandlerServiceImpl.pop();
+			HandlerServiceImpl.pop(windowContext);
 		}
 	}
 

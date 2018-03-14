@@ -19,6 +19,7 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
+import org.eclipse.e4.core.commands.internal.IContextProvider;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -41,6 +42,18 @@ public class CommandToModelProcessor {
 
 	private EModelService modelService;
 
+	private IContextProvider provider;
+
+	public CommandToModelProcessor() {
+		this.provider = new IContextProvider() {
+
+			@Override
+			public IEclipseContext getContext() {
+				return WorkbenchPlugin.getDefault().getWorkbenchContext();
+			}
+		};
+	}
+
 	@Execute
 	void process(MApplication application, IEclipseContext context, EModelService modelService) {
 		this.modelService = modelService;
@@ -56,7 +69,7 @@ public class CommandToModelProcessor {
 			HandlerServiceImpl.handlerGenerator = new ContextFunction() {
 				@Override
 				public Object compute(IEclipseContext context, String contextKey) {
-					return new WorkbenchHandlerServiceHandler(contextKey);
+					return new WorkbenchHandlerServiceHandler(contextKey, provider);
 				}
 			};
 			commandManager = new CommandManager();
