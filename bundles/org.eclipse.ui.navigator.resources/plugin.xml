@@ -149,7 +149,7 @@
 		         </enablement>
 			</commonWizard>              
       </navigatorContent>
-      <actionProvider 
+		      <actionProvider 
       			id="org.eclipse.ui.navigator.resources.OpenActions"
 				class="org.eclipse.ui.internal.navigator.resources.actions.OpenActionProvider">
 			<enablement>
@@ -246,6 +246,15 @@
 			<enablement> 
 				<!-- 'true' -->
    				<or/>
+			</enablement>
+		</actionProvider>
+      <actionProvider 
+      			id="org.eclipse.ui.navigator.resources.FoldersAsProjectsActionProvider"
+				class="org.eclipse.ui.internal.navigator.resources.actions.FoldersAsProjectsActionProvider">
+			<enablement>
+				<or>
+					<adapt type="org.eclipse.core.resources.IFolder" /> 	
+				</or>
 			</enablement>
 		</actionProvider>
 
@@ -392,5 +401,5 @@
     	<perspectiveExtension targetID = "org.eclipse.ui.resourcePerspective">
 		    <showInPart id = "org.eclipse.ui.navigator.ProjectExplorer"/>
     	</perspectiveExtension>
-   	</extension>    
+   	</extension>
 </plugin> 
