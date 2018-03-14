@@ -149,37 +149,25 @@ public class ImportExportPespectiveHandler {
 			return;
 		}
 
-		IPerspectiveDescriptor perspToOverwriteDesc = perspectiveRegistry.findPerspectiveWithLabel(perspective
-				.getLabel());
+		IPerspectiveDescriptor perspToOverwrite = perspectiveRegistry.findPerspectiveWithLabel(perspective.getLabel());
 
 		// a new perspective
-		if (perspToOverwriteDesc == null) {
+		if (perspToOverwrite == null) {
 			perspectiveRegistry.addPerspective(perspective);
 			importToolbarsLocation(perspective);
 			return;
 		}
 
-		perspectiveRegistry.deletePerspective(perspToOverwriteDesc);
-		perspectiveRegistry.addPerspective(perspective);
-
+		String perspToOverwriteId = perspToOverwrite.getId();
 		// a perspective with the same label exists, but has different ID
-		if (!perspective.getElementId().equals(perspToOverwriteDesc.getId())) {
-			MPerspective perspToOverwrite = getPerspectiveIfOpen(perspToOverwriteDesc);
-			if (perspToOverwrite != null) {
-				perspToOverwrite.setElementId(perspective.getElementId());
-			}
+		if (!perspective.getElementId().equals(perspToOverwriteId)) {
+			logger.warn(String.format("Cannot import perspective \"%s\" because a perspective" //$NON-NLS-1$
+					+ " with the same label but different ID exists in the workbench", perspective.getElementId())); //$NON-NLS-1$
+		} else {
+			perspectiveRegistry.deletePerspective(perspToOverwrite);
+			perspectiveRegistry.addPerspective(perspective);
 		}
-
 		importToolbarsLocation(perspective);
-	}
-
-	private MPerspective getPerspectiveIfOpen(IPerspectiveDescriptor perspToOverwrite) {
-		MPerspective perspective = null;
-		List<MPerspective> foundPerspectives = modelService.findElements(application, perspToOverwrite.getId(), MPerspective.class, null);
-		if (!foundPerspectives.isEmpty()) {
-			perspective = foundPerspectives.get(0);
-		}
-		return perspective;
 	}
 
 	private void logError(PreferenceChangeEvent event, Exception e) {
