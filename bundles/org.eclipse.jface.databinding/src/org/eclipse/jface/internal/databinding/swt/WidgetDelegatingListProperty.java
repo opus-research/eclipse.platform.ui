@@ -28,7 +28,6 @@ abstract class WidgetDelegatingListProperty extends DelegatingListProperty
 		super(elementType);
 	}
 
-	@Override
 	public ISWTObservableList observe(Widget widget) {
 		return (ISWTObservableList) observe(SWTObservables.getRealm(widget
 				.getDisplay()), widget);
