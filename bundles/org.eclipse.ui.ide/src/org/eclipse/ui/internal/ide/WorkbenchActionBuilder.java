@@ -106,11 +106,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 
     private IWorkbenchAction editActionSetAction;
 
-    private IWorkbenchAction closePerspAction;
-
     private IWorkbenchAction lockToolBarAction;
-
-    private IWorkbenchAction closeAllPerspsAction;
 
     private IWorkbenchAction showViewMenuAction;
 
@@ -670,12 +666,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             showViewMenuMgr.add(showViewMenu);
             menu.add(showViewMenuMgr);
         }
-        menu.add(new Separator());
-        menu.add(editActionSetAction);
-        menu.add(getSavePerspectiveItem());
-        menu.add(getResetPerspectiveItem());
-        menu.add(closePerspAction);
-        menu.add(closeAllPerspsAction);
     }
 
     /**
@@ -830,9 +820,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         saveAsAction = null;
         hideShowEditorAction = null;
         editActionSetAction = null;
-        closePerspAction = null;
         lockToolBarAction = null;
-        closeAllPerspsAction = null;
         showViewMenuAction = null;
         showPartPaneMenuAction = null;
         nextPartAction = null;
@@ -1071,11 +1059,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         register(editActionSetAction);
         lockToolBarAction = ActionFactory.LOCK_TOOL_BAR.create(window);
         register(lockToolBarAction);
-        closePerspAction = ActionFactory.CLOSE_PERSPECTIVE.create(window);
-        register(closePerspAction);
-        closeAllPerspsAction = ActionFactory.CLOSE_ALL_PERSPECTIVES
-                .create(window);
-        register(closeAllPerspsAction);
 
         forwardHistoryAction = ActionFactory.FORWARD_HISTORY
                 .create(window);
@@ -1394,28 +1377,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 				WorkbenchMessages.Workbench_copy,
 				WorkbenchMessages.Workbench_copyToolTip, null);
 	}
-    
-    private IContributionItem getResetPerspectiveItem() {
-		return getItem(
-				ActionFactory.RESET_PERSPECTIVE.getId(),
-				ActionFactory.RESET_PERSPECTIVE.getCommandId(),
-				null,
-				null,
-				WorkbenchMessages.ResetPerspective_text,
-				WorkbenchMessages.ResetPerspective_toolTip, 
-				IWorkbenchHelpContextIds.RESET_PERSPECTIVE_ACTION);
-    }
-    
-    private IContributionItem getSavePerspectiveItem() {
-		return getItem(
-				ActionFactory.SAVE_PERSPECTIVE.getId(),
-				ActionFactory.SAVE_PERSPECTIVE.getCommandId(),
-				null,
-				null,
-				WorkbenchMessages.SavePerspective_text,
-				WorkbenchMessages.SavePerspective_toolTip, 
-				IWorkbenchHelpContextIds.SAVE_PERSPECTIVE_ACTION);
-    }
     
     private IContributionItem getPasteItem() {
 		return getItem(
