@@ -27,7 +27,6 @@ import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -67,16 +66,10 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	private IContributionFactory contributionFactory;
 
 	@Inject
-	private MApplication application;
-
-	@Inject
 	@Optional
 	private Logger logger;
 
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<>();
-
-	// Use to resolve the context for dynamic menu children.
-	private static final String DYNAMIC_MENU_CONTEXT = "ModelUtils.dynamicMenuContext"; //$NON-NLS-1$
 
 	@Override
 	public void menuAboutToShow(IMenuManager manager) {
@@ -88,13 +81,10 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		final Menu menu = menuManager.getMenu();
 
 		if (menuModel != null && menuManager != null) {
-			cleanUp(menu);
-		}
-		if (menuModel != null) {
-			addContextToDynamicElements(menuModel);
+			cleanUp(menu, menuModel, menuManager);
 		}
 		if (menuModel instanceof MPopupMenu) {
-			showPopup((MPopupMenu) menuModel);
+			showPopup(menu, (MPopupMenu) menuModel, menuManager);
 		}
 		AbstractPartRenderer obj = rendererFactory.getRenderer(menuModel,
 				menu.getParent());
@@ -115,15 +105,16 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		}
 		MenuManager menuManager = (MenuManager) manager;
 		final MMenu menuModel = renderer.getMenuModel(menuManager);
+		final Menu menu = menuManager.getMenu();
 		if (menuModel != null) {
 			processDynamicElements(menuModel, menuManager);
-			showMenu(menuModel, menuManager);
+			showMenu(menu, menuModel, menuManager);
 		}
 	}
 
 	/**
 	 * HashMap key for storage of {@link MDynamicMenuContribution} elements used
-	 * in <i>processDynamicElements(MMenu, MenuManager)</i>
+	 * in {@link #processDynamicElements(MMenu, MenuManager)}
 	 */
 	protected static final String DYNAMIC_ELEMENT_STORAGE_KEY = MenuManagerShowProcessor.class
 			.getSimpleName() + ".dynamicElements"; //$NON-NLS-1$
@@ -194,12 +185,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 							menuElement.setElementId(currentMenuElement
 									.getElementId() + "." + j); //$NON-NLS-1$
 						}
-
-						// Store the application on the dymanic menu so the
-						// @Execute method has access to it a context,
-						// even after the SWT.Hide event has caused the model to
-						// be torn-down.
-						menuElement.getTransientData().put(DYNAMIC_MENU_CONTEXT, application);
 						menuModel.getChildren().add(position++, menuElement);
 						renderer.modelProcessSwitch(menuManager, menuElement);
 					}
@@ -209,25 +194,8 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		}
 	}
 
-	/**
-	 * Dynamic menus are hidden before the selected event (in SWT) so we tag the
-	 * context onto the element to ensure it's usable when handlers need to be
-	 * executed (i.e. after the menu is hidden and it's model torn-down).
-	 */
-	private void addContextToDynamicElements(MMenu menuModel) {
-		MMenuElement[] ml = menuModel.getChildren().toArray(new MMenuElement[menuModel.getChildren().size()]);
-		for (int i = 0; i < ml.length; i++) {
-			MMenuElement currentMenuElement = ml[i];
-			if (currentMenuElement instanceof MDynamicMenuContribution) {
-				// Store the application on the dynamic menu so the @Execute
-				// method has access to it a context, even after the SWT.Hide
-				// event has caused the model to be torn-down.
-				currentMenuElement.getTransientData().put(DYNAMIC_MENU_CONTEXT, application);
-			}
-		}
-	}
-
-	private void cleanUp(final Menu menu) {
+	private void cleanUp(final Menu menu, MMenu menuModel,
+			MenuManager menuManager) {
 		trace("cleanUp", menu, null); //$NON-NLS-1$
 		if (pendingCleanup.isEmpty()) {
 			return;
@@ -239,7 +207,8 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		}
 	}
 
-	private void showPopup(final MPopupMenu menuModel) {
+	private void showPopup(final Menu menu, final MPopupMenu menuModel,
+			MenuManager menuManager) {
 		// System.err.println("showPopup: " + menuModel + "\n\t" + menu);
 		// we need some context foolery here
 		final IEclipseContext popupContext = menuModel.getContext();
@@ -250,7 +219,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 				originalChild);
 	}
 
-	private void showMenu(final MMenu menuModel,
+	private void showMenu(final Menu menu, final MMenu menuModel,
 			MenuManager menuManager) {
 
 		final IEclipseContext evalContext;
