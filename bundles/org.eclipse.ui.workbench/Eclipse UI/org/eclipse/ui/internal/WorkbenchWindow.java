@@ -1177,7 +1177,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return null;
 	}
 
-	private void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
+	public void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
 		for (IContributionItem item : manager.getItems()) {
 			if (item instanceof MenuManager) {
 				MenuManager menuManager = (MenuManager) item;

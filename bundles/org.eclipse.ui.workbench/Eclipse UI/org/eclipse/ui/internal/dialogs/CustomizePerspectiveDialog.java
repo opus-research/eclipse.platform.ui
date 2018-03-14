@@ -32,10 +32,12 @@ import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
@@ -44,13 +46,15 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
+import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
@@ -113,8 +117,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.CoolBar;
-import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -145,6 +147,7 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.ActionSetActionBars;
 import org.eclipse.ui.internal.ActionSetContributionItem;
+import org.eclipse.ui.internal.CoolBarToTrimManager;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.Perspective;
 import org.eclipse.ui.internal.PluginActionCoolBarContributionItem;
@@ -1427,9 +1430,15 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 * for the workbench. We cannot use the actual workbench action bars,
 		 * since doing so would make the action set items visible.
 		 */
-		private MenuManager menuManager = new MenuManager();
-		private CoolBarManager coolBarManager = new CoolBarManager();
+		private MenuManager menuManager = new MenuManager("MenuBar", "org.eclipse.ui.main.menu"); //$NON-NLS-1$//$NON-NLS-2$
+		// private CoolBarManager coolBarManager = new CoolBarManager();
+		private CoolBarToTrimManager coolbarToTrim;
 		private StatusLineManager statusLineManager = new StatusLineManager();
+		private List<MTrimElement> workbenchTrimElements = new ArrayList<MTrimElement>();
+		private MTrimmedWindow windowModel;
+		private MMenu mainMenu;
+
+		private MenuManagerRenderer menuRenderer;
 
 		/**
 		 * Create a new instance of this class.
@@ -1439,6 +1448,25 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 */
 		public CustomizeActionBars(IWorkbenchWindowConfigurer configurer) {
 			this.configurer = configurer;
+			IRendererFactory rendererFactory = context.get(IRendererFactory.class);
+			EModelService modelService = context.get(EModelService.class);
+
+			windowModel = modelService.createModelElement(MTrimmedWindow.class);
+			MApplication app = context.get(MApplication.class);
+			windowModel.setContext(app.getContext().createChild("window - CustomizeActionBars")); //$NON-NLS-1$
+			Shell value = new Shell();
+			windowModel.setWidget(value);
+			value.setData(org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer.OWNING_ME,
+					windowModel);
+			mainMenu = modelService.createModelElement(MMenu.class);
+			mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
+
+			menuRenderer = (MenuManagerRenderer) rendererFactory.getRenderer(
+					mainMenu, null);
+			menuRenderer.linkModelToManager(mainMenu, menuManager);
+
+			coolbarToTrim = new CoolBarToTrimManager(app, windowModel, workbenchTrimElements,
+					rendererFactory);
 		}
 
 		@Override
@@ -1458,7 +1486,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		@Override
 		public ICoolBarManager getCoolBarManager() {
-			return coolBarManager;
+			return coolbarToTrim;
 		}
 
 		@Override
@@ -1491,7 +1519,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 * Clean up the action bars.
 		 */
 		public void dispose() {
-			coolBarManager.dispose();
+			coolbarToTrim.dispose();
 			menuManager.dispose();
 			statusLineManager.dispose();
 		}
@@ -2735,8 +2763,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * items are visible and not.
 	 */
 	private void loadMenuAndToolbarStructure() {
-		WorkbenchWindow workbenchWindow = (WorkbenchWindow) PlatformUI
-				.getWorkbench().getActiveWorkbenchWindow();
+		// WorkbenchWindow workbenchWindow = (WorkbenchWindow) PlatformUI
+		// .getWorkbench().getActiveWorkbenchWindow();
 
 		customizeActionBars = new CustomizeActionBars(configurer);
 
@@ -2745,16 +2773,28 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				| ActionBarAdvisor.FILL_MENU_BAR
 				| ActionBarAdvisor.FILL_COOL_BAR);
 
+		((WorkbenchWindow) configurer.getWindow()).fill(customizeActionBars.menuRenderer,
+				customizeActionBars.mainMenu, customizeActionBars.menuManager);
+
+		customizeActionBars.menuRenderer.reconcileManagerToModel(customizeActionBars.menuManager,
+				customizeActionBars.mainMenu);
+		customizeActionBars.windowModel.setMainMenu(customizeActionBars.mainMenu);
+		IPresentationEngine engine = context.get(IPresentationEngine.class);
+		engine.createGui(customizeActionBars.mainMenu,
+				customizeActionBars.windowModel.getWidget(),
+				customizeActionBars.windowModel.getContext());
+
 		// 3.3 start
-		// final IMenuService menuService = (IMenuService) window
-		// .getService(IMenuService.class);
+		// final IMenuService menuService = (IMenuService)
+		// window.getService(IMenuService.class);
 		// menuService.populateContributionManager(
 		// (ContributionManager) customizeActionBars.getMenuManager(),
 		// MenuUtil.MAIN_MENU);
 		// ICoolBarManager coolbar = customizeActionBars.getCoolBarManager();
 		// if (coolbar != null) {
-		// menuService.populateContributionManager(
-		// (ContributionManager) coolbar, MenuUtil.MAIN_TOOLBAR);
+		// menuService.populateContributionManager((ContributionManager)
+		// coolbar,
+		// MenuUtil.MAIN_TOOLBAR);
 		// }
 		// 3.3 end
 
@@ -2773,23 +2813,28 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		customizeActionBars.menuManager.setVisible(true);
 
 		makeAllContributionsVisible(customizeActionBars.menuManager);
+		customizeActionBars.menuRenderer.reconcileManagerToModel(customizeActionBars.menuManager,
+				customizeActionBars.mainMenu);
 
 		// Get the menu from the action bars
-		customizeActionBars.menuManager
-				.createMenuBar((Decorations) workbenchWindow.getShell());
+		// customizeActionBars.menuManager
+		// .createMenuBar((Decorations) workbenchWindow.getShell());
 
-		CoolBar cb = customizeActionBars.coolBarManager
-				.createControl(workbenchWindow.getShell());
-		cb.equals(cb);
+		// CoolBar cb = customizeActionBars.coolBarManager
+		// .createControl(workbenchWindow.getShell());
+		// cb.equals(cb);
+		engine.createGui(customizeActionBars.coolbarToTrim.getTopTrim(),
+				customizeActionBars.windowModel.getWidget(),
+				customizeActionBars.windowModel.getContext());
 
 		// Ensure the menu is completely built by updating the menu manager.
 		// (This method call requires a menu already be created)
 		customizeActionBars.menuManager.updateAll(true);
-		customizeActionBars.coolBarManager.update(true);
+		customizeActionBars.getCoolBarManager().update(true);
 
 		shortcuts = new Category(""); //$NON-NLS-1$
-		toolBarItems = createTrimBarEntries(window.getTopTrim());
-		menuItems = createMenuStructure(window.getModel().getMainMenu());
+		toolBarItems = createTrimBarEntries(customizeActionBars.coolbarToTrim.getTopTrim());
+		menuItems = createMenuStructure(customizeActionBars.mainMenu);
 	}
 
 	private PluginActionSet buildMenusAndToolbarsFor(
