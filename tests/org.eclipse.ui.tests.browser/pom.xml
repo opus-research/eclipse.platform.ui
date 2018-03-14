@@ -21,4 +21,10 @@
   <version>3.1.0</version>
   <packaging>eclipse-test-plugin</packaging>
 
+  <properties>
+  	<!-- Test not ready for Surefire -->
+  	<skipTests>true</skipTests>
+  </properties>
+
+
 </project>

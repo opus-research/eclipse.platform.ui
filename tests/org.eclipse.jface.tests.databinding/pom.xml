@@ -21,6 +21,13 @@
   <artifactId>org.eclipse.jface.tests.databinding</artifactId>
   <version>1.0.100-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
+  
+  <properties>
+  	<!-- Test not ready for Surefire -->
+  	<skipTests>true</skipTests>
+  </properties>
+  
+  
    <build>
     <plugins>
       <plugin>

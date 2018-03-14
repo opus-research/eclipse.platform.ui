@@ -20,5 +20,10 @@
   <artifactId>org.eclipse.e4.ui.bindings.tests</artifactId>
   <version>0.9.200-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
+  
+  <properties>
+  	<!-- Test not ready for Surefire -->
+  	<skipTests>true</skipTests>
+  </properties>
 
 </project>
