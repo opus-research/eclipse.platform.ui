@@ -122,7 +122,8 @@ public class NestedProjectManager {
 			}
 			queriedLocation = queriedLocation.removeLastSegments(1);
 		}
-		if (mostDirectParentProject != null) {
+
+		if (mostDirectParentProject != null && mostDirectParentProject.getLocation() != null) {
 			IPath parentContainerAbsolutePath = project.getLocation().removeLastSegments(1);
 			if (parentContainerAbsolutePath.equals(mostDirectParentProject.getLocation())) {
 				return mostDirectParentProject;
