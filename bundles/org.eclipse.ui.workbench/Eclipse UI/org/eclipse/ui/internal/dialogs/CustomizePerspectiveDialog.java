@@ -517,12 +517,12 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 *            The state to set this branch to.
 		 */
 		public void setItemsState(boolean state) {
-			for (ShortcutItem shortcutItem : contributionItems) {
-				shortcutItem.setCheckState(state);
+			for (Iterator<ShortcutItem> i = contributionItems.iterator(); i.hasNext();) {
+				DisplayItem item = i.next();
+				item.setCheckState(state);
 			}
-
-			for (Object o : getChildren()) {
-				Category category = (Category) o;
+			for (Iterator i = getChildren().iterator(); i.hasNext();) {
+				Category category = (Category) i.next();
 				category.setItemsState(state);
 			}
 		}
