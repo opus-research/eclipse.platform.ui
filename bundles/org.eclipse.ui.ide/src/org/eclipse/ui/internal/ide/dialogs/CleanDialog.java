@@ -124,6 +124,11 @@ public class CleanDialog extends MessageDialog {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+     */
     @Override
 	protected void buttonPressed(int buttonId) {
         final boolean cleanAll = allButton.getSelection();
@@ -181,6 +186,9 @@ public class CleanDialog extends MessageDialog {
         cleanJob.schedule();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.MessageDialog#createCustomArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createCustomArea(Composite parent) {
         Composite area = new Composite(parent, SWT.NONE);
@@ -254,6 +262,9 @@ public class CleanDialog extends MessageDialog {
         return area;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.IconAndMessageDialog#createContents(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createContents(Composite parent) {
     	Control contents= super.createContents(parent);
@@ -354,18 +365,27 @@ public class CleanDialog extends MessageDialog {
         projectBuildButton.setSelection(!globalBuildButton.getSelection());
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#close()
+     */
     @Override
 	public boolean close() {
         persistDialogSettings(getShell(), DIALOG_SETTINGS_SECTION);
         return super.close();
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#getInitialLocation(org.eclipse.swt.graphics.Point)
+     */
     @Override
 	protected Point getInitialLocation(Point initialSize) {
         Point p = getInitialLocation(DIALOG_SETTINGS_SECTION);
         return p != null ? p : super.getInitialLocation(initialSize);
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#getInitialSize()
+     */
     @Override
 	protected Point getInitialSize() {
         Point p = super.getInitialSize();
@@ -446,6 +466,10 @@ public class CleanDialog extends MessageDialog {
         return initialSize;
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
     @Override
 	protected boolean isResizable() {
         return true;

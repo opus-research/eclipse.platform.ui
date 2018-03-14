@@ -240,6 +240,11 @@ public class ProjectContentsLocationArea {
 		}
 
 		locationPathField.addModifyListener(new ModifyListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+			 */
 			@Override
 			public void modifyText(ModifyEvent e) {
 				errorReporter.reportError(checkValidLocation(), false);

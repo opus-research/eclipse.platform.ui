@@ -63,6 +63,9 @@ public class ObjectActionContributor extends PluginActionBuilder implements
         this.objectClass = config.getAttribute(IWorkbenchRegistryConstants.ATT_OBJECTCLASS);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IObjectContributor.
+     */
     @Override
 	public boolean canAdapt() {
         return adaptable;
@@ -77,6 +80,9 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 		return objectClass;
 	}
 
+    /* (non-Javadoc)
+     * Method declared on IObjectActionContributor.
+     */
     @Override
 	public void contributeObjectActionIdOverrides(List actionIdOverrides) {
         if (!configRead) {
@@ -193,12 +199,18 @@ public class ObjectActionContributor extends PluginActionBuilder implements
         return true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
     @Override
 	protected ActionDescriptor createActionDescriptor(
             IConfigurationElement element) {
         return new ActionDescriptor(element, ActionDescriptor.T_POPUP);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
     @Override
 	protected BasicContribution createContribution() {
         return new ObjectContribution();
@@ -249,6 +261,9 @@ public class ObjectActionContributor extends PluginActionBuilder implements
         configRead = true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
     @Override
 	protected boolean readElement(IConfigurationElement element) {
         String tag = element.getName();
@@ -399,6 +414,9 @@ public class ObjectActionContributor extends PluginActionBuilder implements
     	return buffer.toString();
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IConfigurationElement.class)) {
