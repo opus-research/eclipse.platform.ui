@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,9 +71,8 @@ public abstract class MasterDetailsBlock {
 	static final int DRAGGER_SIZE = 40;
 
 	class MDSashForm extends SashForm {
-		ArrayList<Sash> sashes = new ArrayList<>();
+		ArrayList sashes = new ArrayList();
 		Listener listener = new Listener () {
-			@Override
 			public void handleEvent(Event e) {
 				switch (e.type) {
 				case SWT.MouseEnter:
@@ -97,13 +96,11 @@ public abstract class MasterDetailsBlock {
 			super(parent, style);
 		}
 
-		@Override
 		public void layout(boolean changed) {
 			super.layout(changed);
 			hookSashListeners();
 		}
 
-		@Override
 		public void layout(Control [] children) {
 			super.layout(children);
 			hookSashListeners();
@@ -125,8 +122,8 @@ public abstract class MasterDetailsBlock {
 			}
 		}
 		private void purgeSashes() {
-			for (Iterator<Sash> iter=sashes.iterator(); iter.hasNext();) {
-				Sash sash = iter.next();
+			for (Iterator iter=sashes.iterator(); iter.hasNext();) {
+				Sash sash = (Sash)iter.next();
 				if (sash.isDisposed())
 					iter.remove();
 			}

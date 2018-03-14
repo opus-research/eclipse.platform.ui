@@ -36,7 +36,7 @@ public class FormImages {
 	}
 
 	private ResourceManagerManger manager = new ResourceManagerManger();
-	private Map<Integer, AbstractImageDescriptor> descriptors;
+	private Map descriptors;
 
 	private FormImages() {
 	}
@@ -54,7 +54,6 @@ public class FormImages {
 			fLength = length;
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof AbstractImageDescriptor) {
 				AbstractImageDescriptor id = (AbstractImageDescriptor)obj;
@@ -69,7 +68,6 @@ public class FormImages {
 			return false;
 		}
 
-		@Override
 		public int hashCode() {
 			int hash = 0;
 			for (int i = 0; i < fRGBs.length; i++)
@@ -90,7 +88,6 @@ public class FormImages {
 			fMarginHeight = marginHeight;
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof SimpleImageDescriptor) {
 				SimpleImageDescriptor id = (SimpleImageDescriptor) obj;
@@ -101,7 +98,6 @@ public class FormImages {
 			return false;
 		}
 
-		@Override
 		public int hashCode() {
 			int hash = super.hashCode();
 			hash = hash * 7 + new Integer(fTheight).hashCode();
@@ -109,12 +105,10 @@ public class FormImages {
 			return hash;
 		}
 
-		@Override
 		public ImageData getImageData() {
 			return null;
 		}
 
-		@Override
 		public Image createImage(boolean returnMissingImageOnError,	Device device) {
 			Image image = new Image(device, 1, fLength);
 			Color color1 = new Color(device, fRGBs[0]);
@@ -146,7 +140,6 @@ public class FormImages {
 			fPercents = percents;
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof ComplexImageDescriptor) {
 				ComplexImageDescriptor id = (ComplexImageDescriptor) obj;
@@ -167,7 +160,6 @@ public class FormImages {
 			return false;
 		}
 
-		@Override
 		public int hashCode() {
 			int hash = super.hashCode();
 			hash = hash * 7 + Boolean.valueOf(fVertical).hashCode();
@@ -176,12 +168,10 @@ public class FormImages {
 			return hash;
 		}
 
-		@Override
 		public ImageData getImageData() {
 			return null;
 		}
 
-		@Override
 		public Image createImage(boolean returnMissingImageOnError,	Device device) {
 			int width = fVertical ? 1 : fLength;
 			int height = fVertical ? fLength : 1;
@@ -259,7 +249,6 @@ public class FormImages {
 			fMarginHeight = marginHeight;
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof SimpleImageDescriptor) {
 				SimpleImageDescriptor id = (SimpleImageDescriptor) obj;
@@ -269,7 +258,6 @@ public class FormImages {
 			return false;
 		}
 
-		@Override
 		public int hashCode() {
 			int hash = super.hashCode();
 			hash = hash * 7 + new Integer(fTheight).hashCode();
@@ -277,12 +265,10 @@ public class FormImages {
 			return hash;
 		}
 
-		@Override
 		public ImageData getImageData() {
 			return null;
 		}
 
-		@Override
 		public Image createImage(boolean returnMissingImageOnError, Device device) {
 			Image image = new Image(device, 1, fLength);
 			Color originalBgColor = new Color(device, fRGBs[0]);
@@ -308,7 +294,6 @@ public class FormImages {
 			super(new Color[] { color1, color2 }, realtheight, theight, marginHeight);
 		}
 
-		@Override
 		public Image createImage(boolean returnMissingImageOnError, Device device) {
 			Image image = new Image(device, 1, fLength);
 			Color color1 = new Color(device, fRGBs[0]);
@@ -369,7 +354,7 @@ public class FormImages {
 	public synchronized boolean markFinished(Image image, Display display) {
 		checkHashMaps();
 		Integer imageHashCode = new Integer(image.hashCode());
-		AbstractImageDescriptor desc = descriptors.get(imageHashCode);
+		AbstractImageDescriptor desc = (AbstractImageDescriptor)descriptors.get(imageHashCode);
 		if (desc != null) {
 			LocalResourceManager resourceManager = manager.getResourceManager(display);
 			resourceManager.destroyImage(desc);
@@ -387,7 +372,7 @@ public class FormImages {
 
 	private void checkHashMaps() {
 		if (descriptors == null)
-			descriptors = new HashMap<>();
+			descriptors = new HashMap();
 	}
 
 	private void validateHashMaps() {
