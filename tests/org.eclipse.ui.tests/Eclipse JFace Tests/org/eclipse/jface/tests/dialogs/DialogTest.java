@@ -27,7 +27,6 @@ public class DialogTest extends TestCase {
 	 */
 	private Dialog dialog;
 
-	@Override
 	protected void tearDown() throws Exception {
 		if (dialog != null) {
 			// close the dialog
