@@ -115,7 +115,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/** stop image descriptor */
 	protected static ImageDescriptor fgStopImage = ImageDescriptor
-			.createFromFile(StatusLine.class, "images/stop.gif");//$NON-NLS-1$
+			.createFromFile(StatusLine.class, "images/stop.png");//$NON-NLS-1$
 
 	private MenuItem copyMenuItem;
 	static {
