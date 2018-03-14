@@ -147,6 +147,7 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
+import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityView;
@@ -1964,6 +1965,26 @@ public class WorkbenchPage implements IWorkbenchPage {
 	public INavigationHistory getNavigationHistory() {
         return navigationHistory;
     }
+
+    public boolean editActionSets() {
+		Perspective persp = getActivePerspective();
+		if (persp == null) {
+			return false;
+		}
+
+		// Create list dialog.
+		CustomizePerspectiveDialog dlg = legacyWindow.createCustomizePerspectiveDialog(persp,
+				window.getContext());
+		// Open.
+		boolean ret = (dlg.open() == Window.OK);
+		if (ret) {
+			legacyWindow.updateActionSets();
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_RESET);
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_RESET_COMPLETE);
+		}
+		return ret;
+    }
+
 
     /**
      * See IWorkbenchPage@findView.
@@ -4297,7 +4318,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return stack == null ? null : stack.getSelectedElement();
 	}
 
-	public Perspective getActivePerspective() {
+	Perspective getActivePerspective() {
 		return getPerspective(getCurrentPerspective());
 	}
 
