@@ -9,8 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431340, 431348, 426535, 433234
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431868, 454143
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *******************************************************************************/
 
@@ -2545,13 +2545,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			List<MPlaceholder> placeholders = modelService.findElements(window, null,
-					MPlaceholder.class, null, scope);
+			List<MPart> parts = modelService.findElements(window, null, MPart.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				for (MPlaceholder placeholder : placeholders) {
-					if (reference.getModel() == placeholder.getRef()
-							&& placeholder.isToBeRendered()) {
+				for (MPart part : parts) {
+					if (partService.isPartOrPlaceholderInPerspective(part.getElementId(), perspective)) {
 						// only rendered placeholders are valid view references
 						visibleReferences.add(reference);
 					}
