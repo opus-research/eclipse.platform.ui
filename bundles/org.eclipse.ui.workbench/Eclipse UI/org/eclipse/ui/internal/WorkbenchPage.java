@@ -1192,10 +1192,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			editorReference.setPage(this);
 		}
 
-		// Avoid dups
-		if (!editorReferences.contains(editorReference)) {
-			editorReferences.add(editorReference);
-		}
+		editorReferences.add(editorReference);
 	}
 
 	MPartDescriptor findDescriptor(String id) {
@@ -5190,6 +5187,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 */
 	private void unzoomSharedArea() {
 		MPerspective curPersp = getPerspectiveStack().getSelectedElement();
+		if (curPersp == null)
+			return;
+
 		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, curPersp);
 		for (MPart part : modelService.findElements(eaPH, null, MPart.class, null)) {
 			if (part.isToBeRendered()) {
