@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,12 +39,13 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
  * </p>
  * @noextend This class is not intended to be subclassed by clients.
  */
-public abstract class WizardDataTransferPage extends WizardPage implements Listener, IOverwriteQuery {
+public abstract class WizardDataTransferPage extends WizardPage implements
+        Listener, IOverwriteQuery {
 
     // constants
     protected static final int SIZING_TEXT_FIELD_WIDTH = 250;
 
-	protected static final int COMBO_HISTORY_LENGTH = 20;
+    protected static final int COMBO_HISTORY_LENGTH = 5;
 
     /**
      * Creates a new wizard page.
@@ -167,7 +168,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
     /**
      * Returns whether this page is complete. This determination is made based upon
      * the current contents of this page's controls.  Subclasses wishing to include
-     * their controls in this determination should override the hook methods
+     * their controls in this determination should override the hook methods 
      * <code>validateSourceGroup</code> and/or <code>validateOptionsGroup</code>.
      *
      * @return <code>true</code> if this page is complete, and <code>false</code> if
@@ -198,7 +199,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
         if (text.length() == 0) {
 			return new Path(text);
 		}
-
+       
         return (new Path(text)).makeAbsolute();
     }
 
@@ -236,16 +237,15 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
     }
 
     /**
-     * The <code>WizardDataTransfer</code> implementation of this
-     * <code>IOverwriteQuery</code> method asks the user whether the existing
+     * The <code>WizardDataTransfer</code> implementation of this 
+     * <code>IOverwriteQuery</code> method asks the user whether the existing 
      * resource at the given path should be overwritten.
      *
-     * @param pathString
-     * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>,
+     * @param pathString 
+     * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>, 
      *   or <code>"CANCEL"</code>
      */
-    @Override
-	public String queryOverwrite(String pathString) {
+    public String queryOverwrite(String pathString) {
 
         Path path = new Path(pathString);
 
@@ -267,8 +267,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
                         IDialogConstants.NO_LABEL,
                         IDialogConstants.NO_TO_ALL_LABEL,
                         IDialogConstants.CANCEL_LABEL }, 0) {
-        	@Override
-			protected int getShellStyle() {
+        	protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
         	}
         };
@@ -276,8 +275,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
         //run in syncExec because callback is from an operation,
         //which is probably not running in the UI thread.
         getControl().getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 dialog.open();
             }
         });
@@ -298,8 +296,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
                 (Image) null, message, MessageDialog.NONE,
                 new String[] { IDialogConstants.YES_LABEL,
                         IDialogConstants.NO_LABEL }, 0) {
-        	@Override
-			protected int getShellStyle() {
+        	protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
         	}
         };
@@ -310,7 +307,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
 
     /**
      * Restores control settings that were saved in the previous instance of this
-     * page.
+     * page.  
      * <p>
      * The <code>WizardDataTransferPage</code> implementation of this method does
      * nothing. Subclasses may override this hook method.
@@ -321,7 +318,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
 
     /**
      * Saves control settings that are to be restored in the next instance of
-     * this page.
+     * this page.  
      * <p>
      * The <code>WizardDataTransferPage</code> implementation of this method does
      * nothing. Subclasses may override this hook method.
@@ -331,7 +328,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
     }
 
     /**
-     * Determine if the page is complete and update the page appropriately.
+     * Determine if the page is complete and update the page appropriately. 
      */
     protected void updatePageCompletion() {
         boolean pageComplete = determinePageCompletion();
@@ -359,7 +356,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
      * <code>true</code>. Subclasses may reimplement this hook method.
      * </p>
      *
-     * @return <code>true</code> indicating validity of all controls in the
+     * @return <code>true</code> indicating validity of all controls in the 
      *   destination specification group
      */
     protected boolean validateDestinationGroup() {
@@ -389,7 +386,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
      * <code>true</code>. Subclasses may reimplement this hook method.
      * </p>
      *
-     * @return <code>true</code> indicating validity of all controls in the
+     * @return <code>true</code> indicating validity of all controls in the 
      *   source specification group
      */
     protected boolean validateSourceGroup() {

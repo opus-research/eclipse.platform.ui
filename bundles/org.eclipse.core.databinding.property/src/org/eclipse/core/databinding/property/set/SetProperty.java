@@ -31,7 +31,7 @@ import org.eclipse.core.internal.databinding.property.SetPropertyDetailValuesMap
 
 /**
  * Abstract implementation of ISetProperty
- *
+ * 
  * @since 1.2
  */
 public abstract class SetProperty implements ISetProperty {
@@ -40,17 +40,16 @@ public abstract class SetProperty implements ISetProperty {
 	 * By default, this method returns <code>Collections.EMPTY_SET</code> in
 	 * case the source object is <code>null</code>. Otherwise, this method
 	 * delegates to {@link #doGetSet(Object)}.
-	 *
+	 * 
 	 * <p>
 	 * Clients may override this method if they e.g. want to return a specific
 	 * default set in case the source object is <code>null</code>.
 	 * </p>
-	 *
+	 * 
 	 * @see #doGetSet(Object)
-	 *
+	 * 
 	 * @since 1.3
 	 */
-	@Override
 	public Set getSet(Object source) {
 		if (source == null) {
 			return Collections.EMPTY_SET;
@@ -60,7 +59,7 @@ public abstract class SetProperty implements ISetProperty {
 
 	/**
 	 * Returns a Set with the current contents of the source's set property
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @return a Set with the current contents of the source's set property
@@ -79,7 +78,6 @@ public abstract class SetProperty implements ISetProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void setSet(Object source, Set set) {
 		if (source != null) {
 			doSetSet(source, set);
@@ -88,7 +86,7 @@ public abstract class SetProperty implements ISetProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param set
@@ -103,7 +101,6 @@ public abstract class SetProperty implements ISetProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void updateSet(Object source, SetDiff diff) {
 		if (source != null && !diff.isEmpty()) {
 			doUpdateSet(source, diff);
@@ -112,7 +109,7 @@ public abstract class SetProperty implements ISetProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param diff
@@ -129,38 +126,31 @@ public abstract class SetProperty implements ISetProperty {
 		}
 	}
 
-	@Override
 	public IObservableSet observe(Object source) {
 		return observe(Realm.getDefault(), source);
 	}
 
-	@Override
 	public IObservableFactory setFactory() {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableFactory setFactory(final Realm realm) {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableSet observeDetail(IObservableValue master) {
 		return MasterDetailObservables.detailSet(master,
 				setFactory(master.getRealm()), getElementType());
 	}
 
-	@Override
 	public final IMapProperty values(IValueProperty detailValues) {
 		return new SetPropertyDetailValuesMap(this, detailValues);
 	}

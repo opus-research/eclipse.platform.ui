@@ -110,7 +110,7 @@ public class ShowViewMenu extends ContributionItem {
 
 	/**
 	 * Creates a Show View menu.
-	 *
+	 * 
 	 * @param window
 	 *            the window containing the menu
 	 * @param id
@@ -122,7 +122,7 @@ public class ShowViewMenu extends ContributionItem {
 
 	/**
 	 * Creates a Show View menu.
-	 *
+	 * 
 	 * @param window
 	 *            the window containing the menu
 	 * @param id
@@ -166,7 +166,7 @@ public class ShowViewMenu extends ContributionItem {
 		}
 
 		showDlgAction.setActionDefinitionId(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW);
-
+		
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class ShowViewMenu extends ContributionItem {
 		if (!innerMgr.isEmpty()) {
 			innerMgr.add(new Separator());
 		}
-
+		
 		// Add Other...
 		innerMgr.add(showDlgAction);
 	}
@@ -246,11 +246,21 @@ public class ShowViewMenu extends ContributionItem {
 			pluginId = ((ViewDescriptor) v).getPluginId();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+		 */
 		@Override
 		public String getLocalId() {
 			return localId;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+		 */
 		@Override
 		public String getPluginId() {
 			return pluginId;
@@ -265,7 +275,7 @@ public class ShowViewMenu extends ContributionItem {
 			return null;
 		}
 		String label = desc.getLabel();
-
+		
 		CommandContributionItemParameter parms = new PluginCCIP(desc,
 				window, viewId, IWorkbenchCommandConstants.VIEWS_SHOW_VIEW,
 				CommandContributionItem.STYLE_PUSH);

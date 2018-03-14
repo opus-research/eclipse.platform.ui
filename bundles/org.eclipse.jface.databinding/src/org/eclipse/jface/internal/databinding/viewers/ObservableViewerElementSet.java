@@ -36,8 +36,8 @@ import org.eclipse.jface.viewers.StructuredViewer;
  * the use of {@link #equals(Object)} when comparing elements. This class is
  * designed for use with {@link StructuredViewer} which uses
  * {@link IElementComparer} for element comparisons.
- *
- *
+ * 
+ * 
  * @since 1.2
  */
 public class ObservableViewerElementSet extends AbstractObservableSet {
@@ -48,7 +48,7 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 	/**
 	 * Constructs an ObservableViewerElementSet on the given {@link Realm} which
 	 * uses the given {@link IElementComparer} to compare elements.
-	 *
+	 * 
 	 * @param realm
 	 *            the realm of the constructed set.
 	 * @param elementType
@@ -66,36 +66,30 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 		this.comparer = comparer;
 	}
 
-	@Override
 	protected Set getWrappedSet() {
 		return wrappedSet;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	public Iterator iterator() {
 		getterCalled();
 		final Iterator wrappedIterator = wrappedSet.iterator();
 		return new Iterator() {
 			Object last;
 
-			@Override
 			public boolean hasNext() {
 				getterCalled();
 				return wrappedIterator.hasNext();
 			}
 
-			@Override
 			public Object next() {
 				getterCalled();
 				return last = wrappedIterator.next();
 			}
 
-			@Override
 			public void remove() {
 				getterCalled();
 				wrappedIterator.remove();
@@ -105,7 +99,6 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 		};
 	}
 
-	@Override
 	public boolean add(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.add(o);
@@ -115,7 +108,6 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean addAll(Collection c) {
 		getterCalled();
 		Set additions = new ViewerElementSet(comparer);
@@ -130,7 +122,6 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.remove(o);
@@ -140,7 +131,6 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean removeAll(Collection c) {
 		getterCalled();
 		Set removals = new ViewerElementSet(comparer);
@@ -155,7 +145,6 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean retainAll(Collection c) {
 		getterCalled();
 		Set removals = new ViewerElementSet(comparer);
@@ -178,7 +167,6 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public void clear() {
 		getterCalled();
 		if (!wrappedSet.isEmpty()) {
@@ -191,7 +179,7 @@ public class ObservableViewerElementSet extends AbstractObservableSet {
 	/**
 	 * Returns an {@link IObservableSet} for holding viewer elements, using the
 	 * given {@link IElementComparer} for comparisons.
-	 *
+	 * 
 	 * @param realm
 	 *            the realm of the returned observable
 	 * @param elementType

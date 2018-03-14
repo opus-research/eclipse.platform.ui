@@ -38,13 +38,13 @@ public class CommonWizardDescriptorManager {
 	private static final String[] NO_DESCRIPTOR_IDS = new String[0];
 
 	private static final CommonWizardDescriptor[] NO_DESCRIPTORS = new CommonWizardDescriptor[0];
-
+	
 	/**
 	 * Find wizards of type 'new'.
 	 */
 	public static final String WIZARD_TYPE_NEW = "new"; //$NON-NLS-1$
 
-	private Map<String, Set> commonWizardDescriptors = new HashMap<String, Set>();
+	private Map commonWizardDescriptors = new HashMap();
 
 	/**
 	 * @return the singleton instance of the registry
@@ -73,10 +73,10 @@ public class CommonWizardDescriptorManager {
 			NavigatorPlugin.logError(0, "A null wizardId was supplied for a commonWizard in " + aDesc.getNamespace(), null); //$NON-NLS-1$
 		}
 		synchronized (commonWizardDescriptors) {
-			Set<CommonWizardDescriptor> descriptors = commonWizardDescriptors.get(aDesc
+			Set descriptors = (Set) commonWizardDescriptors.get(aDesc
 					.getType());
-			if (descriptors == null) {
-				commonWizardDescriptors.put(aDesc.getType(), descriptors = new HashSet<CommonWizardDescriptor>());
+			if (descriptors == null) { 
+				commonWizardDescriptors.put(aDesc.getType(), descriptors = new HashSet());
 			}
 			if (!descriptors.contains(aDesc)) {
 				descriptors.add(aDesc);
@@ -85,27 +85,27 @@ public class CommonWizardDescriptorManager {
 	}
 
 	/**
-	 *
+	 * 
 	 * Returns all wizard id(s) which enable for the given element.
-	 *
+	 * 
 	 * @param anElement
 	 *            the element to return the best content descriptor for
 	 * @param aType
 	 *            The type of wizards to locate (e.g. 'new', 'import', or
 	 *            'export' etc).
-	 * @param aContentService
-	 * 			 The content service to use when deciding visibility.
+	 * @param aContentService 
+	 * 			 The content service to use when deciding visibility.   
 	 * @return The set of commonWizard ids for the given element
 	 */
 	public String[] getEnabledCommonWizardDescriptorIds(Object anElement,
 			String aType, INavigatorContentService aContentService) {
 
-		Set commonDescriptors = commonWizardDescriptors.get(aType);
+		Set commonDescriptors = (Set) commonWizardDescriptors.get(aType);
 		if (commonDescriptors == null) {
 			return NO_DESCRIPTOR_IDS;
 		}
 		/* Find other Common Wizard providers which enable for this object */
-		List<String> descriptorIds = new ArrayList<String>();
+		List descriptorIds = new ArrayList();
 		for (Iterator commonWizardDescriptorsItr = commonDescriptors.iterator(); commonWizardDescriptorsItr
 				.hasNext();) {
 			CommonWizardDescriptor descriptor = (CommonWizardDescriptor) commonWizardDescriptorsItr
@@ -117,32 +117,32 @@ public class CommonWizardDescriptorManager {
 			}
 		}
 		String[] wizardIds = new String[descriptorIds.size()];
-		return descriptorIds.toArray(wizardIds);
+		return (String[]) descriptorIds.toArray(wizardIds); 
 	}
-
+	
 
 	/**
-	 *
+	 * 
 	 * Returns all wizard descriptor(s) which enable for the given element.
-	 *
+	 * 
 	 * @param anElement
 	 *            the element to return the best content descriptor for
 	 * @param aType
 	 *            The type of wizards to locate (e.g. 'new', 'import', or
 	 *            'export' etc).
-	 * @param aContentService
-	 * 			 The content service to use when deciding visibility.
+	 * @param aContentService 
+	 * 			 The content service to use when deciding visibility.   
 	 * @return The set of commonWizard descriptors for the element
 	 */
 	public CommonWizardDescriptor[] getEnabledCommonWizardDescriptors(Object anElement,
 			String aType, INavigatorContentService aContentService) {
 
-		Set commonDescriptors = commonWizardDescriptors.get(aType);
+		Set commonDescriptors = (Set) commonWizardDescriptors.get(aType);
 		if (commonDescriptors == null) {
 			return NO_DESCRIPTORS;
 		}
 		/* Find other Common Wizard providers which enable for this object */
-		List<CommonWizardDescriptor> descriptors = new ArrayList<CommonWizardDescriptor>();
+		List descriptors = new ArrayList();
 		for (Iterator commonWizardDescriptorsItr = commonDescriptors.iterator(); commonWizardDescriptorsItr
 				.hasNext();) {
 			CommonWizardDescriptor descriptor = (CommonWizardDescriptor) commonWizardDescriptorsItr
@@ -154,7 +154,7 @@ public class CommonWizardDescriptorManager {
 			}
 		}
 		CommonWizardDescriptor[] enabledDescriptors = new CommonWizardDescriptor[descriptors.size()];
-		return descriptors.toArray(enabledDescriptors);
+		return (CommonWizardDescriptor[]) descriptors.toArray(enabledDescriptors);  
 	}
 
 	/**
@@ -163,25 +163,23 @@ public class CommonWizardDescriptorManager {
 	 * @return True if the descriptor is visible to the given content service.
 	 */
 	private boolean isVisible(INavigatorContentService aContentService, CommonWizardDescriptor descriptor) {
-		return !WorkbenchActivityHelper.filterItem(descriptor) &&
-					(aContentService == null ||
-							(descriptor.getId() == null ||
-									( aContentService.isVisible(descriptor.getId()) &&
+		return !WorkbenchActivityHelper.filterItem(descriptor) && 
+					(aContentService == null || 
+							(descriptor.getId() == null || 
+									( aContentService.isVisible(descriptor.getId()) && 
 											aContentService.isActive(descriptor.getId())
 									)
 							)
 					);
 	}
-
+  
 	private class CommonWizardRegistry extends NavigatorContentRegistryReader {
 
-		@Override
 		protected boolean readElement(final IConfigurationElement anElement) {
 			final boolean[] retValue = new boolean[1];
 
 			if (TAG_COMMON_WIZARD.equals(anElement.getName())) {
 				SafeRunner.run(new NavigatorSafeRunnable(anElement) {
-					@Override
 					public void run() throws Exception {
 						addCommonWizardDescriptor(new CommonWizardDescriptor(anElement));
 						retValue[0] = true;
@@ -199,7 +197,6 @@ public class CommonWizardDescriptorManager {
 					// Assume it did not work
 					retValue[0] = false;
 					SafeRunner.run(new NavigatorSafeRunnable(element) {
-						@Override
 						public void run() throws Exception {
 							addCommonWizardDescriptor(new CommonWizardDescriptor(element,
 									contentExtensionId));

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Matthieu Wipliez <matthieu.wipliez@synflow.com> (Synflow SAS) - [CommonNavigator] Implementation of Binding isVisibleExtension not excluding as expected - http://bugs.eclipse.org/425867
+ *     Matthieu Wipliez <matthieu.wipliez@synflow.com> (Synflow SAS) - [CommonNavigator] Implementation of Binding isVisibleExtension not excluding as expected - http://bugs.eclipse.org/425867 
  ******************************************************************************/
 
 package org.eclipse.ui.internal.navigator.extensions;
@@ -28,30 +28,35 @@ import org.eclipse.ui.internal.navigator.Policy;
 
 class Binding {
 
-	private final Set<Pattern> rootPatterns = new HashSet<Pattern>();
+	private final Set rootPatterns = new HashSet();
 
-	private final Set<Pattern> includePatterns = new HashSet<Pattern>();
+	private final Set includePatterns = new HashSet();
 
-	private final Set<Pattern> excludePatterns = new HashSet<Pattern>();
+	private final Set excludePatterns = new HashSet();
 
 	private final String TAG_EXTENSION;
 
-	private final Map<String, Boolean> knownIds = new HashMap<String, Boolean>();
-	private final Map<String, Boolean> knownRootIds = new HashMap<String, Boolean>();
+	private final Map knownIds = new HashMap();
+	private final Map knownRootIds = new HashMap();
 
 	protected Binding(String tagExtension) {
 		TAG_EXTENSION = tagExtension;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isVisibleExtension(java.lang.String)
+	 */
 	boolean isVisibleExtension(String anExtensionId) {
 		// Have we seen this pattern before?
 		if (knownIds.containsKey(anExtensionId)) {
 			// we have, don't recompute
-			return knownIds.get(anExtensionId).booleanValue();
+			return ((Boolean) knownIds.get(anExtensionId)).booleanValue();
 		}
 
-		for (Iterator<Pattern> itr = excludePatterns.iterator(); itr.hasNext();) {
-			Pattern pattern = itr.next();
+		for (Iterator itr = excludePatterns.iterator(); itr.hasNext();) {
+			Pattern pattern = (Pattern) itr.next();
 			if (pattern.matcher(anExtensionId).matches()) {
 				knownIds.put(anExtensionId, Boolean.FALSE);
 				if (Policy.DEBUG_RESOLUTION) {
@@ -62,8 +67,8 @@ class Binding {
 			}
 		}
 
-		for (Iterator<Pattern> itr = includePatterns.iterator(); itr.hasNext();) {
-			Pattern pattern = itr.next();
+		for (Iterator itr = includePatterns.iterator(); itr.hasNext();) {
+			Pattern pattern = (Pattern) itr.next();
 			if (pattern.matcher(anExtensionId).matches()) {
 				// keep track of the result for next time
 				knownIds.put(anExtensionId, Boolean.TRUE);
@@ -83,18 +88,23 @@ class Binding {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isRootExtension(java.lang.String)
+	 */
 	boolean isRootExtension(String anExtensionId) {
 		if (rootPatterns.size() == 0) {
 			return false;
-		}
+		} 
 		// Have we seen this pattern before?
 		if (knownRootIds.containsKey(anExtensionId)) {
 			// we have, don't recompute
-			return knownRootIds.get(anExtensionId).booleanValue();
+			return ((Boolean) knownRootIds.get(anExtensionId)).booleanValue();
 		}
 		Pattern pattern = null;
-		for (Iterator<Pattern> itr = rootPatterns.iterator(); itr.hasNext();) {
-			pattern = itr.next();
+		for (Iterator itr = rootPatterns.iterator(); itr.hasNext();) {
+			pattern = (Pattern) itr.next();
 			if (pattern.matcher(anExtensionId).matches()) {
 				knownRootIds.put(anExtensionId, Boolean.TRUE);
 				return true;
@@ -104,6 +114,11 @@ class Binding {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#hasOverriddenRootExtensions()
+	 */
 	boolean hasOverriddenRootExtensions() {
 		return rootPatterns.size() > 0;
 	}
@@ -191,11 +206,11 @@ class Binding {
 		}
 
 	}
-
+	
 	void addBinding(Binding otherBinding) {
 		includePatterns.addAll(otherBinding.includePatterns);
 		excludePatterns.addAll(otherBinding.excludePatterns);
 		rootPatterns.addAll(otherBinding.rootPatterns);
 	}
-
+	
 }

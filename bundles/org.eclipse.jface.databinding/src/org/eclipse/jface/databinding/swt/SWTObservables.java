@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,11 +15,11 @@
  *     Boris Bokowski - bug 245647
  *     Tom Schindl - bug 246462
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 327086
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 449022
- *     Eugen Neufeld - bug 461560
  *******************************************************************************/
 package org.eclipse.jface.databinding.swt;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
@@ -35,23 +35,31 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * A factory for creating observables for SWT widgets
- *
+ * 
  * @since 1.1
- * @deprecated
  */
-@Deprecated
 public class SWTObservables {
+
+	private static java.util.List realms = new ArrayList();
 
 	/**
 	 * Returns the realm representing the UI thread for the given display.
-	 *
+	 * 
 	 * @param display
 	 * @return the realm representing the UI thread for the given display
-	 * @deprecated please use {@link DisplayRealm#getRealm(Display)} instead.
 	 */
-	@Deprecated
 	public static Realm getRealm(final Display display) {
-		return DisplayRealm.getRealm(display);
+		synchronized (realms) {
+			for (Iterator it = realms.iterator(); it.hasNext();) {
+				DisplayRealm displayRealm = (DisplayRealm) it.next();
+				if (displayRealm.display == display) {
+					return displayRealm;
+				}
+			}
+			DisplayRealm result = new DisplayRealm(display);
+			realms.add(result);
+			return result;
+		}
 	}
 
 	/**
@@ -74,7 +82,7 @@ public class SWTObservables {
 	 * <p>
 	 * Note that this observable will not forward {@link ValueChangingEvent}
 	 * events from a wrapped {@link IVetoableValue}.
-	 *
+	 * 
 	 * @param delay
 	 *            the delay in milliseconds
 	 * @param observable
@@ -82,11 +90,10 @@ public class SWTObservables {
 	 * @return an observable which delays notification of value change events
 	 *         from <code>observable</code> until <code>delay</code>
 	 *         milliseconds have elapsed since the last change event.
-	 *
+	 * 
 	 * @since 1.2
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeDelayedValue(int delay,
 			ISWTObservableValue observable) {
 		return new SWTDelayedObservableValueDecorator(
@@ -104,14 +111,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.ScrollBar</li>
 	 * <li>org.eclipse.swt.widgets.ToolItem</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return an observable value tracking the enabled state of the given
 	 *         widget.
 	 * @since 1.5
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeEnabled(Widget widget) {
 		return WidgetProperties.enabled().observe(widget);
 	}
@@ -119,14 +125,13 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the enabled state of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the enabled state of the given
 	 *         control
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeEnabled(Control control) {
 		return observeEnabled((Widget) control);
 	}
@@ -134,14 +139,13 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the visible state of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the visible state of the given
 	 *         control
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeVisible(Control control) {
 		return WidgetProperties.visible().observe(control);
 	}
@@ -158,14 +162,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.TrayItem</li>
 	 * <li>org.eclipse.swt.widgets.TreeColumn</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return an observable value tracking the tooltip text of the given item
-	 *
+	 * 
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeTooltipText(Widget widget) {
 		return WidgetProperties.tooltipText().observe(widget);
 	}
@@ -173,14 +176,13 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the tooltip text of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the tooltip text of the given
 	 *         control
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeTooltipText(Control control) {
 		return observeTooltipText((Widget) control);
 	}
@@ -197,7 +199,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.MenuItem (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Scale</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -205,7 +207,6 @@ public class SWTObservables {
 	 * @since 1.5
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSelection(Widget widget) {
 		return WidgetProperties.selection().observe(widget);
 	}
@@ -222,14 +223,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Slider (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Spinner</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSelection(Control control) {
 		return observeSelection((Widget) control);
 	}
@@ -242,14 +242,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Slider (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Scale</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeMin(Control control) {
 		return WidgetProperties.minimum().observe(control);
 	}
@@ -262,14 +261,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Slider (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Scale</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeMax(Control control) {
 		return WidgetProperties.maximum().observe(control);
 	}
@@ -281,7 +279,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * <li>org.eclipse.swt.custom.StyledText (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @param events
 	 *            array of SWT event types to register for change events. May
@@ -293,7 +291,6 @@ public class SWTObservables {
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Control control, int[] events) {
 		return WidgetProperties.text(events).observe(control);
 	}
@@ -305,7 +302,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * <li>org.eclipse.swt.custom.StyledText (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @param event
 	 *            event type to register for change events
@@ -314,7 +311,6 @@ public class SWTObservables {
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Control control, int event) {
 		return WidgetProperties.text(event).observe(control);
 	}
@@ -327,7 +323,6 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.custom.CLabel</li>
 	 * <li>org.eclipse.swt.widgets.Combo</li>
-	 * <li>org.eclipse.swt.widgets.Group (as of 1.7)</li>
 	 * <li>org.eclipse.swt.widgets.Item</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * <li>org.eclipse.swt.widgets.Link (as of 1.2)</li>
@@ -335,16 +330,15 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.StyledText (as of 1.3)</li>
 	 * <li>org.eclipse.swt.widgets.Text (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if the type of <code>widget</code> is unsupported
-	 *
+	 * 
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Widget widget) {
 		return WidgetProperties.text().observe(widget);
 	}
@@ -357,21 +351,19 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.custom.CLabel</li>
 	 * <li>org.eclipse.swt.widgets.Combo</li>
-	 * <li>org.eclipse.swt.widgets.Group (as of 1.7)</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * <li>org.eclipse.swt.widgets.Link (as of 1.2)</li>
 	 * <li>org.eclipse.swt.widgets.Shell</li>
 	 * <li>org.eclipse.swt.custom.StyledText (as of 1.3)</li>
 	 * <li>org.eclipse.swt.widgets.Text (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeText(Control control) {
 		return observeText((Widget) control);
 	}
@@ -383,14 +375,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * <li>org.eclipse.swt.widgets.ToolTip</li>
 	 * <ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return an observable observing the message attribute of the provided
 	 *         <code>widget</code>.
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeMessage(Widget widget) {
 		return WidgetProperties.message().observe(widget);
 	}
@@ -404,7 +395,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Item</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -412,7 +403,6 @@ public class SWTObservables {
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeImage(Widget widget) {
 		return WidgetProperties.image().observe(widget);
 	}
@@ -425,14 +415,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.widgets.List</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable list
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static IObservableList observeItems(Control control) {
 		return WidgetProperties.items().observe(control);
 	}
@@ -446,14 +435,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.widgets.List</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSingleSelectionIndex(
 			Control control) {
 		return WidgetProperties.singleSelectionIndex().observe(control);
@@ -462,14 +450,13 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the foreground color of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the foreground color of the given
 	 *         control
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeForeground(Control control) {
 		return WidgetProperties.foreground().observe(control);
 	}
@@ -477,48 +464,45 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the background color of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the background color of the given
 	 *         control
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeBackground(Control control) {
 		return WidgetProperties.background().observe(control);
 	}
 
 	/**
 	 * Returns an observable value tracking the font of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the font of the given control
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeFont(Control control) {
 		return WidgetProperties.font().observe(control);
 	}
 
 	/**
 	 * Returns an observable value tracking the size of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the size of the given control
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeSize(Control control) {
 		return WidgetProperties.size().observe(control);
 	}
 
 	/**
 	 * Returns an observable value tracking the location of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the location of the given control
@@ -530,28 +514,26 @@ public class SWTObservables {
 
 	/**
 	 * Returns an observable value tracking the focus of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the focus of the given control
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeFocus(Control control) {
 		return WidgetProperties.focused().observe(control);
 	}
 
 	/**
 	 * Returns an observable value tracking the bounds of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the bounds of the given control
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeBounds(Control control) {
 		return WidgetProperties.bounds().observe(control);
 	}
@@ -564,15 +546,71 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.StyledText (since 1.6)</li>
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if <code>control</code> type is unsupported
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
-	@Deprecated
 	public static ISWTObservableValue observeEditable(Control control) {
 		return WidgetProperties.editable().observe(control);
+	}
+
+	private static class DisplayRealm extends Realm {
+		private Display display;
+
+		/**
+		 * @param display
+		 */
+		private DisplayRealm(Display display) {
+			this.display = display;
+		}
+
+		public boolean isCurrent() {
+			return Display.getCurrent() == display;
+		}
+
+		public void asyncExec(final Runnable runnable) {
+			Runnable safeRunnable = new Runnable() {
+				public void run() {
+					safeRun(runnable);
+				}
+			};
+			if (!display.isDisposed()) {
+				display.asyncExec(safeRunnable);
+			}
+		}
+
+		public void timerExec(int milliseconds, final Runnable runnable) {
+			if (!display.isDisposed()) {
+				Runnable safeRunnable = new Runnable() {
+					public void run() {
+						safeRun(runnable);
+					}
+				};
+				display.timerExec(milliseconds, safeRunnable);
+			}
+		}
+
+		public int hashCode() {
+			return (display == null) ? 0 : display.hashCode();
+		}
+
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			final DisplayRealm other = (DisplayRealm) obj;
+			if (display == null) {
+				if (other.display != null)
+					return false;
+			} else if (!display.equals(other.display))
+				return false;
+			return true;
+		}
 	}
 }

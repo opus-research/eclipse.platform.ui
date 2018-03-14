@@ -24,15 +24,15 @@ import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 /**
  * Observable set backed by an observable list. The wrapped list must not
  * contain duplicate elements.
- *
+ * 
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @since 1.0
- *
+ * 
  */
 public class ListToSetAdapter extends ObservableSet {
 
@@ -40,7 +40,6 @@ public class ListToSetAdapter extends ObservableSet {
 
 	private IListChangeListener listener = new IListChangeListener() {
 
-		@Override
 		public void handleListChange(ListChangeEvent event) {
 			Set added = new HashSet();
 			Set removed = new HashSet();
@@ -74,7 +73,6 @@ public class ListToSetAdapter extends ObservableSet {
 		this.list.addListChangeListener(listener);
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 		if (list != null && listener != null) {

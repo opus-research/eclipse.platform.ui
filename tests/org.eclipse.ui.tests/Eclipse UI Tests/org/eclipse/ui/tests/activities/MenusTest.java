@@ -25,7 +25,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class MenusTest extends UITestCase {
 
@@ -36,7 +36,7 @@ public class MenusTest extends UITestCase {
 
 	/**
 	 * @since 3.3
-	 *
+	 * 
 	 */
 	private final class TestFactory extends AbstractContributionFactory {
 		private CommandContributionItem fooItemWithNoVisibilityClause;
@@ -51,7 +51,6 @@ public class MenusTest extends UITestCase {
 			super(location, namespace);
 		}
 
-		@Override
 		public void createContributionItems(IServiceLocator serviceLocator,
 				IContributionRoot additions) {
 			fooItemWithNoVisibilityClause = new CommandContributionItem(
@@ -87,7 +86,11 @@ public class MenusTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow();
@@ -97,7 +100,11 @@ public class MenusTest extends UITestCase {
 		assertNotNull(service);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				enabledActivities);
@@ -120,21 +127,21 @@ public class MenusTest extends UITestCase {
 		MenuManager manager = new MenuManager();
 		service.populateContributionManager(manager, "menu:tests");
 		assertTrue(manager.getSize() > 0);
-
+		
 		assertTrue(factory.getFooItemWithNoVisibilityClause().isVisible());
 		assertTrue(factory.getBarItemWithNoVisibilityClause().isVisible());
-
+		
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				Collections.EMPTY_SET);
 		assertTrue(factory.getFooItemWithNoVisibilityClause().isVisible());
 		assertTrue(factory.getBarItemWithNoVisibilityClause().isVisible());
-
+		
 	}
 
 	public void XXXtestMenuVisibilityWithCustomFactory() {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				Collections.singleton("menuTest1")); // enable the foo
-														// activity
+														// activity		
 		factory = new TestFactory("menu:tests",
 				"org.eclipse.ui.tests");
 		service.addContributionFactory(factory);

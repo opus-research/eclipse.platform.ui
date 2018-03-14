@@ -39,25 +39,23 @@ import org.eclipse.core.internal.databinding.property.set.SimplePropertyObservab
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- *
+ * 
  * @since 1.2
  */
 public abstract class SimpleSetProperty extends SetProperty {
-	@Override
 	public IObservableSet observe(Realm realm, Object source) {
 		return new SimplePropertyObservableSet(realm, source, this);
 	}
 
 	// Accessors
 
-	@Override
 	protected abstract Set doGetSet(Object source);
 
 	// Mutators
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param set
@@ -73,7 +71,7 @@ public abstract class SimpleSetProperty extends SetProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param set
@@ -84,13 +82,11 @@ public abstract class SimpleSetProperty extends SetProperty {
 	 */
 	protected abstract void doSetSet(Object source, Set set, SetDiff diff);
 
-	@Override
 	protected void doSetSet(Object source, Set set) {
 		SetDiff diff = Diffs.computeLazySetDiff(doGetSet(source), set);
 		doSetSet(source, set, diff);
 	}
 
-	@Override
 	protected void doUpdateSet(Object source, SetDiff diff) {
 		Set set = new HashSet(doGetSet(source));
 		diff.applyTo(set);
@@ -107,7 +103,7 @@ public abstract class SimpleSetProperty extends SetProperty {
 	 * <p>
 	 * This method returns null if the source object has no listener APIs for
 	 * this property.
-	 *
+	 * 
 	 * @param listener
 	 *            the property listener to receive events
 	 * @return a native listener which parlays property change events to the

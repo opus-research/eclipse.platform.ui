@@ -28,13 +28,16 @@ import org.eclipse.ui.model.PerspectiveLabelProvider;
  * <p>
  * Replacement for CyclePerspectiveAction
  * </p>
- *
+ * 
  * @since 3.3
  */
 public class CyclePerspectiveHandler extends CycleBaseHandler {
 	private PerspectiveLabelProvider labelProvider = new PerspectiveLabelProvider(
             false);
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.CycleBaseHandler#addItems(org.eclipse.swt.widgets.Table, org.eclipse.ui.internal.WorkbenchPage)
+	 */
 	@Override
 	protected void addItems(Table table, WorkbenchPage page) {
 		IPerspectiveDescriptor perspectives[] = page.getSortedPerspectives();
@@ -52,6 +55,9 @@ public class CyclePerspectiveHandler extends CycleBaseHandler {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.CycleBaseHandler#getBackwardCommand()
+	 */
 	@Override
 	protected ParameterizedCommand getBackwardCommand() {
 		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
@@ -60,6 +66,9 @@ public class CyclePerspectiveHandler extends CycleBaseHandler {
 		return commandBack;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.CycleBaseHandler#getForwardCommand()
+	 */
 	@Override
 	protected ParameterizedCommand getForwardCommand() {
 		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
@@ -68,11 +77,17 @@ public class CyclePerspectiveHandler extends CycleBaseHandler {
 		return commandF;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.CycleBaseHandler#getTableHeader()
+	 */
 	@Override
 	protected String getTableHeader(IWorkbenchPart activePart) {
 		return WorkbenchMessages.CyclePerspectiveAction_header;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (labelProvider!=null) {

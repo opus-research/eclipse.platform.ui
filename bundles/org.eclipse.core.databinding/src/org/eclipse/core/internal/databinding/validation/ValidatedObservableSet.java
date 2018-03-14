@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ValidatedObservableSet extends ObservableSet {
 	private IObservableSet target;
@@ -48,7 +48,6 @@ public class ValidatedObservableSet extends ObservableSet {
 	private boolean updatingTarget = false;
 
 	private ISetChangeListener targetChangeListener = new ISetChangeListener() {
-		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			if (updatingTarget)
 				return;
@@ -75,14 +74,12 @@ public class ValidatedObservableSet extends ObservableSet {
 	};
 
 	private IStaleListener targetStaleListener = new IStaleListener() {
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			fireStale();
 		}
 	};
 
 	private IValueChangeListener validationStatusChangeListener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			IStatus oldStatus = (IStatus) event.diff.getOldValue();
 			IStatus newStatus = (IStatus) event.diff.getNewValue();
@@ -161,13 +158,11 @@ public class ValidatedObservableSet extends ObservableSet {
 		}
 	}
 
-	@Override
 	public boolean isStale() {
 		getterCalled();
 		return stale || target.isStale();
 	}
 
-	@Override
 	public boolean add(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.add(o);
@@ -180,7 +175,6 @@ public class ValidatedObservableSet extends ObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean addAll(Collection c) {
 		getterCalled();
 		HashSet set = new HashSet(wrappedSet);
@@ -194,7 +188,6 @@ public class ValidatedObservableSet extends ObservableSet {
 		return changed;
 	}
 
-	@Override
 	public void clear() {
 		getterCalled();
 		if (isEmpty())
@@ -205,24 +198,20 @@ public class ValidatedObservableSet extends ObservableSet {
 		fireSetChange(diff);
 	}
 
-	@Override
 	public Iterator iterator() {
 		getterCalled();
 		final Iterator wrappedIterator = wrappedSet.iterator();
 		return new Iterator() {
 			Object last = null;
 
-			@Override
 			public boolean hasNext() {
 				return wrappedIterator.hasNext();
 			}
 
-			@Override
 			public Object next() {
 				return last = wrappedIterator.next();
 			}
 
-			@Override
 			public void remove() {
 				wrappedIterator.remove();
 				SetDiff diff = Diffs.createSetDiff(Collections.EMPTY_SET,
@@ -233,7 +222,6 @@ public class ValidatedObservableSet extends ObservableSet {
 		};
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.remove(o);
@@ -246,7 +234,6 @@ public class ValidatedObservableSet extends ObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean removeAll(Collection c) {
 		getterCalled();
 		Set set = new HashSet(wrappedSet);
@@ -260,7 +247,6 @@ public class ValidatedObservableSet extends ObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean retainAll(Collection c) {
 		getterCalled();
 		Set set = new HashSet(wrappedSet);
@@ -274,7 +260,6 @@ public class ValidatedObservableSet extends ObservableSet {
 		return changed;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		target.removeSetChangeListener(targetChangeListener);
 		target.removeStaleListener(targetStaleListener);

@@ -21,6 +21,7 @@
 package org.eclipse.e4.ui.css.core.impl.sac;
 
 import java.util.Set;
+
 import org.w3c.css.sac.Selector;
 import org.w3c.dom.Element;
 
@@ -42,5 +43,5 @@ public interface ExtendedSelector extends Selector {
 	/**
 	 * Fills the given set with the attribute names found in this selector.
 	 */
-	void fillAttributeSet(Set<String> attrSet);
+	void fillAttributeSet(Set attrSet);
 }

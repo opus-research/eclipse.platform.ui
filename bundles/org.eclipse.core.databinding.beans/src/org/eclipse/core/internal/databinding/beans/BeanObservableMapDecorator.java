@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.observable.map.IObservableMap;
 
 /**
  * {@link IBeanObservable} decorator for an {@link IObservableMap}.
- *
+ * 
  * @since 3.3
  */
 public class BeanObservableMapDecorator extends DecoratingObservableMap
@@ -39,13 +39,11 @@ public class BeanObservableMapDecorator extends DecoratingObservableMap
 		this.propertyDescriptor = propertyDescriptor;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		this.propertyDescriptor = null;
 		super.dispose();
 	}
 
-	@Override
 	public Object getObserved() {
 		IObservable decorated = getDecorated();
 		if (decorated instanceof IObserving)
@@ -53,7 +51,6 @@ public class BeanObservableMapDecorator extends DecoratingObservableMap
 		return null;
 	}
 
-	@Override
 	public PropertyDescriptor getPropertyDescriptor() {
 		return propertyDescriptor;
 	}

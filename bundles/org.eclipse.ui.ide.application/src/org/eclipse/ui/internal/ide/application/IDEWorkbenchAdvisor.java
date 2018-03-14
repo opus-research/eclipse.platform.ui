@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
- *     Christian Georgi (SAP)            - Bug 432480
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -19,12 +18,21 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.ibm.icu.text.Collator;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.net.proxy.IProxyService;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
@@ -38,8 +46,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.E4Workbench;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -49,14 +59,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -78,11 +80,6 @@ import org.eclipse.ui.internal.ide.undo.WorkspaceUndoMonitor;
 import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.statushandlers.AbstractStatusHandler;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
-
-import com.ibm.icu.text.Collator;
 
 /**
  * IDE-specified workbench advisor which configures the workbench for use as an
@@ -90,7 +87,7 @@ import com.ibm.icu.text.Collator;
  * <p>
  * Note: This class replaces <code>org.eclipse.ui.internal.Workbench</code>.
  * </p>
- *
+ * 
  * @since 3.0
  */
 public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
@@ -104,6 +101,12 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	private static final String INSTALLED_FEATURES = "installedFeatures"; //$NON-NLS-1$
 
 	private static IDEWorkbenchAdvisor workbenchAdvisor = null;
+
+	/**
+	 * Contains the workspace location if the -showlocation command line
+	 * argument is specified, or <code>null</code> if not specified.
+	 */
+	private String workspaceLocation = null;
 
 	/**
 	 * Ordered map of versioned feature ids -> info that are new for this
@@ -130,7 +133,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	private IDEIdleHelper idleHelper;
 
 	private Listener settingsChangeListener;
-
+	
 	/**
 	 * Support class for monitoring workspace changes and periodically
 	 * validating the undo history
@@ -156,9 +159,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			throw new IllegalStateException();
 		}
 		workbenchAdvisor = this;
-
+		
 		Listener closeListener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				boolean doExit = IDEWorkbenchWindowAdvisor.promptOnExit(null);
 				event.doit = doExit;
@@ -178,16 +180,40 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		this.delayedEventsProcessor = processor;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#initialize
+	 */
 	public void initialize(IWorkbenchConfigurer configurer) {
 
 		PluginActionBuilder.setAllowIdeLogging(true);
-
+		
 		// make sure we always save and restore workspace state
 		configurer.setSaveAndRestore(true);
 
 		// register workspace adapters
 		IDE.registerAdapters();
+
+		// get the command line arguments
+		String[] cmdLineArgs = Platform.getCommandLineArgs();
+
+		// include the workspace location in the title
+		// if the command line option -showlocation is specified
+		for (int i = 0; i < cmdLineArgs.length; i++) {
+			if ("-showlocation".equalsIgnoreCase(cmdLineArgs[i])) { //$NON-NLS-1$
+				String name = null;
+				if (cmdLineArgs.length > i + 1) {
+					name = cmdLineArgs[i + 1];
+				}
+				if (name != null && name.indexOf("-") == -1) { //$NON-NLS-1$
+					workspaceLocation = name;
+				} else {
+					workspaceLocation = Platform.getLocation().toOSString();
+				}
+				break;
+			}
+		}
 
 		// register shared images
 		declareWorkbenchImages();
@@ -197,7 +223,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// initialize idle handler
 		idleHelper = new IDEIdleHelper(configurer);
-
+		
 		// initialize the workspace undo monitor
 		workspaceUndoMonitor = WorkspaceUndoMonitor.getInstance();
 
@@ -207,7 +233,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		Policy.setComparator(Collator.getInstance());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preStartup()
+	 */
 	public void preStartup() {
 
 		// Suspend background jobs while we startup
@@ -224,7 +254,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 				ResourcesPlugin.FAMILY_AUTO_BUILD);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postStartup()
+	 */
 	public void postStartup() {
 		try {
 			refreshFromLocal();
@@ -254,7 +288,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 		if (proxyService == null) {
 			IDEWorkbenchPlugin.log("Proxy service could not be found."); //$NON-NLS-1$
-		}
+		}	
 	}
 
 	/**
@@ -266,7 +300,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			boolean currentHighContrast = Display.getCurrent()
 					.getHighContrast();
 
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if (Display.getCurrent().getHighContrast() == currentHighContrast)
 					return;
@@ -288,7 +321,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postShutdown
+	 */
 	public void postShutdown() {
 		if (activityHelper != null) {
 			activityHelper.shutdown();
@@ -307,14 +344,22 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preShutdown()
+	 */
 	public boolean preShutdown() {
 		Display.getCurrent().removeListener(SWT.Settings,
 				settingsChangeListener);
 		return super.preShutdown();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#createWorkbenchWindowAdvisor(org.eclipse.ui.application.IWorkbenchWindowConfigurer)
+	 */
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
 			IWorkbenchWindowConfigurer configurer) {
 		return new IDEWorkbenchWindowAdvisor(this, configurer);
@@ -322,7 +367,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Return true if the intro plugin is present and false otherwise.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public boolean hasIntro() {
@@ -349,7 +394,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		final IContainer root = ResourcesPlugin.getWorkspace().getRoot();
 		Job job = new WorkspaceJob(IDEWorkbenchMessages.Workspace_refreshing) {
-			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
 				root.refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -371,21 +415,26 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			this.dialog = dialog;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#internalWorked(double)
+		 */
 		public void internalWorked(double work) {
 			super.internalWorked(work);
 			total += work;
 			updateProgressDetails();
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#worked(int)
+		 */
 		public void worked(int work) {
 			super.worked(work);
 			total += work;
 			updateProgressDetails();
 		}
 
-		@Override
 		public void beginTask(String name, int totalWork) {
 			super.beginTask(name, totalWork);
 			subTask(IDEWorkbenchMessages.IDEWorkbenchAdvisor_preHistoryCompaction);
@@ -410,7 +459,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			super(parent);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog#createDetailsButton(org.eclipse.swt.widgets.Composite)
+		 */
 		protected void createButtonsForButtonBar(Composite parent) {
 			super.createButtonsForButtonBar(parent);
 			registerCancelButtonListener();
@@ -418,7 +470,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		public void registerCancelButtonListener() {
 			cancel.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					subTaskLabel.setText(""); //$NON-NLS-1$
 				}
@@ -442,7 +493,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 					.getDescription().isApplyFileStatePolicy();
 
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				@Override
 				public void run(IProgressMonitor monitor) {
 					try {
 						if (applyPolicy)
@@ -478,12 +528,20 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getDefaultPageInput
+	 */
 	public IAdaptable getDefaultPageInput() {
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor
+	 */
 	public String getInitialWindowPerspectiveId() {
 		int index = PlatformUI.getWorkbench().getWorkbenchWindowCount() - 1;
 
@@ -502,7 +560,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * Returns the map of versioned feature ids -> info object for all installed
 	 * features. The format of the versioned feature id (the key of the map) is
 	 * featureId + ":" + versionId.
-	 *
+	 * 
 	 * @return map of versioned feature ids -> info object (key type:
 	 *         <code>String</code>, value type: <code>AboutInfo</code>)
 	 * @since 3.0
@@ -533,7 +591,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	/**
 	 * Returns the ordered map of versioned feature ids -> AboutInfo that are
 	 * new for this session.
-	 *
+	 * 
 	 * @return ordered map of versioned feature ids (key type:
 	 *         <code>String</code>) -> infos (value type:
 	 *         <code>AboutInfo</code>).
@@ -575,7 +633,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * Declares all IDE-specific workbench images. This includes both "shared"
 	 * images (named in {@link org.eclipse.ui.ide.IDE.SharedImages}) and internal images (named in
 	 * {@link org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages}).
-	 *
+	 * 
 	 * @see IWorkbenchConfigurer#declareImage
 	 */
 	private void declareWorkbenchImages() {
@@ -772,7 +830,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Declares an IDE-specific workbench image.
-	 *
+	 * 
 	 * @param symbolicName
 	 *            the symbolic name of the image
 	 * @param path
@@ -790,32 +848,22 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		getWorkbenchConfigurer().declareImage(symbolicName, desc, shared);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getMainPreferencePageId
+	 */
 	public String getMainPreferencePageId() {
 		// indicate that we want the Workench preference page to be prominent
 		return WORKBENCH_PREFERENCE_CATEGORY_ID;
 	}
 
 	/**
-	 * Returns the location to show in the window title, depending on a
-	 * {@link IDEInternalPreferences#SHOW_LOCATION user preference}. Note that
-	 * this may be overridden by the '-showlocation' command line argument.
-	 *
-	 * @return the location string, or <code>null</code> if the location is not
-	 *         being shown
+	 * @return the workspace location string, or <code>null</code> if the
+	 *         location is not being shown
 	 */
 	public String getWorkspaceLocation() {
-		// read command line, which has priority
-		IEclipseContext context = getWorkbenchConfigurer().getWorkbench().getService(IEclipseContext.class);
-		String location = context != null ? (String) context.get(E4Workbench.FORCED_SHOW_LOCATION) : null;
-		if (location != null) {
-			return location;
-		}
-		// read the preference
-		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION)) {
-			return Platform.getLocation().toOSString();
-		}
-		return null;
+		return workspaceLocation;
 	}
 
 	/**
@@ -842,7 +890,11 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		return welcomePerspectiveInfos;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getWorkbenchErrorHandler()
+	 */
 	public synchronized AbstractStatusHandler getWorkbenchErrorHandler() {
 		if (ideWorkbenchErrorHandler == null) {
 			ideWorkbenchErrorHandler = new IDEWorkbenchErrorHandler(
@@ -851,7 +903,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		return ideWorkbenchErrorHandler;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#eventLoopIdle(org.eclipse.swt.widgets.Display)
+	 */
 	public void eventLoopIdle(Display display) {
 		if (delayedEventsProcessor != null)
 			delayedEventsProcessor.catchUp(display);
