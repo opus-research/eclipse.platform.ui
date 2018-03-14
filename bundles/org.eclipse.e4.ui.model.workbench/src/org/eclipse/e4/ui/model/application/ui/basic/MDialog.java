@@ -29,5 +29,5 @@ package org.eclipse.e4.ui.model.application.ui.basic;
  * @model
  * @generated
  */
-public interface MDialog extends MWindow {
+public interface MDialog extends MFrame<MDialogElement> {
 } // MDialog

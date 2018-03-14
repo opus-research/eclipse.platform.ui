@@ -20,6 +20,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.*;
 import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialogElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -144,6 +145,10 @@ public class AdvancedAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public <T extends MUIElement> Adapter caseGenericTile(MGenericTile<T> object) {
 				return createGenericTileAdapter();
+			}
+			@Override
+			public Adapter caseDialogElement(MDialogElement object) {
+				return createDialogElementAdapter();
 			}
 			@Override
 			public Adapter casePartSashContainer(MPartSashContainer object) {
@@ -376,6 +381,20 @@ public class AdvancedAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createGenericTileAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialogElement <em>Dialog Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialogElement
+	 * @generated
+	 */
+	public Adapter createDialogElementAdapter() {
 		return null;
 	}
 
