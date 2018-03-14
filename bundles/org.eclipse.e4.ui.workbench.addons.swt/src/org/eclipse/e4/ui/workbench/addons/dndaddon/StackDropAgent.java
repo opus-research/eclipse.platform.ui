@@ -24,8 +24,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -40,7 +38,6 @@ public class StackDropAgent extends DropAgent {
 
 	private ArrayList<Rectangle> itemRects;
 	private int curDropIndex = -2;
-	private Image dropImage;
 
 	/**
 	 * @param manager
@@ -196,13 +193,15 @@ public class StackDropAgent extends DropAgent {
 		} else {
 			if (dropIndex < dropCTF.getItemCount()) {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex).getBounds();
+				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
-				addDropFeedback(itemBounds);
+				dndManager.frameRect(itemBounds);
 			} else if (dropCTF.getItemCount() > 0) {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex - 1).getBounds();
 				itemBounds.x = itemBounds.x + itemBounds.width;
+				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
-				addDropFeedback(itemBounds);
+				dndManager.frameRect(itemBounds);
 			} else {
 				Rectangle fr = new Rectangle(tabArea.x, tabArea.y, tabArea.width, tabArea.height);
 				fr.width = 2;
@@ -217,39 +216,6 @@ public class StackDropAgent extends DropAgent {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Add drop feedback image, centered at the top-left point of the given item
-	 * bounds.
-	 */
-	private void addDropFeedback(Rectangle itemBounds) {
-		Image img = getDropImage();
-		Rectangle imgBounds = img.getBounds();
-		imgBounds.x = itemBounds.x - imgBounds.width / 2;
-		imgBounds.y = itemBounds.y - imgBounds.height / 2;
-		dndManager.clearOverlay();
-		dndManager.addImage(imgBounds, img);
-	}
-
-	/**
-	 * return the image to use as drop feedback
-	 * 
-	 * @return the dropImage
-	 */
-	public Image getDropImage() {
-		if (dropImage == null) {
-			Display curDisplay = Display.getCurrent();
-			dropImage = new Image(curDisplay, 16, 16);
-			GC gc = new GC(dropImage);
-			int[] pts = new int[] { 1, 1, 15, 0, 8, 15 };
-			gc.setBackground(curDisplay.getSystemColor(SWT.COLOR_GRAY));
-			gc.fillPolygon(pts);
-			gc.setForeground(curDisplay.getSystemColor(SWT.COLOR_BLACK));
-			gc.drawPolygon(pts);
-			gc.dispose();
-		}
-		return dropImage;
 	}
 
 	/**
