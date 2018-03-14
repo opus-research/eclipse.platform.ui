@@ -42,8 +42,7 @@ public class ViewActionBuilder extends PluginActionBuilder {
     /* (non-Javadoc)
      * Method declared on PluginActionBuilder.
      */
-    @Override
-	protected ActionDescriptor createActionDescriptor(
+    protected ActionDescriptor createActionDescriptor(
             org.eclipse.core.runtime.IConfigurationElement element) {
         return new ActionDescriptor(element, ActionDescriptor.T_VIEW,
                 targetPart);

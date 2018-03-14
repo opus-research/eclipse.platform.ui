@@ -274,7 +274,6 @@ public class CommandContributionItem extends ContributionItem {
 	 * 		The style of this menu contribution. See the STYLE_* contants.
 	 * @deprecated create the {@link CommandContributionItemParameter}
 	 */
-	@Deprecated
 	public CommandContributionItem(IServiceLocator serviceLocator, String id,
 			String commandId, Map parameters, ImageDescriptor icon,
 			ImageDescriptor disabledIcon, ImageDescriptor hoverIcon,
@@ -307,7 +306,6 @@ public class CommandContributionItem extends ContributionItem {
 	private ICommandListener getCommandListener() {
 		if (commandListener == null) {
 			commandListener = new ICommandListener() {
-				@Override
 				public void commandChanged(CommandEvent commandEvent) {
 					if (commandEvent.isHandledChanged()
 							|| commandEvent.isEnabledChanged()
@@ -325,7 +323,6 @@ public class CommandContributionItem extends ContributionItem {
 			dropDownMenuOverride = null;
 		}
 		Runnable update = new Runnable() {
-			@Override
 			public void run() {
 				if (commandEvent.isEnabledChanged()
 						|| commandEvent.isHandledChanged()) {
@@ -421,7 +418,6 @@ public class CommandContributionItem extends ContributionItem {
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .Menu, int)
 	 */
-	@Override
 	public void fill(Menu parent, int index) {
 		if (command == null) {
 			return;
@@ -458,7 +454,6 @@ public class CommandContributionItem extends ContributionItem {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void fill(Composite parent) {
 		if (command == null) {
 			return;
@@ -494,7 +489,6 @@ public class CommandContributionItem extends ContributionItem {
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .ToolBar, int)
 	 */
-	@Override
 	public void fill(ToolBar parent, int index) {
 		if (command == null) {
 			return;
@@ -527,7 +521,6 @@ public class CommandContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#update()
 	 */
-	@Override
 	public void update() {
 		update(null);
 	}
@@ -537,7 +530,6 @@ public class CommandContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#update(java.lang.String)
 	 */
-	@Override
 	public void update(String id) {
 		if (widget != null) {
 			if (widget instanceof MenuItem) {
@@ -713,7 +705,6 @@ public class CommandContributionItem extends ContributionItem {
 		}
 	}
 
-	@Override
 	public void setParent(IContributionManager parent) {
 		super.setParent(parent);
 		if (parent == null)
@@ -724,37 +715,30 @@ public class CommandContributionItem extends ContributionItem {
 		if (command != null) {
 			UIElement callback = new UIElement(serviceLocator) {
 	
-				@Override
 				public void setChecked(boolean checked) {
 					CommandContributionItem.this.setChecked(checked);
 				}
 	
-				@Override
 				public void setDisabledIcon(ImageDescriptor desc) {
 					CommandContributionItem.this.setDisabledIcon(desc);
 				}
 	
-				@Override
 				public void setHoverIcon(ImageDescriptor desc) {
 					CommandContributionItem.this.setHoverIcon(desc);
 				}
 	
-				@Override
 				public void setIcon(ImageDescriptor desc) {
 					CommandContributionItem.this.setIcon(desc);
 				}
 	
-				@Override
 				public void setText(String text) {
 					CommandContributionItem.this.setText(text);
 				}
 	
-				@Override
 				public void setTooltip(String text) {
 					CommandContributionItem.this.setTooltip(text);
 				}
 	
-				@Override
 				public void setDropDownId(String id) {
 					dropDownMenuOverride = id;
 				}
@@ -792,7 +776,6 @@ public class CommandContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (widget != null) {
 			widget.dispose();
@@ -820,7 +803,6 @@ public class CommandContributionItem extends ContributionItem {
 	private Listener getItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -899,7 +881,6 @@ public class CommandContributionItem extends ContributionItem {
 						workbenchHelpSystem.setHelp(menu, helpContextId);
 					}
 					menuManager.addMenuListener(new IMenuListener2() {
-						@Override
 						public void menuAboutToShow(IMenuManager manager) {
 							String id = getId();
 							if (dropDownMenuOverride != null) {
@@ -908,10 +889,8 @@ public class CommandContributionItem extends ContributionItem {
 							menuService.populateContributionManager(
 									menuManager, "menu:" + id); //$NON-NLS-1$
 						}
-						@Override
 						public void menuAboutToHide(IMenuManager manager) {
 							display.asyncExec(new Runnable() {
-								@Override
 								public void run() {
 									menuService.releaseContributions(menuManager);
 									menuManager.dispose();
@@ -1009,7 +988,6 @@ public class CommandContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#isEnabled()
 	 */
-	@Override
 	public boolean isEnabled() {
 		if (command != null) {
 			command.getCommand().setEnabled(menuService.getCurrentState());
@@ -1021,7 +999,6 @@ public class CommandContributionItem extends ContributionItem {
 	/**
 	 * @since 3.4
 	 */
-	@Override
 	public boolean isVisible() {
 		if (visibleEnabled) {
 			return super.isVisible() && isEnabled();
@@ -1031,7 +1008,6 @@ public class CommandContributionItem extends ContributionItem {
 
 	private IBindingManagerListener bindingManagerListener = new IBindingManagerListener() {
 
-		@Override
 		public void bindingManagerChanged(BindingManagerEvent event) {
 			if (event.isActiveBindingsChanged()
 					&& event.isActiveBindingsChangedFor(getCommand())) {

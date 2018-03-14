@@ -38,7 +38,6 @@ public class WorkbenchPartTestable implements IWorkbenchPartTestable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.testing.IWorkbenchPartTestable#getControl()
 	 */
-	@Override
 	public Composite getControl() {
 		return composite;
 	}

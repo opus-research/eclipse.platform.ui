@@ -73,16 +73,14 @@ public class HelpContentsAction extends Action implements IWorkbenchAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
         }
         //This may take a while, so use the busy indicator
         BusyIndicator.showWhile(null, new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
             	workbenchWindow.getWorkbench().getHelpSystem().displayHelp();
             }
         });
@@ -91,8 +89,7 @@ public class HelpContentsAction extends Action implements IWorkbenchAction {
     /* (non-Javadoc)
      * Method declared on ActionFactory.IWorkbenchAction.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         workbenchWindow = null;
     }
 

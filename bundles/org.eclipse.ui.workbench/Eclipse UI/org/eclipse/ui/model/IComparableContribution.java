@@ -53,7 +53,6 @@ public interface IComparableContribution extends IAdaptable {
 	 * provided by the platform will provide this adapter.</dd>
 	 * </dl>
 	 */
-	@Override
 	public Object getAdapter(Class adapter);
 
 }

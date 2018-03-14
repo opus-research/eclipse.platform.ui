@@ -51,7 +51,6 @@ public abstract class AbstractHandler extends
     /**
      * @see IHandler#addHandlerListener(IHandlerListener)
      */
-	@Override
 	@Deprecated
     public void addHandlerListener(
             org.eclipse.ui.commands.IHandlerListener handlerListener) {
@@ -72,13 +71,11 @@ public abstract class AbstractHandler extends
      * 
      * @see org.eclipse.ui.commands.IHandler#dispose()
      */
-	@Override
 	@Deprecated
     public void dispose() {
         // Do nothing.
     }
 
-	@Override
 	@Deprecated
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         try {
@@ -96,7 +93,6 @@ public abstract class AbstractHandler extends
      *            the event describing changes to this instance. Must not be
      *            <code>null</code>.
      */
-	@Override
 	@Deprecated
     protected void fireHandlerChanged(HandlerEvent handlerEvent) {
         super.fireHandlerChanged(handlerEvent);
@@ -182,7 +178,6 @@ public abstract class AbstractHandler extends
      * 
      * @see IHandler#getAttributeValuesByName()
      */
-	@Override
 	@Deprecated
     public Map getAttributeValuesByName() {
         return Collections.EMPTY_MAP;
@@ -196,13 +191,11 @@ public abstract class AbstractHandler extends
      *         AbstractHandler
      * @since 3.1
      */
-	@Override
 	@Deprecated
     protected final boolean hasListeners() {
         return super.hasListeners() || handlerListeners != null;
     }
 
-	@Override
 	@Deprecated
     public boolean isEnabled() {
         final Object handled = getAttributeValuesByName().get("enabled"); //$NON-NLS-1$
@@ -213,7 +206,6 @@ public abstract class AbstractHandler extends
         return false;
     }
 
-	@Override
 	@Deprecated
     public boolean isHandled() {
         final Object handled = getAttributeValuesByName().get(
@@ -228,7 +220,6 @@ public abstract class AbstractHandler extends
     /**
      * @see IHandler#removeHandlerListener(IHandlerListener)
      */
-	@Override
 	@Deprecated
     public void removeHandlerListener(
             org.eclipse.ui.commands.IHandlerListener handlerListener) {
