@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 459932
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -1418,6 +1418,35 @@ public class StackRenderer extends LazyStackRenderer {
 					});
 				}
 
+
+				int hidden = getCloseableParts(part, true).size();
+				int visible = getCloseableParts(part, false).size();
+				if (hidden > 0) {
+					new MenuItem(menu, SWT.SEPARATOR);
+				}
+				if (hidden > 0) {
+					MenuItem menuItemHidden = new MenuItem(menu, SWT.NONE);
+					menuItemHidden.setText(SWTRenderersMessages.menuCloseHidden);
+					menuItemHidden.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+							closeParts(part, true);
+						}
+					});
+				}
+				if (visible > 0 && hidden > 0) {
+					MenuItem menuItemVisible = new MenuItem(menu, SWT.NONE);
+					menuItemVisible.setText(SWTRenderersMessages.menuCloseVisible);
+					menuItemVisible.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+							closeParts(part, false);
+						}
+					});
+				}
+
 				new MenuItem(menu, SWT.SEPARATOR);
 
 				MenuItem menuItemAll = new MenuItem(menu, SWT.NONE);
@@ -1442,6 +1471,42 @@ public class StackRenderer extends LazyStackRenderer {
 			return placeholder == null ? null : placeholder.getParent();
 		}
 		return parent;
+	}
+
+	private List<MPart> getCloseableParts(MPart part, boolean hidden) {
+		MElementContainer<MUIElement> container = getParent(part);
+		if (container == null) {
+			return new ArrayList<MPart>();
+		}
+		List<MPart> closeableSiblings = new ArrayList<MPart>();
+		List<MUIElement> children = container.getChildren();
+		for (MUIElement child : children) {
+			// If the element isn't showing skip it
+			if (!child.isToBeRendered()) {
+				continue;
+			}
+
+			MPart otherPart = null;
+			if (child instanceof MPart) {
+				otherPart = (MPart) child;
+			} else if (child instanceof MPlaceholder) {
+				MUIElement otherItem = ((MPlaceholder) child).getRef();
+				if (otherItem instanceof MPart) {
+					otherPart = (MPart) otherItem;
+				}
+			}
+			if (otherPart == null) {
+				continue;
+			}
+			if (otherPart.isToBeRendered() && isClosable(otherPart)) {
+				CTabItem item = findItemForPart(otherPart);
+				boolean isHidden = item != null && !item.isShowing();
+				if (isHidden == hidden) {
+					closeableSiblings.add(otherPart);
+				}
+			}
+		}
+		return closeableSiblings;
 	}
 
 	private List<MPart> getCloseableSideParts(MPart part, boolean left) {
@@ -1496,6 +1561,15 @@ public class StackRenderer extends LazyStackRenderer {
 				closeableSiblings.add(otherPart);
 		}
 		return closeableSiblings;
+	}
+
+	private void closeParts(MPart part, boolean hidden) {
+		MElementContainer<MUIElement> container = getParent(part);
+		if (container == null) {
+			return;
+		}
+		List<MPart> others = getCloseableParts(part, hidden);
+		closeSiblingParts(part, others, true);
 	}
 
 	private void closeSideParts(MPart part, boolean left) {
