@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 - 2014 Tom Schindl and others.
+ * Copyright (c) 2006 - 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,9 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -55,7 +48,8 @@ public class Snippet004HideSelection {
 				| SWT.FULL_SELECTION);
 		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(ArrayContentProvider.getInstance());
-		v.setInput(createModel());
+		MyModel[] model = createModel();
+		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().addMouseListener(new MouseAdapter() {
 
@@ -69,12 +63,13 @@ public class Snippet004HideSelection {
 		});
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
 
 		for (int i = 0; i < 10; i++) {
-			elements.add(new MyModel(i));
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 
@@ -89,6 +84,7 @@ public class Snippet004HideSelection {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
+
 		display.dispose();
 
 	}
