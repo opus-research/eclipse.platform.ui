@@ -25,18 +25,18 @@ import com.ibm.icu.text.NumberFormat;
  *
  * @since 1.0
  */
-public class IntegerToStringConverter extends Converter<Object, Object> {
+public class IntegerToStringConverter extends Converter {
 	private final boolean primitive;
 	private final NumberFormat numberFormat;
-	private final Class<?> boxedType;
+	private final Class boxedType;
 
 	/**
 	 * @param numberFormat
 	 * @param fromType
 	 * @param boxedType
 	 */
-	private IntegerToStringConverter(NumberFormat numberFormat,
-			Class<?> fromType, Class<?> boxedType) {
+	private IntegerToStringConverter(NumberFormat numberFormat, Class fromType,
+			Class boxedType) {
 		super(fromType, String.class);
 		this.primitive = fromType.isPrimitive();
 		this.numberFormat = numberFormat;

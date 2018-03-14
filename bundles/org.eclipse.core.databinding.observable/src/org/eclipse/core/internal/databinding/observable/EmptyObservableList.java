@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208858, 208332, 146397, 249526
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -68,12 +69,12 @@ public class EmptyObservableList<E> implements IObservableList<E> {
 	}
 
 	@Override
-	public void addListChangeListener(IListChangeListener<E> listener) {
+	public void addListChangeListener(IListChangeListener<? super E> listener) {
 		// ignore
 	}
 
 	@Override
-	public void removeListChangeListener(IListChangeListener<E> listener) {
+	public void removeListChangeListener(IListChangeListener<? super E> listener) {
 		// ignore
 	}
 

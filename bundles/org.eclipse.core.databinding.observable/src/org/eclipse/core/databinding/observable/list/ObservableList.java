@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bugs 164653, 167204
  *     Matthew Hall - bugs 208858, 208332, 274450
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -64,13 +66,13 @@ public abstract class ObservableList<E> extends AbstractObservable implements
 
 	@Override
 	public synchronized void addListChangeListener(
-			IListChangeListener<E> listener) {
+			IListChangeListener<? super E> listener) {
 		addListener(ListChangeEvent.TYPE, listener);
 	}
 
 	@Override
 	public synchronized void removeListChangeListener(
-			IListChangeListener<E> listener) {
+			IListChangeListener<? super E> listener) {
 		removeListener(ListChangeEvent.TYPE, listener);
 	}
 

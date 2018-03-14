@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Boris Bokowski, IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 212468
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable;
 
@@ -67,7 +68,7 @@ public class StalenessObservableValue extends AbstractObservableValue<Boolean> {
 
 	@Override
 	protected Boolean doGetValue() {
-		return tracked.isStale() ? Boolean.TRUE : Boolean.FALSE;
+		return tracked.isStale();
 	}
 
 	@Override

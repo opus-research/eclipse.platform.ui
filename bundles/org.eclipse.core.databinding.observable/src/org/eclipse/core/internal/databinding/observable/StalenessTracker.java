@@ -88,8 +88,7 @@ public class StalenessTracker {
 	 */
 	private boolean getOldChildStale(IObservable child) {
 		Boolean oldChildValue = staleMap.get(child);
-		boolean oldChildStale = oldChildValue == null ? false : oldChildValue
-				.booleanValue();
+		boolean oldChildStale = oldChildValue != null && oldChildValue;
 		return oldChildStale;
 	}
 

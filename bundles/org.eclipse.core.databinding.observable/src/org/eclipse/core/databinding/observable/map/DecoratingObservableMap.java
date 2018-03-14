@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626, 226289
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.DecoratingObservable;
+import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable map which decorates another observable map.
@@ -50,14 +53,12 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(
-			IMapChangeListener<K, V> listener) {
+	public synchronized void addMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
 		addListener(MapChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeMapChangeListener(
-			IMapChangeListener<K, V> listener) {
+	public synchronized void removeMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
 		removeListener(MapChangeEvent.TYPE, listener);
 	}
 
@@ -88,7 +89,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		if (mapChangeListener == null) {
 			mapChangeListener = new IMapChangeListener<K, V>() {
 				@Override
-				public void handleMapChange(MapChangeEvent<K, V> event) {
+				public void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
 					DecoratingObservableMap.this.handleMapChange(event);
 				}
 			};
@@ -115,8 +116,8 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleMapChange(final MapChangeEvent<K, V> event) {
-		fireMapChange(event.diff);
+	protected void handleMapChange(final MapChangeEvent<? extends K, ? extends V> event) {
+		fireMapChange(Diffs.unmodifiableDiff(event.diff));
 	}
 
 	@Override

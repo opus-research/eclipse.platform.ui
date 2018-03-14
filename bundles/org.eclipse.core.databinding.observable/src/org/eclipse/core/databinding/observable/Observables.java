@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 Cerner Corporation and others.
+ * Copyright (c) 2006, 2015 Cerner Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     Matthew Hall - bugs 208332, 212518, 219909, 184830, 237718, 245647,
  *         226289
  *     Marko Topolnik - bug 184830
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -623,7 +624,7 @@ public class Observables {
 
 			@Override
 			public synchronized void addListChangeListener(
-					IListChangeListener<E> listener) {
+					IListChangeListener<? super E> listener) {
 			}
 		};
 	}
@@ -781,7 +782,7 @@ public class Observables {
 		destination.setValue(source.getValue());
 		source.addValueChangeListener(new IValueChangeListener<T>() {
 			@Override
-			public void handleValueChange(ValueChangeEvent<T> event) {
+			public void handleValueChange(ValueChangeEvent<? extends T> event) {
 				destination.setValue(event.diff.getNewValue());
 			}
 		});

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208332, 265727
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -80,9 +81,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	 * @since 1.2
 	 */
 	public UnionSet(IObservableSet<? extends E>[] childSets, Object elementType) {
-		this(
-				new HashSet<IObservableSet<? extends E>>(
-						Arrays.asList(childSets)), elementType);
+		this(new HashSet<IObservableSet<? extends E>>(Arrays.asList(childSets)), elementType);
 	}
 
 	/**
@@ -90,20 +89,17 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	 * @param elementType
 	 * @since 1.6
 	 */
-	public UnionSet(Set<IObservableSet<? extends E>> childSets,
-			Object elementType) {
+	public UnionSet(Set<IObservableSet<? extends E>> childSets, Object elementType) {
 		super(childSets.iterator().next().getRealm(), null, elementType);
 		this.childSets = childSets;
 
-		this.stalenessTracker = new StalenessTracker(
-				childSets.toArray(new IObservableSet[0]), stalenessConsumer);
+		this.stalenessTracker = new StalenessTracker(childSets.toArray(new IObservableSet[0]), stalenessConsumer);
 	}
 
 	private ISetChangeListener<E> childSetChangeListener = new ISetChangeListener<E>() {
 		@Override
-		public void handleSetChange(SetChangeEvent<E> event) {
-			processAddsAndRemoves(event.diff.getAdditions(),
-					event.diff.getRemovals());
+		public void handleSetChange(SetChangeEvent<? extends E> event) {
+			processAddsAndRemoves(event.diff.getAdditions(), event.diff.getRemovals());
 		}
 	};
 
@@ -133,8 +129,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 		return false;
 	}
 
-	private void processAddsAndRemoves(Set<? extends E> adds,
-			Set<? extends E> removes) {
+	private void processAddsAndRemoves(Set<? extends E> adds, Set<? extends E> removes) {
 		Set<E> addsToFire = new HashSet<>();
 		Set<E> removesToFire = new HashSet<>();
 

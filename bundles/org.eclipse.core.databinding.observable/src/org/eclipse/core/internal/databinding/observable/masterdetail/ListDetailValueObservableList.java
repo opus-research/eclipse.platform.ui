@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 Ovidio Mallo and others.
+ * Copyright (c) 2010, 2015 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Ovidio Mallo - initial API and implementation (bug 305367)
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable.masterdetail;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.RandomAccess;
 
@@ -68,14 +68,14 @@ public class ListDetailValueObservableList<M, E> extends
 
 	private IListChangeListener<M> masterListListener = new IListChangeListener<M>() {
 		@Override
-		public void handleListChange(ListChangeEvent<M> event) {
+		public void handleListChange(ListChangeEvent<? extends M> event) {
 			handleMasterListChange(event.diff);
 		}
 	};
 
 	private IValueChangeListener<E> detailValueListener = new IValueChangeListener<E>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<E> event) {
+		public void handleValueChange(ValueChangeEvent<? extends E> event) {
 			if (!event.getObservable().isStale()) {
 				staleDetailObservables.remove(event.getObservable());
 			}
@@ -127,8 +127,7 @@ public class ListDetailValueObservableList<M, E> extends
 		});
 
 		List<M> emptyList = Collections.emptyList();
-		ListDiff<M> initMasterDiff = Diffs.computeListDiff(emptyList,
-				masterList);
+		ListDiff<M> initMasterDiff = Diffs.computeListDiff(emptyList, masterList);
 		handleMasterListChange(initMasterDiff);
 	}
 
@@ -158,15 +157,14 @@ public class ListDetailValueObservableList<M, E> extends
 		staleDetailObservables.clear();
 	}
 
-	private void handleMasterListChange(ListDiff<M> masterListDiff) {
+	private void handleMasterListChange(ListDiff<? extends M> masterListDiff) {
 		boolean wasStale = isStale();
 
 		boolean hasListeners = hasListeners();
-		List<ListDiffEntry<M>> masterEntries = masterListDiff
-				.getDifferencesAsList();
-		List<ListDiffEntry<E>> detailEntries = new ArrayList<>(masterEntries.size());
-		for (int i = 0; i < masterEntries.size(); i++) {
-			ListDiffEntry<M> masterEntry = masterEntries.get(i);
+		ListDiffEntry<? extends M>[] masterEntries = masterListDiff.getDifferences();
+		List<ListDiffEntry<E>> detailEntries = new ArrayList<>(masterEntries.length);
+		for (int i = 0; i < masterEntries.length; i++) {
+			ListDiffEntry<? extends M> masterEntry = masterEntries[i];
 			int index = masterEntry.getPosition();
 
 			M masterElement = masterEntry.getElement();
@@ -240,8 +238,8 @@ public class ListDetailValueObservableList<M, E> extends
 		return detailValue;
 	}
 
-	private void handleDetailValueChange(ValueChangeEvent<E> event) {
-		IObservableValue<E> detail = event.getObservableValue();
+	private void handleDetailValueChange(ValueChangeEvent<? extends E> event) {
+		IObservableValue<? extends E> detail = event.getObservableValue();
 
 		// When we get a change event on a detail observable, we must find its
 		// position while there may also be duplicate entries.
@@ -255,10 +253,8 @@ public class ListDetailValueObservableList<M, E> extends
 		// Create the diff for every found position.
 		E oldValue = event.diff.getOldValue();
 		E newValue = event.diff.getNewValue();
-		List<ListDiffEntry<E>> diffEntries = new ArrayList<>(
-				2 * detailIndexes.cardinality());
-		for (int b = detailIndexes.nextSetBit(0); b != -1; b = detailIndexes
-				.nextSetBit(b + 1)) {
+		List<ListDiffEntry<E>> diffEntries = new ArrayList<>(2 * detailIndexes.cardinality());
+		for (int b = detailIndexes.nextSetBit(0); b != -1; b = detailIndexes.nextSetBit(b + 1)) {
 			diffEntries.add(Diffs.createListDiffEntry(b, false, oldValue));
 			diffEntries.add(Diffs.createListDiffEntry(b, true, newValue));
 		}
@@ -344,9 +340,7 @@ public class ListDetailValueObservableList<M, E> extends
 		}
 
 		if (detailList != null) {
-			for (Iterator<IObservableValue<E>> iter = detailList.iterator(); iter
-					.hasNext();) {
-				IObservableValue<E> detailValue = iter.next();
+			for (IObservableValue<E> detailValue : detailList) {
 				detailValue.dispose();
 			}
 			detailList.clear();

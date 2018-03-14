@@ -29,38 +29,34 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 
 /**
- * @param <T>
- *            the type of the elements in the list on the target side
- * @param <M>
- *            the type of the elements in the list on the model side
  * @since 1.0
  *
  */
-public class ListBinding<M, T> extends
-		Binding<IObservableList<M>, IObservableList<T>> {
+public class ListBinding extends Binding {
 
-	private UpdateListStrategy<T, M> targetToModel;
-	private UpdateListStrategy<M, T> modelToTarget;
-	private IObservableValue<IStatus> validationStatusObservable;
+	private UpdateListStrategy targetToModel;
+	private UpdateListStrategy modelToTarget;
+	private IObservableValue validationStatusObservable;
 	private boolean updatingTarget;
 	private boolean updatingModel;
 
-	private IListChangeListener<T> targetChangeListener = new IListChangeListener<T>() {
+	private IListChangeListener targetChangeListener = new IListChangeListener() {
 		@Override
-		public void handleListChange(ListChangeEvent<T> event) {
+		public void handleListChange(ListChangeEvent event) {
 			if (!updatingTarget) {
-				doUpdate(getTarget(), getModel(), event.diff, targetToModel,
-						false, false);
+				doUpdate((IObservableList) getTarget(),
+						(IObservableList) getModel(), event.diff,
+						targetToModel, false, false);
 			}
 		}
 	};
-
-	private IListChangeListener<M> modelChangeListener = new IListChangeListener<M>() {
+	private IListChangeListener modelChangeListener = new IListChangeListener() {
 		@Override
-		public void handleListChange(ListChangeEvent<M> event) {
+		public void handleListChange(ListChangeEvent event) {
 			if (!updatingModel) {
-				doUpdate(getModel(), getTarget(), event.diff, modelToTarget,
-						false, false);
+				doUpdate((IObservableList) getModel(),
+						(IObservableList) getTarget(), event.diff,
+						modelToTarget, false, false);
 			}
 		}
 	};
@@ -71,9 +67,9 @@ public class ListBinding<M, T> extends
 	 * @param modelToTargetStrategy
 	 * @param targetToModelStrategy
 	 */
-	public ListBinding(IObservableList<T> target, IObservableList<M> model,
-			UpdateListStrategy<T, M> targetToModelStrategy,
-			UpdateListStrategy<M, T> modelToTargetStrategy) {
+	public ListBinding(IObservableList target, IObservableList model,
+			UpdateListStrategy targetToModelStrategy,
+			UpdateListStrategy modelToTargetStrategy) {
 		super(target, model);
 		this.targetToModel = targetToModelStrategy;
 		this.modelToTarget = modelToTargetStrategy;
@@ -90,7 +86,7 @@ public class ListBinding<M, T> extends
 	}
 
 	@Override
-	public IObservableValue<IStatus> getValidationStatus() {
+	public IObservableValue getValidationStatus() {
 		return validationStatusObservable;
 	}
 
@@ -98,9 +94,8 @@ public class ListBinding<M, T> extends
 	protected void preInit() {
 		ObservableTracker.setIgnore(true);
 		try {
-			validationStatusObservable = new WritableValue<>(
-					context.getValidationRealm(), Status.OK_STATUS,
-					IStatus.class);
+			validationStatusObservable = new WritableValue(context
+					.getValidationRealm(), Status.OK_STATUS, IStatus.class);
 		} finally {
 			ObservableTracker.setIgnore(false);
 		}
@@ -118,28 +113,28 @@ public class ListBinding<M, T> extends
 
 	@Override
 	public void updateModelToTarget() {
-		final IObservableList<M> modelList = getModel();
+		final IObservableList modelList = (IObservableList) getModel();
 		modelList.getRealm().exec(new Runnable() {
 			@Override
 			public void run() {
-				ListDiff<M> diff = Diffs.computeListDiff(
-						Collections.<M> emptyList(), modelList);
-				doUpdate(modelList, getTarget(), diff, modelToTarget, true,
-						true);
+				ListDiff diff = Diffs.computeListDiff(Collections.EMPTY_LIST,
+						modelList);
+				doUpdate(modelList, (IObservableList) getTarget(), diff,
+						modelToTarget, true, true);
 			}
 		});
 	}
 
 	@Override
 	public void updateTargetToModel() {
-		final IObservableList<T> targetList = getTarget();
+		final IObservableList targetList = (IObservableList) getTarget();
 		targetList.getRealm().exec(new Runnable() {
 			@Override
 			public void run() {
-				ListDiff<T> diff = Diffs.computeListDiff(
-						Collections.<T> emptyList(), targetList);
-				doUpdate(targetList, getModel(), diff, targetToModel, true,
-						true);
+				ListDiff diff = Diffs.computeListDiff(Collections.EMPTY_LIST,
+						targetList);
+				doUpdate(targetList, (IObservableList) getModel(), diff,
+						targetToModel, true, true);
 			}
 		});
 	}
@@ -158,9 +153,9 @@ public class ListBinding<M, T> extends
 	 * This method may be moved to UpdateListStrategy in the future if clients
 	 * need more control over how the two lists are kept in sync.
 	 */
-	private <S, D> void doUpdate(final IObservableList<S> source,
-			final IObservableList<D> destination, final ListDiff<S> diff,
-			final UpdateListStrategy<S, D> updateListStrategy,
+	private void doUpdate(final IObservableList source,
+			final IObservableList destination, final ListDiff diff,
+			final UpdateListStrategy updateListStrategy,
 			final boolean explicit, final boolean clearDestination) {
 		final int policy = updateListStrategy.getUpdatePolicy();
 		if (policy != UpdateListStrategy.POLICY_NEVER) {
@@ -179,12 +174,12 @@ public class ListBinding<M, T> extends
 							if (clearDestination) {
 								destination.clear();
 							}
-							diff.accept(new ListDiffVisitor<S>() {
+							diff.accept(new ListDiffVisitor() {
 								boolean useMoveAndReplace = updateListStrategy
 										.useMoveAndReplace();
 
 								@Override
-								public void handleAdd(int index, S element) {
+								public void handleAdd(int index, Object element) {
 									IStatus setterStatus = updateListStrategy
 											.doAdd(destination,
 													updateListStrategy
@@ -195,7 +190,8 @@ public class ListBinding<M, T> extends
 								}
 
 								@Override
-								public void handleRemove(int index, S element) {
+								public void handleRemove(int index,
+										Object element) {
 									IStatus setterStatus = updateListStrategy
 											.doRemove(destination, index);
 
@@ -204,7 +200,7 @@ public class ListBinding<M, T> extends
 
 								@Override
 								public void handleMove(int oldIndex,
-										int newIndex, S element) {
+										int newIndex, Object element) {
 									if (useMoveAndReplace) {
 										IStatus setterStatus = updateListStrategy
 												.doMove(destination, oldIndex,
@@ -219,15 +215,11 @@ public class ListBinding<M, T> extends
 
 								@Override
 								public void handleReplace(int index,
-										S oldElement, S newElement) {
+										Object oldElement, Object newElement) {
 									if (useMoveAndReplace) {
-										// TODO Code change to be reviewed
 										IStatus setterStatus = updateListStrategy
-												.doReplace(
-														destination,
-														index,
-														updateListStrategy
-																.convert(newElement));
+												.doReplace(destination, index,
+														newElement);
 
 										mergeStatus(multiStatus, setterStatus);
 									} else {
@@ -269,11 +261,13 @@ public class ListBinding<M, T> extends
 	@Override
 	public void dispose() {
 		if (targetChangeListener != null) {
-			getTarget().removeListChangeListener(targetChangeListener);
+			((IObservableList) getTarget())
+					.removeListChangeListener(targetChangeListener);
 			targetChangeListener = null;
 		}
 		if (modelChangeListener != null) {
-			getModel().removeListChangeListener(modelChangeListener);
+			((IObservableList) getModel())
+					.removeListChangeListener(modelChangeListener);
 			modelChangeListener = null;
 		}
 		super.dispose();

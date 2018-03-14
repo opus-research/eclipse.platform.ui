@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 Ovidio Mallo and others.
+ * Copyright (c) 2010, 2015 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Ovidio Mallo - initial API and implementation (bug 305367)
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable.masterdetail;
@@ -68,7 +69,7 @@ public class MapDetailValueObservableMap<K, M, E> extends
 
 	private IMapChangeListener<K, M> masterMapListener = new IMapChangeListener<K, M>() {
 		@Override
-		public void handleMapChange(MapChangeEvent<K, M> event) {
+		public void handleMapChange(MapChangeEvent<? extends K, ? extends M> event) {
 			handleMasterMapChange(event.diff);
 		}
 	};
@@ -84,8 +85,7 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		@SuppressWarnings("unchecked")
 		@Override
 		public void handleStale(StaleEvent staleEvent) {
-			addStaleDetailObservable((IObservableValue<E>) staleEvent
-					.getObservable());
+			addStaleDetailObservable((IObservableValue<E>) staleEvent.getObservable());
 		}
 	};
 
@@ -115,21 +115,18 @@ public class MapDetailValueObservableMap<K, M, E> extends
 
 		// Initialize the map with the current state of the master map.
 		Map<K, M> emptyMap = Collections.emptyMap();
-		MapDiff<K, M> initMasterDiff = Diffs
-				.computeMapDiff(emptyMap, masterMap);
+		MapDiff<K, M> initMasterDiff = Diffs.computeMapDiff(emptyMap, masterMap);
 		handleMasterMapChange(initMasterDiff);
 	}
 
-	private void handleMasterMapChange(MapDiff<K, M> diff) {
+	private void handleMasterMapChange(MapDiff<? extends K, ? extends M> diff) {
 		// Collect the detail values for the master values in the input diff.
 		IdentityMap<K, E> oldValues = new IdentityMap<>();
 		IdentityMap<K, E> newValues = new IdentityMap<>();
 
 		// Handle added master values.
-		Set<K> addedKeys = diff.getAddedKeys();
-		for (Iterator<K> iter = addedKeys.iterator(); iter.hasNext();) {
-			K addedKey = iter.next();
-
+		Set<? extends K> addedKeys = diff.getAddedKeys();
+		for (K addedKey : addedKeys) {
 			// For added master values, we set up a new detail observable.
 			addDetailObservable(addedKey);
 
@@ -139,10 +136,8 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		}
 
 		// Handle removed master values.
-		Set<K> removedKeys = diff.getRemovedKeys();
-		for (Iterator<K> iter = removedKeys.iterator(); iter.hasNext();) {
-			K removedKey = iter.next();
-
+		Set<? extends K> removedKeys = diff.getRemovedKeys();
+		for (K removedKey : removedKeys) {
 			// First of all, get the current detail value and add it to the set
 			// of old values of the new diff.
 			IObservableValue<E> detailValue = getDetailObservableValue(removedKey);
@@ -153,10 +148,8 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		}
 
 		// Handle changed master values.
-		Set<K> changedKeys = diff.getChangedKeys();
-		for (Iterator<K> iter = changedKeys.iterator(); iter.hasNext();) {
-			K changedKey = iter.next();
-
+		Set<? extends K> changedKeys = diff.getChangedKeys();
+		for (K changedKey : changedKeys) {
 			// Get the detail value prior to the change and add it to the set of
 			// old values of the new diff.
 			IObservableValue<E> oldDetailValue = getDetailObservableValue(changedKey);
@@ -189,7 +182,7 @@ public class MapDetailValueObservableMap<K, M, E> extends
 
 			detailValue.addValueChangeListener(new IValueChangeListener<E>() {
 				@Override
-				public void handleValueChange(ValueChangeEvent<E> event) {
+				public void handleValueChange(ValueChangeEvent<? extends E> event) {
 					if (!event.getObservableValue().isStale()) {
 						staleDetailObservables.remove(event.getSource());
 					}
@@ -330,9 +323,7 @@ public class MapDetailValueObservableMap<K, M, E> extends
 		}
 
 		if (keyDetailMap != null) {
-			for (Iterator<IObservableValue<E>> iter = keyDetailMap.values()
-					.iterator(); iter.hasNext();) {
-				IObservableValue<E> detailValue = iter.next();
+			for (IObservableValue<E> detailValue : keyDetailMap.values()) {
 				detailValue.dispose();
 			}
 			keyDetailMap.clear();

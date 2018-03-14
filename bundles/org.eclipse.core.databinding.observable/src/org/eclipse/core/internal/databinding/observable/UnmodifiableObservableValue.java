@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     Matthew Hall - initial API and implementation (bug 219909)
  *     Matthew Hall - bugs 237884, 237718
  *     Ovidio Mallo - bug 237163
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -24,8 +25,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  *
  * @since 1.1
  */
-public class UnmodifiableObservableValue<T> extends
-		DecoratingObservableValue<T> {
+public class UnmodifiableObservableValue<T> extends DecoratingObservableValue<T> {
 	/**
 	 * Constructs an UnmodifiableObservableValue which wraps the given
 	 * observable value

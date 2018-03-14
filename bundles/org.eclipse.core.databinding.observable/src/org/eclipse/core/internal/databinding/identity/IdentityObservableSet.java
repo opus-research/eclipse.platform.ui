@@ -10,6 +10,7 @@
  *     Matthew Hall - bug 230267
  *         (through ObservableViewerElementSet.java)
  *     Matthew Hall - bug 262269
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.identity;
@@ -91,8 +92,7 @@ public class IdentityObservableSet<E> extends AbstractObservableSet<E> {
 				getterCalled();
 				wrappedIterator.remove();
 				Set<E> emptySet = Collections.emptySet();
-				fireSetChange(Diffs.createSetDiff(emptySet,
-						Collections.singleton(last)));
+				fireSetChange(Diffs.createSetDiff(emptySet, Collections.singleton(last)));
 			}
 		};
 	}
@@ -103,8 +103,7 @@ public class IdentityObservableSet<E> extends AbstractObservableSet<E> {
 		boolean changed = wrappedSet.add(o);
 		if (changed) {
 			Set<E> emptySet = Collections.emptySet();
-			fireSetChange(Diffs.createSetDiff(Collections.singleton(o),
-					emptySet));
+			fireSetChange(Diffs.createSetDiff(Collections.singleton(o), emptySet));
 		}
 		return changed;
 	}
@@ -126,6 +125,7 @@ public class IdentityObservableSet<E> extends AbstractObservableSet<E> {
 		return changed;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean remove(Object o) {
 		getterCalled();
@@ -138,6 +138,7 @@ public class IdentityObservableSet<E> extends AbstractObservableSet<E> {
 		return changed;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		getterCalled();
@@ -161,8 +162,7 @@ public class IdentityObservableSet<E> extends AbstractObservableSet<E> {
 		getterCalled();
 		Set<E> removals = new IdentitySet<>();
 		Object[] toRetain = c.toArray();
-		outer: for (Iterator<E> iterator = wrappedSet.iterator(); iterator
-				.hasNext();) {
+		outer: for (Iterator<E> iterator = wrappedSet.iterator(); iterator.hasNext();) {
 			E element = iterator.next();
 			// Cannot rely on c.contains(element) because we must compare
 			// elements using IElementComparer.

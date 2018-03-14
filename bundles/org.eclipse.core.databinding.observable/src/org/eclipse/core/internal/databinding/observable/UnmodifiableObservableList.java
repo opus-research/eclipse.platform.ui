@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006-2008 Cerner Corporation and others.
+ * Copyright (c) 2006-2008, 2015 Cerner Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Brad Reynolds - initial API and implementation
  *     Matthew Hall - bug 208332, 237718
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -68,7 +69,7 @@ public class UnmodifiableObservableList<E> extends DecoratingObservableList<E> {
 	}
 
 	@Override
-	public Iterator iterator() {
+	public Iterator<E> iterator() {
 		getterCalled();
 		return unmodifiableList.iterator();
 	}

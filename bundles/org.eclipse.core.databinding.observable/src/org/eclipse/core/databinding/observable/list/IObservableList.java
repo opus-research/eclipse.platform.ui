@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 167204
  *     Matthew Hall - bugs 208858, 237718
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -44,7 +45,7 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	 *
 	 * @param listener
 	 */
-	public void addListChangeListener(IListChangeListener<E> listener);
+	public void addListChangeListener(IListChangeListener<? super E> listener);
 
 	/**
 	 * Removes the given list change listener from the list of list change
@@ -53,7 +54,7 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	 *
 	 * @param listener
 	 */
-	public void removeListChangeListener(IListChangeListener<E> listener);
+	public void removeListChangeListener(IListChangeListener<? super E> listener);
 
 	/**
 	 * @TrackedGetter

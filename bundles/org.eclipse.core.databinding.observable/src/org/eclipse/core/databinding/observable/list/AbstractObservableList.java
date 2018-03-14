@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Brad Reynolds - bugs 164653, 167204
  *     Matthew Hall - bugs 118516, 208858, 208332, 247367, 146397, 249526,
  *                    349038
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -107,16 +109,14 @@ public abstract class AbstractObservableList<E> extends AbstractList<E>
 	}
 
 	@Override
-	public synchronized void addListChangeListener(
-			IListChangeListener<E> listener) {
+	public synchronized void addListChangeListener(IListChangeListener<? super E> listener) {
 		if (!disposed) {
 			changeSupport.addListener(ListChangeEvent.TYPE, listener);
 		}
 	}
 
 	@Override
-	public synchronized void removeListChangeListener(
-			IListChangeListener<E> listener) {
+	public synchronized void removeListChangeListener(IListChangeListener<? super E> listener) {
 		if (!disposed) {
 			changeSupport.removeListener(ListChangeEvent.TYPE, listener);
 		}

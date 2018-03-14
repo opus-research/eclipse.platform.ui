@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 Matt Carter and others.
+ * Copyright (c) 2005, 2015 Matt Carter and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matt Carter - initial API and implementation (bug 212518)
  *     Matthew Hall - bug 212518, 146397, 249526
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable;
 
@@ -81,12 +82,12 @@ public class ConstantObservableValue<T> implements IObservableValue<T> {
 	}
 
 	@Override
-	public void addValueChangeListener(IValueChangeListener<T> listener) {
+	public void addValueChangeListener(IValueChangeListener<? super T> listener) {
 		// ignore
 	}
 
 	@Override
-	public void removeValueChangeListener(IValueChangeListener<T> listener) {
+	public void removeValueChangeListener(IValueChangeListener<? super T> listener) {
 		// ignore
 	}
 

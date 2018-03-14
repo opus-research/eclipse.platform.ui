@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Matthew Hall - bugs 241585, 247394, 226289, 194734, 190881, 266754,
  *                    268688
  *     Ovidio Mallo - bug 303847
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -52,9 +53,9 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 
 	private ISetChangeListener<K> setChangeListener = new ISetChangeListener<K>() {
 		@Override
-		public void handleSetChange(SetChangeEvent<K> event) {
-			Set<K> addedKeys = new HashSet<>(event.diff.getAdditions());
-			Set<K> removedKeys = new HashSet<>(event.diff.getRemovals());
+		public void handleSetChange(SetChangeEvent<? extends K> event) {
+			Set<K> addedKeys = new HashSet<K>(event.diff.getAdditions());
+			Set<K> removedKeys = new HashSet<K>(event.diff.getRemovals());
 			Map<K, V> oldValues = new HashMap<>();
 			Map<K, V> newValues = new HashMap<>();
 			for (Iterator<K> it = removedKeys.iterator(); it.hasNext();) {
@@ -268,6 +269,7 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 		return keySet;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	final public V get(Object key) {
 		getterCalled();

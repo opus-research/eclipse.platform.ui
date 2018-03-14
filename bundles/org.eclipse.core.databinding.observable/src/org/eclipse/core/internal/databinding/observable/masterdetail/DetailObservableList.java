@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Brad Reynolds - bug 147515
  *     Matthew Hall - bug 221351, 247875, 246782, 249526, 268022, 251424
  *     Ovidio Mallo - bug 241318
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable.masterdetail;
 
@@ -41,17 +43,15 @@ import org.eclipse.core.runtime.Assert;
  * @since 3.2
  *
  */
-
-public class DetailObservableList<M, E> extends ObservableList<E> implements
-		IObserving {
+public class DetailObservableList<M, E> extends ObservableList<E>implements IObserving {
 
 	private boolean updating = false;
 
 	private IListChangeListener<E> innerChangeListener = new IListChangeListener<E>() {
 		@Override
-		public void handleListChange(ListChangeEvent<E> event) {
+		public void handleListChange(ListChangeEvent<? extends E> event) {
 			if (!updating) {
-				fireListChange(event.diff);
+				fireListChange(Diffs.unmodifiableDiff(event.diff));
 			}
 		}
 	};
@@ -74,8 +74,7 @@ public class DetailObservableList<M, E> extends ObservableList<E> implements
 	public DetailObservableList(
 			IObservableFactory<? super M, IObservableList<E>> factory,
 			IObservableValue<M> outerObservableValue, Object detailType) {
-		super(outerObservableValue.getRealm(), Collections.<E> emptyList(),
-				detailType);
+		super(outerObservableValue.getRealm(), Collections.<E> emptyList(), detailType);
 		Assert.isTrue(!outerObservableValue.isDisposed(),
 				"Master observable is disposed"); //$NON-NLS-1$
 
@@ -101,7 +100,7 @@ public class DetailObservableList<M, E> extends ObservableList<E> implements
 
 	IValueChangeListener<M> outerChangeListener = new IValueChangeListener<M>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<M> event) {
+		public void handleValueChange(ValueChangeEvent<? extends M> event) {
 			if (isDisposed())
 				return;
 			ObservableTracker.setIgnore(true);

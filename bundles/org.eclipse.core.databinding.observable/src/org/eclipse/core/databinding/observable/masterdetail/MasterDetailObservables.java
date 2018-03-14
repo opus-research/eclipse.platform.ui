@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Brad Reynolds - bug 147515
  *     Matthew Hall - bug 221704, 226289
  *     Ovidio Mallo - bugs 305367
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.masterdetail;
@@ -217,12 +218,9 @@ public class MasterDetailObservables {
 	 *
 	 * @since 1.4
 	 */
-	public static <M, E> IObservableList<E> detailValues(
-			IObservableList<M> masterList,
-			IObservableFactory<? super M, IObservableValue<E>> detailFactory,
-			Object detailType) {
-		return new ListDetailValueObservableList<>(masterList,
-				detailFactory, detailType);
+	public static <M, E> IObservableList<E> detailValues(IObservableList<M> masterList,
+			IObservableFactory<? super M, IObservableValue<E>> detailFactory, Object detailType) {
+		return new ListDetailValueObservableList<>(masterList, detailFactory, detailType);
 	}
 
 	/**

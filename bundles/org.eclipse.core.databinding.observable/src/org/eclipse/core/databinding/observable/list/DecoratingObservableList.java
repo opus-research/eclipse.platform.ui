@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
+import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable list which decorates another observable list.
@@ -49,13 +52,13 @@ public class DecoratingObservableList<E> extends
 
 	@Override
 	public synchronized void addListChangeListener(
-			IListChangeListener<E> listener) {
+			IListChangeListener<? super E> listener) {
 		addListener(ListChangeEvent.TYPE, listener);
 	}
 
 	@Override
 	public synchronized void removeListChangeListener(
-			IListChangeListener<E> listener) {
+			IListChangeListener<? super E> listener) {
 		removeListener(ListChangeEvent.TYPE, listener);
 	}
 
@@ -76,7 +79,7 @@ public class DecoratingObservableList<E> extends
 		if (listChangeListener == null) {
 			listChangeListener = new IListChangeListener<E>() {
 				@Override
-				public void handleListChange(ListChangeEvent<E> event) {
+				public void handleListChange(ListChangeEvent<? extends E> event) {
 					DecoratingObservableList.this.handleListChange(event);
 				}
 			};
@@ -103,8 +106,8 @@ public class DecoratingObservableList<E> extends
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleListChange(final ListChangeEvent<E> event) {
-		fireListChange(event.diff);
+	protected void handleListChange(final ListChangeEvent<? extends E> event) {
+		fireListChange(Diffs.unmodifiableDiff(event.diff));
 	}
 
 	@Override

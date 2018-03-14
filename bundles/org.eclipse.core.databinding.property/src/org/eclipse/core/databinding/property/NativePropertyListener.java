@@ -16,16 +16,11 @@ import org.eclipse.core.databinding.observable.IDiff;
 /**
  * Abstract INativePropertyListener implementation
  *
- * @param <S>
- *            type of the source object
- * @param <D>
- *            type of the diff handled by this listener
  * @since 1.2
  */
-public abstract class NativePropertyListener<S, D extends IDiff> implements
-		INativePropertyListener<S> {
+public abstract class NativePropertyListener implements INativePropertyListener {
 	private final IProperty property;
-	private final ISimplePropertyListener<D> listener;
+	private final ISimplePropertyListener listener;
 
 	/**
 	 * Constructs a NativePropertyListener with the specified arguments
@@ -36,26 +31,26 @@ public abstract class NativePropertyListener<S, D extends IDiff> implements
 	 *            the listener to receive property change notifications
 	 */
 	public NativePropertyListener(IProperty property,
-			ISimplePropertyListener<D> listener) {
+			ISimplePropertyListener listener) {
 		this.property = property;
 		this.listener = listener;
 	}
 
 	@Override
-	public final void addTo(S source) {
+	public final void addTo(Object source) {
 		if (source != null)
 			doAddTo(source);
 	}
 
-	protected abstract void doAddTo(S source);
+	protected abstract void doAddTo(Object source);
 
 	@Override
-	public final void removeFrom(S source) {
+	public final void removeFrom(Object source) {
 		if (source != null)
 			doRemoveFrom(source);
 	}
 
-	protected abstract void doRemoveFrom(S source);
+	protected abstract void doRemoveFrom(Object source);
 
 	/**
 	 * Notifies the listener that a property change occured on the source
@@ -66,8 +61,8 @@ public abstract class NativePropertyListener<S, D extends IDiff> implements
 	 * @param diff
 	 *            a diff describing the change in state
 	 */
-	protected void fireChange(Object source, D diff) {
-		listener.handleEvent(new SimplePropertyEvent<D>(
+	protected void fireChange(Object source, IDiff diff) {
+		listener.handleEvent(new SimplePropertyEvent(
 				SimplePropertyEvent.CHANGE, source, property, diff));
 	}
 
@@ -79,7 +74,7 @@ public abstract class NativePropertyListener<S, D extends IDiff> implements
 	 *            the source object whose property became stale
 	 */
 	protected void fireStale(Object source) {
-		listener.handleEvent(new SimplePropertyEvent<D>(
-				SimplePropertyEvent.STALE, source, property, null));
+		listener.handleEvent(new SimplePropertyEvent(SimplePropertyEvent.STALE,
+				source, property, null));
 	}
 }

@@ -16,7 +16,7 @@ import org.eclipse.core.databinding.conversion.Converter;
 /**
  * Converts a character to a string.
  */
-public class CharacterToStringConverter extends Converter<Object, Object> {
+public class CharacterToStringConverter extends Converter {
 	private final boolean primitive;
 
 	/**

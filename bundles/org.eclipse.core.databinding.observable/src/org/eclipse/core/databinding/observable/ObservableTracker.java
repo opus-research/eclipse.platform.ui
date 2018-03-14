@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 210115, 146397, 249526, 262269, 251424
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable;
 
@@ -136,8 +137,7 @@ public class ObservableTracker {
 	 * @since 1.2
 	 */
 	public static IObservable[] runAndCollect(Runnable runnable) {
-		Set<IObservable> lastObservableCreatedSet = currentObservableCreatedSet
-				.get();
+		Set<IObservable> lastObservableCreatedSet = currentObservableCreatedSet.get();
 		Integer lastIgnore = currentIgnoreCount.get();
 
 		Set<IObservable> observableSet = new IdentitySet<>();
@@ -276,8 +276,7 @@ public class ObservableTracker {
 	public static void observableCreated(IObservable observable) {
 		if (isIgnore())
 			return;
-		Set<IObservable> observableCreatedSet = currentObservableCreatedSet
-				.get();
+		Set<IObservable> observableCreatedSet = currentObservableCreatedSet.get();
 		if (observableCreatedSet != null) {
 			observableCreatedSet.add(observable);
 		}

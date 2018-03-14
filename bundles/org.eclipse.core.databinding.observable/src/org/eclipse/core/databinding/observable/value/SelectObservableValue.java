@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 249992)
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -53,9 +54,9 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 
 	private IValueChangeListener<Boolean> listener = new IValueChangeListener<Boolean>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<Boolean> event) {
+		public void handleValueChange(ValueChangeEvent<? extends Boolean> event) {
 			if (!updating) {
-				IObservableValue<Boolean> observable = event
+				IObservableValue<? extends Boolean> observable = event
 						.getObservableValue();
 				if (Boolean.TRUE.equals(observable.getValue())) {
 					notifyIfChanged(indexOfObservable(observable));
@@ -169,7 +170,7 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 
 	private T getLiveValue() {
 		for (Option option : options) {
-			if (Boolean.TRUE.equals(option.observable.getValue()))
+			if (option.observable.getValue())
 				return option.value;
 		}
 		return null;
@@ -182,8 +183,7 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 		try {
 			updating = true;
 			for (int i = 0; i < options.size(); i++) {
-				options.get(i).observable.setValue(i == index ? Boolean.TRUE
-						: Boolean.FALSE);
+				options.get(i).observable.setValue(i == index);
 			}
 		} finally {
 			updating = false;
@@ -205,7 +205,7 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 		return -1;
 	}
 
-	private int indexOfObservable(IObservableValue<Boolean> observable) {
+	private int indexOfObservable(IObservableValue<? extends Boolean> observable) {
 		for (int i = 0; i < options.size(); i++)
 			if (options.get(i).observable == observable)
 				return i;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 226216
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -34,6 +36,182 @@ import org.eclipse.core.internal.databinding.observable.Util;
  *
  */
 public class Diffs {
+	private static final class UnmodifiableListDiff<E> extends ListDiff<E> {
+		private ListDiff<? extends E> toWrap;
+
+		public UnmodifiableListDiff(ListDiff<? extends E> diff) {
+			this.toWrap = diff;
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public ListDiffEntry<E>[] getDifferences() {
+			ListDiffEntry<? extends E>[] original = toWrap.getDifferences();
+			ListDiffEntry<?>[] result = new ListDiffEntry<?>[original.length];
+
+			for (int idx = 0; idx < original.length; idx++) {
+				result[idx] = original[idx];
+			}
+			return (ListDiffEntry<E>[]) result;
+		}
+	}
+
+	private static final class UnmodifiableSetDiff<E> extends SetDiff<E> {
+		private SetDiff<? extends E> toWrap;
+
+		public UnmodifiableSetDiff(SetDiff<? extends E> diff) {
+			toWrap = diff;
+		}
+
+		@Override
+		public Set<E> getAdditions() {
+			return Collections.unmodifiableSet(toWrap.getAdditions());
+		}
+
+		@Override
+		public Set<E> getRemovals() {
+			return Collections.unmodifiableSet(toWrap.getRemovals());
+		}
+	}
+
+	private static final class UnmodifiableMapDiff<K, V> extends MapDiff<K, V> {
+		private MapDiff<? extends K, ? extends V> toWrap;
+
+		public UnmodifiableMapDiff(MapDiff<? extends K, ? extends V> diff) {
+			toWrap = diff;
+		}
+
+		@Override
+		public Set<K> getAddedKeys() {
+			return Collections.unmodifiableSet(toWrap.getAddedKeys());
+		}
+
+		@Override
+		public Set<K> getRemovedKeys() {
+			return Collections.unmodifiableSet(toWrap.getRemovedKeys());
+		}
+
+		@Override
+		public Set<K> getChangedKeys() {
+			return Collections.unmodifiableSet(toWrap.getChangedKeys());
+		}
+
+		@Override
+		public V getOldValue(Object key) {
+			return toWrap.getOldValue(key);
+		}
+
+		@Override
+		public V getNewValue(Object key) {
+			return toWrap.getNewValue(key);
+		}
+	}
+
+	private static final class UnmodifiableValueDiff<E> extends ValueDiff<E> {
+		private ValueDiff<? extends E> toWrap;
+
+		public UnmodifiableValueDiff(ValueDiff<? extends E> diff) {
+			toWrap = diff;
+		}
+
+		@Override
+		public E getOldValue() {
+			return toWrap.getOldValue();
+		}
+
+		@Override
+		public E getNewValue() {
+			return toWrap.getNewValue();
+		}
+	}
+
+	/**
+	 * Returns an unmodifiable wrapper on top of the given diff. The returned
+	 * diff will suppress any attempt to modify the collections it returns.
+	 * Diffs are normally unmodifiable anyway, so this method is mainly used as
+	 * a type-safe way to convert a {@code ListDiff<? extends E>} into a
+	 * {@code ListDiff<E>}.
+	 *
+	 * @param diff
+	 *            the diff to convert
+	 * @return an unmodifiable wrapper on top of the given diff
+	 * @since 1.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static <E> ListDiff<E> unmodifiableDiff(ListDiff<? extends E> diff) {
+		// If the diff is already unmodifiable, there's no need to wrap it again
+		if (diff instanceof UnmodifiableListDiff) {
+			return (ListDiff<E>) diff;
+		}
+
+		return new UnmodifiableListDiff<E>(diff);
+	}
+
+	/**
+	 * Returns an unmodifiable wrapper on top of the given diff. The returned
+	 * diff will suppress any attempt to modify the collections it returns.
+	 * Diffs are normally unmodifiable anyway, so this method is mainly used as
+	 * a type-safe way to convert a {@code SetDiff<? extends E>} into a
+	 * {@code SetDiff<E>}.
+	 *
+	 * @param diff
+	 *            the diff to convert
+	 * @return an unmodifiable wrapper on top of the given diff
+	 * @since 1.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static <E> SetDiff<E> unmodifiableDiff(SetDiff<? extends E> diff) {
+		// If the diff is already unmodifiable, there's no need to wrap it again
+		if (diff instanceof UnmodifiableSetDiff) {
+			return (SetDiff<E>) diff;
+		}
+
+		return new UnmodifiableSetDiff<E>(diff);
+	}
+
+	/**
+	 * Returns an unmodifiable wrapper on top of the given diff. The returned
+	 * diff will suppress any attempt to modify the collections it returns.
+	 * Diffs are normally unmodifiable anyway, so this method is mainly used as
+	 * a type-safe way to convert a {@code MapDiff<? extends K, ? extends V>}
+	 * into a {@code MapDiff<K,V>}.
+	 *
+	 * @param diff
+	 *            the diff to convert
+	 * @return an unmodifiable wrapper on top of the given diff
+	 * @since 1.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static <K, V> MapDiff<K, V> unmodifiableDiff(MapDiff<? extends K, ? extends V> diff) {
+		// If the diff is already unmodifiable, there's no need to wrap it again
+		if (diff instanceof UnmodifiableMapDiff) {
+			return (MapDiff<K, V>) diff;
+		}
+
+		return new UnmodifiableMapDiff<K, V>(diff);
+	}
+
+	/**
+	 * Returns an unmodifiable wrapper on top of the given diff. The returned
+	 * diff will suppress any attempt to modify the collections it returns.
+	 * Diffs are normally unmodifiable anyway, so this method is mainly used as
+	 * a type-safe way to convert a {@code ValueDiff<? extends V>} into a
+	 * {@code ValueDiff<V>}.
+	 *
+	 * @param diff
+	 *            the diff to convert
+	 * @return an unmodifiable wrapper on top of the given diff
+	 * @since 1.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static <V> ValueDiff<V> unmodifiableDiff(ValueDiff<? extends V> diff) {
+		// If the diff is already unmodifiable, there's no need to wrap it again
+		if (diff instanceof UnmodifiableValueDiff) {
+			return (ValueDiff<V>) diff;
+		}
+
+		return new UnmodifiableValueDiff<V>(diff);
+	}
 
 	/**
 	 * Returns a {@link ListDiff} describing the change between the specified
@@ -47,11 +225,11 @@ public class Diffs {
 	 * @param newList
 	 *            the new list state
 	 * @return the differences between oldList and newList
+	 * @since 1.6
 	 */
-	public static <E> ListDiff<E> computeListDiff(List<E> oldList,
-			List<E> newList) {
+	public static <E> ListDiff<E> computeListDiff(List<? extends E> oldList, List<? extends E> newList) {
 		List<ListDiffEntry<E>> diffEntries = new ArrayList<>();
-		createListDiffs(new ArrayList<>(oldList), newList, diffEntries);
+		createListDiffs(new ArrayList<E>(oldList), newList, diffEntries);
 		ListDiff<E> listDiff = createListDiff(diffEntries);
 		return listDiff;
 	}
@@ -71,13 +249,13 @@ public class Diffs {
 	 *         the specified old and new list states.
 	 * @since 1.3
 	 */
-	public static <E> ListDiff<E> computeLazyListDiff(final List<E> oldList,
-			final List<E> newList) {
+	public static <E> ListDiff<E> computeLazyListDiff(final List<? extends E> oldList,
+			final List<? extends E> newList) {
 		return new ListDiff<E>() {
 			ListDiff<E> lazyDiff;
 
 			@Override
-			public ListDiffEntry<?>[] getDifferences() {
+			public ListDiffEntry<E>[] getDifferences() {
 				if (lazyDiff == null) {
 					lazyDiff = Diffs.computeListDiff(oldList, newList);
 				}
@@ -89,10 +267,10 @@ public class Diffs {
 	/**
 	 * adapted from EMF's ListDifferenceAnalyzer
 	 */
-	private static <E> void createListDiffs(List<E> oldList, List<E> newList,
+	private static <E> void createListDiffs(List<E> oldList, List<? extends E> newList,
 			List<ListDiffEntry<E>> listDiffs) {
 		int index = 0;
-		for (Iterator<E> it = newList.iterator(); it.hasNext();) {
+		for (Iterator<? extends E> it = newList.iterator(); it.hasNext();) {
 			E newValue = it.next();
 			if (oldList.size() <= index) {
 				// append newValue to newList
@@ -209,7 +387,7 @@ public class Diffs {
 	 * @return a {@link SetDiff} describing the change between the specified old
 	 *         and new set states.
 	 */
-	public static <E> SetDiff<E> computeSetDiff(Set<E> oldSet, Set<E> newSet) {
+	public static <E> SetDiff<E> computeSetDiff(Set<? extends E> oldSet, Set<? extends E> newSet) {
 		Set<E> additions = new HashSet<E>(newSet);
 		additions.removeAll(oldSet);
 		Set<E> removals = new HashSet<E>(oldSet);
@@ -232,8 +410,7 @@ public class Diffs {
 	 *         the specified old and new set states.
 	 * @since 1.3
 	 */
-	public static <E> SetDiff<E> computeLazySetDiff(final Set<E> oldSet,
-			final Set<E> newSet) {
+	public static <E> SetDiff<E> computeLazySetDiff(final Set<? extends E> oldSet, final Set<? extends E> newSet) {
 		return new SetDiff<E>() {
 
 			private SetDiff<E> lazyDiff;
@@ -273,8 +450,8 @@ public class Diffs {
 	 * @return a {@link MapDiff} describing the change between the specified old
 	 *         and new map states.
 	 */
-	public static <K, V> MapDiff<K, V> computeMapDiff(Map<K, V> oldMap,
-			Map<K, V> newMap) {
+	public static <K, V> MapDiff<K, V> computeMapDiff(Map<? extends K, ? extends V> oldMap,
+			Map<? extends K, ? extends V> newMap) {
 		// starts out with all keys from the new map, we will remove keys from
 		// the old map as we go
 		final Set<K> addedKeys = new HashSet<K>(newMap.keySet());
@@ -282,9 +459,7 @@ public class Diffs {
 		final Set<K> changedKeys = new HashSet<K>();
 		final Map<K, V> oldValues = new HashMap<K, V>();
 		final Map<K, V> newValues = new HashMap<K, V>();
-		for (Iterator<Entry<K, V>> it = oldMap.entrySet().iterator(); it
-				.hasNext();) {
-			Map.Entry<K, V> oldEntry = it.next();
+		for (Entry<? extends K, ? extends V> oldEntry : oldMap.entrySet()) {
 			K oldKey = oldEntry.getKey();
 			if (addedKeys.remove(oldKey)) {
 				// potentially changed key since it is in oldMap and newMap
@@ -305,7 +480,7 @@ public class Diffs {
 			newValues.put(newKey, newMap.get(newKey));
 		}
 		return new MapDiff<K, V>() {
-                        @Override
+			@Override
 			public Set<K> getAddedKeys() {
 				return addedKeys;
 			}
@@ -348,8 +523,8 @@ public class Diffs {
 	 *         the specified old and new map states.
 	 * @since 1.3
 	 */
-	public static <K, V> MapDiff<K, V> computeLazyMapDiff(
-			final Map<K, V> oldMap, final Map<K, V> newMap) {
+	public static <K, V> MapDiff<K, V> computeLazyMapDiff(final Map<? extends K, ? extends V> oldMap,
+			final Map<? extends K, ? extends V> newMap) {
 		return new MapDiff<K, V>() {
 
 			private MapDiff<K, V> lazyDiff;
@@ -398,8 +573,7 @@ public class Diffs {
 	 * @param newValue
 	 * @return a value diff
 	 */
-	public static <T> ValueDiff<T> createValueDiff(final T oldValue,
-			final T newValue) {
+	public static <T> ValueDiff<T> createValueDiff(final T oldValue, final T newValue) {
 		return new ValueDiff<T>() {
 
 			@Override
@@ -421,7 +595,7 @@ public class Diffs {
 	 * @param removals
 	 * @return a set diff
 	 */
-	public static <E> SetDiff<E> createSetDiff(Set<E> additions, Set<E> removals) {
+	public static <E> SetDiff<E> createSetDiff(Set<? extends E> additions, Set<? extends E> removals) {
 		final Set<E> unmodifiableAdditions = Collections
 				.unmodifiableSet(additions);
 		final Set<E> unmodifiableRemovals = Collections
@@ -481,7 +655,7 @@ public class Diffs {
 	public static <E> ListDiff<E> createListDiff(final ListDiffEntry<E>[] differences) {
 		return new ListDiff<E>() {
 			@Override
-			public ListDiffEntry<?>[] getDifferences() {
+			public ListDiffEntry<E>[] getDifferences() {
 				return differences;
 			}
 		};
@@ -497,13 +671,11 @@ public class Diffs {
 	 * @return a list diff with the given entries
 	 * @since 1.6
 	 */
-	public static <E> ListDiff<E> createListDiff(
-			final List<ListDiffEntry<E>> differences) {
-		final ListDiffEntry<?>[] differencesArray = differences
-				.toArray(new ListDiffEntry[differences.size()]);
+	public static <E> ListDiff<E> createListDiff(final List<ListDiffEntry<E>> differences) {
+		final ListDiffEntry<E>[] differencesArray = differences.toArray(new ListDiffEntry[differences.size()]);
 		return new ListDiff<E>() {
 			@Override
-			public ListDiffEntry<?>[] getDifferences() {
+			public ListDiffEntry<E>[] getDifferences() {
 				return differencesArray;
 			}
 		};
@@ -712,19 +884,22 @@ public class Diffs {
 	 * @param newValues
 	 * @return a map diff
 	 */
-	public static <K, V> MapDiff<K, V> createMapDiff(final Set<K> addedKeys,
-			final Set<K> removedKeys, final Set<K> changedKeys,
-			final Map<K, V> oldValues, final Map<K, V> newValues) {
-		return new MapDiff<K, V>() {
+	public static <K, V> MapDiff<K, V> createMapDiff(Set<? extends K> addedKeys, Set<? extends K> removedKeys,
+			Set<? extends K> changedKeys, final Map<? extends K, ? extends V> oldValues,
+			final Map<? extends K, ? extends V> newValues) {
+		final Set<K> finalAddedKeys = Collections.unmodifiableSet(addedKeys);
+		final Set<K> finalRemovedKeys = Collections.unmodifiableSet(removedKeys);
+		final Set<K> finalChangedKeys = Collections.unmodifiableSet(changedKeys);
 
+		return new MapDiff<K, V>() {
 			@Override
 			public Set<K> getAddedKeys() {
-				return addedKeys;
+				return finalAddedKeys;
 			}
 
 			@Override
 			public Set<K> getChangedKeys() {
-				return changedKeys;
+				return finalChangedKeys;
 			}
 
 			@Override
@@ -739,7 +914,7 @@ public class Diffs {
 
 			@Override
 			public Set<K> getRemovedKeys() {
-				return removedKeys;
+				return finalRemovedKeys;
 			}
 		};
 	}

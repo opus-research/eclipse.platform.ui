@@ -32,14 +32,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 
 /**
- * @param <K>
- * @param <V>
  * @since 3.3
  *
  */
-public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
-	private IObservableMap<K, V> target;
-	private IObservableValue<IStatus> validationStatus;
+public class ValidatedObservableMap extends ObservableMap {
+	private IObservableMap target;
+	private IObservableValue validationStatus;
 
 	// Only true when out of sync with target due to validation status
 	private boolean stale;
@@ -49,20 +47,20 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 
 	private boolean updatingTarget = false;
 
-	private IMapChangeListener<K, V> targetChangeListener = new IMapChangeListener<K, V>() {
+	private IMapChangeListener targetChangeListener = new IMapChangeListener() {
 		@Override
-		public void handleMapChange(MapChangeEvent<K, V> event) {
+		public void handleMapChange(MapChangeEvent event) {
 			if (updatingTarget)
 				return;
-			IStatus status = validationStatus.getValue();
+			IStatus status = (IStatus) validationStatus.getValue();
 			if (isValid(status)) {
 				if (stale) {
 					// this.stale means we are out of sync with target,
 					// so reset wrapped list to exactly mirror target
 					stale = false;
-					updateWrappedMap(new HashMap<K, V>(target));
+					updateWrappedMap(new HashMap(target));
 				} else {
-					MapDiff<K, V> diff = event.diff;
+					MapDiff diff = event.diff;
 					if (computeNextDiff) {
 						diff = Diffs.computeMapDiff(wrappedMap, target);
 						computeNextDiff = false;
@@ -83,16 +81,16 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 		}
 	};
 
-	private IValueChangeListener<IStatus> validationStatusChangeListener = new IValueChangeListener<IStatus>() {
+	private IValueChangeListener validationStatusChangeListener = new IValueChangeListener() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<IStatus> event) {
-			IStatus oldStatus = event.diff.getOldValue();
-			IStatus newStatus = event.diff.getNewValue();
+		public void handleValueChange(ValueChangeEvent event) {
+			IStatus oldStatus = (IStatus) event.diff.getOldValue();
+			IStatus newStatus = (IStatus) event.diff.getNewValue();
 			if (stale && !isValid(oldStatus) && isValid(newStatus)) {
 				// this.stale means we are out of sync with target,
 				// reset wrapped map to exactly mirror target
 				stale = false;
-				updateWrappedMap(new HashMap<K, V>(target));
+				updateWrappedMap(new HashMap(target));
 
 				// If the validation status becomes valid because of a change in
 				// target observable
@@ -105,13 +103,14 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 	 * @param target
 	 * @param validationStatus
 	 */
-	public ValidatedObservableMap(final IObservableMap<K, V> target,
-			final IObservableValue<IStatus> validationStatus) {
-		super(target.getRealm(), new HashMap<K, V>(target));
+	public ValidatedObservableMap(final IObservableMap target,
+			final IObservableValue validationStatus) {
+		super(target.getRealm(), new HashMap(target));
 		Assert.isNotNull(validationStatus,
 				"Validation status observable cannot be null"); //$NON-NLS-1$
-		Assert.isTrue(target.getRealm().equals(validationStatus.getRealm()),
-				"Target and validation status observables must be on the same realm"); //$NON-NLS-1$
+		Assert
+				.isTrue(target.getRealm().equals(validationStatus.getRealm()),
+						"Target and validation status observables must be on the same realm"); //$NON-NLS-1$
 		this.target = target;
 		this.validationStatus = validationStatus;
 		target.addMapChangeListener(targetChangeListener);
@@ -119,9 +118,9 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 		validationStatus.addValueChangeListener(validationStatusChangeListener);
 	}
 
-	private void updateWrappedMap(Map<K, V> newMap) {
-		Map<K, V> oldMap = wrappedMap;
-		MapDiff<K, V> diff = Diffs.computeMapDiff(oldMap, newMap);
+	private void updateWrappedMap(Map newMap) {
+		Map oldMap = wrappedMap;
+		MapDiff diff = Diffs.computeMapDiff(oldMap, newMap);
 		wrappedMap = newMap;
 		fireMapChange(diff);
 	}
@@ -130,18 +129,18 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 		return status.isOK() || status.matches(IStatus.INFO | IStatus.WARNING);
 	}
 
-	private void applyDiff(MapDiff<K, V> diff, Map<K, V> map) {
-		for (Iterator<K> iterator = diff.getRemovedKeys().iterator(); iterator
+	private void applyDiff(MapDiff diff, Map map) {
+		for (Iterator iterator = diff.getRemovedKeys().iterator(); iterator
 				.hasNext();)
 			map.remove(iterator.next());
-		for (Iterator<K> iterator = diff.getChangedKeys().iterator(); iterator
+		for (Iterator iterator = diff.getChangedKeys().iterator(); iterator
 				.hasNext();) {
-			K key = iterator.next();
+			Object key = iterator.next();
 			map.put(key, diff.getNewValue(key));
 		}
-		for (Iterator<K> iterator = diff.getAddedKeys().iterator(); iterator
+		for (Iterator iterator = diff.getAddedKeys().iterator(); iterator
 				.hasNext();) {
-			K key = iterator.next();
+			Object key = iterator.next();
 			map.put(key, diff.getNewValue(key));
 		}
 	}
@@ -153,7 +152,7 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 		}
 	}
 
-	private void updateTargetMap(MapDiff<K, V> diff) {
+	private void updateTargetMap(MapDiff diff) {
 		updatingTarget = true;
 		try {
 			if (stale) {
@@ -178,18 +177,17 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 		checkRealm();
 		if (isEmpty())
 			return;
-		MapDiff<K, V> diff = Diffs.computeMapDiff(wrappedMap,
-				Collections.<K, V> emptyMap());
-		wrappedMap = new HashMap<K, V>();
+		MapDiff diff = Diffs.computeMapDiff(wrappedMap, Collections.EMPTY_MAP);
+		wrappedMap = new HashMap();
 		updateTargetMap(diff);
 		fireMapChange(diff);
 	}
 
 	@Override
-	public V put(K key, V value) {
+	public Object put(Object key, Object value) {
 		checkRealm();
-		MapDiff<K, V> diff;
-		V oldValue;
+		MapDiff diff;
+		Object oldValue;
 		if (wrappedMap.containsKey(key)) {
 			oldValue = wrappedMap.put(key, value);
 			if (wrappedMap.containsKey(key)) { // Changed
@@ -207,24 +205,23 @@ public class ValidatedObservableMap<K, V> extends ObservableMap<K, V> {
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends V> m) {
+	public void putAll(Map m) {
 		checkRealm();
-		Map<K, V> map = new HashMap<K, V>(wrappedMap);
+		Map map = new HashMap(wrappedMap);
 		map.putAll(m);
-		MapDiff<K, V> diff = Diffs.computeMapDiff(wrappedMap, map);
+		MapDiff diff = Diffs.computeMapDiff(wrappedMap, map);
 		wrappedMap = map;
 		updateTargetMap(diff);
 		fireMapChange(diff);
 	}
 
 	@Override
-	public V remove(Object key) {
+	public Object remove(Object key) {
 		checkRealm();
 		if (!wrappedMap.containsKey(key))
 			return null;
-
-		V oldValue = wrappedMap.remove(key);
-		MapDiff<K, V> diff = Diffs.createMapDiffSingleRemove((K) key, oldValue);
+		Object oldValue = wrappedMap.remove(key);
+		MapDiff diff = Diffs.createMapDiffSingleRemove(key, oldValue);
 		updateTargetMap(diff);
 		fireMapChange(diff);
 		return oldValue;

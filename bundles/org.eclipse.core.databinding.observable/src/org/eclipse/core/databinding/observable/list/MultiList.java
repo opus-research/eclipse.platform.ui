@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 222289)
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -150,8 +152,7 @@ public class MultiList<E> extends AbstractObservableList<E> {
 	 *            element type of the constructed list.
 	 * @since 1.6
 	 */
-	public MultiList(Realm realm, List<IObservableList<E>> lists,
-			Object elementType) {
+	public MultiList(Realm realm, List<IObservableList<E>> lists, Object elementType) {
 		super(realm);
 		this.lists = lists;
 		this.elementType = elementType;
@@ -167,7 +168,7 @@ public class MultiList<E> extends AbstractObservableList<E> {
 		if (listChangeListener == null) {
 			listChangeListener = new IListChangeListener<E>() {
 				@Override
-				public void handleListChange(final ListChangeEvent<E> event) {
+				public void handleListChange(final ListChangeEvent<? extends E> event) {
 					getRealm().exec(new Runnable() {
 						@Override
 						public void run() {
@@ -229,8 +230,8 @@ public class MultiList<E> extends AbstractObservableList<E> {
 		}
 	}
 
-	private void listChanged(ListChangeEvent<E> event) {
-		IObservableList<E> source = event.getObservableList();
+	private void listChanged(ListChangeEvent<? extends E> event) {
+		IObservableList<? extends E> source = event.getObservableList();
 		int offset = 0;
 		for (IObservableList<E> list : lists) {
 			if (source == list) {
@@ -244,25 +245,22 @@ public class MultiList<E> extends AbstractObservableList<E> {
 				"MultiList received a ListChangeEvent from an observable list that is not one of its sources."); //$NON-NLS-1$
 	}
 
-	private ListDiff<E> offsetListDiff(int offset, ListDiff<E> diff) {
-		return Diffs.createListDiff(offsetListDiffEntries(offset,
-				diff.getDifferencesAsList()));
+	private ListDiff<E> offsetListDiff(int offset, ListDiff<? extends E> diff) {
+		List<ListDiffEntry<E>> differences = offsetListDiffEntries(offset, diff.getDifferences());
+		return Diffs.createListDiff(differences);
 	}
 
 	private List<ListDiffEntry<E>> offsetListDiffEntries(int offset,
-			List<ListDiffEntry<E>> entries) {
-		List<ListDiffEntry<E>> offsetEntries = new ArrayList<ListDiffEntry<E>>(
-				entries.size());
-		for (ListDiffEntry<E> entry : entries) {
+			ListDiffEntry<? extends E>[] entries) {
+		List<ListDiffEntry<E>> offsetEntries = new ArrayList<>(entries.length);
+		for (ListDiffEntry<? extends E> entry : entries) {
 			offsetEntries.add(offsetListDiffEntry(offset, entry));
 		}
 		return offsetEntries;
 	}
 
-	private ListDiffEntry<E> offsetListDiffEntry(int offset,
-			ListDiffEntry<E> entry) {
-		return Diffs.createListDiffEntry(offset + entry.getPosition(),
-				entry.isAddition(), entry.getElement());
+	private ListDiffEntry<E> offsetListDiffEntry(int offset, ListDiffEntry<? extends E> entry) {
+		return Diffs.<E>createListDiffEntry(offset + entry.getPosition(), entry.isAddition(), entry.getElement());
 	}
 
 	@Override
@@ -345,8 +343,7 @@ public class MultiList<E> extends AbstractObservableList<E> {
 
 		int subListIndex = 0;
 		for (IObservableList<E> list : lists) {
-			List<?> subList = that.subList(subListIndex,
-					subListIndex + list.size());
+			List<?> subList = that.subList(subListIndex, subListIndex + list.size());
 			if (!list.equals(subList)) {
 				return false;
 			}

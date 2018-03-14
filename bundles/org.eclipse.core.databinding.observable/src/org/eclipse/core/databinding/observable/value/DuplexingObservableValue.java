@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Matthew Hall and others.
+ * Copyright (c) 2009, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 175735)
  *     Matthew Hall - bug 262407
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -27,8 +28,7 @@ import org.eclipse.core.internal.databinding.observable.Util;
  *            the type of value being observed
  * @since 1.2
  */
-public abstract class DuplexingObservableValue<T> extends
-		AbstractObservableValue<T> {
+public abstract class DuplexingObservableValue<T> extends AbstractObservableValue<T> {
 	/**
 	 * Returns a DuplexingObservableValue implementation with predefined values
 	 * to use if the list is empty or contains multiple different values.
@@ -207,8 +207,7 @@ public abstract class DuplexingObservableValue<T> extends
 	}
 
 	@Override
-	public synchronized void addValueChangeListener(
-			IValueChangeListener<T> listener) {
+	public synchronized void addValueChangeListener(IValueChangeListener<? super T> listener) {
 		super.addValueChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners

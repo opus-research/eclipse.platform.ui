@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 Matthew Hall and others.
+ * Copyright (c) 2007, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  * 		Boris Bokowski, IBM - initial API and implementation
  * 		Matthew Hall - bugs 212223, 208332, 245647
  *  	Will Horn - bug 215297
+ *  	Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -94,8 +95,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	 * @throws IllegalArgumentException
 	 *             if <code>updateEventType</code> is an incorrect type.
 	 */
-	public DelayedObservableValue(int delayMillis,
-			IObservableValue<T> observable) {
+	public DelayedObservableValue(int delayMillis, IObservableValue<T> observable) {
 		super(observable.getRealm());
 		this.delay = delayMillis;
 		this.observable = observable;
@@ -107,7 +107,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	}
 
 	@Override
-	public void handleValueChange(ValueChangeEvent<T> event) {
+	public void handleValueChange(ValueChangeEvent<? extends T> event) {
 		if (!updating)
 			makeDirty();
 	}

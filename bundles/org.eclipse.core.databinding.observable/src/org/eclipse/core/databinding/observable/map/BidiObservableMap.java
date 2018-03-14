@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *         (through BidirectionalMap.java)
  *     Matthew Hall - bug 233306
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.map;
 
@@ -43,7 +44,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	 * is put in this set. This field is null when no listeners are registered
 	 * on this observable.
 	 */
-	private Map<V, K> valuesToSingleKeys = null;
+	private Map<V, K> valuesToSingleKeys;
 
 	/**
 	 * Inverse of wrapped map. When multiple keys map to the same value, they
@@ -51,7 +52,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	 * single key map is removed. This field is null when no listeners are
 	 * registered on this observable.
 	 */
-	private Map<V, Set<K>> valuesToSetsOfKeys = null;
+	private Map<V, Set<K>> valuesToSetsOfKeys;
 
 	/**
 	 * Constructs a BidirectionalMap tracking the given observable map.
@@ -84,19 +85,16 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	}
 
 	@Override
-	protected void handleMapChange(MapChangeEvent<K, V> event) {
-		MapDiff<K, V> diff = event.diff;
-		for (Iterator<K> it = diff.getAddedKeys().iterator(); it.hasNext();) {
-			K addedKey = it.next();
+	protected void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
+		MapDiff<? extends K, ? extends V> diff = event.diff;
+		for (K addedKey : diff.getAddedKeys()) {
 			addMapping(addedKey, diff.getNewValue(addedKey));
 		}
-		for (Iterator<K> it = diff.getChangedKeys().iterator(); it.hasNext();) {
-			K changedKey = it.next();
+		for (K changedKey : diff.getChangedKeys()) {
 			removeMapping(changedKey, diff.getOldValue(changedKey));
 			addMapping(changedKey, diff.getNewValue(changedKey));
 		}
-		for (Iterator<K> it = diff.getRemovedKeys().iterator(); it.hasNext();) {
-			K removedKey = it.next();
+		for (K removedKey : diff.getRemovedKeys()) {
 			removeMapping(removedKey, diff.getOldValue(removedKey));
 		}
 		super.handleMapChange(event);
@@ -107,8 +105,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 		getterCalled();
 		// Faster lookup
 		if (valuesToSingleKeys != null) {
-			return (valuesToSingleKeys.containsKey(value) || valuesToSetsOfKeys
-					.containsKey(value));
+			return (valuesToSingleKeys.containsKey(value) || valuesToSetsOfKeys.containsKey(value));
 		}
 		return super.containsValue(value);
 	}
