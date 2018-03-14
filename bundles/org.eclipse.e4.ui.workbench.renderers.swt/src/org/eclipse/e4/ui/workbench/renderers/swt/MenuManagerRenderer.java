@@ -15,7 +15,7 @@
  *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 378849
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 378849
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -94,14 +94,14 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	private static final String NO_LABEL = "UnLabled"; //$NON-NLS-1$
 	public static final String GROUP_MARKER = "org.eclipse.jface.action.GroupMarker.GroupMarker(String)"; //$NON-NLS-1$
 
-	private Map<MMenu, MenuManager> modelToManager = new HashMap<>();
-	private Map<MenuManager, MMenu> managerToModel = new HashMap<>();
+	private Map<MMenu, MenuManager> modelToManager = new HashMap<MMenu, MenuManager>();
+	private Map<MenuManager, MMenu> managerToModel = new HashMap<MenuManager, MMenu>();
 
-	private Map<MMenuElement, IContributionItem> modelToContribution = new HashMap<>();
-	private Map<IContributionItem, MMenuElement> contributionToModel = new HashMap<>();
+	private Map<MMenuElement, IContributionItem> modelToContribution = new HashMap<MMenuElement, IContributionItem>();
+	private Map<IContributionItem, MMenuElement> contributionToModel = new HashMap<IContributionItem, MMenuElement>();
 
-	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<>();
-	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<>();
+	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<MMenuElement, ContributionRecord>();
+	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<MMenuElement, ArrayList<ContributionRecord>>();
 
 	private Collection<IContributionManager> mgrToUpdate = new LinkedHashSet<>();
 
@@ -430,7 +430,7 @@ MenuManagerEventHelper.getInstance()
 		}
 		Collection<ContributionRecord> vals = modelContributionToRecord
 				.values();
-		List<ContributionRecord> disposedRecords = new ArrayList<>();
+		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
 		for (ContributionRecord record : vals
 				.toArray(new ContributionRecord[vals.size()])) {
 			if (record.menuModel == menuModel) {
@@ -487,7 +487,7 @@ MenuManagerEventHelper.getInstance()
 		if (elementId == null) {
 			return;
 		}
-		final ArrayList<MMenuContribution> toContribute = new ArrayList<>();
+		final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
 		ContributionsAnalyzer.XXXgatherMenuContributions(menuModel,
 				application.getMenuContributions(), elementId, toContribute,
 				null, isPopup);
@@ -506,8 +506,8 @@ MenuManagerEventHelper.getInstance()
 	 */
 	private void generateContributions(MMenu menuModel,
 			ArrayList<MMenuContribution> toContribute, boolean menuBar) {
-		HashSet<String> existingMenuIds = new HashSet<>();
-		HashSet<String> existingSeparatorNames = new HashSet<>();
+		HashSet<String> existingMenuIds = new HashSet<String>();
+		HashSet<String> existingSeparatorNames = new HashSet<String>();
 		for (MMenuElement child : menuModel.getChildren()) {
 			String elementId = child.getElementId();
 			if (child instanceof MMenu && elementId != null) {
@@ -520,7 +520,7 @@ MenuManagerEventHelper.getInstance()
 		MenuManager manager = getManager(menuModel);
 		boolean done = toContribute.size() == 0;
 		while (!done) {
-			ArrayList<MMenuContribution> curList = new ArrayList<>(
+			ArrayList<MMenuContribution> curList = new ArrayList<MMenuContribution>(
 					toContribute);
 			int retryCount = toContribute.size();
 			toContribute.clear();
@@ -575,7 +575,7 @@ MenuManagerEventHelper.getInstance()
 				&& ((EObject) menuModel).eContainer() instanceof MPart;
 	}
 
-	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<>();
+	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<ContributionRecord>();
 
 	public ArrayList<ContributionRecord> getList(MMenuElement item) {
 		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
@@ -588,7 +588,7 @@ MenuManagerEventHelper.getInstance()
 	public void addRecord(MMenuElement item, ContributionRecord rec) {
 		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
 		if (tmp == null) {
-			tmp = new ArrayList<>();
+			tmp = new ArrayList<ContributionRecord>();
 			sharedElementToRecord.put(item, tmp);
 		}
 		tmp.add(rec);
@@ -924,7 +924,7 @@ MenuManagerEventHelper.getInstance()
 	 * @return the array of active ContributionRecords.
 	 */
 	public ContributionRecord[] getContributionRecords() {
-		HashSet<ContributionRecord> records = new HashSet<>(
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>(
 				modelContributionToRecord.values());
 		return records.toArray(new ContributionRecord[records.size()]);
 	}
@@ -941,9 +941,9 @@ MenuManagerEventHelper.getInstance()
 	public void reconcileManagerToModel(MenuManager menuManager, MMenu menuModel) {
 		List<MMenuElement> modelChildren = menuModel.getChildren();
 
-		HashSet<MMenuItem> oldModelItems = new HashSet<>();
-		HashSet<MMenu> oldMenus = new HashSet<>();
-		HashSet<MMenuSeparator> oldSeps = new HashSet<>();
+		HashSet<MMenuItem> oldModelItems = new HashSet<MMenuItem>();
+		HashSet<MMenu> oldMenus = new HashSet<MMenu>();
+		HashSet<MMenuSeparator> oldSeps = new HashSet<MMenuSeparator>();
 		for (MMenuElement itemModel : modelChildren) {
 			if (OpaqueElementUtil.isOpaqueMenuSeparator(itemModel)) {
 				oldSeps.add((MMenuSeparator) itemModel);
