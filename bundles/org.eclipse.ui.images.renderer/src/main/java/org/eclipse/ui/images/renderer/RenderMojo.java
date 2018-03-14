@@ -284,7 +284,7 @@ public class RenderMojo extends AbstractMojo {
         int remainingIcons = icons.size();
 
         // The number of icons to distribute to a rendering callable
-        final int threadExecSize = Math.max(1, icons.size() / this.threads);
+        final int threadExecSize = icons.size() / this.threads;
 
         // The current offset to start a batch, as they're distributed
         // between rendering callables
@@ -292,7 +292,7 @@ public class RenderMojo extends AbstractMojo {
 
         // A list of callables used to render icons on multiple threads
         // Each callable gets a set of icons to render
-        List<Callable<Object>> tasks = new ArrayList<>(
+        List<Callable<Object>> tasks = new ArrayList<Callable<Object>>(
                 this.threads);
 
         // Distribute the rasterization operations between multiple threads
@@ -325,8 +325,7 @@ public class RenderMojo extends AbstractMojo {
 
             // Create the callable and add it to the task pool
             Callable<Object> runnable = new Callable<Object>() {
-                @Override
-				public Object call() throws Exception {
+                public Object call() throws Exception {
                     // The jhlabs filters are not thread safe, so provide one set per thread
                     GrayscaleFilter grayFilter = new GrayscaleFilter();
 
@@ -468,7 +467,7 @@ public class RenderMojo extends AbstractMojo {
     private void init(int threads, double scale) {
         this.threads = threads;
         this.outputScale = Math.max(1, scale);
-        icons = new ArrayList<>();
+        icons = new ArrayList<IconEntry>();
         execPool = Executors.newFixedThreadPool(threads);
         counter = new AtomicInteger();
     }

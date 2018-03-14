@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1321,6 +1321,11 @@ public class PopupDialog extends Window {
 	protected void adjustBounds() {
 	}
 
+	/**
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.window.Window#getInitialLocation(org.eclipse.swt.graphics.Point)
+	 */
 	@Override
 	protected Point getInitialLocation(Point initialSize) {
 		Point result = getDefaultLocation(initialSize);
@@ -1542,7 +1547,7 @@ public class PopupDialog extends Window {
 	 * @return the List of controls
 	 */
 	protected List<Control> getForegroundColorExclusions() {
-		List<Control> list = new ArrayList<>(3);
+		List<Control> list = new ArrayList<Control>(3);
 		if (infoLabel != null) {
 			list.add(infoLabel);
 		}
@@ -1563,7 +1568,7 @@ public class PopupDialog extends Window {
 	 * @return the List of controls
 	 */
 	protected List<Control> getBackgroundColorExclusions() {
-		List<Control> list = new ArrayList<>(2);
+		List<Control> list = new ArrayList<Control>(2);
 		if (titleSeparator != null) {
 			list.add(titleSeparator);
 		}
