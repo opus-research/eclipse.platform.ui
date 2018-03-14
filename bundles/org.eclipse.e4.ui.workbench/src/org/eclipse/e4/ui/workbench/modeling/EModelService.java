@@ -90,7 +90,7 @@ public interface EModelService {
 
 	/** Searches for elements in the UI presentation, including all perspectives */
 	public static final int ANYWHERE = OUTSIDE_PERSPECTIVE | IN_ANY_PERSPECTIVE | IN_SHARED_AREA
-			| IN_TRIM | IN_MAIN_MENU | IN_PART;
+			| IN_TRIM;
 
 	/**
 	 * Searches for elements in the UI that the user is currently seeing that are OUTSIDE the
@@ -129,9 +129,9 @@ public interface EModelService {
 	/**
 	 * This is a convenience method that constructs a new Selector based on {@link ElementMatcher}
 	 * and forwards the call on to the base API
-	 * {@link EModelService#findElements(MApplicationElement, Class, int, Selector)}.
+	 * {@link EModelService#findElements(MApplicationElement, int, Selector)}.
 	 * 
-	 * @see EModelService#findElements(MApplicationElement, Class, int, Selector)
+	 * @see EModelService#findElements(MApplicationElement, int, Selector)
 	 */
 	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
 			List<String> tagsToMatch, int searchFlags);
@@ -184,7 +184,7 @@ public interface EModelService {
 	 *            stacks.
 	 * @param matcher
 	 *            An implementation of a Selector that will return true for elements that it wants
-	 *            in the returned list. Must not be null
+	 *            in the returned list.
 	 * @return The generically typed list of matching elements.
 	 * 
 	 * @since 1.1

@@ -45,7 +45,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -53,7 +52,6 @@ import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.emf.ecore.EObject;
@@ -483,24 +481,9 @@ public class PartServiceImpl implements EPartService {
 	private boolean isInContainer(MUIElement element) {
 		if (modelService.isHostedElement(element, getWindow()))
 			return true;
-
-		ElementMatcher matcher = new ElementMatcher(null, element.getClass(), (String) null);
-
-		for (MWindowElement wElement : workbenchWindow.getChildren()) {
-			if (modelService.findElements(wElement, element.getClass(), EModelService.PRESENTATION,
-					matcher).contains(element)) {
-				return true;
-			}
-		}
-
-		for (MWindow wElement : workbenchWindow.getWindows()) {
-			if (modelService.findElements(wElement, element.getClass(), EModelService.PRESENTATION,
-					matcher).contains(element)) {
-				return true;
-			}
-		}
-
-		return false;
+		List<MUIElement> allPerspectiveElements = modelService.findElements(workbenchWindow, null,
+				MUIElement.class, null, EModelService.PRESENTATION);
+		return allPerspectiveElements.contains(element);
 	}
 
 	boolean isInContainer(MElementContainer<?> container, MUIElement element) {

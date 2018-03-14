@@ -48,9 +48,6 @@ public class CSSPropertyUnselectedTabsSWTHandler extends AbstractCSSPropertySWTH
 		}
 		if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Gradient grad = (Gradient) engine.convert(value, Gradient.class, control.getDisplay());
-			if (grad == null) {
-				return;
-			}
 			Color[] colors = null;
 			int[] percents = null;
 			if (!grad.getValues().isEmpty()) {
