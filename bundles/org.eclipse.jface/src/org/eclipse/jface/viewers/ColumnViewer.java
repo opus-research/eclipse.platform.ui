@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,9 +33,10 @@ import org.eclipse.swt.widgets.Widget;
  * (e.g., AbstractTreeViewer and AbstractTableViewer). Concrete subclasses of
  * {@link ColumnViewer} should implement a matching concrete subclass of {@link
  * ViewerColumn}.
- *
+ * <p>
  * <strong> This class is not intended to be subclassed outside of the JFace
  * viewers framework.</strong>
+ * </p>
  *
  * @since 3.3
  *
@@ -83,8 +84,8 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * 		the control you want to hook on
 	 */
 	protected void hookEditingSupport(Control control) {
-		// Needed for backwards comp with AbstractTreeViewer
-		// which is not hooked this way others may already overwrite and provide
+		// Needed for backwards comp with AbstractTreeViewer and TableTreeViewer
+		// who are not hooked this way others may already overwrite and provide
 		// their
 		// own impl
 		if (viewerEditor != null) {

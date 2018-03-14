@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439, 475689
+ *     Thorsten Maack <tm@tmaack.de> - Bug 482163
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 481490
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -26,6 +28,7 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableTreeItem;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTarget;
@@ -269,6 +272,39 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			clear();
 		}
 
+		@Override
+		public void applyFontsAndColors(TableTreeItem control) {
+
+			if(colorProvider == null){
+				if(usedDecorators){
+					//If there is no provider only apply set values
+					if(background != null) {
+						control.setBackground(background);
+					}
+
+					if(foreground != null) {
+						control.setForeground(foreground);
+					}
+				}
+			}
+			else{
+				//Always set the value if there is a provider
+				control.setBackground(background);
+				control.setForeground(foreground);
+			}
+
+			if(fontProvider == null){
+				if(usedDecorators && font != null) {
+					control.setFont(font);
+				}
+			} else {
+				control.setFont(font);
+			}
+
+			clear();
+		}
+
+
 	}
 
 	/**
@@ -352,6 +388,29 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		 * @param control
 		 */
 		public void applyFontsAndColors(TreeItem control) {
+			if(usedDecorators){
+				//If there is no provider only apply set values
+				if(background != null) {
+					control.setBackground(background);
+				}
+
+				if(foreground != null) {
+					control.setForeground(foreground);
+				}
+
+				if(font != null) {
+					control.setFont(font);
+				}
+			}
+			clear();
+		}
+
+		/**
+		 * Apply the fonts and colors to the control if
+		 * required.
+		 * @param control
+		 */
+		public void applyFontsAndColors(TableTreeItem control) {
 			if(usedDecorators){
 				//If there is no provider only apply set values
 				if(background != null) {
@@ -500,11 +559,11 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/**
 	 * Adds the given filter to this viewer, and triggers refiltering and
 	 * resorting of the elements. If you want to add more than one filter
-	 * consider using {@link StructuredViewer#setFilters(ViewerFilter[])}.
+	 * consider using {@link StructuredViewer#setFilters(ViewerFilter...)}.
 	 *
 	 * @param filter
 	 *            a viewer filter
-	 * @see StructuredViewer#setFilters(ViewerFilter[])
+	 * @see StructuredViewer#setFilters(ViewerFilter...)
 	 */
 	public void addFilter(ViewerFilter filter) {
 		if (filters == null) {
@@ -886,7 +945,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * Returns this viewer's filters.
 	 *
 	 * @return an array of viewer filters
-	 * @see StructuredViewer#setFilters(ViewerFilter[])
+	 * @see StructuredViewer#setFilters(ViewerFilter...)
 	 */
 	public ViewerFilter[] getFilters() {
 		if (filters == null) {
@@ -1531,11 +1590,11 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * Removes the given filter from this viewer, and triggers refiltering and
 	 * resorting of the elements if required. Has no effect if the identical
 	 * filter is not registered. If you want to remove more than one filter
-	 * consider using {@link StructuredViewer#setFilters(ViewerFilter[])}.
+	 * consider using {@link StructuredViewer#setFilters(ViewerFilter...)}.
 	 *
 	 * @param filter
 	 *            a viewer filter
-	 * @see StructuredViewer#setFilters(ViewerFilter[])
+	 * @see StructuredViewer#setFilters(ViewerFilter...)
 	 */
 	public void removeFilter(ViewerFilter filter) {
 		Assert.isNotNull(filter);
@@ -1565,10 +1624,10 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * refiltering and resorting of the elements.
 	 *
 	 * @param filters
-	 *            an array of viewer filters
+	 *            an varargs of viewer filters
 	 * @since 3.3
 	 */
-	public void setFilters(ViewerFilter[] filters) {
+	public void setFilters(ViewerFilter... filters) {
 		if (filters.length == 0) {
 			resetFilters();
 		} else {
@@ -1597,6 +1656,15 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	public abstract void reveal(Object element);
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * The <code>StructuredViewer</code> implementation of this method calls
+	 * {@link #assertContentProviderType(IContentProvider)} to validate the
+	 * content provider. For a <code>StructuredViewer</code>, the content
+	 * provider must implement {@link IStructuredContentProvider}.
+	 * </p>
+	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
 		assertContentProviderType(provider);
@@ -1708,13 +1776,15 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/**
 	 * Sets this viewer's sorter and triggers refiltering and resorting of this
 	 * viewer's element. Passing <code>null</code> turns sorting off.
-     * <p>
-     * It is recommended to use <code>setComparator()</code> instead.
-     * </p>
+	 * <p>
+	 *
+	 * @deprecated use <code>setComparator()</code> instead.
+	 *             </p>
 	 *
 	 * @param sorter
 	 *            a viewer sorter, or <code>null</code> if none
 	 */
+	@Deprecated
 	public void setSorter(ViewerSorter sorter) {
 		if (this.sorter != sorter) {
 			this.sorter = sorter;

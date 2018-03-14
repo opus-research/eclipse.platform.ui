@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -107,13 +108,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
         IPath containerPath = container.getFullPath();
 
         for (int i = 0; i < elements.length; i++) {
-            IResource resource = null;
-
-            if (elements[i] instanceof IResource) {
-				resource = (IResource) elements[i];
-			} else {
-				resource = elements[i].getAdapter(IResource.class);
-			}
+			IResource resource = Adapters.adapt(elements[i], IResource.class);
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
@@ -394,22 +389,12 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		    		continue;
 		    	}
 		    	item = (IAdaptable)items[i];
-		        IContainer container = null;
-		        IResource resource = null;
+				IContainer container = Adapters.adapt(item, IContainer.class);
 
-		        if (item instanceof IContainer) {
-		            container = (IContainer) item;
-		        } else {
-		            container = item.getAdapter(IContainer.class);
-		        }
 		        if (container != null) {
 		            setSubtreeChecked(container, true, true);
 		        }
-		        if (item instanceof IResource) {
-		            resource = (IResource) item;
-		        } else {
-		            resource = item.getAdapter(IResource.class);
-		        }
+				IResource resource = Adapters.adapt(item, IResource.class);
 		        if (resource != null && resource.isAccessible() == false) {
 		            IProject project = resource.getProject();
 		            if (tree.getChecked(project) == false) {

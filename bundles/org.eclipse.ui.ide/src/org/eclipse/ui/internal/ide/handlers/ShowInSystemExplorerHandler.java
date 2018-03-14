@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 487772
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.handlers;
@@ -18,6 +19,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,7 +47,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	/**
 	 * Command id
 	 */
-	public static final String ID = "org.eclipse.ui.showIn.systemExplorer"; //$NON-NLS-1$
+	public static final String ID = "org.eclipse.ui.ide.showInSystemExplorer"; //$NON-NLS-1$
 
 	private static final String VARIABLE_RESOURCE = "${selected_resource_loc}"; //$NON-NLS-1$
 	private static final String VARIABLE_RESOURCE_URI = "${selected_resource_uri}"; //$NON-NLS-1$
@@ -122,8 +124,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 
 		Object selectedObject = ((IStructuredSelection) selection)
 				.getFirstElement();
-		IResource item = org.eclipse.ui.internal.util.Util
-				.getAdapter(selectedObject, IResource.class);
+		IResource item = Adapters.adapt(selectedObject, IResource.class);
 		return item;
 	}
 
@@ -136,7 +137,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile();
 		}
-		return input.getAdapter(IResource.class);
+		return Adapters.adapt(input, IResource.class);
 	}
 
 	/**
