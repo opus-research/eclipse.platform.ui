@@ -13,7 +13,6 @@ package org.eclipse.ui.part;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
@@ -98,9 +97,29 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
         addPropertyListener(compatibilityTitleListener);
     }
 
+	/*
+	 * Saves the contents of this editor.
+	 * <p>
+	 * Subclasses must override this method to implement the open-save-close
+	 * lifecycle for an editor. For greater details, see
+	 * <code>IEditorPart</code>
+	 * </p>
+	 *
+	 * @see IEditorPart
+	 */
     @Override
 	public abstract void doSave(IProgressMonitor monitor);
 
+	/*
+	 * Saves the contents of this editor to another object.
+	 * <p>
+	 * Subclasses must override this method to implement the open-save-close
+	 * lifecycle for an editor. For greater details, see
+	 * <code>IEditorPart</code>
+	 * </p>
+	 *
+	 * @see IEditorPart
+	 */
     @Override
 	public abstract void doSaveAs();
 
@@ -122,16 +141,59 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
 		return editorInput.getToolTipText();
     }
 
+
+    /*
+     * Initializes the editor part with a site and input.
+     * <p>
+     * Subclasses of <code>EditorPart</code> must implement this method.  Within
+     * the implementation subclasses should verify that the input type is acceptable
+     * and then save the site and input.  Here is sample code:
+     * </p>
+     * <pre>
+     *		if (!(input instanceof IFileEditorInput))
+     *			throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+     *		setSite(site);
+     *		setInput(input);
+     * </pre>
+     */
     @Override
 	public abstract void init(IEditorSite site, IEditorInput input)
             throws PartInitException;
 
+
+    /* Returns whether the contents of this editor have changed since the last save
+     * operation.
+     * <p>
+     * Subclasses must override this method to implement the open-save-close lifecycle
+     * for an editor.  For greater details, see <code>IEditorPart</code>
+     * </p>
+     *
+     * @see IEditorPart
+     */
     @Override
 	public abstract boolean isDirty();
 
+
+    /*
+	 * Returns whether the "save as" operation is supported by this editor. 
+	 * <p>
+	 * Subclasses must override this method to implement the open-save-close
+	 * lifecycle for an editor. For greater details, see
+	 * <code>IEditorPart</code> 
+	 * </p>
+	 *
+	 * @see IEditorPart
+	 */
     @Override
 	public abstract boolean isSaveAsAllowed();
 
+    /* Returns whether the contents of this editor should be saved when the editor
+     * is closed.
+     * <p>
+     * This method returns <code>true</code> if and only if the editor is dirty
+     * (<code>isDirty</code>).
+     * </p>
+     */
     @Override
 	public boolean isSaveOnCloseNeeded() {
         return isDirty();
