@@ -113,13 +113,30 @@ public interface MBasicFactory {
 	MDialog createDialog();
 
 	/**
-	 * Returns a new object of class '<em>Wizard Dialog</em>'.
+	 * Returns a new object of class '<em>Wizard</em>'.
 	 * <!-- begin-user-doc -->
-	 * @since 1.1
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Wizard Dialog</em>'.
+	 * @return a new object of class '<em>Wizard</em>'.
 	 * @generated
 	 */
-	MWizardDialog createWizardDialog();
+	MWizard createWizard();
+
+	/**
+	 * Returns a new object of class '<em>Dialog Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Dialog Element</em>'.
+	 * @generated
+	 */
+	MDialogElement createDialogElement();
+
+	/**
+	 * Returns a new object of class '<em>Wizard Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Wizard Element</em>'.
+	 * @generated
+	 */
+	MWizardElement createWizardElement();
 
 } //MBasicFactory
