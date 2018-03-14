@@ -242,11 +242,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 		String keyBindingText = null;
 		if (parmCmd != null) {
 			if (text == null || text.isEmpty()) {
-				try {
-					text = parmCmd.getName(getModel().getCommand().getLocalizedCommandName());
-				} catch (NotDefinedException e) {
-					e.printStackTrace();
-				}
+				text = getModel().getCommand().getLocalizedCommandName();
 			}
 			if (bindingService != null) {
 				TriggerSequence binding = bindingService.getBestSequenceFor(parmCmd);
