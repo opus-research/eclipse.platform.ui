@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,12 +29,12 @@ public class PatternFilter extends ViewerFilter {
 	/*
 	 * Cache of filtered elements in the tree
 	 */
-	private Map<Object, Object[]> cache = new HashMap<>();
+	private Map cache = new HashMap();
 
 	/*
 	 * Maps parent elements to TRUE or FALSE
 	 */
-	private Map<Object, Boolean> foundAnyCache = new HashMap<>();
+	private Map foundAnyCache = new HashMap();
 
 	private boolean useCache = false;
 
@@ -66,9 +66,9 @@ public class PatternFilter extends ViewerFilter {
 			return super.filter(viewer, parent, elements);
 		}
 
-		Object[] filtered = cache.get(parent);
+		Object[] filtered = (Object[]) cache.get(parent);
 		if (filtered == null) {
-			Boolean foundAny = foundAnyCache.get(parent);
+			Boolean foundAny = (Boolean) foundAnyCache.get(parent);
 			if (foundAny != null && !foundAny.booleanValue()) {
 				filtered = EMPTY;
 			} else {
@@ -99,13 +99,14 @@ public class PatternFilter extends ViewerFilter {
 			return computeAnyVisible(viewer, elements);
 		}
 
-		Object[] filtered = cache.get(parent);
+		Object[] filtered = (Object[]) cache.get(parent);
 		if (filtered != null) {
 			return filtered.length > 0;
 		}
-		Boolean foundAny = foundAnyCache.get(parent);
+		Boolean foundAny = (Boolean) foundAnyCache.get(parent);
 		if (foundAny == null) {
-			foundAny = computeAnyVisible(viewer, elements) ? Boolean.TRUE : Boolean.FALSE;
+			foundAny = computeAnyVisible(viewer, elements) ? Boolean.TRUE
+					: Boolean.FALSE;
 			foundAnyCache.put(parent, foundAny);
 		}
 		return foundAny.booleanValue();
@@ -131,7 +132,8 @@ public class PatternFilter extends ViewerFilter {
 	}
 
 	@Override
-	public final boolean select(Viewer viewer, Object parentElement, Object element) {
+	public final boolean select(Viewer viewer, Object parentElement,
+			Object element) {
 		return isElementVisible(viewer, element);
 	}
 
@@ -142,7 +144,8 @@ public class PatternFilter extends ViewerFilter {
 	 * @param includeLeadingWildcard
 	 *            Whether a leading wildcard should be added.
 	 */
-	public final void setIncludeLeadingWildcard(final boolean includeLeadingWildcard) {
+	public final void setIncludeLeadingWildcard(
+			final boolean includeLeadingWildcard) {
 		this.includeLeadingWildcard = includeLeadingWildcard;
 	}
 
@@ -285,7 +288,7 @@ public class PatternFilter extends ViewerFilter {
 	 * @return an array of words
 	 */
 	private String[] getWords(String text) {
-		List<String> words = new ArrayList<>();
+		List words = new ArrayList();
 		// Break the text up into words, separating based on whitespace and
 		// common punctuation.
 		// Previously used String.split(..., "\\W"), where "\W" is a regular
@@ -309,7 +312,7 @@ public class PatternFilter extends ViewerFilter {
 			}
 			i = j;
 		}
-		return words.toArray(new String[words.size()]);
+		return (String[]) words.toArray(new String[words.size()]);
 	}
 
 	/**
