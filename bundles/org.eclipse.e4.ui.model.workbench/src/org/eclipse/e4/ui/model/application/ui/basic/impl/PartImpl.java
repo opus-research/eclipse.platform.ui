@@ -26,7 +26,6 @@ import org.eclipse.e4.ui.model.application.impl.StringToStringMapImpl;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
-import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -75,7 +74,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#isCloseable <em>Closeable</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getDescription <em>Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getLocalizedDescription <em>Localized Description</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
  *
  * @generated
@@ -350,16 +348,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 	 * @ordered
 	 */
 	protected static final String LOCALIZED_DESCRIPTION_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getDialogs() <em>Dialogs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDialogs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MFrame> dialogs;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -683,18 +671,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<MFrame> getDialogs() {
-		if (dialogs == null) {
-			dialogs = new EObjectContainmentEList<MFrame>(MFrame.class, this, BasicPackageImpl.PART__DIALOGS);
-		}
-		return dialogs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
 	 */
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
@@ -739,8 +715,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 				return ((InternalEList<?>)getMenus()).basicRemove(otherEnd, msgs);
 			case BasicPackageImpl.PART__TOOLBAR:
 				return basicSetToolbar(null, msgs);
-			case BasicPackageImpl.PART__DIALOGS:
-				return ((InternalEList<?>)getDialogs()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -790,8 +764,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 				return getDescription();
 			case BasicPackageImpl.PART__LOCALIZED_DESCRIPTION:
 				return getLocalizedDescription();
-			case BasicPackageImpl.PART__DIALOGS:
-				return getDialogs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -854,10 +826,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 			case BasicPackageImpl.PART__DESCRIPTION:
 				setDescription((String)newValue);
 				return;
-			case BasicPackageImpl.PART__DIALOGS:
-				getDialogs().clear();
-				getDialogs().addAll((Collection<? extends MFrame>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -915,9 +883,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 			case BasicPackageImpl.PART__DESCRIPTION:
 				setDescription(DESCRIPTION_EDEFAULT);
 				return;
-			case BasicPackageImpl.PART__DIALOGS:
-				getDialogs().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -966,8 +931,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 				return DESCRIPTION_EDEFAULT == null ? description != null : !DESCRIPTION_EDEFAULT.equals(description);
 			case BasicPackageImpl.PART__LOCALIZED_DESCRIPTION:
 				return LOCALIZED_DESCRIPTION_EDEFAULT == null ? getLocalizedDescription() != null : !LOCALIZED_DESCRIPTION_EDEFAULT.equals(getLocalizedDescription());
-			case BasicPackageImpl.PART__DIALOGS:
-				return dialogs != null && !dialogs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

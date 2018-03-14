@@ -4,18 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.basic;
 
-import org.eclipse.e4.ui.model.application.ui.MGenericStack;
-import org.eclipse.e4.ui.model.application.ui.MUILabel;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Wizard</b></em>'.
+ * A representation of the model object '<em><b>Wizard Dialog</b></em>'.
  * <!-- end-user-doc -->
  *
  * <!-- begin-model-doc -->
@@ -31,5 +29,5 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
  * @model
  * @generated
  */
-public interface MWizard extends MGenericStack<MStackElement>, MFrameElement, MUILabel {
-} // MWizard
+public interface MWizardDialog extends MDialog {
+} // MWizardDialog
