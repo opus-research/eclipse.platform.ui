@@ -232,7 +232,8 @@ public class E4Application implements IApplication {
 		ContextInjectionFactory.setDefault(appContext);
 
 		// Get the factory to create DI instances with
-		IContributionFactory factory = appContext.get(IContributionFactory.class);
+		IContributionFactory factory = (IContributionFactory) appContext
+				.get(IContributionFactory.class.getName());
 
 		// Install the life-cycle manager for this session if there's one
 		// defined
@@ -264,13 +265,15 @@ public class E4Application implements IApplication {
 
 		// for compatibility layer: set the application in the OSGi service
 		// context (see Workbench#getInstance())
-		if (!E4Workbench.getServiceContext().containsKey(MApplication.class)) {
+		if (!E4Workbench.getServiceContext().containsKey(
+				MApplication.class.getName())) {
 			// first one wins.
-			E4Workbench.getServiceContext().set(MApplication.class, appModel);
+			E4Workbench.getServiceContext().set(MApplication.class.getName(),
+					appModel);
 		}
 
 		// Set the app's context after adding itself
-		appContext.set(MApplication.class, appModel);
+		appContext.set(MApplication.class.getName(), appModel);
 
 		// adds basic services to the contexts
 		initializeServices(appModel);
@@ -421,7 +424,8 @@ public class E4Application implements IApplication {
 				appContext, false);
 
 		if (resourceHandler == null) {
-			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class;
+			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
+					+ ResourceHandler.class.getName();
 		}
 
 		IContributionFactory factory = eclipseContext
