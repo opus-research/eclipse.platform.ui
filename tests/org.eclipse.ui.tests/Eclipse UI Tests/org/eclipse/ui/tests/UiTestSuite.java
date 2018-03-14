@@ -31,7 +31,6 @@ import org.eclipse.ui.tests.preferences.PreferencesTestSuite;
 import org.eclipse.ui.tests.progress.ProgressTestSuite;
 import org.eclipse.ui.tests.propertysheet.PropertySheetTestSuite;
 import org.eclipse.ui.tests.services.ServicesTestSuite;
-import org.eclipse.ui.tests.statushandlers.StatusHandlingTestSuite;
 import org.eclipse.ui.tests.themes.ThemesTestSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -61,8 +60,7 @@ import org.junit.runners.Suite;
 	MultiPageEditorTestSuite.class,
 	ContextsTestSuite.class,
 	ConcurrencyTestSuite.class,
-	FilteredTreeTests.class,
-	StatusHandlingTestSuite.class
+	FilteredTreeTests.class
 })
 public class UiTestSuite {
 
@@ -78,5 +76,6 @@ public class UiTestSuite {
 	// PresentationsTestSuite.class,
 	// LeakTests.class,
 	// MultiEditorTestSuite.class,
+	// StatusHandlingTestSuite.class,
 	// OpenSystemInPlaceEditorTest..class,
 }
