@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
@@ -297,7 +298,8 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 		private void bindUI() {
 			DataBindingContext dbc = new DataBindingContext();
 
-			final IObservableList people = BeanProperties.list(viewModel.getClass(), "people").observe(viewModel);
+			final IObservableList people = BeansObservables.observeList(Realm
+					.getDefault(), viewModel, "people");
 
 			addPersonButton.addListener(SWT.Selection, new Listener() {
 				@Override
@@ -352,17 +354,16 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 			dbc.bindValue(WidgetProperties.enabled().observe(friendsViewer
 					.getTable()), personSelected);
 
-			dbc.bindValue(
-					WidgetProperties.text(SWT.Modify).observe(personName),
-					BeanProperties.value((Class) selectedPerson.getValueType(), "name", String.class)
-					.observeDetail(selectedPerson));
+			dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(personName),
+					BeansObservables.observeDetailValue(selectedPerson, "name",
+							String.class));
 
 			ViewerSupport.bind(friendsViewer, people, BeanProperties.value(
 					Person.class, "name"));
 
 			dbc.bindSet(ViewersObservables.observeCheckedElements(
-					friendsViewer, Person.class),BeanProperties.set((Class) selectedPerson.getValueType(), "friends", Person.class)
-					.observeDetail(selectedPerson));
+					friendsViewer, Person.class), BeansObservables
+					.observeDetailSet(selectedPerson, "friends", Person.class));
 		}
 	}
 }
