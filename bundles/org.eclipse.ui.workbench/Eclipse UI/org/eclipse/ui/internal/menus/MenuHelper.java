@@ -103,19 +103,19 @@ public class MenuHelper {
 		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
 	}
 
-	public static final String MAIN_MENU_ID = ActionSet.MAIN_MENU;
+	public static final String MAIN_MENU_ID = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
 	private static Field urlField;
 
 	/**
 	 * The private 'location' field that is defined in the FileImageDescriptor.
-	 *
+	 * 
 	 * @see #getLocation(ImageDescriptor)
 	 */
 	private static Field locationField;
 
 	/**
 	 * The private 'name' field that is defined in the FileImageDescriptor.
-	 *
+	 * 
 	 * @see #getName(ImageDescriptor)
 	 */
 	private static Field nameField;
@@ -282,7 +282,7 @@ public class MenuHelper {
 
 	/**
 	 * Do a type-safe extraction of an object from the evalation context
-	 *
+	 * 
 	 * @param context
 	 *            the evaluation context
 	 * @param expectedType
@@ -659,7 +659,7 @@ public class MenuHelper {
 			RenderedElementUtil.setContributionManager(menu, generator);
 			item.setMenu(menu);
 		}
-
+		
 		item.setElementId(id);
 		item.setCommand(cmd);
 		if (iconUri == null) {
@@ -799,7 +799,7 @@ public class MenuHelper {
 		return null;
 	}
 
-	public static MHandledToolItem createToolItem(MApplication application, CommandContributionItem cci) {
+	public static MToolItem createToolItem(MApplication application, CommandContributionItem cci) {
 		String id = cci.getCommand().getId();
 		for (MCommand command : application.getCommands()) {
 			if (id.equals(command.getElementId())) {
@@ -1168,7 +1168,7 @@ public class MenuHelper {
 	/**
 	 * Rewrite certain types of URLs to more durable forms, as these URLs may
 	 * may be persisted in the model.
-	 *
+	 * 
 	 * @param url
 	 *            the url
 	 * @return the rewritten URL

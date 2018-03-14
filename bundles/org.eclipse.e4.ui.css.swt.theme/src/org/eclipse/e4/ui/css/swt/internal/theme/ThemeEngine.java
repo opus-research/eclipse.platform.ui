@@ -334,13 +334,20 @@ public class ThemeEngine implements IThemeEngine {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
 		// TODO: Need to differentiate win32 versions
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
+		String os_version = System.getProperty("os.version");
+		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
 		ArrayList<IConfigurationElement> matchingElements = new ArrayList<IConfigurationElement>();
 		for (IConfigurationElement element : elements) {
 			String elementOs = element.getAttribute("os");
 			String elementWs = element.getAttribute("ws");
+			String elementOsVersion = element.getAttribute("os_version");
 			if (osname != null
 					&& (elementOs == null || elementOs.contains(osname))) {
+				if (os_version != null && os_version.equalsIgnoreCase(elementOsVersion)) {
+					// best match
+					matchingElements.add(element);
+					continue;
+				}
 				matchingElements.add(element);
 			} else if (wsname != null && wsname.equalsIgnoreCase(elementWs)) {
 				matchingElements.add(element);
@@ -356,18 +363,13 @@ public class ThemeEngine implements IThemeEngine {
 		if (osVersion != null) {
 			boolean found = false;
 			for (Theme t : themes) {
-				String osVersionList = t.getOsVersion();
-				if (osVersionList != null) {
-					String[] osVersions = osVersionList.split(","); //$NON-NLS-1$
-					for (String osVersionFromTheme : osVersions) {
-						if (osVersionFromTheme != null && osVersion.contains(osVersionFromTheme)) {
-							String themeVersion = themeId + osVersionList;
-							if (t.getId().equals(themeVersion)) {
-								setTheme(t, restore);
-								found = true;
-								break;
-							}
-						}
+				String version = t.getOsVersion();
+				if (version != null && osVersion.contains(version)) {
+					String themeVersion = themeId + version;
+					if (t.getId().equals(themeVersion)) {
+						setTheme(t, restore);
+						found = true;
+						break;
 					}
 				}
 			}
@@ -523,8 +525,7 @@ public class ThemeEngine implements IThemeEngine {
 	}
 
 	private IEclipsePreferences getPreferences() {
-		return InstanceScope.INSTANCE.getNode(
-				FrameworkUtil.getBundle(
+		return new InstanceScope().getNode(FrameworkUtil.getBundle(
 				ThemeEngine.class).getSymbolicName());
 	}
 

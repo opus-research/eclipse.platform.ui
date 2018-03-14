@@ -64,7 +64,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	/**
 	 * Create a ProjectLocationSelectionDialog on the supplied project parented
 	 * by the parentShell.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param existingProject
 	 */
@@ -79,7 +79,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	/**
 	 * Check the message. If it is null then continue otherwise inform the user
 	 * via the status value and disable the OK.
-	 *
+	 * 
 	 * @param errorMsg
 	 *            the error message to show if it is not <code>null</code>
 	 */
@@ -150,6 +150,9 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 		setResult(list);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -157,6 +160,9 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 				IIDEHelpContextIds.PROJECT_LOCATION_SELECTION_DIALOG);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		// page group
@@ -190,7 +196,7 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 
 	/**
 	 * Creates the project name specification controls.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -272,11 +278,16 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 
 	/**
 	 * Get an error reporter for the receiver.
-	 *
+	 * 
 	 * @return IErrorMessageReporter
 	 */
 	private IErrorMessageReporter getErrorReporter() {
 		return new IErrorMessageReporter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
+			 */
 			@Override
 			public void reportError(String errorMessage, boolean infoOnly) {
 				setMessage(errorMessage);

@@ -27,6 +27,12 @@ public class ThemesExtension implements IThemesExtension {
 
 	private List<IThemeElementDefinitionOverridable<?>> definitions = new ArrayList<IThemeElementDefinitionOverridable<?>>();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.internal.css.swt.definition.IThemesExtension#
+	 * addFontDefinition(java.lang.String)
+	 */
 	@Override
 	public void addFontDefinition(String symbolicName) {
 		FontDefinition definition = new FontDefinition(formatDefaultName(FontDefinition.class,
@@ -35,6 +41,12 @@ public class ThemesExtension implements IThemesExtension {
 		definitions.add(definition);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.internal.css.swt.definition.IThemesExtension#
+	 * addColorDefinition(java.lang.String)
+	 */
 	@Override
 	public void addColorDefinition(String symbolicName) {
 		ColorDefinition definition = new ColorDefinition(formatDefaultName(ColorDefinition.class,

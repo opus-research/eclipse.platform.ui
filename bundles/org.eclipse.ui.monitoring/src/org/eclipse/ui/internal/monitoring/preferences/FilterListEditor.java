@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring.preferences;
 
-import java.util.Arrays;
-
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.ListEditor;
 import org.eclipse.jface.window.Window;
@@ -22,17 +20,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
 
 /**
- * Displays the list of stack frames used as a filter.
+ * Displays the list of traces to filter out and ignore.
  */
 public class FilterListEditor extends ListEditor {
-	private String dialogMessage;
-
-	FilterListEditor(String name, String label, String addButtonLabel, String removeButtonLabel,
-			String dialogMessage, Composite parent) {
-		super(name, label, parent);
-		this.dialogMessage = dialogMessage;
-		getAddButton().setText(addButtonLabel);
-		getRemoveButton().setText(removeButtonLabel);
+	FilterListEditor(String name, String labelText, Composite parent) {
+		super(name, labelText, parent);
+		getAddButton().setText(Messages.ListFieldEditor_add_filter_button_label);
 		getUpButton().setVisible(false);
 		getDownButton().setVisible(false);
 	}
@@ -43,7 +36,7 @@ public class FilterListEditor extends ListEditor {
         List list = getListControl(parent);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, numColumns - 1, 1);
     	PixelConverter pixelConverter = new PixelConverter(parent);
-        gd.widthHint = pixelConverter.convertWidthInCharsToPixels(75);
+        gd.widthHint = pixelConverter.convertWidthInCharsToPixels(65);
         list.setLayoutData(gd);
     }
 
@@ -67,19 +60,9 @@ public class FilterListEditor extends ListEditor {
 
 	@Override
 	protected String getNewInputObject() {
-		FilterInputDialog dialog = new FilterInputDialog(getShell(), dialogMessage);
+		FilterInputDialog dialog = new FilterInputDialog(getShell());
 		if (dialog.open() == Window.OK) {
-			String filter = dialog.getFilter();
-			List list = getList();
-			if (list.getItemCount() != 0) {
-				int pos = Arrays.binarySearch(list.getItems(), filter);
-				if (pos >= 0) {
-					return null;  // Identical item already exists.
-				}
-				// Select the element before the insertion point to keep the list sorted.
-				list.setSelection(-pos - 2);
-			}
-			return filter;
+			return dialog.getFilter();
 		}
 		return null;
 	}
@@ -89,9 +72,7 @@ public class FilterListEditor extends ListEditor {
 		if (stringList.isEmpty()) {
 			return new String[0];
 		}
-		String[] items = stringList.split(","); //$NON-NLS-1$
-		Arrays.sort(items);;
-		return items;
+		return stringList.split(","); //$NON-NLS-1$
 	}
 
 	@Override

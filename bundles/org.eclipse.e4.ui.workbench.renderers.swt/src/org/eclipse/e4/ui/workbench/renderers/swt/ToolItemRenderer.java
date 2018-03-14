@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -74,9 +74,9 @@ public class ToolItemRenderer extends SWTPartRenderer {
 	private static final String TIR_STATIC_CONTEXT = "HCI-staticContext"; //$NON-NLS-1$
 
 	@Inject
-	private Logger logger;
+	Logger logger;
 	@Inject
-	private IEventBroker eventBroker;
+	IEventBroker eventBroker;
 
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
