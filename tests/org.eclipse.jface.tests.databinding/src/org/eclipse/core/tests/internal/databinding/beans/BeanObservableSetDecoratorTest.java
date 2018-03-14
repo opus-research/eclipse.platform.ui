@@ -37,8 +37,8 @@ public class BeanObservableSetDecoratorTest extends TestCase {
 
 		bean = new Bean();
 		propertyDescriptor = new PropertyDescriptor("set", Bean.class);
-		observableSet = BeansObservables.observeSet(DisplayRealm
-				.getRealm(Display.getDefault()), bean, "set");
+		observableSet = BeansObservables.observeSet(
+				DisplayRealm.getRealm(Display.getDefault()), bean, "set");
 		decorator = new BeanObservableSetDecorator(observableSet,
 				propertyDescriptor);
 	}

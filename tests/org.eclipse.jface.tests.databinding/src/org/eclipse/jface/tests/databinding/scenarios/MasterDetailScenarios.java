@@ -82,8 +82,8 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 
 		IObservableList lodgings = BeansObservables.observeList(realm, catalog,
 				"lodgings");
-		ViewerSupport.bind(listViewer, lodgings, BeanProperties.value(
-				Lodging.class, "name"));
+		ViewerSupport.bind(listViewer, lodgings,
+				BeanProperties.value(Lodging.class, "name"));
 
 		assertArrayEquals(catalog.getLodgings(), getViewerContent(listViewer)
 				.toArray());
@@ -145,8 +145,8 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 
 		IObservableList lodgings = BeansObservables.observeList(realm, catalog,
 				"lodgings");
-		ViewerSupport.bind(listViewer, lodgings, BeanProperties.value(
-				Lodging.class, "name"));
+		ViewerSupport.bind(listViewer, lodgings,
+				BeanProperties.value(Lodging.class, "name"));
 
 		assertArrayEquals(catalog.getLodgings(), getViewerContent(listViewer)
 				.toArray());
@@ -217,8 +217,8 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 				assertTrue(txtName.getEnabled());
 				assertTrue(txtDescription.getEnabled());
 				assertEquals(newLodging.getName(), txtName.getText());
-				assertEquals(newLodging.getDescription(), txtDescription
-						.getText());
+				assertEquals(newLodging.getDescription(),
+						txtDescription.getText());
 			}
 
 			@Override
@@ -271,11 +271,11 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 
 		IObservableList categories = BeansObservables.observeList(realm,
 				catalog, "categories");
-		ViewerSupport.bind(categoryListViewer, categories, BeanProperties
-				.value(Category.class, "name"));
+		ViewerSupport.bind(categoryListViewer, categories,
+				BeanProperties.value(Category.class, "name"));
 
-		assertArrayEquals(catalog.getCategories(), getViewerContent(
-				categoryListViewer).toArray());
+		assertArrayEquals(catalog.getCategories(),
+				getViewerContent(categoryListViewer).toArray());
 
 		final IObservableValue selectedCategoryObservable = ViewersObservables
 				.observeSingleSelection(categoryListViewer);
@@ -287,8 +287,8 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 
 		IObservableList adventures = BeansObservables.observeDetailList(
 				selectedCategoryObservable, "adventures", Adventure.class);
-		ViewerSupport.bind(adventureListViewer, adventures, BeanProperties
-				.value(Adventure.class, "name"));
+		ViewerSupport.bind(adventureListViewer, adventures,
+				BeanProperties.value(Adventure.class, "name"));
 
 		ComputedValue categorySelectionExistsObservable = new ComputedValue() {
 			@Override
@@ -342,8 +342,8 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 		assertFalse(txtName.getEnabled());
 		adventureListViewer.setSelection(new StructuredSelection(
 				SampleData.RAFTING_HOLIDAY));
-		assertEquals(Boolean.TRUE, adventureSelectionExistsObservable
-				.getValue());
+		assertEquals(Boolean.TRUE,
+				adventureSelectionExistsObservable.getValue());
 		assertTrue(txtName.getEnabled());
 		assertEquals(SampleData.RAFTING_HOLIDAY.getName(), txtName.getText());
 		categoryListViewer.setSelection(new StructuredSelection(

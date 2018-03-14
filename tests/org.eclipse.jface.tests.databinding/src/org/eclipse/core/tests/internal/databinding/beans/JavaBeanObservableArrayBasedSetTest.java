@@ -66,8 +66,9 @@ public class JavaBeanObservableArrayBasedSetTest extends
 				propertyName)).getPropertyDescriptor();
 		bean = new Bean(new HashSet());
 
-		set = BeansObservables.observeSet(DisplayRealm.getRealm(Display
-				.getDefault()), bean, propertyName);
+		set = BeansObservables
+				.observeSet(DisplayRealm.getRealm(Display.getDefault()), bean,
+						propertyName);
 		beanObservable = (IBeanObservable) set;
 	}
 
@@ -308,10 +309,10 @@ public class JavaBeanObservableArrayBasedSetTest extends
 				.observe(observable);
 		bean.setArray(new Object[] { "new" });
 		assertEquals(1, tracker.count);
-		assertEquals(Collections.singleton("old"), tracker.event.diff
-				.getRemovals());
-		assertEquals(Collections.singleton("new"), tracker.event.diff
-				.getAdditions());
+		assertEquals(Collections.singleton("old"),
+				tracker.event.diff.getRemovals());
+		assertEquals(Collections.singleton("new"),
+				tracker.event.diff.getAdditions());
 	}
 
 	public void testModifyObservableSet_FiresSetChange() {
@@ -323,8 +324,8 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		observable.add("new");
 
 		assertEquals(1, tracker.count);
-		assertDiff(tracker.event.diff, Collections.EMPTY_SET, Collections
-				.singleton("new"));
+		assertDiff(tracker.event.diff, Collections.EMPTY_SET,
+				Collections.singleton("new"));
 	}
 
 	public void testSetBeanPropertyOutsideRealm_FiresEventInsideRealm() {
@@ -341,8 +342,8 @@ public class JavaBeanObservableArrayBasedSetTest extends
 
 		realm.setCurrent(true);
 		assertEquals(1, tracker.count);
-		assertDiff(tracker.event.diff, Collections.EMPTY_SET, Collections
-				.singleton("element"));
+		assertDiff(tracker.event.diff, Collections.EMPTY_SET,
+				Collections.singleton("element"));
 	}
 
 	private static void assertDiff(SetDiff diff, Set oldSet, Set newSet) {
@@ -365,10 +366,10 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		PropertyChangeEvent event = listener.evt;
 		assertEquals("event did not fire", 1, listener.count);
 		assertEquals("array", event.getPropertyName());
-		assertTrue("old value", Arrays.equals(old, (Object[]) event
-				.getOldValue()));
-		assertTrue("new value", Arrays.equals(bean.getArray(), (Object[]) event
-				.getNewValue()));
+		assertTrue("old value",
+				Arrays.equals(old, (Object[]) event.getOldValue()));
+		assertTrue("new value",
+				Arrays.equals(bean.getArray(), (Object[]) event.getNewValue()));
 		assertFalse("sets are equal", Arrays.equals(bean.getArray(), old));
 	}
 
