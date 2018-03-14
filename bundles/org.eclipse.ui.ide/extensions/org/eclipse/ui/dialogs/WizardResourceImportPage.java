@@ -150,6 +150,9 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         return true;
     }
 
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
 

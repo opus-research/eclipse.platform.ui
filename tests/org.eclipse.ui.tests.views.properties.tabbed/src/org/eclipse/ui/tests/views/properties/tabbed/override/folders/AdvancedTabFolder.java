@@ -31,12 +31,20 @@ import org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTest
  */
 public class AdvancedTabFolder extends AbstractTabFolder {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see asd.views.folders.AbstractSampleViewFolder#appliesTo(asd.views.elements.ISampleViewElement)
+	 */
 	public boolean appliesTo(Element element) {
 		return ((element instanceof File) || (element instanceof Folder));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see asd.views.folders.IAaaFolder#getAaaItem()
+	 */
 	public IOverrideTestsItem[] getItem() {
 		return new IOverrideTestsItem[] { new FileItem(), new FolderItem() };
 	}
