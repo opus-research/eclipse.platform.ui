@@ -691,11 +691,12 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 		if (overridenVisibility != null) {
 			if (prevChildVisible == null) {
-				boolean oldVisible = modelItem.isVisible();
-				if (oldVisible != overridenVisibility) {
+				boolean modelVisible = modelItem.isVisible();
+				boolean itemVisible = item.isVisible();
+				if (modelVisible != overridenVisibility || itemVisible != overridenVisibility) {
 					needUpdate = true;
 				}
-				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
+				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, itemVisible);
 				modelItem.setVisible(overridenVisibility);
 			} else {
 				return needUpdate;
