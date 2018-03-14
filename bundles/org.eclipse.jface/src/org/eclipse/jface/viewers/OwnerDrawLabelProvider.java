@@ -28,29 +28,32 @@ import org.eclipse.swt.widgets.Listener;
  * <p>
  * <b>This class is intended to be subclassed by implementors.</b>
  * </p>
- *
+
+ * @param <E> Type of an element of the model
+ * 
  * @since 3.3
  *
  */
-public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
+public abstract class OwnerDrawLabelProvider<E> extends CellLabelProvider<E> {
 
-	static class OwnerDrawListener implements Listener {
-		Set enabledColumns = new HashSet();
+	static class OwnerDrawListener<E> implements Listener {
+		Set<ViewerColumn<E,?>> enabledColumns = new HashSet<ViewerColumn<E,?>>();
 		int enabledGlobally = 0;
-		private ColumnViewer viewer;
+		private ColumnViewer<E,?> viewer;
 
-		OwnerDrawListener(ColumnViewer viewer) {
+		OwnerDrawListener(ColumnViewer<E,?> viewer) {
 			this.viewer = viewer;
 		}
 
 		@Override
 		public void handleEvent(Event event) {
-			ViewerColumn column = viewer.getViewerColumn(event.index);
+			ViewerColumn<E,?> column = viewer.getViewerColumn(event.index);
 			if (column != null && (enabledGlobally > 0 || enabledColumns.contains(column))) {
-				CellLabelProvider provider = column.getLabelProvider();
+				CellLabelProvider<E> provider = column.getLabelProvider();
 				if (provider instanceof OwnerDrawLabelProvider) {
-					Object element = event.item.getData();
-					OwnerDrawLabelProvider ownerDrawProvider = (OwnerDrawLabelProvider) provider;
+					@SuppressWarnings("unchecked")
+					E element = (E) event.item.getData();
+					OwnerDrawLabelProvider<E> ownerDrawProvider = (OwnerDrawLabelProvider<E>) provider;
 					switch (event.type) {
 					case SWT.MeasureItem:
 						ownerDrawProvider.measure(event, element);
@@ -85,13 +88,14 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 		getOrCreateOwnerDrawListener(viewer).enabledGlobally++;
 	}
 
-	private static OwnerDrawListener getOrCreateOwnerDrawListener(
-			final ColumnViewer viewer) {
+	private static <E> OwnerDrawListener<E>  getOrCreateOwnerDrawListener(
+			final ColumnViewer<E,?> viewer) {
 		Control control = viewer.getControl();
-		OwnerDrawListener listener = (OwnerDrawListener) control
+		@SuppressWarnings("unchecked")
+		OwnerDrawListener<E> listener = (OwnerDrawListener<E>) control
 				.getData(OWNER_DRAW_LABEL_PROVIDER_LISTENER);
 		if (listener == null) {
-			listener = new OwnerDrawListener(viewer);
+			listener = new OwnerDrawListener<E>(viewer);
 			control.setData(OWNER_DRAW_LABEL_PROVIDER_LISTENER, listener);
 			control.addListener(SWT.MeasureItem, listener);
 			control.addListener(SWT.EraseItem, listener);
@@ -109,7 +113,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	}
 
 	@Override
-	public void dispose(ColumnViewer viewer, ViewerColumn column) {
+	public void dispose(ColumnViewer<E,?> viewer, ViewerColumn<E,?> column) {
 		if (!viewer.getControl().isDisposed()) {
 			setOwnerDrawEnabled(viewer, column, false);
 		}
@@ -126,7 +130,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * {@link #initialize(ColumnViewer, ViewerColumn, boolean)}.
 	 */
 	@Override
-	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
+	protected void initialize(ColumnViewer<E,?> viewer, ViewerColumn<E,?> column) {
 		this.initialize(viewer, column, true);
 	}
 
@@ -149,14 +153,14 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 *
 	 * @since 3.4
 	 */
-	final protected void initialize(ColumnViewer viewer, ViewerColumn column,
+	final protected void initialize(ColumnViewer<E,?> viewer, ViewerColumn<E,?> column,
 			boolean enableOwnerDraw) {
 		super.initialize(viewer, column);
 		setOwnerDrawEnabled(viewer, column, enableOwnerDraw);
 	}
 
 	@Override
-	public void update(ViewerCell cell) {
+	public void update(ViewerCell<E> cell) {
 		// Force a redraw
 		Rectangle cellBounds = cell.getBounds();
 		cell.getControl().redraw(cellBounds.x, cellBounds.y, cellBounds.width,
@@ -180,7 +184,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * @see SWT#COLOR_LIST_SELECTION
 	 * @see SWT#COLOR_LIST_SELECTION_TEXT
 	 */
-	protected void erase(Event event, Object element) {
+	protected void erase(Event event, E element) {
 
 		Rectangle bounds = event.getBounds();
 		if ((event.detail & SWT.SELECTED) != 0) {
@@ -212,7 +216,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 *            the model element
 	 * @see SWT#MeasureItem
 	 */
-	protected abstract void measure(Event event, Object element);
+	protected abstract void measure(Event event, E element);
 
 	/**
 	 * Handle the paint event.
@@ -223,7 +227,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 *            the model element
 	 * @see SWT#PaintItem
 	 */
-	protected abstract void paint(Event event, Object element);
+	protected abstract void paint(Event event, E element);
 
 	/**
 	 * Enables or disables owner draw for the given viewer and column. This
@@ -244,17 +248,18 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 *
 	 * @since 3.4
 	 */
-	protected void setOwnerDrawEnabled(ColumnViewer viewer,
-			ViewerColumn column, boolean enabled) {
+	protected void setOwnerDrawEnabled(ColumnViewer<E,?> viewer,
+			ViewerColumn<E,?> column, boolean enabled) {
 		if (enabled) {
-			OwnerDrawListener listener = getOrCreateOwnerDrawListener(viewer);
+			OwnerDrawListener<E> listener = getOrCreateOwnerDrawListener(viewer);
 			if (column == null) {
 				listener.enabledGlobally++;
 			} else {
 				listener.enabledColumns.add(column);
 			}
 		} else {
-			OwnerDrawListener listener = (OwnerDrawListener) viewer
+			@SuppressWarnings("unchecked")
+			OwnerDrawListener<E> listener = (OwnerDrawListener<E>) viewer
 					.getControl().getData(OWNER_DRAW_LABEL_PROVIDER_LISTENER);
 			if (listener != null) {
 				if (column == null) {

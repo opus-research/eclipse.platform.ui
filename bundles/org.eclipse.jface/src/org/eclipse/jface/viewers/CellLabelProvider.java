@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Shindl <tom.schindl@bestsolution.at> - initial API and implementation
- *     											- bug fixes for 182443
+ *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation, Bug 182443
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -25,11 +25,12 @@ import org.eclipse.swt.graphics.Point;
  * structured viewers.
  *
  * <p><b>This class is intended to be subclassed</b></p>
+ * @param <E> Type of an element of the model
  *
  * @since 3.3
  * @see ColumnLabelProvider as a concrete implementation
  */
-public abstract class CellLabelProvider extends BaseLabelProvider implements IToolTipProvider {
+public abstract class CellLabelProvider<E> extends BaseLabelProvider<E> implements IToolTipProvider<E> {
 
 	/**
 	 * Create a new instance of the receiver.
@@ -45,8 +46,8 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *            The labelProvider to convert
 	 * @return ViewerLabelProvider
 	 */
-	/* package */static CellLabelProvider createViewerLabelProvider(
-			ColumnViewer viewer, IBaseLabelProvider labelProvider) {
+	/* package */static <E> CellLabelProvider<E> createViewerLabelProvider(
+			ColumnViewer<E, ?> viewer, IBaseLabelProvider<E> labelProvider) {
 
 		boolean noColumnTreeViewer = viewer instanceof AbstractTreeViewer && viewer
 				.doGetColumnCount() == 0;
@@ -54,10 +55,13 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 		if (!noColumnTreeViewer
 				&& (labelProvider instanceof ITableLabelProvider
 						|| labelProvider instanceof ITableColorProvider || labelProvider instanceof ITableFontProvider))
-			return new TableColumnViewerLabelProvider(labelProvider);
-		if (labelProvider instanceof CellLabelProvider)
-			return (CellLabelProvider) labelProvider;
-		return new WrappedViewerLabelProvider(labelProvider);
+			return new TableColumnViewerLabelProvider<E>(labelProvider);
+		if (labelProvider instanceof CellLabelProvider) {
+			@SuppressWarnings("unchecked")
+			CellLabelProvider<E> cellLabelProvider = (CellLabelProvider<E>) labelProvider;
+			return cellLabelProvider;
+		}
+		return new WrappedViewerLabelProvider<E>(labelProvider);
 
 	}
 
@@ -75,7 +79,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 * @return {@link Image} or <code>null</code> if there is not image.
 	 */
 
-	public Image getToolTipImage(Object object) {
+	public Image getToolTipImage(E object) {
 		return null;
 	}
 
@@ -94,7 +98,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *         display
 	 */
 	@Override
-	public String getToolTipText(Object element) {
+	public String getToolTipText(E element) {
 		return null;
 	}
 
@@ -108,7 +112,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *         the default color {@link SWT#COLOR_INFO_BACKGROUND}
 	 * @see SWT#COLOR_INFO_BACKGROUND
 	 */
-	public Color getToolTipBackgroundColor(Object object) {
+	public Color getToolTipBackgroundColor(E object) {
 		return null;
 	}
 
@@ -121,7 +125,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *         the default color {@link SWT#COLOR_INFO_FOREGROUND}
 	 * @see SWT#COLOR_INFO_FOREGROUND
 	 */
-	public Color getToolTipForegroundColor(Object object) {
+	public Color getToolTipForegroundColor(E object) {
 		return null;
 	}
 
@@ -133,7 +137,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 * @return {@link Font} or <code>null</code> if the default font is to be
 	 *         used.
 	 */
-	public Font getToolTipFont(Object object) {
+	public Font getToolTipFont(E object) {
 		return null;
 	}
 
@@ -149,7 +153,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 * @return {@link Point} to shift of the tool tip or <code>null</code> if the
 	 *         default shift should be used.
 	 */
-	public Point getToolTipShift(Object object) {
+	public Point getToolTipShift(E object) {
 		return null;
 	}
 
@@ -170,7 +174,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *            the {@link Object} for which the tool tip is shown
 	 * @return <code>true</code> if native tool tips should be used
 	 */
-	public boolean useNativeToolTip(Object object) {
+	public boolean useNativeToolTip(E object) {
 		return false;
 	}
 
@@ -181,7 +185,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *            the {@link Object} for which the tool tip is shown
 	 * @return time in milliseconds the tool tip is shown for
 	 */
-	public int getToolTipTimeDisplayed(Object object) {
+	public int getToolTipTimeDisplayed(E object) {
 		return 0;
 	}
 
@@ -192,7 +196,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *            the {@link Object} for which the tool tip is shown
 	 * @return time in milliseconds until the tool tip is displayed
 	 */
-	public int getToolTipDisplayDelayTime(Object object) {
+	public int getToolTipDisplayDelayTime(E object) {
 		return 0;
 	}
 
@@ -205,7 +209,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 * @return the style used to create the label
 	 * @see CLabel
 	 */
-	public int getToolTipStyle(Object object) {
+	public int getToolTipStyle(E object) {
 		return SWT.SHADOW_NONE;
 	}
 
@@ -215,7 +219,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 * @param cell
 	 *            {@link ViewerCell}
 	 */
-	public abstract void update(ViewerCell cell);
+	public abstract void update(ViewerCell<E> cell);
 
 	/**
 	 * Initialize this label provider for use with the given column viewer for
@@ -231,7 +235,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *
 	 * @since 3.4
 	 */
-	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
+	protected void initialize(ColumnViewer<E,?> viewer, ViewerColumn<E,?> column) {
 	}
 
 	/**
@@ -247,7 +251,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider implements ITo
 	 *
 	 * @since 3.4
 	 */
-	public void dispose(ColumnViewer viewer, ViewerColumn column) {
+	public void dispose(ColumnViewer<E,?> viewer, ViewerColumn<E,?> column) {
 		dispose();
 	}
 
