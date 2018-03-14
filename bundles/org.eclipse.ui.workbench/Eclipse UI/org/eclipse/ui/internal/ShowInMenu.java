@@ -242,7 +242,11 @@ public class ShowInMenu extends ContributionItem implements
 					}
 					String iconURI = menuElement.getIconURI();
 					try {
-						ccip.icon = ImageDescriptor.createFromURL(new URL(iconURI));
+						if (iconURI != null) {
+							ccip.icon = ImageDescriptor.createFromURL(new URL(iconURI));
+						} else {
+							ccip.icon = imgService.getImageDescriptor(commandId);
+						}
 					} catch (MalformedURLException e) {
 						ccip.icon = imgService.getImageDescriptor(commandId);
 					}
