@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
- *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *******************************************************************************/
 package org.eclipse.ui.application;
 
@@ -162,22 +161,18 @@ public interface IWorkbenchWindowConfigurer {
      * <p>
      * The initial value is <code>false</code>.
      * </p>
-     *
-     * @return <code>true</code> for fast view bars, and
+     * 
+     * @return <code>true</code> for fast view bars, and 
      * <code>false</code> for no fast view bars
-     * @deprecated discontinued support for fast views
      */
-    @Deprecated
     public boolean getShowFastViewBars();
 
     /**
-     * Sets whether the underlying workbench window has fast view bars.
-     *
-     * @param enable <code>true</code> for fast view bars, and
+     * Sets whether the underlying workbench window has fast view bars. 
+     * 
+     * @param enable <code>true</code> for fast view bars, and 
      * <code>false</code> for no fast view bars
-     * @deprecated discontinued support for fast views
      */
-    @Deprecated
     public void setShowFastViewBars(boolean enable);
 
     /**
