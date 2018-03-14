@@ -47,8 +47,7 @@ public class Snippet002UpdateComboRetainSelection {
     public static void main(String[] args) {
     	final Display display = new Display();
     	Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-    		@Override
-			public void run() {
+    		public void run() {
     			ViewModel viewModel = new ViewModel();
     			Shell shell = new View(viewModel).createShell();
     			
@@ -145,8 +144,7 @@ public class Snippet002UpdateComboRetainSelection {
             Button reset = new Button(shell, SWT.NULL);
             reset.setText("reset collection");
             reset.addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent e) {
+                public void widgetSelected(SelectionEvent e) {
                     List newList = new ArrayList();
                     newList.add("Chocolate");
                     newList.add("Vanilla");
@@ -178,8 +176,7 @@ public class Snippet002UpdateComboRetainSelection {
 
     private static IObservableFactory getListDetailFactory() {
         return new IObservableFactory() {
-            @Override
-			public IObservable createObservable(Object target) {
+            public IObservable createObservable(Object target) {
                 WritableList list = WritableList.withElementType(String.class);
                 list.addAll((Collection) target);
                 return list;
