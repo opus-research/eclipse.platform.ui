@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Part3 Plug-in
+Bundle-Name: RCP Mail demo
 Bundle-SymbolicName: org.eclipse.ui.examples.rcp.mail;singleton:=true
 Bundle-Version: 1.100.0
 Bundle-Activator: org.eclipse.ui.examples.rcp.mail.Part3Plugin

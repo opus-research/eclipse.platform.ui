@@ -18,7 +18,7 @@
     <relativePath>../../</relativePath>
   </parent>
   <groupId>org.eclipse.ui</groupId>
-  <artifactId>org.eclipse.ui.tutorials.rcp.part3</artifactId>
+  <artifactId>org.eclipse.ui.examples.rcp.mail</artifactId>
   <version>1.100.0</version>
   <packaging>eclipse-plugin</packaging>
 </project>
