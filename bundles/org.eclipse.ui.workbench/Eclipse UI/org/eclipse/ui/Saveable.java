@@ -256,10 +256,13 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 			Composite toDisable = ((Composite) paneChildren[0]);
 			toDisable.setEnabled(false);
 			if (waitCursor == null) {
-				waitCursor = new Cursor(workbenchPart.getSite().getWorkbenchWindow().getShell().getDisplay(), SWT.CURSOR_WAIT);
+				waitCursor = workbenchPart.getSite().getWorkbenchWindow().getShell().getDisplay()
+						.getSystemCursor(SWT.CURSOR_WAIT);
 			}
-			originalCursor = paneComposite.getCursor();
-			paneComposite.setCursor(waitCursor);
+			if (waitCursor.equals(paneComposite.getCursor())) {
+				originalCursor = paneComposite.getCursor();
+				paneComposite.setCursor(waitCursor);
+			}
 		}
 	}
 
@@ -286,8 +289,7 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 			Control[] paneChildren = paneComposite.getChildren();
 			Composite toEnable = ((Composite) paneChildren[0]);
 			paneComposite.setCursor(originalCursor);
-			if (waitCursor!=null && !waitCursor.isDisposed()) {
-				waitCursor.dispose();
+			if (waitCursor != null) {
 				waitCursor = null;
 			}
 			toEnable.setEnabled(true);
