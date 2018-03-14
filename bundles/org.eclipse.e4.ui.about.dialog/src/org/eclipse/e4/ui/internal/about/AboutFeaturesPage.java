@@ -85,15 +85,13 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 	private Composite infoArea;
 
-//	FIXME use JFaceResources instead ???
+	// FIXME use JFaceResources instead ???
 	private Map<ImageDescriptor, Image> cachedImages = new HashMap<ImageDescriptor, Image>();
 
 	private AboutBundleGroupData[] bundleGroupInfos;
 
-	private String columnTitles[] = {
-			WorkbenchMessages.AboutFeaturesDialog_provider,
-			WorkbenchMessages.AboutFeaturesDialog_featureName,
-			WorkbenchMessages.AboutFeaturesDialog_version,
+	private String columnTitles[] = { WorkbenchMessages.AboutFeaturesDialog_provider,
+			WorkbenchMessages.AboutFeaturesDialog_featureName, WorkbenchMessages.AboutFeaturesDialog_version,
 			WorkbenchMessages.AboutFeaturesDialog_featureId, };
 
 	private int lastColumnChosen = 0; // initially sort by provider
@@ -117,29 +115,25 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 	private void initializeBundleGroupInfos() {
 		if (bundleGroupInfos == null) {
-			
-			IBundleGroupProvider[] providers = Platform
-					.getBundleGroupProviders();
+
+			IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
 			// create a descriptive object for each BundleGroup
 			LinkedList<AboutBundleGroupData> groups = new LinkedList<AboutBundleGroupData>();
 			if (providers != null) {
 				for (int i = 0; i < providers.length; ++i) {
-					IBundleGroup[] bundleGroups = providers[i]
-							.getBundleGroups();
+					IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
 					for (int j = 0; j < bundleGroups.length; ++j) {
 						groups.add(new AboutBundleGroupData(bundleGroups[j]));
 					}
 				}
 			}
-			bundleGroupInfos = (AboutBundleGroupData[]) groups
-					.toArray(new AboutBundleGroupData[0]);
+			bundleGroupInfos = (AboutBundleGroupData[]) groups.toArray(new AboutBundleGroupData[0]);
 		} else {
 			// the order of the array may be changed due to sorting, so create a
 			// copy, since the client set this value.
 			AboutBundleGroupData[] clientArray = bundleGroupInfos;
 			bundleGroupInfos = new AboutBundleGroupData[clientArray.length];
-			System.arraycopy(clientArray, 0, bundleGroupInfos, 0,
-					clientArray.length);
+			System.arraycopy(clientArray, 0, bundleGroupInfos, 0, clientArray.length);
 		}
 		AboutData.sortByProvider(reverseSort, bundleGroupInfos);
 	}
@@ -156,30 +150,20 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 		AboutBundleGroupData info = (AboutBundleGroupData) items[0].getData();
 		IBundleGroup bundleGroup = info.getBundleGroup();
-		Bundle[] bundles = bundleGroup == null ? new Bundle[0] : bundleGroup
-				.getBundles();
+		Bundle[] bundles = bundleGroup == null ? new Bundle[0] : bundleGroup.getBundles();
 
-		AboutPluginsDialog d = new AboutPluginsDialog(
-				getShell(),
-				getProductName(),
-				bundles,
-				WorkbenchMessages.AboutFeaturesDialog_pluginInfoTitle,
-				NLS
-						.bind(
-								WorkbenchMessages.AboutFeaturesDialog_pluginInfoMessage,
-								bundleGroup.getIdentifier()),
+		AboutPluginsDialog d = new AboutPluginsDialog(getShell(), getProductName(), bundles,
+				WorkbenchMessages.AboutFeaturesDialog_pluginInfoTitle, NLS.bind(
+						WorkbenchMessages.AboutFeaturesDialog_pluginInfoMessage, bundleGroup.getIdentifier()),
 				IWorkbenchHelpContextIds.ABOUT_FEATURES_PLUGINS_DIALOG);
 		d.open();
 	}
 
 	@Override
 	public void createPageButtons(Composite parent) {
-		moreButton = createButton(parent, MORE_ID,
-				WorkbenchMessages.AboutFeaturesDialog_moreInfo);
-		pluginsButton = createButton(parent, PLUGINS_ID,
-				WorkbenchMessages.AboutFeaturesDialog_pluginsInfo);
-		createButton(parent, COLUMNS_ID,
-				WorkbenchMessages.AboutFeaturesDialog_columns);
+		moreButton = createButton(parent, MORE_ID, WorkbenchMessages.AboutFeaturesDialog_moreInfo);
+		pluginsButton = createButton(parent, PLUGINS_ID, WorkbenchMessages.AboutFeaturesDialog_pluginsInfo);
+		createButton(parent, COLUMNS_ID, WorkbenchMessages.AboutFeaturesDialog_columns);
 		TableItem[] items = table.getSelection();
 		if (items.length > 0) {
 			updateButtons((AboutBundleGroupData) items[0].getData());
@@ -195,10 +179,10 @@ public class AboutFeaturesPage extends ProductInfoPage {
 				disposeImages();
 			}
 		});
-		
-//		FIXME HelpSystem
-//		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
-//				IWorkbenchHelpContextIds.ABOUT_FEATURES_DIALOG);
+
+		// FIXME HelpSystem
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
+		// IWorkbenchHelpContextIds.ABOUT_FEATURES_DIALOG);
 
 		Composite outer = createOuterComposite(parent);
 
@@ -214,8 +198,7 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		Font font = parent.getFont();
 
 		infoArea = new Composite(parent, SWT.BORDER);
-		infoArea.setBackground(infoArea.getDisplay().getSystemColor(
-				SWT.COLOR_LIST_BACKGROUND));
+		infoArea.setBackground(infoArea.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		infoArea.setBackgroundMode(SWT.INHERIT_FORCE);
 		GridData data = new GridData(GridData.FILL, GridData.FILL, true, false);
 		// need to provide space for arbitrary feature infos, not just the
@@ -237,9 +220,10 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		// text on the right
 		text = new StyledText(infoArea, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
 		text.setAlwaysShowScrollBars(false);
-		
-		// Don't set caret to 'null' as this causes https://bugs.eclipse.org/293263.
-//		text.setCaret(null);
+
+		// Don't set caret to 'null' as this causes
+		// https://bugs.eclipse.org/293263.
+		// text.setCaret(null);
 
 		text.setFont(parent.getFont());
 		data = new GridData(GridData.FILL, GridData.FILL, true, true);
@@ -265,11 +249,9 @@ public class AboutFeaturesPage extends ProductInfoPage {
 
 		initializeBundleGroupInfos();
 
-		table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.SINGLE
-				| SWT.FULL_SELECTION | SWT.BORDER);
+		table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
 
-		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
-				true);
+		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
 		gridData.heightHint = convertVerticalDLUsToPixels(TABLE_HEIGHT);
 		table.setLayoutData(gridData);
 		table.setHeaderVisible(true);
@@ -283,17 +265,14 @@ public class AboutFeaturesPage extends ProductInfoPage {
 				// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=266177
 				if (e.item == null)
 					return;
-				AboutBundleGroupData info = (AboutBundleGroupData) e.item
-						.getData();
+				AboutBundleGroupData info = (AboutBundleGroupData) e.item.getData();
 				updateInfoArea(info);
 				updateButtons(info);
 			}
 		});
 
-		int[] columnWidths = { convertHorizontalDLUsToPixels(120),
-				convertHorizontalDLUsToPixels(120),
-				convertHorizontalDLUsToPixels(70),
-				convertHorizontalDLUsToPixels(130) };
+		int[] columnWidths = { convertHorizontalDLUsToPixels(120), convertHorizontalDLUsToPixels(120),
+				convertHorizontalDLUsToPixels(70), convertHorizontalDLUsToPixels(130) };
 
 		for (int i = 0; i < columnTitles.length; i++) {
 			TableColumn tableColumn = new TableColumn(table, SWT.NULL);
@@ -485,22 +464,21 @@ public class AboutFeaturesPage extends ProductInfoPage {
 	 *            the source information for the new row, must not be null
 	 */
 	private static String[] createRow(AboutBundleGroupData info) {
-		return new String[] { info.getProviderName(), info.getName(),
-				info.getVersion(), info.getId() };
+		return new String[] { info.getProviderName(), info.getName(), info.getVersion(), info.getId() };
 	}
 
 	protected Collection<Object> getSelectionValue() {
 		if (table == null || table.isDisposed())
 			return null;
-		
+
 		TableItem[] items = table.getSelection();
 		if (items.length <= 0) {
 			return null;
 		}
-		
+
 		List<Object> list = new ArrayList<Object>(1);
 		list.add(items[0].getData());
-		
+
 		return list;
 	}
 
@@ -520,10 +498,8 @@ public class AboutFeaturesPage extends ProductInfoPage {
 		}
 
 		AboutBundleGroupData info = (AboutBundleGroupData) items[0].getData();
-		if (info == null
-				|| !AboutUtils.openBrowser(getShell(), info.getLicenseUrl())) {
-			MessageDialog.openInformation(getShell(),
-					WorkbenchMessages.AboutFeaturesDialog_noInfoTitle,
+		if (info == null || !AboutUtils.openBrowser(getShell(), info.getLicenseUrl())) {
+			MessageDialog.openInformation(getShell(), WorkbenchMessages.AboutFeaturesDialog_noInfoTitle,
 					WorkbenchMessages.AboutFeaturesDialog_noInformation);
 		}
 	}

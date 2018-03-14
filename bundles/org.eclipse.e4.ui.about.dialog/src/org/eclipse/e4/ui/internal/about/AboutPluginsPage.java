@@ -79,7 +79,7 @@ import org.osgi.framework.FrameworkUtil;
  * PRIVATE this class is internal to the IDE
  */
 public class AboutPluginsPage extends ProductInfoPage {
-	
+
 	private static final String UNKNOWN = "UNKNOWN";
 
 	private static final String SIGNED_YES = "SIGNED_YES";
@@ -90,9 +90,9 @@ public class AboutPluginsPage extends ProductInfoPage {
 	 * Get image descriptors for the signed, unsigned and unknown button.
 	 */
 	static {
-		
+
 		Bundle bundle = FrameworkUtil.getBundle(AboutPluginsPage.class);
-		
+
 		String rootPath = "$nl$/icons/full/obj16/";
 		IPath signedNoPath = new Path(rootPath + "signed_no_tbl.png");
 		URL signedNoURL = FileLocator.find(bundle, signedNoPath, null);
@@ -103,23 +103,20 @@ public class AboutPluginsPage extends ProductInfoPage {
 
 		IPath signedYesPath = new Path(rootPath + "signed_yes_tbl.png");
 		URL signedYesURL = FileLocator.find(bundle, signedYesPath, null);
-		ImageDescriptor signedYesDesc = ImageDescriptor
-				.createFromURL(signedYesURL);
+		ImageDescriptor signedYesDesc = ImageDescriptor.createFromURL(signedYesURL);
 		if (signedYesDesc != null) {
 			JFaceResources.getImageRegistry().put(SIGNED_YES, signedYesDesc);
 		}
-		
+
 		IPath unkPath = new Path(rootPath + "signed_unk_tbl.png");
 		URL unkURL = FileLocator.find(bundle, unkPath, null);
-		ImageDescriptor unkDesc = ImageDescriptor
-				.createFromURL(unkURL);
+		ImageDescriptor unkDesc = ImageDescriptor.createFromURL(unkURL);
 		if (unkDesc != null) {
 			JFaceResources.getImageRegistry().put(UNKNOWN, unkDesc);
 		}
 	}
 
-	public class BundleTableLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	public class BundleTableLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 		/**
 		 * Queue containing bundle signing info to be resolved.
@@ -180,7 +177,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 		 * this job is responsible for feeding label change events into the
 		 * viewer as they become available from the resolve job
 		 */
-		
+
 		private Job updateJob = new BasicUIJob("Load", Display.getDefault()) {
 
 			@Override
@@ -195,17 +192,15 @@ public class AboutPluginsPage extends ProductInfoPage {
 						if (updateQueue.isEmpty())
 							return Status.OK_STATUS;
 
-						data = updateQueue
-								.toArray(new AboutBundleData[updateQueue.size()]);
+						data = updateQueue.toArray(new AboutBundleData[updateQueue.size()]);
 						updateQueue.clear();
 
 					}
-					fireLabelProviderChanged(new LabelProviderChangedEvent(
-							BundleTableLabelProvider.this, data));
+					fireLabelProviderChanged(new LabelProviderChangedEvent(BundleTableLabelProvider.this, data));
 				}
 			}
 		};
-		
+
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -215,18 +210,16 @@ public class AboutPluginsPage extends ProductInfoPage {
 		 */
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
-			
+
 			if (columnIndex == 0) {
-				
+
 				ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
-				
+
 				if (element instanceof AboutBundleData) {
 					final AboutBundleData data = (AboutBundleData) element;
 					if (data.isSignedDetermined()) {
-						
-						return imageRegistry.get(
-								data.isSigned() ? 
-										SIGNED_YES : SIGNED_NO);
+
+						return imageRegistry.get(data.isSigned() ? SIGNED_YES : SIGNED_NO);
 					}
 
 					synchronized (resolveQueue) {
@@ -237,7 +230,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 					return imageRegistry.get(UNKNOWN);
 				}
 			}
-			
+
 			return null;
 		}
 
@@ -295,12 +288,9 @@ public class AboutPluginsPage extends ProductInfoPage {
 
 	private String helpContextId = IWorkbenchHelpContextIds.ABOUT_PLUGINS_DIALOG;
 
-	private String columnTitles[] = {
-			WorkbenchMessages.AboutPluginsDialog_signed,
-			WorkbenchMessages.AboutPluginsDialog_provider,
-			WorkbenchMessages.AboutPluginsDialog_pluginName,
-			WorkbenchMessages.AboutPluginsDialog_version,
-			WorkbenchMessages.AboutPluginsDialog_pluginId,
+	private String columnTitles[] = { WorkbenchMessages.AboutPluginsDialog_signed,
+			WorkbenchMessages.AboutPluginsDialog_provider, WorkbenchMessages.AboutPluginsDialog_pluginName,
+			WorkbenchMessages.AboutPluginsDialog_version, WorkbenchMessages.AboutPluginsDialog_pluginId,
 
 	};
 	private Bundle[] bundles = FrameworkUtil.getBundle(getClass()).getBundleContext().getBundles();
@@ -326,20 +316,17 @@ public class AboutPluginsPage extends ProductInfoPage {
 	protected void handleSigningInfoPressed() {
 		if (signingArea == null) {
 			signingArea = new BundleSigningInfo();
-			AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
-					.getSelection()).getFirstElement();
+			AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo.getSelection())
+					.getFirstElement();
 			signingArea.setData(bundleInfo);
 
 			signingArea.createContents(sashForm);
-			sashForm.setWeights(new int[] { 100 - SIGNING_AREA_PERCENTAGE,
-					SIGNING_AREA_PERCENTAGE });
-			signingInfo
-					.setText(WorkbenchMessages.AboutPluginsDialog_signingInfo_hide);
+			sashForm.setWeights(new int[] { 100 - SIGNING_AREA_PERCENTAGE, SIGNING_AREA_PERCENTAGE });
+			signingInfo.setText(WorkbenchMessages.AboutPluginsDialog_signingInfo_hide);
 
 		} else {
 			// hide
-			signingInfo
-					.setText(WorkbenchMessages.AboutPluginsDialog_signingInfo_show);
+			signingInfo.setText(WorkbenchMessages.AboutPluginsDialog_signingInfo_show);
 			signingArea.dispose();
 			signingArea = null;
 			sashForm.setWeights(new int[] { 100 });
@@ -349,25 +336,22 @@ public class AboutPluginsPage extends ProductInfoPage {
 	@Override
 	public void createPageButtons(Composite parent) {
 
-		moreInfo = createButton(parent, MORE_ID,
-				WorkbenchMessages.AboutPluginsDialog_moreInfo);
+		moreInfo = createButton(parent, MORE_ID, WorkbenchMessages.AboutPluginsDialog_moreInfo);
 		moreInfo.setEnabled(false);
 
-		signingInfo = createButton(parent, SIGNING_ID,
-				WorkbenchMessages.AboutPluginsDialog_signingInfo_show);
+		signingInfo = createButton(parent, SIGNING_ID, WorkbenchMessages.AboutPluginsDialog_signingInfo_show);
 		signingInfo.setEnabled(false);
 
-		createButton(parent, COLUMNS_ID,
-				WorkbenchMessages.AboutPluginsDialog_columns);
+		createButton(parent, COLUMNS_ID, WorkbenchMessages.AboutPluginsDialog_columns);
 	}
-	
-	// TODO: needs a better name
-    public static boolean isReady(Bundle bundle) {
-    	return bundle != null && isReady(bundle.getState());
-    }
 
-    public static boolean isReady(int bundleState) {
-    	return (bundleState & (Bundle.RESOLVED | Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING)) != 0;
+	// TODO: needs a better name
+	public static boolean isReady(Bundle bundle) {
+		return bundle != null && isReady(bundle.getState());
+	}
+
+	public static boolean isReady(int bundleState) {
+		return (bundleState & (Bundle.RESOLVED | Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING)) != 0;
 	}
 
 	@Override
@@ -379,13 +363,11 @@ public class AboutPluginsPage extends ProductInfoPage {
 		Map<String, AboutBundleData> map = new HashMap<String, AboutBundleData>();
 		for (int i = 0; i < bundles.length; ++i) {
 			AboutBundleData data = new AboutBundleData(bundles[i]);
-			if (isReady(data.getState())
-					&& !map.containsKey(data.getVersionedId())) {
+			if (isReady(data.getState()) && !map.containsKey(data.getVersionedId())) {
 				map.put(data.getVersionedId(), data);
 			}
 		}
-		bundleInfos = map.values().toArray(
-				new AboutBundleData[0]);
+		bundleInfos = map.values().toArray(new AboutBundleData[0]);
 		DialogPlugin.class.getSigners();
 
 		sashForm = new SashForm(parent, SWT.HORIZONTAL | SWT.SMOOTH);
@@ -397,8 +379,9 @@ public class AboutPluginsPage extends ProductInfoPage {
 		sashForm.setLayoutData(data);
 
 		Composite outer = createOuterComposite(sashForm);
-//		FIXME HelpSystem
-//		PlatformUI.getWorkbench().getHelpSystem().setHelp(outer, helpContextId);
+		// FIXME HelpSystem
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(outer,
+		// helpContextId);
 
 		if (message != null) {
 			Label label = new Label(outer, SWT.NONE);
@@ -423,8 +406,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 		filterText.setMessage(WorkbenchMessages.AboutPluginsDialog_filterTextMessage);
 		filterText.setFocus();
 
-		vendorInfo = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
+		vendorInfo = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
 		vendorInfo.setUseHashlookup(true);
 		vendorInfo.getTable().setHeaderVisible(true);
 		vendorInfo.getTable().setLinesVisible(true);
@@ -441,15 +423,12 @@ public class AboutPluginsPage extends ProductInfoPage {
 		vendorInfo.setComparator(comparator);
 		int[] columnWidths = {
 				convertHorizontalDLUsToPixels(30), // signature
-				convertHorizontalDLUsToPixels(120),
-				convertHorizontalDLUsToPixels(120),
-				convertHorizontalDLUsToPixels(70),
-				convertHorizontalDLUsToPixels(130), };
+				convertHorizontalDLUsToPixels(120), convertHorizontalDLUsToPixels(120),
+				convertHorizontalDLUsToPixels(70), convertHorizontalDLUsToPixels(130), };
 
 		// create table headers
 		for (int i = 0; i < columnTitles.length; i++) {
-			TableColumn column = new TableColumn(vendorInfo.getTable(),
-					SWT.NULL);
+			TableColumn column = new TableColumn(vendorInfo.getTable(), SWT.NULL);
 			if (i == PLUGIN_NAME_COLUMN_INDEX) { // prime initial sorting
 				updateTableSorting(i);
 			}
@@ -477,8 +456,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 		});
 		vendorInfo.addFilter(searchFilter);
 
-		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
-				true);
+		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true, true);
 		gridData.heightHint = convertVerticalDLUsToPixels(TABLE_HEIGHT);
 		vendorInfo.getTable().setLayoutData(gridData);
 
@@ -493,17 +471,14 @@ public class AboutPluginsPage extends ProductInfoPage {
 	 * @since 3.4
 	 */
 	private void updateTableSorting(final int columnIndex) {
-		TableComparator comparator = (TableComparator) vendorInfo
-				.getComparator();
+		TableComparator comparator = (TableComparator) vendorInfo.getComparator();
 		// toggle direction if it's the same column
 		if (columnIndex == comparator.getSortColumn()) {
 			comparator.setAscending(!comparator.isAscending());
 		}
 		comparator.setSortColumn(columnIndex);
-		vendorInfo.getTable().setSortColumn(
-				vendorInfo.getTable().getColumn(columnIndex));
-		vendorInfo.getTable().setSortDirection(
-				comparator.isAscending() ? SWT.UP : SWT.DOWN);
+		vendorInfo.getTable().setSortColumn(vendorInfo.getTable().getColumn(columnIndex));
+		vendorInfo.getTable().setSortDirection(comparator.isAscending() ? SWT.UP : SWT.DOWN);
 		vendorInfo.refresh(false);
 	}
 
@@ -524,8 +499,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 			return null;
 		}
 
-		URL aboutUrl = Platform.find(bundle, baseNLPath.append(PLUGININFO),
-				null);
+		URL aboutUrl = Platform.find(bundle, baseNLPath.append(PLUGININFO), null);
 		if (!makeLocal) {
 			return aboutUrl;
 		}
@@ -566,11 +540,9 @@ public class AboutPluginsPage extends ProductInfoPage {
 	private void checkEnablement() {
 		// enable if there is an item selected and that
 		// item has additional info
-		IStructuredSelection selection = (IStructuredSelection) vendorInfo
-				.getSelection();
+		IStructuredSelection selection = (IStructuredSelection) vendorInfo.getSelection();
 		if (selection.getFirstElement() instanceof AboutBundleData) {
-			AboutBundleData selected = (AboutBundleData) selection
-					.getFirstElement();
+			AboutBundleData selected = (AboutBundleData) selection.getFirstElement();
 			moreInfo.setEnabled(selectionHasInfo(selected));
 			signingInfo.setEnabled(true);
 			if (signingArea != null) {
@@ -613,12 +585,13 @@ public class AboutPluginsPage extends ProductInfoPage {
 
 		URL infoURL = getMoreInfoURL(bundleInfo, false);
 
-//		FIXME logger
-//		// only report ini problems if the -debug command line argument is used
-//		if (infoURL == null && WorkbenchPlugin.DEBUG) {
-//			WorkbenchPlugin.log("Problem reading plugin info for: " //$NON-NLS-1$
-//					+ bundleInfo.getName());
-//		}
+		// FIXME logger
+		// // only report ini problems if the -debug command line argument is
+		// used
+		// if (infoURL == null && WorkbenchPlugin.DEBUG) {
+		//			WorkbenchPlugin.log("Problem reading plugin info for: " //$NON-NLS-1$
+		// + bundleInfo.getName());
+		// }
 
 		return infoURL != null;
 	}
@@ -636,14 +609,12 @@ public class AboutPluginsPage extends ProductInfoPage {
 		if (vendorInfo.getSelection().isEmpty())
 			return;
 
-		AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
-				.getSelection()).getFirstElement();
+		AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo.getSelection())
+				.getFirstElement();
 
-		if (!AboutUtils.openBrowser(getShell(),
-				getMoreInfoURL(bundleInfo, true))) {
-			String message = NLS.bind(
-					WorkbenchMessages.AboutPluginsDialog_unableToOpenFile,
-					PLUGININFO, bundleInfo.getId());
+		if (!AboutUtils.openBrowser(getShell(), getMoreInfoURL(bundleInfo, true))) {
+			String message = NLS.bind(WorkbenchMessages.AboutPluginsDialog_unableToOpenFile, PLUGININFO,
+					bundleInfo.getId());
 
 			AboutUtils.handleStatus(WorkbenchMessages.AboutPluginsDialog_errorTitle + ": " + message);
 		}
@@ -673,8 +644,7 @@ class TableComparator extends ViewerComparator {
 	 */
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
-		if (sortColumn == 0 && e1 instanceof AboutBundleData
-				&& e2 instanceof AboutBundleData) {
+		if (sortColumn == 0 && e1 instanceof AboutBundleData && e2 instanceof AboutBundleData) {
 			AboutBundleData d1 = (AboutBundleData) e1;
 			AboutBundleData d2 = (AboutBundleData) e2;
 			int diff = getSignedSortValue(d1) - getSignedSortValue(d2);
@@ -688,10 +658,8 @@ class TableComparator extends ViewerComparator {
 				IBaseLabelProvider baseLabel = tableViewer.getLabelProvider();
 				if (baseLabel instanceof ITableLabelProvider) {
 					ITableLabelProvider tableProvider = (ITableLabelProvider) baseLabel;
-					String e1p = tableProvider
-							.getColumnText(e1, lastSortColumn);
-					String e2p = tableProvider
-							.getColumnText(e2, lastSortColumn);
+					String e1p = tableProvider.getColumnText(e1, lastSortColumn);
+					String e2p = tableProvider.getColumnText(e2, lastSortColumn);
 					int result = getComparator().compare(e1p, e2p);
 					return lastAscending ? result : (-1) * result;
 				}
@@ -715,12 +683,10 @@ class TableComparator extends ViewerComparator {
 						result = getComparator().compare(e1p, e2p);
 						return lastAscending ? result : (-1) * result;
 					} // secondary sort is by column 0
-					if (e1 instanceof AboutBundleData
-							&& e2 instanceof AboutBundleData) {
+					if (e1 instanceof AboutBundleData && e2 instanceof AboutBundleData) {
 						AboutBundleData d1 = (AboutBundleData) e1;
 						AboutBundleData d2 = (AboutBundleData) e2;
-						int diff = getSignedSortValue(d1)
-								- getSignedSortValue(d2);
+						int diff = getSignedSortValue(d1) - getSignedSortValue(d2);
 						return lastAscending ? diff : -diff;
 					}
 				}

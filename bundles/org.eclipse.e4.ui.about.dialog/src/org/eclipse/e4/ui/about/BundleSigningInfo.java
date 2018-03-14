@@ -91,8 +91,7 @@ public class BundleSigningInfo {
 			date = new Text(composite, SWT.READ_ONLY);
 			GC gc = new GC(date);
 			gc.setFont(JFaceResources.getDialogFont());
-			Point size = gc.stringExtent(DateFormat.getDateTimeInstance()
-					.format(new Date()));
+			Point size = gc.stringExtent(DateFormat.getDateTimeInstance().format(new Date()));
 			data.widthHint = size.x;
 			gc.dispose();
 			date.setText(WorkbenchMessages.BundleSigningTray_Working);
@@ -101,15 +100,12 @@ public class BundleSigningInfo {
 		// signer
 		{
 			Label label = new Label(composite, SWT.NONE);
-			label
-					.setText(WorkbenchMessages.BundleSigningTray_Signing_Certificate);
-			GridData data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true,
-					false);
+			label.setText(WorkbenchMessages.BundleSigningTray_Signing_Certificate);
+			GridData data = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false);
 			data.horizontalSpan = 2;
 			data = new GridData(SWT.FILL, SWT.FILL, true, true);
 			data.horizontalSpan = 2;
-			certificate = new StyledText(composite, SWT.READ_ONLY | SWT.MULTI
-					| SWT.WRAP);
+			certificate = new StyledText(composite, SWT.READ_ONLY | SWT.MULTI | SWT.WRAP);
 			certificate.setText(WorkbenchMessages.BundleSigningTray_Working);
 			certificate.setLayoutData(data);
 		}
@@ -127,11 +123,11 @@ public class BundleSigningInfo {
 			return;
 		certificate.setText(WorkbenchMessages.BundleSigningTray_Working);
 		date.setText(WorkbenchMessages.BundleSigningTray_Working);
-		
-		final BundleContext bundleContext =	FrameworkUtil.getBundle(getClass()).getBundleContext();
+
+		final BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
 		final ServiceReference<SignedContentFactory> factoryRef = bundleContext
 				.getServiceReference(SignedContentFactory.class);
-		
+
 		if (factoryRef == null) {
 			AboutUtils.handleStatus(WorkbenchMessages.BundleSigningTray_Cant_Find_Service, IStatus.WARNING);
 			return;
@@ -144,17 +140,15 @@ public class BundleSigningInfo {
 		}
 
 		final AboutBundleData myData = data;
-		final Job signerJob = new Job(NLS.bind(
-				WorkbenchMessages.BundleSigningTray_Determine_Signer_For,
-				myData.getId())) {
+		final Job signerJob = new Job(
+				NLS.bind(WorkbenchMessages.BundleSigningTray_Determine_Signer_For, myData.getId())) {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					if (myData != data)
 						return Status.OK_STATUS;
-					SignedContent signedContent = contentFactory
-							.getSignedContent(myData.getBundle());
+					SignedContent signedContent = contentFactory.getSignedContent(myData.getBundle());
 					if (myData != data)
 						return Status.OK_STATUS;
 					SignerInfo[] signers = signedContent.getSignerInfos();
@@ -166,14 +160,12 @@ public class BundleSigningInfo {
 						signerText = WorkbenchMessages.BundleSigningTray_Unsigned;
 						dateText = WorkbenchMessages.BundleSigningTray_Unsigned;
 					} else {
-						Properties[] certs = parseCerts(signers[0]
-								.getCertificateChain());
+						Properties[] certs = parseCerts(signers[0].getCertificateChain());
 						if (certs.length == 0)
 							signerText = WorkbenchMessages.BundleSigningTray_Unknown;
 						else {
 							StringBuffer buffer = new StringBuffer();
-							for (Iterator i = certs[0].entrySet().iterator(); i
-									.hasNext();) {
+							for (Iterator i = certs[0].entrySet().iterator(); i.hasNext();) {
 								Map.Entry entry = (Entry) i.next();
 								buffer.append(entry.getKey());
 								buffer.append('=');
@@ -184,37 +176,32 @@ public class BundleSigningInfo {
 							signerText = buffer.toString();
 						}
 
-						Date signDate = signedContent
-								.getSigningTime(signers[0]);
+						Date signDate = signedContent.getSigningTime(signers[0]);
 						if (signDate != null)
-							dateText = DateFormat.getDateTimeInstance().format(
-									signDate);
+							dateText = DateFormat.getDateTimeInstance().format(signDate);
 						else
 							dateText = WorkbenchMessages.BundleSigningTray_Unknown;
 					}
-					
-					//FIXME
-					Display.getDefault().asyncExec(
-							new Runnable() {
-								@Override
-								public void run() {
-									// check to see if the tray is still visible
-									// and if
-									// we're still looking at the same item
-									if (!isOpen()
-											&& BundleSigningInfo.this.data != myData)
-										return;
-									certificate.setText(signerText);
-									date.setText(dateText);
-								}
-							});
+
+					// FIXME
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							// check to see if the tray is still visible
+							// and if
+							// we're still looking at the same item
+							if (!isOpen() && BundleSigningInfo.this.data != myData)
+								return;
+							certificate.setText(signerText);
+							date.setText(dateText);
+
+						}
+					});
 
 				} catch (IOException e) {
-					return new Status(IStatus.ERROR,
-							DialogPlugin.ID, e.getMessage(), e);
+					return new Status(IStatus.ERROR, DialogPlugin.ID, e.getMessage(), e);
 				} catch (GeneralSecurityException e) {
-					return new Status(IStatus.ERROR,
-							DialogPlugin.ID, e.getMessage(), e);
+					return new Status(IStatus.ERROR, DialogPlugin.ID, e.getMessage(), e);
 				}
 				return Status.OK_STATUS;
 			}
@@ -223,8 +210,7 @@ public class BundleSigningInfo {
 		signerJob.belongsTo(signerJob);
 		signerJob.schedule();
 
-		Job cleanup = new Job(
-				WorkbenchMessages.BundleSigningTray_Unget_Signing_Service) {
+		Job cleanup = new Job(WorkbenchMessages.BundleSigningTray_Unget_Signing_Service) {
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
@@ -252,13 +238,12 @@ public class BundleSigningInfo {
 	private Properties[] parseCerts(Certificate[] chain) {
 		List<Properties> certs = new ArrayList<Properties>(chain.length);
 		for (int i = 0; i < chain.length; i++) {
-			
+
 			if (!(chain[i] instanceof X509Certificate))
 				continue;
-			
-			Properties cert = parseCert(((X509Certificate) chain[i]).getSubjectDN()
-					.getName());
-			
+
+			Properties cert = parseCert(((X509Certificate) chain[i]).getSubjectDN().getName());
+
 			if (cert != null) {
 				certs.add(cert);
 			}

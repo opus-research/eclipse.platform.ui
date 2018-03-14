@@ -67,9 +67,7 @@ public final class ConfigurationInfo {
 		StringWriter out = new StringWriter();
 		PrintWriter writer = new PrintWriter(out);
 		writer.println(NLS.bind(WorkbenchMessages.SystemSummary_timeStamp,
-				DateFormat
-						.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL)
-						.format(new Date())));
+				DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(new Date())));
 
 		ConfigurationInfo.appendExtensions(writer);
 		writer.close();
@@ -77,18 +75,16 @@ public final class ConfigurationInfo {
 	}
 
 	public static final String TAG_CLASS = "class"; //$NON-NLS-1$
-	
+
 	/*
 	 * Appends the contents of all extensions to the configurationLogSections
 	 * extension point.
 	 */
 	private static void appendExtensions(PrintWriter writer) {
-		
-		IConfigurationElement[] configElements = getSortedExtensions(Platform
-				.getExtensionRegistry().getConfigurationElementsFor(
-						DialogPlugin.ID,
-						IWorkbenchRegistryConstants.PL_SYSTEM_SUMMARY_SECTIONS));
-		
+
+		IConfigurationElement[] configElements = getSortedExtensions(Platform.getExtensionRegistry()
+				.getConfigurationElementsFor(DialogPlugin.ID, IWorkbenchRegistryConstants.PL_SYSTEM_SUMMARY_SECTIONS));
+
 		for (int i = 0; i < configElements.length; ++i) {
 			IConfigurationElement element = configElements[i];
 
@@ -100,9 +96,7 @@ public final class ConfigurationInfo {
 			}
 
 			writer.println();
-			writer.println(NLS.bind(
-					WorkbenchMessages.SystemSummary_sectionTitle, element
-							.getAttribute("sectionTitle"))); //$NON-NLS-1$
+			writer.println(NLS.bind(WorkbenchMessages.SystemSummary_sectionTitle, element.getAttribute("sectionTitle"))); //$NON-NLS-1$
 
 			if (obj instanceof ISystemSummarySection) {
 				ISystemSummarySection logSection = (ISystemSummarySection) obj;
@@ -113,37 +107,35 @@ public final class ConfigurationInfo {
 		}
 	}
 
-    public static Object createExtension(final IConfigurationElement element,
-            final String classAttribute) throws CoreException {
-        try {
+	public static Object createExtension(final IConfigurationElement element, final String classAttribute)
+			throws CoreException {
+		try {
 
-        	final Object[] ret = new Object[1];
-            final CoreException[] exc = new CoreException[1];
-            BusyIndicator.showWhile(null, new Runnable() {
-                @Override
+			final Object[] ret = new Object[1];
+			final CoreException[] exc = new CoreException[1];
+			BusyIndicator.showWhile(null, new Runnable() {
+				@Override
 				public void run() {
-                    try {
-                        ret[0] = element
-                                .createExecutableExtension(classAttribute);
-                    } catch (CoreException e) {
-                        exc[0] = e;
-                    }
-                }
-            });
-            if (exc[0] != null) {
+					try {
+						ret[0] = element.createExecutableExtension(classAttribute);
+					} catch (CoreException e) {
+						exc[0] = e;
+					}
+				}
+			});
+			if (exc[0] != null) {
 				throw exc[0];
 			}
-            return ret[0];
+			return ret[0];
 
-        } catch (CoreException core) {
-            throw core;
-        } catch (Exception e) {
-        	AboutUtils.handleStatus(WorkbenchMessages.WorkbenchPlugin_extension, e);
-        }
+		} catch (CoreException core) {
+			throw core;
+		} catch (Exception e) {
+			AboutUtils.handleStatus(WorkbenchMessages.WorkbenchPlugin_extension, e);
+		}
 		return null;
-    }
-    
-	
+	}
+
 	public static IConfigurationElement[] getSortedExtensions(IConfigurationElement[] configElements) {
 
 		Arrays.sort(configElements, new Comparator() {

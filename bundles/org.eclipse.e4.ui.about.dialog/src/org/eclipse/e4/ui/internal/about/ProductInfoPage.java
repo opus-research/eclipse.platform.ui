@@ -21,13 +21,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Abstract superclass of about dialog installation pages.  The ProductInfoPage
+ * Abstract superclass of about dialog installation pages. The ProductInfoPage
  * is set up so that the page can be hosted as one of many pages in the
  * InstallationDialog, or as the only page in a ProductInfoDialog.
  */
 
-public abstract class ProductInfoPage extends InstallationPage implements
-		IShellProvider {
+public abstract class ProductInfoPage extends InstallationPage implements IShellProvider {
 
 	private IProduct product;
 

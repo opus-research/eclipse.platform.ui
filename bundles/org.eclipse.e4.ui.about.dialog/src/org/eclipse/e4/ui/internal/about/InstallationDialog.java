@@ -57,12 +57,14 @@ import org.eclipse.swt.widgets.TabItem;
  * @since 3.5
  * 
  */
-public class InstallationDialog extends TrayDialog implements
-		IInstallationPageContainer {
+public class InstallationDialog extends TrayDialog implements IInstallationPageContainer {
 	class ButtonManager {
 
 		private Composite composite;
-		private Map<String, List<Button>> buttonMap = new HashMap<String, List<Button>>(); // page id->Collection of page
+		private Map<String, List<Button>> buttonMap = new HashMap<String, List<Button>>(); // page
+																							// id->Collection
+																							// of
+																							// page
 
 		// buttons
 
@@ -111,11 +113,9 @@ public class InstallationDialog extends TrayDialog implements
 			composite.layout(true);
 		}
 
-		protected void setButtonLayoutData(FontMetrics metrics, Control button,
-				boolean visible) {
+		protected void setButtonLayoutData(FontMetrics metrics, Control button, boolean visible) {
 			GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-			int widthHint = Dialog.convertHorizontalDLUsToPixels(metrics,
-					IDialogConstants.BUTTON_WIDTH);
+			int widthHint = Dialog.convertHorizontalDLUsToPixels(metrics, IDialogConstants.BUTTON_WIDTH);
 			Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 			data.widthHint = Math.max(widthHint, minSize.x);
 			data.exclude = !visible;
@@ -162,8 +162,7 @@ public class InstallationDialog extends TrayDialog implements
 		IProduct product = Platform.getProduct();
 		if (product != null && product.getName() != null)
 			productName = product.getName();
-		newShell.setText(NLS.bind(
-				WorkbenchMessages.InstallationDialog_ShellTitle, productName));
+		newShell.setText(NLS.bind(WorkbenchMessages.InstallationDialog_ShellTitle, productName));
 	}
 
 	@Override
@@ -192,18 +191,15 @@ public class InstallationDialog extends TrayDialog implements
 		});
 		return composite;
 	}
-	
+
 	protected void createFolderItems(TabFolder folder) {
-		IConfigurationElement[] elements = ConfigurationInfo
-				.getSortedExtensions(loadElements());
+		IConfigurationElement[] elements = ConfigurationInfo.getSortedExtensions(loadElements());
 		for (int i = 0; i < elements.length; i++) {
 			IConfigurationElement element = elements[i];
 			TabItem item = new TabItem(folder, SWT.NONE);
-			item.setText(element
-					.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
+			item.setText(element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
 			item.setData(element);
-			item.setData(ID, element
-					.getAttribute(IWorkbenchRegistryConstants.ATT_ID));
+			item.setData(ID, element.getAttribute(IWorkbenchRegistryConstants.ATT_ID));
 
 			Composite control = new Composite(folder, SWT.NONE);
 			control.setLayout(new GridLayout());
@@ -247,8 +243,7 @@ public class InstallationDialog extends TrayDialog implements
 
 	private void tabSelected(TabItem item) {
 		if (item.getData() instanceof IConfigurationElement) {
-			final IConfigurationElement element = (IConfigurationElement) item
-					.getData();
+			final IConfigurationElement element = (IConfigurationElement) item.getData();
 
 			Composite pageComposite = (Composite) item.getControl();
 			try {
@@ -262,8 +257,7 @@ public class InstallationDialog extends TrayDialog implements
 				// Must be done before creating the buttons because the control
 				// button creation methods
 				// use this map.
-				String attribute = element
-						.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
+				String attribute = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 				pageToId.put(page, attribute);
 				createButtons(page);
 				item.setData(page);
@@ -286,12 +280,12 @@ public class InstallationDialog extends TrayDialog implements
 		String id = (String) item.getData(ID);
 		rememberSelectedTab(id);
 		buttonManager.update(id);
-		Button button = createButton(buttonManager.getParent(),
-				IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, true);
+		Button button = createButton(buttonManager.getParent(), IDialogConstants.CLOSE_ID,
+				IDialogConstants.CLOSE_LABEL, true);
 		GridData gd = (GridData) button.getLayoutData();
 		gd.horizontalAlignment = SWT.BEGINNING;
 		gd.horizontalIndent = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH) / 2;
-		// Layout the button bar's parent and all of its children.  We must
+		// Layout the button bar's parent and all of its children. We must
 		// cascade through all children because the buttons have changed and
 		// because tray dialog inserts an extra composite in the button bar
 		// hierarchy.
@@ -330,18 +324,17 @@ public class InstallationDialog extends TrayDialog implements
 
 	private IConfigurationElement[] loadElements() {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint point = registry
-				.getExtensionPoint(DialogPlugin.ID, "installationPages"); //$NON-NLS-1$ //$NON-NLS-2$
+		IExtensionPoint point = registry.getExtensionPoint(DialogPlugin.ID, "installationPages"); //$NON-NLS-1$ //$NON-NLS-2$
 		return point.getConfigurationElements();
 	}
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-//		FIXME Dialogsettings
-/*
- * IDialogSettings settings = WorkbenchPlugin.getDefault()
-				.getDialogSettings();		
- */
+		// FIXME Dialogsettings
+		/*
+		 * IDialogSettings settings = WorkbenchPlugin.getDefault()
+		 * .getDialogSettings();
+		 */
 		IDialogSettings settings = new DialogSettings(DialogPlugin.ID);
 		IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
 		if (section == null) {

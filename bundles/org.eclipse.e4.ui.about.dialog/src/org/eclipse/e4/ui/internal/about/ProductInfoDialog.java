@@ -46,8 +46,7 @@ public abstract class ProductInfoDialog extends InstallationDialog {
 		super(shell);
 	}
 
-	public void initializeDialog(ProductInfoPage page, String title,
-			String helpContextId) {
+	public void initializeDialog(ProductInfoPage page, String title, String helpContextId) {
 		this.page = page;
 		this.title = title;
 		this.helpContextId = helpContextId;
@@ -73,7 +72,7 @@ public abstract class ProductInfoDialog extends InstallationDialog {
 		});
 		control.layout(true, true);
 	}
-	
+
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		super.createButtonsForButtonBar(parent);
@@ -84,14 +83,14 @@ public abstract class ProductInfoDialog extends InstallationDialog {
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(title);
-		
-//		FIXME HelpSystem
-//		if (helpContextId != null) {
-//			PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
-//					helpContextId);
-//		}
+
+		// FIXME HelpSystem
+		// if (helpContextId != null) {
+		// PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
+		// helpContextId);
+		// }
 	}
-	
+
 	@Override
 	protected String pageToId(InstallationPage page) {
 		Assert.isLegal(page == this.page);

@@ -14,7 +14,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.registry;
 
-
 /**
  * Interface containing various registry constants (tag and attribute names).
  * 
@@ -48,10 +47,11 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_ALLOW_MULTIPLE = "allowMultiple"; //$NON-NLS-1$
 
 	/**
-	 * Attribute that specifies whether a view gets restored upon workbench restart. Value <code>restorable</code>.
+	 * Attribute that specifies whether a view gets restored upon workbench
+	 * restart. Value <code>restorable</code>.
 	 */
 	public static String ATT_RESTORABLE = "restorable"; //$NON-NLS-1$
-	
+
 	/**
 	 * Attribute that specifies whether a wizard is immediately capable of
 	 * finishing. Value <code>canFinishEarly</code>.
@@ -68,7 +68,7 @@ public interface IWorkbenchRegistryConstants {
 	 * Category id attribute. Value <code>categoryId</code>.
 	 */
 	public static String ATT_CATEGORY_ID = "categoryId"; //$NON-NLS-1$
-	
+
 	/**
 	 * The name of the attribute storing checkEnabled for the visibleWhen
 	 * element. Value <code>checkEnabled</code>.
@@ -107,10 +107,11 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_CONFIGURATION = "configuration"; //$NON-NLS-1$
 
 	/**
-	 * Intro content detector class attribute (optional). Value <code>contentDetector</code>.
+	 * Intro content detector class attribute (optional). Value
+	 * <code>contentDetector</code>.
 	 */
 	public static String ATT_CONTENT_DETECTOR = "contentDetector"; //$NON-NLS-1$
-	
+
 	/**
 	 * Editor content type id binding attribute. Value
 	 * <code>contentTypeId</code>.
@@ -297,7 +298,8 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_LOCATION = "location"; //$NON-NLS-1$
 
 	/**
-	 * Editor management strategy attribute. Value <code>matchingStrategy</code>.
+	 * Editor management strategy attribute. Value <code>matchingStrategy</code>
+	 * .
 	 */
 	public static String ATT_MATCHING_STRATEGY = "matchingStrategy"; //$NON-NLS-1$
 
@@ -317,8 +319,8 @@ public interface IWorkbenchRegistryConstants {
 	public static String ATT_MNEMONIC = "mnemonic"; //$NON-NLS-1$
 
 	/**
-	 * The name of the minimized attribute, which appears
-	 * when adding a view in a perspectiveExtension.
+	 * The name of the minimized attribute, which appears when adding a view in
+	 * a perspectiveExtension.
 	 */
 	public static String ATT_MINIMIZED = "minimized"; //$NON-NLS-1$
 
@@ -484,9 +486,9 @@ public interface IWorkbenchRegistryConstants {
 	 * Perspective singleton attribute. Value <code>singleton</code>.
 	 */
 	public static String ATT_SINGLETON = "singleton";//$NON-NLS-1$
-	
+
 	/**
-	 * Splash id attribute.  Value <code>splashId</code>.
+	 * Splash id attribute. Value <code>splashId</code>.
 	 * 
 	 * @since 3.3
 	 */
@@ -698,7 +700,7 @@ public interface IWorkbenchRegistryConstants {
 	public static String PL_PROPERTY_PAGES = "propertyPages"; //$NON-NLS-1$
 
 	public static String PL_STARTUP = "startup"; //$NON-NLS-1$
-	
+
 	/**
 	 * @since 3.3
 	 */
@@ -832,7 +834,8 @@ public interface IWorkbenchRegistryConstants {
 	public static String TAG_CATEGORYDEFINITION = "themeElementCategory"; //$NON-NLS-1$
 
 	/**
-	 * Category presentation tag. Value <code>categoryPresentationBinding</code>.
+	 * Category presentation tag. Value <code>categoryPresentationBinding</code>
+	 * .
 	 */
 	public static String TAG_CATEGORYPRESENTATIONBINDING = "categoryPresentationBinding"; //$NON-NLS-1$
 
@@ -1014,8 +1017,7 @@ public interface IWorkbenchRegistryConstants {
 	public static String TAG_LOCATION = "location"; //$NON-NLS-1$
 
 	/**
-	 * The name of the element defining the insertion point for menu
-	 * additions.
+	 * The name of the element defining the insertion point for menu additions.
 	 * 
 	 * @since 3.3
 	 */
@@ -1105,8 +1107,7 @@ public interface IWorkbenchRegistryConstants {
 	 * Separator tag. Value <code>separator</code>.
 	 */
 	public static String TAG_SEPARATOR = "separator"; //$NON-NLS-1$
-	
-	
+
 	/**
 	 * Tag for the settings transfer entry.
 	 */
@@ -1121,23 +1122,23 @@ public interface IWorkbenchRegistryConstants {
 	 * The name of the element storing some state.
 	 */
 	public static String TAG_STATE = "state"; //$NON-NLS-1$
-	
-	
+
 	/**
 	 * The name of the element describing splash handlers. Value
 	 * <code>splashHandler</code>.
+	 * 
 	 * @since 3.3
 	 */
 	public static String TAG_SPLASH_HANDLER = "splashHandler"; //$NON-NLS-1$
-	
 
 	/**
 	 * The name of the element describing splash handler product bindings. Value
 	 * <code>splashHandlerProductBinding</code>.
+	 * 
 	 * @since 3.3
 	 */
 	public static String TAG_SPLASH_HANDLER_PRODUCT_BINDING = "splashHandlerProductBinding"; //$NON-NLS-1$
-	
+
 	/**
 	 * Sticky view tag. Value <code>stickyView</code>.
 	 */
@@ -1239,15 +1240,15 @@ public interface IWorkbenchRegistryConstants {
 	public static String TYPE_WIDGET = "widget"; //$NON-NLS-1$
 
 	public static String TAG_TOOLBAR = "toolbar"; //$NON-NLS-1$
-	
+
 	public static String TAG_SERVICE_FACTORY = "serviceFactory"; //$NON-NLS-1$
-	
+
 	public static String TAG_SERVICE = "service"; //$NON-NLS-1$
 
 	public static final String ATTR_FACTORY_CLASS = "factoryClass"; //$NON-NLS-1$
 
 	public static final String ATTR_SERVICE_CLASS = "serviceClass"; //$NON-NLS-1$
-	
+
 	public static final String TAG_SOURCE_PROVIDER = "sourceProvider"; //$NON-NLS-1$
 
 	public static final String ATTR_PROVIDER = "provider"; //$NON-NLS-1$
@@ -1255,7 +1256,7 @@ public interface IWorkbenchRegistryConstants {
 	public static final String TAG_VARIABLE = "variable"; //$NON-NLS-1$
 
 	public static final String ATT_PRIORITY_LEVEL = "priorityLevel"; //$NON-NLS-1$
-	
+
 	public static final String ATT_MODE = "mode"; //$NON-NLS-1$
 
 	public static final String ATT_PLATFORMS = "platforms"; //$NON-NLS-1$

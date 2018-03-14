@@ -73,13 +73,11 @@ public class AboutUtils {
 			urlOffset++;
 
 			// Right to "://"
-			StringTokenizer tokenizer = new StringTokenizer(s
-					.substring(urlSeparatorOffset + 3), " \t\n\r\f<>", false); //$NON-NLS-1$
+			StringTokenizer tokenizer = new StringTokenizer(s.substring(urlSeparatorOffset + 3), " \t\n\r\f<>", false); //$NON-NLS-1$
 			if (!tokenizer.hasMoreTokens())
 				return null;
 
-			int urlLength = tokenizer.nextToken().length() + 3
-					+ urlSeparatorOffset - urlOffset;
+			int urlLength = tokenizer.nextToken().length() + 3 + urlSeparatorOffset - urlOffset;
 
 			if (startDoubleQuote) {
 				int endOffset = -1;
@@ -100,9 +98,8 @@ public class AboutUtils {
 
 			urlSeparatorOffset = s.indexOf("://", urlOffset + urlLength + 1); //$NON-NLS-1$
 		}
-		return new AboutItem(s, (int[][]) linkRanges.toArray(new int[linkRanges
-				.size()][2]), (String[]) links
-				.toArray(new String[links.size()]));
+		return new AboutItem(s, (int[][]) linkRanges.toArray(new int[linkRanges.size()][2]),
+				(String[]) links.toArray(new String[links.size()]));
 	}
 
 	/**
@@ -171,14 +168,16 @@ public class AboutUtils {
 		}
 		return retu.toString();
 	}
-	
+
 	/**
-	 * Returns the result of converting a list of comma-separated tokens into an array.
-	 * Used as a replacement for <code>String.split(String)</code>, to allow compilation
-	 * against JCL Foundation (bug 80053).
+	 * Returns the result of converting a list of comma-separated tokens into an
+	 * array. Used as a replacement for <code>String.split(String)</code>, to
+	 * allow compilation against JCL Foundation (bug 80053).
 	 * 
-	 * @param prop the initial comma-separated string
-	 * @param separator the separator characters
+	 * @param prop
+	 *            the initial comma-separated string
+	 * @param separator
+	 *            the separator characters
 	 * @return the array of string tokens
 	 * @since 3.1
 	 */
@@ -187,7 +186,7 @@ public class AboutUtils {
 			return new String[0];
 		}
 		List<String> list = new ArrayList<String>();
-		StringTokenizer tokens = new StringTokenizer(prop, separator); 
+		StringTokenizer tokens = new StringTokenizer(prop, separator);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
 			if (!token.equals("")) { //$NON-NLS-1$
@@ -200,33 +199,30 @@ public class AboutUtils {
 	public static void handleStatus(String status) {
 		handleStatus(status, IStatus.ERROR, null);
 	}
-	
+
 	public static void handleStatus(String status, Exception e) {
 		handleStatus(status, IStatus.ERROR, e);
 	}
-	
+
 	public static void handleStatus(String status, int level) {
 		handleStatus(status, level, null);
 	}
-	
+
 	public static void handleStatus(String status, int level, Exception e) {
 		ILog log = Platform.getLog(FrameworkUtil.getBundle(AboutUtils.class));
 		log.log(new Status(level, DialogPlugin.ID, status, e));
 	}
-	
+
 	/**
 	 * display an error message
 	 */
-	private static void openWebBrowserError(Shell shell, final String href,
-			final Throwable t) {
+	private static void openWebBrowserError(Shell shell, final String href, final Throwable t) {
 		String title = WorkbenchMessages.ProductInfoDialog_errorTitle;
-		String msg = NLS.bind(
-				WorkbenchMessages.ProductInfoDialog_unableToOpenWebBrowser,
-				href);
-		
+		String msg = NLS.bind(WorkbenchMessages.ProductInfoDialog_unableToOpenWebBrowser, href);
+
 		AboutUtils.handleStatus(title + ": " + msg);
 	}
-	
+
 	public static void openErrorLogBrowser(Shell shell) {
 		String filename = Platform.getLogFileLocation().toOSString();
 
@@ -239,8 +235,7 @@ public class AboutUtils {
 			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=97783
 			File logCopy = makeDisplayCopy(log);
 			if (logCopy != null) {
-				AboutUtils.openLink(shell,
-						"file:///" + logCopy.getAbsolutePath()); //$NON-NLS-1$
+				AboutUtils.openLink(shell, "file:///" + logCopy.getAbsolutePath()); //$NON-NLS-1$
 				return;
 			}
 			// Couldn't make copy, try to open the original log.
@@ -256,10 +251,8 @@ public class AboutUtils {
 			AboutUtils.openLink(shell, "file:///" + filename); //$NON-NLS-1$
 			return;
 		}
-		MessageDialog.openInformation(shell,
-				WorkbenchMessages.AboutSystemDialog_noLogTitle, NLS.bind(
-						WorkbenchMessages.AboutSystemDialog_noLogMessage,
-						filename));
+		MessageDialog.openInformation(shell, WorkbenchMessages.AboutSystemDialog_noLogTitle,
+				NLS.bind(WorkbenchMessages.AboutSystemDialog_noLogMessage, filename));
 	}
 
 	/**
@@ -268,12 +261,12 @@ public class AboutUtils {
 	 * @return the file, or <code>null</code>
 	 */
 	private static File makeDisplayCopy(File file) {
-			
+
 		IPath path = Platform.getStateLocation(FrameworkUtil.getBundle(AboutUtils.class));
-		
-//		TODO tut das selbe wie in der Plugin Methode
-//		IPath path = WorkbenchPlugin.getDefault().getDataLocation();
-		
+
+		// TODO tut das selbe wie in der Plugin Methode
+		// IPath path = WorkbenchPlugin.getDefault().getDataLocation();
+
 		if (path == null) {
 			return null;
 		}
