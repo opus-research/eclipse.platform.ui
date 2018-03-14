@@ -800,7 +800,14 @@ public class TrimStack {
 			int index = toolControlId.indexOf('(');
 			String stackId = toolControlId.substring(0, index);
 			String perspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
-			MPerspective persp = (MPerspective) modelService.find(perspId, ps.get(0));
+
+			MPerspective persp = null;
+			List<MPerspective> perspectives = modelService.findElements(ps.get(0), perspId,
+					MPerspective.class, null);
+			if (perspectives != null && !perspectives.isEmpty()) {
+				persp = perspectives.get(0);
+			}
+
 			if (persp != null) {
 				result = modelService.find(stackId, persp);
 			} else {
