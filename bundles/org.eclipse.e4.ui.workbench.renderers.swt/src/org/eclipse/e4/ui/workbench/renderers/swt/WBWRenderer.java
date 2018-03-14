@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
+ *     Simon Scholz <scholzsimon@arcor.de - Bug 429729
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -769,6 +770,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 
 		@Override
+		protected void configureShell(Shell newShell) {
+			super.configureShell(newShell);
+			newShell.setText(SWTRenderersMessages.choosePartsToSaveTitle);
+		}
+
+
+		@Override
 		protected Control createDialogArea(Composite parent) {
 			parent = (Composite) super.createDialogArea(parent);
 
@@ -809,6 +817,11 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		public Object[] getCheckedElements() {
 			return checkedElements;
+		}
+
+		@Override
+		protected boolean isResizable() {
+			return true;
 		}
 
 	}
