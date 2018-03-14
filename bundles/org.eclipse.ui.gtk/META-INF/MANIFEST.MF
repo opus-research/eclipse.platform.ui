@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %fragmentName
+Bundle-SymbolicName: org.eclipse.ui.gtk;singleton:=true
+Bundle-Version: 1.1.100.qualifier
+Fragment-Host: org.eclipse.ui.workbench;bundle-version="3.107.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Vendor: %providerName
+Eclipse-PlatformFilter: (osgi.ws=gtk)
