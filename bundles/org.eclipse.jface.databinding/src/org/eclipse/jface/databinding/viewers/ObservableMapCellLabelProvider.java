@@ -42,7 +42,6 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 	protected IObservableMap[] attributeMaps;
 
 	private IMapChangeListener mapChangeListener = new IMapChangeListener() {
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			Set affectedElements = event.diff.getChangedKeys();
 			LabelProviderChangedEvent newEvent = new LabelProviderChangedEvent(
@@ -77,7 +76,6 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 		}
 	}
 
-	@Override
 	public void dispose() {
 		for (int i = 0; i < attributeMaps.length; i++) {
 			attributeMaps[i].removeMapChangeListener(mapChangeListener);
@@ -87,7 +85,6 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 		this.mapChangeListener = null;
 	}
 
-	@Override
 	public void update(ViewerCell cell) {
 		Object element = cell.getElement();
 		Object value = attributeMaps[0].get(element);
