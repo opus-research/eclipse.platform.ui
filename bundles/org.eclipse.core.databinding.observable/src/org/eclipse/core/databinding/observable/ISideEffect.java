@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Stefan Xenos - initial API and implementation
+ *     Stefan Xenos (Google) - initial API and implementation
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -14,21 +14,48 @@ package org.eclipse.core.databinding.observable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.eclipse.core.databinding.observable.value.ComputedValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.internal.databinding.observable.SideEffect;
+
 /**
- * TODO: Rework this documentation and provide more examples
- *
- * A {@link ISideEffect} holds a Runnable which it executes once upon activation
- * and again every time any tracked getter the Runnable touches changes. A
- * {@link ISideEffect} can be used much like a listener, except that it is
- * associated with the code it affects rather than being attached to the
- * observables it listens to.
+ * A {@link ISideEffect} allows you to run code whenever one or more observables
+ * change. A {@link ISideEffect} is a lot like a listener except that it doesn't
+ * need to be attached to anything. Instead, it reacts automatically to changes
+ * in tracked getters that are invoked by the listener.
  * <p>
+ * Observables form a directed graph of dependencies. Classes like
+ * {@link WritableValue} form the inputs to the graph (nodes which have only
+ * outputs), classes like {@link ComputedValue} form the interior nodes (they
+ * receive inputs from observables and produce an output which is used by other
+ * observables), and {@link ISideEffect} is used for the leaf nodes (nodes which
+ * receive inputs but produce no output).
+ * <p>
+ * Side-effects have a life-cycle which passes through a number of states:
+ * <ul>
+ * <li>Paused: The side-effect will listen for changes but will not react to
+ * them. If any change occurs while the side-effect is paused, it will react
+ * when and if the side-effect is resumed. Some side-effects are paused
+ * immediately on construction. This is useful, for example, for creating a
+ * side-effect in an object's constructor which should not begin running until a
+ * later time. When using a side-effect to update a control or a view, it is
+ * common to pause the side-effect when the view is hidden and resume the
+ * side-effect when the view becomes visible.</li>
+ * <li>Resumed: The side-effect will listen for changes and react to them
+ * asynchronously. Side-effects may be paused and resumed any number of times.
+ * </li>
+ * <li>Disposed: The side-effect will not listen to or react to changes. It will
+ * also remove any strong references to its dependencies. Once a side-effect
+ * enters the disposed state it remains in that state until it is garbage
+ * collected.</li>
+ * </ul>
+ *
  * Example usage:
  *
- * <pre>
- * ObservableValue<String> firstName = ...
- * ObservableValue<String> lastName = ...
- * ObservableValue<Boolean> showFullNamePreference = ...
+ * <code><pre>
+ * IObservableValue<String> firstName = ...
+ * IObservableValue<String> lastName = ...
+ * IObservableValue<Boolean> showFullNamePreference = ...
  * Label userName = ...
  *
  * ISideEffect sideEffect = ISideEffect.create(() -> {
@@ -37,39 +64,52 @@ import java.util.function.Supplier;
  *         : firstName.get();
  *     userName.setText("Your name is " + name);
  * });
- * </pre>
+ * </pre></code>
  * <p>
- * The above example demonstrates how to use a {@link ISideEffect} to fill in a
- * label with a user's first and last names. Every time the firstName, lastName,
- * or showFullNamePreference observables change state, the {@link ISideEffect}
- * will re-run and cause the label to update. The {@link ISideEffect} keeps
- * track of which observables to listen to based on what TrackedGetters it
- * invokes during its run method.
+ * The above example uses a {@link ISideEffect} to fill in a label with a user's
+ * name. It will react automatically to changes in the username and the
+ * showFullNamePreference.
  * <p>
  * The same thing could be accomplished by attaching listeners to all three
  * observables, but there are several advantages to using {@link ISideEffect}
  * over listeners.
  * <ul>
  * <li>The {@link ISideEffect} can self-optimize based on branches in the run
- * method, and remove its listeners from any {@link IObservable} which wasn't
+ * method. It will remove listeners from any {@link IObservable} which wasn't
  * used on the most recent run. In the above example, there is no need to listen
  * to the lastName field when showFullNamePreference is false.
  * <li>The {@link ISideEffect} will batch changes together and run
- * asynchronously. So if firstName and lastName change at the same time, the
- * {@link ISideEffect} will only recompute itself once.
+ * asynchronously. If firstName and lastName change at the same time, the
+ * {@link ISideEffect} will only run once.
  * <li>Since the {@link ISideEffect} doesn't need to be explicitly attached to
  * the observables it affects, it is impossible for it to get out of sync with
  * the underlying data.
  * </ul>
  * <p>
- * Please be aware of a common anti-pattern. It is bad form to create
- * {@link IObservable}s inside a {@link ISideEffect} unless you also cache the
- * {@link IObservable} somewhere so that subsequent runs of the
- * {@link ISideEffect} will use the same instance of the observable. Otherwise
- * it is easy to create infinite event cycles where each run of the
- * {@link ISideEffect} creates an {@link IObservable} and each
- * {@link IObservable} fires a change events that re-runs the
- * {@link ISideEffect}
+ * Please be aware of a common anti-pattern. Don't create new observables inside
+ * a {@link ISideEffect} unless you remember them for future runs. Creating new
+ * observables inside a {@link ISideEffect} can easily create infinite loops.
+ *
+ * <code><pre>
+ * // Bad: May create an infinite loop, since each AvatarObservable instance may
+ * // fire an asynchronous event after creation
+ * void createControls() {
+ *   ISideEffect sideEffect = ISideEffect.create(() -> {
+ *       IObservableValue<Image> myAvatar = new AvatarObservable();
+ *
+ *       myIcon.setImage(myAvatar.getValue());
+ *   });
+ * }
+ *
+ * // Good: The AvatarObservable instance is remembered between invocations of
+ * // the side-effect.
+ * void createControls() {
+ *   final IObservableValue<Image> myAvatar = new AvatarObservable();
+ *   ISideEffect sideEffect = ISideEffect.create(() -> {
+ *       myIcon.setImage(myAvatar.getValue());
+ *   });
+ * }
+ * </pre></code>
  *
  * @since 1.6
  * @noimplement This interface is not intended to be implemented by clients.
@@ -80,14 +120,17 @@ public interface ISideEffect {
 	 * memory used by the side-effect. The side-effect will not execute again
 	 * after this method is invoked, and no other public methods may be invoked
 	 * on the side-effect after invoking this one.
+	 * <p>
+	 * This method may be invoked more than once.
 	 */
 	void dispose();
 
 	/**
-	 * Pauses a {@link ISideEffect}, preventing it from running again until it
+	 * Pauses an {@link ISideEffect}, preventing it from running again until it
 	 * is resumed. Note that the side-effect will continue listening to its
-	 * dependencies while it is paused. If a dependency changes while paused,
-	 * the {@link ISideEffect} will run again after it is resumed.
+	 * dependencies while it is paused. If a dependency changes while the
+	 * {@link ISideEffect} is paused, the {@link ISideEffect} will run again
+	 * after it is resumed.
 	 * <p>
 	 * A side-effect may be paused and resumed any number of times. You should
 	 * use pause instead of dispose if there is a chance you may want to resume
@@ -99,7 +142,8 @@ public interface ISideEffect {
 	 * Resumes a paused {@link ISideEffect}, causing it to start reacting to
 	 * changes in tracked getters invoked by its runnable. It will continue to
 	 * react to changes until it is either paused or disposed. If the
-	 * {@link ISideEffect} is dirty, it will be run at the earliest opportunity.
+	 * {@link ISideEffect} is dirty, it will be run at the earliest opportunity
+	 * after the method returns.
 	 * <p>
 	 * Has no effect if the {@link ISideEffect} is already resumed.
 	 */
@@ -191,6 +235,12 @@ public interface ISideEffect {
 	 * disposed. The returned {@link ISideEffect} is associated with the default
 	 * realm. The caller must dispose the returned {@link ISideEffect} when they
 	 * are done with it.
+	 * <p>
+	 * The ISideEffect will initially be in the resumed state.
+	 * <p>
+	 * The first invocation of this method will be synchronous. This version is
+	 * slightly more efficient than {@link #createResumed(Supplier, Consumer)} and
+	 * should be preferred if synchronous execution is acceptable.
 	 *
 	 * @param supplier
 	 *            a supplier which will compute a value and be monitored for
@@ -204,16 +254,41 @@ public interface ISideEffect {
 	 *         executed anymore after the dispose method is invoked.
 	 */
 	static <T> ISideEffect create(Supplier<T> supplier, Consumer<T> consumer) {
-		return ISideEffect.create(() -> {
-			T value = supplier.get();
+		return ISideEffect.create(SideEffect.makeRunnable(supplier, consumer));
+	}
 
-			ObservableTracker.setIgnore(true);
-			try {
-				consumer.accept(value);
-			} finally {
-				ObservableTracker.setIgnore(false);
-			}
-		});
+	/**
+	 * Runs the supplier and passes its result to the consumer. The same thing
+	 * will happen again after any tracked getter invoked by the supplier
+	 * changes. It will continue to do so until the given {@link ISideEffect} is
+	 * disposed. The returned {@link ISideEffect} is associated with the default
+	 * realm. The caller must dispose the returned {@link ISideEffect} when they
+	 * are done with it.
+	 * <p>
+	 * The ISideEffect will initially be in the resumed state.
+	 * <p>
+	 * The first invocation of this method will be asynchronous. This is useful,
+	 * for example, when constructing an {@link ISideEffect} in a constructor
+	 * since it ensures that the constructor will run to completion before the
+	 * first invocation of the {@link ISideEffect}. However, this extra safety
+	 * comes with a small performance cost over
+	 * {@link #create(Supplier, Consumer)}.
+	 *
+	 * @param supplier
+	 *            a supplier which will compute a value and be monitored for
+	 *            changes in tracked getters. It should be side-effect-free.
+	 * @param consumer
+	 *            a consumer which will receive the value. It should be
+	 *            idempotent. It will not be monitored for tracked getters.
+	 *
+	 * @return an {@link ISideEffect} interface that may be used to stop the
+	 *         side-effect from running. The {@link Runnable} will not be
+	 *         executed anymore after the dispose method is invoked.
+	 */
+	static <T> ISideEffect createResumed(Supplier<T> supplier, Consumer<T> consumer) {
+		ISideEffect result = ISideEffect.createPaused(SideEffect.makeRunnable(supplier, consumer));
+		result.resume();
+		return result;
 	}
 
 	/**
@@ -240,7 +315,7 @@ public interface ISideEffect {
 	 * <p>
 	 *
 	 * <code><pre>
-	 * Observable<String> loadFileAsString(String filename) {
+	 * IObservableValue<String> loadFileAsString(String filename) {
 	 *   // Uses another thread to load the given filename. The resulting observable returns
 	 *   // null if the file is not yet loaded or contains the file contents if the file is
 	 *   // fully loaded
@@ -248,8 +323,8 @@ public interface ISideEffect {
 	 * }
 	 *
 	 * void showFileContents(Shell parentShell, String filename) {
-	 *   ObservableValue<String> webPageContent = loadFileAsString(someUrl);
-	 *   ISideEffect.runOnce(webPageContent::getValue(), (content) -> {
+	 *   IObservableValue<String> webPageContent = loadFileAsString(filename);
+	 *   ISideEffect.runOnce(webPageContent::getValue, (content) -> {
 	 *   	MessageDialog.openInformation(parentShell, "Your file contains", content);
 	 *   })
 	 * }
@@ -261,13 +336,13 @@ public interface ISideEffect {
 	 *            consumer if it is time to invoke the consumer
 	 * @param consumer
 	 *            a (possibly non-idempotent) consumer which will receive the
-	 *            first non-null result returned by the consumer.
+	 *            first non-null result returned by the supplier.
 	 * @return a side-effect which can be used to control this operation. If it
 	 *         is disposed before the consumer is invoked, the consumer will
 	 *         never be invoked. It will not invoke the supplier if it is
 	 *         paused.
 	 */
-	static <T> ISideEffect runOnce(Supplier<T> supplier, Consumer<T> consumer) {
+	static <T> ISideEffect consumeOnceAsync(Supplier<T> supplier, Consumer<T> consumer) {
 		final ISideEffect[] result = new ISideEffect[1];
 
 		Runnable theRunnable = () -> {

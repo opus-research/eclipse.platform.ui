@@ -6,13 +6,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Stefan Xenos - initial API and implementation
+ *     Stefan Xenos (Google) - initial API and implementation
  ******************************************************************************/
 package org.eclipse.core.tests.databinding;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.databinding.observable.ISideEffect;
+import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
@@ -235,6 +237,87 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 
 		runAsync();
 		assertTrue(hasRun.get());
+	}
+
+	public void testConsumeOnceDoesntPassNullToConsumer() throws Exception {
+		AtomicBoolean consumerHasRun = new AtomicBoolean();
+		WritableValue<Object> makesThingsDirty = new WritableValue<>(null, null);
+		ComputedValue<Object> value = new ComputedValue<Object>() {
+			@Override
+			protected Object calculate() {
+				makesThingsDirty.getValue();
+				return null;
+			}
+		};
+
+		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(value::getValue, (Object) -> {
+			consumerHasRun.set(true);
+		});
+
+		makesThingsDirty.setValue(new Object());
+		runAsync();
+		makesThingsDirty.setValue(new Object());
+		runAsync();
+		assertFalse(consumerHasRun.get());
+		consumeOnce.dispose();
+	}
+
+	public void testConsumeOnceDoesntRunTwice() throws Exception {
+		AtomicInteger numberOfRuns = new AtomicInteger();
+		WritableValue<Object> makesThingsDirty = new WritableValue<>(null, null);
+		WritableValue<Object> returnValue = new WritableValue<>(null, null);
+		ComputedValue<Object> value = new ComputedValue<Object>() {
+			@Override
+			protected Object calculate() {
+				makesThingsDirty.getValue();
+				return returnValue.getValue();
+			}
+		};
+
+		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(value::getValue, (Object) -> {
+			numberOfRuns.set(numberOfRuns.get() + 1);
+		});
+
+		makesThingsDirty.setValue(new Object());
+		runAsync();
+		assertEquals(0, numberOfRuns.get());
+
+		returnValue.setValue("Foo");
+		runAsync();
+		assertEquals(1, numberOfRuns.get());
+
+		returnValue.setValue("Bar");
+		runAsync();
+		assertEquals(1, numberOfRuns.get());
+		consumeOnce.dispose();
+	}
+
+	public void testConsumeOnceDoesntRunAtAllIfDisposed() throws Exception {
+		AtomicInteger numberOfRuns = new AtomicInteger();
+		WritableValue<Object> returnValue = new WritableValue<>("foo", null);
+
+		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(returnValue::getValue, (Object) -> {
+			numberOfRuns.set(numberOfRuns.get() + 1);
+		});
+
+		consumeOnce.dispose();
+
+		runAsync();
+		assertEquals(0, numberOfRuns.get());
+	}
+
+	public void testConsumeOnceRunsIfInitialValueNonNull() throws Exception {
+		AtomicInteger numberOfRuns = new AtomicInteger();
+		WritableValue<Object> returnValue = new WritableValue<>("foo", null);
+
+		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(returnValue::getValue, (Object) -> {
+			numberOfRuns.set(numberOfRuns.get() + 1);
+		});
+
+		runAsync();
+		assertEquals(1, numberOfRuns.get());
+
+		consumeOnce.dispose();
 	}
 
 	public void testNestedSideEffectCreation() throws Exception {

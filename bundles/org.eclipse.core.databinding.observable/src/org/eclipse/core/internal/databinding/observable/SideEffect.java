@@ -6,73 +6,31 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Stefan Xenos - initial API and implementation
+ *     Stefan Xenos (Google) - initial API and implementation
  ******************************************************************************/
-package org.eclipse.core.databinding.observable;
+package org.eclipse.core.internal.databinding.observable;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
+import org.eclipse.core.databinding.observable.IObservable;
+import org.eclipse.core.databinding.observable.ISideEffect;
+import org.eclipse.core.databinding.observable.ObservableTracker;
+import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * TODO: Rework this documentation and provide more examples
- *
- * A {@link ISideEffect} holds a Runnable which it executes once upon activation
- * and again every time any tracked getter the Runnable touches changes. A
- * {@link ISideEffect} can be used much like a listener, except that it is
- * associated with the code it affects rather than being attached to the
- * observables it listens to.
- * <p>
- * Example usage:
- *
- * <pre>
- * ObservableValue<String> firstName = ...
- * ObservableValue<String> lastName = ...
- * ObservableValue<Boolean> showFullNamePreference = ...
- * Label userName = ...
- *
- * ISideEffect sideEffect = ISideEffect.create(() -> {
- *     String name = showFullNamePreference.get()
- *         ? (firstName.get() + " " + lastName.get())
- *         : firstName.get();
- *     userName.setText("Your name is " + name);
- * });
- * </pre>
- * <p>
- * The above example demonstrates how to use a {@link ISideEffect} to fill in a
- * label with a user's first and last names. Every time the firstName, lastName,
- * or showFullNamePreference observables change state, the {@link ISideEffect}
- * will re-run and cause the label to update. The {@link ISideEffect} keeps
- * track of which observables to listen to based on what TrackedGetters it
- * invokes during its run method.
- * <p>
- * The same thing could be accomplished by attaching listeners to all three
- * observables, but there are several advantages to using {@link ISideEffect}
- * over listeners.
- * <ul>
- * <li>The {@link ISideEffect} can self-optimize based on branches in the run
- * method, and remove its listeners from any {@link IObservable} which wasn't
- * used on the most recent run. In the above example, there is no need to listen
- * to the lastName field when showFullNamePreference is false.
- * <li>The {@link ISideEffect} will batch changes together and run
- * asynchronously. So if firstName and lastName change at the same time, the
- * {@link ISideEffect} will only recompute itself once.
- * <li>Since the {@link ISideEffect} doesn't need to be explicitly attached to
- * the observables it affects, it is impossible for it to get out of sync with
- * the underlying data.
- * </ul>
- * <p>
- * Please be aware of a common anti-pattern. It is bad form to create
- * {@link IObservable}s inside a {@link ISideEffect} unless you also cache the
- * {@link IObservable} somewhere so that subsequent runs of the
- * {@link ISideEffect} will use the same instance of the observable. Otherwise
- * it is easy to create infinite event cycles where each run of the
- * {@link ISideEffect} creates an {@link IObservable} and each
- * {@link IObservable} fires a change events that re-runs the
- * {@link ISideEffect}
+ * Concrete implementation of the {@link ISideEffect} interface.
  *
  * @since 1.6
  */
-final class SideEffect implements ISideEffect {
-	static final ISideEffect NULL_SIDE_EFFECT = new ISideEffect() {
+public final class SideEffect implements ISideEffect {
+	/**
+	 * Holds a singleton side-effect which does nothing.
+	 */
+	public static final ISideEffect NULL_SIDE_EFFECT = new ISideEffect() {
 		@Override
 		public void dispose() {
 		}
@@ -93,6 +51,7 @@ final class SideEffect implements ISideEffect {
 		public void runIfDirty() {
 		}
 	};
+
 	/**
 	 * True if we've been dirtied since the last time we executed
 	 * {@link #runnable}. A side-effect becomes dirtied if:
@@ -116,32 +75,43 @@ final class SideEffect implements ISideEffect {
 	private IObservable[] dependencies;
 	private Realm realm;
 
-	private class PrivateInterface implements IChangeListener, Runnable {
-		@Override
-		public void handleChange(ChangeEvent event) {
-			markDirtyInternal();
-		}
-
-		@Override
-		public void run() {
-			asyncScheduled = false;
-			update();
-		}
-	}
-
 	private PrivateInterface privateInterface = new PrivateInterface();
 
-	SideEffect(Runnable runnable) {
+	/**
+	 * Creates a SideEffect in the paused state that wraps the given runnable on
+	 * the default Realm.
+	 *
+	 * @param runnable
+	 *            the runnable to execute.
+	 */
+	public SideEffect(Runnable runnable) {
 		this(Realm.getDefault(), runnable);
 	}
 
-	SideEffect(Realm realm, Runnable runnable) {
+	/**
+	 * Creates a SideEffect in the given realm that wraps the given runnable.
+	 *
+	 * @param realm
+	 *            the realm to use for this SideEffect.
+	 * @param runnable
+	 *            the runnable to execute.
+	 */
+	public SideEffect(Realm realm, Runnable runnable) {
 		this.runnable = runnable;
 		this.realm = realm;
 		this.dirty = true;
 	}
 
-	SideEffect(Runnable runnable, IObservable... dependencies) {
+	/**
+	 * Creates a SideEffect with the given initial set of dependencies in the
+	 * default realm that wraps the given runnable.
+	 *
+	 * @param runnable
+	 *            the runnable to wrap
+	 * @param dependencies
+	 *            the initial set of dependencies
+	 */
+	public SideEffect(Runnable runnable, IObservable... dependencies) {
 		this.dependencies = dependencies;
 		this.runnable = runnable;
 		this.dirty = false;
@@ -216,10 +186,6 @@ final class SideEffect implements ISideEffect {
 		}
 	}
 
-	/**
-	 * Disposes this SideEffect. Disposing a SideEffect will detach any
-	 * listeners in use and will stop it from executing further.
-	 */
 	@Override
 	public void dispose() {
 		checkRealm();
@@ -278,5 +244,43 @@ final class SideEffect implements ISideEffect {
 
 	private void checkRealm() {
 		Assert.isTrue(realm.isCurrent(), "This operation must be run within the observable's realm"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Creates a runnable which will execute the given supplier and pass the
+	 * result to the given consumer while suppressing all tracked getters from
+	 * the consumer.
+	 *
+	 * @param supplier
+	 *            supplier to execute
+	 * @param consumer
+	 *            a consumer that will receive the value and in which tracked
+	 *            getters will be suppressed.
+	 * @return a newly constructed runnable
+	 */
+	public static <T> Runnable makeRunnable(Supplier<T> supplier, Consumer<T> consumer) {
+		return () -> {
+			T value = supplier.get();
+
+			ObservableTracker.setIgnore(true);
+			try {
+				consumer.accept(value);
+			} finally {
+				ObservableTracker.setIgnore(false);
+			}
+		};
+	}
+
+	private class PrivateInterface implements IChangeListener, Runnable {
+		@Override
+		public void handleChange(ChangeEvent event) {
+			markDirtyInternal();
+		}
+
+		@Override
+		public void run() {
+			asyncScheduled = false;
+			update();
+		}
 	}
 }
