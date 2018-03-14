@@ -212,7 +212,7 @@ public class CommandProcessingAddon {
 		String desc = localize(cmdModel.getDescription(), cmdModel);
 		List<MCommandParameter> modelParms = cmdModel.getParameters();
 		if (modelParms != null && !modelParms.isEmpty()) {
-			ArrayList<Parameter> parmList = new ArrayList<Parameter>();
+			ArrayList<Parameter> parmList = new ArrayList<>();
 			for (MCommandParameter cmdParm : modelParms) {
 				ParameterType parameterType = null;
 				if (cmdParm.getTypeId() != null && cmdParm.getTypeId().length() > 0) {
