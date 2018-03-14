@@ -141,8 +141,7 @@ public class ImageBasedFrame extends Canvas {
 	}
 
 	protected void drawFrame(PaintEvent e) {
-		if (handle.isDisposed() || (imageCache != null && imageCache.isDisposed())) {
-			reskin(SWT.NONE);
+		if (handle.isDisposed()) {
 			return;
 		}
 		
