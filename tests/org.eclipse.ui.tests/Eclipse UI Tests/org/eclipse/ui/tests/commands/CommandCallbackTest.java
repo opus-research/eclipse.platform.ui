@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  ******************************************************************************/
 
 package org.eclipse.ui.tests.commands;
@@ -18,6 +17,7 @@ import java.util.Map;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.Parameterization;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -71,7 +71,11 @@ public class CommandCallbackTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		commandService = (ICommandService) fWorkbench
@@ -91,7 +95,6 @@ public class CommandCallbackTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		if (cmd1Activation != null) {
 			handlerService.deactivateHandler(cmd1Activation);
@@ -108,19 +111,28 @@ public class CommandCallbackTest extends UITestCase {
 			IElementUpdater {
 		public int callbacks = 0;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.commands.ICallbackUpdater#updateCallback(org.eclipse.core.runtime.IAdaptable,
+		 *      java.util.Map)
+		 */
 		public void updateElement(UIElement callback, Map parameters) {
 			callbacks++;
 		}
 
-		@Override
-		public Object execute(ExecutionEvent event) {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
+		public Object execute(ExecutionEvent event) throws ExecutionException {
 			return null;
 		}
 	}
 
 	private static class MyElement extends UIElement {
-
+		
 		/**
 		 * 
 		 */
@@ -128,37 +140,61 @@ public class CommandCallbackTest extends UITestCase {
 			super(locator);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.menus.UIElement#setChecked(boolean)
+		 */
 		public void setChecked(boolean checked) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.menus.UIElement#setDisabledIcon(org.eclipse.jface.resource.ImageDescriptor)
+		 */
 		public void setDisabledIcon(ImageDescriptor desc) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.menus.UIElement#setHoverIcon(org.eclipse.jface.resource.ImageDescriptor)
+		 */
 		public void setHoverIcon(ImageDescriptor desc) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.menus.UIElement#setIcon(org.eclipse.jface.resource.ImageDescriptor)
+		 */
 		public void setIcon(ImageDescriptor desc) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.menus.UIElement#setText(java.lang.String)
+		 */
 		public void setText(String text) {
 			// TODO Auto-generated method stub
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.menus.UIElement#setTooltip(java.lang.String)
+		 */
 		public void setTooltip(String text) {
 			// TODO Auto-generated method stub
 
