@@ -47,10 +47,10 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
 
 /**
  * @since 3.2
- *
+ * 
  */
-public class CommonFiltersTab extends CustomizationTab {
-
+public class CommonFiltersTab extends CustomizationTab { 
+ 
 	private static final String ALL = "*"; //$NON-NLS-1$
 
 	private String initialFilterTextValue = CommonNavigatorMessages.CommonFilterSelectionDialog_enter_name_of_filte_;
@@ -67,36 +67,41 @@ public class CommonFiltersTab extends CustomizationTab {
 			INavigatorContentService aContentService) {
 		super(parent, aContentService);
 		createControl();
-	}
-
-	private void createControl() {
+	} 
+	  
+	private void createControl() {  
 
 		createInstructionsLabel(CommonNavigatorMessages.CommonFilterSelectionDialog_Select_the_filters_to_apply);
-
+		
 		createPatternFilterText(this);
-
-		createTable();
+		
+		createTable(); 
 
 		getTableViewer().setContentProvider(filterContentProvider);
 		getTableViewer().setLabelProvider(filterLabelProvider);
 		getTableViewer().setSorter(new CommonFilterSorter());
 		getTableViewer().setInput(getContentService());
-
+		
 		getTableViewer().addFilter(patternFilter);
-
+		
 		updateFiltersCheckState();
 
 	}
 
 	private void createPatternFilterText(Composite composite) {
 		filterText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData filterTextGridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData filterTextGridData = new GridData(GridData.FILL_HORIZONTAL); 
 		filterText.setLayoutData(filterTextGridData);
 		filterText.setText(initialFilterTextValue);
 		filterText.setFont(composite.getFont());
 
 		filterText.getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.swt.accessibility.AccessibleListener#getName(org.eclipse.swt.accessibility.AccessibleEvent)
+					 */
 					@Override
 					public void getName(AccessibleEvent e) {
 						String filterTextString = filterText.getText();
@@ -109,6 +114,11 @@ public class CommonFiltersTab extends CustomizationTab {
 				});
 
 		filterText.addFocusListener(new FocusAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
+			 */
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (initialFilterTextValue.equals(filterText.getText().trim())) {
@@ -118,6 +128,11 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addMouseListener(new MouseAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseAdapter#mouseUp(org.eclipse.swt.events.MouseEvent)
+			 */
 			@Override
 			public void mouseUp(MouseEvent e) {
 				super.mouseUp(e);
@@ -128,6 +143,11 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addKeyListener(new KeyAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
+			 */
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// on a CR we want to transfer focus to the list
@@ -181,6 +201,11 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addModifyListener(new ModifyListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+			 */
 			@Override
 			public void modifyText(ModifyEvent e) {
 				textChanged();
@@ -191,16 +216,16 @@ public class CommonFiltersTab extends CustomizationTab {
 	void setInitialFocus() {
 		filterText.forceFocus();
 	}
-
+	
 	private void textChanged() {
 		patternFilter.setPattern(filterText.getText());
 		getTableViewer().refresh();
-
+		
 		Set<Object> checkedItems = getCheckedItems();
-		for (Iterator<Object> iterator = checkedItems.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = checkedItems.iterator(); iterator.hasNext();) {  
 			getTableViewer().setChecked(iterator.next(), true);
 		}
-	}
+	} 
 
 	private void updateFiltersCheckState() {
 		Object[] children = filterContentProvider
@@ -223,6 +248,12 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		private StringMatcher matcher = null;
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
@@ -231,20 +262,20 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		protected void setPattern(String newPattern) {
 			if (newPattern == null || newPattern.trim().length() == 0) {
-				matcher = new StringMatcher(ALL, true, false);
+				matcher = new StringMatcher(ALL, true, false);  
 			} else {
-				String patternString = ALL + newPattern + ALL;
+				String patternString = ALL + newPattern + ALL; 
 				matcher = new StringMatcher(patternString, true, false);
 			}
 
-		}
+		} 
 
 		/**
 		 * Answers whether the given String matches the pattern.
-		 *
+		 * 
 		 * @param input
 		 *            the String to test
-		 *
+		 * 
 		 * @return whether the string matches the pattern
 		 */
 		protected boolean match(String input) {
@@ -254,21 +285,27 @@ public class CommonFiltersTab extends CustomizationTab {
 			return matcher == null || matcher.match(input);
 		}
 	}
-
+ 
 	private class CommonFilterSorter extends ViewerSorter {
-
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ViewerSorter#sort(org.eclipse.jface.viewers.Viewer, java.lang.Object[])
+		 */
 		@Override
 		public void sort(Viewer viewer, Object[] elements) {
 			Arrays.sort(elements, new Comparator() {
+				/* (non-Javadoc)
+				 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+				 */
 				@Override
-				public int compare(Object o1, Object o2) {
+				public int compare(Object o1, Object o2) { 
 					ICommonFilterDescriptor lvalue = (ICommonFilterDescriptor) o1;
 					ICommonFilterDescriptor rvalue = (ICommonFilterDescriptor) o2;
-
+					
 					return lvalue.getName().compareTo(rvalue.getName());
 				}
 			});
-
+		
 		}
 
 	}

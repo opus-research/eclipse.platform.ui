@@ -19,8 +19,8 @@ import org.eclipse.ui.IPersistableElement;
 
 /**
  * Implements an input for a <code>AbstractMultiEditor</code>.
- *
- * This class is intended to be instantiated by clients but is
+ * 
+ * This class is intended to be instantiated by clients but is 
  * not intended to be subclassed.
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -106,8 +106,11 @@ public class MultiEditorInput implements IEditorInput {
 	public Object getAdapter(Class adapter) {
         return null;
     }
-
-
+    
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
 	public boolean equals(Object obj) {
         if (this == obj) {
@@ -119,8 +122,11 @@ public class MultiEditorInput implements IEditorInput {
         MultiEditorInput other = (MultiEditorInput) obj;
         return Arrays.equals(this.editors, other.editors) && Arrays.equals(this.input, other.input);
     }
-
-
+    
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
 	public int hashCode() {
         int hash = 0;

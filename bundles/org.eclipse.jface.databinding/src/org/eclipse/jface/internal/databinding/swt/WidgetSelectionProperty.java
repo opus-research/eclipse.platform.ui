@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Spinner;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public final class WidgetSelectionProperty extends
 		WidgetDelegatingValueProperty {
@@ -39,7 +39,6 @@ public final class WidgetSelectionProperty extends
 	private IValueProperty slider;
 	private IValueProperty spinner;
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof Button) {
 			if (button == null)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring.preferences;
 
@@ -17,30 +16,28 @@ import org.eclipse.ui.internal.monitoring.MonitoringPlugin;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 
 /**
- * Initializes the default values of the monitoring plug-in preferences.
+ * Initializes the default values for monitoring plug-in preferences.
  */
 public class MonitoringPreferenceInitializer extends AbstractPreferenceInitializer {
+	/** Force a logged event for a possible deadlock when an event hangs for longer than this */
+	private static final int DEFAULT_FORCE_DEADLOCK_LOG_TIME_MILLIS = 10 * 60 * 1000; // == 10 minutes
+	private static final String DEFAULT_FILTER_TRACES =
+			"org.eclipse.swt.internal.gtk.OS.gtk_dialog_run," //$NON-NLS-1$
+			+ "org.eclipse.e4.ui.workbench.addons.dndaddon.DnDManager.startDrag"; //$NON-NLS-1$
+
 	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = MonitoringPlugin.getDefault().getPreferenceStore();
 
 		store.setDefault(PreferenceConstants.MONITORING_ENABLED, false);
-		store.setDefault(PreferenceConstants.LONG_EVENT_WARNING_THRESHOLD_MILLIS, 500); // 0.5 sec
-		store.setDefault(PreferenceConstants.LONG_EVENT_ERROR_THRESHOLD_MILLIS, 2000); // 2 sec
-		store.setDefault(PreferenceConstants.MAX_STACK_SAMPLES, 3);
-		store.setDefault(PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS,
-				5 * 60 * 1000); // 5 min
+		store.setDefault(PreferenceConstants.FORCE_DEADLOCK_LOG_TIME_MILLIS,
+				DEFAULT_FORCE_DEADLOCK_LOG_TIME_MILLIS);
+		store.setDefault(PreferenceConstants.MAX_LOG_TRACE_COUNT, 3);
+		store.setDefault(PreferenceConstants.MAX_EVENT_LOG_TIME_MILLIS, 500);
+		store.setDefault(PreferenceConstants.MAX_EVENT_SAMPLE_TIME_MILLIS, 500);
+		store.setDefault(PreferenceConstants.SAMPLE_INTERVAL_TIME_MILLIS, 300);
+		store.setDefault(PreferenceConstants.DUMP_ALL_THREADS, false);
 		store.setDefault(PreferenceConstants.LOG_TO_ERROR_LOG, true);
-		store.setDefault(PreferenceConstants.UI_THREAD_FILTER, ""); //$NON-NLS-1$
-		store.setDefault(PreferenceConstants.NONINTERESTING_THREAD_FILTER,
-				"java.*" //$NON-NLS-1$
-				+ ",sun.*" //$NON-NLS-1$
-				+ ",org.eclipse.core.internal.jobs.WorkerPool.sleep" //$NON-NLS-1$
-				+ ",org.eclipse.core.internal.jobs.WorkerPool.startJob" //$NON-NLS-1$
-				+ ",org.eclipse.core.internal.jobs.Worker.run" //$NON-NLS-1$
-				+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent" //$NON-NLS-1$
-				+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run" //$NON-NLS-1$
-				+ ",org.eclipse.equinox.internal.util.impl.tpt.timer.TimerImpl.run" //$NON-NLS-1$
-				+ ",org.eclipse.equinox.internal.util.impl.tpt.threadpool.Executor.run"); //$NON-NLS-1$
+		store.setDefault(PreferenceConstants.FILTER_TRACES, DEFAULT_FILTER_TRACES);
 	}
 }

@@ -1,95 +1,66 @@
 /*******************************************************************************
- * Copyright (C) 2014 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *	   Steve Foreman (Google) - initial API and implementation
- *	   Marcus Eng (Google)
- *	   Sergey Prigogin (Google)
- *	   Simon Scholz <simon.scholz@vogella.com> - Bug 443391
+ *     Steve Foreman (Google) - initial API and implementation
+ *     Marcus Eng (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
+
+import org.eclipse.ui.monitoring.StackSample;
+import org.eclipse.ui.monitoring.UiFreezeEvent;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-
-import org.eclipse.ui.monitoring.StackSample;
-import org.junit.Test;
 
 /**
  * Tests for {@link FilterHandler} class.
  */
-public class FilterHandlerTests {
+public class FilterHandlerTests extends TestCase {
 	private static final String FILTER_TRACES =
-			"org.eclipse.ui.internal.monitoring.FilterHandlerTests.createFilteredStackSamples"
-			+ ",org.eclipse.ui.internal.monitoring.SomeClass.someMethod"
-			+ ",org.eclipse.ui.internal.monitoring.OtherClass.otherMethod";
+			"org.eclipse.ui.internal.monitoring.FilterHandlerTests.createFilteredUiFreezeEvent";
 	private static final long THREAD_ID = Thread.currentThread().getId();
 
-	private StackSample[] createStackSamples() throws Exception {
+	private UiFreezeEvent createUiFreezeEvent() {
 		ThreadMXBean jvmThreadManager = ManagementFactory.getThreadMXBean();
-		ThreadInfo threadInfo =
+		ThreadInfo thread =
 				jvmThreadManager.getThreadInfo(Thread.currentThread().getId(), Integer.MAX_VALUE);
-		// Remove the top 4 frames of the stack trace so that createFilteredStackSamples or
-		// createUnfilteredStackSamples appears at the top of the stack. We have to use reflection
-		// since ThreadInfo.stackTrace field is private and cannot be changed through the public
-		// methods.
-		StackTraceElement[] stackTrace = threadInfo.getStackTrace();
-		Field field = ThreadInfo.class.getDeclaredField("stackTrace");
-		field.setAccessible(true);
-		field.set(threadInfo, Arrays.copyOfRange(stackTrace, 4, stackTrace.length));
-		return new StackSample[] { new StackSample(0, new ThreadInfo[] { threadInfo }) };
+		StackSample[] samples = { new StackSample(0, new ThreadInfo[] { thread }) };
+		return new UiFreezeEvent(0, 0, samples, 1, false);
 	}
 
 	/**
-	 * Creates stack samples that should not be filtered.
+	 * Creates a {@link UiFreezeEvent} with a stack trace that is not filtered.
 	 */
-	private StackSample[] createUnfilteredStackSamples() throws Exception {
-		return createStackSamples();
+	private UiFreezeEvent createUnfilteredUiFreezeEvent() {
+		return createUiFreezeEvent();
 	}
 
 	/**
-	 * Creates stack samples that should be filtered.
+	 * Creates a {@link UiFreezeEvent} with a stack trace that should be filtered.
 	 */
-	private StackSample[] createFilteredStackSamples() throws Exception {
-		return createStackSamples();
+	private UiFreezeEvent createFilteredUiFreezeEvent() {
+		return createUiFreezeEvent();
 	}
 
-	@Test
-	public void testUnfilteredEventLogging() throws Exception {
+	public void testUnfilteredEventLogging() {
 		FilterHandler filterHandler = new FilterHandler(FILTER_TRACES);
-		StackSample[] samples = createUnfilteredStackSamples();
-		assertTrue(filterHandler.shouldLogEvent(samples, samples.length, THREAD_ID));
+		UiFreezeEvent unfilteredEvent = createUnfilteredUiFreezeEvent();
+
+		assertTrue(filterHandler.shouldLogEvent(unfilteredEvent, THREAD_ID));
 	}
 
-	@Test
-	public void testFilteredEventLogging() throws Exception {
+	public void testFilteredEventLogging() {
 		FilterHandler filterHandler = new FilterHandler(FILTER_TRACES);
-		StackSample[] samples = createFilteredStackSamples();
-		assertFalse(filterHandler.shouldLogEvent(samples, samples.length, THREAD_ID));
-	}
+		UiFreezeEvent filteredEvent = createFilteredUiFreezeEvent();
 
-	@Test
-	public void testWildcardFilter() throws Exception {
-		FilterHandler filterHandler = new FilterHandler("*.FilterHandlerTests.testW?ld*Filter");
-		ThreadMXBean jvmThreadManager = ManagementFactory.getThreadMXBean();
-		ThreadInfo threadInfo =
-				jvmThreadManager.getThreadInfo(Thread.currentThread().getId(), Integer.MAX_VALUE);
-		boolean matched = false;
-		for (StackTraceElement element : threadInfo.getStackTrace()) {
-			if (filterHandler.matchesFilter(element)) {
-				matched = true;
-			}
-		}
-		assertTrue(matched);
+		assertFalse(filterHandler.shouldLogEvent(filteredEvent, THREAD_ID));
 	}
 }

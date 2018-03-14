@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -15,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.ui.themes.IThemeManager;
 
 /**
@@ -129,7 +130,7 @@ public class ThemeRegistry implements IThemeRegistry {
     	descriptors.add(newElement);
         return null;
     }
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.IThemeRegistry#getLookNFeels()
      */
@@ -186,7 +187,7 @@ public class ThemeRegistry implements IThemeRegistry {
 
     /**
      * Overlay the overrides onto the base definitions.
-     *
+     * 
      * @param defs the base definitions
      * @param overrides the overrides
      * @return the overlayed elements
@@ -205,7 +206,7 @@ public class ThemeRegistry implements IThemeRegistry {
 
     /**
      * Overlay the override onto the base definition.
-     *
+     * 
      * @param defs the base definition
      * @param overrides the override
      * @return the overlayed element
@@ -284,7 +285,7 @@ public class ThemeRegistry implements IThemeRegistry {
         if (dataMap.containsKey(name)) {
 			return;
 		}
-
+        
         dataMap.put(name, value);
     }
 
@@ -298,7 +299,7 @@ public class ThemeRegistry implements IThemeRegistry {
 
     /**
      * Add the data from another map to this data
-     *
+     * 
      * @param otherData the other data to add
      */
     public void addData(Map otherData) {
@@ -309,6 +310,23 @@ public class ThemeRegistry implements IThemeRegistry {
 			}
             dataMap.put(key, otherData.get(key));
         }
+    }
+
+    /**
+     * Add a category presentation binding.  The given category will only be 
+     * availible if the given presentation is active.
+     * 
+     * @param categoryId the category id
+     * @param presentationId the presentation id
+     */
+    public void addCategoryPresentationBinding(String categoryId,
+            String presentationId) {
+        Set presentations = (Set) categoryBindingMap.get(categoryId);
+        if (presentations == null) {
+            presentations = new HashSet();
+            categoryBindingMap.put(categoryId, presentations);
+        }
+        presentations.add(presentationId);
     }
 
     /* (non-Javadoc)

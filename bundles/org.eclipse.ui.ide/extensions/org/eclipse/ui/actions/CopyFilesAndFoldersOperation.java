@@ -17,8 +17,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.EFS;
@@ -125,7 +123,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Returns a new name for a copy of the resource at the given path in the
 	 * given workspace. This name is determined automatically.
-	 *
+	 * 
 	 * @param originalName
 	 *            the full path of the resource
 	 * @param workspace
@@ -133,42 +131,38 @@ public class CopyFilesAndFoldersOperation {
 	 * @return the new full path for the copy
 	 */
 	static IPath getAutoNewNameFor(IPath originalName, IWorkspace workspace) {
+		int counter = 1;
 		String resourceName = originalName.lastSegment();
 		IPath leadupSegment = originalName.removeLastSegments(1);
-		boolean isFile = !originalName.hasTrailingSeparator();
 
-		String newName = computeNewName(resourceName, isFile);
 		while (true) {
-			IPath pathToTry = leadupSegment.append(newName);
+			String nameSegment;
+
+			if (counter > 1) {
+				nameSegment = NLS
+						.bind(
+								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_copyNameTwoArgs,
+								new Integer(counter), resourceName);
+			} else {
+				nameSegment = NLS
+						.bind(
+								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_copyNameOneArg,
+								resourceName);
+			}
+
+			IPath pathToTry = leadupSegment.append(nameSegment);
+
 			if (!workspace.getRoot().exists(pathToTry)) {
 				return pathToTry;
 			}
-			newName = computeNewName(newName, isFile);
-		}
-	}
 
-	private static String computeNewName(String str, boolean isFile) {
-		int lastIndexOfDot = str.lastIndexOf('.');
-		String fileExtension = ""; //$NON-NLS-1$
-		String fileNameNoExtension = str;
-		if (isFile && lastIndexOfDot > 0) {
-			fileExtension = str.substring(lastIndexOfDot);
-			fileNameNoExtension = str.substring(0, lastIndexOfDot);
+			counter++;
 		}
-		Pattern p = Pattern.compile("[0-9]+$"); //$NON-NLS-1$
-		Matcher m = p.matcher(fileNameNoExtension);
-		if (m.find()) {
-			// String ends with a number: increment it by 1
-			int newNumber = Integer.parseInt(m.group()) + 1;
-			String numberStr = m.replaceFirst(Integer.toString(newNumber));
-			return numberStr + fileExtension;
-		}
-		return fileNameNoExtension + "2" + fileExtension; //$NON-NLS-1$
 	}
 
 	/**
 	 * Creates a new operation initialized with a shell.
-	 *
+	 * 
 	 * @param shell
 	 *            parent shell for error dialogs
 	 */
@@ -179,7 +173,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Returns whether this operation is able to perform on-the-fly
 	 * auto-renaming of resources with name collisions.
-	 *
+	 * 
 	 * @return <code>true</code> if auto-rename is supported, and
 	 *         <code>false</code> otherwise
 	 */
@@ -189,7 +183,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Returns the message for querying deep copy/move of a linked resource.
-	 *
+	 * 
 	 * @param source
 	 *            resource the query is made for
 	 * @return the deep query message
@@ -203,7 +197,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Checks whether the infos exist.
-	 *
+	 * 
 	 * @param stores
 	 *            the file infos to test
 	 * @return Multi status with one error message for each missing file.
@@ -228,7 +222,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Checks whether the resources with the given names exist.
-	 *
+	 * 
 	 * @param resources
 	 *            IResources to checl
 	 * @return Multi status with one error message for each missing file.
@@ -271,7 +265,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Check if the user wishes to overwrite the supplied resource or all
 	 * resources.
-	 *
+	 * 
 	 * @param source
 	 *            the source resource
 	 * @param destination
@@ -287,7 +281,6 @@ public class CopyFilesAndFoldersOperation {
 
 		// Dialogs need to be created and opened in the UI thread
 		Runnable query = new Runnable() {
-			@Override
 			public void run() {
 				String message;
 				int resultId[] = { IDialogConstants.YES_ID,
@@ -342,7 +335,6 @@ public class CopyFilesAndFoldersOperation {
 						messageShell,
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_resourceExists,
 						null, message, MessageDialog.QUESTION, labels, 0) {
-					@Override
 					protected int getShellStyle() {
 						return super.getShellStyle() | SWT.SHEET;
 					}
@@ -363,7 +355,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Recursively collects existing files in the specified destination path.
-	 *
+	 * 
 	 * @param destinationPath
 	 *            destination path to check for existing files
 	 * @param copyResources
@@ -418,19 +410,18 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Copies the resources to the given destination. This method is called
 	 * recursively to merge folders during folder copy.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to copy
 	 * @param destination
 	 *            destination to which resources will be copied
 	 * @param subMonitor
 	 *            a progress monitor for showing progress and for cancelation
-	 *
+	 * 
 	 * @deprecated As of 3.3, the work is performed in the undoable operation
 	 *             created in
 	 *             {@link #getUndoableCopyOrMoveOperation(IResource[], IPath)}
 	 */
-	@Deprecated
 	protected void copy(IResource[] resources, IPath destination,
 			IProgressMonitor subMonitor) throws CoreException {
 
@@ -514,7 +505,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Transform an absolute path URI to a relative path one (i.e. from
 	 * "C:\foo\bar\file.txt" to "VAR\file.txt" granted that the relativeVariable
 	 * is "VAR" and points to "C:\foo\bar\").
-	 *
+	 * 
 	 * @param locationURI
 	 * @return an URI that was made relative to a variable
 	 */
@@ -533,7 +524,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Sets the content of the existing file to the source file content.
-	 *
+	 * 
 	 * @param source
 	 *            source file to copy
 	 * @param existing
@@ -562,7 +553,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Copies the given resources to the destination. The current Thread is
 	 * halted while the resources are copied using a WorkspaceModifyOperation.
 	 * This method should be called from the UIThread.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to copy
 	 * @param destination
@@ -582,7 +573,7 @@ public class CopyFilesAndFoldersOperation {
 	 * without forking a new Thread or blocking using a
 	 * WorkspaceModifyOperation. It recommended that this method only be called
 	 * from a {@link WorkspaceJob} to avoid possible deadlock.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to copy
 	 * @param destination
@@ -602,7 +593,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Copies the given resources to the destination.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to copy
 	 * @param destination
@@ -629,7 +620,6 @@ public class CopyFilesAndFoldersOperation {
 		}
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				copyResources(resources, destinationPath, copiedResources,
 						monitor);
@@ -655,7 +645,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Return whether the operation is a move or a copy
-	 *
+	 * 
 	 * @return whether the operation is a move or a copy
 	 * @since 3.2
 	 */
@@ -682,7 +672,7 @@ public class CopyFilesAndFoldersOperation {
 	 * is halted while the resources are copied using a
 	 * WorkspaceModifyOperation. This method should be called from the UI
 	 * Thread.
-	 *
+	 * 
 	 * @param uris
 	 *            the URIs to copy
 	 * @param destination
@@ -706,7 +696,7 @@ public class CopyFilesAndFoldersOperation {
 	 * new Thread or blocking using a WorkspaceModifyOperation. It is
 	 * recommended that this method only be called from a {@link WorkspaceJob}
 	 * to avoid possible deadlock.
-	 *
+	 * 
 	 * @param uris
 	 *            the URIs to copy
 	 * @param destination
@@ -730,7 +720,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Build the collection of fileStores that map to fileNames. If any of them
 	 * cannot be found then match then return <code>null</code>.
-	 *
+	 * 
 	 * @param uris
 	 * @return IFileStore[]
 	 */
@@ -760,7 +750,7 @@ public class CopyFilesAndFoldersOperation {
 	 * destination or creates links or shows a dialog that lets the user choose. The current thread
 	 * is halted while the resources are copied using a {@link WorkspaceModifyOperation}. This
 	 * method should be called from the UI Thread.
-	 *
+	 * 
 	 * @param fileNames names of the files to copy
 	 * @param destination destination to which files will be copied
 	 * @param dropOperation the drop operation ({@link DND#DROP_NONE}, {@link DND#DROP_MOVE}
@@ -822,7 +812,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Copies the given files and folders to the destination. The current Thread is halted while the
 	 * resources are copied using a WorkspaceModifyOperation. This method should be called from the
 	 * UI Thread.
-	 *
+	 * 
 	 * @param fileNames names of the files to copy
 	 * @param destination destination to which files will be copied
 	 * @see WorkspaceModifyOperation
@@ -844,7 +834,7 @@ public class CopyFilesAndFoldersOperation {
 	 * new Thread or blocking using a WorkspaceModifyOperation. It is
 	 * recommended that this method only be called from a {@link WorkspaceJob}
 	 * to avoid possible deadlock.
-	 *
+	 * 
 	 * @param fileNames
 	 *            names of the files to copy
 	 * @param destination
@@ -868,7 +858,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Build the collection of fileStores that map to fileNames. If any of them
 	 * cannot be found then match then return null.
-	 *
+	 * 
 	 * @param fileNames
 	 * @return IFileStore[]
 	 */
@@ -887,13 +877,12 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Report that a file info could not be found.
-	 *
+	 * 
 	 * @param fileName
 	 */
 	private void reportFileInfoNotFound(final String fileName) {
 
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				ErrorDialog
 						.openError(
@@ -909,7 +898,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Copies the given files and folders to the destination.
-	 *
+	 * 
 	 * @param stores
 	 *            the file stores to copy
 	 * @param destination
@@ -934,7 +923,6 @@ public class CopyFilesAndFoldersOperation {
 
 		if (fork) {
 			WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
-				@Override
 				public void execute(IProgressMonitor monitor) {
 					copyFileStores(stores, destinationPath, monitor);
 				}
@@ -960,13 +948,12 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Display the supplied status in an error dialog.
-	 *
+	 * 
 	 * @param status
 	 *            The status to display
 	 */
 	private void displayError(final IStatus status) {
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				ErrorDialog.openError(messageShell, getProblemsTitle(), null,
 						status);
@@ -977,7 +964,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Creates a file or folder handle for the source resource as if it were to
 	 * be created in the destination container.
-	 *
+	 * 
 	 * @param destination
 	 *            destination container
 	 * @param source
@@ -1001,7 +988,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Removes the given resource from the workspace.
-	 *
+	 * 
 	 * @param resource
 	 *            resource to remove from the workspace
 	 * @param monitor
@@ -1039,13 +1026,12 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Opens an error dialog to display the given message.
-	 *
+	 * 
 	 * @param message
 	 *            the error message to show
 	 */
 	private void displayError(final String message) {
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				MessageDialog.openError(messageShell, getProblemsTitle(),
 						message);
@@ -1055,7 +1041,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Returns the resource either casted to or adapted to an IFile.
-	 *
+	 * 
 	 * @param resource
 	 *            resource to cast/adapt
 	 * @return the resource either casted to or adapted to an IFile.
@@ -1065,12 +1051,12 @@ public class CopyFilesAndFoldersOperation {
 		if (resource instanceof IFile) {
 			return (IFile) resource;
 		}
-		return ((IAdaptable) resource).getAdapter(IFile.class);
+		return (IFile) ((IAdaptable) resource).getAdapter(IFile.class);
 	}
 
 	/**
 	 * Returns java.io.File objects for the given file names.
-	 *
+	 * 
 	 * @param fileNames
 	 *            files to return File object for.
 	 * @return java.io.File objects for the given file names.
@@ -1078,7 +1064,6 @@ public class CopyFilesAndFoldersOperation {
 	 *             class and is only provided for backwards compatability with
 	 *             subclasses of the receiver.
 	 */
-	@Deprecated
 	protected File[] getFiles(String[] fileNames) {
 		File[] files = new File[fileNames.length];
 
@@ -1090,7 +1075,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Returns the resource either casted to or adapted to an IFolder.
-	 *
+	 * 
 	 * @param resource
 	 *            resource to cast/adapt
 	 * @return the resource either casted to or adapted to an IFolder.
@@ -1100,13 +1085,13 @@ public class CopyFilesAndFoldersOperation {
 		if (resource instanceof IFolder) {
 			return (IFolder) resource;
 		}
-		return ((IAdaptable) resource).getAdapter(IFolder.class);
+		return (IFolder) ((IAdaptable) resource).getAdapter(IFolder.class);
 	}
 
 	/**
 	 * Returns a new name for a copy of the resource at the given path in the
 	 * given workspace.
-	 *
+	 * 
 	 * @param originalName
 	 *            the full path of the resource
 	 * @param workspace
@@ -1121,10 +1106,8 @@ public class CopyFilesAndFoldersOperation {
 		final String returnValue[] = { "" }; //$NON-NLS-1$
 
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				IInputValidator validator = new IInputValidator() {
-					@Override
 					public String isValid(String string) {
 						if (resource.getName().equals(string)) {
 							return IDEWorkbenchMessages.CopyFilesAndFoldersOperation_nameMustBeDifferent;
@@ -1149,7 +1132,7 @@ public class CopyFilesAndFoldersOperation {
 								.bind(
 										IDEWorkbenchMessages.CopyFilesAndFoldersOperation_inputDialogMessage,
 										resource.getName()), initial, validator) {
-
+					
 					@Override
 					protected Control createContents(Composite parent) {
 						Control contents= super.createContents(parent);
@@ -1177,7 +1160,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Returns the task title for this operation's progress dialog.
-	 *
+	 * 
 	 * @return the task title
 	 */
 	protected String getOperationTitle() {
@@ -1186,7 +1169,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Returns the message for this operation's problems dialog.
-	 *
+	 * 
 	 * @return the problems message
 	 */
 	protected String getProblemsMessage() {
@@ -1195,7 +1178,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Returns the title for this operation's problems dialog.
-	 *
+	 * 
 	 * @return the problems dialog title
 	 */
 	protected String getProblemsTitle() {
@@ -1206,7 +1189,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Returns whether the source file in a destination collision will be
 	 * validateEdited together with the collision itself. Returns false. Should
 	 * return true if the source file is to be deleted after the operation.
-	 *
+	 * 
 	 * @return boolean <code>true</code> if the source file in a destination
 	 *         collision should be validateEdited. <code>false</code> if only
 	 *         the destination should be validated.
@@ -1218,7 +1201,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Returns whether the given resources are either both linked or both
 	 * unlinked.
-	 *
+	 * 
 	 * @param source
 	 *            source resource
 	 * @param destination
@@ -1238,7 +1221,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Returns whether the given resource is accessible. Files and folders are
 	 * always considered accessible and a project is accessible if it is open.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource
 	 * @return <code>true</code> if the resource is accessible, and
@@ -1260,7 +1243,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Returns whether any of the given source resources are being recopied to
 	 * their current container.
-	 *
+	 * 
 	 * @param sourceResources
 	 *            the source resources
 	 * @param destination
@@ -1297,7 +1280,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Note: the destination container may need to be created prior to copying
 	 * the resources.
 	 * </p>
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to copy
 	 * @param destination
@@ -1342,7 +1325,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Note: the destination container may need to be created prior to copying
 	 * the resources.
 	 * </p>
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to copy
 	 * @param destination
@@ -1358,9 +1341,6 @@ public class CopyFilesAndFoldersOperation {
 			for (int i = 0; i < resources.length; i++) {
 				IResource source = resources[i];
 				destinationPaths[i] = destination.append(source.getName());
-				if (source.getType() != IResource.FILE) {
-					destinationPaths[i] = destinationPaths[i].addTrailingSeparator();
-				}
 
 				if (workspace.getRoot().exists(destinationPaths[i])) {
 					destinationPaths[i] = getNewNameFor(destinationPaths[i],
@@ -1389,7 +1369,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Performs an import of the given stores into the provided container.
 	 * Returns a status indicating if the import was successful.
-	 *
+	 * 
 	 * @param stores
 	 *            stores that are to be imported
 	 * @param target
@@ -1400,7 +1380,6 @@ public class CopyFilesAndFoldersOperation {
 	private void performFileImport(IFileStore[] stores, IContainer target,
 			IProgressMonitor monitor) {
 		IOverwriteQuery query = new IOverwriteQuery() {
-			@Override
 			public String queryOverwrite(String pathString) {
 				if (alwaysOverwrite) {
 					return ALL;
@@ -1416,13 +1395,11 @@ public class CopyFilesAndFoldersOperation {
 						IDialogConstants.NO_LABEL,
 						IDialogConstants.CANCEL_LABEL };
 				messageShell.getDisplay().syncExec(new Runnable() {
-					@Override
 					public void run() {
 						MessageDialog dialog = new MessageDialog(
 								messageShell,
 								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_question,
 								null, msg, MessageDialog.QUESTION, options, 0) {
-							@Override
 							protected int getShellStyle() {
 								return super.getShellStyle() | SWT.SHEET;
 							}
@@ -1479,7 +1456,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Records the core exception to be displayed to the user once the action is
 	 * finished.
-	 *
+	 * 
 	 * @param error
 	 *            a <code>CoreException</code>
 	 */
@@ -1497,7 +1474,7 @@ public class CopyFilesAndFoldersOperation {
 	 * <p>
 	 * Note this method is for internal use only. It is not API.
 	 * </p>
-	 *
+	 * 
 	 * @param destination
 	 *            the destination container
 	 * @param sourceResources
@@ -1573,7 +1550,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Validates that the given source resources can be copied to the
 	 * destination as decided by the VCM provider.
-	 *
+	 * 
 	 * @param destination
 	 *            copy destination
 	 * @param sourceResources
@@ -1605,7 +1582,7 @@ public class CopyFilesAndFoldersOperation {
 	 * <p>
 	 * Note this method is for internal use only. It is not API.
 	 * </p>
-	 *
+	 * 
 	 * @param destination
 	 *            the destination container
 	 * @param sourceNames
@@ -1642,7 +1619,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Eclipse compiler with regards to visibility and type resolution when
 	 * linking.
 	 * </p>
-	 *
+	 * 
 	 * @param destination
 	 *            the destination container
 	 * @param sourceStores
@@ -1691,7 +1668,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Check if the destination is valid for the given source resource.
-	 *
+	 * 
 	 * @param destination
 	 *            destination container of the operation
 	 * @param source
@@ -1741,7 +1718,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Returns whether moving all of the given source resources to the given
 	 * destination container could be done without causing name collisions.
-	 *
+	 * 
 	 * @param destination
 	 *            the destination container
 	 * @param sourceResources
@@ -1869,7 +1846,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Returns the model provider ids that are known to the client that
 	 * instantiated this operation.
-	 *
+	 * 
 	 * @return the model provider ids that are known to the client that
 	 *         instantiated this operation.
 	 * @since 3.2
@@ -1882,7 +1859,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Sets the model provider ids that are known to the client that
 	 * instantiated this operation. Any potential side effects reported by these
 	 * models during validation will be ignored.
-	 *
+	 * 
 	 * @param modelProviderIds
 	 *            the model providers known to the client who is using this
 	 *            operation.
@@ -1897,7 +1874,7 @@ public class CopyFilesAndFoldersOperation {
 	 * destination. The current Thread is halted while the resources are copied
 	 * using a WorkspaceModifyOperation. This method should be called from the
 	 * UI Thread.
-	 *
+	 * 
 	 * @param fileNames
 	 *            names of the files to copy
 	 * @param destination
@@ -1923,7 +1900,7 @@ public class CopyFilesAndFoldersOperation {
 	 * current Thread is halted while the resources are copied using a
 	 * WorkspaceModifyOperation. This method should be called from the UI
 	 * Thread.
-	 *
+	 * 
 	 * @param fileNames
 	 *            names of the files to copy
 	 * @param destination
@@ -1946,7 +1923,7 @@ public class CopyFilesAndFoldersOperation {
 	/**
 	 * Set whether or not virtual folders and links will be created under the destination
 	 * container.
-	 *
+	 * 
 	 * @param value
 	 * @since 3.6
 	 */
@@ -1956,7 +1933,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Set whether or not links will be created under the destination container.
-	 *
+	 * 
 	 * @param value
 	 * @since 3.6
 	 */
@@ -1966,7 +1943,7 @@ public class CopyFilesAndFoldersOperation {
 
 	/**
 	 * Set a variable relative to which the links are created
-	 *
+	 * 
 	 * @param variable
 	 * @since 3.6
 	 */
@@ -1978,7 +1955,7 @@ public class CopyFilesAndFoldersOperation {
 	 * Returns an AbstractWorkspaceOperation suitable for performing the move or
 	 * copy operation that will move or copy the given resources to the given
 	 * destination path.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be moved or copied
 	 * @param destinationPath

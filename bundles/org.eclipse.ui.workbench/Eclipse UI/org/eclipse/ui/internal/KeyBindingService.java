@@ -39,7 +39,7 @@ import org.eclipse.ui.internal.handlers.CommandLegacyActionWrapper;
  * This class is provided for backwards compatibility only, and might be removed
  * in the future. All of the functionality is the class can be duplicated by
  * using the commands and contexts API.
- *
+ * 
  * @since 2.0
  */
 public final class KeyBindingService implements INestableKeyBindingService {
@@ -74,7 +74,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
     /**
      * Constructs a new instance of <code>KeyBindingService</code> on a given
      * workbench site. This instance is not nested.
-     *
+     * 
      * @param workbenchPartSite
      *            The site for which this service will be responsible; should
      *            not be <code>null</code>.
@@ -86,7 +86,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
     /**
      * Constructs a new instance of <code>KeyBindingService</code> on a given
      * workbench site.
-     *
+     * 
      * @param workbenchPartSite
      *            The site for which this service will be responsible; should
      *            not be <code>null</code>.
@@ -100,6 +100,11 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		this.parent = parent;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.INestableKeyBindingService#activateKeyBindingService(org.eclipse.ui.IWorkbenchSite)
+     */
     @Override
 	public boolean activateKeyBindingService(IWorkbenchSite nestedSite) {
         if (disposed) {
@@ -257,6 +262,11 @@ public final class KeyBindingService implements INestableKeyBindingService {
 	}
 
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.INestableKeyBindingService#getKeyBindingService(org.eclipse.ui.IWorkbenchSite)
+     */
 	@Override
 	public IKeyBindingService getKeyBindingService(IWorkbenchSite nestedSite) {
 		if (disposed) {
@@ -304,7 +314,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
         if (disposed) {
 			return;
 		}
-
+        
         if (action instanceof CommandLegacyActionWrapper) {
         	// this is a registration of a fake action for an already
 			// registered handler
@@ -312,7 +322,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 					.log("Cannot register a CommandLegacyActionWrapper back into the system"); //$NON-NLS-1$
 			return;
         }
-
+        
         if (action instanceof CommandAction) {
 			// we unfortunately had to allow these out into the wild, but they
 			// still must not feed back into the system
@@ -349,6 +359,11 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		}
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.INestableKeyBindingService#removeKeyBindingService(org.eclipse.ui.IWorkbenchSite)
+     */
 	@Override
 	public boolean removeKeyBindingService(IWorkbenchSite nestedSite) {
 		if (disposed) {
@@ -376,7 +391,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		enabledContextIds = new HashSet<String>(Arrays.asList(scopes));
 		EContextService cs = workbenchPartSite.getService(EContextService.class);
 		addParents(cs, scopes);
-
+		
 		for (String id : oldContextIds) {
 			if (!enabledContextIds.contains(id)) {
 				cs.deactivateContext(id);

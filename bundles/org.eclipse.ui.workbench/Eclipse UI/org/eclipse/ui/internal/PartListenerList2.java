@@ -11,7 +11,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.util.SafeRunnable;
@@ -40,7 +40,7 @@ public class PartListenerList2 extends EventManager {
 
     /**
      * Calls a part listener with associated performance event instrumentation
-     *
+     * 
      * @param runnable
      * @param listener
      * @param ref
@@ -52,7 +52,7 @@ public class PartListenerList2 extends EventManager {
     		label = string + ref.getTitle();
     		UIStats.start(UIStats.NOTIFY_PART_LISTENERS, label);
     	}
-    	SafeRunner.run(runnable);
+    	Platform.run(runnable);
     	if (UIStats.isDebugging(UIStats.NOTIFY_PART_LISTENERS)) {
 			UIStats.end(UIStats.NOTIFY_PART_LISTENERS, listener, label);
 		}
@@ -203,7 +203,7 @@ public class PartListenerList2 extends EventManager {
             }, l, ref, "inputChanged::"); //$NON-NLS-1$
         }
     }
-
+    
     /**
      * Removes an IPartListener from the part service.
      */

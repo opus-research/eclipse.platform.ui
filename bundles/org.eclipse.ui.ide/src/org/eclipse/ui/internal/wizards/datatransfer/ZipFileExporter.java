@@ -49,8 +49,7 @@ public class ZipFileExporter implements IFileExporter {
      *
      *	@exception java.io.IOException
      */
-    @Override
-	public void finished() throws IOException {
+    public void finished() throws IOException {
         outputStream.close();
     }
 
@@ -91,7 +90,7 @@ public class ZipFileExporter implements IFileExporter {
         long localTimeStamp = contents.getLocalTimeStamp();
         if(localTimeStamp != IResource.NULL_STAMP)
         	entry.setTime(localTimeStamp);
-
+        
         outputStream.putNextEntry(entry);
     	InputStream contentStream = contents.getContents(false);
         try {
@@ -107,8 +106,7 @@ public class ZipFileExporter implements IFileExporter {
         outputStream.closeEntry();
     }
 
-    @Override
-	public void write(IContainer container, String destinationPath)
+    public void write(IContainer container, String destinationPath)
             throws IOException {
         ZipEntry newEntry = new ZipEntry(destinationPath);
         outputStream.putNextEntry(newEntry);
@@ -122,8 +120,7 @@ public class ZipFileExporter implements IFileExporter {
      *  @exception java.io.IOException
      *  @exception org.eclipse.core.runtime.CoreException
      */
-    @Override
-	public void write(IFile resource, String destinationPath)
+    public void write(IFile resource, String destinationPath)
             throws IOException, CoreException {
         ZipEntry newEntry = new ZipEntry(destinationPath);
         write(newEntry, resource);

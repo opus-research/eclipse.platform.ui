@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    IBM Corporation - initial API and implementation
+ *    IBM Corporation - initial API and implementation 
  *    Bob Foster <bob@objfac.com>
  *     - Fix for bug 23025 - SaveAsDialog should not assume what is being saved is an IFile
  *    Benjamin Muskalla <b.muskalla@gmx.net>
@@ -56,9 +56,9 @@ import org.eclipse.ui.internal.ide.misc.ResourceAndContainerGroup;
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class SaveAsDialog extends TitleAreaDialog {
-
+	
 	private static final String DIALOG_SETTINGS_SECTION = "SaveAsDialogSettings"; //$NON-NLS-1$
-
+	
 	private IFile originalFile = null;
 
     private String originalName = null;
@@ -85,16 +85,20 @@ public class SaveAsDialog extends TitleAreaDialog {
         setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
-    @Override
-	protected void configureShell(Shell shell) {
+    /* (non-Javadoc)
+     * Method declared in Window.
+     */
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(IDEWorkbenchMessages.SaveAsDialog_text);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.SAVE_AS_DIALOG);
     }
 
-    @Override
-	protected Control createContents(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared in Window.
+     */
+    protected Control createContents(Composite parent) {
 
         Control contents = super.createContents(parent);
 
@@ -113,28 +117,31 @@ public class SaveAsDialog extends TitleAreaDialog {
         return contents;
     }
 
-    /**
+    /** 
      * The <code>SaveAsDialog</code> implementation of this <code>Window</code>
      * method disposes of the banner image when the dialog is closed.
      */
-    @Override
-	public boolean close() {
+    public boolean close() {
         if (dlgTitleImage != null) {
 			dlgTitleImage.dispose();
 		}
         return super.close();
     }
 
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
                 IDialogConstants.CANCEL_LABEL, false);
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected Control createDialogArea(Composite parent) {
         // top level composite
         Composite parentComposite = (Composite) super.createDialogArea(parent);
 
@@ -150,8 +157,7 @@ public class SaveAsDialog extends TitleAreaDialog {
         composite.setFont(parentComposite.getFont());
 
         Listener listener = new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 setDialogComplete(validatePage());
             }
         };
@@ -169,7 +175,7 @@ public class SaveAsDialog extends TitleAreaDialog {
      * Returns the full path entered by the user.
      * <p>
      * Note that the file and container might not exist and would need to be created.
-     * See the <code>IFile.create</code> method and the
+     * See the <code>IFile.create</code> method and the 
      * <code>ContainerGenerator</code> class.
      * </p>
      *
@@ -193,14 +199,16 @@ public class SaveAsDialog extends TitleAreaDialog {
         setDialogComplete(validatePage());
     }
 
-    @Override
-	protected void okPressed() {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected void okPressed() {
         // Get new path.
         IPath path = resourceGroup.getContainerFullPath().append(
                 resourceGroup.getResource());
 
-        //If the user does not supply a file extension and if the save
-        //as dialog was provided a default file name append the extension
+        //If the user does not supply a file extension and if the save 
+        //as dialog was provided a default file name append the extension 
         //of the default filename to the new name
         if (path.getFileExtension() == null) {
             if (originalFile != null && originalFile.getFileExtension() != null) {
@@ -224,7 +232,6 @@ public class SaveAsDialog extends TitleAreaDialog {
 			MessageDialog d = new MessageDialog(getShell(),
                     IDEWorkbenchMessages.Question,
                     null, question, MessageDialog.QUESTION, buttons, 0) {
-				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
@@ -292,10 +299,10 @@ public class SaveAsDialog extends TitleAreaDialog {
             }
             return false;
         }
-
+        
         String resourceName = resourceGroup.getResource();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
+        
         // Do not allow a closed project to be selected
         IPath fullPath = resourceGroup.getContainerFullPath();
         if (fullPath != null) {
@@ -309,29 +316,36 @@ public class SaveAsDialog extends TitleAreaDialog {
 	        	}
 	        }
         }
-
+        
         IStatus result = workspace.validateName(resourceName, IResource.FILE);
         if (!result.isOK()){
         	setErrorMessage(result.getMessage());
         	return false;
         }
-
+        
         setErrorMessage(null);
         return true;
     }
-
-	@Override
+    
+	/* (non-Javadoc)
+     * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
+     * 
+     * @since 3.2
+     */
 	protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
         if (section == null) {
             section = settings.addNewSection(DIALOG_SETTINGS_SECTION);
-        }
+        } 
         return section;
 	}
-
-    @Override
-	protected boolean isResizable() {
+	
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
+    protected boolean isResizable() {
     	return true;
     }
 }

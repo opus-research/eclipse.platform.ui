@@ -26,7 +26,7 @@ import org.eclipse.jface.util.Util;
  * format. This is typically what you would see on the menus for the given
  * platform and locale.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class NativeKeyFormatter extends AbstractKeyFormatter {
@@ -85,7 +85,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	 * Formats an individual key into a human readable format. This uses an
 	 * internationalization resource bundle to look up the key. This does the
 	 * platform-specific formatting for Carbon.
-	 *
+	 * 
 	 * @param key
 	 *            The key to format.
 	 * @return The key formatted as a string; should not be <code>null</code>.
@@ -96,7 +96,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 		final String name = lookup.formalNameLookup(key);
 
 		// TODO consider platform-specific resource bundles
-		if (Util.isMac()) {
+		if (Util.isMac()) {    	
 			String formattedName = (String) CARBON_KEY_LOOK_UP.get(name);
 			if (formattedName != null) {
 				return formattedName;
@@ -106,6 +106,11 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 		return super.format(key);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyDelimiter()
+	 */
 	@Override
 	protected String getKeyDelimiter() {
 		// We must do the look up every time, as our locale might change.
@@ -118,6 +123,11 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 				KeyStroke.KEY_DELIMITER);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
+	 */
 	@Override
 	protected String getKeyStrokeDelimiter() {
 		// We must do the look up every time, as our locale might change.
@@ -131,6 +141,11 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 				KeySequence.KEY_STROKE_DELIMITER);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#sortModifierKeys(int)
+	 */
 	@Override
 	protected int[] sortModifierKeys(final int modifierKeys) {
 		final IKeyLookup lookup = KeyLookupFactory.getDefault();

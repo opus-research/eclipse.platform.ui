@@ -18,41 +18,38 @@ import org.eclipse.ui.views.markers.MarkerItem;
 
 /**
  * MarkerLocationField is the field for the location field.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkerLocationField extends MarkerField {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
 	 */
-	@Override
 	public String getValue(MarkerItem item) {
 		return item.getLocation();
 	}
 
 	/**
 	 * Get the number of characters that should be reserved for the receiver.
-	 *
+	 * 
 	 * @param control
 	 *            the control to scale from
 	 * @return int
 	 */
-	@Override
 	public int getDefaultColumnWidth(Control control) {
 		return 15 * MarkerSupportInternalUtilities.getFontWidth(control);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.views.markers.MarkerField#compare(org.eclipse.ui.views.markers.MarkerItem,
 	 *      org.eclipse.ui.views.markers.MarkerItem)
 	 */
-	@Override
 	public int compare(MarkerItem item1, MarkerItem item2) {
 
 		//See if location got overridden

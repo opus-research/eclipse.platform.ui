@@ -18,25 +18,21 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ControlForegroundProperty extends WidgetValueProperty {
-	@Override
 	public Object getValueType() {
 		return Color.class;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return ((Control) source).getForeground();
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		((Control) source).setForeground((Color) value);
 	}
 
-	@Override
 	public String toString() {
 		return "Control.foreground <Color>"; //$NON-NLS-1$
 	}
