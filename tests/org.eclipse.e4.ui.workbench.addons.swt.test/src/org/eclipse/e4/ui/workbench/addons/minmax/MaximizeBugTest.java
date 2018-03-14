@@ -50,6 +50,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+@SuppressWarnings("restriction")
 @RunWith(Parameterized.class)
 public class MaximizeBugTest {
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 483842
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 380233
  ******************************************************************************/
 
@@ -854,7 +854,7 @@ public class PerspectiveSwitcher {
 	private void fixSize() {
 		psTB.pack();
 		psTB.getParent().pack();
-		psTB.requestLayout();
+		psTB.getShell().layout(new Control[] { psTB }, SWT.DEFER);
 	}
 
 	private void removePerspectiveItem(MPerspective toRemove) {
