@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -75,6 +77,7 @@ public class KeyBindingDispatcher {
 		 * @param event
 		 *            The event to process; must not be <code>null</code>.
 		 */
+		@Override
 		public final void handleEvent(final Event event) {
 			if (!enabled) {
 				return;
@@ -267,18 +270,25 @@ public class KeyBindingDispatcher {
 
 		final boolean commandDefined = command.isDefined();
 		// boolean commandEnabled;
-		boolean commandHandled;
+		boolean commandHandled = false;
 
 		try {
 			// commandEnabled = handlerService.canExecute(parameterizedCommand, staticContext);
-			commandHandled = HandlerServiceImpl.lookUpHandler(context, command.getId()) != null;
+			Object obj = HandlerServiceImpl.lookUpHandler(context, command.getId());
+			if (obj != null) {
+				if (obj instanceof IHandler) {
+					commandHandled = ((IHandler) obj).isHandled();
+				} else {
+					commandHandled = true;
+				}
+			}
 
-			try {
-				handlerService.executeHandler(parameterizedCommand, staticContext);
-			} catch (final Exception e) {
+			handlerService.executeHandler(parameterizedCommand, staticContext);
+			final Object commandException = staticContext.get(HandlerServiceImpl.HANDLER_EXCEPTION);
+			if (commandException instanceof CommandException) {
 				commandHandled = false;
-				if (logger != null) {
-					logger.error(e);
+				if (logger != null && commandException instanceof ExecutionException) {
+					logger.error((Throwable) commandException);
 				}
 			}
 			/*
@@ -425,6 +435,7 @@ public class KeyBindingDispatcher {
 		final long myStartTime = startTime;
 		final Display display = getDisplay();
 		display.timerExec(DELAY, new Runnable() {
+			@Override
 			public void run() {
 				if ((System.currentTimeMillis() > (myStartTime - DELAY))
 						&& (startTime == myStartTime)) {
@@ -560,6 +571,10 @@ public class KeyBindingDispatcher {
 			}
 			event.type = SWT.NONE;
 		}
+	}
+
+	public void resetState() {
+		resetState(true);
 	}
 
 	private void resetState(boolean clearRememberedState) {

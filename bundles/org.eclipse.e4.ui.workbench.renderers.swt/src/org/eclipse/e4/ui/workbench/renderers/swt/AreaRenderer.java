@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,6 +42,7 @@ public class AreaRenderer extends SWTPartRenderer {
 	IEventBroker eventBroker;
 
 	private EventHandler itemUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MArea
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MArea))
@@ -58,17 +59,20 @@ public class AreaRenderer extends SWTPartRenderer {
 
 			String attName = (String) event
 					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 				areaItem.setText(areaModel.getLocalizedLabel());
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				areaItem.setImage(getImage(areaModel));
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
+			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 				areaItem.setToolTipText(areaModel.getLocalizedTooltip());
 			}
 		}
 	};
 
 	private EventHandler widgetListener = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			final MUIElement changedElement = (MUIElement) event
 					.getProperty(EventTags.ELEMENT);
@@ -103,6 +107,7 @@ public class AreaRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(widgetListener);
 	}
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MArea) || !(parent instanceof Composite))
 			return null;

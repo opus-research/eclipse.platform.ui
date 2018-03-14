@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
+ *     Tristan Hume - <trishume@gmail.com> -
+ *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
+ *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -26,6 +29,20 @@ public interface IPreferenceConstants {
 
     //Boolean: true = open after delay
     public static final String OPEN_AFTER_DELAY = "OPEN_AFTER_DELAY"; //$NON-NLS-1$
+
+	// Boolean: true = bidi support enabled; false = bidi support disabled
+	public static final String BIDI_SUPPORT = "BIDI_SUPPORT"; //$NON-NLS-1$
+
+	// String: Text direction. May have the following values: "ltr", "rtl",
+	// "auto", and "".
+	public static final String TEXT_DIRECTION = "TEXT_DIRECTION"; //$NON-NLS-1$
+
+	// String: Layout direction. May have the following values:
+	// SWT.LEFT_TO_RIGHT, SWT.RIGHT_TO_LEFT, and SWT.NONE.
+	public static final String LAYOUT_DIRECTION = "LAYOUT_DIRECTION"; //$NON-NLS-1$
+
+	// String: Unicode locale extensions
+	public static final String NL_EXTENSIONS = "NL_EXTENSIONS"; //$NON-NLS-1$
 
     //Do we show color icons in toolbars?
     public static final String COLOR_ICONS = "COLOR_ICONS"; //$NON-NLS-1$
@@ -233,5 +250,14 @@ public interface IPreferenceConstants {
 	 * @since 3.4
 	 */
 	public static final String USE_32_THREADING = "use32Threading"; //$NON-NLS-1$
+
+	/**
+	 * Preference value that specifies the time interval in minutes between
+	 * workbench auto-saves. If the value is zero it disables workbench
+	 * auto-save.
+	 * 
+	 * @since 3.105
+	 */
+	public static final String WORKBENCH_SAVE_INTERVAL = "WORKBENCH_SAVE_INTERVAL"; //$NON-NLS-1$
 
 }

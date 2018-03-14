@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,6 +47,7 @@ public class ErrorViewPart extends ViewPart {
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		parentControl = parent;
 		if (error != null) {
@@ -59,6 +60,7 @@ public class ErrorViewPart extends ViewPart {
 	 * 
 	 * @see org.eclipse.ui.part.ViewPart#setPartName(java.lang.String)
 	 */
+	@Override
 	public void setPartName(String newName) {
 		super.setPartName(newName);
 	}
@@ -68,6 +70,7 @@ public class ErrorViewPart extends ViewPart {
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
+	@Override
 	public void setFocus() {
 		parentControl.setFocus();
 	}
@@ -77,6 +80,7 @@ public class ErrorViewPart extends ViewPart {
 	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		parentControl = null;

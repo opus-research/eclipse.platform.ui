@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *     IBM Corporation - ongoing development
  *******************************************************************************/
 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.w3c.dom.stylesheets.StyleSheet;
 import org.w3c.dom.stylesheets.StyleSheetList;
 
@@ -27,18 +27,20 @@ public class StyleSheetListImpl implements StyleSheetList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.w3c.dom.stylesheets.StyleSheetList#getLength()
 	 */
+	@Override
 	public int getLength() {
 		return (styleSheets != null) ? styleSheets.size() : 0;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.w3c.dom.stylesheets.StyleSheetList#item(int)
 	 */
+	@Override
 	public StyleSheet item(int index) {
 		return (styleSheets != null) ? (StyleSheet) styleSheets.get(index)
 				: null;
@@ -46,7 +48,7 @@ public class StyleSheetListImpl implements StyleSheetList {
 
 	/**
 	 * Add {@link StyleSheet} to the collection of style sheets
-	 * 
+	 *
 	 * @param styleSheet
 	 */
 	public void addStyleSheet(StyleSheet styleSheet) {

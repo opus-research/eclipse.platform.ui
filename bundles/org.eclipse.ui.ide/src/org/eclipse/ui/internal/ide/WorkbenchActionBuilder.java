@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -90,8 +90,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 
     private IWorkbenchAction newWindowAction;
     
-    private IWorkbenchAction newEditorAction;
-
     private IWorkbenchAction helpContentsAction;
 
     private IWorkbenchAction helpSearchAction;
@@ -620,7 +618,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         addMacWindowMenuItems(menu);
         
         menu.add(newWindowAction);
-		menu.add(newEditorAction);
 		
         menu.add(new Separator());
         addPerspectiveActions(menu);
@@ -825,7 +822,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         saveAction = null;
         saveAllAction = null;
         newWindowAction = null;
-		newEditorAction = null;
         helpContentsAction = null;
         helpSearchAction = null;
 		dynamicHelpAction = null;
@@ -877,7 +873,10 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         showInQuickMenu = null;
         newQuickMenu = null;
         buildProjectAction = null;
-        newWizardMenu = null;
+        if (newWizardMenu != null) {
+            newWizardMenu.dispose();
+            newWizardMenu = null;
+        }
         statusLineItem = null;
         prefListener = null;
         propPrefListener = null;
@@ -972,18 +971,11 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         newWindowAction.setText(IDEWorkbenchMessages.Workbench_openNewWindow);
         register(newWindowAction);
 
-		newEditorAction = ActionFactory.NEW_EDITOR.create(window);
-		register(newEditorAction);
-
         undoAction = ActionFactory.UNDO.create(window);
         register(undoAction);
 
         redoAction = ActionFactory.REDO.create(window);
         register(redoAction);
-
-
-
-
 
 
         closeAction = ActionFactory.CLOSE.create(window);

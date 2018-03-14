@@ -5,9 +5,10 @@
   are made available under the terms of the Eclipse Distribution License v1.0
   which accompanies this distribution, and is available at
   http://www.eclipse.org/org/documents/edl-v10.php
- 
+
   Contributors:
      Igor Fedorenko - initial implementation
+     Lars Vogel <Lars.Vogel@gmail.com> - Bug 421291, 427127 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -15,13 +16,13 @@
   <parent>
     <groupId>org.eclipse</groupId>
     <artifactId>eclipse-platform-parent</artifactId>
-    <version>4.2.2-SNAPSHOT</version>
+    <version>4.5.0-SNAPSHOT</version>
     <relativePath>../eclipse-platform-parent</relativePath>
   </parent>
 
   <groupId>eclipse.platform.ui</groupId>
   <artifactId>eclipse.platform.ui</artifactId>
-  <version>4.2.2-SNAPSHOT</version>
+  <version>4.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
    <properties>
@@ -40,7 +41,7 @@
       <url>https://repo.eclipse.org/content/repositories/eclipse/</url>
     </repository>
   </repositories>
- 
+
   <modules>
     <!--
     requires org.eclipse.ui.presentations.PresentationUtil which is not available from anywhere
@@ -56,7 +57,7 @@
     <module>examples/org.eclipse.ui.examples.readmetool</module>
     <module>examples/org.eclipse.ui.examples.undo</module>
     <module>examples/org.eclipse.ui.examples.views.properties.tabbed.article</module>
-    <!-- 
+    <!--
     <module>examples/org.eclipse.e4.demo.contacts</module>
     <module>examples/org.eclipse.e4.demo.e4photo</module>
     <module>examples/org.eclipse.e4.examples.services</module>
@@ -69,32 +70,8 @@
     <module>examples/org.eclipse.ui.examples.views.properties.tabbed.hockeyleague</module>
     <module>examples/org.eclipse.ui.examples.views.properties.tabbed.logic</module>
     <module>examples/org.eclipse.ui.forms.examples</module>
-    <module>tests/org.eclipse.e4.core.commands.tests</module>
-    <module>tests/org.eclipse.e4.emf.xpath.test</module>
-    <module>tests/org.eclipse.e4.ui.bindings.tests</module>
-    <module>tests/org.eclipse.e4.ui.compat.tests.tweaklet</module>
-    <module>tests/org.eclipse.e4.ui.compatibility.tests</module>
-    <module>tests/org.eclipse.e4.ui.keybinding.tests</module>
-    <module>tests/org.eclipse.e4.ui.menu.tests</module>
-    <module>tests/org.eclipse.e4.ui.menu.tests.debug</module>
-    <module>tests/org.eclipse.e4.ui.menu.tests.p1</module>
-    <module>tests/org.eclipse.e4.ui.menu.tests.p2</module>
-    <module>tests/org.eclipse.e4.ui.menu.tests.p3</module>
-    <module>tests/org.eclipse.e4.ui.menu.tests.p4</module>
-    <module>tests/org.eclipse.e4.ui.tests</module>
-    <module>tests/org.eclipse.e4.ui.tests.css.core</module>
-    <module>tests/org.eclipse.e4.ui.tests.css.swt</module>
-    <module>tests/org.eclipse.ui.tests.browser</module>
+    <module>examples/org.eclipse.ui.examples.rcp.mail</module>
      -->
-    <module>tests/org.eclipse.jface.tests.databinding</module>
-    <module>tests/org.eclipse.jface.tests.databinding.conformance</module>
-    <module>tests/org.eclipse.ui.tests</module>
-    <module>tests/org.eclipse.ui.tests.forms</module>
-    <module>tests/org.eclipse.ui.tests.harness</module>
-    <module>tests/org.eclipse.ui.tests.navigator</module>
-    <module>tests/org.eclipse.ui.tests.performance</module>
-    <module>tests/org.eclipse.ui.tests.rcp</module>
-    <module>tests/org.eclipse.ui.tests.views.properties.tabbed</module>
 
     <module>bundles/org.eclipse.core.commands</module>
     <module>bundles/org.eclipse.core.databinding</module>
@@ -102,7 +79,6 @@
     <module>bundles/org.eclipse.core.databinding.observable</module>
     <module>bundles/org.eclipse.core.databinding.property</module>
     <module>bundles/org.eclipse.e4.core.commands</module>
-    <module>bundles/org.eclipse.e4.core.contexts.debug</module>
     <module>bundles/org.eclipse.e4.emf.xpath</module>
     <module>bundles/org.eclipse.e4.ui.bindings</module>
     <module>bundles/org.eclipse.e4.ui.css.core</module>
@@ -110,7 +86,7 @@
     <module>bundles/org.eclipse.e4.ui.css.swt.theme</module>
     <module>bundles/org.eclipse.e4.ui.di</module>
     <module>bundles/org.eclipse.e4.ui.model.workbench</module>
-    <module>bundles/org.eclipse.e4.ui.model.workbench.edit</module>
+    <module>bundles/org.eclipse.e4.ui.progress</module>
     <module>bundles/org.eclipse.e4.ui.services</module>
     <module>bundles/org.eclipse.e4.ui.widgets</module>
     <module>bundles/org.eclipse.e4.ui.workbench</module>
@@ -128,15 +104,16 @@
     <module>bundles/org.eclipse.ui.views.properties.tabbed</module>
     <module>bundles/org.eclipse.ui.workbench</module>
     <module>bundles/org.eclipse.ui.navigator</module>
-    <module>bundles/org.eclipse.ui.tutorials.rcp.part1</module>
-    <module>bundles/org.eclipse.ui.tutorials.rcp.part2</module>
-    <module>bundles/org.eclipse.ui.tutorials.rcp.part3</module>
+    <module>bundles/org.eclipse.ui.themes</module>
     <module>features/org.eclipse.e4.rcp</module>
     <module>bundles/org.eclipse.ui.ide</module>
     <module>bundles/org.eclipse.ui.ide.application</module>
     <module>bundles/org.eclipse.ui.win32</module>
+    <module>bundles/org.eclipse.ui.cocoa</module>
     <module>bundles/org.eclipse.ui.navigator.resources</module>
     <module>bundles/org.eclipse.ui.workbench.compatibility</module>
+
+    <module>tests</module>
 
   </modules>
 

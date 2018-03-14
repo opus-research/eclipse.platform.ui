@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -158,7 +158,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IMenuManager#addMenuListener(org.eclipse.jface.action.IMenuListener)
      */
-    public void addMenuListener(IMenuListener listener) {
+    @Override
+	public void addMenuListener(IMenuListener listener) {
         listeners.add(listener);
     }
 
@@ -210,17 +211,19 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @return the menu control
      * @deprecated use <code>createMenuBar(Decorations)</code> instead.
      */
-    public Menu createMenuBar(Shell parent) {
+    @Deprecated
+	public Menu createMenuBar(Shell parent) {
         return createMenuBar((Decorations) parent);
     }
 
     /**
-     * Disposes of this menu manager and frees all allocated SWT resources.
-     * Notifies all contribution items of the dispose. Note that this method does
-     * not clean up references between this menu manager and its associated
-     * contribution items. Use <code>removeAll</code> for that purpose.
+     * Disposes of this menu manager and frees all allocated SWT resources. Notifies all
+     * contribution items of the dispose. Note that this method does not clean up references between
+     * this menu manager and its associated contribution items. Use {@link #removeAll()} for that
+     * purpose, but note that will not dispose the items.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (menuExist()) {
 			menu.dispose();
 		}
@@ -244,19 +247,22 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Composite)
      */
-    public void fill(Composite parent) {
+    @Override
+	public void fill(Composite parent) {
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar, int)
      */
-    public void fill(CoolBar parent, int index) {
+    @Override
+	public void fill(CoolBar parent, int index) {
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Menu, int)
      */
-    public void fill(Menu parent, int index) {
+    @Override
+	public void fill(Menu parent, int index) {
         if (menuItem == null || menuItem.isDisposed()) {
             if (index >= 0) {
 				menuItem = new MenuItem(parent, SWT.CASCADE, index);
@@ -293,13 +299,15 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.ToolBar, int)
      */
-    public void fill(ToolBar parent, int index) {
+    @Override
+	public void fill(ToolBar parent, int index) {
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IMenuManager#findMenuUsingPath(java.lang.String)
      */
-    public IMenuManager findMenuUsingPath(String path) {
+    @Override
+	public IMenuManager findMenuUsingPath(String path) {
         IContributionItem item = findUsingPath(path);
         if (item instanceof IMenuManager) {
 			return (IMenuManager) item;
@@ -310,7 +318,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IMenuManager#findUsingPath(java.lang.String)
      */
-    public IContributionItem findUsingPath(String path) {
+    @Override
+	public IContributionItem findUsingPath(String path) {
         String id = path;
         String rest = null;
         int separator = path.indexOf('/');
@@ -368,7 +377,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 	 * 
 	 * @return the menu id
 	 */
-    public String getId() {
+    @Override
+	public String getId() {
         return id;
     }
 
@@ -416,26 +426,32 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionManager#getOverrides()
      */
-    public IContributionManagerOverrides getOverrides() {
+    @Override
+	public IContributionManagerOverrides getOverrides() {
         if (overrides == null) {
             if (parent == null) {
                 overrides = new IContributionManagerOverrides() {
-                    public Integer getAccelerator(IContributionItem item) {
+                    @Override
+					public Integer getAccelerator(IContributionItem item) {
                         return null;
                     }
 
-                    public String getAcceleratorText(IContributionItem item) {
+                    @Override
+					public String getAcceleratorText(IContributionItem item) {
                         return null;
                     }
 
-                    public Boolean getEnabled(IContributionItem item) {
+                    @Override
+					public Boolean getEnabled(IContributionItem item) {
                         return null;
                     }
 
-                    public String getText(IContributionItem item) {
+                    @Override
+					public String getText(IContributionItem item) {
                         return null;
                     }
-    				public Boolean getVisible(IContributionItem item) {
+    				@Override
+					public Boolean getVisible(IContributionItem item) {
     					return null;
     				}
                 };
@@ -460,7 +476,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IMenuManager#getRemoveAllWhenShown()
      */
-    public boolean getRemoveAllWhenShown() {
+    @Override
+	public boolean getRemoveAllWhenShown() {
         return removeAllWhenShown;
     }
 
@@ -471,9 +488,9 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         if (removeAllWhenShown) {
 			removeAll();
 		}
-        MenuManagerEventHelper.showEventPreHelper(this);
+        MenuManagerEventHelper.getInstance().showEventPreHelper(this);
         fireAboutToShow(this);
-        MenuManagerEventHelper.showEventPostHelper(this);
+        MenuManagerEventHelper.getInstance().showEventPostHelper(this);
         update(false, false);
     }
 
@@ -481,9 +498,9 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * Notifies all listeners that this menu is about to disappear.
      */
     private void handleAboutToHide() {
-    	MenuManagerEventHelper.hideEventPreHelper(this);
+    	MenuManagerEventHelper.getInstance().hideEventPreHelper(this);
         fireAboutToHide(this);
-        MenuManagerEventHelper.hideEventPostHelper(this);
+        MenuManagerEventHelper.getInstance().hideEventPostHelper(this);
     }
 
     /**
@@ -491,12 +508,14 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      */
     private void initializeMenu() {
         menu.addMenuListener(new MenuAdapter() {
-            public void menuHidden(MenuEvent e) {
+            @Override
+			public void menuHidden(MenuEvent e) {
                 //			ApplicationWindow.resetDescription(e.widget);
             	handleAboutToHide();
             }
 
-            public void menuShown(MenuEvent e) {
+            @Override
+			public void menuShown(MenuEvent e) {
                 handleAboutToShow();
             }
         });
@@ -507,7 +526,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#isDynamic()
      */
-    public boolean isDynamic() {
+    @Override
+	public boolean isDynamic() {
         return false;
     }
 
@@ -522,21 +542,24 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @return <code>true</code> if enabled, and
      *   <code>false</code> if disabled
      */
-    public boolean isEnabled() {
+    @Override
+	public boolean isEnabled() {
         return true;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#isGroupMarker()
      */
-    public boolean isGroupMarker() {
+    @Override
+	public boolean isGroupMarker() {
         return false;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#isSeparator()
      */
-    public boolean isSeparator() {
+    @Override
+	public boolean isSeparator() {
         return false;
     }
 
@@ -548,14 +571,16 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @deprecated this method is no longer a part of the 
      *   {@link org.eclipse.jface.action.IContributionItem} API.
      */
-    public boolean isSubstituteFor(IContributionItem item) {
+    @Deprecated
+	public boolean isSubstituteFor(IContributionItem item) {
         return this.equals(item);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#isVisible()
      */
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         if (!visible) {
 			return false; // short circuit calculations in this case
 		}
@@ -585,7 +610,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * 
      * @since 3.1
      */
-    public void markDirty() {
+    @Override
+	public void markDirty() {
         super.markDirty();
         // Can't optimize by short-circuiting when the first dirty manager is encountered,
         // since non-visible children are not even processed.
@@ -615,14 +641,16 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IMenuManager#removeMenuListener(org.eclipse.jface.action.IMenuListener)
      */
-    public void removeMenuListener(IMenuListener listener) {
+    @Override
+	public void removeMenuListener(IMenuListener listener) {
         listeners.remove(listener);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
      */
-    public void saveWidgetState() {
+    @Override
+	public void saveWidgetState() {
     }
 
     /**
@@ -631,7 +659,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @param newOverrides the overrides for the items of this manager
      * @since 2.0
      */
-    public void setOverrides(IContributionManagerOverrides newOverrides) {
+    @Override
+	public void setOverrides(IContributionManagerOverrides newOverrides) {
         overrides = newOverrides;
         super.setOverrides(overrides);
     }
@@ -639,21 +668,24 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
      */
-    public void setParent(IContributionManager manager) {
+    @Override
+	public void setParent(IContributionManager manager) {
         parent = manager;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IMenuManager#setRemoveAllWhenShown(boolean)
      */
-    public void setRemoveAllWhenShown(boolean removeAll) {
+    @Override
+	public void setRemoveAllWhenShown(boolean removeAll) {
         this.removeAllWhenShown = removeAll;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#setVisible(boolean)
      */
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         this.visible = visible;
     }
     
@@ -673,7 +705,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#update()
      */
-    public void update() {
+    @Override
+	public void update() {
         updateMenuItem();
     }
 
@@ -683,7 +716,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      *
      * @see #updateAll
      */
-    public void update(boolean force) {
+    @Override
+	public void update(boolean force) {
         update(force, false);
     }
 
@@ -761,7 +795,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             if (menuExist()) {
                 // clean contains all active items without double separators
                 IContributionItem[] items = getItems();
-                List clean = new ArrayList(items.length);
+                List<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
                 IContributionItem separator = null;
                 for (int i = 0; i < items.length; ++i) {
                     IContributionItem ci = items[i];
@@ -803,8 +837,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
                 int srcIx = 0;
                 int destIx = 0;
 
-                for (Iterator e = clean.iterator(); e.hasNext();) {
-                    IContributionItem src = (IContributionItem) e.next();
+                for (Iterator<IContributionItem> e = clean.iterator(); e.hasNext();) {
+                    IContributionItem src = e.next();
                     IContributionItem dest;
 
                     // get corresponding item in SWT widget
@@ -878,7 +912,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
      */
-    public void update(String property) {
+    @Override
+	public void update(String property) {
         IContributionItem items[] = getItems();
 
         for (int i = 0; i < items.length; i++) {
@@ -950,7 +985,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IMenuManager#updateAll(boolean)
      */
-    public void updateAll(boolean force) {
+    @Override
+	public void updateAll(boolean force) {
         update(force, true);
     }
 
@@ -1002,5 +1038,21 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 			return v.booleanValue();
 		}
 		return item.isVisible();
+	}
+
+	/**
+	 * @param menuText The text (label) of the menu.
+	 * @since 3.10
+	 */
+	public void setMenuText(String menuText) {
+		this.menuText = menuText;
+	}
+
+	/**
+	 * @param imageDescriptor The image descriptor to set.
+	 * @since 3.10
+	 */
+	public void setImageDescriptor(ImageDescriptor imageDescriptor) {
+		this.image = imageDescriptor;
 	}
 }
