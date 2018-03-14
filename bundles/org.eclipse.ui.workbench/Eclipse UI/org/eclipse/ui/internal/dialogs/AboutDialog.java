@@ -75,7 +75,7 @@ public class AboutDialog extends TrayDialog {
 
     private AboutBundleGroupData[] bundleGroupInfos;
 
-    private ArrayList images = new ArrayList();
+	private ArrayList<Image> images = new ArrayList<Image>();
 
     private AboutFeaturesButtonManager buttonManager = new AboutFeaturesButtonManager();
 
@@ -100,7 +100,7 @@ public class AboutDialog extends TrayDialog {
 
         // create a descriptive object for each BundleGroup
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-        LinkedList groups = new LinkedList();
+		LinkedList<AboutBundleGroupData> groups = new LinkedList<AboutBundleGroupData>();
         if (providers != null) {
 			for (int i = 0; i < providers.length; ++i) {
                 IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
@@ -109,13 +109,9 @@ public class AboutDialog extends TrayDialog {
 				}
             }
 		}
-        bundleGroupInfos = (AboutBundleGroupData[]) groups
-                .toArray(new AboutBundleGroupData[0]);
+		bundleGroupInfos = groups.toArray(new AboutBundleGroupData[0]);
     }
 
-    /*
-     * (non-Javadoc) Method declared on Dialog.
-     */
     @Override
 	protected void buttonPressed(int buttonId) {
         switch (buttonId) {
@@ -140,16 +136,13 @@ public class AboutDialog extends TrayDialog {
 	public boolean close() {
         // dispose all images
         for (int i = 0; i < images.size(); ++i) {
-            Image image = (Image) images.get(i);
+			Image image = images.get(i);
             image.dispose();
         }
 
         return super.close();
     }
 
-    /*
-     * (non-Javadoc) Method declared on Window.
-     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -480,11 +473,6 @@ public class AboutDialog extends TrayDialog {
         return button;
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-	 */
 	@Override
 	protected boolean isResizable() {
 		return true;
