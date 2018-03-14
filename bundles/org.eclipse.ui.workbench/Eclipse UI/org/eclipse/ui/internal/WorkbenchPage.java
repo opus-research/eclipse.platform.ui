@@ -3508,6 +3508,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		// deactivate and activate other action sets as
 		updateActionSets(getPerspective(persp), getPerspective(dummyPerspective));
+		legacyWindow.getActionPresentation().setActionSets(getActionSets());
 		modelToPerspectiveMapping.remove(dummyPerspective);
 		getPerspective(persp).updateActionBars();
 
