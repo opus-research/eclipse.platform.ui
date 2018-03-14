@@ -11,6 +11,7 @@
  *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
  *     Marco Descher <marco@descher.at> - Bug 397677
  *     Dmitry Spiridenok - Bug 429756
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -36,7 +37,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.IHelpService;
+import org.eclipse.e4.ui.internal.workbench.EHelpService;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -134,7 +135,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	@Inject
 	@Optional
-	private IHelpService helpService;
+	private EHelpService helpService;
 
 	@Inject
 	@Optional
@@ -226,7 +227,7 @@ public class HandledContributionItem extends ContributionItem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void generateCommand() {
 		if (model.getCommand() != null && model.getWbCommand() == null) {
@@ -279,13 +280,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .Menu, int)
-	 */
 	@Override
 	public void fill(Menu menu, int index) {
 		if (model == null) {
@@ -326,13 +320,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .ToolBar, int)
-	 */
 	@Override
 	public void fill(ToolBar parent, int index) {
 		if (model == null) {
@@ -420,21 +407,11 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update()
-	 */
 	@Override
 	public void update() {
 		update(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update(java.lang.String)
-	 */
 	@Override
 	public void update(String id) {
 		updateIcons();
@@ -648,11 +625,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -854,7 +826,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a parent context for this part.
-	 * 
+	 *
 	 * @param element
 	 *            the part to start searching from
 	 * @return the parent's closest context, or global context if none in the
@@ -866,7 +838,7 @@ public class HandledContributionItem extends ContributionItem {
 
 	/**
 	 * Return a context for this part.
-	 * 
+	 *
 	 * @param part
 	 *            the part to start searching from
 	 * @return the closest context, or global context if none in the hierarchy
