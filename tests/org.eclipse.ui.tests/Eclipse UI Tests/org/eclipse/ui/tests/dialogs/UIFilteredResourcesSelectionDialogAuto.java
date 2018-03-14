@@ -12,7 +12,6 @@
 package org.eclipse.ui.tests.dialogs;
 
 import java.util.*;
-
 import org.eclipse.core.resources.*;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
@@ -27,7 +26,7 @@ public class UIFilteredResourcesSelectionDialogAuto extends
 
 	/**
 	 * Checks if content provider displays expected resources from the history.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testReadHistory() throws Exception {
@@ -41,13 +40,13 @@ public class UIFilteredResourcesSelectionDialogAuto extends
 		assertEquals(historyResources.length, items.length);
 		Set itemsSet = new HashSet(historyResources.length);
 		itemsSet.addAll(Arrays.asList(items));
-		for (IResource historyResource : historyResources) {
-			assertEquals(true, itemsSet.contains(historyResource));
+		for (int i = 0; i < historyResources.length; i++) {
+			assertEquals(true, itemsSet.contains(historyResources[i]));
 		}
 
 		closeDialog(dialog);
 	}
-
+	
 	private static MockedFilteredResourcesSelectionDialog createDialog() {
 		final IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();

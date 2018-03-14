@@ -50,7 +50,7 @@ public class WorkingSetTests extends DynamicTestCase {
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicWorkingSetElementAdapter";
 	}
-
+	
 	@Override
 	public void testClass() throws Exception {
 		super.testClass();
@@ -164,9 +164,8 @@ public class WorkingSetTests extends DynamicTestCase {
 
 			@Override
 			public Object getAdapter(Class adapter) {
-				if (adapter == IResource.class) {
+				if (adapter == IResource.class)
 					return ResourcesPlugin.getWorkspace().getRoot();
-				}
 				return null;
 			}
 		};
@@ -211,9 +210,8 @@ public class WorkingSetTests extends DynamicTestCase {
 
 			@Override
 			public Object getAdapter(Class adapter) {
-				if (adapter == IResource.class) {
+				if (adapter == IResource.class)
 					return ResourcesPlugin.getWorkspace().getRoot();
-				}
 				return null;
 			}
 		};
