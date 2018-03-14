@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 431992
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 456729, 404348, 421178, 420956, 424638
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 456729, 404348, 421178, 420956
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -66,7 +66,6 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -537,23 +536,12 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
+		String title = perspective.getDesc().getLabel();
 
-		String title = getPerspectiveTitle();
 		title = NLS.bind(WorkbenchMessages.ActionSetSelection_customize, title);
 		shell.setText(title);
 		window.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.ACTION_SET_SELECTION_DIALOG);
-	}
-	
-	private String getPerspectiveTitle() {
-		IPerspectiveDescriptor descriptor = perspective.getDesc();
-		String title;
-		if (descriptor == null) {
-			title = WorkbenchMessages.MissingPerspective_title;
-		} else {
-			title = descriptor.getLabel();
-		}
-		return title;
 	}
 
 	@Override
@@ -606,7 +594,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Select... label
 		Label label = new Label(menusComposite, SWT.WRAP);
 		label.setText(NLS.bind(
-				WorkbenchMessages.Shortcuts_selectShortcutsLabel, getPerspectiveTitle()));
+				WorkbenchMessages.Shortcuts_selectShortcutsLabel, perspective
+						.getDesc().getLabel()));
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		label.setLayoutData(data);
 
@@ -774,7 +763,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		Label label = new Label(actionSetsComposite, SWT.WRAP);
 		label.setText(NLS.bind(
 				WorkbenchMessages.ActionSetSelection_selectActionSetsLabel,
-				getPerspectiveTitle()));
+				perspective.getDesc().getLabel()));
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		label.setLayoutData(data);
 
@@ -1068,10 +1057,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 								initSelectAS = (ActionSet) actionSetViewer
 										.getElementAt(0);
 							}
-							if (initSelectAS != null) {
-								setSelectionOn(actionSetViewer, initSelectAS);
-								actionSetViewer.reveal(initSelectAS);
-							}
+							setSelectionOn(actionSetViewer, initSelectAS);
+							actionSetViewer.reveal(initSelectAS);
 							if (initSelectCI != null) {
 								setSelectionOn(menuStructureViewer2,
 										initSelectCI);
@@ -1225,10 +1212,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 								initSelectAS = (ActionSet) actionSetViewer
 										.getElementAt(0);
 							}
-							if (initSelectAS != null) {
-								setSelectionOn(actionSetViewer, initSelectAS);
-								actionSetViewer.reveal(initSelectAS);
+							if (initSelectAS == null) {
+								return;
 							}
+							setSelectionOn(actionSetViewer, initSelectAS);
+							actionSetViewer.reveal(initSelectAS);
 							if (initSelectCI != null) {
 								setSelectionOn(toolbarStructureViewer2,
 										initSelectCI);
@@ -1349,14 +1337,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * @param selected
 	 */
 	private static void setSelectionOn(Viewer viewer, final Object selected) {
-		ISelection selection;
-		if (selected == null) {
-			selection = StructuredSelection.EMPTY;
-		} else {
-			selection = new StructuredSelection(selected);
-		}
-		boolean reveal = selection != StructuredSelection.EMPTY;
-		viewer.setSelection(selection, reveal);
+		viewer.setSelection(new StructuredSelection(selected), true);
 	}
 
 	/**
