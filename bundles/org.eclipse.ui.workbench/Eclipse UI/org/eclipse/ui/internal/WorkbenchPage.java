@@ -245,8 +245,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 */
 	private MPerspectiveStack _perspectiveStack;
 
-	private List<String> mruPartIds = new ArrayList<String>();
-
 	/**
 	 * Deactivate the last editor's action bars if another type of editor has //
 	 * * been activated.
@@ -2478,8 +2476,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *            the id of the part that the action was performed on
 	 */
 	public void performedShowIn(String partId) {
-		mruPartIds.remove(partId);
-		mruPartIds.add(0, partId);
+		// TODO compat: show in
 	}
 
 	/**
@@ -2489,17 +2486,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *            the collection of part ids to rearrange
 	 */
 	public void sortShowInPartIds(ArrayList<?> partIds) {
-		Collections.sort(partIds, new Comparator<Object>() {
-
-			@Override
-			public int compare(Object ob1, Object ob2) {
-				if (mruPartIds.contains(ob1) && !mruPartIds.contains(ob2))
-					return -1;
-				if (!mruPartIds.contains(ob1) && mruPartIds.contains(ob2))
-					return 1;
-				return mruPartIds.indexOf(ob1) - mruPartIds.indexOf(ob2);
-			}
-		});
+		// TODO compat: can't sort what we don't have
 	}
 
     /**
