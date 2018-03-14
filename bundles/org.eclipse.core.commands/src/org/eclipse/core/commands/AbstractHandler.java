@@ -14,8 +14,6 @@ import org.eclipse.core.commands.common.EventManager;
 
 /**
  * <p>
- * 
- * 
  * This class is a partial implementation of <code>IHandler</code>. This
  * abstract implementation provides support for handler listeners. You should
  * subclass from this method unless you want to implement your own listener
@@ -24,9 +22,6 @@ import org.eclipse.core.commands.common.EventManager;
  * changes. Subclasses can also override {@link AbstractHandler#isEnabled()} and
  * {@link AbstractHandler#isHandled()}.
  * </p>
- * 
- * test sakith
- * 
  * 
  * @since 3.1
  */

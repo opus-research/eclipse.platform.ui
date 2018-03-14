@@ -65,7 +65,7 @@ public class ToolItemElement extends ItemElement {
 
 	@Override
 	public void reset() {
-		CSSSWTImageHelper.restoreDefaultImage(getToolItem());
 		super.reset();
+		CSSSWTImageHelper.restoreDefaultImage(getToolItem());
 	}
 }
