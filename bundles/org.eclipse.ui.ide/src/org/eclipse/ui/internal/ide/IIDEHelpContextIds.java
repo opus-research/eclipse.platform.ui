@@ -172,9 +172,6 @@ public interface IIDEHelpContextIds {
     // Property pages
     public static final String PROJECT_REFERENCE_PROPERTY_PAGE = PREFIX
             + "project_reference_property_page_context"; //$NON-NLS-1$
-    
-    public static final String PROJECT_NATURES_PROPERTY_PAGE = PREFIX
-    		+ "project_natures_property_page_context"; //$NON-NLS-1$
 
 	public static final String RESOURCE_FILTER_PROPERTY_PAGE = PREFIX
 			+ "resource_filter_property_page_context"; //$NON-NLS-1$
