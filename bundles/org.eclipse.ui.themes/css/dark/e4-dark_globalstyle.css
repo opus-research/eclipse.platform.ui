@@ -135,11 +135,17 @@ Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][s
     color: #E39898;
 }
 
-StyledText,
 Spinner,
 CCombo {
     background-color: #383C3E;
     color: #dddddd;
+}
+
+.MPartStack#left StyledText,
+.MPartStack#right StyledText,
+.MPartStack#bottom StyledText {
+    background-color: #383C3E;
+    color: #ddddd
 }
 
 Composite > StyledText,
