@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@
  *     Bruce Sutton, bug 221768
  *     Matthew Hall, bug 221988
  *     Julien Desgats, bug 203950
- *     Robert Roth <robert.roth.off@gmail.com> - bug 259245
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -2369,10 +2368,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	}
 
 	/**
-	 * The <code>AbstractTreeViewer</code> implementation of this method checks
-	 * to ensure that the content provider is an
-	 * <code>ITreeContentProvider</code> or an
-	 * <code>ITreePathContentProvider</code>.
+	 * The <code>AbstractTreeViewer</code> implementation of this method
+	 * checks to ensure that the content provider is an
+	 * <code>ITreeContentProvider</code>.
 	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
