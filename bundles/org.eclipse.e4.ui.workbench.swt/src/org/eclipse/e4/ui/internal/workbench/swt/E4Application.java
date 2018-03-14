@@ -126,7 +126,12 @@ public class E4Application implements IApplication {
 		return display;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
+	 * IApplicationContext)
+	 */
 	public Object start(IApplicationContext applicationContext)
 			throws Exception {
 		// set the display name before the Display is
