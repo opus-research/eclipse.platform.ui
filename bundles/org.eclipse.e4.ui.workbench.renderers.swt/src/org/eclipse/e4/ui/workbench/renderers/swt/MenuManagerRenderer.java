@@ -9,10 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
+ *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 391430 - Dynamically creating / deleting menu items in Menu and MPopupMenu doesn't work
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -254,6 +256,37 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
+	/**
+	 * EventHanlder which handles the adding and disappearing of menu entries.
+	 */
+	private EventHandler childrenUpdater = new EventHandler() {
+		public void handleEvent(Event event) {
+			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
+			if (changedObj instanceof MMenu) {
+				MMenu menuModel = (MMenu) changedObj;
+				MenuManager manager = getManager(menuModel);
+				if (manager == null)
+					return;
+				if (UIEvents.isREMOVE(event)) {
+					// remove can be one or many --> always use a list of
+					// entries
+					@SuppressWarnings("unchecked")
+					Iterable<MMenuElement> toRemove = (Iterable<MMenuElement>) UIEvents
+							.asIterable(event, UIEvents.EventTags.OLD_VALUE);
+
+					handleMenuElementRemove(manager, toRemove);
+				} else if (UIEvents.isADD(event)) {
+					// add can also be one or many --> always use a list of
+					// entries
+					@SuppressWarnings("unchecked")
+					Iterable<MMenuElement> toAdd = (Iterable<MMenuElement>) UIEvents
+							.asIterable(event, UIEvents.EventTags.NEW_VALUE);
+					handleMenuElementAdd(manager, toAdd);
+				}
+			}
+		}
+	};
+
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
@@ -264,6 +297,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
 				.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
+				childrenUpdater);
 
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
@@ -289,6 +324,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(selectionUpdater);
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
+		eventBroker.unsubscribe(childrenUpdater);
 
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance()
 				.getShowHelper(),
@@ -616,7 +652,7 @@ MenuManagerEventHelper.getInstance()
 		if (parent == null) {
 			parentManager.add(menuManager);
 		} else {
-			int index = parent.getChildren().indexOf(model);
+			int index = findBestFittingIndex(parentManager.getItems(), model);
 			// shouldn't be -1, but better safe than sorry
 			if (index > parentManager.getSize() || index == -1) {
 				parentManager.add(menuManager);
@@ -624,6 +660,119 @@ MenuManagerEventHelper.getInstance()
 				parentManager.insert(index, menuManager);
 			}
 		}
+	}
+
+	/**
+	 * A helper method to find the best fitting insert index for the new
+	 * {@link MMenuElement}.
+	 * <p>
+	 * This method tries to find a sibling of the given {@link MMenuElement} in
+	 * the given list of {@link IContributionItem}'s and based on this it will
+	 * return new insert index.
+	 * </p>
+	 *
+	 * @param existingContributions
+	 *            the list of menu entries into which the new
+	 *            {@link MMenuElement} should be added
+	 * @param newElement
+	 *            the element for which an insert index should be found
+	 * @return the best fitting insert index, or -1 if there is no fitting
+	 *         insert index
+	 */
+	private int findBestFittingIndex(IContributionItem[] existingContributions,
+			MMenuElement newElement) {
+		/*
+		 * A normal "newElement.getParent().getChildren().indexOf(newElement)"
+		 * isn't enough, because the MenuManager maybe hasn't as much items as
+		 * the "newElement.getParent().getChildren()".
+		 * 
+		 * This happens especial if:
+		 * 
+		 * -) there are placeholders in a Menu-Bar (because there is nothing
+		 * like a MenuManagerSeparator)
+		 * 
+		 * -) menu entries were created directly via the Menu-Manager and not
+		 * via the E4 model (happens in the e3 compatibility mode)
+		 */
+
+		if (existingContributions == null || existingContributions.length <= 0
+				|| newElement == null)
+			return -1;
+
+		MElementContainer<MUIElement> parent = newElement.getParent();
+		if (parent != null) {
+			int insertIndex = -1;
+			List<MUIElement> children = parent.getChildren();
+			List<IContributionItem> existingContributionsAsList = Arrays
+					.asList(existingContributions);
+
+			// search the siblings in the reverse order beginning at the menu
+			// entry located above the one to insert
+			int searchIndex = children.indexOf(newElement);
+			if (searchIndex == 0) {
+				return 0; // means no sibling above this
+			}
+			for (searchIndex--; searchIndex >= 0; searchIndex--) {
+				MUIElement sibling = children.get(searchIndex);
+
+				// special check for opaque elements (e.g: converted actions)
+				// they do not have an element ID, but the opaque element is
+				// already in the list of IContributionItems
+				Object opaqueItem = OpaqueElementUtil.getOpaqueItem(sibling);
+				if (opaqueItem != null) {
+					insertIndex = existingContributionsAsList
+							.indexOf(opaqueItem);
+				} else {
+					// MenuManager and their IContributionItems have the same ID
+					// as there MMenuElements have
+					insertIndex = findById(existingContributionsAsList,
+							sibling.getElementId(), searchIndex);
+				}
+
+				if (insertIndex >= 0) {
+					return insertIndex + 1; // insert after
+				}
+			}
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Returns the index of the {@link IContributionItem} in the list which has
+	 * the given ID.
+	 *
+	 * @param existingContributions
+	 *            the list of existing {@link IContributionItem} from the
+	 *            {@link MenuManager}
+	 * @param id
+	 *            the ID of the element which should be found in the list of
+	 *            given {@link IContributionItem}s
+	 * @param feasibleIndex
+	 *            the index to begin searching (should be the index of the
+	 *            {@link MMenuElement} in it's parent child list)
+	 * @return the index of the {@link IContributionItem} which has the same ID
+	 */
+	private int findById(List<IContributionItem> existingContributions,
+			String id,
+			int feasibleIndex) {
+
+		/*
+		 * The feasibleIndex is used to have an entry in the list from where to
+		 * begin the search. This reduces the amount of iterations to find the
+		 * entry in the list and it helps to find a good insertion point if the
+		 * MMenuElement is a separator (they do not have an element ID).
+		 */
+
+		for (int i = Math.min(existingContributions.size() - 1,
+				Math.max(0, feasibleIndex)); i >= 0; i--) {
+			String contribID = existingContributions.get(i).getId();
+			if (id == contribID || (id != null && id.equals(contribID))) {
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
 	/**
@@ -1111,5 +1260,67 @@ MenuManagerEventHelper.getInstance()
 		}
 		MenuManager mm = getManager(menu);
 		clearModelToManager(menu, mm);
+	}
+
+	/**
+	 * Handles the create of menu entries.
+	 *
+	 * @param manager
+	 *            the {@link MenuManager} to add the new entries too
+	 * @param menuElements
+	 *            the new entries to add
+	 */
+	private void handleMenuElementAdd(MenuManager manager,
+			Iterable<MMenuElement> menuElements) {
+		Iterator<MMenuElement> iterMenuElements = menuElements.iterator();
+
+		if (!iterMenuElements.hasNext())
+			return;
+
+		while (iterMenuElements.hasNext()) {
+			modelProcessSwitch(manager, iterMenuElements.next());
+		}
+
+		manager.updateAll(false);
+	}
+
+	/**
+	 * Handles the remove of menu entries.
+	 *
+	 * @param manager
+	 *            the {@link MenuManager} to remove the entries from
+	 * @param menuElements
+	 *            the elements to remove
+	 */
+	private void handleMenuElementRemove(MenuManager manager,
+			Iterable<MMenuElement> menuElements) {
+		Iterator<MMenuElement> iterMenuElements = menuElements.iterator();
+
+		if (!iterMenuElements.hasNext())
+			return;
+
+		while (iterMenuElements.hasNext()) {
+			MMenuElement menuElement = iterMenuElements.next();
+			if (menuElement instanceof MMenu) {
+				MMenu menuModel = (MMenu) menuElement;
+				MenuManager mi = getManager(menuModel);
+				manager.remove(mi);
+
+				// clean up (children also)
+				clearModelToManager(menuModel, mi);
+				handleMenuElementRemove(mi, menuModel.getChildren());
+				mi.dispose();
+			} else {
+				IContributionItem ci = getContribution(menuElement);
+				manager.remove(ci);
+
+				// clean up
+				clearModelToContribution(menuElement, ci);
+				ci.dispose();
+			}
+
+		}
+
+		manager.updateAll(false);
 	}
 }
