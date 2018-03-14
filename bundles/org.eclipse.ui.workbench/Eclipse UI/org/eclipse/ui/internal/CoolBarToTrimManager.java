@@ -226,9 +226,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		if (IWorkbenchActionConstants.TOOLBAR_FILE.equalsIgnoreCase(elementId)) {
 			return WorkbenchMessages.WorkbenchWindow_FileToolbar;
 		}
-		if (IWorkbenchActionConstants.TOOLBAR_EDIT.equalsIgnoreCase(elementId)) {
-			return WorkbenchMessages.WorkbenchWindow_EditToolbar;
-		}
 		if (IWorkbenchActionConstants.TOOLBAR_NAVIGATE.equalsIgnoreCase(elementId)) {
 			return WorkbenchMessages.WorkbenchWindow_NavigateToolbar;
 		}
