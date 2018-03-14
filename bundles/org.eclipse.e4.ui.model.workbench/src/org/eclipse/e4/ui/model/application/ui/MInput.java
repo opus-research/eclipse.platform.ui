@@ -36,7 +36,6 @@ package org.eclipse.e4.ui.model.application.ui;
  * @model interface="true" abstract="true"
  * @generated
  */
-@Deprecated
 public interface MInput {
 	/**
 	 * Returns the value of the '<em><b>Input URI</b></em>' attribute.

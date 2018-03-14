@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Shell;
@@ -51,8 +50,8 @@ public class CommonViewerSiteIViewSiteDelegate implements ICommonViewerWorkbench
 	}
 
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
-		return Adapters.adapt(viewSite, adapter);
+	public Object getAdapter(Class adapter) {
+		return viewSite.getAdapter(adapter);
 	}
 
 	@Override

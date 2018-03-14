@@ -16,6 +16,7 @@ package org.eclipse.jface.viewers;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -126,10 +127,15 @@ public abstract class ColumnViewerEditor {
 					.setEnableEditorActivationWithKeyboard(true);
 		}
 		this.feature = feature;
-		this.disposeListener = e -> {
-			if( viewer.isCellEditorActive() ) {
-				cancelEditing();
+		this.disposeListener = new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if( viewer.isCellEditorActive() ) {
+					cancelEditing();
+				}
 			}
+
 		};
 		initCellEditorListener();
 	}
@@ -240,11 +246,15 @@ public abstract class ColumnViewerEditor {
 				}
 
 				if (tabeditingListener == null) {
-					tabeditingListener = e -> {
-						if ((feature & DEFAULT) != DEFAULT) {
-							processTraverseEvent(cell.getColumnIndex(),
-									viewer.getViewerRowFromItem(cell
-											.getItem()), e);
+					tabeditingListener = new TraverseListener() {
+
+						@Override
+						public void keyTraversed(TraverseEvent e) {
+							if ((feature & DEFAULT) != DEFAULT) {
+								processTraverseEvent(cell.getColumnIndex(),
+										viewer.getViewerRowFromItem(cell
+												.getItem()), e);
+							}
 						}
 					};
 				}

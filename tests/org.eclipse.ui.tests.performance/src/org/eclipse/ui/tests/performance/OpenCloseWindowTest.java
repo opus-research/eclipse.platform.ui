@@ -30,13 +30,11 @@ public class OpenCloseWindowTest extends BasicPerformanceTest {
         this.id = id;
     }
 
-    @Override
-	protected void runTest() throws Throwable {
+    protected void runTest() throws Throwable {
     	tagIfNecessary("UI - Open/Close Window", Dimension.ELAPSED_PROCESS);
 
     	exercise(new TestRunnable() {
-            @Override
-			public void run() throws Exception {
+            public void run() throws Exception {
                 processEvents();
                 EditorTestHelper.calmDown(500, 30000, 500);
 

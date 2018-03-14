@@ -17,9 +17,13 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -160,10 +164,21 @@ public class FeatureSelectionDialog extends SelectionDialog {
                 getInitialElementSelections()), true);
 
         // Add a selection change listener
-        listViewer.addSelectionChangedListener(event -> getOkButton().setEnabled(!event.getSelection().isEmpty()));
+        listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
+                // Update OK button enablement
+                getOkButton().setEnabled(!event.getSelection().isEmpty());
+            }
+        });
 
         // Add double-click listener
-        listViewer.addDoubleClickListener(event -> okPressed());
+        listViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
+                okPressed();
+            }
+        });
         return composite;
     }
 

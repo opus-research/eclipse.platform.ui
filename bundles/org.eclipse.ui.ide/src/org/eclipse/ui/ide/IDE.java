@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,8 +35,8 @@ import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
 import org.eclipse.core.resources.mapping.ModelProvider;
 import org.eclipse.core.resources.mapping.ModelStatus;
 import org.eclipse.core.resources.mapping.ResourceChangeValidator;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IStatus;
@@ -288,7 +288,12 @@ public final class IDE {
 	 *            the marker
 	 */
 	public static void gotoMarker(IEditorPart editor, IMarker marker) {
-		IGotoMarker gotoMarker = Adapters.adapt(editor, IGotoMarker.class);
+		IGotoMarker gotoMarker = null;
+		if (editor instanceof IGotoMarker) {
+			gotoMarker = (IGotoMarker) editor;
+		} else {
+			gotoMarker = editor.getAdapter(IGotoMarker.class);
+		}
 		if (gotoMarker != null) {
 			gotoMarker.gotoMarker(marker);
 		}
@@ -840,7 +845,7 @@ public final class IDE {
 		for (int i = 0; i < overrides.length; i++) {
 			editorDescriptors = overrides[i].overrideEditors(editorInput, contentType, editorDescriptors);
 		}
-		return removeNullEntries(editorDescriptors);
+		return editorDescriptors;
 	}
 
 	/**
@@ -861,27 +866,7 @@ public final class IDE {
 		for (int i = 0; i < overrides.length; i++) {
 			editorDescriptors = overrides[i].overrideEditors(fileName, contentType, editorDescriptors);
 		}
-		return removeNullEntries(editorDescriptors);
-	}
-
-	private static IEditorDescriptor[] removeNullEntries(IEditorDescriptor[] editorDescriptors) {
-		boolean nullDescriptorFound = false;
-		for (IEditorDescriptor d : editorDescriptors) {
-			if (d == null) {
-				nullDescriptorFound = true;
-				break;
-			}
-		}
-		if (!nullDescriptorFound) {
-			return editorDescriptors;
-		}
-		List<IEditorDescriptor> nonNullDescriptors = new ArrayList<>(editorDescriptors.length);
-		for (IEditorDescriptor d : editorDescriptors) {
-			if (d != null) {
-				nonNullDescriptors.add(d);
-			}
-		}
-		return nonNullDescriptors.toArray(new IEditorDescriptor[nonNullDescriptors.size()]);
+		return editorDescriptors;
 	}
 
 	/**
@@ -1381,7 +1366,12 @@ public final class IDE {
 		List resources = null;
 		for (Iterator e = originalSelection.iterator(); e.hasNext();) {
 			Object next = e.next();
-			Object resource = Adapters.adapt(next, IResource.class);
+			Object resource = null;
+			if (next instanceof IResource) {
+				resource = next;
+			} else if (next instanceof IAdaptable) {
+				resource = ((IAdaptable) next).getAdapter(IResource.class);
+			}
 			if (resource != null) {
 				if (resources == null) {
 					// lazy init to avoid creating empty lists
@@ -1518,35 +1508,38 @@ public final class IDE {
 				IDEWorkbenchMessages.IDE_areYouSure, message);
 
 		final boolean[] result = new boolean[] { false };
-		Runnable runnable = () -> {
-			ErrorDialog dialog = new ErrorDialog(shell, title,
-					dialogMessage, displayStatus, IStatus.ERROR
-							| IStatus.WARNING | IStatus.INFO) {
-				@Override
-				protected void createButtonsForButtonBar(Composite parent) {
-					createButton(parent, IDialogConstants.YES_ID,
-							IDialogConstants.YES_LABEL, false);
-					createButton(parent, IDialogConstants.NO_ID,
-							IDialogConstants.NO_LABEL, true);
-					createDetailsButton(parent);
-				}
-
-				@Override
-				protected void buttonPressed(int id) {
-					if (id == IDialogConstants.YES_ID) {
-						super.buttonPressed(IDialogConstants.OK_ID);
-					} else if (id == IDialogConstants.NO_ID) {
-						super.buttonPressed(IDialogConstants.CANCEL_ID);
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				ErrorDialog dialog = new ErrorDialog(shell, title,
+						dialogMessage, displayStatus, IStatus.ERROR
+								| IStatus.WARNING | IStatus.INFO) {
+					@Override
+					protected void createButtonsForButtonBar(Composite parent) {
+						createButton(parent, IDialogConstants.YES_ID,
+								IDialogConstants.YES_LABEL, false);
+						createButton(parent, IDialogConstants.NO_ID,
+								IDialogConstants.NO_LABEL, true);
+						createDetailsButton(parent);
 					}
-					super.buttonPressed(id);
-				}
-				@Override
-				protected int getShellStyle() {
-					return super.getShellStyle() | SWT.SHEET;
-				}
-			};
-			int code = dialog.open();
-			result[0] = code == 0;
+
+					@Override
+					protected void buttonPressed(int id) {
+						if (id == IDialogConstants.YES_ID) {
+							super.buttonPressed(IDialogConstants.OK_ID);
+						} else if (id == IDialogConstants.NO_ID) {
+							super.buttonPressed(IDialogConstants.CANCEL_ID);
+						}
+						super.buttonPressed(id);
+					}
+					@Override
+					protected int getShellStyle() {
+						return super.getShellStyle() | SWT.SHEET;
+					}
+				};
+				int code = dialog.open();
+				result[0] = code == 0;
+			}
 		};
 		if (syncExec) {
 			shell.getDisplay().syncExec(runnable);

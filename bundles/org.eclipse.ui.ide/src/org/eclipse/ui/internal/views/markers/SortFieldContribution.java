@@ -15,6 +15,7 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -44,6 +45,11 @@ public class SortFieldContribution extends MarkersContribution {
 		super(id);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
+	 */
 	@Override
 	protected IContributionItem[] getContributionItems() {
 		ExtendedMarkersView view = getView();
@@ -75,15 +81,29 @@ public class SortFieldContribution extends MarkersContribution {
 	private IContributionItem getDirectionContribution() {
 		return new ContributionItem() {
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu,
+			 *      int)
+			 */
 			@Override
 			public void fill(Menu menu, int index) {
 				MenuItem item = new MenuItem(menu, SWT.CHECK);
 				item.setText(MarkerMessages.sortDirectionAscending_text);
 				final ExtendedMarkersView view = getView();
-				item.addListener(SWT.Selection, event -> {
+				item.addListener(SWT.Selection, new Listener() {
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+					 */
+					@Override
+					public void handleEvent(Event event) {
 
-					if (view != null)
-						view.toggleSortDirection();
+						if (view != null)
+							view.toggleSortDirection();
+					}
 				});
 
 				if (view != null)
@@ -103,6 +123,12 @@ public class SortFieldContribution extends MarkersContribution {
 	private IContributionItem getContributionItem(final MarkerField field) {
 		return new ContributionItem() {
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu,
+			 *      int)
+			 */
 			@Override
 			public void fill(Menu menu, int index) {
 				MenuItem item = new MenuItem(menu, SWT.RADIO);
@@ -126,12 +152,20 @@ public class SortFieldContribution extends MarkersContribution {
 			 */
 			private Listener getMenuItemListener(final MarkerField field,
 					final ExtendedMarkersView view) {
-				return event -> {
+				return new Listener() {
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+					 */
+					@Override
+					public void handleEvent(Event event) {
 
-					MenuItem item = (MenuItem) event.widget;
+						MenuItem item = (MenuItem) event.widget;
 
-					if (item.getSelection() && view != null)
-						view.setPrimarySortField(field);
+						if (item.getSelection() && view != null)
+							view.setPrimarySortField(field);
+					}
 				};
 			}
 		};

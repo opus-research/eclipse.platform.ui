@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.core.commands.operations.IOperationHistoryListener;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -39,6 +38,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.operations.TimeTriggeredProgressMonitorDialog;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.part.MultiPageEditorSite;
 import org.eclipse.ui.statushandlers.StatusManager;
 
@@ -341,32 +341,31 @@ public abstract class OperationHistoryActionHandler extends Action implements
 
 	abstract IStatus runCommand(IProgressMonitor pm) throws ExecutionException;
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IUndoContext.class)) {
-			return (T) undoContext;
+			return undoContext;
 		}
 		if (adapter.equals(IProgressMonitor.class)) {
 			if (progressDialog != null) {
-				return (T) progressDialog.getProgressMonitor();
+				return progressDialog.getProgressMonitor();
 			}
 		}
 		if (site != null) {
 			if (adapter.equals(Shell.class)) {
-				return (T) getWorkbenchWindow().getShell();
+				return getWorkbenchWindow().getShell();
 			}
 			if (adapter.equals(IWorkbenchWindow.class)) {
-				return (T) getWorkbenchWindow();
+				return getWorkbenchWindow();
 			}
 			if (adapter.equals(IWorkbenchPart.class)) {
-				return (T) site.getPart();
+				return site.getPart();
 			}
 			// Refer all other requests to the part itself.
 			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=108144
 			IWorkbenchPart part = site.getPart();
 			if (part != null) {
-				return Adapters.adapt(part, adapter);
+				return Util.getAdapter(part, adapter);
 			}
 		}
 		return null;
