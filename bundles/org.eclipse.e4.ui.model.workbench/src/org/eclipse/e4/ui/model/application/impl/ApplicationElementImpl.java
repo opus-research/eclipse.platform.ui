@@ -340,22 +340,10 @@ public abstract class ApplicationElementImpl extends org.eclipse.emf.ecore.impl.
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (elementId: "); //$NON-NLS-1$
 		result.append(elementId);
-		if(tags != null){
-			result.append(", tags: "); //$NON-NLS-1$
-			result.append(tags);
-		}
-		if(contributorURI != null){
-			result.append(", contributorURI: "); //$NON-NLS-1$
-			result.append(contributorURI);
-		}
-		if(persistedState != null){
-			result.append(", persistedState: "); //$NON-NLS-1$
-			result.append(persistedState);
-		}
-		if(transientData != null && !transientData.isEmpty()){
-			result.append(", transientData: "); //$NON-NLS-1$
-			result.append(transientData);
-		}
+		result.append(", tags: "); //$NON-NLS-1$
+		result.append(tags);
+		result.append(", contributorURI: "); //$NON-NLS-1$
+		result.append(contributorURI);
 		result.append(')');
 		return result.toString();
 	}
