@@ -62,6 +62,7 @@ public class ModeledPageLayout implements IPageLayout {
 	public static final String SHOW_VIEW_TAG = "persp.viewSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_MENU_PREFIX = "persp.hideMenuSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_TOOLBAR_PREFIX = "persp.hideToolbarSC:"; //$NON-NLS-1$
+	public static final String HIDDEN_ACTIONSET_PREFIX = "persp.hideActionSetSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_ITEMS_KEY = "persp.hiddenItems"; //$NON-NLS-1$
 
 	public static List<String> getIds(MPerspective model, String tagPrefix) {
@@ -147,8 +148,6 @@ public class ModeledPageLayout implements IPageLayout {
 			// sharedArea.setLabel("Editor Area"); //$NON-NLS-1$
 
 			editorStack = modelService.createModelElement(MPartStack.class);
-			// temporary HACK for bug 303982
-			editorStack.getTags().add("newtablook"); //$NON-NLS-1$
 			editorStack.getTags().add("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
 			editorStack.getTags().add("EditorStack"); //$NON-NLS-1$
 			editorStack.setElementId("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
@@ -412,8 +411,6 @@ public class ModeledPageLayout implements IPageLayout {
 
 	private MPartStack createStack(String id, boolean visible) {
 		MPartStack newStack = modelService.createModelElement(MPartStack.class);
-		// temporary HACK for bug 303982
-		newStack.getTags().add("newtablook"); //$NON-NLS-1$
 		newStack.setElementId(id);
 		newStack.setToBeRendered(visible);
 		return newStack;
@@ -682,22 +679,31 @@ public class ModeledPageLayout implements IPageLayout {
 			E4Util.unsupported("stackView: failed to find " + refId + " for " + id); //$NON-NLS-1$//$NON-NLS-2$
 			return;
 		}
-		MStackElement viewModel = createViewModel(application, id, visible, page, partService,
+
+		// Hide views that are filtered by capabilities
+		boolean isFiltered = isViewFiltered(id);
+		boolean toBeRendered = visible && !isFiltered;
+
+		MStackElement viewModel = createViewModel(application, id, toBeRendered, page, partService,
 				createReferences);
 		if (viewModel != null) {
 			MPartStack stack = (MPartStack) refModel;
 			boolean wasEmpty = stack.getChildren().isEmpty();
 			stack.getChildren().add(viewModel);
-			if (wasEmpty && visible) {
+			if (wasEmpty && toBeRendered) {
 				// the stack didn't originally have any children, set this as
 				// the selected element
 				stack.setSelectedElement(viewModel);
 			}
 
-			if (visible || viewModel.isToBeRendered()) {
+			if (viewModel.isToBeRendered()) {
 				// ensure that the parent is being rendered, it may have been a
 				// placeholder folder so its flag may actually be false
 				resetToBeRenderedFlag(viewModel, true);
+			}
+
+			if (isFiltered) {
+				addViewActivator(viewModel);
 			}
 		}
 	}

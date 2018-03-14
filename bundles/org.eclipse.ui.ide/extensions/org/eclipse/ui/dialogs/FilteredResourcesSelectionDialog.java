@@ -78,7 +78,7 @@ import com.ibm.icu.text.Collator;
 /**
  * Shows a list of resources to the user with a text entry field for a string
  * pattern used to filter the list of resources.
- * 
+ *
  * @since 3.3
  */
 public class FilteredResourcesSelectionDialog extends
@@ -122,7 +122,7 @@ public class FilteredResourcesSelectionDialog extends
 
 	/**
 	 * Creates a new instance of the class
-	 * 
+	 *
 	 * @param shell
 	 *            the parent shell
 	 * @param multi
@@ -184,22 +184,12 @@ public class FilteredResourcesSelectionDialog extends
 		setDetailsLabelProvider(resourceItemDetailsLabelProvider);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.SelectionStatusDialog#configureShell(org.eclipse.swt.widgets.Shell)
-	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, IIDEHelpContextIds.OPEN_RESOURCE_DIALOG);
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.SelectionDialog#setTitle(java.lang.String)
-	 */
+
 	@Override
 	public void setTitle(String title) {
 		super.setTitle(title);
@@ -208,7 +198,7 @@ public class FilteredResourcesSelectionDialog extends
 
 	/**
 	 * Adds or replaces subtitle of the dialog
-	 * 
+	 *
 	 * @param text
 	 *            the new subtitle
 	 */
@@ -220,11 +210,6 @@ public class FilteredResourcesSelectionDialog extends
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#getDialogSettings()
-	 */
 	@Override
 	protected IDialogSettings getDialogSettings() {
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
@@ -238,11 +223,6 @@ public class FilteredResourcesSelectionDialog extends
 		return settings;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#storeDialog(org.eclipse.jface.dialogs.IDialogSettings)
-	 */
 	@Override
 	protected void storeDialog(IDialogSettings settings) {
 		super.storeDialog(settings);
@@ -264,11 +244,6 @@ public class FilteredResourcesSelectionDialog extends
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#restoreDialog(org.eclipse.jface.dialogs.IDialogSettings)
-	 */
 	@Override
 	protected void restoreDialog(IDialogSettings settings) {
 		super.restoreDialog(settings);
@@ -296,11 +271,6 @@ public class FilteredResourcesSelectionDialog extends
 		applyFilter();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#fillViewMenu(org.eclipse.jface.action.IMenuManager)
-	 */
 	@Override
 	protected void fillViewMenu(IMenuManager menuManager) {
 		super.fillViewMenu(menuManager);
@@ -354,21 +324,11 @@ public class FilteredResourcesSelectionDialog extends
 		workingSetFilterActionGroup.fillContextMenu(menuManager);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#createExtendedContentArea(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createExtendedContentArea(Composite parent) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.SelectionDialog#getResult()
-	 */
 	@Override
 	public Object[] getResult() {
 		Object[] result = super.getResult();
@@ -387,11 +347,6 @@ public class FilteredResourcesSelectionDialog extends
 		return resultToReturn.toArray();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#open()
-	 */
 	@Override
 	public int open() {
 		if (getInitialPattern() == null) {
@@ -420,60 +375,31 @@ public class FilteredResourcesSelectionDialog extends
 		return super.open();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#getElementName(java.lang.Object)
-	 */
 	@Override
 	public String getElementName(Object item) {
 		IResource resource = (IResource) item;
 		return resource.getName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#validateItem(java.lang.Object)
-	 */
 	@Override
 	protected IStatus validateItem(Object item) {
 		return new Status(IStatus.OK, WorkbenchPlugin.PI_WORKBENCH, 0, "", null); //$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#createFilter()
-	 */
 	@Override
 	protected ItemsFilter createFilter() {
 		return new ResourceFilter(container, searchContainer, isDerived, typeMask);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#applyFilter()
-	 */
 	@Override
 	protected void applyFilter() {
 		super.applyFilter();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#getItemsComparator()
-	 */
 	@Override
 	protected Comparator getItemsComparator() {
 		return new Comparator() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.util.Comparator#compare(java.lang.Object,
-			 *      java.lang.Object)
-			 */
 			@Override
 			public int compare(Object o1, Object o2) {
 				Collator collator = Collator.getInstance();
@@ -481,7 +407,7 @@ public class FilteredResourcesSelectionDialog extends
 				IResource resource2 = (IResource) o2;
 				String s1 = resource1.getName();
 				String s2 = resource2.getName();
-				
+
 				// Compare names without extension first
 				int s1Dot = s1.lastIndexOf('.');
 				int s2Dot = s2.lastIndexOf('.');
@@ -490,7 +416,7 @@ public class FilteredResourcesSelectionDialog extends
 				int comparability = collator.compare(n1, n2);
 				if (comparability != 0)
 					return comparability;
-				
+
 				// Compare full names
 				if (s1Dot != -1 || s2Dot != -1) {
 					comparability = collator.compare(s1, s2);
@@ -502,7 +428,7 @@ public class FilteredResourcesSelectionDialog extends
 				if (searchContainer != null) {
 					IContainer c1 = resource1.getParent();
 					IContainer c2 = resource2.getParent();
-					
+
 					// Return paths 'closer' to the searchContainer first
 					comparability = pathDistance(c1) - pathDistance(c2);
 					if (comparability != 0)
@@ -534,7 +460,7 @@ public class FilteredResourcesSelectionDialog extends
 	 * - Closest distance is if the item is the same folder as the search container.<br>
 	 * - Next are folders inside the search container.<br>
 	 * - After all those, distance increases with decreasing matching prefix folder count.<br>
-	 * 
+	 *
 	 * @param item
 	 *            parent of the resource being examined
 	 * @return the "distance" of the passed in IResource from the search
@@ -553,28 +479,21 @@ public class FilteredResourcesSelectionDialog extends
 		IPath itemPath = item.getFullPath();
 		if (itemPath.equals(containerPath))
 			return 0;
-		
+
 		int matching = containerPath.matchingFirstSegments(itemPath);
 		if (matching == 0)
 			return Integer.MAX_VALUE / 2;
-		
+
 		int containerSegmentCount = containerPath.segmentCount();
 		if (matching == containerSegmentCount) {
-			// inside searchContainer: 
+			// inside searchContainer:
 			return itemPath.segmentCount() - matching;
 		}
-		
+
 		//outside searchContainer:
 		return Integer.MAX_VALUE / 4 + containerSegmentCount - matching;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#fillContentProvider(org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.AbstractContentProvider,
-	 *      org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.ItemsFilter,
-	 *      org.eclipse.core.runtime.IProgressMonitor)
-	 */
+
 	@Override
 	protected void fillContentProvider(AbstractContentProvider contentProvider,
 			ItemsFilter itemsFilter, IProgressMonitor progressMonitor)
@@ -585,11 +504,11 @@ public class FilteredResourcesSelectionDialog extends
 					.beginTask(
 							WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
 							members.length);
-			
+
 			ResourceProxyVisitor visitor = new ResourceProxyVisitor(
 					contentProvider, (ResourceFilter) itemsFilter,
 					progressMonitor);
-			
+
 			if (visitor.visit(container.createProxy())) {
 				for (int i= 0; i < members.length; i++) {
 					IResource member = members[i];
@@ -600,7 +519,7 @@ public class FilteredResourcesSelectionDialog extends
 						break;
 				}
 			}
-			
+
 		}
 		progressMonitor.done();
 	}
@@ -647,11 +566,6 @@ public class FilteredResourcesSelectionDialog extends
 			provider.addListener(this);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
-		 */
 		@Override
 		public Image getImage(Object element) {
 			if (!(element instanceof IResource)) {
@@ -663,11 +577,6 @@ public class FilteredResourcesSelectionDialog extends
 			return provider.getImage(res);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
-		 */
 		@Override
 		public String getText(Object element) {
 			if (!(element instanceof IResource)) {
@@ -685,10 +594,7 @@ public class FilteredResourcesSelectionDialog extends
 
 			return str;
 		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
-		 */
+
 		@Override
 		public StyledString getStyledText(Object element) {
 			if (!(element instanceof IResource)) {
@@ -704,7 +610,7 @@ public class FilteredResourcesSelectionDialog extends
 				str.append(" - ", StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
 				str.append(res.getParent().getFullPath().makeRelative().toString(), StyledString.QUALIFIER_STYLER);
 			}
-			
+
 //Debugging:
 //			int pathDistance = pathDistance(res.getParent());
 //			if (pathDistance != Integer.MAX_VALUE / 2) {
@@ -713,15 +619,10 @@ public class FilteredResourcesSelectionDialog extends
 //				else
 //					str.append(" (" + pathDistance + " folders down from current selection)", StyledString.QUALIFIER_STYLER);
 //			}
-			
+
 			return str;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.LabelProvider#dispose()
-		 */
 		@Override
 		public void dispose() {
 			provider.removeListener(this);
@@ -730,31 +631,16 @@ public class FilteredResourcesSelectionDialog extends
 			super.dispose();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
 		@Override
 		public void addListener(ILabelProviderListener listener) {
 			listeners.add(listener);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.LabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			listeners.remove(listener);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
-		 */
 		@Override
 		public void labelProviderChanged(LabelProviderChangedEvent event) {
 			Object[] l = listeners.getListeners();
@@ -770,11 +656,6 @@ public class FilteredResourcesSelectionDialog extends
 	 */
 	private class ResourceItemDetailsLabelProvider extends
 			ResourceItemLabelProvider {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
-		 */
 		@Override
 		public Image getImage(Object element) {
 			if (!(element instanceof IResource)) {
@@ -785,11 +666,6 @@ public class FilteredResourcesSelectionDialog extends
 			return provider.getImage(parent);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
-		 */
 		@Override
 		public String getText(Object element) {
 			if (!(element instanceof IResource)) {
@@ -807,11 +683,6 @@ public class FilteredResourcesSelectionDialog extends
 			return parent.getFullPath()	.makeRelative().toString();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
-		 */
 		@Override
 		public void labelProviderChanged(LabelProviderChangedEvent event) {
 			Object[] l = super.listeners.getListeners();
@@ -829,7 +700,7 @@ public class FilteredResourcesSelectionDialog extends
 
 		/**
 		 * Sets the active working set.
-		 * 
+		 *
 		 * @param workingSet
 		 *            the working set the filter should work with
 		 */
@@ -837,12 +708,6 @@ public class FilteredResourcesSelectionDialog extends
 			resourceWorkingSetFilter.setWorkingSet(workingSet);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
-		 *      java.lang.Object, java.lang.Object)
-		 */
 		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
@@ -866,7 +731,7 @@ public class FilteredResourcesSelectionDialog extends
 
 		/**
 		 * Creates new ResourceProxyVisitor instance.
-		 * 
+		 *
 		 * @param contentProvider
 		 * @param resourceFilter
 		 * @param progressMonitor
@@ -881,11 +746,6 @@ public class FilteredResourcesSelectionDialog extends
 			this.progressMonitor = progressMonitor;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.resources.IResourceProxyVisitor#visit(org.eclipse.core.resources.IResourceProxy)
-		 */
 		@Override
 		public boolean visit(IResourceProxy proxy) {
 
@@ -930,7 +790,7 @@ public class FilteredResourcesSelectionDialog extends
 		 * @since 3.6
 		 */
 		private SearchPattern relativeContainerPattern;
-		
+
 		/**
 		 * Camel case pattern for the name part of the file name (without extension). Is <code>null</code> if there's no extension.
 		 * @since 3.6
@@ -941,12 +801,12 @@ public class FilteredResourcesSelectionDialog extends
 		 * @since 3.6
 		 */
 		SearchPattern extensionPattern;
-		
+
 		private int filterTypeMask;
 
 		/**
 		 * Creates new ResourceFilter instance
-		 * 
+		 *
 		 * @param container
 		 * @param showDerived
 		 *            flag which determine showing derived elements
@@ -962,9 +822,9 @@ public class FilteredResourcesSelectionDialog extends
 
 		/**
 		 * Creates new ResourceFilter instance
-		 * 
+		 *
 		 * @param container
-		 * @param searchContainer 
+		 * @param searchContainer
 		 *            IContainer to use for performing relative search
 		 * @param showDerived
 		 *            flag which determine showing derived elements
@@ -977,24 +837,24 @@ public class FilteredResourcesSelectionDialog extends
 			String stringPattern = getPattern();
 			int matchRule = getMatchRule();
 			String filenamePattern;
-			
+
 			int sep = stringPattern.lastIndexOf(IPath.SEPARATOR);
 			if (sep != -1) {
 				filenamePattern = stringPattern.substring(sep + 1, stringPattern.length());
 				if ("*".equals(filenamePattern)) //$NON-NLS-1$
 					filenamePattern= "**"; //$NON-NLS-1$
-				
+
 				if (sep > 0) {
 					if (filenamePattern.length() == 0) // relative patterns don't need a file name
 						filenamePattern= "**"; //$NON-NLS-1$
-						
+
 					String containerPattern = stringPattern.substring(0, sep);
-					
+
 					if (searchContainer != null) {
 						relativeContainerPattern = new SearchPattern(SearchPattern.RULE_EXACT_MATCH | SearchPattern.RULE_PATTERN_MATCH);
 						relativeContainerPattern.setPattern(searchContainer.getFullPath().append(containerPattern).toString());
 					}
-					
+
 					if (!containerPattern.startsWith("" + IPath.SEPARATOR)) //$NON-NLS-1$
 						containerPattern = IPath.SEPARATOR + containerPattern;
 					this.containerPattern= new SearchPattern(SearchPattern.RULE_EXACT_MATCH | SearchPattern.RULE_PREFIX_MATCH | SearchPattern.RULE_PATTERN_MATCH);
@@ -1015,7 +875,7 @@ public class FilteredResourcesSelectionDialog extends
 			} else {
 				filenamePattern= stringPattern;
 			}
-			
+
 			int lastPatternDot = filenamePattern.lastIndexOf('.');
 			if (lastPatternDot != -1) {
 				if (matchRule != SearchPattern.RULE_EXACT_MATCH) {
@@ -1090,8 +950,8 @@ public class FilteredResourcesSelectionDialog extends
 				}
 				return true;
 			}
-			
-			return false;			
+
+			return false;
 		}
 
 		private boolean nameMatches(String name) {
@@ -1107,11 +967,6 @@ public class FilteredResourcesSelectionDialog extends
 			return matches(name);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.ItemsFilter#isSubFilter(org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.ItemsFilter)
-		 */
 		@Override
 		public boolean isSubFilter(ItemsFilter filter) {
 			if (!super.isSubFilter(filter))
@@ -1131,11 +986,6 @@ public class FilteredResourcesSelectionDialog extends
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.ItemsFilter#equalsFilter(org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.ItemsFilter)
-		 */
 		@Override
 		public boolean equalsFilter(ItemsFilter iFilter) {
 			if (!super.equalsFilter(iFilter))
@@ -1157,7 +1007,7 @@ public class FilteredResourcesSelectionDialog extends
 
 		/**
 		 * Check show derived flag for a filter
-		 * 
+		 *
 		 * @return true if filter allow derived resources false if not
 		 */
 		public boolean isShowDerived() {
@@ -1173,11 +1023,6 @@ public class FilteredResourcesSelectionDialog extends
 	 */
 	private class ResourceSelectionHistory extends SelectionHistory {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.SelectionHistory#restoreItemFromMemento(org.eclipse.ui.IMemento)
-		 */
 		@Override
 		protected Object restoreItemFromMemento(IMemento element) {
 			ResourceFactory resourceFactory = new ResourceFactory();
@@ -1186,12 +1031,6 @@ public class FilteredResourcesSelectionDialog extends
 			return resource;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog.SelectionHistory#storeItemToMemento(java.lang.Object,
-		 *      org.eclipse.ui.IMemento)
-		 */
 		@Override
 		protected void storeItemToMemento(Object item, IMemento element) {
 			IResource resource = (IResource) item;
