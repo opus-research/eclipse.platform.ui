@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 462707 - [WorkbenchLauncher] dialog not closed on ESC
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -28,8 +29,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -39,7 +38,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
@@ -57,6 +58,11 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
     private boolean suppressAskAgain = false;
 
     private boolean centerOnMonitor = false;
+
+	private Shell parentShell;
+
+	private Listener keyListener;
+
     /**
      * Create a modal dialog on the arugment shell, using and updating the
      * argument data object.
@@ -74,7 +80,28 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         this.launchData = launchData;
         this.suppressAskAgain = suppressAskAgain;
         this.centerOnMonitor = centerOnMonitor;
+
+		// Bug 462707 - [WorkbenchLauncher] dialog not closed on ESC
+		this.parentShell = parentShell;
+		this.keyListener = new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (event.character == SWT.ESC) {
+					cancelPressed();
+				}
+			}
+		};
+		parentShell.getDisplay().addFilter(SWT.KeyDown, keyListener);
     }
+
+	/**
+	 * Remove key down filter and close
+	 */
+	@Override
+	public boolean close() {
+		parentShell.getDisplay().removeFilter(SWT.KeyDown, keyListener);
+		return super.close();
+	}
 
     /**
      * Show the dialog to the user (if needed). When this method finishes,
@@ -92,9 +119,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         if (force || launchData.getShowDialog()) {
             open();
 
-			// Bug 70576: Dialog gets dismissed via ESC and via the window's
-			// close box. Make sure the launch doesn't continue with the default
-			// workspace.
+			// dialog is dismissed on ESC too
             if (getReturnCode() == CANCEL) {
 				launchData.workspaceSelected(null);
 			}
@@ -186,22 +211,21 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		return productName;
 	}
 
+    /**
+     * Configures the given shell in preparation for opening this window
+     * in it.
+     * <p>
+     * The default implementation of this framework method
+     * sets the shell's image and gives it a grid layout.
+     * Subclasses may extend or reimplement.
+     * </p>
+     *
+     * @param shell the shell
+     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_dialogName);
-		shell.addTraverseListener(new TraverseListener() {
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				// Bug 462707: [WorkbenchLauncher] dialog not closed on ESC.
-				// The dialog doesn't always have a parent, so
-				// Shell#traverseEscape() doesn't always close it for free.
-				if (e.detail == SWT.TRAVERSE_ESCAPE) {
-					e.detail = SWT.TRAVERSE_NONE;
-					cancelPressed();
-				}
-			}
-		});
     }
 
     /**
@@ -226,6 +250,14 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		return text.getText();
 	}
 
+    /**
+     * Notifies that the cancel button of this dialog has been pressed.
+     * <p>
+     * The <code>Dialog</code> implementation of this framework method sets
+     * this dialog's return code to <code>Window.CANCEL</code>
+     * and closes the dialog. Subclasses may override if desired.
+     * </p>
+     */
     @Override
 	protected void cancelPressed() {
         launchData.workspaceSelected(null);

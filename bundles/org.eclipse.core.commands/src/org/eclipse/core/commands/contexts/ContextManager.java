@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,29 +32,30 @@ import org.eclipse.core.internal.commands.util.Util;
  *
  * @since 3.1
  */
-public final class ContextManager extends HandleObjectManager implements IContextListener {
+public final class ContextManager extends HandleObjectManager implements
+		IContextListener {
 
 	/**
 	 * This flag can be set to <code>true</code> if the context manager should
 	 * print information to <code>System.out</code> when certain boundary
 	 * conditions occur.
 	 */
-	public static boolean DEBUG;
+	public static boolean DEBUG = false;
 
 	/**
 	 * The set of active context identifiers. This value may be empty, but it is
 	 * never <code>null</code>.
 	 */
-	private Set<String> activeContextIds = new HashSet<>();
+	private Set activeContextIds = new HashSet();
 
 	// allow the ContextManager to send one event for a larger delta
-	private boolean caching;
+	private boolean caching = false;
 
-	private int cachingRef;
+	private int cachingRef = 0;
 
-	private boolean activeContextsChange;
+	private boolean activeContextsChange = false;
 
-	private Set<String> oldIds;
+	private Set oldIds = null;
 
 	/**
 	 * Informs the manager that a batch operation has started.
@@ -102,10 +103,11 @@ public final class ContextManager extends HandleObjectManager implements IContex
 		if (caching) {
 			activeContextIds.add(contextId);
 		} else {
-			final Set<String> previouslyActiveContextIds = new HashSet<>(activeContextIds);
+			final Set previouslyActiveContextIds = new HashSet(activeContextIds);
 			activeContextIds.add(contextId);
 
-			fireContextManagerChanged(new ContextManagerEvent(this, null, false, true, previouslyActiveContextIds));
+			fireContextManagerChanged(new ContextManagerEvent(this, null,
+					false, true, previouslyActiveContextIds));
 		}
 
 		if (DEBUG) {
@@ -122,11 +124,11 @@ public final class ContextManager extends HandleObjectManager implements IContex
 	 * @param listener
 	 *            The listener to attach; must not be <code>null</code>.
 	 */
-	public final void addContextManagerListener(final IContextManagerListener listener) {
+	public final void addContextManagerListener(
+			final IContextManagerListener listener) {
 		addListenerObject(listener);
 	}
 
-	@Override
 	public final void contextChanged(final ContextEvent contextEvent) {
 		if (contextEvent.isDefinedChanged()) {
 			final Context context = contextEvent.getContext();
@@ -138,7 +140,8 @@ public final class ContextManager extends HandleObjectManager implements IContex
 				definedHandleObjects.remove(context);
 			}
 			if (isListenerAttached()) {
-				fireContextManagerChanged(new ContextManagerEvent(this, contextId, contextIdAdded, false, null));
+				fireContextManagerChanged(new ContextManagerEvent(this,
+						contextId, contextIdAdded, false, null));
 			}
 		}
 	}
@@ -171,7 +174,6 @@ public final class ContextManager extends HandleObjectManager implements IContex
 	 *         the set is not <code>null</code>, then it contains only
 	 *         instances of <code>String</code>.
 	 */
-	@SuppressWarnings("rawtypes")
 	public final Set getActiveContextIds() {
 		return Collections.unmodifiableSet(activeContextIds);
 	}
@@ -205,7 +207,6 @@ public final class ContextManager extends HandleObjectManager implements IContex
 	 * @return The set of defined context identifiers; this value may be empty,
 	 *         but it is never <code>null</code>.
 	 */
-	@SuppressWarnings("rawtypes")
 	public final Set getDefinedContextIds() {
 		return getDefinedHandleObjectIds();
 	}
@@ -218,7 +219,8 @@ public final class ContextManager extends HandleObjectManager implements IContex
 	 * @since 3.2
 	 */
 	public final Context[] getDefinedContexts() {
-		return (Context[]) definedHandleObjects.toArray(new Context[definedHandleObjects.size()]);
+		return (Context[]) definedHandleObjects
+				.toArray(new Context[definedHandleObjects.size()]);
 	}
 
 	/**
@@ -237,7 +239,7 @@ public final class ContextManager extends HandleObjectManager implements IContex
 		if (caching) {
 			activeContextIds.remove(contextId);
 		} else {
-			final Set<String> previouslyActiveContextIds = new HashSet<>(activeContextIds);
+			final Set previouslyActiveContextIds = new HashSet(activeContextIds);
 			activeContextIds.remove(contextId);
 
 			fireContextManagerChanged(new ContextManagerEvent(this, null,
@@ -255,7 +257,8 @@ public final class ContextManager extends HandleObjectManager implements IContex
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */
-	public final void removeContextManagerListener(final IContextManagerListener listener) {
+	public final void removeContextManagerListener(
+			final IContextManagerListener listener) {
 		removeListenerObject(listener);
 	}
 
@@ -268,17 +271,16 @@ public final class ContextManager extends HandleObjectManager implements IContex
 	 *            The new set of active context identifiers; may be
 	 *            <code>null</code>.
 	 */
-	@SuppressWarnings("unchecked")
-	public final void setActiveContextIds(@SuppressWarnings("rawtypes") final Set activeContextIds) {
+	public final void setActiveContextIds(final Set activeContextIds) {
 		if (Util.equals(this.activeContextIds, activeContextIds)) {
 			return;
 		}
 
 		activeContextsChange = true;
 
-		final Set<String> previouslyActiveContextIds = this.activeContextIds;
+		final Set previouslyActiveContextIds = this.activeContextIds;
 		if (activeContextIds != null) {
-			this.activeContextIds = new HashSet<>();
+			this.activeContextIds = new HashSet();
 			this.activeContextIds.addAll(activeContextIds);
 		} else {
 			this.activeContextIds = null;
@@ -290,7 +292,8 @@ public final class ContextManager extends HandleObjectManager implements IContex
 		}
 
 		if (!caching) {
-			fireContextManagerChanged(new ContextManagerEvent(this, null, false, true, previouslyActiveContextIds));
+			fireContextManagerChanged(new ContextManagerEvent(this, null,
+					false, true, previouslyActiveContextIds));
 		}
 	}
 
@@ -308,17 +311,18 @@ public final class ContextManager extends HandleObjectManager implements IContex
 		}
 		caching = cache;
 		boolean fireChange = activeContextsChange;
-		Set<String> holdOldIds = (oldIds == null ? Collections.EMPTY_SET : oldIds);
+		Set holdOldIds = (oldIds==null?Collections.EMPTY_SET:oldIds);
 
 		if (caching) {
-			oldIds = new HashSet<>(activeContextIds);
+			oldIds = new HashSet(activeContextIds);
 		} else {
 			oldIds = null;
 		}
 		activeContextsChange = false;
 
 		if (!caching && fireChange) {
-			fireContextManagerChanged(new ContextManagerEvent(this, null, false, true, holdOldIds));
+			fireContextManagerChanged(new ContextManagerEvent(this, null,
+					false, true, holdOldIds));
 		}
 	}
 }
