@@ -74,8 +74,7 @@ public class ProgressMonitorPart extends Composite implements
 
     /** the cancel lister attached to the cancel component */
     protected Listener fCancelListener = new Listener() {
-        @Override
-		public void handleEvent(Event e) {
+        public void handleEvent(Event e) {
             setCanceled(true);
             if (fCancelComponent != null) {
 				fCancelComponent.setEnabled(false);
@@ -162,8 +161,7 @@ public class ProgressMonitorPart extends Composite implements
      * Implements <code>IProgressMonitor.beginTask</code>.
      * @see IProgressMonitor#beginTask(java.lang.String, int)
      */
-    @Override
-	public void beginTask(String name, int totalWork) {
+    public void beginTask(String name, int totalWork) {
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
         updateLabel();
@@ -182,8 +180,7 @@ public class ProgressMonitorPart extends Composite implements
      * Implements <code>IProgressMonitor.done</code>.
      * @see IProgressMonitor#done()
      */
-    @Override
-	public void done() {
+    public void done() {
         fLabel.setText("");//$NON-NLS-1$
         fSubTaskName = ""; //$NON-NLS-1$
         fProgressIndicator.sendRemainingWork();
@@ -283,8 +280,7 @@ public class ProgressMonitorPart extends Composite implements
         	fToolBar.setCursor(arrowCursor);
         	fStopButton.setImage(stopImage);
         	fStopButton.addDisposeListener(new DisposeListener() {
-        		@Override
-				public void widgetDisposed(DisposeEvent e) {
+        		public void widgetDisposed(DisposeEvent e) {
         			stopImage.dispose();
         			arrowCursor.dispose();
         		}
@@ -298,8 +294,7 @@ public class ProgressMonitorPart extends Composite implements
      * Implements <code>IProgressMonitor.internalWorked</code>.
      * @see IProgressMonitor#internalWorked(double)
      */
-    @Override
-	public void internalWorked(double work) {
+    public void internalWorked(double work) {
         fProgressIndicator.worked(work);
     }
 
@@ -307,8 +302,7 @@ public class ProgressMonitorPart extends Composite implements
      * Implements <code>IProgressMonitor.isCanceled</code>.
      * @see IProgressMonitor#isCanceled()
      */
-    @Override
-	public boolean isCanceled() {
+    public boolean isCanceled() {
         return fIsCanceled;
     }
 
@@ -334,8 +328,7 @@ public class ProgressMonitorPart extends Composite implements
      * Implements <code>IProgressMonitor.setCanceled</code>.
      * @see IProgressMonitor#setCanceled(boolean)
      */
-    @Override
-	public void setCanceled(boolean b) {
+    public void setCanceled(boolean b) {
         fIsCanceled = b;
     }
 
@@ -353,8 +346,7 @@ public class ProgressMonitorPart extends Composite implements
      *  (non-Javadoc)
      * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
      */
-    @Override
-	public void setTaskName(String name) {
+    public void setTaskName(String name) {
         fTaskName = name;
         updateLabel();
     }
@@ -363,8 +355,7 @@ public class ProgressMonitorPart extends Composite implements
      *  (non-Javadoc)
      * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
      */
-    @Override
-	public void subTask(String name) {
+    public void subTask(String name) {
         fSubTaskName = name;
         updateLabel();
     }
@@ -410,16 +401,14 @@ public class ProgressMonitorPart extends Composite implements
      * Implements <code>IProgressMonitor.worked</code>.
      * @see IProgressMonitor#worked(int)
      */
-    @Override
-	public void worked(int work) {
+    public void worked(int work) {
         internalWorked(work);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
      */
-    @Override
-	public void clearBlocked() {
+    public void clearBlocked() {
         blockedStatus = null;
         updateLabel();
 
@@ -428,8 +417,7 @@ public class ProgressMonitorPart extends Composite implements
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
      */
-    @Override
-	public void setBlocked(IStatus reason) {
+    public void setBlocked(IStatus reason) {
         blockedStatus = reason;
         updateLabel();
 

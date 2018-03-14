@@ -354,21 +354,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			Object clientObject = part.getObject();
 			if (clientObject instanceof CompatibilityPart) {
 				return ((CompatibilityPart) clientObject).getPart();
-			} else if (clientObject != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					return (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
-
-				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
-				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
 			}
 		}
 		return null;
@@ -1110,14 +1095,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 
 	public void addEditorReference(EditorReference editorReference) {
-		WorkbenchPage curPage = (WorkbenchPage) editorReference.getPage();
-
-		// Ensure that the page is up-to-date
-		if (curPage != this) {
-			curPage.editorReferences.remove(editorReference);
-			editorReference.setPage(this);
-		}
-
 		editorReferences.add(editorReference);
 	}
 
@@ -1706,7 +1683,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			broker.unsubscribe(areaWidgetHandler);
 			broker.unsubscribe(referenceRemovalEventHandler);
 			broker.unsubscribe(firingHandler);
-			broker.unsubscribe(childrenHandler);
 			partEvents.clear();
 
 			ISelectionService selectionService = getWorkbenchWindow().getSelectionService();
@@ -2146,21 +2122,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			Object object = part.getObject();
 			if (object instanceof CompatibilityPart) {
 				return ((CompatibilityPart) object).getPart();
-			} else if (object != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					return (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
-
-				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
-				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
 			}
 		}
 		return null;
@@ -2633,7 +2594,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		broker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, areaWidgetHandler);
 		broker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED, referenceRemovalEventHandler);
 		broker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, firingHandler);
-		broker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, childrenHandler);
 
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
@@ -4483,19 +4443,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (aggregateWorkingSet == null) {
 			IWorkingSetManager workingSetManager = PlatformUI.getWorkbench()
 					.getWorkingSetManager();
-
-			if (aggregateWorkingSetId == null) {
-				aggregateWorkingSet = findAggregateWorkingSet(workingSetManager);
-				aggregateWorkingSetId = aggregateWorkingSet == null ? getDefaultAggregateWorkingSetId()
-						: aggregateWorkingSet.getName();
-			} else {
-				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
-						.getWorkingSet(aggregateWorkingSetId);
-			}
-
+			aggregateWorkingSet = (AggregateWorkingSet) workingSetManager.getWorkingSet(
+							getAggregateWorkingSetId());
 			if (aggregateWorkingSet == null) {
 				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
-						.createAggregateWorkingSet(aggregateWorkingSetId,
+						.createAggregateWorkingSet(
+								getAggregateWorkingSetId(),
 								WorkbenchMessages.WorkbenchPage_workingSet_default_label,
 								getWorkingSets());
 				workingSetManager.addWorkingSet(aggregateWorkingSet);
@@ -4504,19 +4457,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return aggregateWorkingSet;
 	}
 
-	private String getDefaultAggregateWorkingSetId() {
-		return "Aggregate for window " + System.currentTimeMillis(); //$NON-NLS-1$
+	private String getAggregateWorkingSetId() {	
+		if (aggregateWorkingSetId == null) {
+			aggregateWorkingSetId = "Aggregate for window " + System.currentTimeMillis(); //$NON-NLS-1$
+		}
+		return aggregateWorkingSetId;
 	}
 	
-	private AggregateWorkingSet findAggregateWorkingSet(IWorkingSetManager workingSetManager) {
-		for (IWorkingSet workingSet : workingSetManager.getAllWorkingSets()) {
-			if (workingSet instanceof AggregateWorkingSet) {
-				return (AggregateWorkingSet) workingSet;
-			}
-		}
-		return null;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -5003,41 +4950,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 					}
 					if ((e & FIRE_PART_BROUGHTTOTOP) == FIRE_PART_BROUGHTTOTOP) {
 						firePartBroughtToTop((MPart) element);
-					}
-				}
-			}
-		}
-	};
-
-	private EventHandler childrenHandler = new EventHandler() {
-		public void handleEvent(Event event) {
-			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-
-			// ...in this window ?
-			MUIElement changedElement = (MUIElement) changedObj;
-			if (modelService.getTopLevelWindowFor(changedElement) != window)
-				return;
-
-			if (UIEvents.isADD(event)) {
-				for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
-					if (!(o instanceof MUIElement))
-						continue;
-
-					// We have to iterate through the new elements to see if any
-					// contain (or are) MParts (e.g. we may have dragged a split
-					// editor which contains two editors, both with EditorRefs)
-					MUIElement element = (MUIElement) o;
-					List<MPart> addedParts = modelService.findElements(element, null, MPart.class,
-							null);
-					for (MPart part : addedParts) {
-						IWorkbenchPartReference ref = (IWorkbenchPartReference) part
-								.getTransientData().get(
-								IWorkbenchPartReference.class.getName());
-
-						// For now we only check for editors changing pages
-						if (ref instanceof EditorReference && getEditorReference(part) == null) {
-							addEditorReference((EditorReference) ref);
-						}
 					}
 				}
 			}
