@@ -39,8 +39,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -52,13 +50,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -125,13 +118,6 @@ class PropertySheetViewer extends Viewer {
     
     // the property sheet sorter
     private PropertySheetSorter sorter = new PropertySheetSorter();
-    
-    // the text used to filter property sheet entries
-	private String textFilter = ""; //$NON-NLS-1$    
-
-	// The composite where the contents of the property pane are show. Consist of a filtering text 
-	// box and a properties tree.
-	private Composite contents;
 
     /**
      * Creates a property sheet viewer on a newly-created tree control
@@ -141,18 +127,9 @@ class PropertySheetViewer extends Viewer {
      *            the parent control
      */
     public PropertySheetViewer(Composite parent) {
-    	contents = new Composite(parent,SWT.NONE);
-    	GridLayout layout = new GridLayout();
-    	layout.marginBottom=0;
-    	layout.marginTop=0;
-    	contents.setLayout(layout);
-    	
-    	initFilteringControl(contents);
-    	
-        tree = new Tree(contents, SWT.FULL_SELECTION | SWT.SINGLE
+        tree = new Tree(parent, SWT.FULL_SELECTION | SWT.SINGLE
                 | SWT.HIDE_SELECTION);
-        tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        
+
         // configure the widget
         tree.setLinesVisible(true);
         tree.setHeaderVisible(true);
@@ -171,40 +148,6 @@ class PropertySheetViewer extends Viewer {
         createEditorListener();
     }
 
-	/**
-	 * Initialise controls used to filter property entries
-	 */
-	private void initFilteringControl(Composite parent) {
-		GridLayout layout;
-		Composite filterComposite = new Composite(parent, SWT.NONE);
-    	layout = new GridLayout();
-    	layout.marginBottom=0;
-    	layout.marginTop=0;
-    	layout.numColumns=3;
-    	filterComposite.setLayout(layout);
-    	Label label = new Label(filterComposite,SWT.NONE);
-    	label.setText("Filter:"); //$NON-NLS-1$
-    	final Text text = new Text(filterComposite,SWT.SINGLE|SWT.BORDER);
-    	text.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				textFilter = ((Text)e.getSource()).getText();
-				refresh();
-			}
-		});
-    	Button clearBtn = new Button(filterComposite, SWT.NONE);
-    	clearBtn.setText("Clear"); //$NON-NLS-1$
-    	clearBtn.addMouseListener(new MouseAdapter() {
-    		/* (non-Javadoc)
-    		 * @see org.eclipse.swt.events.MouseAdapter#mouseUp(org.eclipse.swt.events.MouseEvent)
-    		 */
-    		public void mouseUp(MouseEvent e) {
-    			textFilter = ""; //$NON-NLS-1$
-    			text.setText(""); //$NON-NLS-1$
-    			refresh();
-    		}
-		});
-	}
-    
     /**
      * Activate a cell editor for the given selected tree item.
      * 
@@ -657,7 +600,7 @@ class PropertySheetViewer extends Viewer {
      * (non-Javadoc) Method declared on Viewer.
      */
     public Control getControl() {
-        return contents; 
+        return tree;
     }
 
     /**
@@ -670,7 +613,7 @@ class PropertySheetViewer extends Viewer {
     private List getFilteredEntries(IPropertySheetEntry[] entries) {
         // if no filter just return all entries
         if (isShowingExpertProperties) {
-			return getTextFilteredEntries(Arrays.asList(entries));
+			return Arrays.asList(entries);
 		}
 
         // check each entry for the filter
@@ -693,29 +636,9 @@ class PropertySheetViewer extends Viewer {
 				}
             }
         }
-        return getTextFilteredEntries(filteredEntries);
+        return filteredEntries;
     }
     
-	/**
-	 * Filter property entries by their display names or string values, using
-	 * the global filter string.
-	 * 
-	 * @param entries
-	 * @return Property entries whose display name or string value contains the filter text.
-	 */
-	private List getTextFilteredEntries(List entries) {
-		List textFiltered = new ArrayList();
-		for (int i = 0; i < entries.size(); i++) {
-			IPropertySheetEntry entry = (IPropertySheetEntry) entries.get(i);
-			if ((entry.getDisplayName().toLowerCase().indexOf(textFilter.toLowerCase()) >= 0) ||
-			    (entry.getValueAsString().toLowerCase().indexOf(textFilter.toLowerCase()) >= 0)) {
-				textFiltered.add(entry);
-			}
-		}
-
-		return textFiltered;
-	}        
-   
     /**
 	 * Returns a sorted list of <code>IPropertySheetEntry</code> entries.
 	 * 
@@ -1484,14 +1407,5 @@ class PropertySheetViewer extends Viewer {
             new TreeItem(item, SWT.NULL); // append a dummy to create the
             // plus sign
         }
-    }
-
-    /**
-     * Returns the {@link Tree} that displays the properties
-     * 
-     * @return the tree that displays the properties.
-     */
-    Tree getPropertiesTreeControl() {
-        return tree;
     }
 }
