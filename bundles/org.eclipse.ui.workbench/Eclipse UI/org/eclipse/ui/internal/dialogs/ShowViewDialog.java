@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids - bug 128526, bug 128529
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 455527
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -23,7 +22,6 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogLabelKeys;
@@ -95,8 +93,6 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 
 	private MWindow window;
 
-	private EPartService partService;
-
 	/**
 	 * Constructs a new ShowViewDialog.
 	 *
@@ -104,17 +100,15 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	 * @param application
 	 * @param window
 	 * @param modelService
-	 * @param partService
 	 * @param context
 	 *
 	 */
-	public ShowViewDialog(Shell shell, MApplication application, MWindow window, EModelService modelService,
-			EPartService partService, IEclipseContext context) {
+	public ShowViewDialog(Shell shell, MApplication application, MWindow window,
+			EModelService modelService, IEclipseContext context) {
 		super(shell);
 		this.application = application;
 		this.window = window;
 		this.modelService = modelService;
-		this.partService = partService;
 		this.context = context;
 	}
 
@@ -232,7 +226,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 			}
 		});
 
-		treeViewer.setLabelProvider(new ViewLabelProvider(context, modelService, partService, window,
+		treeViewer.setLabelProvider(new ViewLabelProvider(context, modelService, window,
 				dimmedForeground));
 		treeViewer.setContentProvider(new ViewContentProvider(application));
 		treeViewer.setComparator(new ViewComparator());
