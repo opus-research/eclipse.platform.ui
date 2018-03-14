@@ -212,10 +212,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 	private CheckboxTableViewer actionSetAvailabilityTable;
 
-	private TreeViewer actionSetMenuViewer;
-
-	private TreeViewer actionSetToolbarViewer;
-
 	private CheckboxTreeViewer menuStructureViewer1;
 
 	private CheckboxTreeViewer menuStructureViewer2;
@@ -873,7 +869,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		label.setText(WorkbenchMessages.ActionSetSelection_menubarActions);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		actionSetMenuViewer = new TreeViewer(menubarGroup);
+		final TreeViewer actionSetMenuViewer = new TreeViewer(menubarGroup);
 		actionSetMenuViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		actionSetMenuViewer.getControl().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -899,7 +895,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		label.setText(WorkbenchMessages.ActionSetSelection_toolbarActions);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		actionSetToolbarViewer = new TreeViewer(toolbarGroup);
+		final TreeViewer actionSetToolbarViewer = new TreeViewer(toolbarGroup);
 		actionSetToolbarViewer
 				.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		actionSetToolbarViewer.getControl().setLayoutData(
@@ -1435,10 +1431,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * On a change to availability, updates the appropriate widgets.
 	 */
 	private void actionSetAvailabilityChanged() {
-		actionSetAvailabilityTable.refresh();
-		actionSetMenuViewer.refresh();
-		actionSetToolbarViewer.refresh();
-
 		menuStructureViewer1.refresh();
 		menuStructureViewer2.refresh();
 		toolbarStructureViewer1.refresh();
@@ -1943,9 +1935,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				contributionItem = menuMngrRenderer.getManager((MMenu) menuItem);
 			} else {
 				contributionItem = menuMngrRenderer.getContribution(menuItem);
-			}
-			if (contributionItem == null) {
-				return dynamicEntry;
 			}
 			if (dynamicEntry != null
 					&& contributionItem.equals(dynamicEntry.getIContributionItem())) {
