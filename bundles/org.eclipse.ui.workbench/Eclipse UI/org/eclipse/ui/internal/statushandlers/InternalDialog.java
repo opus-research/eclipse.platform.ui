@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -947,8 +948,10 @@ public class InternalDialog extends TrayDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					Workbench.getInstance().getActiveWorkbenchWindow()
-							.getActivePage().showView(LOG_VIEW_ID);
+					IWorkbenchWindow window = Workbench.getInstance().getActiveWorkbenchWindow();
+					if (window != null && window.getActivePage() != null) {
+						window.getActivePage().showView(LOG_VIEW_ID);
+					}
 				} catch (CoreException ce) {
 					StatusManager.getManager().handle(ce,
 							WorkbenchPlugin.PI_WORKBENCH);
