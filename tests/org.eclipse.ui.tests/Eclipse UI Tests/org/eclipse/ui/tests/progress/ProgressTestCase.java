@@ -23,7 +23,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  *
  */
 public abstract class ProgressTestCase extends UITestCase {
-	
+
 
 	protected ProgressView progressView;
 	private IWorkbenchWindow window;
@@ -34,9 +34,6 @@ public abstract class ProgressTestCase extends UITestCase {
 		super(testName);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -45,18 +42,18 @@ public abstract class ProgressTestCase extends UITestCase {
 
 	/**
 	 * Opens the ProgresView on the specified page and process the UI events.
-	 * 
-	 * @throws PartInitException 
+	 *
+	 * @throws PartInitException
 	 */
 	public void openProgressView() throws PartInitException {
-		
+
 		IWorkbenchPage activePage = window.getActivePage();
 		progressView = (ProgressView) activePage.showView(IPageLayout.ID_PROGRESS_VIEW);
 		assertNotNull("Progress View is not created properly", progressView);
-		
+
 		processEvents();
 	}
-	
+
 	public void hideProgressView() {
 		window.getActivePage().hideView(progressView);
 		processEvents();

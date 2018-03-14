@@ -52,18 +52,4 @@ public interface IWorkingSetSelectionDialog {
      * @param workingSets the working sets to select in the dialog.
      */
     public void setSelection(IWorkingSet[] workingSets);
-
-	/**
-	 * @return the default working set for items that don't have a working set
-	 *         selected. Can be null is none was selected.
-	 */
-	public IWorkingSet getDefaultWorkingSet();
-
-	/**
-	 * Sets the default working set initially selected in dialog
-	 * 
-	 * @param whether
-	 *            user already configured a default working set
-	 */
-	public void setDefaultWorkingSet(IWorkingSet defaultWorkingSet);
 }

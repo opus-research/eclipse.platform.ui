@@ -19,7 +19,7 @@ import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.ListeningLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  * Tests UpdatableTreeContentProvider and DirtyIndicationLabelProvider. Creates
  * a tree containing three randomly-generated sets of integers, and one node
  * that contains the union of the other sets.
- * 
+ *
  * @since 1.0
  */
 public class LabelProviderTest {
@@ -60,11 +60,6 @@ public class LabelProviderTest {
 	private Button renameButton;
 
 	private SelectionListener buttonSelectionListener = new SelectionAdapter() {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-		 */
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Button pressed = (Button) e.widget;
@@ -83,7 +78,7 @@ public class LabelProviderTest {
 	private IObservableValue selectedRenamable;
 
 	/**
-	 * 
+	 *
 	 */
 	public LabelProviderTest() {
 
@@ -104,12 +99,6 @@ public class LabelProviderTest {
 					}
 				};
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.jface.databinding.viewers.ViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
-				 *      java.lang.Object)
-				 */
 				@Override
 				public void updateLabel(ViewerLabel label, Object element) {
 					if (element instanceof RenamableItem) {
@@ -194,7 +183,7 @@ public class LabelProviderTest {
 	 */
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 
 			@Override
 			public void run() {

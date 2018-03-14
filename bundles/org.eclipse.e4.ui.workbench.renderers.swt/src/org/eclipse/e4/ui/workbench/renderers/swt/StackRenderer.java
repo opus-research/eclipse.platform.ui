@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150, 442285
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
@@ -44,15 +45,12 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
-import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
@@ -109,7 +107,7 @@ import org.w3c.dom.css.CSSValue;
  */
 public class StackRenderer extends LazyStackRenderer {
 	/**
-	 * 
+	 *
 	 */
 	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
 
@@ -134,19 +132,13 @@ public class StackRenderer extends LazyStackRenderer {
 	// Minimum characters in for stacks inside the shared area
 	private static int MIN_EDITOR_CHARS = 15;
 
-	Image viewMenuImage;
+	private Image viewMenuImage;
 
 	@Inject
-	IStylingEngine stylingEngine;
+	private IEventBroker eventBroker;
 
 	@Inject
-	IEventBroker eventBroker;
-
-	@Inject
-	IPresentationEngine renderer;
-
-	@Inject
-	EModelService modelService;
+	private IPresentationEngine renderer;
 
 	private EventHandler itemUpdater;
 
@@ -234,7 +226,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Handles changes in tags
-	 * 
+	 *
 	 * @param event
 	 */
 	@Inject
@@ -1117,7 +1109,6 @@ public class StackRenderer extends LazyStackRenderer {
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this,
-				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
 				getInitialMRUValue(ctf));
 		editorList.setInput();
 
@@ -1174,7 +1165,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Closes the part that's backed by the given widget.
-	 * 
+	 *
 	 * @param widget
 	 *            the part that owns this widget
 	 * @param check
@@ -1528,7 +1519,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Determine whether the given view menu has any visible menu items.
-	 * 
+	 *
 	 * @param viewMenu
 	 *            the view menu to check
 	 * @param part
@@ -1619,8 +1610,13 @@ public class StackRenderer extends LazyStackRenderer {
 				part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 			}
 
+			String prevCssCls = WidgetElement.getCSSClass(cti);
 			setCSSInfo(part, cti);
-			reapplyStyles(cti.getParent());
+
+			if (prevCssCls == null
+					|| !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
+				reapplyStyles(cti.getParent());
+			}
 		}
 
 		public boolean validateElement(Object element) {

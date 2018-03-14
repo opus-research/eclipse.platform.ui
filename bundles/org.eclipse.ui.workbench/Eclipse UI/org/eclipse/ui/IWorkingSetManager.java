@@ -98,21 +98,10 @@ public interface IWorkingSetManager {
     public static final String CHANGE_WORKING_SET_UPDATER_UNINSTALLED = "workingSetUpdaterUninstalled"; //$NON-NLS-1$
 
     /**
-	 * Change event id when default working set is used.
-	 */
-	public static final String CHANGE_WORKING_SET_USEDEFAULT = "workingSetDefaultToggle"; //$NON-NLS-1$
-
-	/**
-	 * Change event id when default working set is changed.
-	 */
-	public static final String CHANGE_WORKING_SET_DEFAULT = "workingSetDefault"; //$NON-NLS-1$
-
-	/**
-	 * Adds a property change listener.
-	 * 
-	 * @param listener
-	 *            the property change listener to add
-	 */
+     * Adds a property change listener.
+     * 
+     * @param listener the property change listener to add
+     */
     public void addPropertyChangeListener(IPropertyChangeListener listener);
 
     /**
@@ -308,10 +297,10 @@ public interface IWorkingSetManager {
     public IWorkingSet getWorkingSet(String name);
 
     /**
-	 * Returns an array of all working sets stored in the receiver. Any working
-	 * set whose {@link IWorkingSet#isVisible()} method returns false will not be
-	 * included in this array. For a complete list of working sets please use
-	 * {@link #getAllWorkingSets()}.
+	 * Returns an array of all working sets stored in the receiver. The array is
+	 * sorted by names. Any working set whose {@link IWorkingSet#isVisible()}
+	 * method returns false will not be included in this array. For a complete
+	 * list of working sets please use {@link #getAllWorkingSets()}.
 	 * 
 	 * @return the working sets stored in the receiver
 	 */
@@ -379,16 +368,4 @@ public interface IWorkingSetManager {
 	 * @since 3.7
 	 */
 	public int getRecentWorkingSetsLength();
-
-	/**
-	 * @return the default working set. Can be null if none is configured
-	 */
-	public IWorkingSet getDefaultWorkingSet();
-
-	/**
-	 * @param defaultWorkingSet
-	 *            the new default working set, or null if we don't want to use a
-	 *            default working set.
-	 */
-	public void setDefaultWorkingSet(IWorkingSet defaultWorkingSet);
 }

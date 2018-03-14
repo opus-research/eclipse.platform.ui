@@ -23,7 +23,7 @@ import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * An example showing how to create a {@link ILabelProvider label provider} that
  * to provide colors.
- * 
+ *
  * @since 3.2
  */
 public class Snippet007ColorLabelProvider {
@@ -60,7 +60,7 @@ public class Snippet007ColorLabelProvider {
 		persons.add(new Person("David Gilmour", Person.MALE));
 
 		final Display display = new Display();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				Shell shell = new Shell(display);
@@ -192,7 +192,7 @@ public class Snippet007ColorLabelProvider {
 		/**
 		 * Returns the name. Method declared public to satisfy Java bean
 		 * conventions
-		 * 
+		 *
 		 * @return the name
 		 */
 		public String getName() {
@@ -213,7 +213,7 @@ public class Snippet007ColorLabelProvider {
 		/**
 		 * Returns the gender. Method declared public to satisfy Java bean
 		 * conventions
-		 * 
+		 *
 		 * @return the gender
 		 */
 		public int getGender() {

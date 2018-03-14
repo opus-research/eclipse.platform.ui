@@ -46,63 +46,46 @@ public class TitleTestEditor extends EditorPart {
     Label cdLabel;
 
     /**
-     * 
+     *
      */
     public TitleTestEditor() {
         super();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
-     */
     @Override
 	public void doSave(IProgressMonitor monitor) {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.ISaveablePart#doSaveAs()
-     */
     @Override
 	public void doSaveAs() {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IEditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
-     */
     @Override
 	public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
 
-        if (!(input instanceof IFileEditorInput))
-            throw new PartInitException(
+        if (!(input instanceof IFileEditorInput)) {
+			throw new PartInitException(
                     "Invalid Input: Must be IFileEditorInput");
+		}
         setSite(site);
         setInput(input);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.ISaveablePart#isDirty()
-     */
     @Override
 	public boolean isDirty() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
-     */
     @Override
 	public boolean isSaveAsAllowed() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-     */
     @Override
 	public void createPartControl(Composite parent) {
         composite = new Composite(parent, SWT.NONE);
@@ -159,9 +142,6 @@ public class TitleTestEditor extends EditorPart {
         updateLabels();
 
         addPropertyListener(new IPropertyListener() {
-            /* (non-Javadoc)
-             * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
-             */
             @Override
 			public void propertyChanged(Object source, int propId) {
                 updateLabels();
@@ -175,9 +155,6 @@ public class TitleTestEditor extends EditorPart {
         cdLabel.setText(getContentDescription());
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
-     */
     @Override
 	public void setFocus() {
         composite.setFocus();

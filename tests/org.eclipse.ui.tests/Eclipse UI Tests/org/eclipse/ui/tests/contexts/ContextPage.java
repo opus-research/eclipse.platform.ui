@@ -24,7 +24,7 @@ import org.eclipse.ui.part.Page;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @see PageBookView
  */
 public class ContextPage extends Page {
@@ -43,9 +43,6 @@ public class ContextPage extends Page {
 		// do nothing
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPage.
-	 */
 	@Override
 	public void createControl(Composite parent) {
 		// Message in default page of Outline should have margins
@@ -56,9 +53,6 @@ public class ContextPage extends Page {
 		msgLabel.setText(message);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPage.
-	 */
 	@Override
 	public Control getControl() {
 		return pgComp;
@@ -77,21 +71,17 @@ public class ContextPage extends Page {
 
 	/**
 	 * Sets the message to the given string.
-	 * 
+	 *
 	 * @param message
 	 *            the message text
 	 */
 	public void setMessage(String msg) {
 		this.message = msg;
-		if (msgLabel != null)
+		if (msgLabel != null) {
 			msgLabel.setText(msg);
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.Page#init(org.eclipse.ui.part.IPageSite)
-	 */
 	@Override
 	public void init(IPageSite pageSite) {
 		super.init(pageSite);

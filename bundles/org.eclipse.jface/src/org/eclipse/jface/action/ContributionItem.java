@@ -107,9 +107,6 @@ public abstract class ContributionItem implements IContributionItem {
 	public void saveWidgetState() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public String getId() {
         return id;
@@ -199,7 +196,8 @@ public abstract class ContributionItem implements IContributionItem {
      */
     @Override
 	public String toString() {
-        return getClass().getName() + "(id=" + getId() + ")";//$NON-NLS-2$//$NON-NLS-1$
+		return getClass().getSimpleName() + "(id=" + getId() + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "visible=" + isVisible() + ")";//$NON-NLS-2$//$NON-NLS-1$
     }
 
     /**
@@ -210,9 +208,6 @@ public abstract class ContributionItem implements IContributionItem {
 	public void update() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionItem.
-     */
     @Override
 	public void setParent(IContributionManager parent) {
         this.parent = parent;

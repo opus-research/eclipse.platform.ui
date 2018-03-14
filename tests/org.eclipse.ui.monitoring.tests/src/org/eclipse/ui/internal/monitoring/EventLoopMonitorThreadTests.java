@@ -64,13 +64,19 @@ public class EventLoopMonitorThreadTests {
 		}
 	}
 
-	private static final String FILTER_TRACES =
-			"org.eclipse.swt.internal.gtk.OS.gtk_dialog_run,"
-					+ "org.eclipse.e4.ui.workbench.addons.dndaddon.DnDManager.startDrag";
+	private static final String UI_THREAD_FILTER =
+			"org.eclipse.swt.internal.gtk.OS.gtk_dialog_run"
+			+ ",org.eclipse.e4.ui.workbench.addons.dndaddon.DnDManager.startDrag";
+	private static final String NONINTERESTING_THREAD_FILTER =
+			"java.*"
+			+ ",sun.*"
+			+ ",org.eclipse.core.internal.jobs.WorkerPool.sleep"
+			+ ",org.eclipse.core.internal.jobs.WorkerPool.startJob"
+			+ ",org.eclipse.core.internal.jobs.Worker.run";
 	/* NOTE: All time-related values in this class are in milliseconds. */
 	private static final long MAX_TIMEOUT_MS = 1 * 1000; // 1 second
 	private static final int THRESHOLD_MS = 100;
-	private static final int POLLING_RATE_MS = THRESHOLD_MS / 2;
+	private static final int SAMPLE_INTERVAL_MS = THRESHOLD_MS * 2 / 3;
 	public static final int FORCE_DEADLOCK_LOG_TIME_MILLIS = 10 * 60 * 1000; // == 10 minutes
 	private static final int MIN_STACK_TRACES = 5;
 	private static final int MAX_STACK_TRACES = 11;
@@ -112,13 +118,12 @@ public class EventLoopMonitorThreadTests {
 	 */
 	private static MockEventLoopMonitorThread createTestThread(int threshold) throws Exception {
 		EventLoopMonitorThread.Parameters args = new Parameters();
-		args.longEventThreshold = threshold - 1;
-		args.initialSampleDelay = POLLING_RATE_MS - 1;
-		args.dumpAllThreads = true;
-		args.sampleInterval = POLLING_RATE_MS - 1;
+		args.longEventWarningThreshold = threshold - 1;
+		args.longEventErrorThreshold = threshold - 1;
 		args.maxStackSamples = MIN_STACK_TRACES;
 		args.deadlockThreshold = FORCE_DEADLOCK_LOG_TIME_MILLIS;
-		args.filterTraces = FILTER_TRACES;
+		args.uiThreadFilter = UI_THREAD_FILTER;
+		args.noninterestingThreadFilter = NONINTERESTING_THREAD_FILTER;
 
 		return new MockEventLoopMonitorThread(args);
 	}
@@ -127,7 +132,7 @@ public class EventLoopMonitorThreadTests {
 	 * Shuts down the event monitoring thread.
 	 */
 	private void shutdownMonitoringThread() throws Exception {
-		sendEvent(SWT.Wakeup);
+		sendEvent(SWT.PostExternalEventDispatch);
 		sendEvent(SWT.PostEvent);
 		monitoringThread.shutdown();
 		monitoringThread.join();
@@ -137,7 +142,7 @@ public class EventLoopMonitorThreadTests {
 	 * Runs the current thread for a specified amount of time for delays.
 	 */
 	private static void runForCycles(long numCycles) throws Exception {
-		runForTime(POLLING_RATE_MS * numCycles);
+		runForTime(SAMPLE_INTERVAL_MS * numCycles);
 	}
 
 	/**
@@ -146,7 +151,7 @@ public class EventLoopMonitorThreadTests {
 	private static void runForTime(long millis) throws Exception {
 		synchronized (sleepLock) {
 			while (millis > 0) {
-				long next = Math.min(millis, POLLING_RATE_MS);
+				long next = Math.min(millis, SAMPLE_INTERVAL_MS);
 				timestamp += next;
 
 				long sleeps = numSleeps;
@@ -164,7 +169,7 @@ public class EventLoopMonitorThreadTests {
 	 * Returns the expected number of stack traces captured.
 	 */
 	private static int expectedStackCount(long runningTimeMs) {
-		return Math.min((int) (runningTimeMs / POLLING_RATE_MS), MIN_STACK_TRACES);
+		return Math.min((int) (runningTimeMs / SAMPLE_INTERVAL_MS), MIN_STACK_TRACES);
 	}
 
 	private void sendEvent(int eventType) {
@@ -236,7 +241,7 @@ public class EventLoopMonitorThreadTests {
 
 	@Test
 	public void testPublishPossibleDeadlock() throws Exception {
-		monitoringThread = createTestThread(POLLING_RATE_MS * 4);
+		monitoringThread = createTestThread(SAMPLE_INTERVAL_MS * 4);
 		monitoringThread.start();
 		long maxDeadlock = FORCE_DEADLOCK_LOG_TIME_MILLIS;
 		sendEvent(SWT.PreEvent);
@@ -286,7 +291,7 @@ public class EventLoopMonitorThreadTests {
 				runForCycles(1);
 				sendEvent(SWT.PostEvent);
 			}
-			sendEvent(SWT.Sleep);
+			sendEvent(SWT.PreExternalEventDispatch);
 
 			// Wait for the end of the event to propagate to the deadlock tracker.
 			runForTime(FORCE_DEADLOCK_LOG_TIME_MILLIS * 2);
@@ -304,9 +309,9 @@ public class EventLoopMonitorThreadTests {
 
 		// One level deep
 		synchronized (sleepLock) {
-			sendEvent(SWT.Sleep);
-			runForTime(eventFactor * POLLING_RATE_MS);
-			sendEvent(SWT.Wakeup);
+			sendEvent(SWT.PreExternalEventDispatch);
+			runForTime(eventFactor * SAMPLE_INTERVAL_MS);
+			sendEvent(SWT.PostExternalEventDispatch);
 			runForCycles(3);
 		}
 
@@ -454,8 +459,8 @@ public class EventLoopMonitorThreadTests {
 		long eventResumeTime = 0;
 		long eventStallDuration = 0;
 
-		// Exceed the threshold after the thread is started in the middle of an event, then end the
-		// event and validate that no long event was logged.
+		// Exceed the threshold after the thread is started in the middle of an event, then end
+		// the event and validate that no long event was logged.
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreEvent);
 			// Initially the outer thread is invoking nested events that are responsive.
@@ -511,8 +516,8 @@ public class EventLoopMonitorThreadTests {
 			// Nested events
 			for (int i = 0; i < eventFactor; ++i) {
 				runForCycles(1);
-				sendEvent(SWT.Sleep);
-				sendEvent(SWT.Wakeup);
+				sendEvent(SWT.PreExternalEventDispatch);
+				sendEvent(SWT.PostExternalEventDispatch);
 			}
 
 			// Before exiting the outer thread is invoking nested events that are responsive.
@@ -525,7 +530,7 @@ public class EventLoopMonitorThreadTests {
 			runForCycles(3);
 		}
 
-		assertTrue("A long running event should not be published if Display.sleep() was called",
+		assertTrue("A long running event should not be published during an external event dispatch",
 				loggedEvents.isEmpty());
 	}
 
@@ -540,22 +545,23 @@ public class EventLoopMonitorThreadTests {
 
 		synchronized (sleepLock) {
 			sendEvent(SWT.PreEvent);
-			sendEvent(SWT.Sleep);
+			sendEvent(SWT.PreExternalEventDispatch);
 			runForTime(THRESHOLD_MS);
-			sendEvent(SWT.Wakeup);
+			sendEvent(SWT.PostExternalEventDispatch);
 			eventStartTime = timestamp;
 			runForCycles(3);
 		}
 
-		assertTrue("A long running event shold not be published during a sleep",
+		assertTrue("A long running event shold not be published during an external event dispatch",
 				loggedEvents.isEmpty());
 
-		// Let a long time elapse between the last Wakeup and the next Sleep.
+		// Let a long time elapse between the last PostExternalEventDispatch and the next
+		// PreExternalEventDispatch.
 		synchronized (sleepLock) {
 			runForTime(THRESHOLD_MS * eventFactor);
 			eventDuration = timestamp - eventStartTime;
-			sendEvent(SWT.Sleep);
-			sendEvent(SWT.Wakeup);
+			sendEvent(SWT.PreExternalEventDispatch);
+			sendEvent(SWT.PostExternalEventDispatch);
 			sendEvent(SWT.PostEvent);
 			runForCycles(3);
 		}

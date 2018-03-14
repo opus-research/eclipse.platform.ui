@@ -24,6 +24,7 @@ import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
@@ -49,7 +50,7 @@ import org.eclipse.swt.widgets.Table;
 public class Snippet013TableViewerEditing {
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				ViewModel viewModel = new ViewModel();
@@ -145,7 +146,7 @@ public class Snippet013TableViewerEditing {
 	 * Editing support that uses JFace Data Binding to control the editing
 	 * lifecycle. The standard EditingSupport get/setValue(...) lifecycle is not
 	 * used.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private static class InlineEditingSupport extends

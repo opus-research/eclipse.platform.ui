@@ -22,7 +22,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests bug 56822 -- NPE thrown when setTitle(null) is called.
- * 
+ *
  * @since 3.0
  */
 public class ViewPartTitleTest extends UITestCase {
@@ -49,9 +49,6 @@ public class ViewPartTitleTest extends UITestCase {
     boolean contentChangeEvent = false;
 
     private IPropertyListener propertyListener = new IPropertyListener() {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
-         */
         @Override
 		public void propertyChanged(Object source, int propId) {
             switch (propId) {
@@ -82,9 +79,6 @@ public class ViewPartTitleTest extends UITestCase {
         contentChangeEvent = false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
-     */
     @Override
 	protected void doTearDown() throws Exception {
         view.removePropertyListener(propertyListener);
@@ -118,7 +112,7 @@ public class ViewPartTitleTest extends UITestCase {
 
     /**
      * Ensure that we've received the given property change events since the start of the test
-     * 
+     *
      * @param titleEvent PROP_TITLE
      * @param nameEvent PROP_PART_NAME
      * @param descriptionEvent PROP_CONTENT_DESCRIPTION
@@ -147,7 +141,7 @@ public class ViewPartTitleTest extends UITestCase {
     /**
      * Ensures that we can call ViewPart.setTitle(null) without throwing
      * any exceptions
-     * 
+     *
      * @throws Throwable
      */
     public void testNullTitle() throws Throwable {

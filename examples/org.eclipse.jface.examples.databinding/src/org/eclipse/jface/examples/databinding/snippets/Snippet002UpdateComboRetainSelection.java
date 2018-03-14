@@ -28,7 +28,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.masterdetail.MasterDetailObservables;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,25 +42,25 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Shows how to bind a Combo so that when update its items, the selection is
  * retained if at all possible.
- * 
+ *
  * @since 3.2
  */
 public class Snippet002UpdateComboRetainSelection {
     public static void main(String[] args) {
     	final Display display = new Display();
-    	Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
     		@Override
 			public void run() {
     			ViewModel viewModel = new ViewModel();
     			Shell shell = new View(viewModel).createShell();
-    			
+
     			// The SWT event loop
     			while (!shell.isDisposed()) {
     				if (!display.readAndDispatch()) {
     					display.sleep();
     				}
     			}
-    			
+
     			// Print the results
     			System.out.println(viewModel.getText());
     		}

@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
+ *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring.preferences;
 
@@ -44,13 +45,12 @@ public class MonitoringPreferenceListener implements IPropertyChangeListener {
 		String property = event.getProperty();
 		if (!property.equals(PreferenceConstants.MONITORING_ENABLED)
 				&& !property.equals(PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS)
-				&& !property.equals(PreferenceConstants.MAX_STACK_SAMPLES)
-				&& !property.equals(PreferenceConstants.LONG_EVENT_THRESHOLD_MILLIS)
-				&& !property.equals(PreferenceConstants.INITIAL_SAMPLE_DELAY_MILLIS)
-				&& !property.equals(PreferenceConstants.SAMPLE_INTERVAL_MILLIS)
-				&& !property.equals(PreferenceConstants.DUMP_ALL_THREADS)
+				&& !property.equals(PreferenceConstants.LONG_EVENT_ERROR_THRESHOLD_MILLIS)
+				&& !property.equals(PreferenceConstants.LONG_EVENT_WARNING_THRESHOLD_MILLIS)
 				&& !property.equals(PreferenceConstants.LOG_TO_ERROR_LOG)
-				&& !property.equals(PreferenceConstants.FILTER_TRACES)) {
+				&& !property.equals(PreferenceConstants.MAX_STACK_SAMPLES)
+				&& !property.equals(PreferenceConstants.UI_THREAD_FILTER)
+				&& !property.equals(PreferenceConstants.NONINTERESTING_THREAD_FILTER)) {
 			return;
 		}
 

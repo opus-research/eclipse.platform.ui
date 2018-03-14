@@ -12,7 +12,6 @@
  * Tristan Hume - <trishume@gmail.com> -
  * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
- * Mickael Istria (Red Hat Inc.) - 266030 Default working set
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -89,6 +88,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SaveAll_toolTip;
 	public static String Workbench_revert;
 	public static String Workbench_revertToolTip;
+	public static String Workbench_missingPropertyMessage;
 	public static String Workbench_move;
 
 	public static String Workbench_moveToolTip;
@@ -362,6 +362,7 @@ public class WorkbenchMessages extends NLS {
 	//--- Coolbar ---
 	public static String WorkbenchWindow_FileToolbar;
 	public static String WorkbenchWindow_NavigateToolbar;
+	public static String WorkbenchWindow_HelpToolbar;
 	public static String WorkbenchWindow_searchCombo_toolTip;
 	public static String WorkbenchWindow_searchCombo_text;
 
@@ -522,13 +523,6 @@ public class WorkbenchMessages extends NLS {
 	public static String OpenPerspectiveMode_optionsTitle;
 	public static String OpenPerspectiveMode_sameWindow;
 	public static String OpenPerspectiveMode_newWindow;
-
-	public static String FastViewsGroup_title;
-	public static String OpenViewMode_title;
-	public static String OpenViewMode_embed;
-	public static String OpenViewMode_fast;
-
-	public static String FastViewBar_hide;
 
 	public static String PerspectivesPreference_MakeDefault;
 	public static String PerspectivesPreference_MakeDefaultTip;
@@ -700,7 +694,6 @@ public class WorkbenchMessages extends NLS {
 	public static String StandardSystemToolbar_Restore;
 
 	public static String EditorArea_Tooltip;
-	public static String ViewPane_fastView;
 	public static String ViewPane_minimizeView;
 	public static String ViewPane_moveView;
 	public static String ViewPane_moveFolder;
@@ -876,7 +869,6 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetSelectionDialog_detailsButton_label;
 	public static String WorkingSetSelectionDialog_newButton_label;
 	public static String WorkingSetSelectionDialog_removeButton_label;
-	public static String WorkingSetSelectionDialog_defaultWorkingSet;
 	
 	public static String WorkbenchPage_workingSet_default_label;
 	public static String WorkbenchPage_workingSet_multi_label;
@@ -949,12 +941,6 @@ public class WorkbenchMessages extends NLS {
 	public static String PerspectiveSwitcher_topRight;
 	public static String PerspectiveSwitcher_topLeft;
 	public static String PerspectiveSwitcher_left;
-
-
-	public static String FastViewBar_view_orientation;
-	public static String FastViewBar_horizontal;
-	public static String FastViewBar_vertical;
-	public static String FastViewBar_0;
 
 	public static String WorkbenchPlugin_extension;
 
@@ -1080,7 +1066,6 @@ public class WorkbenchMessages extends NLS {
     // Trim area Display Names
     public static String TrimCommon_Main_TrimName;
     public static String TrimCommon_PerspectiveSwitcher_TrimName;
-    public static String TrimCommon_FastView_TrimName;
     public static String TrimCommon_HeapStatus_TrimName;
     public static String TrimCommon_IntroBar_TrimName;
     public static String TrimCommon_Progress_TrimName;
@@ -1119,8 +1104,6 @@ public class WorkbenchMessages extends NLS {
 	}
 
 
-    public static String FastViewBar_show_view;
-    
     // Content assist support
     public static String ContentAssist_Cue_Description_Key;
 	
@@ -1170,4 +1153,5 @@ public class WorkbenchMessages extends NLS {
 	public static String Util_listNull;
 
 
+	
 }

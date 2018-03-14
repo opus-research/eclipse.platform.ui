@@ -33,6 +33,7 @@ public class JstPipelineTest extends NavigatorTestBase {
 		_navigatorInstanceId = TEST_VIEWER_PIPELINE;
 	}
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -72,7 +73,7 @@ public class JstPipelineTest extends NavigatorTestBase {
 		TreeItem[] rootItems = _viewer.getTree().getItems();
 
 		assertEquals(
-				"There should be " + _projectCount + " item(s).", _projectCount, rootItems.length); //$NON-NLS-1$		
+				"There should be " + _projectCount + " item(s).", _projectCount, rootItems.length); //$NON-NLS-1$
 
 		assertTrue(
 				"The root object should be an IJavaProject, which is IAdaptable.", rootItems[0].getData() instanceof IAdaptable); //$NON-NLS-1$

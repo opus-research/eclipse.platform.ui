@@ -34,7 +34,7 @@ import org.eclipse.ui.navigator.CommonViewer;
  *
  */
 public class OpenFolderAsProjectAction extends Action {
-	
+
 	private IFolder folder;
 	private CommonViewer viewer;
 
@@ -60,7 +60,7 @@ public class OpenFolderAsProjectAction extends Action {
 			if (status.isOK()) {
 				viewer.setSelection(new StructuredSelection(operation.getAffectedObjects()));
 			} else {
-				WorkbenchNavigatorPlugin.getDefault().getLog().log(status);	
+				WorkbenchNavigatorPlugin.getDefault().getLog().log(status);
 			}
 		} catch (IOException e) {
 			WorkbenchNavigatorPlugin

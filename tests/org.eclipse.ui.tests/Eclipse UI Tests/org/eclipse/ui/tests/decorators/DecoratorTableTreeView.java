@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Composite;
  * for table trees.
  */
 public class DecoratorTableTreeView extends DecoratorTestPart {
-	
+
 	TableTreeViewer viewer;
 
 	/**
@@ -29,9 +29,6 @@ public class DecoratorTableTreeView extends DecoratorTestPart {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TableTreeViewer(parent);
@@ -43,14 +40,11 @@ public class DecoratorTableTreeView extends DecoratorTestPart {
 
 		GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL
 				| GridData.FILL_BOTH);
-		
+
 		viewer.getControl().setLayoutData(data);
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
-	 */
 	@Override
 	public void setFocus() {
 		// XXX Auto-generated method stub

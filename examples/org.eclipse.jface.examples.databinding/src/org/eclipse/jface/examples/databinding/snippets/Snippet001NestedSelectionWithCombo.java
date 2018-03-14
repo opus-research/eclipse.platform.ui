@@ -25,7 +25,7 @@ import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -93,7 +93,7 @@ public class Snippet001NestedSelectionWithCombo {
 	}
 
 	// The data model class. This is normally a persistent class of some sort.
-	// 
+	//
 	// This example implements full JavaBeans bound properties so that changes
 	// to instances of this class will automatically be propogated to the UI.
 	public static class Person extends AbstractModelObject {
@@ -135,7 +135,7 @@ public class Snippet001NestedSelectionWithCombo {
 	// The ViewModel is responsible for getting the objects to edit from the
 	// DAO. Since this snippet doesn't have any persistent objects to
 	// retrieve, this ViewModel just instantiates some objects to edit.
-	// 
+	//
 	// This ViewModel also implements JavaBean bound properties.
 	static class ViewModel extends AbstractModelObject {
 		// The model to bind
@@ -176,7 +176,7 @@ public class Snippet001NestedSelectionWithCombo {
 		public Shell createShell() {
 			// Build a UI
 			Shell shell = new Shell(Display.getCurrent());
-			Realm realm = SWTObservables.getRealm(shell.getDisplay());
+			Realm realm = DisplayRealm.getRealm(shell.getDisplay());
 
 			List peopleList = new List(shell, SWT.BORDER);
 			Text name = new Text(shell, SWT.BORDER);

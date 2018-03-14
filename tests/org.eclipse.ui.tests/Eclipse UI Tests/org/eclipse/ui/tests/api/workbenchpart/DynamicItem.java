@@ -21,9 +21,9 @@ import org.eclipse.ui.actions.CompoundContributionItem;
 
 /**
  * Test implementation for dynamic menu item support.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class DynamicItem extends CompoundContributionItem {
 
@@ -65,11 +65,6 @@ public class DynamicItem extends CompoundContributionItem {
 				.getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
-	 */
 	@Override
 	protected IContributionItem[] getContributionItems() {
 		IContributionItem[] items = { new ActionContributionItem(action1),

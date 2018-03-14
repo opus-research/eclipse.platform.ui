@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 441150
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 441150
  *     Simon Scholz <scholzsimon@arcor.de - Bug 429729
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -55,7 +55,6 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -901,10 +900,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	private void forceLayout(Shell shell) {
-		if (Util.isMac())
-			return; // Bug 431966: Relaunching with many editors opened, the
-					// caret disappears when switching editors.
-
 		int i = 0;
 		while(shell.isLayoutDeferred()) {
 			shell.setLayoutDeferred(false);

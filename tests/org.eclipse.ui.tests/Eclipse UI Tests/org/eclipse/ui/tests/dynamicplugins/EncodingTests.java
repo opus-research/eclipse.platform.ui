@@ -35,7 +35,7 @@ public class EncodingTests extends DynamicTestCase {
 		removeBundle();
 		assertFalse(WorkbenchEncoding.getDefinedEncodings().contains(ENCODING));
 	}
-	
+
 	public void testIDEEncodings() {
 		assertFalse(IDEEncoding.getIDEEncodings().contains(ENCODING));
 		getBundle();
@@ -43,26 +43,17 @@ public class EncodingTests extends DynamicTestCase {
 		removeBundle();
 		assertFalse(IDEEncoding.getIDEEncodings().contains(ENCODING));
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
-	 */
+
 	@Override
 	protected String getExtensionId() {
 		return "newEncoding1.testDynamicEncodingAddition";
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
-	 */
 	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_ENCODINGS;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
-	 */
 	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newEncoding1";

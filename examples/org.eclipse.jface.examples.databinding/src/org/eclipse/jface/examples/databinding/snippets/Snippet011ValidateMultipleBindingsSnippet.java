@@ -23,7 +23,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -36,12 +36,12 @@ import org.eclipse.swt.widgets.Text;
  * Snippet that validates values across multiple bindings on change of each
  * observable. If the values of the target observables are not equal the model
  * is not updated. When the values are equal they will be written to sysout.
- * 
+ *
  * @author Brad Reynolds
  */
 public class Snippet011ValidateMultipleBindingsSnippet {
 	public static void main(String[] args) {
-		Realm.runWithDefault(SWTObservables.getRealm(Display.getDefault()),
+		Realm.runWithDefault(DisplayRealm.getRealm(Display.getDefault()),
 				new Runnable() {
 					@Override
 					public void run() {
@@ -94,11 +94,11 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 
 	/**
 	 * @since 3.2
-	 * 
+	 *
 	 */
 	private static final class CrossFieldValidator implements IValidator {
 		/**
-		 * 
+		 *
 		 */
 		private final IObservableValue other;
 

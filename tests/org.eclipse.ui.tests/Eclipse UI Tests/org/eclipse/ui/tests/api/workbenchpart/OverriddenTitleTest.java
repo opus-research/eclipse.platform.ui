@@ -43,9 +43,6 @@ public class OverriddenTitleTest extends UITestCase {
     boolean contentChangeEvent = false;
 
     private IPropertyListener propertyListener = new IPropertyListener() {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
-         */
         @Override
 		public void propertyChanged(Object source, int propId) {
             switch (propId) {
@@ -75,9 +72,6 @@ public class OverriddenTitleTest extends UITestCase {
         contentChangeEvent = false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
-     */
     @Override
 	protected void doTearDown() throws Exception {
         view.removePropertyListener(propertyListener);
@@ -104,7 +98,7 @@ public class OverriddenTitleTest extends UITestCase {
 
     /**
      * Ensure that we've received the given property change events since the start of the test
-     * 
+     *
      * @param titleEvent PROP_TITLE
      * @param nameEvent PROP_PART_NAME
      * @param descriptionEvent PROP_CONTENT_DESCRIPTION

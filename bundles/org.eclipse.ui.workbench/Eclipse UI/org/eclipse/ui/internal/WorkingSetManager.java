@@ -52,22 +52,12 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 		super(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSetManager
-	 */
 	@Override
 	public void addRecentWorkingSet(IWorkingSet workingSet) {
 		internalAddRecentWorkingSet(workingSet);
 		saveState();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSetManager
-	 */
 	@Override
 	public void addWorkingSet(IWorkingSet workingSet) {
 		super.addWorkingSet(workingSet);
@@ -89,11 +79,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 		return path.toFile();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSetManager
-	 */
 	@Override
 	public void removeWorkingSet(IWorkingSet workingSet) {
 		if (internalRemoveWorkingSet(workingSet)) {
@@ -116,7 +101,8 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 						new InputStreamReader(input, "utf-8")); //$NON-NLS-1$
 
 				IMemento memento = XMLMemento.createReadRoot(reader);
-				restoreState(memento);
+				restoreWorkingSetState(memento);
+				restoreMruList(memento);
 				reader.close();
 			} catch (IOException e) {
 				handleInternalError(
@@ -137,12 +123,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 				savePending = false;
 			}
 		}
-	}
-
-	private void restoreState(IMemento memento) {
-		restoreWorkingSetState(memento);
-		restoreMruList(memento);
-		restoreDefaultWorkingSet(memento);
 	}
 
 	/**
