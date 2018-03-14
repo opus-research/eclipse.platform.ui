@@ -387,7 +387,7 @@ public class DataBindingContext {
 	}
 
 	/**
-	 * Returns an unmodifiable {@link IObservableList} &lt;
+	 * Returns an unmodifiable an unmodifiable {@link IObservableList} &lt;
 	 * {@link ValidationStatusProvider} &gt; of all validation status providers
 	 * in order by time of addition.
 	 *
