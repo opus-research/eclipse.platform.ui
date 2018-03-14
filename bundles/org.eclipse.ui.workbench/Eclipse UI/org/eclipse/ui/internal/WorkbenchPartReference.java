@@ -17,8 +17,10 @@ import java.util.Iterator;
 import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -28,6 +30,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablePart;
@@ -45,6 +48,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.util.Util;
+import org.eclipse.ui.part.ViewPart;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -52,6 +56,11 @@ import org.osgi.service.event.EventHandler;
  * 
  */
 public abstract class WorkbenchPartReference implements IWorkbenchPartReference, ISizeProvider {
+
+    /**
+	 * 
+	 */
+	private static final String E4_WRAPPER_KEY = "e4Wrapper"; //$NON-NLS-1$
 
 	/**
      * Internal property ID: Indicates that the underlying part was created
@@ -154,6 +163,36 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		}
     };
 
+	class E4PartWrapper extends ViewPart {
+		MPart wrappedPart;
+
+		E4PartWrapper(MPart part) {
+			wrappedPart = part;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt
+		 * .widgets.Composite)
+		 */
+		@Override
+		public void createPartControl(Composite parent) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+		 */
+		@Override
+		public void setFocus() {
+			if (part.getObject() != null && part.getContext() != null)
+				ContextInjectionFactory.invoke(part.getObject(), Focus.class, part.getContext());
+		}
+
+	}
 	private IWorkbenchPage page;
 
 	private MPart part;
@@ -166,11 +205,6 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     	this.windowContext = windowContext;
 		this.page = page;
 		this.part = part;
-
-		// cache the reference in the MPart's transientData
-		if (part != null) {
-			part.getTransientData().put(IWorkbenchPartReference.class.getName(), this);
-		}
 	}
 
 	private EventHandler createContextEventHandler() {
@@ -302,10 +336,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	 * @see org.eclipse.ui.IWorkbenchPartReference#getTitleToolTip()
 	 */
 	public String getTitleToolTip() {
-		String toolTip = (String) part.getTransientData().get(
-				IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
-		if (toolTip == null || toolTip.length() == 0)
-			toolTip = part.getLocalizedTooltip();
+		String toolTip = part.getLocalizedTooltip();
 		return Util.safeString(toolTip);
 	}
 
@@ -344,15 +375,13 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		if (isDisposed()) {
 			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
 		}
-
-		WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow();
-		if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
-			SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
+	 
+		if (part != null && part.getRenderer() instanceof SWTPartRenderer) {
+			SWTPartRenderer r = (SWTPartRenderer) part.getRenderer();
 			return r.getImage(part);
 		}
 
-		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
+		return null;
 	}
     
     /* package */ void fireVisibilityChange() {
@@ -418,10 +447,14 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 					legacyPart = compatibilityPart.getPart();
 				}
 			} else if (part.getObject() != null) {
-        		if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-        		  return (IWorkbenchPart) part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY);
+				if (part.getTransientData().get(E4_WRAPPER_KEY) instanceof E4PartWrapper) {
+					legacyPart = (IWorkbenchPart) part.getTransientData().get(E4_WRAPPER_KEY);
+				} else {
+					legacyPart = new E4PartWrapper(part);
+					part.getTransientData().put(E4_WRAPPER_KEY, legacyPart);
 				}
-        	}
+				
+			}
 		}
 
 		return legacyPart;
@@ -559,10 +592,6 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     
 	public IWorkbenchPage getPage() {
 		return page;
-	}
-
-	public void setPage(IWorkbenchPage newPage) {
-		page = newPage;
 	}
 
 	/*

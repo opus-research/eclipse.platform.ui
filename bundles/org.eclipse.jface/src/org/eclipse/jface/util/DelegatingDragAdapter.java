@@ -112,13 +112,11 @@ public class DelegatingDragAdapter implements DragSourceListener {
      * @param event the drag source event
      * @see DragSourceListener#dragFinished(DragSourceEvent)
      */
-    @Override
-	public void dragFinished(final DragSourceEvent event) {
+    public void dragFinished(final DragSourceEvent event) {
         //		if (Policy.DEBUG_DRAG_DROP)
         //			System.out.println("Drag Finished: " + toString()); //$NON-NLS-1$
         SafeRunnable.run(new SafeRunnable() {
-            @Override
-			public void run() throws Exception {
+            public void run() throws Exception {
                 if (currentListener != null) {
                     // there is a listener that can handle the drop, delegate the event
                     currentListener.dragFinished(event);
@@ -145,16 +143,14 @@ public class DelegatingDragAdapter implements DragSourceListener {
      * @param event the drag source event
      * @see DragSourceListener#dragSetData(DragSourceEvent)
      */
-    @Override
-	public void dragSetData(final DragSourceEvent event) {
+    public void dragSetData(final DragSourceEvent event) {
         //		if (Policy.DEBUG_DRAG_DROP)
         //			System.out.println("Drag Set Data: " + toString()); //$NON-NLS-1$
 
         updateCurrentListener(event); // find a listener that can provide the given data type
         if (currentListener != null) {
         	SafeRunnable.run(new SafeRunnable() {
-                @Override
-				public void run() throws Exception {
+                public void run() throws Exception {
                     currentListener.dragSetData(event);
                 }
             });
@@ -171,8 +167,7 @@ public class DelegatingDragAdapter implements DragSourceListener {
      * @param event the drag source event
      * @see DragSourceListener#dragStart(DragSourceEvent)
      */
-    @Override
-	public void dragStart(final DragSourceEvent event) {
+    public void dragStart(final DragSourceEvent event) {
         //		if (Policy.DEBUG_DRAG_DROP)
         //			System.out.println("Drag Start: " + toString()); //$NON-NLS-1$
         boolean doit = false; // true if any one of the listeners can handle the drag
@@ -184,8 +179,7 @@ public class DelegatingDragAdapter implements DragSourceListener {
                     .get(i);
             event.doit = true; // restore event.doit
             SafeRunnable.run(new SafeRunnable() {
-                @Override
-				public void run() throws Exception {
+                public void run() throws Exception {
                     listener.dragStart(event);
                 }
             });

@@ -12,8 +12,8 @@ package org.eclipse.e4.ui.css.swt.dom;
 
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.e4.ui.css.swt.helpers.CSSSWTImageHelper;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -22,11 +22,14 @@ import org.w3c.dom.Node;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link TableItem}.
- *
+ * 
  */
 public class ToolItemElement extends ItemElement {
+	private static final String DEFAULT_IMAGE = "defaultImage";
+
 	public ToolItemElement(ToolItem toolItem, CSSEngine engine) {
 		super(toolItem, engine);
+		toolItem.setData(DEFAULT_IMAGE, toolItem.getImage());
 	}
 
 	public ToolItem getToolItem() {
@@ -66,6 +69,10 @@ public class ToolItemElement extends ItemElement {
 	@Override
 	public void reset() {
 		super.reset();
-		CSSSWTImageHelper.restoreDefaultImage(getToolItem());
+		ToolItem item = getToolItem();
+		Image defaultImage = (Image) item.getData(DEFAULT_IMAGE);
+		if (item.getImage() != defaultImage) {
+			item.setImage(defaultImage);
+		}
 	}
 }
