@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.zoom;
-
-import junit.framework.Assert;
 
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -49,8 +48,8 @@ public class ShowViewTest extends ZoomTestCase {
         
         page.bringToTop(newPart);
         
-        Assert.assertTrue(page.getActivePart() == newPart);
-        Assert.assertTrue(isZoomed(newPart));
+		assertTrue(page.getActivePart() == newPart);
+		assertTrue(isZoomed(newPart));
     }
 
     /** 
@@ -63,17 +62,17 @@ public class ShowViewTest extends ZoomTestCase {
         zoom(unstackedView);
         IViewPart newPart = showRegularView(ZoomPerspectiveFactory.STACK1_PLACEHOLDER1, IWorkbenchPage.VIEW_CREATE);
         page.bringToTop(newPart);
-        Assert.assertTrue(page.getActivePart() == unstackedView);
+		assertTrue(page.getActivePart() == unstackedView);
         
         // Ensure no change to zoom
-        Assert.assertTrue(isZoomed(unstackedView));
+		assertTrue(isZoomed(unstackedView));
         
         // Ensure that the new part was brought to the top of the stack
         MUIElement partParent = getPartParent(unstackedView);
         assertTrue(partParent instanceof MPartStack);
         
         MPartStack stack = (MPartStack) partParent;
-        Assert.assertTrue(stack.getSelectedElement() == getPartModel(unstackedView));
+		assertTrue(stack.getSelectedElement() == getPartModel(unstackedView));
     }
     
     /** 
@@ -85,17 +84,17 @@ public class ShowViewTest extends ZoomTestCase {
     public void testCreateViewAndMakeVisibleInOtherStack() {
         zoom(unstackedView);
         IViewPart newPart = showRegularView(ZoomPerspectiveFactory.STACK1_PLACEHOLDER1, IWorkbenchPage.VIEW_VISIBLE);
-        Assert.assertTrue(page.getActivePart() == unstackedView);
+		assertTrue(page.getActivePart() == unstackedView);
         
         // Ensure no change to zoom
-        Assert.assertTrue(isZoomed(unstackedView));
+		assertTrue(isZoomed(unstackedView));
         
         // Ensure that the new part was brought to the top of the stack
         MUIElement partParent = getPartParent(newPart);
         assertTrue(partParent instanceof MPartStack);
         
         MPartStack stack = (MPartStack) partParent;
-        Assert.assertTrue(stack.getSelectedElement() == getPartModel(newPart));
+		assertTrue(stack.getSelectedElement() == getPartModel(newPart));
     }
     /** 
      * <p>Test: Zoom an editor, create a new view using the IWorkbenchPage.VIEW_VISIBLE mode</p>
@@ -105,15 +104,15 @@ public class ShowViewTest extends ZoomTestCase {
     public void testCreateViewAndMakeVisibleWhileEditorZoomed() {
         zoom(editor1);
         IViewPart newPart = showRegularView(ZoomPerspectiveFactory.STACK1_PLACEHOLDER1, IWorkbenchPage.VIEW_VISIBLE);
-        Assert.assertTrue(isZoomed());
-        Assert.assertTrue(page.getActivePart() == editor1);
+		assertTrue(isZoomed());
+		assertTrue(page.getActivePart() == editor1);
         
         // Ensure that the new part was brought to the top of the stack
         MUIElement partParent = getPartParent(newPart);
         assertTrue(partParent instanceof MPartStack);
         
         MPartStack stack = (MPartStack) partParent;
-        Assert.assertTrue(stack.getSelectedElement() == getPartModel(newPart));
+		assertTrue(stack.getSelectedElement() == getPartModel(newPart));
     }
         
     /** 
