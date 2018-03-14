@@ -11,6 +11,7 @@
 
 package org.eclipse.e4.ui.tests.application;
 
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -21,6 +22,7 @@ public class StartupTestSuite extends TestSuite {
 
 		suite.addTestSuite(EModelServiceTest.class);
 		suite.addTestSuite(EModelServiceFindTest.class);
+		suite.addTest(new JUnit4TestAdapter(EModelServicePerspectiveFindTests.class));
 		suite.addTestSuite(EModelServiceInsertTest.class);
 		suite.addTestSuite(EPartServiceTest.class);
 		suite.addTestSuite(ESelectionServiceTest.class);
