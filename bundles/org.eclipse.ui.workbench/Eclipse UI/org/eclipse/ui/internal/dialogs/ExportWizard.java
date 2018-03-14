@@ -68,7 +68,7 @@ public class ExportWizard extends Wizard {
     @Override
 	public void addPages() {
         addPage(new SelectionPage(this.theWorkbench, this.selection,
-                getAvailableExportWizards(), WorkbenchMessages.ExportWizard_selectWizard));
+                getAvailableExportWizards(), WorkbenchMessages.ExportWizard_selectDestination));
     }
 
     /**
