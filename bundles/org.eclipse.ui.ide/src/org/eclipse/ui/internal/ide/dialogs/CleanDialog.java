@@ -31,7 +31,9 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
@@ -295,10 +297,13 @@ public class CleanDialog extends MessageDialog {
         }
         //table is disabled to start because all button is selected
         projectNames.getTable().setEnabled(selectedButton.getSelection());
-        projectNames.addCheckStateListener(event -> {
-		    selection = projectNames.getCheckedElements();
-		    updateEnablement();
-		});
+        projectNames.addCheckStateListener(new ICheckStateListener() {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+                selection = projectNames.getCheckedElements();
+                updateEnablement();
+            }
+        });
     }
 
     /**
