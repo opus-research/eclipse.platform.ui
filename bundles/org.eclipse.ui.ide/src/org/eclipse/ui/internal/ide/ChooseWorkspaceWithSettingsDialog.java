@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -242,35 +243,33 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	@Override
 	protected void okPressed() {
-		Iterator settingsIterator = selectedSettings.iterator();
-		MultiStatus result = new MultiStatus(
-				PlatformUI.PLUGIN_ID,
-				IStatus.OK,
-				IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_ProblemsTransferTitle,
-				null);
+		String targetWorkspace = getWorkspaceLocation();
+		transferSelectedSettings(targetWorkspace);
+		super.okPressed();
+	}
 
-		IPath path = new Path(getWorkspaceLocation());
+	private void transferSelectedSettings(String targetWorkspace) {
+		Iterator<?> settingsIterator = selectedSettings.iterator();
+		MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
+				IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_ProblemsTransferTitle, null);
+
+		IPath path = new Path(targetWorkspace);
 		String[] selectionIDs = new String[selectedSettings.size()];
 		int index = 0;
 
 		while (settingsIterator.hasNext()) {
-			IConfigurationElement elem = (IConfigurationElement) settingsIterator
-					.next();
+			IConfigurationElement elem = (IConfigurationElement) settingsIterator.next();
 			result.add(transferSettings(elem, path));
 			selectionIDs[index] = elem.getAttribute(ATT_ID);
 		}
 		if (result.getSeverity() != IStatus.OK) {
-			ErrorDialog
-					.openError(
-							getShell(),
-							IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_TransferFailedMessage,
-							IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed,
-							result);
+			ErrorDialog.openError(getShell(),
+					IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_TransferFailedMessage,
+					IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed, result);
 			return;
 		}
 
 		saveSettings(selectionIDs);
-		super.okPressed();
 	}
 
 	/**

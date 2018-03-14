@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Christian Georgi (SAP)            - Bug 432480
+ *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -22,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -68,6 +70,7 @@ import org.eclipse.e4.ui.workbench.IExceptionHandler;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
+import org.eclipse.e4.ui.workbench.lifecycle.PostSave;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
@@ -155,15 +158,9 @@ public class E4Application implements IApplication {
 					workbench.getContext()))
 				return EXIT_OK;
 
-			IEclipseContext workbenchContext = workbench.getContext();
-
 			// Create and run the UI (if any)
 			workbench.createAndRunUI(workbench.getApplication());
 
-			// Save the model into the targetURI
-			if (lcManager != null) {
-				ContextInjectionFactory.invoke(lcManager, PreSave.class, workbenchContext, null);
-			}
 			saveModel();
 			workbench.close();
 
@@ -180,10 +177,13 @@ public class E4Application implements IApplication {
 		}
 	}
 
+	// TODO should be moved to E4Workbench
 	public void saveModel() {
 		try {
-			if (!(handler instanceof ResourceHandler) || ((ResourceHandler) handler).hasTopLevelWindows()) {
+			if (handler.isSaveAllowed()) {
+				notifyPreSaveListeners();
 				handler.save();
+				notifyPostSaveListeners();
 			} else {
 				Logger logger = new WorkbenchLogger(PLUGIN_ID);
 				logger.error(
@@ -194,6 +194,31 @@ public class E4Application implements IApplication {
 		} catch (IOException e) {
 			Logger logger = new WorkbenchLogger(PLUGIN_ID);
 			logger.error(e, "Error saving the workbench model"); //$NON-NLS-1$
+		}
+	}
+
+	private void notifyPreSaveListeners() {
+		notifyLifeCycleManager(PreSave.class);
+		notifyWorkbenchListeners(PreSave.class);
+	}
+
+
+	private void notifyPostSaveListeners() {
+		notifyLifeCycleManager(PostSave.class);
+		notifyWorkbenchListeners(PostSave.class);
+	}
+
+	private void notifyLifeCycleManager(Class<? extends Annotation> qualifier) {
+		if (lcManager != null) {
+			IEclipseContext workbenchContext = workbench.getContext();
+			ContextInjectionFactory.invoke(lcManager, PreSave.class, workbenchContext, null);
+		}
+	}
+
+	private void notifyWorkbenchListeners(Class<? extends Annotation> qualifier) {
+		IEclipseContext workbenchContext = workbench.getContext();
+		for (Object listener : workbench.getWorkbenchListeners()) {
+			ContextInjectionFactory.invoke(listener, qualifier, workbenchContext, null);
 		}
 	}
 
