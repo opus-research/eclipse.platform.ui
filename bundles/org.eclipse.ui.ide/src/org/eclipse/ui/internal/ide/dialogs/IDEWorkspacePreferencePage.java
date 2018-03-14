@@ -12,6 +12,7 @@
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
  *     Christian Georgi (SAP SE)          -  bug 458811
+ *     Denis Zygann <d.zygann@web.de>      - Bug 458832
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -22,7 +23,9 @@ import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -58,6 +61,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.LineDelimiterEditor;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * The IDEWorkspacePreferencePage is the page used to set IDE-specific preferences settings
@@ -466,11 +470,11 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
      * The default button has been pressed.
      */
     @Override
-	protected void performDefaults() {
-
+    protected void performDefaults() {
         // core holds onto this preference.
-        boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
-                .getDefaultBoolean(ResourcesPlugin.PREF_AUTO_BUILDING);
+        IEclipsePreferences node = DefaultScope.INSTANCE.getNode(ResourcesPlugin.PI_RESOURCES);
+
+        boolean autoBuild = node.getBoolean(ResourcesPlugin.PREF_AUTO_BUILDING, true);
         autoBuildButton.setSelection(autoBuild);
 
         IPreferenceStore store = getIDEPreferenceStore();
@@ -478,30 +482,25 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
-		showLocationInWindowTitle.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION));
+        showLocationInWindowTitle.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION));
         workspaceName.loadDefault();
-        
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
         closeUnrelatedProjectButton.setSelection(closeUnrelatedProj);
 
-        boolean lightweightRefresh = ResourcesPlugin.getPlugin()
-                .getPluginPreferences().getDefaultBoolean(
-                		ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH);
-        boolean autoRefresh = ResourcesPlugin.getPlugin()
-		        .getPluginPreferences().getDefaultBoolean(
-		                ResourcesPlugin.PREF_AUTO_REFRESH);
-        autoRefreshButton.setSelection(autoRefresh);
+        boolean lightweightRefresh = node.getBoolean(ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, false);
+        boolean autoRefresh = node.getBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
         lightweightRefreshButton.setSelection(lightweightRefresh);
+        autoRefreshButton.setSelection(autoRefresh);
 
         clearUserSettings = true;
 
-		List encodings = WorkbenchEncoding.getDefinedEncodings();
-		Collections.sort(encodings);
+        List encodings = WorkbenchEncoding.getDefinedEncodings();
+        Collections.sort(encodings);
         encodingEditor.loadDefault();
-		lineSeparatorEditor.loadDefault();
-		openReferencesEditor.loadDefault();
+        lineSeparatorEditor.loadDefault();
+        openReferencesEditor.loadDefault();
 
-		systemExplorer.loadDefault();
+        systemExplorer.loadDefault();
 
         super.performDefaults();
     }
@@ -510,7 +509,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
     @Override
-	public boolean performOk() {
+    public boolean performOk() {
         // set the workspace auto-build flag
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace()
                 .getDescription();
@@ -549,37 +548,43 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
                                 (int) newSaveInterval));
             } catch (CoreException e) {
                 IDEWorkbenchPlugin.log(
-                        "Error changing save interval preference", e //$NON-NLS-1$
+                        "Error changing save interval preference", e//$NON-NLS-1$
                                 .getStatus());
             }
         }
         
-		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationInWindowTitle.getSelection());
+        store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationInWindowTitle.getSelection());
 
         workspaceName.store();
 
-		systemExplorer.store();
+        systemExplorer.store();
 
-        Preferences preferences = ResourcesPlugin.getPlugin()
-                .getPluginPreferences();
+        IEclipsePreferences node = ConfigurationScope.INSTANCE.getNode(ResourcesPlugin.PI_RESOURCES);
 
         boolean autoRefresh = autoRefreshButton.getSelection();
-        preferences.setValue(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
+        node.putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
         boolean lightweightRefresh = lightweightRefreshButton.getSelection();
-        preferences.setValue(ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, lightweightRefresh);
+        node.putBoolean(ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, lightweightRefresh);
+        
+        try {
+            node.flush();
+        } catch (BackingStoreException e) {
+            IDEWorkbenchPlugin.log(
+                    "Error saving autoRefresh and lightweightRefresh preferences.", e);//$NON-NLS-1$
+        }
 
         boolean closeUnrelatedProj = closeUnrelatedProjectButton.getSelection();
         getIDEPreferenceStore().setValue(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS, closeUnrelatedProj);
         
         
         if (clearUserSettings) {
-			IDEEncoding.clearUserEncodings();
-		}
+                IDEEncoding.clearUserEncodings();
+        }
         encodingEditor.store();
-		lineSeparatorEditor.store();
-		openReferencesEditor.store();
+        lineSeparatorEditor.store();
+        openReferencesEditor.store();
 
-		return super.performOk();
+        return super.performOk();
     }
 
 }
