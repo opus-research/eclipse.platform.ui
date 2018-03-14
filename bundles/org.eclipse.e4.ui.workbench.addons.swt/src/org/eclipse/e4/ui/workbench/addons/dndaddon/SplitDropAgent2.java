@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 361731
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
@@ -16,6 +17,7 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -290,6 +292,13 @@ public class SplitDropAgent2 extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
+
+		MUIElement hasContainerData = dragElement;
+		while (hasContainerData != null
+				&& (MUIElement) hasContainerData.getParent() instanceof MPartSashContainer == false) {
+			hasContainerData = hasContainerData.getParent();
+		}
+
 		MPartSashContainerElement toInsert = (MPartSashContainerElement) dragElement;
 		if (dragElement instanceof MPartStack) {
 			// Ensure we restore the stack to the presentation first
@@ -341,6 +350,7 @@ public class SplitDropAgent2 extends DropAgent {
 			}
 		}
 
+		toInsert.setContainerData(hasContainerData.getContainerData());
 		dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
 				where, ratio);
 		// reactivatePart(dragElement);
