@@ -116,7 +116,7 @@ public class CTabItemTest extends CSSSWTTestCase {
 		CTabFolder folder = createTestTabFolder("Button { font-family: Verdana; font-size: 12 }\n"
 				+ "CTabItem { font-family: Verdana; font-size: 16 }");
 		spinEventLoop();
-		folder.getItems();
+		CTabItem[] items = folder.getItems();
 		assertEquals(0, folder.getSelectionIndex());
 		CTabItem item = folder.getItem(0);
 		{

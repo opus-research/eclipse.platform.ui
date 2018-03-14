@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
 
@@ -69,7 +68,7 @@ public class PipelineTest extends NavigatorTestBase {
 		assertTrue(
 				"The root object should be an IJavaProject, which is IAdaptable.", rootItems[0].getData() instanceof IAdaptable); //$NON-NLS-1$
 
-		IProject adaptedProject = ((IAdaptable) rootItems[_projectInd]
+		IProject adaptedProject = (IProject) ((IAdaptable) rootItems[_projectInd]
 				.getData()).getAdapter(IProject.class);
 		assertEquals(_project, adaptedProject);
 
