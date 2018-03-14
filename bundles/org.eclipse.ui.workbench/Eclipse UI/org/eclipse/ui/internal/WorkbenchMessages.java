@@ -430,7 +430,7 @@ public class WorkbenchMessages extends NLS {
 
 	// --- Import/Export ---
 	public static String ImportExportPage_chooseImportSource;
-	public static String ImportExportPage_chooseExportDestination;
+	public static String ImportExportPage_chooseExportWizard;
 
 	// --- Import ---
 	public static String ImportWizard_title;
@@ -438,7 +438,7 @@ public class WorkbenchMessages extends NLS {
 
 	// --- Export ---
 	public static String ExportWizard_title;
-	public static String ExportWizard_selectDestination;
+	public static String ExportWizard_selectWizard;
 	// --- New Project ---
 	public static String NewProject_title;
 
