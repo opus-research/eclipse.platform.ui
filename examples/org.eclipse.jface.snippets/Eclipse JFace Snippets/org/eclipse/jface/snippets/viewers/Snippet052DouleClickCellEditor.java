@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  *
  */
-public class Snippet052DoubleClickCellEditor {
+public class Snippet052DouleClickCellEditor {
 
 	public static boolean flag = true;
 
@@ -57,7 +57,7 @@ public class Snippet052DoubleClickCellEditor {
 		}
 	}
 
-	public Snippet052DoubleClickCellEditor(Shell shell) {
+	public Snippet052DouleClickCellEditor(Shell shell) {
 		final TableViewer viewer = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
@@ -120,7 +120,7 @@ public class Snippet052DoubleClickCellEditor {
 
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
-		new Snippet052DoubleClickCellEditor(shell);
+		new Snippet052DouleClickCellEditor(shell);
 		shell.open();
 
 		while (!shell.isDisposed()) {
