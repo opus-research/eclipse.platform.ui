@@ -140,18 +140,12 @@ public class TreeManager {
 	public static class TreeItemLabelProvider extends LabelProvider {
 		@Override
 		public String getText(Object element) {
-			if (element instanceof TreeItem) {
-				return ((TreeItem) element).getLabel();
-			}
-			return super.getText(element);
+			return ((TreeItem)element).getLabel();
 		}
 
 		@Override
 		public Image getImage(Object element) {
-			if (element instanceof TreeItem) {
-				return ((TreeItem) element).getImage();
-			}
-			return super.getImage(element);
+			return ((TreeItem)element).getImage();
 		}
 	}
 
@@ -240,7 +234,8 @@ public class TreeManager {
 		private TreeItem parent;
 		private List<TreeItem> children;
 		private int checkState;
-		private boolean changedByUser;
+
+		private boolean changedByUser = false;
 
 		public TreeItem(String label) {
 			this.label = label;
@@ -277,10 +272,6 @@ public class TreeManager {
 
 		public List<TreeItem> getChildren() {
 			return children;
-		}
-
-		public int getChildrenCount() {
-			return children.size();
 		}
 
 		public TreeItem getParent() {
@@ -426,12 +417,6 @@ public class TreeManager {
 		public boolean isChangedByUser() {
 			return changedByUser;
 		}
-
-		@Override
-		public String toString() {
-			return label + ", check=" + getState() + ", changed=" + changedByUser; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
 	}
 
 	/**
