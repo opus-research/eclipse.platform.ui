@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
+ *     Christian Georgi (SAP SE)          -  bug 458811
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -21,9 +23,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -34,6 +37,7 @@ import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -48,6 +52,7 @@ import org.eclipse.ui.WorkbenchEncoding;
 import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.ide.IDEEncoding;
 import org.eclipse.ui.ide.dialogs.ResourceEncodingFieldEditor;
+import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
@@ -62,8 +67,9 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
  *Note:This class extends from PreferencePage,and there's no WorkspacePreferencePage class.
  *Hence when the IDE settings doesn't appear in this preference page, this page will be empty.
  */
-public class IDEWorkspacePreferencePage extends PreferencePage
-        implements IWorkbenchPreferencePage{
+public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+
+	private IEclipseContext e4Context;
 
 	private Button autoBuildButton;
 
@@ -72,7 +78,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     private IntegerFieldEditor saveInterval;
 
 	private FieldEditor workspaceName;
-	private FieldEditor showLocationInWindowTitle;
+	private Button showLocationInWindowTitle;
 
 	private Button autoRefreshButton;
 
@@ -83,7 +89,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 	private ResourceEncodingFieldEditor encodingEditor;
 
 	private LineDelimiterEditor lineSeparatorEditor;
-	
+
     //A boolean to indicate if the user settings were cleared.
 	private boolean clearUserSettings = false;
 
@@ -112,30 +118,30 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         createSaveAllBeforeBuildPref(composite);
         createCloseUnrelatedProjPrefControls(composite);
 
-        createSpace(composite);
+		createSpace(composite);
+		createSaveIntervalGroup(composite);
+		createWindowTitleGroup(composite);
+
+		createSpace(composite);
 		createWorkspaceLocationGroup(composite);
 
 		createSpace(composite);
-        createSaveIntervalGroup(composite);
-        createWindowTitleGroup(composite);
-		createSpace(composite);
-		
 		createOpenPrefControls(composite);
 
 		createSpace(composite);
 		createSystemExplorerGroup(composite);
 		createSpace(composite);
-		
+
 		Composite lower = new Composite(composite,SWT.NONE);
 		GridLayout lowerLayout = new GridLayout();
 		lowerLayout.marginWidth = 0;
 		lowerLayout.numColumns = 2;
 		lowerLayout.makeColumnsEqualWidth = true;
 		lower.setLayout(lowerLayout);
-		
+
 		lower.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
-		
+
 		createEncodingEditorControls(lower);
 		createLineSeparatorEditorControls(lower);
 		applyDialogFont(composite);
@@ -205,26 +211,32 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(locationLabel);
 		Text workspacePath = new Text(groupComposite, SWT.READ_ONLY);
 		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		workspacePath.setText(Platform.getLocation().toOSString());
-		workspacePath.setToolTipText(workspacePath.getText());
+		workspacePath.setText(TextProcessor.process(Platform.getLocation().toOSString()));
 		workspacePath.setSelection(workspacePath.getText().length());
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.hint(convertHorizontalDLUsToPixels(200), SWT.DEFAULT).applyTo(workspacePath);
 
-		Composite showLocationComposite = new Composite(composite, SWT.LEFT);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(showLocationComposite);
-		GridLayoutFactory.fillDefaults().applyTo(showLocationComposite);
-		showLocationInWindowTitle = new BooleanFieldEditor(IDEInternalPreferences.SHOW_LOCATION,
-				IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle, showLocationComposite);
-		showLocationInWindowTitle.setPage(this);
-		showLocationInWindowTitle.setPreferenceStore(getIDEPreferenceStore());
-		showLocationInWindowTitle.load();
+		// show workspace location in window title
+		boolean showLocationIsSetOnCommandLine = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
+		showLocationInWindowTitle = new Button(groupComposite, SWT.CHECK);
+		showLocationInWindowTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle);
+		showLocationInWindowTitle.setSelection(showLocationIsSetOnCommandLine
+				|| getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION));
+		showLocationInWindowTitle.setEnabled(!showLocationIsSetOnCommandLine);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(showLocationInWindowTitle);
+
+		if (showLocationIsSetOnCommandLine) {
+			Composite noteComposite = createNoteComposite(composite.getFont(), groupComposite,
+					WorkbenchMessages.Preference_note,
+					IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle_lockedByCommandLine);
+			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(noteComposite);
+		}
 	}
 
     /**
      * Create a composite that contains entry fields specifying save interval
      * preference.
-     * 
+     *
      * @param composite the Composite the group is created in.
      */
     private void createSaveIntervalGroup(Composite composite) {
@@ -273,7 +285,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     /**
      * Create a composite that contains entry fields specifying the workspace name
      * preference.
-     * 
+     *
      * @param composite the Composite the group is created in.
      */
     private void createWindowTitleGroup(Composite composite) {
@@ -296,10 +308,10 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     }
 
 	/**
-     * Create the Refresh controls
-     * 
-     * @param parent
-     */
+	 * Create the Refresh controls
+	 *
+	 * @param parent
+	 */
     private void createAutoRefreshControls(Composite parent) {
 
         this.autoRefreshButton = new Button(parent, SWT.CHECK);
@@ -310,28 +322,26 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         this.lightweightRefreshButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_RefreshLightweightButtonText);
         this.lightweightRefreshButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_RefreshLightweightButtonToolTip);
 
-        boolean lightweightRefresh = ResourcesPlugin.getPlugin()
-                .getPluginPreferences().getBoolean(
-                		ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH);
-        boolean autoRefresh = ResourcesPlugin.getPlugin()
-		        .getPluginPreferences().getBoolean(
-		                ResourcesPlugin.PREF_AUTO_REFRESH);
-        
+		boolean lightweightRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
+				ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, false, null);
+		boolean autoRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
+				ResourcesPlugin.PREF_AUTO_REFRESH, false, null);
+
         this.autoRefreshButton.setSelection(autoRefresh);
         this.lightweightRefreshButton.setSelection(lightweightRefresh);
     }
 
     /**
-     * Create a composite that contains the encoding controls
-     * 
-     * @param parent
-     */
-    private void createEncodingEditorControls(Composite parent){    			
+	 * Create a composite that contains the encoding controls
+	 *
+	 * @param parent
+	 */
+    private void createEncodingEditorControls(Composite parent){
 		Composite encodingComposite = new Composite(parent,SWT.NONE);
 		encodingComposite.setLayout(new GridLayout());
 		encodingComposite.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
-		
+
 		encodingEditor = new ResourceEncodingFieldEditor(IDEWorkbenchMessages.WorkbenchPreference_encoding, encodingComposite, ResourcesPlugin
 				.getWorkspace().getRoot());
 
@@ -347,10 +357,10 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 			}
 		});
     }
-    
+
     /**
      * Create a composite that contains the line delimiter controls
-     * 
+     *
      * @param parent
      */
     private void createLineSeparatorEditorControls(Composite parent){
@@ -362,14 +372,14 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 		lineComposite.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
-		
+
 		lineSeparatorEditor = new LineDelimiterEditor(lineComposite);
 		lineSeparatorEditor.doLoad();
     }
 
 	/**
 	 * Create the widget for the system explorer command.
-	 * 
+	 *
 	 * @param composite
 	 */
 	protected void createSystemExplorerGroup(Composite composite) {
@@ -411,10 +421,10 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     protected IPreferenceStore getIDEPreferenceStore() {
         return IDEWorkbenchPlugin.getDefault().getPreferenceStore();
     }
-	
+
 	/**
      * Creates a tab of one horizontal spans.
-     * 
+     *
      * @param parent
      *            the parent in which the tab should be created
      */
@@ -432,7 +442,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 	/**
      * Creates the composite which will contain all the preference controls for
      * this page.
-     * 
+     *
      * @param parent
      *            the parent composite
      * @return the composite for this page
@@ -450,8 +460,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
+		e4Context = workbench.getService(IEclipseContext.class);
     }
-    
+
     /**
      * The default button has been pressed.
      */
@@ -468,9 +479,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
-		showLocationInWindowTitle.loadDefault();
+		showLocationInWindowTitle.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION));
         workspaceName.loadDefault();
-        
+
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
         closeUnrelatedProjectButton.setSelection(closeUnrelatedProj);
 
@@ -543,8 +554,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                                 .getStatus());
             }
         }
-        
-		showLocationInWindowTitle.store();
+
+		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationInWindowTitle.getSelection());
+
         workspaceName.store();
 
 		systemExplorer.store();
@@ -559,8 +571,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
         boolean closeUnrelatedProj = closeUnrelatedProjectButton.getSelection();
         getIDEPreferenceStore().setValue(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS, closeUnrelatedProj);
-        
-        
+
+
         if (clearUserSettings) {
 			IDEEncoding.clearUserEncodings();
 		}

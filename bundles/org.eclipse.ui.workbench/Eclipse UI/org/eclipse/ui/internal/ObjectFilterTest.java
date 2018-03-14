@@ -25,7 +25,7 @@ public class ObjectFilterTest {
     private HashMap filterElements;
 
     /**
-     * Create a new object filter. 
+     * Create a new object filter.
      */
     public ObjectFilterTest() {
         // do nothing
@@ -33,7 +33,7 @@ public class ObjectFilterTest {
 
     /**
      * Add a filter element to the test.  This element must contain
-     * a name value filter pair, as defined by the 
+     * a name value filter pair, as defined by the
      * <code>org.eclipse.ui.actionFilters</code> extension point.
      */
     public boolean addFilterElement(IConfigurationElement element) {
@@ -62,7 +62,7 @@ public class ObjectFilterTest {
 	 * <code>true</code> if the object is a wrapper for a resource, and the
 	 * resource produces a filter match.
 	 * </p>
-	 * 
+	 *
 	 * @param object
 	 *            the object to examine
 	 * @returns <code>true</code> if there is a filter match.
@@ -85,7 +85,7 @@ public class ObjectFilterTest {
      */
     private boolean preciselyMatches(Object object) {
         // Get the action filter.
-        IActionFilter filter = (IActionFilter)Util.getAdapter(object, IActionFilter.class);
+        IActionFilter filter = Util.getAdapter(object, IActionFilter.class);
         if (filter == null) {
 			return false;
 		}

@@ -4,10 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *      IBM Corporation - initial API and implementation
+ *      Steven Spungin <steven@spungin.tv> - Bug 437958
  */
 package org.eclipse.e4.ui.model.fragment;
 
@@ -29,12 +30,12 @@ package org.eclipse.e4.ui.model.fragment;
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.fragment.MStringModelFragment#getFeaturename <em>Featurename</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.fragment.MStringModelFragment#getParentElementId <em>Parent Element Id</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.fragment.MStringModelFragment#getPositionInList <em>Position In List</em>}</li>
  * </ul>
- * </p>
  *
  * @model
  * @generated
@@ -72,6 +73,18 @@ public interface MStringModelFragment extends MModelFragment {
 	/**
 	 * Returns the value of the '<em><b>Parent Element Id</b></em>' attribute.
 	 * <!-- begin-user-doc -->
+	 * The parentElementId specifies the targeted parent or parents when a fragment is merged.  The ID can be specified in 3 ways: <br />
+	 * <ol>
+	 * <li> elementId (a single elementId)
+	 * <li> elementId1,elementId2,elementId3 (a comma delimited list of elementIds)
+	 * <li> xpath:[xpath goes here] (an xpath expression)
+	 * </ol>
+	 * <br />
+	 * An xpath example targeting 2 destinations in the model <br />
+	 * <pre>
+	 * xpath://*[@elementId='app.menu.primary' or @elementId='app.menu.secondary']
+	 * </pre>
+	 * @return The parentElementId expression.  Must not be null, but may be an empty string if the fragment did not specify a target.
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
@@ -91,6 +104,7 @@ public interface MStringModelFragment extends MModelFragment {
 	/**
 	 * Sets the value of the '{@link org.eclipse.e4.ui.model.fragment.MStringModelFragment#getParentElementId <em>Parent Element Id</em>}' attribute.
 	 * <!-- begin-user-doc -->
+	 * @see setParentElementId
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Parent Element Id</em>' attribute.
 	 * @see #getParentElementId()

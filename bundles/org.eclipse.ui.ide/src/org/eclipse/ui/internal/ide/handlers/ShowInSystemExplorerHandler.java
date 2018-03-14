@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,19 +10,19 @@
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.handlers;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.services.statusreporter.StatusReporter;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -35,7 +35,7 @@ import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEPreferenceInitializer;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
-import org.eclipse.ui.statushandlers.StatusManager;
+
 
 /**
  * @since 3.106
@@ -52,71 +52,60 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	private static final String VARIABLE_FOLDER = "${selected_resource_parent_loc}"; //$NON-NLS-1$
 
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		ILog log = IDEWorkbenchPlugin.getDefault().getLog();
+	public Object execute(final ExecutionEvent event) {
 
-		IResource item = getResource(event);
+		final IResource item = getResource(event);
 		if (item == null) {
 			return null;
 		}
 
-		String logMsgPrefix;
-		try {
-			logMsgPrefix = event.getCommand().getName() + ": "; //$NON-NLS-1$
-		} catch (NotDefinedException e) {
-			// will used id instead...
-			logMsgPrefix = event.getCommand().getId() + ": "; //$NON-NLS-1$
-		}
+		final StatusReporter statusReporter = HandlerUtil.getActiveWorkbenchWindow(event).getService(
+				StatusReporter.class);
 
-		try {
-			File canonicalPath = getSystemExplorerPath(item);
-			if (canonicalPath == null) {
-				StatusManager
-						.getManager()
-						.handle(new Status(
-								IStatus.ERROR,
-								IDEWorkbenchPlugin.getDefault().getBundle()
-										.getSymbolicName(),
-								logMsgPrefix
-										+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_notDetermineLocation),
-								StatusManager.SHOW | StatusManager.LOG);
-				return null;
-			}
-			String launchCmd = formShowInSytemExplorerCommand(canonicalPath);
+		Job job = new Job(IDEWorkbenchMessages.ShowInSystemExplorerHandler_jobTitle) {
 
-			if ("".equals(launchCmd)) { //$NON-NLS-1$
-				StatusManager
-						.getManager()
-						.handle(new Status(
-								IStatus.ERROR,
-								IDEWorkbenchPlugin.getDefault().getBundle()
-										.getSymbolicName(),
-								logMsgPrefix
-										+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_commandUnavailable),
-								StatusManager.SHOW | StatusManager.LOG);
-				return null;
-			}
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				String logMsgPrefix;
+				try {
+					logMsgPrefix = event.getCommand().getName() + ": "; //$NON-NLS-1$
+				} catch (NotDefinedException e) {
+					// will used id instead...
+					logMsgPrefix = event.getCommand().getId() + ": "; //$NON-NLS-1$
+				}
 
-			File dir = item.getWorkspace().getRoot().getLocation().toFile();
-			Process p;
-			if (Util.isLinux() || Util.isMac()) {
-				p = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", launchCmd }, null, dir); //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
-				p = Runtime.getRuntime().exec(launchCmd, null, dir);
+				try {
+					File canonicalPath = getSystemExplorerPath(item);
+					if (canonicalPath == null) {
+						return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
+								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_notDetermineLocation, null);
+					}
+					String launchCmd = formShowInSytemExplorerCommand(canonicalPath);
+
+					if ("".equals(launchCmd)) { //$NON-NLS-1$
+						return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
+								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_commandUnavailable, null);
+					}
+
+					File dir = item.getWorkspace().getRoot().getLocation().toFile();
+					Process p;
+					if (Util.isLinux() || Util.isMac()) {
+						p = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", launchCmd }, null, dir); //$NON-NLS-1$ //$NON-NLS-2$
+					} else {
+						p = Runtime.getRuntime().exec(launchCmd, null, dir);
+					}
+					int retCode = p.waitFor();
+					if (retCode != 0 && !Util.isWindows()) {
+						return statusReporter.newStatus(IStatus.ERROR, "Execution of '" + launchCmd //$NON-NLS-1$
+								+ "' failed with return code: " + retCode, null); //$NON-NLS-1$
+					}
+				} catch (Exception e) {
+					return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix + "Unhandled failure.", e); //$NON-NLS-1$
+				}
+				return Status.OK_STATUS;
 			}
-			int retCode = p.waitFor();
-			if (retCode != 0 && !Util.isWindows()) {
-				log.log(new Status(IStatus.ERROR, IDEWorkbenchPlugin
-						.getDefault().getBundle().getSymbolicName(),
-						logMsgPrefix + "Execution of '" + launchCmd //$NON-NLS-1$
-								+ "' failed with return code: " + retCode)); //$NON-NLS-1$
-			}
-		} catch (Exception e) {
-			log.log(new Status(IStatus.ERROR, IDEWorkbenchPlugin.getDefault()
-					.getBundle().getSymbolicName(), logMsgPrefix
-					+ "Unhandled failure.", e)); //$NON-NLS-1$
-			throw new ExecutionException("Show in Explorer command failed.", e); //$NON-NLS-1$
-		}
+		};
+		job.schedule();
 		return null;
 	}
 
@@ -127,7 +116,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		}
 		return resource;
 	}
-	
+
 	private IResource getSelectionResource(ExecutionEvent event) {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if ((selection == null) || (selection.isEmpty())
@@ -137,7 +126,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 
 		Object selectedObject = ((IStructuredSelection) selection)
 				.getFirstElement();
-		IResource item = (IResource) org.eclipse.ui.internal.util.Util
+		IResource item = org.eclipse.ui.internal.util.Util
 				.getAdapter(selectedObject, IResource.class);
 		return item;
 	}
@@ -151,12 +140,12 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile();
 		}
-		return (IResource) input.getAdapter(IResource.class);
+		return input.getAdapter(IResource.class);
 	}
 
 	/**
 	 * Prepare command for launching system explorer to show a path
-	 * 
+	 *
 	 * @param path
 	 *            the path to show
 	 * @return the command that shows the path
@@ -164,7 +153,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	private String formShowInSytemExplorerCommand(File path) throws IOException {
 		String command = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
 				.getString(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER);
-		
+
 		command = Util.replaceAll(command, VARIABLE_RESOURCE, quotePath(path.getCanonicalPath()));
 		command = Util.replaceAll(command, VARIABLE_RESOURCE_URI, path.getCanonicalFile().toURI().toString());
 		File parent = path.getParentFile();
@@ -186,7 +175,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	/**
 	 * Returns the path used for a resource when showing it in the system
 	 * explorer
-	 * 
+	 *
 	 * @see File#getCanonicalPath()
 	 * @param resource
 	 *            the {@link IResource} object to be used
@@ -204,12 +193,12 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 
 	/**
 	 * The default command for launching the system explorer on this platform.
-	 * 
+	 *
 	 * @return The default command which launches the system explorer on this system, or an empty
 	 *         string if no default exists
 	 */
 	public static String getDefaultCommand() {
-		// See https://bugs.eclipse.org/419940 why it is implemented in IDEPreferenceInitializer 
+		// See https://bugs.eclipse.org/419940 why it is implemented in IDEPreferenceInitializer
 		return IDEPreferenceInitializer.getShowInSystemExplorerCommand();
 	}
 }
