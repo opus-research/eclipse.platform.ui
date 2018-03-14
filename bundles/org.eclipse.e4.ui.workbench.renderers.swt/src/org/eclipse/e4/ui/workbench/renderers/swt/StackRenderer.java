@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 388476
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -21,15 +21,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
-import org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyMruVisibleSWTHandler;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
@@ -69,8 +64,6 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabFolder2Adapter;
 import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuDetectEvent;
@@ -113,43 +106,11 @@ import org.w3c.dom.css.CSSValue;
  * IPresentation.STYLE_OVERRIDE_KEY key
  *
  */
-public class StackRenderer extends LazyStackRenderer implements IPreferenceChangeListener {
+public class StackRenderer extends LazyStackRenderer {
 	/**
 	 *
 	 */
 	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
-
-	/**
-	 * Key to control the default default value of the "most recently used"
-	 * order enablement
-	 */
-	public static final String MRU_KEY_DEFAULT = "enableMruDefault"; //$NON-NLS-1$
-
-	/**
-	 * Key to control the actual boolean preference of the "most recently used"
-	 * order enablement
-	 */
-	public static final String MRU_KEY = "enableMru"; //$NON-NLS-1$
-
-	/**
-	 * Key to switch if the "most recently used" behavior controlled via CSS or
-	 * preferences
-	 */
-	public static final String MRU_CONTROLLED_BY_CSS_KEY = "mruControlledByCSS"; //$NON-NLS-1$
-
-	/*
-	 * org.eclipse.ui.internal.dialogs.ViewsPreferencePage controls currently
-	 * the MRU behavior via IEclipsePreferences, so that CSS values from the
-	 * themes aren't used.
-	 *
-	 * TODO once we can use preferences from CSS (and update the value on the
-	 * fly) we can switch this default to true, see discussion on bug 388476.
-	 */
-	private static final boolean MRU_CONTROLLED_BY_CSS_DEFAULT = false;
-
-	@Inject
-	@Preference(nodePath = "org.eclipse.e4.ui.workbench.renderers.swt")
-	private IEclipsePreferences preferences;
 
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
@@ -201,7 +162,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	// Manages CSS styling based on active part changes
 	private EventHandler stylingHandler;
 
-	private boolean ignoreTabSelChanges;
+	private boolean ignoreTabSelChanges = false;
 
 	List<CTabItem> getItemsToSet(MPart part) {
 		List<CTabItem> itemsToSet = new ArrayList<CTabItem>();
@@ -343,9 +304,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	@PostConstruct
 	public void init() {
 		super.init(eventBroker);
-
-		preferences.addPreferenceChangeListener(this);
-		preferenceChange(null);
 
 		// TODO: Refactor using findItemForPart(MPart) method
 		itemUpdater = new EventHandler() {
@@ -625,7 +583,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		int styleOverride = getStyleOverride(pStack);
 		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
 		final CTabFolder ctf = new CTabFolder(parentComposite, style);
-		ctf.setMRUVisible(getMruValue(ctf));
+		ctf.setMRUVisible(getInitialMRUValue(ctf));
 
 		// Adjust the minimum chars based on the location
 		int location = modelService.getElementLocation(element);
@@ -661,32 +619,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			return result;
 
 		return Boolean.parseBoolean(value.getCssText());
-	}
-
-	@SuppressWarnings("restriction")
-	private boolean getMruValue(Control control) {
-		if (CSSPropertyMruVisibleSWTHandler.isMruControlledByCSS()) {
-			return getInitialMRUValue(control);
-		}
-		return getMRUValueFromPreferences();
-	}
-
-	private boolean getMRUValueFromPreferences() {
-		boolean initialMRUValue = preferences.getBoolean(MRU_KEY_DEFAULT, true);
-		boolean actualValue = preferences.getBoolean(MRU_KEY, initialMRUValue);
-		return actualValue;
-	}
-
-	private void updateMruValue(CTabFolder ctf) {
-		boolean actualMRUValue = getMruValue(ctf);
-		ctf.setMRUVisible(actualMRUValue);
-	}
-
-	@SuppressWarnings("restriction")
-	@Override
-	public void preferenceChange(PreferenceChangeEvent event) {
-		boolean mruControlledByCSS = preferences.getBoolean(MRU_CONTROLLED_BY_CSS_KEY, MRU_CONTROLLED_BY_CSS_DEFAULT);
-		CSSPropertyMruVisibleSWTHandler.setMruControlledByCSS(mruControlledByCSS);
 	}
 
 	/**
@@ -833,7 +765,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		} finally {
 			adjusting = false;
 		}
-		updateMruValue(ctf);
 	}
 
 	@Override
@@ -856,7 +787,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				cti.setControl((Control) element.getWidget());
 			return;
 		}
-		updateMruValue(ctf);
+
 		int createFlags = SWT.NONE;
 		if (part != null && isClosable(part)) {
 			createFlags |= SWT.CLOSE;
@@ -1173,13 +1104,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				}
 			}
 		});
-
-		ctf.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				updateMruValue(ctf);
-			}
-		});
 	}
 
 	public void showAvailableItems(MElementContainer<?> stack, CTabFolder ctf) {
@@ -1187,7 +1111,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this,
-                getMRUValueFromPreferences());
+				getInitialMRUValue(ctf));
 		editorList.setInput();
 
 		Point size = editorList.computeSizeHint();
@@ -1468,6 +1392,34 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 					}
 				});
 
+				int leftFrom = getCloseableSideParts(part, true).size();
+				if (leftFrom > 0) {
+					MenuItem menuItemLeft = new MenuItem(menu, SWT.NONE);
+					menuItemLeft.setText(SWTRenderersMessages.menuCloseLeft);
+					menuItemLeft.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+							closeSideParts(part, true);
+						}
+					});
+				}
+
+				int rightFrom = getCloseableSideParts(part, false).size();
+				if (rightFrom > 0) {
+					MenuItem menuItemRight = new MenuItem(menu, SWT.NONE);
+					menuItemRight.setText(SWTRenderersMessages.menuCloseRight);
+					menuItemRight.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+							closeSideParts(part, false);
+						}
+					});
+				}
+
+				new MenuItem(menu, SWT.SEPARATOR);
+
 				MenuItem menuItemAll = new MenuItem(menu, SWT.NONE);
 				menuItemAll.setText(SWTRenderersMessages.menuCloseAll);
 				menuItemAll.addSelectionListener(new SelectionAdapter() {
@@ -1492,16 +1444,37 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		return parent;
 	}
 
-	private List<MPart> getCloseableSiblingParts(MPart part) {
-		// broken out from closeSiblingParts so it can be used to determine how
-		// many closeable siblings are available
+	private List<MPart> getCloseableSideParts(MPart part, boolean left) {
 		MElementContainer<MUIElement> container = getParent(part);
-		List<MPart> closeableSiblings = new ArrayList<MPart>();
-		if (container == null)
-			return closeableSiblings;
+		if (container == null) {
+			return new ArrayList<MPart>();
+		}
 
 		List<MUIElement> children = container.getChildren();
-		for (MUIElement child : children) {
+		int thisPartIdx = children.indexOf(part);
+		final int start = left ? 0 : thisPartIdx + 1;
+		final int end = left ? thisPartIdx : children.size();
+
+		return getCloseableSiblingParts(part, children, start, end);
+	}
+
+	private List<MPart> getCloseableSiblingParts(MPart part) {
+		MElementContainer<MUIElement> container = getParent(part);
+		if (container == null) {
+			return new ArrayList<MPart>();
+		}
+
+		List<MUIElement> children = container.getChildren();
+		return getCloseableSiblingParts(part, children, 0, children.size());
+	}
+
+	private List<MPart> getCloseableSiblingParts(MPart part, List<MUIElement> children,
+			final int start, final int end) {
+		// broken out from closeSiblingParts so it can be used to determine how
+		// many closeable siblings are available
+		List<MPart> closeableSiblings = new ArrayList<MPart>();
+		for (int i = start; i < end; i++) {
+			MUIElement child = children.get(i);
 			// If the element isn't showing skip it
 			if (!child.isToBeRendered())
 				continue;
@@ -1525,12 +1498,26 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		return closeableSiblings;
 	}
 
+	private void closeSideParts(MPart part, boolean left) {
+		MElementContainer<MUIElement> container = getParent(part);
+		if (container == null) {
+			return;
+		}
+		List<MPart> others = getCloseableSideParts(part, left);
+		closeSiblingParts(part, others, true);
+	}
+
 	private void closeSiblingParts(MPart part, boolean skipThisPart) {
 		MElementContainer<MUIElement> container = getParent(part);
-		if (container == null)
+		if (container == null) {
 			return;
-
+		}
 		List<MPart> others = getCloseableSiblingParts(part);
+		closeSiblingParts(part, others, skipThisPart);
+	}
+
+	private void closeSiblingParts(MPart part, List<MPart> others, boolean skipThisPart) {
+		MElementContainer<MUIElement> container = getParent(part);
 
 		// add the current part last so that we unrender obscured items first
 		if (!skipThisPart && part.isToBeRendered() && isClosable(part)) {
