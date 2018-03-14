@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *   IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font should be activated and used by other components.
+ *   Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 
 package org.eclipse.ui.dialogs;
@@ -82,7 +83,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
         resolutions = markerResolutions;
         setTitle(IDEWorkbenchMessages.MarkerResolutionSelectionDialog_title);
         setMessage(IDEWorkbenchMessages.MarkerResolutionSelectionDialog_messageLabel);
-        setInitialSelections(new Object[] { markerResolutions[0] });
+		setInitialSelections(markerResolutions[0]);
     }
 
     @Override

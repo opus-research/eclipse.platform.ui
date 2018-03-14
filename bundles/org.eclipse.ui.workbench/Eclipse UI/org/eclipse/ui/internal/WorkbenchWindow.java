@@ -13,6 +13,7 @@
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -547,7 +548,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					ListSelectionDialog dialog = new ListSelectionDialog(getShell(), parts,
 							ArrayContentProvider.getInstance(), labelProvider,
 							WorkbenchMessages.EditorManager_saveResourcesMessage);
-					dialog.setInitialSelections(parts.toArray());
+					dialog.setInitialElementSelections(parts);
 					dialog.setTitle(WorkbenchMessages.EditorManager_saveResourcesTitle);
 					if (dialog.open() == IDialogConstants.CANCEL_ID) {
 						return new Save[] { Save.CANCEL };
