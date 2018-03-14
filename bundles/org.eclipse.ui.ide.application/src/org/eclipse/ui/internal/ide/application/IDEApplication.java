@@ -181,8 +181,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return <code>null</code> if a valid instance location has been set and an exit code
      *         otherwise
      */
-    @SuppressWarnings("rawtypes")
-	private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
+    private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
         // -data @none was specified but an ide requires workspace
         Location instanceLoc = Platform.getInstanceLocation();
         if (instanceLoc == null) {
@@ -286,8 +285,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private static boolean isDevLaunchMode(Map args) {
+	private static boolean isDevLaunchMode(Map args) {
 		// see org.eclipse.pde.internal.core.PluginPathFinder.isDevLaunchMode()
 		if (Boolean.getBoolean("eclipse.pde.launch")) //$NON-NLS-1$
 			return true;

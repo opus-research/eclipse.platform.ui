@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426460, 441150
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426460
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -36,8 +36,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Default SWT renderer responsible for an MPart. See
- * {@link WorkbenchRendererFactory}
+ * Create a contribute part.
  */
 public class ContributedPartRenderer extends SWTPartRenderer {
 
@@ -121,10 +120,10 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 
 		// Create a context for this part
 		IEclipseContext localContext = part.getContext();
-		localContext.set(Composite.class, newComposite);
+		localContext.set(Composite.class.getName(), newComposite);
 
-		IContributionFactory contributionFactory = localContext
-				.get(IContributionFactory.class);
+		IContributionFactory contributionFactory = (IContributionFactory) localContext
+				.get(IContributionFactory.class.getName());
 		Object newPart = contributionFactory.create(part.getContributionURI(),
 				localContext);
 		part.setObject(newPart);
