@@ -14,7 +14,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.IAdaptable;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
@@ -214,6 +216,15 @@ public class WebBrowserEditorInput implements IEditorInput,
 		return true;
 	}
 
+	/**
+	 * Returns an object which is an instance of the given class associated with
+	 * this object. Returns <code>null</code> if no such object can be found.
+	 *
+	 * @param adapter
+	 *            the adapter class to look up
+	 * @return a object castable to the given class, or <code>null</code> if
+	 *         this object does not have an adapter for the given class
+	 */
 	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		return null;
@@ -246,6 +257,15 @@ public class WebBrowserEditorInput implements IEditorInput,
 		return (name != null);
 	}
 
+	/**
+	 * Returns the name of this editor input for display purposes.
+	 * <p>
+	 * For instance, if the fully qualified input name is
+	 * <code>"a\b\MyFile.gif"</code>, the return value would be just
+	 * <code>"MyFile.gif"</code>.
+	 *
+	 * @return the file name string
+	 */
 	@Override
 	public String getName() {
 		if (name != null)
@@ -254,6 +274,11 @@ public class WebBrowserEditorInput implements IEditorInput,
 		return Messages.viewWebBrowserTitle;
 	}
 
+	/*
+	 * Returns an object that can be used to save the state of this editor
+	 * input. @return the persistable element, or <code>null</code> if this
+	 * editor input cannot be persisted
+	 */
 	@Override
 	public IPersistableElement getPersistable() {
 		if ((style & IWorkbenchBrowserSupport.PERSISTENT) == 0)
@@ -314,6 +339,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * public boolean isLocationBarGlobal() { return (style &
 	 * ExternalBrowserInstance.LOCATION_TOOLBAR) != 0; }
 	 */
+
 	public boolean isToolbarLocal() {
 		return (style & BrowserViewer.BUTTON_BAR) != 0;
 	}
@@ -346,6 +372,11 @@ public class WebBrowserEditorInput implements IEditorInput,
 		}
 	}
 
+	/**
+	 * Converts this object to a string.
+	 *
+	 * @return java.lang.String
+	 */
 	@Override
 	public String toString() {
 		return "WebBrowserEditorInput[" + url + " " + style + " " + id + "]";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$

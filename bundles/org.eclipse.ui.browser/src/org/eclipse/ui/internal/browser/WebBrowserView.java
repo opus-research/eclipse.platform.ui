@@ -49,6 +49,14 @@ public class WebBrowserView extends ViewPart implements
 		viewer = new BrowserViewer(parent, style);
 		viewer.setContainer(this);
 
+		/*
+		 * PropertyChangeListener propertyChangeListener = new
+		 * PropertyChangeListener() { public void
+		 * propertyChange(PropertyChangeEvent event) { if
+		 * (BrowserViewer.PROPERTY_TITLE.equals(event.getPropertyName())) {
+		 * setPartName((String) event.getNewValue()); } } };
+		 * viewer.addPropertyChangeListener(propertyChangeListener);
+		 */
 		initDragAndDrop();
 	}
 
@@ -165,7 +173,10 @@ public class WebBrowserView extends ViewPart implements
 	 * Adds drag and drop support to the view.
 	 */
 	protected void initDragAndDrop() {
-		Transfer[] transfers = new Transfer[] { FileTransfer.getInstance() };
+		Transfer[] transfers = new Transfer[] {
+		// LocalSelectionTransfer.getInstance(),
+		// ResourceTransfer.getInstance(),
+		FileTransfer.getInstance() };
 
 		DropTarget dropTarget = new DropTarget(viewer, DND.DROP_COPY
 				| DND.DROP_DEFAULT);
