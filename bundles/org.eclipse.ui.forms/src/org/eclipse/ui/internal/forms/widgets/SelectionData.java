@@ -37,66 +37,78 @@ public class SelectionData {
 	}
 
 	public void markNewLine() {
-		newLineNeeded=true;
+		newLineNeeded = true;
 	}
+
 	public void addSegment(String text) {
 		if (newLineNeeded) {
 			segments.add(System.getProperty("line.separator")); //$NON-NLS-1$
-			newLineNeeded=false;
+			newLineNeeded = false;
 		}
 		segments.add(text);
 	}
 
 	public void update(MouseEvent e) {
-		//Control c = (Control)e.widget;
+		// Control c = (Control)e.widget;
 		stop.x = e.x;
 		stop.y = e.y;
 	}
+
 	public void reset() {
 		segments.clear();
 	}
+
 	public String getSelectionText() {
 		StringBuffer buf = new StringBuffer();
-		for (int i=0; i<segments.size(); i++) {
+		for (int i = 0; i < segments.size(); i++) {
 			buf.append(segments.get(i));
 		}
 		return buf.toString();
 	}
+
 	public boolean canCopy() {
-		return segments.size()>0;
+		return segments.size() > 0;
 	}
 
 	private int getTopOffset() {
-		return start.y<stop.y?start.y:stop.y;
+		return start.y < stop.y ? start.y : stop.y;
 	}
+
 	private int getBottomOffset() {
-		return start.y>stop.y?start.y:stop.y;
+		return start.y > stop.y ? start.y : stop.y;
 	}
+
 	public int getLeftOffset(Locator locator) {
-		return isInverted(locator)? stop.x:start.x;
+		return isInverted(locator) ? stop.x : start.x;
 	}
+
 	public int getLeftOffset(int rowHeight) {
-		return isInverted(rowHeight) ? stop.x:start.x;
+		return isInverted(rowHeight) ? stop.x : start.x;
 	}
+
 	public int getRightOffset(Locator locator) {
-		return isInverted(locator)? start.x: stop.x;
+		return isInverted(locator) ? start.x : stop.x;
 	}
+
 	public int getRightOffset(int rowHeight) {
-		return isInverted(rowHeight) ? start.x:stop.x;
+		return isInverted(rowHeight) ? start.x : stop.x;
 	}
+
 	private boolean isInverted(Locator locator) {
 		int rowHeight = locator.heights.get(locator.rowCounter)[0];
 		return isInverted(rowHeight);
 	}
+
 	private boolean isInverted(int rowHeight) {
 		int deltaY = start.y - stop.y;
 		if (Math.abs(deltaY) > rowHeight) {
 			// inter-row selection
-			return deltaY>0;
+			return deltaY > 0;
 		}
 		// intra-row selection
 		return start.x > stop.x;
 	}
+
 	public boolean isEnclosed() {
 		return !start.equals(stop);
 	}
@@ -107,36 +119,36 @@ public class SelectionData {
 		int rowHeight = locator.heights.get(locator.rowCounter)[0];
 		return isSelectedRow(locator.y, rowHeight);
 	}
+
 	public boolean isSelectedRow(int y, int rowHeight) {
 		if (!isEnclosed())
 			return false;
-		return (y + rowHeight >= getTopOffset() &&
-				y <= getBottomOffset());
+		return (y + rowHeight >= getTopOffset() && y <= getBottomOffset());
 	}
+
 	public boolean isFirstSelectionRow(Locator locator) {
 		if (!isEnclosed())
 			return false;
 		int rowHeight = locator.heights.get(locator.rowCounter)[0];
-		return (locator.y + rowHeight >= getTopOffset() &&
-				locator.y <= getTopOffset());
+		return (locator.y + rowHeight >= getTopOffset() && locator.y <= getTopOffset());
 	}
+
 	public boolean isFirstSelectionRow(int y, int rowHeight) {
 		if (!isEnclosed())
 			return false;
-		return (y + rowHeight >= getTopOffset() &&
-				y <= getTopOffset());
+		return (y + rowHeight >= getTopOffset() && y <= getTopOffset());
 	}
+
 	public boolean isLastSelectionRow(Locator locator) {
 		if (!isEnclosed())
 			return false;
 		int rowHeight = locator.heights.get(locator.rowCounter)[0];
-		return (locator.y + rowHeight >=getBottomOffset() &&
-				locator.y <= getBottomOffset());
+		return (locator.y + rowHeight >= getBottomOffset() && locator.y <= getBottomOffset());
 	}
+
 	public boolean isLastSelectionRow(int y, int rowHeight) {
 		if (!isEnclosed())
 			return false;
-		return (y + rowHeight >=getBottomOffset() &&
-				y <= getBottomOffset());
+		return (y + rowHeight >= getBottomOffset() && y <= getBottomOffset());
 	}
 }
