@@ -65,6 +65,9 @@ public class RectangleAnimationImageFeedback extends
 					getBounds().height);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.swt.widgets.Widget#dispose()
+		 */
 		@Override
 		public void dispose() {
 			super.dispose();
@@ -116,6 +119,9 @@ public class RectangleAnimationImageFeedback extends
 
 	}
 		
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.RectangleAnimationFeedbackBase#jobInit(org.eclipse.ui.internal.AnimationEngine)
+	 */
 	@Override
 	public boolean jobInit(AnimationEngine engine) {
 		changeCoordinates();
