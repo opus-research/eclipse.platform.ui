@@ -20,11 +20,6 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 public class TestJobRule implements ISchedulingRule {
 	private int jobOrder;
 
-	/**
-	 * constructor
-	 *
-	 * @param order
-	 */
 	public TestJobRule(int order) {
 		jobOrder = order;
 	}
@@ -49,8 +44,7 @@ public class TestJobRule implements ISchedulingRule {
 
 	/**
 	 * Return the order of this rule.
-	 * 
-	 * @return joborder
+	 * @return
 	 */
 	public int getJobOrder() {
 		return jobOrder;

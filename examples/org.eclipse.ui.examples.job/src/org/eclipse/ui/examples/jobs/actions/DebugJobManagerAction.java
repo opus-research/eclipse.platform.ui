@@ -11,7 +11,7 @@
 package org.eclipse.ui.examples.jobs.actions;
 
 import org.eclipse.core.internal.jobs.JobManager;
-import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -24,10 +24,6 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
  * mechanism.
  */
 public class DebugJobManagerAction implements IWorkbenchWindowActionDelegate {
-
-	/**
-	 * constructor
-	 */
 	public DebugJobManagerAction() {
 		super();
 	}
@@ -41,9 +37,7 @@ public class DebugJobManagerAction implements IWorkbenchWindowActionDelegate {
 
 	public void run(IAction action) {
 		System.out.println("**** BEGIN DUMP JOB MANAGER INFORMATION ****"); //$NON-NLS-1$
-
-		IJobManager jobManager = Job.getJobManager();
-		Job[] jobs = jobManager.find(null);
+		Job[] jobs = Platform.getJobManager().find(null);
 		for (int i = 0; i < jobs.length; i++) {
 			System.out.println("" + jobs[i].getClass().getName() + " state: " + JobManager.printState(jobs[i].getState())); //$NON-NLS-1$ //$NON-NLS-2$
 		}

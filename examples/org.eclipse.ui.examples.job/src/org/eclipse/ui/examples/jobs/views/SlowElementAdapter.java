@@ -57,8 +57,7 @@ public class SlowElementAdapter implements IDeferredWorkbenchAdapter {
 
 	private void sleep(long mills) {
 		try {
-			// using mills, was 1000
-			Thread.sleep(mills);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			//ignore
 		}
