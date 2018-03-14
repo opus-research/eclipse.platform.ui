@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 Tom Schindl and others.
+ * Copyright (c) 2006, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Boris Bokowski (IBM Corporation) - Javadoc improvements
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -19,9 +20,15 @@ import org.eclipse.swt.widgets.TableColumn;
  * ViewerColumn implementation for TableViewer to enable column-specific label
  * providers and editing support.
  *
+ * @param <E>
+ *            Type of an element of the model
+ * @param <I>
+ *            Type of the input
+ *
  * @since 3.3
  */
-public final class TableViewerColumn extends ViewerColumn {
+public final class TableViewerColumn<E,I> extends ViewerColumn<E,I> {
+
 	private TableColumn column;
 
 	/**
@@ -36,7 +43,7 @@ public final class TableViewerColumn extends ViewerColumn {
 	 *            see {@link TableColumn}
 	 * @see TableColumn#TableColumn(Table, int)
 	 */
-	public TableViewerColumn(TableViewer viewer, int style) {
+	public TableViewerColumn(TableViewer<E,I> viewer, int style) {
 		this(viewer, style, -1);
 	}
 
@@ -54,7 +61,7 @@ public final class TableViewerColumn extends ViewerColumn {
 	 *            the index at which to place the newly created column
 	 * @see TableColumn#TableColumn(Table, int, int)
 	 */
-	public TableViewerColumn(TableViewer viewer, int style, int index) {
+	public TableViewerColumn(TableViewer<E,I> viewer, int style, int index) {
 		this(viewer, createColumn(viewer.getTable(), style, index));
 	}
 
@@ -67,7 +74,7 @@ public final class TableViewerColumn extends ViewerColumn {
 	 * @param column
 	 *            the underlying table column
 	 */
-	public TableViewerColumn(TableViewer viewer, TableColumn column) {
+	public TableViewerColumn(TableViewer<E,I> viewer, TableColumn column) {
 		super(viewer, column);
 		this.column = column;
 	}

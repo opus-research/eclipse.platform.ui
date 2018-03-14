@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
  *                                                 fix for 159597, refactoring (bug 153993),
  *                                                 widget-independency (bug 154329), fix for 187826, 191468
  *     Peter Centgraf - bug 251575
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430873, 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -41,11 +41,11 @@ import org.eclipse.swt.widgets.Widget;
  * </p>
  * <p>
  * As of 3.1 the TableViewer now supports the SWT.VIRTUAL flag. If the
- * underlying table is SWT.VIRTUAL, the content provider may implement {@link
- * ILazyContentProvider} instead of {@link IStructuredContentProvider} . Note
- * that in this case, the viewer does not support sorting or filtering. Also
- * note that in this case, the Widget based APIs may return null if the element
- * is not specified or not created yet.
+ * underlying table is SWT.VIRTUAL, the content provider may implement
+ * {@link ILazyContentProvider} instead of {@link IStructuredContentProvider} .
+ * Note that in this case, the viewer does not support sorting or filtering.
+ * Also note that in this case, the Widget based APIs may return null if the
+ * element is not specified or not created yet.
  * </p>
  * <p>
  * Users of SWT.VIRTUAL should also avoid using getItems() from the Table within
@@ -54,16 +54,21 @@ import org.eclipse.swt.widgets.Widget;
  * of the items thereby eliminating the performance improvements of SWT.VIRTUAL.
  * </p>
  * <p>
- * Users setting up an editable table with more than 1 column <b>have</b> to pass the
- * SWT.FULL_SELECTION style bit
+ * Users setting up an editable table with more than 1 column <b>have</b> to
+ * pass the SWT.FULL_SELECTION style bit
  * </p>
+ *
+ * @param <E>
+ *            Type of an single element of the model
+ * @param <I>
+ *            Type of the input
  *
  * @see SWT#VIRTUAL
  * @see #doFindItem(Object)
  * @see #internalRefresh(Object, boolean)
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class TableViewer extends AbstractTableViewer {
+public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	/**
 	 * This viewer's table control.
 	 */
@@ -72,7 +77,7 @@ public class TableViewer extends AbstractTableViewer {
 	/**
 	 * The cached row which is reused all over
 	 */
-	private TableViewerRow cachedRow;
+	private TableViewerRow<E> cachedRow;
 
 	/**
 	 * Creates a table viewer on a newly-created table control under the given
@@ -131,9 +136,9 @@ public class TableViewer extends AbstractTableViewer {
 	}
 
 	@Override
-	protected ColumnViewerEditor createViewerEditor() {
-		return new TableViewerEditor(this, null,
-				new ColumnViewerEditorActivationStrategy(this),
+	protected ColumnViewerEditor<E,I> createViewerEditor() {
+		return new TableViewerEditor<>(this, null,
+				new ColumnViewerEditorActivationStrategy<>(this),
 				ColumnViewerEditor.DEFAULT);
 	}
 
@@ -163,9 +168,9 @@ public class TableViewer extends AbstractTableViewer {
 	}
 
 	@Override
-	protected ViewerRow getViewerRowFromItem(Widget item) {
+	protected ViewerRow<E> getViewerRowFromItem(Widget item) {
 		if (cachedRow == null) {
-			cachedRow = new TableViewerRow((TableItem) item);
+			cachedRow = new TableViewerRow<>((TableItem) item);
 		} else {
 			cachedRow.setItem((TableItem) item);
 		}
@@ -182,7 +187,7 @@ public class TableViewer extends AbstractTableViewer {
 	 * @since 3.3
 	 */
 	@Override
-	protected ViewerRow internalCreateNewRowPart(int style, int rowIndex) {
+	protected ViewerRow<E> internalCreateNewRowPart(int style, int rowIndex) {
 		TableItem item;
 
 		if (rowIndex >= 0) {
@@ -402,7 +407,7 @@ public class TableViewer extends AbstractTableViewer {
 	}
 
 	@Override
-	public void remove(Object[] elements) {
+	public void remove(E[] elements) {
 		assertElementsNotNull(elements);
 		if (checkBusy())
 			return;
@@ -413,19 +418,21 @@ public class TableViewer extends AbstractTableViewer {
 		// deselect any items that are being removed, see bug 97786
 		boolean deselectedItems = false;
 		Object elementToBeRemoved = null;
-		CustomHashtable elementsToBeRemoved = null;
+		CustomHashtable<E,E> elementsToBeRemoved = null;
 		if (elements.length == 1) {
 			elementToBeRemoved = elements[0];
 		} else {
-			elementsToBeRemoved = new CustomHashtable(getComparer());
-			for (Object element : elements) {
+			elementsToBeRemoved = new CustomHashtable<>(getComparer());
+			for (int i = 0; i < elements.length; i++) {
+				E element = elements[i];
 				elementsToBeRemoved.put(element, element);
 			}
 		}
 		int[] selectionIndices = doGetSelectionIndices();
 		for (int index : selectionIndices) {
 			Item item = doGetItem(index);
-			Object data = item.getData();
+			@SuppressWarnings("unchecked")
+			E data = (E) item.getData();
 			if (data != null) {
 				if ((elementsToBeRemoved != null && elementsToBeRemoved
 						.containsKey(data))
@@ -445,10 +452,11 @@ public class TableViewer extends AbstractTableViewer {
 	}
 
 	@Override
-	protected Widget doFindItem(Object element) {
-		IContentProvider contentProvider = getContentProvider();
+	protected Widget doFindItem(E element) {
+		IContentProvider<? super I> contentProvider = getContentProvider();
 		if (contentProvider instanceof IIndexableLazyContentProvider) {
-			IIndexableLazyContentProvider indexable = (IIndexableLazyContentProvider) contentProvider;
+			@SuppressWarnings("unchecked")
+			IIndexableLazyContentProvider<E,? super I> indexable = (IIndexableLazyContentProvider<E,? super I>) contentProvider;
 			int idx = indexable.findElement(element);
 			if (idx != -1) {
 				return doGetItem(idx);
