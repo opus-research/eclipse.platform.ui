@@ -74,7 +74,6 @@ public DragHandle(Composite parent) {
     setCursor(dragCursor);
 }
 
-@Override
 public void paintControl(PaintEvent e) {
     Point size = getSize();
     
@@ -101,7 +100,6 @@ public void paintControl(PaintEvent e) {
         }
     }
 }
-@Override
 public Point computeSize(int wHint, int hHint, boolean changed) {
     Point result = new Point(wHint, hHint);
     
@@ -122,7 +120,6 @@ public void setHorizontal(boolean isHorizontal) {
     this.isHorizontal = isHorizontal;
 }
 
-@Override
 public void dispose() {
     if (isDisposed()) {
         return;

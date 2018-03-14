@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -140,8 +139,8 @@ public abstract class Viewer implements IInputSelectionProvider {
      */
     protected void fireHelpRequested(HelpEvent event) {
         Object[] listeners = helpListeners.getListeners();
-        for (Object listener : listeners) {
-            ((HelpListener) listener).helpRequested(event);
+        for (int i = 0; i < listeners.length; ++i) {
+            ((HelpListener) listeners[i]).helpRequested(event);
         }
     }
 
@@ -155,8 +154,8 @@ public abstract class Viewer implements IInputSelectionProvider {
      */
     protected void fireSelectionChanged(final SelectionChangedEvent event) {
         Object[] listeners = selectionChangedListeners.getListeners();
-        for (Object listener : listeners) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) listener;
+        for (int i = 0; i < listeners.length; ++i) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {

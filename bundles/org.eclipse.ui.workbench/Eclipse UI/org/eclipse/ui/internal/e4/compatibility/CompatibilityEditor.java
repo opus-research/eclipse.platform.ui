@@ -94,7 +94,6 @@ public class CompatibilityEditor extends CompatibilityPart {
 		((AbstractMultiEditor) part).setChildren(editors);
 	}
 
-	@Override
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
 		super.createPartControl(legacyPart, parent);
 
