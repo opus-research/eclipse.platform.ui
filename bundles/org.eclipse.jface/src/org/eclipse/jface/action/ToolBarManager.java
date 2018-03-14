@@ -11,7 +11,6 @@
 package org.eclipse.jface.action;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -172,8 +171,8 @@ public class ToolBarManager extends ContributionManager implements
 		toolBar = null;
 
 		IContributionItem[] items = getItems();
-		for (int i = 0; i < items.length; i++) {
-			items[i].dispose();
+		for (IContributionItem item : items) {
+			item.dispose();
 		}
 
 		if (getContextMenuManager() != null) {
@@ -222,11 +221,11 @@ public class ToolBarManager extends ContributionManager implements
 			if (layoutBar.getParent() instanceof CoolBar) {
 				CoolBar cb = (CoolBar) layoutBar.getParent();
 				CoolItem[] items = cb.getItems();
-				for (int i = 0; i < items.length; i++) {
-					if (items[i].getControl() == layoutBar) {
-						Point curSize = items[i].getSize();
-						items[i].setSize(curSize.x+ (afterPack.x - beforePack.x),
-									curSize.y+ (afterPack.y - beforePack.y));
+				for (CoolItem item : items) {
+					if (item.getControl() == layoutBar) {
+						Point curSize = item.getSize();
+						item.setSize(curSize.x + (afterPack.x - beforePack.x),
+								curSize.y + (afterPack.y - beforePack.y));
 						return;
 					}
 				}
@@ -244,9 +243,6 @@ public class ToolBarManager extends ContributionManager implements
 		return toolBar != null && !toolBar.isDisposed();
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IContributionManager.
-	 */
 	@Override
 	public void update(boolean force) {
 
@@ -270,8 +266,7 @@ public class ToolBarManager extends ContributionManager implements
 				//			if (DEBUG) {
 				//				cleanStartTime= (new Date()).getTime();
 				//			}
-				for (int i = 0; i < items.length; ++i) {
-					IContributionItem ci = items[i];
+				for (IContributionItem ci : items) {
 					if (!isChildVisible(ci)) {
 						continue;
 					}
@@ -298,17 +293,17 @@ public class ToolBarManager extends ContributionManager implements
 				// determine obsolete items (removed or non active)
 				ToolItem[] mi = toolBar.getItems();
 				ArrayList<ToolItem> toRemove = new ArrayList<ToolItem>(mi.length);
-				for (int i = 0; i < mi.length; i++) {
+				for (ToolItem item : mi) {
 					// there may be null items in a toolbar
-					if (mi[i] == null)
+					if (item == null)
 						continue;
 					
-					Object data = mi[i].getData();
+					Object data = item.getData();
 					if (data == null
 							|| !clean.contains(data)
 							|| (data instanceof IContributionItem && ((IContributionItem) data)
 									.isDynamic())) {
-						toRemove.add(mi[i]);
+						toRemove.add(item);
 					}
 				}
 
@@ -339,12 +334,11 @@ public class ToolBarManager extends ContributionManager implements
                     }
 
                     // add new items
-                    IContributionItem src, dest;
+					IContributionItem dest;
                     mi = toolBar.getItems();
                     int srcIx = 0;
                     int destIx = 0;
-                    for (Iterator<IContributionItem> e = clean.iterator(); e.hasNext();) {
-                        src = e.next();
+					for (IContributionItem src : clean) {
 
                         // get corresponding item in SWT widget
                         if (srcIx < mi.length) {
