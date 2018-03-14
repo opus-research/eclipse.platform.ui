@@ -73,6 +73,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -285,6 +286,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 		org.eclipse.e4.ui.workbench.IWorkbench {
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
+
+	private static final String APPLICATIONMODEL_SAVE_JOB = "Workbench Auto-Save Background Job"; //$NON-NLS-1$
+
+	private static final String APPLICATIONMODEL_SAVE_JOBGROUP = "Workbench Auto-Save Job Group"; //$NON-NLS-1$
+
+	private JobGroup jobGroupWorkbenchSaveJob = new JobGroup(APPLICATIONMODEL_SAVE_JOBGROUP, 1, 1);
 
 	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
 
@@ -1273,7 +1280,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		}
 		final IModelResourceHandler handler = e4Context.get(IModelResourceHandler.class);
 
-		Job cleanAndSaveJob = new Job("Workbench Auto-Save Background Job") { //$NON-NLS-1$
+		Job cleanAndSaveJob = new Job(APPLICATIONMODEL_SAVE_JOB) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				final Resource res = handler.createResourceWithApp(appCopy);
@@ -1294,6 +1301,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		};
 		cleanAndSaveJob.setPriority(Job.SHORT);
 		cleanAndSaveJob.setSystem(true);
+		cleanAndSaveJob.setJobGroup(jobGroupWorkbenchSaveJob);
 		cleanAndSaveJob.schedule();
 	}
 
@@ -3003,10 +3011,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 							return Status.OK_STATUS;
 						}
 
-						@Override
-						public boolean belongsTo(Object family) {
-							return WORKBENCH_AUTO_SAVE_JOB == family;
-						}
 					};
 					autoSaveJob.setSystem(true);
 					autoSaveJob.schedule(millisecondInterval);
