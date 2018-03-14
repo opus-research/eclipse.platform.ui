@@ -185,10 +185,10 @@ public class FolderPreviewView extends ViewPart {
 	@Override
 	public void init(IViewSite site) throws PartInitException {
 		super.init(site);
-		selectionService = site
+		selectionService = (ISelectionService) site
 				.getService(ISelectionService.class);
 		selectionService.addPostSelectionListener(mailFolderChangedListener);
-		mailService = site.getService(IMailService.class);
+		mailService = (IMailService) site.getService(IMailService.class);
 	}
 
 	@Override
