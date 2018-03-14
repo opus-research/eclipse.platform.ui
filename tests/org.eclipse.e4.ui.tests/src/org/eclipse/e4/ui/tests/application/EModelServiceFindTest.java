@@ -16,6 +16,7 @@ import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
@@ -328,6 +329,27 @@ public class EModelServiceFindTest extends TestCase {
 		assertEquals(2, menuElements.size());
 	}
 
+	private MHandler findHandler(EModelService ms,
+			MApplicationElement searchRoot, final String id) {
+		if (searchRoot == null || id == null)
+			return null;
+		// In order to update these tests we first need the generic 'find'
+		// API defined in https://bugs.eclipse.org/bugs/show_bug.cgi?id=431738
+		// Once there the following code should be correct.
+		//
+		// List<Object> handlers = ms.findElements(searchRoot,
+		// EModelService.ANYWHERE, new Selector() {
+		// @Override
+		// public boolean select(MApplicationElement element) {
+		// return element instanceof MHandler &&
+		// id.equals(element.getElementId());
+		// }
+		// });
+		// if (handlers.size() > 0)
+		// return handlers.get(0);
+		return null;
+	}
+
 	public void testFindHandler() {
 		MApplication application = createApplication();
 
@@ -345,20 +367,20 @@ public class EModelServiceFindTest extends TestCase {
 
 		MHandler foundHandler = null;
 
-		foundHandler = modelService.findHandler(application, "handler1");
+		foundHandler = findHandler(modelService, application, "handler1");
 		assertNotNull(foundHandler);
 		assertSame(handler1, foundHandler);
 
-		foundHandler = modelService.findHandler(application, "invalidId");
+		foundHandler = findHandler(modelService, application, "invalidId");
 		assertNull(foundHandler);
 
-		foundHandler = modelService.findHandler(null, "handler1");
+		foundHandler = findHandler(modelService, null, "handler1");
 		assertNull(foundHandler);
 
-		foundHandler = modelService.findHandler(application, "");
+		foundHandler = findHandler(modelService, application, "");
 		assertNull(foundHandler);
 
-		foundHandler = modelService.findHandler(application, null);
+		foundHandler = findHandler(modelService, application, null);
 		assertNull(foundHandler);
 	}
 
