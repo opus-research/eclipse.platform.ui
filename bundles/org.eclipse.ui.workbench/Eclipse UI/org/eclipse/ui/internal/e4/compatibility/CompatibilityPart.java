@@ -17,12 +17,10 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
-import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -89,8 +87,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			// being unset
 			if (event.getProperty(UIEvents.EventTags.ELEMENT) == part
 					&& event.getProperty(UIEvents.EventTags.NEW_VALUE) == null) {
-				Assert.isTrue(!composite.isDisposed(),
-						"The widget should not have been disposed at this point"); //$NON-NLS-1$
+				 Assert.isTrue(!composite.isDisposed(),
+										"The widget should not have been disposed at this point"); //$NON-NLS-1$
 				beingDisposed = true;
 				WorkbenchPartReference reference = getReference();
 				// notify the workbench we're being closed
@@ -131,16 +129,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	CompatibilityPart(MPart part) {
 		this.part = part;
-	}
-
-	@PersistState
-	protected void persistState() {
-		ContextInjectionFactory.invoke(wrapped, PersistState.class, part.getContext(), null);
-	}
-
-	@Persist
-	protected void persist() {
-		ContextInjectionFactory.invoke(wrapped, Persist.class, part.getContext(), null);
 	}
 
 	public abstract WorkbenchPartReference getReference();
@@ -360,8 +348,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 								newImage);
 					}
 					if (wrapped.getTitleToolTip() != null && wrapped.getTitleToolTip().length() > 0) {
-						part.getTransientData().put(
-								IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
+						part.getTransientData()
+								.put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
 								wrapped.getTitleToolTip());
 					}
 					break;
@@ -422,7 +410,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	public MPart getModel() {
 		return part;
 	}
-
+	
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
 		ESelectionService selectionService = (ESelectionService) part.getContext().get(
