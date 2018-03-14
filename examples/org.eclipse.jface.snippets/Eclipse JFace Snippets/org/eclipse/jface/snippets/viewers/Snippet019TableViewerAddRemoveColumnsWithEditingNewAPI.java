@@ -58,16 +58,13 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 
 	private class MyContentProvider implements IStructuredContentProvider {
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (Person[]) inputElement;
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -77,7 +74,6 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 	
 
 	private class GivenNameLabelProvider extends ColumnLabelProvider {
-		@Override
 		public String getText(Object element) {
 			return ((Person) element).givenname;
 		}
@@ -91,22 +87,18 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 			cellEditor = new TextCellEditor(viewer.getTable());
 		}
 		
-		@Override
 		protected boolean canEdit(Object element) {
 			return true;
 		}
 		
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return cellEditor;
 		}
 
-		@Override
 		protected Object getValue(Object element) {
 			return ((Person) element).givenname;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			((Person) element).givenname = value.toString();
 			getViewer().update(element, null);
@@ -114,7 +106,6 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 	}
 	
 	private class SurNameLabelProvider extends ColumnLabelProvider {
-		@Override
 		public String getText(Object element) {
 			return ((Person) element).surname;
 		}
@@ -128,22 +119,18 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 			cellEditor = new TextCellEditor(viewer.getTable());
 		}
 		
-		@Override
 		protected boolean canEdit(Object element) {
 			return true;
 		}
 		
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return cellEditor;
 		}
 
-		@Override
 		protected Object getValue(Object element) {
 			return ((Person) element).surname;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			((Person) element).surname = value.toString();
 			getViewer().update(element, null);
@@ -151,7 +138,6 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 	}
 	
 	private class EmailLabelProvider extends ColumnLabelProvider {
-		@Override
 		public String getText(Object element) {
 			return ((Person) element).email;
 		}
@@ -165,22 +151,18 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 			cellEditor = new TextCellEditor(viewer.getTable());
 		}
 		
-		@Override
 		protected boolean canEdit(Object element) {
 			return true;
 		}
 		
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return cellEditor;
 		}
 
-		@Override
 		protected Object getValue(Object element) {
 			return ((Person) element).email;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			((Person) element).email = value.toString();
 			getViewer().update(element, null);
@@ -224,7 +206,6 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 	private void triggerColumnSelectedColumn(final TableViewer v) {
 		v.getTable().addMouseListener(new MouseAdapter() {
 
-			@Override
 			public void mouseDown(MouseEvent e) {
 				int x = 0;
 				for (int i = 0; i < v.getTable().getColumnCount(); i++) {
@@ -261,28 +242,24 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 		final MenuManager mgr = new MenuManager();
 
 		final Action insertEmailBefore = new Action("Insert E-Mail before") {
-			@Override
 			public void run() {
 				addEmailColumn(v, activeColumn);
 			}
 		};
 
 		final Action insertEmailAfter = new Action("Insert E-Mail after") {
-			@Override
 			public void run() {
 				addEmailColumn(v, activeColumn + 1);
 			}
 		};
 
 		final Action removeEmail = new Action("Remove E-Mail") {
-			@Override
 			public void run() {
 				removeEmailColumn(v);
 			}
 		};
 
 		final Action configureColumns = new Action("Configure Columns...") {
-			@Override
 			public void run() {
 				ConfigureColumns.forTable(v.getTable(), new SameShellProvider(v.getControl()));
 			}
@@ -291,7 +268,6 @@ public class Snippet019TableViewerAddRemoveColumnsWithEditingNewAPI {
 		mgr.setRemoveAllWhenShown(true);
 		mgr.addMenuListener(new IMenuListener() {
 
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				if (v.getTable().getColumnCount() == 2) {
 					manager.add(insertEmailBefore);

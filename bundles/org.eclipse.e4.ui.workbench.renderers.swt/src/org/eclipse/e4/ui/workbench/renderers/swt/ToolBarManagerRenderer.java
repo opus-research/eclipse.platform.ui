@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -50,7 +49,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
-import org.eclipse.e4.ui.workbench.UIEvents.Selector;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
@@ -58,7 +56,6 @@ import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManagerOverrides;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
@@ -172,15 +169,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					return;
 				}
 				ici.setVisible(itemModel.isVisible());
-
-				ToolBarManager parent = null;
-				if (ici instanceof MenuManager) {
-					parent = (ToolBarManager) ((MenuManager) ici).getParent();
-				} else if (ici instanceof ContributionItem) {
-					parent = (ToolBarManager) ((ContributionItem) ici)
-							.getParent();
-				}
-
+				ToolBarManager parent = (ToolBarManager) ((ContributionItem) ici)
+						.getParent();
 				if (parent != null) {
 					parent.markDirty();
 					parent.update(true);
@@ -246,35 +236,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	void dirtyChanged(
 			@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
 		updateEnablement();
-	}
-
-	@Inject
-	@Optional
-	void updateRequest(
-			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
-		final Object v = eventData.getProperty(IEventBroker.DATA);
-		Selector s;
-		if (v instanceof Selector) {
-			s = (Selector) v;
-		} else {
-			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
-				s = new Selector() {
-
-					public boolean select(MApplicationElement element) {
-						return true;
-					}
-				};
-			} else {
-				s = new Selector() {
-
-					public boolean select(MApplicationElement element) {
-						return v.equals(element.getElementId());
-					}
-				};
-			}
-		}
-
-		getUpdater().updateContributionItems(s);
 	}
 
 	@PostConstruct
@@ -933,7 +894,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		return enablementUpdater;
 	}
 
-	void updateEnablement() {
+	public void updateEnablement() {
 		enablementUpdater.updateContributionItems();
 	}
 }
