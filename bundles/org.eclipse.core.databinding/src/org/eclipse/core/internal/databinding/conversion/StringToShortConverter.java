@@ -34,7 +34,11 @@ public class StringToShortConverter extends NumberFormatConverter {
 		primitive = toType.isPrimitive();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
+	 */
 	public Object convert(Object fromObject) {
 		ParseResult result = StringToNumberParser.parse(fromObject,
 				numberFormat, primitive);

@@ -210,8 +210,7 @@ public class PathVariableDialog extends TitleAreaDialog {
      * 
      * @see org.eclipse.jface.window.Window#configureShell(Shell)
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         if (operationMode == NEW_VARIABLE)
             shell.setText(IDEWorkbenchMessages.PathVariableDialog_shellTitle_newVariable);
@@ -226,8 +225,7 @@ public class PathVariableDialog extends TitleAreaDialog {
      * 
      * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         // top level composite
         Composite parentComposite = (Composite) super.createDialogArea(parent);
 
@@ -295,8 +293,7 @@ public class PathVariableDialog extends TitleAreaDialog {
 	        variableNameField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 	        		false, 2, 1));
 	        variableNameField.addModifyListener(new ModifyListener() {
-	            @Override
-				public void modifyText(ModifyEvent event) {
+	            public void modifyText(ModifyEvent event) {
 	                variableNameModified();
 	            }
 	        });
@@ -313,8 +310,7 @@ public class PathVariableDialog extends TitleAreaDialog {
         variableValueField.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
         		false));
         variableValueField.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent event) {
+            public void modifyText(ModifyEvent event) {
                 variableValueModified();
             }
         });
@@ -336,8 +332,7 @@ public class PathVariableDialog extends TitleAreaDialog {
 	        		false));
 	
 	        fileButton.addSelectionListener(new SelectionAdapter() {
-	            @Override
-				public void widgetSelected(SelectionEvent e) {
+	            public void widgetSelected(SelectionEvent e) {
 	                selectFile();
 	            }
 	        });
@@ -353,8 +348,7 @@ public class PathVariableDialog extends TitleAreaDialog {
 	        		false));
 	
 	        folderButton.addSelectionListener(new SelectionAdapter() {
-	            @Override
-				public void widgetSelected(SelectionEvent e) {
+	            public void widgetSelected(SelectionEvent e) {
 	                selectFolder();
 	            }
 	        });
@@ -371,8 +365,7 @@ public class PathVariableDialog extends TitleAreaDialog {
 	    		false));
 	
 	        variableButton.addSelectionListener(new SelectionAdapter() {
-	            @Override
-				public void widgetSelected(SelectionEvent e) {
+	            public void widgetSelected(SelectionEvent e) {
 	                selectVariable();
 	            }
 	        });
@@ -515,8 +508,7 @@ public class PathVariableDialog extends TitleAreaDialog {
      * 
      * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar
      */
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         okButton.setEnabled(type == EXISTING_VARIABLE);
@@ -716,8 +708,11 @@ public class PathVariableDialog extends TitleAreaDialog {
         variableValue = userEditableString;
     }
 
-    @Override
-	protected boolean isResizable() {
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
+    protected boolean isResizable() {
     	return true;
     }
 

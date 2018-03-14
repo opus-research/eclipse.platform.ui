@@ -84,7 +84,6 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 	 * org.eclipse.ui.ide.undo.ResourceDescription#createResource(org.eclipse
 	 * .core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IResource createResource(IProgressMonitor monitor)
 			throws CoreException {
 		IResource resource = createResourceHandle();
@@ -98,7 +97,6 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.ResourceDescription#isValid()
 	 */
-	@Override
 	public boolean isValid() {
 		return parent == null || parent.exists();
 	}
@@ -143,7 +141,6 @@ abstract class AbstractResourceDescription extends ResourceDescription {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.ResourceDescription#verifyExistence(boolean)
 	 */
-	@Override
 	public boolean verifyExistence(boolean checkMembers) {
 		IContainer p = parent;
 		if (p == null) {

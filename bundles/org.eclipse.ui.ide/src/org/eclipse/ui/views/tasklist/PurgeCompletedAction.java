@@ -47,8 +47,7 @@ class PurgeCompletedAction extends TaskAction {
     /**
      * Fetches all the completed tasks in the workspace and deletes them.
      */
-    @Override
-	public void run() {
+    public void run() {
         IResource resource = getTaskList().getResource();
         int depth = getTaskList().getResourceDepth();
         IMarker[] tasks;

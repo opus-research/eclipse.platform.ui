@@ -32,18 +32,15 @@ public class ControlFocusedProperty extends WidgetBooleanValueProperty {
 		super();
 	}
 
-	@Override
 	public boolean doGetBooleanValue(Object source) {
 		return ((Control) source).isFocusControl();
 	}
 
-	@Override
 	public void doSetBooleanValue(Object source, boolean value) {
 		if (value)
 			((Control) source).setFocus();
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		int[] events = { SWT.FocusIn, SWT.FocusOut };
@@ -63,7 +60,6 @@ public class ControlFocusedProperty extends WidgetBooleanValueProperty {
 			super(property, listener, changeEvents, staleEvents);
 		}
 
-		@Override
 		public void handleEvent(Event event) {
 			switch (event.type) {
 			case SWT.FocusIn:
@@ -78,7 +74,6 @@ public class ControlFocusedProperty extends WidgetBooleanValueProperty {
 		}
 	}
 
-	@Override
 	public String toString() {
 		return "Control.focus <boolean>"; //$NON-NLS-1$
 	}

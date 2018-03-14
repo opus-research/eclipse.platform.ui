@@ -141,7 +141,6 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	 * <code>SelectionStatusDialog</code> method builds a two element list -
 	 * the first element is the project name and the second one is the location.
 	 */
-	@Override
 	protected void computeResult() {
 
 		ArrayList list = new ArrayList();
@@ -150,14 +149,18 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 		setResult(list);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.PROJECT_LOCATION_SELECTION_DIALOG);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	protected Control createDialogArea(Composite parent) {
 		// page group
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -178,7 +181,6 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	private void createNameListener() {
 
 		Listener listener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				setLocationForSelection();
 				applyValidationResult(checkValid(), false);
@@ -277,7 +279,11 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 	 */
 	private IErrorMessageReporter getErrorReporter() {
 		return new IErrorMessageReporter() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
+			 */
 			public void reportError(String errorMessage, boolean infoOnly) {
 				setMessage(errorMessage);
 				applyValidationResult(errorMessage, infoOnly);

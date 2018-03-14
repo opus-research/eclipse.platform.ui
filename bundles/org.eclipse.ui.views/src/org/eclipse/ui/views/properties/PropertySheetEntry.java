@@ -89,7 +89,6 @@ public class PropertySheetEntry extends EventManager implements
 	 * changes in the CellEditor, and cancel and finish requests.
 	 */
 	private ICellEditorListener cellEditorListener = new ICellEditorListener() {
-		@Override
 		public void editorValueChanged(boolean oldValidState,
 				boolean newValidState) {
 			if (!newValidState) {
@@ -101,24 +100,26 @@ public class PropertySheetEntry extends EventManager implements
 			}
 		}
 
-		@Override
 		public void cancelEditor() {
 			setErrorText(null);
 		}
 
-		@Override
 		public void applyEditorValue() {
 			PropertySheetEntry.this.applyEditorValue();
 		}
 	};
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void addPropertySheetEntryListener(
 			IPropertySheetEntryListener listener) {
 		addListenerObject(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void applyEditorValue() {
 		if (editor == null) {
 			return;
@@ -271,7 +272,9 @@ public class PropertySheetEntry extends EventManager implements
 		return new PropertySheetEntry();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void dispose() {
 		if (editor != null) {
 			editor.dispose();
@@ -328,12 +331,16 @@ public class PropertySheetEntry extends EventManager implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getCategory() {
 		return descriptor.getCategory();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public IPropertySheetEntry[] getChildEntries() {
 		if (childEntries == null) {
 			createChildEntries();
@@ -341,7 +348,9 @@ public class PropertySheetEntry extends EventManager implements
 		return childEntries;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getDescription() {
 		return descriptor.getDescription();
 	}
@@ -356,12 +365,18 @@ public class PropertySheetEntry extends EventManager implements
 		return descriptor;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getDisplayName() {
 		return descriptor.getDisplayName();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.IPropertySheetEntry#getEditor(org.eclipse.swt.widgets.Composite)
+	 */
 	public CellEditor getEditor(Composite parent) {
 
 		if (editor == null) {
@@ -393,22 +408,30 @@ public class PropertySheetEntry extends EventManager implements
 		return value;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getErrorText() {
 		return errorText;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getFilters()[] {
 		return descriptor.getFilterFlags();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public Object getHelpContextIds() {
 		return descriptor.getHelpContextIds();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public Image getImage() {
 		ILabelProvider provider = descriptor.getLabelProvider();
 		if (provider == null) {
@@ -458,7 +481,9 @@ public class PropertySheetEntry extends EventManager implements
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public String getValueAsString() {
 		if (editValue == null) {
 			return "";//$NON-NLS-1$
@@ -484,7 +509,9 @@ public class PropertySheetEntry extends EventManager implements
 		return values;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public boolean hasChildEntries() {
 		if (childEntries != null && childEntries.length > 0) {
 			return true;
@@ -593,13 +620,17 @@ public class PropertySheetEntry extends EventManager implements
 		setValues(newValues);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void removePropertySheetEntryListener(
 			IPropertySheetEntryListener listener) {
 		removeListenerObject(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	public void resetPropertyValue() {
 		if (parent == null) {
 			// root does not have a default value
@@ -712,7 +743,6 @@ public class PropertySheetEntry extends EventManager implements
 	 * @param objects
 	 *            the new values for this entry
 	 */
-	@Override
 	public void setValues(Object[] objects) {
 		values = objects;
 		sources = new HashMap(values.length * 2 + 1);
