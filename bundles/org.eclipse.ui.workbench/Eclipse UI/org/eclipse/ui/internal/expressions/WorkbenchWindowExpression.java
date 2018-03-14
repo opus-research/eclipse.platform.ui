@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.ui.IWorkbenchWindow;
  * An expression that evaluates to {@link EvaluationResult#TRUE} when the active
  * workbench window matches the window held by this expression.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public class WorkbenchWindowExpression extends Expression {
@@ -44,7 +44,7 @@ public class WorkbenchWindowExpression extends Expression {
 
 	/**
 	 * Constructs a new instance.
-	 * 
+	 *
 	 * @param window
 	 *            The workbench window which must be active for this expression
 	 *            to evaluate to <code>true</code>; may be <code>null</code>
@@ -92,7 +92,7 @@ public class WorkbenchWindowExpression extends Expression {
 
 	/**
 	 * Returns the workbench window to which this expression applies.
-	 * 
+	 *
 	 * @return The workbench window to which this expression applies; may be
 	 *         <code>null</code>.
 	 */

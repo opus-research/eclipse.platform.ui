@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ public interface EHandlerService {
 
 	/**
 	 * Execute a handler for the command.
-	 * 
+	 *
 	 * @param command
 	 *            Must not be <code>null</code>
 	 * @param staticContext
@@ -39,7 +39,7 @@ public interface EHandlerService {
 
 	/**
 	 * Check if a command can be executed.
-	 * 
+	 *
 	 * @param command
 	 *            Must not be <code>null</code>.
 	 * @param staticContext

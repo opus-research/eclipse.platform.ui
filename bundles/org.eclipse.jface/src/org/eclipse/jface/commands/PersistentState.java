@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  * <p>
  * Clients may extend this class.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public abstract class PersistentState extends State {
@@ -36,7 +36,7 @@ public abstract class PersistentState extends State {
 	 * Loads this state from the preference store, given the location at which
 	 * to look. This method must be symmetric with a call to
 	 * {@link #save(IPreferenceStore, String)}.
-	 * 
+	 *
 	 * @param store
 	 *            The store from which to read; must not be <code>null</code>.
 	 * @param preferenceKey
@@ -50,7 +50,7 @@ public abstract class PersistentState extends State {
 	 * Saves this state to the preference store, given the location at which to
 	 * write. This method must be symmetric with a call to
 	 * {@link #load(IPreferenceStore, String)}.
-	 * 
+	 *
 	 * @param store
 	 *            The store to which the state should be written; must not be
 	 *            <code>null</code>.
@@ -63,7 +63,7 @@ public abstract class PersistentState extends State {
 
 	/**
 	 * Sets whether this state should be persisted.
-	 * 
+	 *
 	 * @param persisted
 	 *            Whether this state should be persisted.
 	 */
@@ -74,7 +74,7 @@ public abstract class PersistentState extends State {
 	/**
 	 * Whether this state should be persisted. Subclasses should check this
 	 * method before loading or saving.
-	 * 
+	 *
 	 * @return <code>true</code> if this state should be persisted;
 	 *         <code>false</code> otherwise.
 	 */

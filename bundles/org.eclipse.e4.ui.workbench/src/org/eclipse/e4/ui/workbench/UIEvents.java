@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench;
 
@@ -24,14 +25,14 @@ import org.osgi.service.event.Event;
 
 /**
  * E4 UI events and event topic definitions.
- * 
+ *
  * This file contains generated and hand crafted event topic constants. There are also hand crafted
  * utility methods for constructing topic strings and publishing events.
- * 
+ *
  * When the UI model changes org.eclipse.e4.ui.internal.workbench.swt.GenTopic should be run as an
  * Eclipse application and the console results should be pasted into this file replacing the code
  * below the "Place Generated Code Here" comment
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @since 1.0
@@ -60,7 +61,7 @@ public class UIEvents {
 
 	/**
 	 * Name element for E4 Renderer events
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public static final String UIRendererTopicBase = UITopicBase + "/renderer"; //$NON-NLS-1$
@@ -68,14 +69,16 @@ public class UIEvents {
 	/**
 	 * Event sent when a enabled update is requested for tool-items.
 	 * <p>
-	 * As a value you can pass in to the {@link IEventBroker}:
+	 * As a value you may pass in to the {@link IEventBroker#DATA}:
 	 * <ul>
-	 * <li>the {@link MApplicationElement#getElementId()} of the element to check</li>
-	 * <li>the special value {@link #ALL_ELEMENT_ID}</li>
+	 * <li>the special value {@link #ALL_ELEMENT_ID} to request changes of all
+	 * applicable elements (the default)</li>
+	 * <li>the {@link MApplicationElement#getElementId()} of the element to
+	 * check</li>
 	 * <li>instance of {@link Selector}</li>
 	 * </ul>
 	 * </p>
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public static final String REQUEST_ENABLEMENT_UPDATE_TOPIC = UIRendererTopicBase
@@ -83,7 +86,7 @@ public class UIEvents {
 
 	/**
 	 * Special id passed to force all elements to be checked
-	 * 
+	 *
 	 * @since 1.1
 	 */
 	public static final String ALL_ELEMENT_ID = "ALL"; //$NON-NLS-1$
@@ -102,19 +105,19 @@ public class UIEvents {
 		public static final String SET = "SET"; //$NON-NLS-1$
 		/**
 		 * Add event: value added is {@link EventTags#NEW_VALUE}.
-		 * 
+		 *
 		 * @see UIEvents#isADD(Event)
 		 */
 		public static final String ADD = "ADD"; //$NON-NLS-1$
 		/**
 		 * Add many items: values added are {@link EventTags#NEW_VALUE}
-		 * 
+		 *
 		 * @see UIEvents#isADD(Event)
 		 */
 		public static final String ADD_MANY = "ADD_MANY";//$NON-NLS-1$
 		/**
 		 * Remove event: value removed is {@link EventTags#OLD_VALUE}
-		 * 
+		 *
 		 * @see UIEvents#isREMOVE(Event)
 		 */
 		public static final String REMOVE = "REMOVE"; //$NON-NLS-1$
@@ -122,7 +125,7 @@ public class UIEvents {
 		 * Remove many event: the values removed are the {@link EventTags#OLD_VALUE} (a collection).
 		 * The former positions of the removed values are provided as an integer array in
 		 * {@link EventTags#POSITION}.
-		 * 
+		 *
 		 * @see UIEvents#isREMOVE(Event)
 		 */
 		public static final String REMOVE_MANY = "REMOVE_MANY"; //$NON-NLS-1$
@@ -183,7 +186,7 @@ public class UIEvents {
 	 * {@link EventTypes#ADD}, {@link EventTypes#ADD_MANY}, {@link EventTypes#REMOVE}, and
 	 * {@link EventTypes#REMOVE_MANY}. If the property is not a container (e.g., a collection or
 	 * array), then return true then if {@code container} is equal to {@code o}.
-	 * 
+	 *
 	 * @param event
 	 *            the event
 	 * @param propertyName
@@ -211,7 +214,7 @@ public class UIEvents {
 	/**
 	 * Return the provided event property as an iterable. If already a collection, return the
 	 * collection.
-	 * 
+	 *
 	 * @param event
 	 *            the event object
 	 * @param propertyName
@@ -287,27 +290,35 @@ public class UIEvents {
 		 * Sent when a perspective is opened
 		 */
 		public static final String PERSPECTIVE_OPENED = TOPIC + TOPIC_SEP + "perspOpened"; //$NON-NLS-1$
+
+		/**
+		 * Sent when a perspective is reset
+		 *
+		 * @since 1.2
+		 */
+		public static final String PERSPECTIVE_RESET = TOPIC + TOPIC_SEP + "perspReset"; //$NON-NLS-1$
+
 		/**
 		 * Sent when application startup is complete
 		 */
 		public static final String APP_STARTUP_COMPLETE = TOPIC + TOPIC_SEP + "appStartupComplete"; //$NON-NLS-1$
 		/**
 		 * Sent when application shutdown is starting
-		 * 
+		 *
 		 * @since 1.1
 		 */
 		public static final String APP_SHUTDOWN_STARTED = TOPIC + TOPIC_SEP + "appShutdownStarted"; //$NON-NLS-1$
 
 		/**
 		 * Sent when the theme is changed
-		 * 
+		 *
 		 * @since 1.1
 		 */
 		public static final String THEME_CHANGED = TOPIC + TOPIC_SEP + "themeChanged"; //$NON-NLS-1$
 
 		/**
 		 * Sent when the theme definition is changed
-		 * 
+		 *
 		 * @since 1.1
 		 */
 		public static final String THEME_DEFINITION_CHANGED = TOPIC + TOPIC_SEP
@@ -317,7 +328,7 @@ public class UIEvents {
 	/**
 	 * Publish the topic to the changedElements global event bus. The changedElement is added the
 	 * the EventTags.ELEMENT tag.
-	 * 
+	 *
 	 * @param topic
 	 *            to broadcast
 	 * @param changedElement
@@ -328,7 +339,7 @@ public class UIEvents {
 		if (topic == null || topic.length() == 0 || changedElement == null)
 			return false;
 
-		Map<String, Object> argMap = new HashMap<String, Object>(1);
+		Map<String, Object> argMap = new HashMap<>(1);
 		argMap.put(EventTags.ELEMENT, changedElement);
 		return publishEvent(topic, argMap);
 	}
@@ -337,7 +348,7 @@ public class UIEvents {
 	 * Publish the topic with the provided arguments to the global event bus. argMap MUST contain an
 	 * EventTags.ELEMENT argument that is an MUIElement. the contained MUIElement will be used to
 	 * determine the event bus to publish to.
-	 * 
+	 *
 	 * @param topic
 	 *            to broadcast
 	 * @param argMap
@@ -376,7 +387,7 @@ public class UIEvents {
 	@SuppressWarnings("javadoc")
 	@Deprecated
 	/**
-	 * @deprecated Subscribe to an attribute event by using the TOPIC_<attribute> constant directly 
+	 * @deprecated Subscribe to an attribute event by using the TOPIC_<attribute> constant directly
 	 */
 	public static String buildTopic(String topic, String attrName) {
 		return topic + TOPIC_SEP + attrName + TOPIC_SEP + ALL_SUB_TOPICS;
@@ -393,11 +404,11 @@ public class UIEvents {
 
 	/*************************************************************************************
 	 * GENERATED CODE!!
-	 * 
+	 *
 	 * NOTE: *All* non-generated code must be above this comment.
-	 * 
+	 *
 	 * Replace the generated code below this comment with the output of GenTopic.
-	 * 
+	 *
 	 *************************************************************************************/
 
 	@SuppressWarnings("javadoc")

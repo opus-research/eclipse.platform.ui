@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *     Stefan Weiser <stefanfranz.weiser@gmail.com> - Bug 459983 - getCSSFontPropertiesKey
  *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.resources;
@@ -83,9 +84,15 @@ public class CSSResourcesHelpers {
 
 	public static String getCSSFontPropertiesKey(
 			CSS2FontProperties fontProperties) {
-		return fontProperties.getFamily() + "_" + fontProperties.getSize()
-				+ "_" + fontProperties.getStyle() + "_"
-				+ fontProperties.getWeight();
+		return getCssText(fontProperties.getFamily()) + "_" + getCssText(fontProperties.getSize()) + "_"
+				+ getCssText(fontProperties.getStyle()) + "_" + getCssText(fontProperties.getWeight());
+	}
+
+	private static String getCssText(CSSPrimitiveValue cssPrimitiveValue) {
+		if (cssPrimitiveValue != null) {
+			return cssPrimitiveValue.getCssText();
+		}
+		return String.valueOf(cssPrimitiveValue);
 	}
 
 	/**

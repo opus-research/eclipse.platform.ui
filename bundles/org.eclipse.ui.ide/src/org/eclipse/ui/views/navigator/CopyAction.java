@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,10 +36,11 @@ import org.eclipse.ui.part.ResourceTransfer;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  * @since 2.0
  */
+@Deprecated
 /*package*/class CopyAction extends SelectionListenerAction {
 
     /**
@@ -86,7 +87,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * @param shell the shell for any dialogs
      * @param clipboard a platform clipboard
      * @param pasteAction a paste action
-     * 
+     *
      * @since 2.0
      */
     public CopyAction(Shell shell, Clipboard clipboard, PasteAction pasteAction) {
@@ -94,14 +95,12 @@ import org.eclipse.ui.part.ResourceTransfer;
         this.pasteAction = pasteAction;
     }
 
-   
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.Action#run()
-     */
-    public void run() {
+
+    @Override
+	public void run() {
     	 /**
-         * The <code>CopyAction</code> implementation of this method defined 
-         * on <code>IAction</code> copies the selected resources to the 
+         * The <code>CopyAction</code> implementation of this method defined
+         * on <code>IAction</code> copies the selected resources to the
          * clipboard.
          */
         List selectedResources = getSelectedResources();
@@ -143,7 +142,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 
     /**
      * Set the clipboard contents. Prompt to retry if clipboard is busy.
-     * 
+     *
      * @param resources the resources to copy to the clipboard
      * @param fileNames file names of the resources to copy to the clipboard
      * @param names string representation of all names
@@ -176,18 +175,16 @@ import org.eclipse.ui.part.ResourceTransfer;
         }
     }
 
-   
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.actions.BaseSelectionListenerAction#updateSelection(org.eclipse.jface.viewers.IStructuredSelection)
-     */
-    protected boolean updateSelection(IStructuredSelection selection) {
-    	
+
+    @Override
+	protected boolean updateSelection(IStructuredSelection selection) {
+
     	 /**
          * The <code>CopyAction</code> implementation of this
-         * <code>SelectionListenerAction</code> method enables this action if 
+         * <code>SelectionListenerAction</code> method enables this action if
          * one or more resources of compatible types are selected.
          */
-    	
+
         if (!super.updateSelection(selection)) {
 			return false;
 		}
@@ -213,7 +210,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-        // must have a common parent	
+        // must have a common parent
         IContainer firstParent = ((IResource) selectedResources.get(0))
                 .getParent();
         if (firstParent == null) {

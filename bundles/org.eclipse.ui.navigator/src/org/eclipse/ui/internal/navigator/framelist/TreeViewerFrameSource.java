@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,10 +16,10 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
-/** 
+/**
  * Frame source for tree viewers, which uses <code>TreeFrame</code> to capture
  * the state of the tree viewer.
- * 
+ *
  * @see TreeFrame
  * @since 3.4
  */
@@ -29,7 +29,7 @@ public class TreeViewerFrameSource implements IFrameSource {
 
     /**
      * Constructs a new tree viewer frame source for the specified tree viewer.
-     * 
+     *
      * @param viewer the tree viewer
      */
     public TreeViewerFrameSource(AbstractTreeViewer viewer) {
@@ -39,11 +39,12 @@ public class TreeViewerFrameSource implements IFrameSource {
     /**
      * Connects this source as a listener on the frame list,
      * so that when the current frame changes, the viewer is updated.
-     * @param frameList 
+     * @param frameList
      */
     public void connectTo(FrameList frameList) {
         frameList.addPropertyChangeListener(new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
                 TreeViewerFrameSource.this.handlePropertyChange(event);
             }
         });
@@ -51,7 +52,7 @@ public class TreeViewerFrameSource implements IFrameSource {
 
     /**
      * Returns a new tree frame capturing the specified input element.
-     * 
+     *
      * @param input the input element
      * @return the tree frame
      */
@@ -61,7 +62,7 @@ public class TreeViewerFrameSource implements IFrameSource {
 
     /**
      * Updates the viewer in response to the current frame changing.
-     * 
+     *
      * @param frame the new value for the current frame
      */
     protected void frameChanged(TreeFrame frame) {
@@ -75,7 +76,7 @@ public class TreeViewerFrameSource implements IFrameSource {
 
     /**
      * Returns the current frame.
-     * 
+     *
      * @param flags a bit-wise OR of the frame source flag constants
      * @return the current frame
      */
@@ -89,10 +90,8 @@ public class TreeViewerFrameSource implements IFrameSource {
         return frame;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IFrameSource.
-     */
-    public Frame getFrame(int whichFrame, int flags) {
+    @Override
+	public Frame getFrame(int whichFrame, int flags) {
         switch (whichFrame) {
         case IFrameSource.CURRENT_FRAME:
             return getCurrentFrame(flags);
@@ -107,7 +106,7 @@ public class TreeViewerFrameSource implements IFrameSource {
 
     /**
      * Returns the parent frame, or <code>null</code> if there is no parent frame.
-     * 
+     *
      * @param flags a bit-wise OR of the frame source flag constants
      * @return the parent frame, or <code>null</code>
      */
@@ -116,7 +115,7 @@ public class TreeViewerFrameSource implements IFrameSource {
         ITreeContentProvider provider = (ITreeContentProvider) viewer
                 .getContentProvider();
         Object parent = provider.getParent(input);
-        if (parent == null) 
+        if (parent == null)
             return null;
 		TreeFrame frame = createFrame(parent);
 		if ((flags & IFrameSource.FULL_CONTEXT) != 0) {
@@ -134,7 +133,7 @@ public class TreeViewerFrameSource implements IFrameSource {
     /**
      * Returns the frame for the selection, or <code>null</code> if there is no
      * frame for the selection.
-     * 
+     *
      * @param flags a bit-wise OR of the frame source flag constants
      * @return the selection frame, or <code>null</code>
      */
@@ -156,7 +155,7 @@ public class TreeViewerFrameSource implements IFrameSource {
 
     /**
      * Returns the tree viewer.
-     * 
+     *
      * @return the tree viewer
      */
     public AbstractTreeViewer getViewer() {

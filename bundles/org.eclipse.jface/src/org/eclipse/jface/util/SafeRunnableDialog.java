@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.util;
 
@@ -19,10 +20,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -37,17 +36,17 @@ import org.eclipse.swt.widgets.Control;
 /**
  * SafeRunnableDialog is a dialog that can show the results of multiple safe
  * runnable errors.
- * 
+ *
  */
 class SafeRunnableDialog extends ErrorDialog {
 
 	private TableViewer statusListViewer;
 
-	private Collection<IStatus> statuses = new ArrayList<IStatus>();
+	private Collection<IStatus> statuses = new ArrayList<>();
 
 	/**
 	 * Create a new instance of the receiver on a status.
-	 * 
+	 *
 	 * @param status
 	 *            The status to display.
 	 */
@@ -61,7 +60,7 @@ class SafeRunnableDialog extends ErrorDialog {
 
 		setStatus(status);
 		statuses.add(status);
-		
+
 		setBlockOnOpen(false);
 
 		String reason = JFaceResources
@@ -71,9 +70,8 @@ class SafeRunnableDialog extends ErrorDialog {
 					.getException().toString() : status.getException()
 					.getMessage();
 		}
-		this.message = JFaceResources.format(
-				"SafeRunnableDialog_reason", new Object[] { //$NON-NLS-1$
-				status.getMessage(), reason });
+		this.message = JFaceResources.format("SafeRunnableDialog_reason", //$NON-NLS-1$
+				status.getMessage(), reason);
 	}
 
 	/**
@@ -89,11 +87,6 @@ class SafeRunnableDialog extends ErrorDialog {
 		updateEnablements();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.ErrorDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control area = super.createDialogArea(parent);
@@ -103,7 +96,7 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	/**
 	 * Create the status list if required.
-	 * 
+	 *
 	 * @param parent
 	 *            the Control to create it in.
 	 */
@@ -136,7 +129,7 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	/**
 	 * This method sets the message in the message label.
-	 * 
+	 *
 	 * @param messageString -
 	 *            the String for the message area
 	 */
@@ -152,7 +145,7 @@ class SafeRunnableDialog extends ErrorDialog {
 	/**
 	 * Create an area that allow the user to select one of multiple jobs that
 	 * have reported errors
-	 * 
+	 *
 	 * @param parent -
 	 *            the parent of the area
 	 */
@@ -170,28 +163,18 @@ class SafeRunnableDialog extends ErrorDialog {
 		statusListViewer.setContentProvider(getStatusContentProvider());
 		statusListViewer.setLabelProvider(getStatusListLabelProvider());
 		statusListViewer
-				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
-					public void selectionChanged(SelectionChangedEvent event) {
-						handleSelectionChange();
-					}
-				});
+				.addSelectionChangedListener(event -> handleSelectionChange());
 		applyDialogFont(parent);
 		statusListViewer.setInput(this);
 	}
 
 	/**
 	 * Return the label provider for the status list.
-	 * 
+	 *
 	 * @return CellLabelProvider
 	 */
 	private CellLabelProvider getStatusListLabelProvider() {
 		return new CellLabelProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
-			 */
 			@Override
 			public void update(ViewerCell cell) {
 				cell.setText(((IStatus) cell.getElement()).getMessage());
@@ -202,37 +185,21 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	/**
 	 * Return the content provider for the statuses.
-	 * 
+	 *
 	 * @return IStructuredContentProvider
 	 */
 	private IStructuredContentProvider getStatusContentProvider() {
 		return new IStructuredContentProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-			 */
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return statuses.toArray();
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
 			@Override
 			public void dispose() {
 
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
@@ -250,17 +217,11 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	/**
 	 * Return a viewer sorter for looking at the jobs.
-	 * 
+	 *
 	 * @return ViewerSorter
 	 */
 	private ViewerComparator getViewerComparator() {
 		return new ViewerComparator() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
 			@Override
 			public int compare(Viewer testViewer, Object e1, Object e2) {
 				String message1 = ((IStatus) e1).getMessage();
@@ -290,7 +251,7 @@ class SafeRunnableDialog extends ErrorDialog {
 	/**
 	 * Get the single selection. Return null if the selection is not just one
 	 * element.
-	 * 
+	 *
 	 * @return IStatus or <code>null</code>.
 	 */
 	private IStatus getSingleSelection() {
@@ -316,11 +277,6 @@ class SafeRunnableDialog extends ErrorDialog {
 		showDetailsArea();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.ErrorDialog#shouldShowDetailsButton()
-	 */
 	@Override
 	protected boolean shouldShowDetailsButton() {
 		return true;
@@ -333,8 +289,8 @@ class SafeRunnableDialog extends ErrorDialog {
 	public void addStatus(IStatus status) {
 		statuses.add(status);
 		refresh();
-		
+
 	}
 
-	
+
 }

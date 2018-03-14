@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.markers.internal;
@@ -17,9 +18,9 @@ import org.eclipse.ui.internal.views.markers.MarkerSupportInternalUtilities;
 /**
  * MarkerGroupingEntry is the configuration object for the markerGroupingEntry
  * extension.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class MarkerGroupingEntry {
 
@@ -37,8 +38,7 @@ public class MarkerGroupingEntry {
 	public MarkerGroupingEntry(IConfigurationElement element) {
 		label = element.getAttribute(MarkerSupportRegistry.LABEL);
 		id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
-		sortPriority = Integer.valueOf(element.getAttribute(PRIORITY))
-				.intValue();
+		sortPriority = Integer.parseInt(element.getAttribute(PRIORITY));
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class MarkerGroupingEntry {
 
 	/**
 	 * Set the receiver as the default grouping entry for type markerType.
-	 * 
+	 *
 	 * @param markerType
 	 *            String
 	 */
@@ -63,7 +63,7 @@ public class MarkerGroupingEntry {
 
 	/**
 	 * Return the id for the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getId() {
@@ -72,7 +72,7 @@ public class MarkerGroupingEntry {
 
 	/**
 	 * Set the group for the receiver.
-	 * 
+	 *
 	 * @param group
 	 */
 	public void setGroup(MarkerGroup group) {
@@ -82,7 +82,7 @@ public class MarkerGroupingEntry {
 
 	/**
 	 * Get the label of the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getLabel() {
@@ -91,7 +91,7 @@ public class MarkerGroupingEntry {
 
 	/**
 	 * Return the priority of the receiver.
-	 * 
+	 *
 	 * @return int
 	 */
 	public int getPriority() {
@@ -100,7 +100,7 @@ public class MarkerGroupingEntry {
 
 	/**
 	 * Return the marker group for the receiver.
-	 * 
+	 *
 	 * @return FieldMarkerGroup
 	 */
 	public MarkerGroup getMarkerGroup() {

@@ -19,17 +19,15 @@ import org.eclipse.ui.IStartup;
 public class DynamicStartup implements IStartup {
 
 	public static Throwable history;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public DynamicStartup() {
-		super();		
+		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IStartup#earlyStartup()
-	 */
+	@Override
 	public void earlyStartup() {
 		history = new Throwable();
 		history.fillInStackTrace();

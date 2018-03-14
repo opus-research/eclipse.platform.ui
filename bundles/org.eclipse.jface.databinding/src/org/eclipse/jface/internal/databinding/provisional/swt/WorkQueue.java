@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Display;
 /**
  * NON-API - Helper class to manage a queue of runnables to be posted to the UI
  * thread in a way that they are only run once.
- * 
+ *
  * @since 1.1
- * 
+ *
  */
 public class WorkQueue {
 
@@ -34,6 +34,7 @@ public class WorkQueue {
 	private Set pendingWorkSet = new HashSet();
 
 	private Runnable updateJob = new Runnable() {
+		@Override
 		public void run() {
 			doUpdate();
 			updateScheduled = false;
@@ -67,7 +68,7 @@ public class WorkQueue {
 	 * possible, the work will happen before the next control redraws. The given
 	 * runnable will only be run once. Has no effect if this runnable has
 	 * already been queued for execution.
-	 * 
+	 *
 	 * @param work
 	 *            runnable to execute
 	 */
@@ -88,7 +89,7 @@ public class WorkQueue {
 	 * possible, the work will happen before the next control redraws. Unlike
 	 * runOnce, calling asyncExec twice with the same runnable will cause that
 	 * runnable to run twice.
-	 * 
+	 *
 	 * @param work
 	 *            runnable to execute
 	 */
@@ -105,7 +106,7 @@ public class WorkQueue {
 	/**
 	 * Cancels a previously-scheduled runnable. Has no effect if the given
 	 * runnable was not previously scheduled or has already executed.
-	 * 
+	 *
 	 * @param toCancel
 	 *            runnable to cancel
 	 */

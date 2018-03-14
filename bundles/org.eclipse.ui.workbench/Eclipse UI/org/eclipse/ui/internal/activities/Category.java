@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,15 +106,15 @@ final class Category implements ICategory {
                 castedObject.categoryActivityBindings)) {
             return false;
         }
-        
+
         if (!Util.equals(defined, castedObject.defined)) {
             return false;
         }
-        
+
         if (!Util.equals(id, castedObject.id)) {
             return false;
         }
-        
+
         return Util.equals(name, castedObject.name);
     }
 
@@ -245,9 +245,6 @@ final class Category implements ICategory {
         return string;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.ICategory#getDescription()
-     */
     @Override
 	public String getDescription() throws NotDefinedException {
         if (!defined) {

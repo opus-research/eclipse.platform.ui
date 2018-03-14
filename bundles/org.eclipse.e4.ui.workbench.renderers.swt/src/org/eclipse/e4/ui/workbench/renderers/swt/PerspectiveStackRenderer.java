@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,52 +33,35 @@ import org.eclipse.swt.widgets.Shell;
 public class PerspectiveStackRenderer extends LazyStackRenderer {
 
 	@Inject
-	IPresentationEngine renderer;
+	private IPresentationEngine renderer;
 
 	@Inject
-	IEventBroker eventBroker;
+	private IEventBroker eventBroker;
 
 	@PostConstruct
 	public void init() {
 		super.init(eventBroker);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
-	 * (org.eclipse.e4.ui.model.application.MUIElement, java.lang.Object)
-	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
-		if (!(element instanceof MPerspectiveStack)
-				|| !(parent instanceof Composite))
+		if (!(element instanceof MPerspectiveStack) || !(parent instanceof Composite))
 			return null;
 
 		Composite perspStack = new Composite((Composite) parent, SWT.NONE);
-		IStylingEngine stylingEngine = (IStylingEngine) getContext(element)
-				.get(IStylingEngine.SERVICE_NAME);
+		IStylingEngine stylingEngine = (IStylingEngine) getContext(element).get(IStylingEngine.SERVICE_NAME);
 		stylingEngine.setClassname(perspStack, "perspectiveLayout"); //$NON-NLS-1$
 		perspStack.setLayout(new StackLayout());
 
 		return perspStack;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer#postProcess
-	 * (org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void postProcess(MUIElement element) {
 		super.postProcess(element);
 
 		MPerspectiveStack ps = (MPerspectiveStack) element;
-		if (ps.getSelectedElement() != null
-				&& ps.getSelectedElement().getWidget() != null) {
+		if (ps.getSelectedElement() != null && ps.getSelectedElement().getWidget() != null) {
 			Control ctrl = (Control) ps.getSelectedElement().getWidget();
 			Composite psComp = (Composite) ps.getWidget();
 			StackLayout sl = (StackLayout) psComp.getLayout();
@@ -87,13 +70,6 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.LazyStackRenderer#showTab(org
-	 * .eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	protected void showTab(MUIElement tabElement) {
 		MPerspective persp = (MPerspective) tabElement;
@@ -120,8 +96,7 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 
 		// Force a context switch
 		if (tabElement instanceof MPerspective) {
-			MPerspective selected = (MPerspective) tabElement.getParent()
-					.getSelectedElement();
+			MPerspective selected = (MPerspective) tabElement.getParent().getSelectedElement();
 			if (selected != null) {
 				IEclipseContext context = selected.getContext();
 				context.get(EPartService.class).switchPerspective(selected);

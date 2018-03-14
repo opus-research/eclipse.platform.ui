@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IAdaptable;
  * The Tasks view checks for this adapter before the <code>IResource</code>
  * adapter, allowing the object to provide a resource to the Tasks view without
  * necessarily exposing it to other components that look for an <code>IResource</code>
- * adapter.     
+ * adapter.
  * </p>
  * <p>
  * Implementors of this interface are typically registered with an
@@ -33,7 +33,7 @@ public interface ITaskListResourceAdapter {
     /**
      * Returns the resource to query for the markers to display
      * for the given adaptable.
-     * 
+     *
      * @param adaptable the adaptable being queried.
      * @return the resource or <code>null</code> if there
      * 	is no adapted resource for this object.

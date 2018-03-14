@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002, 2015  The Apache Software Foundation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 package org.eclipse.e4.ui.css.core.impl.sac;
 
 import java.util.Set;
-
 import org.w3c.dom.Element;
 
 /**
@@ -123,9 +122,12 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	 */
 	@Override
 	public boolean match(Element e, String pseudoE) {
+		if (!e.hasAttribute(getLocalName())) {
+			return false;
+		}
 		String val = getValue();
 		if (val == null) {
-			return !e.getAttribute(getLocalName()).equals("");
+			return true;
 		}
 		return e.getAttribute(getLocalName()).equals(val);
 	}
@@ -134,7 +136,7 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	 * Fills the given set with the attribute names found in this selector.
 	 */
 	@Override
-	public void fillAttributeSet(Set attrSet) {
+	public void fillAttributeSet(Set<String> attrSet) {
 		attrSet.add(localName);
 	}
 

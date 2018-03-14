@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import org.eclipse.core.commands.State;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
@@ -49,7 +50,7 @@ import org.eclipse.ui.menus.UIElement;
  * Provides services related to the command architecture within the workbench.
  * This service can be used to access the set of commands and handlers.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class CommandService implements ICommandService, IUpdateService {
@@ -62,7 +63,7 @@ public final class CommandService implements ICommandService, IUpdateService {
 	/**
 	 * Creates a preference key for the given piece of state on the given
 	 * command.
-	 * 
+	 *
 	 * @param command
 	 *            The command for which the preference key should be created;
 	 *            must not be <code>null</code>.
@@ -89,10 +90,12 @@ public final class CommandService implements ICommandService, IUpdateService {
 
 	private IEclipseContext context;
 
+	private ICommandHelpService commandHelpService;
+
 	/**
 	 * Constructs a new instance of <code>CommandService</code> using a
 	 * command manager.
-	 * 
+	 *
 	 * @param commandManager
 	 *            The command manager to use; must not be <code>null</code>.
 	 */
@@ -104,6 +107,7 @@ public final class CommandService implements ICommandService, IUpdateService {
 		this.commandManager = commandManager;
 		this.commandPersistence = new CommandPersistence(commandManager);
 		this.context = context;
+		this.commandHelpService = context.get(ICommandHelpService.class);
 	}
 
 	@Override
@@ -192,17 +196,21 @@ public final class CommandService implements ICommandService, IUpdateService {
 		return commandManager.getDefinedParameterTypes();
 	}
 
+	/**
+	 * @throws NotDefinedException
+	 *             if the given command is not defined
+	 */
 	@Override
 	public final String getHelpContextId(final Command command)
 			throws NotDefinedException {
-		return commandManager.getHelpContextId(command);
+		return commandHelpService.getHelpContextId(command.getId(), context);
 	}
 
 	@Override
 	public final String getHelpContextId(final String commandId)
 			throws NotDefinedException {
 		final Command command = getCommand(commandId);
-		return commandManager.getHelpContextId(command);
+		return getHelpContextId(command);
 	}
 
 	@Override
@@ -221,9 +229,8 @@ public final class CommandService implements ICommandService, IUpdateService {
 	}
 
 	@Override
-	public final void setHelpContextId(final IHandler handler,
-			final String helpContextId) {
-		commandManager.setHelpContextId(handler, helpContextId);
+	public final void setHelpContextId(final IHandler handler, final String helpContextId) {
+		commandHelpService.setHelpContextId(handler, helpContextId);
 	}
 
 	/**
@@ -232,12 +239,6 @@ public final class CommandService implements ICommandService, IUpdateService {
 	 */
 	private Map commandCallbacks = new HashMap();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.commands.ICommandService#refreshElements(java.lang.String,
-	 *      java.util.Map)
-	 */
 	@Override
 	public final void refreshElements(String commandId, Map filter) {
 		Command cmd = getCommand(commandId);
@@ -291,12 +292,6 @@ public final class CommandService implements ICommandService, IUpdateService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.commands.ICommandService#registerElementForCommand(org.eclipse.core.commands.ParameterizedCommand,
-	 *      org.eclipse.ui.menus.UIElement)
-	 */
 	@Override
 	public final IElementReference registerElementForCommand(
 			ParameterizedCommand command, UIElement element)
@@ -317,11 +312,6 @@ public final class CommandService implements ICommandService, IUpdateService {
 		return ref;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.commands.ICommandService#registerElement(org.eclipse.ui.commands.IElementReference)
-	 */
 	@Override
 	public void registerElement(IElementReference elementReference) {
 		List parameterizedCommands = (List) commandCallbacks
@@ -345,11 +335,6 @@ public final class CommandService implements ICommandService, IUpdateService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.commands.ICommandService#unregisterElement(org.eclipse.ui.commands.IElementReference)
-	 */
 	@Override
 	public void unregisterElement(IElementReference elementReference) {
 		if (commandCallbacks == null)
@@ -371,13 +356,6 @@ public final class CommandService implements ICommandService, IUpdateService {
 		return commandPersistence;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService#
-	 * registerElementForUpdate(org.eclipse.core.commands.ParameterizedCommand,
-	 * org.eclipse.e4.ui.model.application.ui.MUILabel)
-	 */
 	@Override
 	public Runnable registerElementForUpdate(ParameterizedCommand parameterizedCommand,
 			final MItem item) {

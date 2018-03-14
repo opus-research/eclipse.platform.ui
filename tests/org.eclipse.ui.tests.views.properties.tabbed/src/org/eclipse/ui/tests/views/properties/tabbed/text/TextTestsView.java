@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -26,7 +26,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * A text view to test dynamic contributions to the tabbed properties view.
- * 
+ *
  * @author Anthony Hunter
  */
 public class TextTestsView extends ViewPart implements
@@ -38,6 +38,7 @@ public class TextTestsView extends ViewPart implements
 
 	private TextViewer viewer;
 
+	@Override
 	public void createPartControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		FormLayout layout = new FormLayout();
@@ -67,6 +68,7 @@ public class TextTestsView extends ViewPart implements
 		getSite().setSelectionProvider(viewer);
 	}
 
+	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IPropertySheetPage.class) {
 			if (tabbedPropertySheetPage == null) {
@@ -77,6 +79,7 @@ public class TextTestsView extends ViewPart implements
 		return super.getAdapter(adapter);
 	}
 
+	@Override
 	public String getContributorId() {
 		return "org.eclipse.ui.tests.views.properties.tabbed.text"; //$NON-NLS-1$
 	}
@@ -89,6 +92,7 @@ public class TextTestsView extends ViewPart implements
 		return viewer;
 	}
 
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

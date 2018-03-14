@@ -1,4 +1,4 @@
-/* Copyright (c) 2005, 2009 IBM Corporation and others.
+/* Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,8 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -27,7 +26,7 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.internal.util.Util;
 
 /**
- * 
+ *
  * @since 3.2
  */
 public class AggregateWorkingSet extends AbstractWorkingSet implements
@@ -41,7 +40,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	private boolean inElementConstruction = false;
 
 	/**
-	 * 
+	 *
 	 * @param name
 	 * @param label
 	 * @param components
@@ -57,7 +56,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	}
 
 	/**
-	 * 
+	 *
 	 * @param name
 	 * @param label
 	 * @param memento
@@ -86,7 +85,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * Takes the elements from all component working sets and sets them to be
 	 * the elements of this working set. Any duplicates are trimmed.
-	 * 
+	 *
 	 * @param fireEvent whether a working set change event should be fired
 	 */
 	private void constructElements(boolean fireEvent) {
@@ -97,7 +96,8 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 		inElementConstruction = true;
 		try {
-			Set elements = new HashSet();
+			// use *linked* set to maintain predictable elements order
+			Set<IAdaptable> elements = new LinkedHashSet<>();
 			IWorkingSet[] localComponents = getComponentsInternal();
 			for (int i = 0; i < localComponents.length; i++) {
 				IWorkingSet workingSet = localComponents[i];
@@ -112,12 +112,11 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 						System.arraycopy(components, i + 1, tmp, i, components.length - i - 1);
 					components = tmp;
 					workingSetMemento = null; // toss cached info
-					fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);						
+					fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
 					continue;
 				}
 			}
-			internalSetElements((IAdaptable[]) elements
-					.toArray(new IAdaptable[elements.size()]));
+			internalSetElements(elements.toArray(new IAdaptable[elements.size()]));
 			if (fireEvent) {
 				fireWorkingSetChanged(
 					IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
@@ -204,7 +203,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 
 	/**
 	 * Return the component working sets.
-	 * 
+	 *
 	 * @return the component working sets
 	 */
 	@Override
@@ -290,10 +289,10 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 
 	@Override
 	public int hashCode() {
-		int hashCode = getName().hashCode() & getComponentsInternal().hashCode();
+		int hashCode = getName().hashCode() & java.util.Arrays.hashCode(getComponentsInternal());
 		return hashCode;
 	}
-	
+
 	@Override
 	public boolean isSelfUpdating() {
 		IWorkingSet[] localComponents = getComponentsInternal();
@@ -307,17 +306,20 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean isAggregateWorkingSet() {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkingSet#adaptElements(org.eclipse.core.runtime.IAdaptable[])
-	 */
 	@Override
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		return new IAdaptable[0];
 	}
+
+	@Override
+	public String toString() {
+		return "AWS [name=" + getName() + ", components=" + Arrays.toString(getComponentsInternal()) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 }

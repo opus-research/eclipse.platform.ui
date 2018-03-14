@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ package org.eclipse.ui.internal.commands;
  * This class is eventually intended to exist in
  * <code>org.eclipse.jface.commands</code>.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public interface ICommandImageManagerListener {
@@ -37,7 +37,7 @@ public interface ICommandImageManagerListener {
 	 * Notifies that one or more properties of an instance of
 	 * <code>CommandImageManager</code> have changed. Specific details are
 	 * described in the <code>CommandImageManagerEvent</code>.
-	 * 
+	 *
 	 * @param event
 	 *            The event; never <code>null</code>.
 	 */

@@ -28,9 +28,9 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 
 /**
  * The ProblemsViewPerformanceTest is a test of population of the problems view.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class ProblemsViewPerformanceTest extends BasicPerformanceTest {
 
@@ -40,7 +40,7 @@ public class ProblemsViewPerformanceTest extends BasicPerformanceTest {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param testName
 	 */
 	public ProblemsViewPerformanceTest(String testName) {
@@ -116,7 +116,7 @@ public class ProblemsViewPerformanceTest extends BasicPerformanceTest {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			Map attribs = new HashMap();
 			for (int i = 0; i < 1000; i++) {
-				attribs.put(IMarker.SEVERITY, new Integer(
+				attribs.put(IMarker.SEVERITY, Integer.valueOf(
 						IMarker.SEVERITY_ERROR));
 				attribs.put(IMarker.MESSAGE, "this is a test " + i);
 				MarkerUtilities.createMarker(root, attribs, IMarker.PROBLEM);

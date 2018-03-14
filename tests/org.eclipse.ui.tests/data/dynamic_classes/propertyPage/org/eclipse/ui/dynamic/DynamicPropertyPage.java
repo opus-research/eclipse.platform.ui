@@ -20,16 +20,14 @@ import org.eclipse.ui.dialogs.PropertyPage;
 public class DynamicPropertyPage extends PropertyPage {
 
 	/**
-	 * 
+	 *
 	 */
 	public DynamicPropertyPage() {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
-	 */
-	protected Control createContents(Composite parent) {		
+	@Override
+	protected Control createContents(Composite parent) {
 		return parent;
 	}
 

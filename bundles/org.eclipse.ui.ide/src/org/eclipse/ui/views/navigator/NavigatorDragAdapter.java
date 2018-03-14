@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,10 +40,11 @@ import org.eclipse.ui.statushandlers.StatusManager;
 /**
  * Implements drag behaviour when items are dragged out of the
  * resource navigator.
- * 
+ *
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
+@Deprecated
 public class NavigatorDragAdapter extends DragSourceAdapter {
     private static final String CHECK_MOVE_TITLE = ResourceNavigatorMessages.DragAdapter_title;
 
@@ -66,7 +67,8 @@ public class NavigatorDragAdapter extends DragSourceAdapter {
      * responds to a drag that has moved resources outside the Navigator by deleting
      * the corresponding source resource.
      */
-    public void dragFinished(DragSourceEvent event) {
+    @Override
+	public void dragFinished(DragSourceEvent event) {
         LocalSelectionTransfer.getInstance().setSelection(null);
 
         if (event.doit == false) {
@@ -75,7 +77,7 @@ public class NavigatorDragAdapter extends DragSourceAdapter {
 
         final int typeMask = IResource.FOLDER | IResource.FILE;
         if (event.detail == DND.DROP_MOVE) {
-            //never delete resources when dragging outside Eclipse. 
+            //never delete resources when dragging outside Eclipse.
             //workaround for bug 30543.
             if (lastDataType != null
                     && FileTransfer.getInstance().isSupportedType(lastDataType)) {
@@ -126,7 +128,8 @@ public class NavigatorDragAdapter extends DragSourceAdapter {
      * This implementation of {@link DragSourceListener#dragSetData(DragSourceEvent)}
      * sets the drag event data based on the current selection in the Navigator.
      */
-    public void dragSetData(DragSourceEvent event) {
+    @Override
+	public void dragSetData(DragSourceEvent event) {
         final int typeMask = IResource.FILE | IResource.FOLDER;
         IResource[] resources = getSelectedResources(typeMask);
 
@@ -181,7 +184,8 @@ public class NavigatorDragAdapter extends DragSourceAdapter {
      * allows the drag to start if the current Navigator selection contains resources
      * that can be dragged.
      */
-    public void dragStart(DragSourceEvent event) {
+    @Override
+	public void dragStart(DragSourceEvent event) {
         lastDataType = null;
         // Workaround for 1GEUS9V
         DragSource dragSource = (DragSource) event.widget;

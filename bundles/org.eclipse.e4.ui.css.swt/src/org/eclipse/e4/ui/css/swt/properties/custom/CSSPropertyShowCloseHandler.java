@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2015 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSP
 					null)).booleanValue();
 			if ("selected".equals(pseudo)) {
 				Control parent = getParent(widget);
-					
+
 				ShowCloseSelectionListener listener = (ShowCloseSelectionListener) parent.getData(
 								CSS_CTABITEM_SELECTED_SHOW_CLOSE_LISTENER_KEY);
 				if (listener == null) {
@@ -80,13 +80,13 @@ public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSP
 	private class ShowCloseSelectionListener implements Listener {
 
 		private CSSEngine engine;
-		
+
 		private Item selection;
 
 		public ShowCloseSelectionListener(CSSEngine engine) {
 			this.engine = engine;
 		}
-		
+
 		public void setSelection(Item selection) {
 			this.selection = selection;
 		}
@@ -97,9 +97,9 @@ public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSP
 
 		@Override
 		public void handleEvent(Event e) {
-			
+
 			Item selection = getSelection(e.widget);
-				
+
 			if (selection == null || selection.isDisposed()
 					|| this.selection == selection) {
 				return;
@@ -142,7 +142,7 @@ public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSP
 					}
 				}
 			}
-			
+
 			this.selection = selection;
 		}
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,8 +27,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -68,13 +66,13 @@ import org.eclipse.swt.widgets.Tracker;
  * to add content. In general, however, the creation of stylistic features, such
  * as the dialog menu, separator styles, and fonts, is kept private so that all
  * popup dialogs will have a similar appearance.
- * 
+ *
  * @since 3.2
  */
 public class PopupDialog extends Window {
 
 	/**
-	 * 
+	 *
 	 */
 	private static GridDataFactory grabBothGridDataFactory;
 
@@ -84,7 +82,7 @@ public class PopupDialog extends Window {
 		}
 		return grabBothGridDataFactory;
 	}
-	
+
 	/**
 	 * The dialog settings key name for stored dialog x location.
 	 */
@@ -108,7 +106,7 @@ public class PopupDialog extends Window {
 	/**
 	 * The dialog settings key name for remembering if the persisted bounds
 	 * should be accessed.
-	 * 
+	 *
 	 * @deprecated Since 3.4, this is retained only for backward compatibility.
 	 */
 	@Deprecated
@@ -117,7 +115,7 @@ public class PopupDialog extends Window {
 	/**
 	 * The dialog settings key name for remembering if the bounds persisted
 	 * prior to 3.4 have been migrated to the 3.4 settings.
-	 * 
+	 *
 	 * @since 3.4
 	 * @deprecated This is marked deprecated at its introduction to discourage
 	 *             future dependency
@@ -147,11 +145,6 @@ public class PopupDialog extends Window {
 					IAction.AS_PUSH_BUTTON);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			performTrackerAction(SWT.NONE);
@@ -165,13 +158,9 @@ public class PopupDialog extends Window {
 	private class ResizeAction extends Action {
 
 		ResizeAction() {
-			super(JFaceResources.getString("PopupDialog.resize"), //$NON-NLS-1$
-					IAction.AS_PUSH_BUTTON);
+			super(JFaceResources.getString("PopupDialog.resize"), IAction.AS_PUSH_BUTTON); //$NON-NLS-1$
 		}
 
-		/*
-		 * @see org.eclipse.jface.action.Action#run()
-		 */
 		@Override
 		public void run() {
 			performTrackerAction(SWT.RESIZE);
@@ -179,22 +168,16 @@ public class PopupDialog extends Window {
 	}
 
 	/**
-	 * 
+	 *
 	 * Remember bounds action for the dialog.
 	 */
 	private class PersistBoundsAction extends Action {
 
 		PersistBoundsAction() {
-			super(JFaceResources.getString("PopupDialog.persistBounds"), //$NON-NLS-1$
-					IAction.AS_CHECK_BOX);
+			super(JFaceResources.getString("PopupDialog.persistBounds"), IAction.AS_CHECK_BOX); //$NON-NLS-1$
 			setChecked(persistLocation && persistSize);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			persistSize = isChecked();
@@ -203,22 +186,16 @@ public class PopupDialog extends Window {
 	}
 
 	/**
-	 * 
+	 *
 	 * Remember bounds action for the dialog.
 	 */
 	private class PersistSizeAction extends Action {
 
 		PersistSizeAction() {
-			super(JFaceResources.getString("PopupDialog.persistSize"), //$NON-NLS-1$
-					IAction.AS_CHECK_BOX);
+			super(JFaceResources.getString("PopupDialog.persistSize"), IAction.AS_CHECK_BOX); //$NON-NLS-1$
 			setChecked(persistSize);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			persistSize = isChecked();
@@ -226,22 +203,16 @@ public class PopupDialog extends Window {
 	}
 
 	/**
-	 * 
+	 *
 	 * Remember location action for the dialog.
 	 */
 	private class PersistLocationAction extends Action {
 
 		PersistLocationAction() {
-			super(JFaceResources.getString("PopupDialog.persistLocation"), //$NON-NLS-1$
-					IAction.AS_CHECK_BOX);
+			super(JFaceResources.getString("PopupDialog.persistLocation"), IAction.AS_CHECK_BOX); //$NON-NLS-1$
 			setChecked(persistLocation);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IAction#run()
-		 */
 		@Override
 		public void run() {
 			persistLocation = isChecked();
@@ -250,10 +221,9 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Shell style appropriate for a simple hover popup that cannot get focus.
-	 * 
+	 *
 	 */
-	public final static int HOVER_SHELLSTYLE = SWT.NO_FOCUS | SWT.ON_TOP
-			| SWT.TOOL;
+	public final static int HOVER_SHELLSTYLE = SWT.NO_FOCUS | SWT.ON_TOP | SWT.TOOL;
 
 	/**
 	 * Shell style appropriate for an info popup that can get focus.
@@ -291,20 +261,20 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Image registry key for menu image.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	public static final String POPUP_IMG_MENU = "popup_menu_image"; //$NON-NLS-1$
 
 	/**
 	 * Image registry key for disabled menu image.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	public static final String POPUP_IMG_MENU_DISABLED = "popup_menu_image_diabled"; //$NON-NLS-1$
 
 	/**
-	 * 
+	 *
 	 */
 	private static GridLayoutFactory popupLayoutFactory;
 	private static GridLayoutFactory getPopupLayout() {
@@ -344,11 +314,11 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Color to be used for the info area text.
-	 * 
+	 *
 	 * @since 3.6
 	 */
 	private Color infoColor;
-	
+
 	/**
 	 * Font to be used for the info area text. Computed based on the dialog's
 	 * font.
@@ -403,7 +373,7 @@ public class PopupDialog extends Window {
 	private boolean persistLocation = false;
 	/**
 	 * Flag specifying whether to use new 3.4 API instead of the old one.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	private boolean isUsing34API = true;
@@ -420,7 +390,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Constructs a new instance of <code>PopupDialog</code>.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent shell.
 	 * @param shellStyle
@@ -450,7 +420,7 @@ public class PopupDialog extends Window {
 	 * @param infoText
 	 *            Text to be shown in a lower info area, or <code>null</code>
 	 *            if there is no info area.
-	 * 
+	 *
 	 * @see PopupDialog#getDialogSettings()
 	 * @deprecated As of 3.4, replaced by
 	 *             {@link #PopupDialog(Shell, int, boolean, boolean, boolean, boolean, boolean, String, String)}
@@ -465,7 +435,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Constructs a new instance of <code>PopupDialog</code>.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent shell.
 	 * @param shellStyle
@@ -502,9 +472,9 @@ public class PopupDialog extends Window {
 	 * @param infoText
 	 *            Text to be shown in a lower info area, or <code>null</code>
 	 *            if there is no info area.
-	 * 
+	 *
 	 * @see PopupDialog#getDialogSettings()
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	public PopupDialog(Shell parent, int shellStyle, boolean takeFocusOnOpen,
@@ -518,7 +488,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Constructs a new instance of <code>PopupDialog</code>.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent shell.
 	 * @param shellStyle
@@ -557,9 +527,9 @@ public class PopupDialog extends Window {
 	 *            if there is no info area.
 	 * @param use34API
 	 *            <code>true</code> if 3.4 API should be used
-	 * 
+	 *
 	 * @see PopupDialog#getDialogSettings()
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	private PopupDialog(Shell parent, int shellStyle, boolean takeFocusOnOpen,
@@ -597,91 +567,100 @@ public class PopupDialog extends Window {
 		initializeWidgetState();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#configureShell(Shell)
-	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		GridLayoutFactory.fillDefaults().margins(0, 0).spacing(5, 5).applyTo(
 				shell);
-
-		shell.addListener(SWT.Deactivate, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				/*
-				 * Close if we are deactivating and have no child shells. If we
-				 * have child shells, we are deactivating due to their opening.
-				 * On X, we receive this when a menu child (such as the system
-				 * menu) of the shell opens, but I have not found a way to
-				 * distinguish that case here. Hence bug #113577 still exists.
-				 */
-				if (listenToDeactivate && event.widget == getShell()
-						&& getShell().getShells().length == 0) {
+		shell.addListener(SWT.Deactivate, event -> {
+			/*
+			 * Close if we are deactivating and have no child shells. If we
+			 * have child shells, we are deactivating due to their opening.
+			 *
+			 * Feature in GTK: this causes the Quick Outline/Type Hierarchy
+			 * Shell to close on re-size/movement on Gtk3. For this reason,
+			 * the asyncClose() call is disabled in GTK. See Eclipse Bugs
+			 * 466500 and 113577 for more information.
+			 */
+			if (listenToDeactivate && event.widget == getShell()
+					&& getShell().getShells().length == 0) {
+				if (!Util.isGtk()) {
 					asyncClose();
-				} else {
-					/*
-					 * We typically ignore deactivates to work around
-					 * platform-specific event ordering. Now that we've ignored
-					 * whatever we were supposed to, start listening to
-					 * deactivates. Example issues can be found in
-					 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=123392
-					 */
-					listenToDeactivate = true;
 				}
+			} else {
+				/*
+				 * We typically ignore deactivates to work around
+				 * platform-specific event ordering. Now that we've ignored
+				 * whatever we were supposed to, start listening to
+				 * deactivates. Example issues can be found in
+				 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=123392
+				 */
+				listenToDeactivate = true;
 			}
 		});
 		// Set this true whenever we activate. It may have been turned
 		// off by a menu or secondary popup showing.
-		shell.addListener(SWT.Activate, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				// ignore this event if we have launched a child
-				if (event.widget == getShell()
-						&& getShell().getShells().length == 0) {
-					listenToDeactivate = true;
-					// Typically we start listening for parent deactivate after
-					// we are activated, except on the Mac, where the deactivate
-					// is received after activate.
-					// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=100668
-					listenToParentDeactivate = !Util.isMac();
-				}
+		shell.addListener(SWT.Activate, event -> {
+			// ignore this event if we have launched a child
+			if (event.widget == getShell() && getShell().getShells().length == 0) {
+				listenToDeactivate = true;
+				// Typically we start listening for parent deactivate after
+				// we are activated, except on the Mac, where the deactivate
+				// is received after activate.
+				// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=100668
+				listenToParentDeactivate = !Util.isMac();
 			}
 		});
 
-		if ((getShellStyle() & SWT.ON_TOP) != 0 && shell.getParent() != null) {
-			parentDeactivateListener = new Listener() {
-				@Override
-				public void handleEvent(Event event) {
+		final Composite parent = shell.getParent();
+		if (parent != null) {
+			if ((getShellStyle() & SWT.ON_TOP) != 0) {
+				parentDeactivateListener = event -> {
 					if (listenToParentDeactivate) {
 						asyncClose();
 					} else {
 						// Our first deactivate, now start listening on the Mac.
 						listenToParentDeactivate = listenToDeactivate;
 					}
-				}
-			};
-			shell.getParent().addListener(SWT.Deactivate,
-					parentDeactivateListener);
+				};
+				parent.addListener(SWT.Deactivate, parentDeactivateListener);
+			} else if (Util.isGtk()) {
+				/*
+				 * Fix for bug 485745 on GTK: popup does not close on parent
+				 * shell activation.
+				 */
+				parent.addListener(SWT.Activate, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						/*
+						 * NB: we must wait with closing until
+						 * listenToDeactivate is set to true, otherwise it may
+						 * happen that the popup closes immediately after
+						 * showing up (seem to be timing issue with shell
+						 * creation).
+						 *
+						 * E.g. "Display" popup does not need this, but
+						 * "Show all Instances" and "Show all References" do.
+						 * They all are InspectPopupDialog instances...
+						 */
+						if (event.widget != parent || !listenToDeactivate || parent.isDisposed()) {
+							return;
+						}
+						parent.removeListener(SWT.Activate, this);
+						asyncClose();
+					}
+				});
+			}
 		}
 
-		shell.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent event) {
-				handleDispose();
-			}
-		});
+		shell.addDisposeListener(event -> handleDispose());
 	}
 
 	private void asyncClose() {
 		// workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=152010
-		getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				close();
-			}
-		});
+		Shell shell = getShell();
+		if (shell != null && !shell.isDisposed()) {
+			shell.getDisplay().asyncExec(() -> close());
+		}
 	}
 
 	/**
@@ -694,10 +673,10 @@ public class PopupDialog extends Window {
 	 * Overriding <code>createDialogArea</code> and (optionally)
 	 * <code>createTitleMenuArea</code> and <code>createTitleMenuArea</code>
 	 * are recommended rather than overriding this method.
-	 * 
+	 *
 	 * @param parent
 	 *            the composite used to parent the contents.
-	 * 
+	 *
 	 * @return the control representing the contents.
 	 */
 	@Override
@@ -744,13 +723,13 @@ public class PopupDialog extends Window {
 	 * <p>
 	 * Subclasses must override this method but may call <code>super</code> as
 	 * in the following example:
-	 * 
+	 *
 	 * <pre>
 	 * Composite composite = (Composite) super.createDialogArea(parent);
 	 * //add controls to composite as necessary
 	 * return composite;
 	 * </pre>
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite to contain the dialog area
 	 * @return the dialog area control
@@ -765,7 +744,7 @@ public class PopupDialog extends Window {
 	/**
 	 * Returns the control that should get initial focus. Subclasses may
 	 * override this method.
-	 * 
+	 *
 	 * @return the Control that should receive focus when the popup opens.
 	 */
 	protected Control getFocusControl() {
@@ -775,7 +754,7 @@ public class PopupDialog extends Window {
 	/**
 	 * Sets the tab order for the popup. Clients should override to introduce
 	 * specific tab ordering.
-	 * 
+	 *
 	 * @param composite
 	 *            the composite in which all content, including the title area
 	 *            and info area, was created. This composite's parent is the
@@ -789,7 +768,7 @@ public class PopupDialog extends Window {
 	 * Returns a boolean indicating whether the popup should have a title area
 	 * at the top of the dialog. Subclasses may override. Default behavior is to
 	 * have a title area if there is to be a menu or title text.
-	 * 
+	 *
 	 * @return <code>true</code> if a title area should be created,
 	 *         <code>false</code> if it should not.
 	 */
@@ -801,7 +780,7 @@ public class PopupDialog extends Window {
 	 * Returns a boolean indicating whether the popup should have an info area
 	 * at the bottom of the dialog. Subclasses may override. Default behavior is
 	 * to have an info area if info text was provided at the time of creation.
-	 * 
+	 *
 	 * @return <code>true</code> if a title area should be created,
 	 *         <code>false</code> if it should not.
 	 */
@@ -816,12 +795,12 @@ public class PopupDialog extends Window {
 	 * indicate whether a menu should be shown, and
 	 * <code>createTitleControl</code> to to customize the presentation of the
 	 * title.
-	 * 
+	 *
 	 * <p>
 	 * If this method is overridden, the returned control's layout data must be
 	 * an instance of <code>GridData</code>. This method must not modify the
 	 * parent's layout.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent composite.
 	 * @return The Control representing the title and menu area.
@@ -830,8 +809,7 @@ public class PopupDialog extends Window {
 
 		Composite titleAreaComposite = new Composite(parent, SWT.NONE);
 		getPopupLayout().copy().numColumns(2).applyTo(titleAreaComposite);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true,
-				false).applyTo(titleAreaComposite);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(titleAreaComposite);
 
 		createTitleControl(titleAreaComposite);
 
@@ -846,12 +824,12 @@ public class PopupDialog extends Window {
 	 * Subclasses may override if a different control is desired for
 	 * representing the title text, or if something different than the title
 	 * should be displayed in location where the title text typically is shown.
-	 * 
+	 *
 	 * <p>
 	 * If this method is overridden, the returned control's layout data must be
 	 * an instance of <code>GridData</code>. This method must not modify the
 	 * parent's layout.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent composite.
 	 * @return The Control representing the title area.
@@ -872,17 +850,17 @@ public class PopupDialog extends Window {
 	 * Creates the optional info text area. This method is only called if the
 	 * <code>hasInfoArea()</code> method returns true. Subclasses typically
 	 * need not override this method, but may do so.
-	 * 
+	 *
 	 * <p>
 	 * If this method is overridden, the returned control's layout data must be
 	 * an instance of <code>GridData</code>. This method must not modify the
 	 * parent's layout.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param parent
 	 *            The parent composite.
 	 * @return The control representing the info text area.
-	 * 
+	 *
 	 * @see PopupDialog#hasInfoArea()
 	 * @see PopupDialog#createTitleControl(Composite)
 	 */
@@ -890,14 +868,21 @@ public class PopupDialog extends Window {
 		// Status label
 		infoLabel = new Label(parent, SWT.RIGHT);
 		infoLabel.setText(infoText);
-		
+
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL,
 				SWT.BEGINNING).applyTo(infoLabel);
 		Display display = parent.getDisplay();
+
+		Color backgroundColor = getBackground();
+		if (backgroundColor == null)
+			backgroundColor = getDefaultBackground();
+		Color foregroundColor = getForeground();
+		if (foregroundColor == null)
+			foregroundColor = getDefaultForeground();
 		infoColor = new Color(display, blend(
-				display.getSystemColor(SWT.COLOR_INFO_BACKGROUND).getRGB(),
-				display.getSystemColor(SWT.COLOR_INFO_FOREGROUND).getRGB(),
+				backgroundColor.getRGB(), foregroundColor.getRGB(),
 				0.56f));
+
 		infoLabel.setForeground(infoColor);
 		return infoLabel;
 	}
@@ -919,7 +904,7 @@ public class PopupDialog extends Window {
 		Assert.isLegal(bg != null);
 		Assert.isLegal(fg != null);
 		Assert.isLegal(factor >= 0f && factor <= 1f);
-		
+
 		float complement = 1f - factor;
 		return new RGB(
 				(int) (complement * bg.red + factor * fg.red),
@@ -927,10 +912,10 @@ public class PopupDialog extends Window {
 				(int) (complement * bg.blue + factor * fg.blue)
 		);
 	}
-	
+
 	/**
 	 * Create a horizontal separator for the given parent.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent composite.
 	 * @return The Control representing the horizontal separator.
@@ -944,7 +929,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Create the dialog's menu for the move and resize actions.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent composite.
 	 */
@@ -953,13 +938,10 @@ public class PopupDialog extends Window {
 		toolBar = new ToolBar(parent, SWT.FLAT);
 		ToolItem viewMenuButton = new ToolItem(toolBar, SWT.PUSH, 0);
 
-		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(
-				toolBar);
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(toolBar);
 		viewMenuButton.setImage(JFaceResources.getImage(POPUP_IMG_MENU));
-		viewMenuButton.setDisabledImage(JFaceResources
-				.getImage(POPUP_IMG_MENU_DISABLED));
-		viewMenuButton.setToolTipText(JFaceResources
-				.getString("PopupDialog.menuTooltip")); //$NON-NLS-1$
+		viewMenuButton.setDisabledImage(JFaceResources.getImage(POPUP_IMG_MENU_DISABLED));
+		viewMenuButton.setToolTipText(JFaceResources.getString("PopupDialog.menuTooltip")); //$NON-NLS-1$
 		viewMenuButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -977,7 +959,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Fill the dialog's menu. Subclasses may extend or override.
-	 * 
+	 *
 	 * @param dialogMenu
 	 *            The dialog's menu.
 	 */
@@ -998,7 +980,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Perform the requested tracker action (resize or move).
-	 * 
+	 *
 	 * @param style
 	 *            The track style (resize or move).
 	 */
@@ -1057,10 +1039,10 @@ public class PopupDialog extends Window {
 	 * Set the text to be shown in the popup's info area. This message has no
 	 * effect if there was no info text supplied when the dialog first opened.
 	 * Subclasses may override this method.
-	 * 
+	 *
 	 * @param text
 	 *            the text to be shown when the info area is displayed.
-	 * 
+	 *
 	 */
 	protected void setInfoText(String text) {
 		infoText = text;
@@ -1073,10 +1055,10 @@ public class PopupDialog extends Window {
 	 * Set the text to be shown in the popup's title area. This message has no
 	 * effect if there was no title label specified when the dialog was
 	 * originally opened. Subclasses may override this method.
-	 * 
+	 *
 	 * @param text
 	 *            the text to be shown when the title area is displayed.
-	 * 
+	 *
 	 */
 	protected void setTitleText(String text) {
 		titleText = text;
@@ -1090,10 +1072,10 @@ public class PopupDialog extends Window {
 	 * This value is initially set in the dialog's constructor, but can be
 	 * modified if the persist bounds action is shown on the menu and the user
 	 * has changed its value. Subclasses may override this method.
-	 * 
+	 *
 	 * @return <code>true</code> if the dialog's bounds will be persisted,
 	 *         <code>false</code> if it will not.
-	 * 
+	 *
 	 * @deprecated As of 3.4, please use {@link #getPersistLocation()} or
 	 *             {@link #getPersistSize()} to determine separately whether
 	 *             size or location should be persisted.
@@ -1108,10 +1090,10 @@ public class PopupDialog extends Window {
 	 * location. This value is initially set in the dialog's constructor, but
 	 * can be modified if the persist location action is shown on the menu and
 	 * the user has changed its value. Subclasses may override this method.
-	 * 
+	 *
 	 * @return <code>true</code> if the dialog's location will be persisted,
 	 *         <code>false</code> if it will not.
-	 * 
+	 *
 	 * @see #getPersistSize()
 	 * @since 3.4
 	 */
@@ -1124,10 +1106,10 @@ public class PopupDialog extends Window {
 	 * This value is initially set in the dialog's constructor, but can be
 	 * modified if the persist size action is shown on the menu and the user has
 	 * changed its value. Subclasses may override this method.
-	 * 
+	 *
 	 * @return <code>true</code> if the dialog's size will be persisted,
 	 *         <code>false</code> if it will not.
-	 * 
+	 *
 	 * @see #getPersistLocation()
 	 * @since 3.4
 	 */
@@ -1144,9 +1126,9 @@ public class PopupDialog extends Window {
 	 * framework hooks that allow subclasses to set the focus and tab order, and
 	 * avoids the use of <code>shell.open()</code> in cases where the focus
 	 * should not be given to the shell initially.
-	 * 
+	 *
 	 * @return the return code
-	 * 
+	 *
 	 * @see org.eclipse.jface.window.Window#open()
 	 */
 	@Override
@@ -1195,7 +1177,7 @@ public class PopupDialog extends Window {
 	 * state so that the widgets can be recreated if the dialog is reopened.
 	 * This method may be extended (<code>super.close</code> must be called).
 	 * </p>
-	 * 
+	 *
 	 * @return <code>true</code> if the window is (or was already) closed, and
 	 *         <code>false</code> if it is still open
 	 */
@@ -1227,7 +1209,7 @@ public class PopupDialog extends Window {
 	 * Gets the dialog settings that should be used for remembering the bounds
 	 * of the dialog. Subclasses should override this method when they wish to
 	 * persist the bounds of the dialog.
-	 * 
+	 *
 	 * @return settings the dialog settings used to store the dialog's location
 	 *         and/or size, or <code>null</code> if the dialog's bounds should
 	 *         never be stored.
@@ -1244,7 +1226,7 @@ public class PopupDialog extends Window {
 	 * <code>super.saveDialogBounds</code> if additional bounds information
 	 * should be stored. Clients may also call this method to persist the bounds
 	 * at times other than closing the dialog.
-	 * 
+	 *
 	 * @param shell
 	 *            The shell whose bounds are to be stored
 	 */
@@ -1278,11 +1260,6 @@ public class PopupDialog extends Window {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#getInitialSize()
-	 */
 	@Override
 	protected Point getInitialSize() {
 		Point result = getDefaultSize();
@@ -1311,9 +1288,9 @@ public class PopupDialog extends Window {
 	 * implementation returns the preferred size of the shell. Subclasses should
 	 * override this method when an alternate default size is desired, rather
 	 * than overriding {@link #getInitialSize()}.
-	 * 
+	 *
 	 * @return the initial size of the shell
-	 * 
+	 *
 	 * @see #getPersistSize()
 	 * @since 3.4
 	 */
@@ -1328,12 +1305,12 @@ public class PopupDialog extends Window {
 	 * {@link org.eclipse.jface.window.Window#getInitialLocation(Point)}.
 	 * Subclasses should override this method when an alternate default location
 	 * is desired, rather than overriding {@link #getInitialLocation(Point)}.
-	 * 
+	 *
 	 * @param initialSize
 	 *            the initial size of the shell, as returned by
 	 *            <code>getInitialSize</code>.
 	 * @return the initial location of the shell
-	 * 
+	 *
 	 * @see #getPersistLocation()
 	 * @since 3.4
 	 */
@@ -1351,11 +1328,6 @@ public class PopupDialog extends Window {
 	protected void adjustBounds() {
 	}
 
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#getInitialLocation(org.eclipse.swt.graphics.Point)
-	 */
 	@Override
 	protected Point getInitialLocation(Point initialSize) {
 		Point result = getDefaultLocation(initialSize);
@@ -1387,7 +1359,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Apply any desired color to the specified composite and its children.
-	 * 
+	 *
 	 * @param composite
 	 *            the contents composite
 	 */
@@ -1409,11 +1381,11 @@ public class PopupDialog extends Window {
 	/**
 	 * Get the foreground color that should be used for this popup. Subclasses
 	 * may override.
-	 * 
+	 *
 	 * @return the foreground color to be used. Should not be <code>null</code>.
-	 * 
+	 *
 	 * @since 3.4
-	 * 
+	 *
 	 * @see #getForegroundColorExclusions()
 	 */
 	protected Color getForeground() {
@@ -1423,11 +1395,11 @@ public class PopupDialog extends Window {
 	/**
 	 * Get the background color that should be used for this popup. Subclasses
 	 * may override.
-	 * 
+	 *
 	 * @return the background color to be used. Should not be <code>null</code>.
-	 * 
+	 *
 	 * @since 3.4
-	 * 
+	 *
 	 * @see #getBackgroundColorExclusions()
 	 */
 	protected Color getBackground() {
@@ -1436,27 +1408,31 @@ public class PopupDialog extends Window {
 
 	/**
 	 * Return the default foreground color used for popup dialogs.
-	 * 
+	 *
 	 * @return the default foreground color.
 	 */
 	private Color getDefaultForeground() {
-		return getShell().getDisplay()
-				.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
+			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+		}
+		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
 	}
 
 	/**
 	 * Return the default background color used for popup dialogs.
-	 * 
+	 *
 	 * @return the default background color
 	 */
 	private Color getDefaultBackground() {
-		return getShell().getDisplay()
-				.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+		if ((getShellStyle() & SWT.NO_FOCUS) != 0) {
+			return getShell().getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+		}
+		return getShell().getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 	}
 
 	/**
 	 * Apply any desired fonts to the specified composite and its children.
-	 * 
+	 *
 	 * @param composite
 	 *            the contents composite
 	 */
@@ -1487,7 +1463,7 @@ public class PopupDialog extends Window {
 	/**
 	 * Set the specified foreground color for the specified control and all of
 	 * its children, except for those specified in the list of exclusions.
-	 * 
+	 *
 	 * @param color
 	 *            the color to use as the foreground color
 	 * @param control
@@ -1512,7 +1488,7 @@ public class PopupDialog extends Window {
 	/**
 	 * Set the specified background color for the specified control and all of
 	 * its children, except for those specified in the list of exclusions.
-	 * 
+	 *
 	 * @param color
 	 *            the color to use as the background color
 	 * @param control
@@ -1540,7 +1516,7 @@ public class PopupDialog extends Window {
 	 * If a subclass wishes to exclude a particular control in its contents from
 	 * getting the specified foreground color, it may instead override
 	 * {@link #getForegroundColorExclusions()}.
-	 * 
+	 *
 	 * @param color
 	 *            the color to use as the foreground color
 	 * @param control
@@ -1557,7 +1533,7 @@ public class PopupDialog extends Window {
 	 * If a subclass wishes to exclude a particular control in its contents from
 	 * getting the specified background color, it may instead override
 	 * {@link #getBackgroundColorExclusions()}
-	 * 
+	 *
 	 * @param color
 	 *            the color to use as the background color
 	 * @param control
@@ -1572,12 +1548,12 @@ public class PopupDialog extends Window {
 	 * Return a list of controls which should never have their foreground color
 	 * reset. Subclasses may extend this method, but should always call
 	 * <code>super.getForegroundColorExclusions</code> to aggregate the list.
-	 * 
-	 * 
+	 *
+	 *
 	 * @return the List of controls
 	 */
 	protected List<Control> getForegroundColorExclusions() {
-		List<Control> list = new ArrayList<Control>(3);
+		List<Control> list = new ArrayList<>(3);
 		if (infoLabel != null) {
 			list.add(infoLabel);
 		}
@@ -1594,11 +1570,11 @@ public class PopupDialog extends Window {
 	 * Return a list of controls which should never have their background color
 	 * reset. Subclasses may extend this method, but should always call
 	 * <code>super.getBackgroundColorExclusions</code> to aggregate the list.
-	 * 
+	 *
 	 * @return the List of controls
 	 */
 	protected List<Control> getBackgroundColorExclusions() {
-		List<Control> list = new ArrayList<Control>(2);
+		List<Control> list = new ArrayList<>(2);
 		if (titleSeparator != null) {
 			list.add(titleSeparator);
 		}
@@ -1657,7 +1633,7 @@ public class PopupDialog extends Window {
 
 	/**
 	 * The dialog is being disposed. Dispose of any resources allocated.
-	 * 
+	 *
 	 */
 	private void handleDispose() {
 		if (infoColor != null && !infoColor.isDisposed()) {

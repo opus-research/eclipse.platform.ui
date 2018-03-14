@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import org.eclipse.jface.fieldassist.TextControlCreator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -35,10 +34,11 @@ import org.eclipse.swt.widgets.Text;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- * 
+ *
  * @since 3.2
  * @deprecated As of 3.3, this class is no longer necessary.
- * 
+ *
+ * This class is planned to be deleted, see Bug 475863.
  */
 @Deprecated
 public class ImageAndMessageArea extends Composite {
@@ -59,7 +59,7 @@ public class ImageAndMessageArea extends Composite {
 	 * The style bit <code>SWT.WRAP</code> should be used if a larger message
 	 * area is desired.
 	 * </p>
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @param style
@@ -90,27 +90,11 @@ public class ImageAndMessageArea extends Composite {
 
 		messageField.getLayoutControl().setLayoutData(gd);
 
-		addPaintListener(new PaintListener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
-			 */
-			@Override
-			public void paintControl(PaintEvent e) {
-				onPaint(e);
-			}
-		});
+		addPaintListener(this::onPaint);
 
 		// sets the layout and size to account for the BORDER_MARGIN between
 		// the border drawn around the container and the decorated field.
 		setLayout(new Layout() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
-			 *      boolean)
-			 */
 			@Override
 			public void layout(Composite parent, boolean changed) {
 				Rectangle carea = getClientArea();
@@ -119,12 +103,6 @@ public class ImageAndMessageArea extends Composite {
 						carea.height - (2 * BORDER_MARGIN));
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
-			 *      int, int, boolean)
-			 */
 			@Override
 			public Point computeSize(Composite parent, int wHint, int hHint,
 					boolean changed) {
@@ -141,11 +119,6 @@ public class ImageAndMessageArea extends Composite {
 		setVisible(false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.widgets.Control#setBackground(org.eclipse.swt.graphics.Color)
-	 */
 	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
@@ -157,10 +130,10 @@ public class ImageAndMessageArea extends Composite {
 	/**
 	 * Sets the text in the decorated field which will be displayed in the
 	 * message area.
-	 * 
+	 *
 	 * @param text
 	 *            the text to be displayed in the message area
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Text#setText(String string)
 	 */
 	public void setText(String text) {
@@ -169,7 +142,7 @@ public class ImageAndMessageArea extends Composite {
 
 	/**
 	 * Adds an image to decorated field to be shown in the message area.
-	 * 
+	 *
 	 * @param image
 	 *            desired image to be shown in the ImageAndMessageArea
 	 */
@@ -196,22 +169,12 @@ public class ImageAndMessageArea extends Composite {
 				carea.y + carea.height - 1 });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.widgets.Control#setFont(org.eclipse.swt.graphics.Font)
-	 */
 	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		((Text) messageField.getControl()).setFont(font);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.widgets.Control#setToolTipText(java.lang.String)
-	 */
 	@Override
 	public void setToolTipText(String text) {
 		super.setToolTipText(text);

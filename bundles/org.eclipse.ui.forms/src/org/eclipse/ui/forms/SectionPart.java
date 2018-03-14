@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -25,7 +26,7 @@ import org.eclipse.ui.forms.widgets.Section;
  * methods like <code>refresh</code>, <code>commit</code>,
  * <code>setFocus</code> etc. Note that most of these methods are not empty -
  * calling <code>super</code> is required.
- * 
+ *
  * @see Section
  * @since 3.0
  */
@@ -34,7 +35,7 @@ public class SectionPart extends AbstractFormPart {
 
 	/**
 	 * Creates a new section part based on the provided section.
-	 * 
+	 *
 	 * @param section
 	 *            the section to use
 	 */
@@ -46,7 +47,7 @@ public class SectionPart extends AbstractFormPart {
 	/**
 	 * Creates a new section part inside the provided parent and using the
 	 * provided toolkit. The section part will create the section widget.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent
 	 * @param toolkit
@@ -62,13 +63,15 @@ public class SectionPart extends AbstractFormPart {
 	 * Adds listeners to the underlying widget.
 	 */
 	protected void hookListeners() {
-		if ((section.getExpansionStyle() & Section.TWISTIE) != 0
-				|| (section.getExpansionStyle() & Section.TREE_NODE) != 0) {
+		if ((section.getExpansionStyle() & ExpandableComposite.TWISTIE) != 0
+				|| (section.getExpansionStyle() & ExpandableComposite.TREE_NODE) != 0) {
 			section.addExpansionListener(new ExpansionAdapter() {
+				@Override
 				public void expansionStateChanging(ExpansionEvent e) {
 					SectionPart.this.expansionStateChanging(e.getState());
 				}
 
+				@Override
 				public void expansionStateChanged(ExpansionEvent e) {
 					SectionPart.this.expansionStateChanged(e.getState());
 				}
@@ -78,7 +81,7 @@ public class SectionPart extends AbstractFormPart {
 
 	/**
 	 * Returns the section widget used in this part.
-	 * 
+	 *
 	 * @return the section widget
 	 */
 	public Section getSection() {
@@ -87,7 +90,7 @@ public class SectionPart extends AbstractFormPart {
 
 	/**
 	 * The section is about to expand or collapse.
-	 * 
+	 *
 	 * @param expanding
 	 *            <code>true</code> for expansion, <code>false</code> for
 	 *            collapse.
@@ -97,7 +100,7 @@ public class SectionPart extends AbstractFormPart {
 
 	/**
 	 * The section has expanded or collapsed.
-	 * 
+	 *
 	 * @param expanded
 	 *            <code>true</code> for expansion, <code>false</code> for
 	 *            collapse.
@@ -106,9 +109,7 @@ public class SectionPart extends AbstractFormPart {
 		getManagedForm().getForm().reflow(false);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.AbstractFormPart#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		Control client = section.getClient();
 		if (client != null)

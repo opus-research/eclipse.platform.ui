@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -38,12 +38,13 @@ import org.eclipse.ui.part.ISetSelectionTarget;
  * otherwise if it is an <code>IAdaptable</code>, it tries to get the <code>IResource.class</code> adapter.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
+@Deprecated
 public class ShowInNavigatorAction extends SelectionProviderAction {
     private IWorkbenchPage page;
 
     /**
      * Create a new instance of this class.
-     * 
+     *
      * @param page the page
      * @param viewer the viewer
      */
@@ -61,36 +62,29 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
      *
      * @return a list of <code>IResource</code>
      */
-    List getResources(IStructuredSelection selection) {
-        List v = new ArrayList();
-        for (Iterator i = selection.iterator(); i.hasNext();) {
+	List<IResource> getResources(IStructuredSelection selection) {
+		List<IResource> v = new ArrayList<>();
+		for (Iterator<?> i = selection.iterator(); i.hasNext();) {
             Object o = i.next();
-            if (o instanceof IResource) {
-                v.add(o);
+
+			IResource resource = Adapters.adapt(o, IResource.class);
+			if (resource != null) {
+				v.add(resource);
             } else if (o instanceof IMarker) {
-                IResource resource = ((IMarker) o).getResource();
-                v.add(resource);
-            } else if (o instanceof IAdaptable) {
-                IResource resource = (IResource) ((IAdaptable) o)
-                        .getAdapter(IResource.class);
-                if (resource != null) {
-                    v.add(resource);
-                }
+				resource = ((IMarker) o).getResource();
+				v.add(resource);
             }
         }
         return v;
     }
 
-    /*
-     * (non-Javadoc)
-     * Method declared on IAction.
-     */
     /**
      * Shows the Navigator view and sets its selection to the resources
      * selected in this action's selection provider.
      */
-    public void run() {
-        List v = getResources(getStructuredSelection());
+    @Override
+	public void run() {
+		List<IResource> v = getResources(getStructuredSelection());
         if (v.isEmpty()) {
 			return;
 		}
@@ -107,11 +101,8 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * Method declared on SelectionProviderAction.
-     */
-    public void selectionChanged(IStructuredSelection selection) {
+    @Override
+	public void selectionChanged(IStructuredSelection selection) {
         setEnabled(!getResources(selection).isEmpty());
     }
 }

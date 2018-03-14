@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +14,9 @@ import org.eclipse.jface.examples.databinding.ModelObject;
 
 
 public class PriceModelObject extends ModelObject {
-	
+
 	private double price;
-	
+
 	public double getDouble(){
 		return price;
 	}
@@ -29,7 +29,7 @@ public class PriceModelObject extends ModelObject {
 		firePropertyChange("cents",oldCents,getCents());
 		firePropertyChange("price",new Double(oldValue), new Double(price));
 	}
-	
+
 	public double getPrice(){
 		return price;
 	}
@@ -37,7 +37,7 @@ public class PriceModelObject extends ModelObject {
 	public int getCents(){
 		return (int) (100*price - 100*Math.floor(price));
 	}
-	
+
 	public void setCents(int cents){
 		double oldPrice = getPrice();
 		int oldCents = getCents();
@@ -45,11 +45,11 @@ public class PriceModelObject extends ModelObject {
 		firePropertyChange("cents",oldCents,getCents());
 		firePropertyChange("price", new Double(oldPrice), new Double(price));
 	}
-	
+
 	public int getDollars(){
 		return new Double(price).intValue();
 	}
-	
+
 	public void setDollars(int dollars){
 		double oldPrice = getPrice();
 		int oldDollars = getDollars();

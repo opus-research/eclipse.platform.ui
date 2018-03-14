@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 Oakland Software Incorporated and others.
+ * Copyright (c) 2008, 2015 Oakland Software Incorporated and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,12 @@
  * Contributors:
  *     Oakland Software Incorporated - initial API and implementation
  *     IBM Corporation - fixed dead code warning
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.util.Properties;
@@ -25,10 +29,11 @@ import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.extension.TestContentProvider;
-import org.eclipse.ui.tests.navigator.extension.TestExtensionTreeData;
 import org.eclipse.ui.tests.navigator.extension.TestContentProviderResource;
+import org.eclipse.ui.tests.navigator.extension.TestExtensionTreeData;
 import org.eclipse.ui.tests.navigator.extension.TestSorterDataAndResource;
 import org.eclipse.ui.tests.navigator.extension.TestSorterResource;
+import org.junit.Test;
 
 public class SorterTest extends NavigatorTestBase {
 
@@ -39,6 +44,7 @@ public class SorterTest extends NavigatorTestBase {
 	private int _statusCount;
 
 	// bug 262707 CommonViewerSorter gets NPE when misconfigured
+	@Test
 	public void testSorterMissing() throws Exception {
 
 		TestContentProviderResource._returnBadObject = true;
@@ -51,6 +57,7 @@ public class SorterTest extends NavigatorTestBase {
 		refreshViewer();
 
 		ILogListener ll = new ILogListener() {
+			@Override
 			public void logging(IStatus status, String plugin) {
 				_statusCount++;
 			}
@@ -70,6 +77,7 @@ public class SorterTest extends NavigatorTestBase {
 
 	// bug 231855 [CommonNavigator] CommonViewerSorter does not support
 	// isSorterProperty method of ViewerComparator
+	@Test
 	public void testSorterProperty() throws Exception {
 
 		_contentService.bindExtensions(
@@ -81,7 +89,7 @@ public class SorterTest extends NavigatorTestBase {
 
 		_viewer.update(_p1, new String[] { "prop1" });
 		_viewer.expandAll();
- 
+
 		assertEquals("prop1", TestSorterResource._sorterProperty);
 		assertEquals(_p1, TestSorterResource._sorterElement);
 	}
@@ -132,7 +140,7 @@ public class SorterTest extends NavigatorTestBase {
 		TreeItem[] childItems;
 
 		//DisplayHelper.sleep(100000000);
-		
+
 		// Backwards
 		assertEquals("p2", items[0].getText());
 		assertEquals("p1", items[1].getText());
@@ -142,12 +150,12 @@ public class SorterTest extends NavigatorTestBase {
 
 		_contentService.getActivationService().deactivateExtensions(
 				new String[] { TEST_CONTENT_SORTER_RESOURCE_SORTONLY }, false);
-		
+
 		refreshViewer();
 		_viewer.expandAll();
 
 		final int WAIT_COUNT = 100;
-		
+
 		int count = WAIT_COUNT;
 		boolean passed = false;
 
@@ -228,9 +236,10 @@ public class SorterTest extends NavigatorTestBase {
 		}
 	}
 
-	// Here we want to make sure the sorting is done by the 
+	// Here we want to make sure the sorting is done by the
 	// highest (in the override hierarchy) content extension that
 	// has a sorter
+	@Test
 	public void testSorterContentOverrideNoSort() throws Exception {
 
 		waitForModelObjects();
@@ -261,6 +270,7 @@ public class SorterTest extends NavigatorTestBase {
 
 	}
 
+	@Test
 	public void testSorterContentAdd() throws Exception {
 
 		waitForModelObjects();
@@ -284,6 +294,7 @@ public class SorterTest extends NavigatorTestBase {
 		assertEquals("BlueAddedFile2.txt", addedParent.getItem(3).getText());
 	}
 
+	@Test
 	public void testSorterContentAddOverride() throws Exception {
 
 		waitForModelObjects();
@@ -298,12 +309,12 @@ public class SorterTest extends NavigatorTestBase {
 		TreeItem[] items = _viewer.getTree().getItems();
 
 		TreeItem addedParent;
-		
+
 		addedParent = items[_projectInd].getItem(3);
 		assertEquals("BlueParent", addedParent.getText());
 		addedParent = items[_projectInd].getItem(2);
 		assertEquals("BlueAddedParent", addedParent.getText());
-		
+
 		// The sorter for TEST_CONTENT_SORTER_MODEL_OVERRIDE sorts the model
 		// using a sorter that is by name
 		assertEquals("BlueAddedChild1", addedParent.getItem(0).getText());
@@ -313,6 +324,7 @@ public class SorterTest extends NavigatorTestBase {
 
 	}
 
+	@Test
 	public void testSorterResource() throws Exception {
 
 		_contentService.bindExtensions(

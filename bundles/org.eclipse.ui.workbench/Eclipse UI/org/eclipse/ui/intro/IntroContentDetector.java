@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,15 +21,15 @@ package org.eclipse.ui.intro;
  * this, the intro view part should draw the user's attention to the new content
  * to avoid confusion about why the intro view part was opened again without the
  * user requesting it.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public abstract class IntroContentDetector {
 
 	/**
 	 * Returns <code>true</code> if new intro content is available.
-	 * 
+	 *
 	 * @return <code>true</code> if new intro content is available
 	 */
 	public abstract boolean isNewContentAvailable();

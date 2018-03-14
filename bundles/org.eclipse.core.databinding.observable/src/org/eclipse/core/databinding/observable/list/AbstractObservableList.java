@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Brad Reynolds - bugs 164653, 167204
  *     Matthew Hall - bugs 118516, 208858, 208332, 247367, 146397, 249526,
  *                    349038
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -32,31 +34,37 @@ import org.eclipse.core.runtime.AssertionFailedException;
 
 /**
  * Subclasses should override at least get(int index) and size().
- * 
+ *
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
+ * @param <E>
+ *            the list element type
+ *
  * @since 1.0
- * 
+ *
  */
-public abstract class AbstractObservableList extends AbstractList implements
-		IObservableList {
+public abstract class AbstractObservableList<E> extends AbstractList<E>
+		implements IObservableList<E> {
 	private final class PrivateChangeSupport extends ChangeSupport {
 		private PrivateChangeSupport(Realm realm) {
 			super(realm);
 		}
 
+		@Override
 		protected void firstListenerAdded() {
 			AbstractObservableList.this.firstListenerAdded();
 		}
 
+		@Override
 		protected void lastListenerRemoved() {
 			AbstractObservableList.this.lastListenerRemoved();
 		}
 
+		@Override
 		protected boolean hasListeners() {
 			return super.hasListeners();
 		}
@@ -67,8 +75,8 @@ public abstract class AbstractObservableList extends AbstractList implements
 	private volatile boolean disposed = false;
 
 	/**
-	 * @param realm 
-	 * 
+	 * @param realm
+	 *
 	 */
 	public AbstractObservableList(Realm realm) {
 		Assert.isNotNull(realm, "Realm cannot be null"); //$NON-NLS-1$
@@ -78,15 +86,15 @@ public abstract class AbstractObservableList extends AbstractList implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public AbstractObservableList() {
 		this(Realm.getDefault());
 	}
-	
+
 	/**
 	 * Returns whether this observable list has any registered listeners.
-	 * 
+	 *
 	 * @return whether this observable list has any registered listeners.
 	 * @since 1.2
 	 */
@@ -94,47 +102,54 @@ public abstract class AbstractObservableList extends AbstractList implements
 		return !disposed && changeSupport.hasListeners();
 	}
 
+	@Override
 	public boolean isStale() {
 		getterCalled();
 		return false;
 	}
 
-	public synchronized void addListChangeListener(IListChangeListener listener) {
+	@Override
+	public synchronized void addListChangeListener(IListChangeListener<? super E> listener) {
 		if (!disposed) {
 			changeSupport.addListener(ListChangeEvent.TYPE, listener);
 		}
 	}
 
-	public synchronized void removeListChangeListener(IListChangeListener listener) {
+	@Override
+	public synchronized void removeListChangeListener(IListChangeListener<? super E> listener) {
 		if (!disposed) {
 			changeSupport.removeListener(ListChangeEvent.TYPE, listener);
 		}
 	}
 
-	protected void fireListChange(ListDiff diff) {
+	protected void fireListChange(ListDiff<E> diff) {
 		// fire general change event first
 		fireChange();
-		changeSupport.fireEvent(new ListChangeEvent(this, diff));
+		changeSupport.fireEvent(new ListChangeEvent<E>(this, diff));
 	}
 
+	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		if (!disposed) {
 			changeSupport.addChangeListener(listener);
 		}
 	}
 
+	@Override
 	public synchronized void removeChangeListener(IChangeListener listener) {
 		if (!disposed) {
 			changeSupport.removeChangeListener(listener);
 		}
 	}
 
+	@Override
 	public synchronized void addStaleListener(IStaleListener listener) {
 		if (!disposed) {
 			changeSupport.addStaleListener(listener);
 		}
 	}
 
+	@Override
 	public synchronized void removeStaleListener(IStaleListener listener) {
 		if (!disposed) {
 			changeSupport.removeStaleListener(listener);
@@ -144,6 +159,7 @@ public abstract class AbstractObservableList extends AbstractList implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public synchronized void addDisposeListener(IDisposeListener listener) {
 		if (!disposed) {
 			changeSupport.addDisposeListener(listener);
@@ -153,6 +169,7 @@ public abstract class AbstractObservableList extends AbstractList implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public synchronized void removeDisposeListener(IDisposeListener listener) {
 		if (!disposed) {
 			changeSupport.removeDisposeListener(listener);
@@ -176,13 +193,13 @@ public abstract class AbstractObservableList extends AbstractList implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void firstListenerAdded() {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void lastListenerRemoved() {
 	}
@@ -190,13 +207,15 @@ public abstract class AbstractObservableList extends AbstractList implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public synchronized boolean isDisposed() {
 		return disposed;
 	}
 
 	/**
-	 * 
+	 *
 	 */
+	@Override
 	public synchronized void dispose() {
 		if (!disposed) {
 			disposed = true;
@@ -207,6 +226,7 @@ public abstract class AbstractObservableList extends AbstractList implements
 		}
 	}
 
+	@Override
 	public final int size() {
 		getterCalled();
 		return doGetSize();
@@ -218,53 +238,62 @@ public abstract class AbstractObservableList extends AbstractList implements
 	protected abstract int doGetSize();
 
 	/**
-	 * 
+	 *
 	 */
 	private void getterCalled() {
 		ObservableTracker.getterCalled(this);
 	}
 
+	@Override
 	public boolean isEmpty() {
 		getterCalled();
 		return super.isEmpty();
 	}
 
+	@Override
 	public boolean contains(Object o) {
 		getterCalled();
 		return super.contains(o);
 	}
 
-	public Iterator iterator() {
+	@Override
+	public Iterator<E> iterator() {
 		getterCalled();
-		final Iterator wrappedIterator = super.iterator();
-		return new Iterator() {
+		final Iterator<E> wrappedIterator = super.iterator();
+		return new Iterator<E>() {
+			@Override
 			public void remove() {
 				wrappedIterator.remove();
 			}
 
+			@Override
 			public boolean hasNext() {
 				return wrappedIterator.hasNext();
 			}
 
-			public Object next() {
+			@Override
+			public E next() {
 				return wrappedIterator.next();
 			}
 		};
 	}
 
+	@Override
 	public Object[] toArray() {
 		getterCalled();
 		return super.toArray();
 	}
 
-	public Object[] toArray(Object a[]) {
+	@Override
+	public <T> T[] toArray(T a[]) {
 		getterCalled();
 		return super.toArray(a);
 	}
 
 	// Modification Operations
 
-	public boolean add(Object o) {
+	@Override
+	public boolean add(E o) {
 		getterCalled();
 		return super.add(o);
 	}
@@ -278,7 +307,7 @@ public abstract class AbstractObservableList extends AbstractList implements
 	 * notification for the remove and add operations in the same
 	 * ListChangeEvent, as this allows {@link ListDiff#accept(ListDiffVisitor)}
 	 * to recognize the operation as a move.
-	 * 
+	 *
 	 * @param oldIndex
 	 *            the element's position before the move. Must be within the
 	 *            range <code>0 &lt;= oldIndex &lt; size()</code>.
@@ -287,12 +316,14 @@ public abstract class AbstractObservableList extends AbstractList implements
 	 *            range <code>0 &lt;= newIndex &lt; size()</code>.
 	 * @return the element that was moved.
 	 * @throws IndexOutOfBoundsException
-	 *             if either argument is out of range (<code>0 &lt;= index &lt; size()</code>).
+	 *             if either argument is out of range (
+	 *             <code>0 &lt;= index &lt; size()</code>).
 	 * @see ListDiffVisitor#handleMove(int, int, Object)
 	 * @see ListDiff#accept(ListDiffVisitor)
 	 * @since 1.1
 	 */
-	public Object move(int oldIndex, int newIndex) {
+	@Override
+	public E move(int oldIndex, int newIndex) {
 		checkRealm();
 		int size = doGetSize();
 		if (oldIndex < 0 || oldIndex >= size)
@@ -301,11 +332,12 @@ public abstract class AbstractObservableList extends AbstractList implements
 		if (newIndex < 0 || newIndex >= size)
 			throw new IndexOutOfBoundsException(
 					"newIndex: " + newIndex + ", size:" + size); //$NON-NLS-1$ //$NON-NLS-2$
-		Object element = remove(oldIndex);
+		E element = remove(oldIndex);
 		add(newIndex, element);
 		return element;
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		getterCalled();
 		return super.remove(o);
@@ -313,60 +345,70 @@ public abstract class AbstractObservableList extends AbstractList implements
 
 	// Bulk Modification Operations
 
-	public boolean containsAll(Collection c) {
+	@Override
+	public boolean containsAll(Collection<?> c) {
 		getterCalled();
 		return super.containsAll(c);
 	}
 
-	public boolean addAll(Collection c) {
+	@Override
+	public boolean addAll(Collection<? extends E> c) {
 		getterCalled();
 		return super.addAll(c);
 	}
 
-	public boolean addAll(int index, Collection c) {
+	@Override
+	public boolean addAll(int index, Collection<? extends E> c) {
 		getterCalled();
 		return super.addAll(c);
 	}
 
-	public boolean removeAll(Collection c) {
+	@Override
+	public boolean removeAll(Collection<?> c) {
 		getterCalled();
 		return super.removeAll(c);
 	}
 
-	public boolean retainAll(Collection c) {
+	@Override
+	public boolean retainAll(Collection<?> c) {
 		getterCalled();
 		return super.retainAll(c);
 	}
 
 	// Comparison and hashing
 
+	@Override
 	public boolean equals(Object o) {
 		getterCalled();
 		return super.equals(o);
 	}
 
+	@Override
 	public int hashCode() {
 		getterCalled();
 		return super.hashCode();
 	}
 
+	@Override
 	public int indexOf(Object o) {
 		getterCalled();
 		return super.indexOf(o);
 	}
 
+	@Override
 	public int lastIndexOf(Object o) {
 		getterCalled();
 		return super.lastIndexOf(o);
 	}
 
+	@Override
 	public Realm getRealm() {
 		return realm;
 	}
-	
+
 	/**
 	 * Asserts that the realm is the current realm.
-	 * 
+	 *
 	 * @see Realm#isCurrent()
 	 * @throws AssertionFailedException
 	 *             if the realm is not the current realm

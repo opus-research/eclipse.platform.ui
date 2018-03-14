@@ -1,17 +1,16 @@
 /*******************************************************************************
- *  Copyright (c) 2010, 2013 IBM Corporation and others.
+ *  Copyright (c) 2010, 2016 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *  Contributors:
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.css.swt;
 
 import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -24,26 +23,24 @@ public class CSSActivator implements BundleActivator {
 	private static CSSActivator activator;
 
 	private BundleContext context;
-	private ServiceTracker pkgAdminTracker;
-	private ServiceTracker logTracker;
-	private ServiceTracker colorAndFontProviderTracker;
+	private ServiceTracker<PackageAdmin, PackageAdmin> pkgAdminTracker;
+	private ServiceTracker<LogService, LogService> logTracker;
+	private ServiceTracker<IColorAndFontProvider, IColorAndFontProvider> colorAndFontProviderTracker;
 
 	public static CSSActivator getDefault() {
 		return activator;
 	}
 
-	public Bundle getBundle() {
-		return context.getBundle();
-	}
-
 	public PackageAdmin getBundleAdmin() {
 		if (pkgAdminTracker == null) {
-			if (context == null)
+			if (context == null) {
 				return null;
-			pkgAdminTracker = new ServiceTracker(context, PackageAdmin.class.getName(), null);
+			}
+			pkgAdminTracker = new ServiceTracker<PackageAdmin, PackageAdmin>(
+					context, PackageAdmin.class.getName(), null);
 			pkgAdminTracker.open();
 		}
-		return (PackageAdmin) pkgAdminTracker.getService();
+		return pkgAdminTracker.getService();
 	}
 
 	/**
@@ -53,19 +50,16 @@ public class CSSActivator implements BundleActivator {
 	 */
 	public Bundle getBundleForName(String bundleName) {
 		Bundle[] bundles = getBundleAdmin().getBundles(bundleName, null);
-		if (bundles == null)
+		if (bundles == null) {
 			return null;
+		}
 		// Return the first bundle that is not installed or uninstalled
-		for (int i = 0; i < bundles.length; i++) {
-			if ((bundles[i].getState() & (Bundle.INSTALLED | Bundle.UNINSTALLED)) == 0) {
-				return bundles[i];
+		for (Bundle bundle : bundles) {
+			if ((bundle.getState() & (Bundle.INSTALLED | Bundle.UNINSTALLED)) == 0) {
+				return bundle;
 			}
 		}
 		return null;
-	}
-
-	public BundleContext getContext() {
-		return context;
 	}
 
 	@Override
@@ -88,18 +82,19 @@ public class CSSActivator implements BundleActivator {
 			colorAndFontProviderTracker.close();
 			colorAndFontProviderTracker = null;
 		}
-		context = null;
+		this.context = null;
 	}
 
 	private LogService getLogger() {
 		if (logTracker == null) {
-			if (context == null)
+			if (context == null) {
 				return null;
-			logTracker = new ServiceTracker(context,
+			}
+			logTracker = new ServiceTracker<LogService, LogService>(context,
 					LogService.class.getName(), null);
 			logTracker.open();
 		}
-		return (LogService) logTracker.getService();
+		return logTracker.getService();
 	}
 
 	public void log(int logError, String message) {
@@ -107,18 +102,26 @@ public class CSSActivator implements BundleActivator {
 		if (logger != null) {
 			logger.log(logError, message);
 		}
-	}	
-	
+	}
+
+	public void log(int logError, String message, Throwable e) {
+		LogService logger = getLogger();
+		if (logger != null) {
+			logger.log(logError, message, e);
+		}
+	}
+
 	public IColorAndFontProvider getColorAndFontProvider() {
 		if (colorAndFontProviderTracker == null) {
 			if (context == null) {
 				return null;
 			}
-			colorAndFontProviderTracker = new ServiceTracker(context,
+			colorAndFontProviderTracker = new ServiceTracker<IColorAndFontProvider, IColorAndFontProvider>(
+					context,
 					IColorAndFontProvider.class.getName(), null);
 			colorAndFontProviderTracker.open();
 		}
-		return (IColorAndFontProvider) colorAndFontProviderTracker.getService();
+		return colorAndFontProviderTracker.getService();
 	}
 
 }

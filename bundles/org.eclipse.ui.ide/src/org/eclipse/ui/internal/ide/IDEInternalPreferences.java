@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
  *     Markus Schorn (Wind River Systems) -  bug 284447
+ *     Christian Georgi (SAP)             -  bug 432480
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -19,10 +20,10 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
  * The IDEInternalPreferences are the internal constants used by the Workbench.
  */
 public interface IDEInternalPreferences {
-    // (boolean) Save all dirty editors before running a full or incremental build 
+    // (boolean) Save all dirty editors before running a full or incremental build
     public static final String SAVE_ALL_BEFORE_BUILD = "SAVE_ALL_BEFORE_BUILD"; //$NON-NLS-1$
 
-    // (boolean) Refresh workspace on startup 
+    // (boolean) Refresh workspace on startup
     public static final String REFRESH_WORKSPACE_ON_STARTUP = "REFRESH_WORKSPACE_ON_STARTUP"; //$NON-NLS-1$
 
     // (int) Workspace save interval in minutes
@@ -42,12 +43,12 @@ public interface IDEInternalPreferences {
 
     /**
      * (String) Whether to open required projects when opening a project.
-     */ 
+     */
     public static final String OPEN_REQUIRED_PROJECTS = "OPEN_REQUIRED_PROJECTS"; //$NON-NLS-1$
-    
+
     /**
      * (String) Whether to confirm closing unrelated projects.
-     */ 
+     */
     public static final String CLOSE_UNRELATED_PROJECTS = "CLOSE_UNRELATED_PROJECTS"; //$NON-NLS-1$
 
     public static final String PSPM_PROMPT = MessageDialogWithToggle.PROMPT;
@@ -58,50 +59,38 @@ public interface IDEInternalPreferences {
 
     // (boolean) Whether or not to display the Welcome dialog on startup.
     public static final String WELCOME_DIALOG = "WELCOME_DIALOG"; //$NON-NLS-1$
-    
+
     //Whether or not to limit problems
     public static final String LIMIT_PROBLEMS = "LIMIT_PROBLEMS"; //$NON-NLS-1$
-    
+
     //The list of defined problems filters
     public static final String PROBLEMS_FILTERS = "PROBLEMS_FILTERS"; //$NON-NLS-1$
-    
+
     //problem limits
     public static final String PROBLEMS_LIMIT = "PROBLEMS_LIMIT"; //$NON-NLS-1$
-    
-    //Whether or not to limit tasks
-    public static final String LIMIT_TASKS = "LIMIT_TASKS"; //$NON-NLS-1$
-    
-    //tasks limits
-    public static final String TASKS_LIMIT = "TASKS_LIMIT"; //$NON-NLS-1$
-    
+
     //The list of defined tasks filters
     public static final String TASKS_FILTERS = "TASKS_FILTERS"; //$NON-NLS-1$
-    
-    //Whether or not to limit bookmarks
-    public static final String LIMIT_BOOKMARKS = "LIMIT_BOOKMARKS"; //$NON-NLS-1$
-    
-    //bookmark limits
-    public static final String BOOKMARKS_LIMIT = "BOOKMARKS_LIMIT"; //$NON-NLS-1$
-    
+
 //  The list of defined tasks filters
     public static final String BOOKMARKS_FILTERS = "BOOKMARKS_FILTERS"; //$NON-NLS-1$
-    
+
     //Enablement of marker limits
     public static final String USE_MARKER_LIMITS = "USE_MARKER_LIMITS"; //$NON-NLS-1$
-    	
+
    	//Value of marker limits
     public static final String MARKER_LIMITS_VALUE = "MARKER_LIMITS_VALUE"; //$NON-NLS-1$
 
     // Type of import
     public static final String IMPORT_FILES_AND_FOLDERS_TYPE = "IMPORT_FILES_AND_FOLDERS_TYPE"; //$NON-NLS-1$
-    
+
     // (boolean) Using variable relative paths for the import file and folder dialog
     public static final String IMPORT_FILES_AND_FOLDERS_RELATIVE = "IMPORT_FILES_AND_FOLDERS_RELATIVE"; //$NON-NLS-1$
 
-    // (string) Save all dirty editors before running a full or incremental build 
+    // (string) Save all dirty editors before running a full or incremental build
     public static final String IMPORT_FILES_AND_FOLDERS_MODE = "IMPORT_FILES_AND_FOLDERS_MODE"; //$NON-NLS-1$
 
-    // (string) Save all dirty editors before running a full or incremental build 
+    // (string) Save all dirty editors before running a full or incremental build
     public static final String IMPORT_FILES_AND_FOLDERS_VIRTUAL_FOLDER_MODE = "IMPORT_FILES_AND_FOLDERS_VIRTUAL_FOLDER_MODE"; //$NON-NLS-1$
 
     public static final String IMPORT_FILES_AND_FOLDERS_MODE_PROMPT = MessageDialogWithToggle.PROMPT;
@@ -109,7 +98,7 @@ public interface IDEInternalPreferences {
     public static final String IMPORT_FILES_AND_FOLDERS_MODE_MOVE_COPY = "MOVE_COPY"; //$NON-NLS-1$
 
     public static final String IMPORT_FILES_AND_FOLDERS_MODE_LINK = "LINK"; //$NON-NLS-1$
-    
+
     public static final String IMPORT_FILES_AND_FOLDERS_MODE_LINK_AND_VIRTUAL_FOLDER = "LINK_AND_VIRTUAL_FOLDER"; //$NON-NLS-1$
 
     // Always show this import window
@@ -121,9 +110,19 @@ public interface IDEInternalPreferences {
     public static final String WORKSPACE_NAME = "WORKSPACE_NAME"; //$NON-NLS-1$
 
     /**
-     * System explore command, used to launch file manager showing selected resource.
-     */
+	 * Whether to show the (workspace) location in the window title.
+	 */
+	public static final String SHOW_LOCATION = "SHOW_LOCATION"; //$NON-NLS-1$
+
+	/**
+	 * System explore command, used to launch file manager showing selected
+	 * resource.
+	 */
     public static final String WORKBENCH_SYSTEM_EXPLORER = "SYSTEM_EXPLORER"; //$NON-NLS-1$
-    
-    
+
+    /**
+     * Warn the user that the workspace is going to be upgraded because the IDE is newer
+     */
+    public static final String WARN_ABOUT_WORKSPACE_INCOMPATIBILITY = "WARN_ABOUT_WORKSPACE_INCOMPATIBILITY"; //$NON-NLS-1$
+
 }

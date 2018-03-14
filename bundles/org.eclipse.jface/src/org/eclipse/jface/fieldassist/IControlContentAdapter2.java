@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Control;
 /**
  * This interface is used by a {@link ContentProposalAdapter} in order to
  * retrieve and set the selection range in a control.
- * 
+ *
  * @since 3.4
  */
 public interface IControlContentAdapter2 {
@@ -28,7 +28,7 @@ public interface IControlContentAdapter2 {
 	 * string. Valid ranges are from 0 to N, where N is the size of the contents
 	 * string. A value of N indicates that the last character is in the
 	 * selection.
-	 * 
+	 *
 	 * @param control
 	 *            the control whose position is to be retrieved.
 	 * @return a point representing the selection start and end
@@ -43,7 +43,7 @@ public interface IControlContentAdapter2 {
 	 * ranges are from 0 to N, where N is the size of the contents string. A
 	 * value of N indicates that the last character is in the selection. If the
 	 * x and y coordinates are the same, then there is no selection.
-	 * 
+	 *
 	 * @param control
 	 *            the control whose position is to be retrieved.
 	 * @param range

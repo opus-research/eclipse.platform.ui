@@ -11,8 +11,8 @@
 package org.eclipse.ui.tests.api;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IParameter;
@@ -55,28 +55,20 @@ public class GenericCommandActionDelegate implements
 
 	private String commandId = null;
 
-	private Map parameterMap = null;
+	private Map<String, String> parameterMap = null;
 
 	private ParameterizedCommand parameterizedCommand = null;
 
 	private IHandlerService handlerService = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
-	 */
+	@Override
 	public void dispose() {
 		handlerService = null;
 		parameterizedCommand = null;
 		parameterMap = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
+	@Override
 	public void run(IAction action) {
 		if (handlerService == null) {
 			// what, no handler service ... no problem
@@ -95,23 +87,13 @@ public class GenericCommandActionDelegate implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.jface.viewers.ISelection)
-	 */
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		// we don't care, handlers get their selection from the
 		// ExecutionEvent application context
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
-	 *      java.lang.String, java.lang.Object)
-	 */
+	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
 		String id = config.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
@@ -140,12 +122,12 @@ public class GenericCommandActionDelegate implements
 
 	/**
 	 * Build a command from the executable extension information.
-	 * 
+	 *
 	 * @param commandService
 	 *            to get the Command object
 	 */
 	private void createCommand(ICommandService commandService) {
-		String id = (String) parameterMap.get(PARM_COMMAND_ID);
+		String id = parameterMap.get(PARM_COMMAND_ID);
 		if (id == null) {
 			return;
 		}
@@ -160,9 +142,8 @@ public class GenericCommandActionDelegate implements
 				return;
 			}
 			ArrayList parameters = new ArrayList();
-			Iterator i = parameterMap.keySet().iterator();
-			while (i.hasNext()) {
-				String parmName = (String) i.next();
+			for (Entry<String, String> entry : parameterMap.entrySet()) {
+				String parmName = entry.getKey();
 				if (PARM_COMMAND_ID.equals(parmName)) {
 					continue;
 				}
@@ -171,8 +152,7 @@ public class GenericCommandActionDelegate implements
 					// asking for a bogus parameter? No problem
 					return;
 				}
-				parameters.add(new Parameterization(parm, (String) parameterMap
-						.get(parmName)));
+				parameters.add(new Parameterization(parm, entry.getValue()));
 			}
 			parameterizedCommand = new ParameterizedCommand(cmd,
 					(Parameterization[]) parameters
@@ -182,41 +162,28 @@ public class GenericCommandActionDelegate implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
-	 */
+	@Override
 	public void init(IWorkbenchWindow window) {
 		if (handlerService != null) {
 			// already initialized
 			return;
 		}
 
-		handlerService = (IHandlerService) window
+		handlerService = window
 				.getService(IHandlerService.class);
 		if (parameterMap != null) {
-			ICommandService commandService = (ICommandService) window
+			ICommandService commandService = window
 					.getService(ICommandService.class);
 			createCommand(commandService);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
-	 */
+	@Override
 	public void init(IViewPart view) {
 		init(view.getSite().getWorkbenchWindow());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.ui.IEditorPart)
-	 */
+	@Override
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		// we don't actually care about the active editor, since that
 		// information is in the ExecutionEvent application context
@@ -226,12 +193,7 @@ public class GenericCommandActionDelegate implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-	 *      org.eclipse.ui.IWorkbenchPart)
-	 */
+	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// we don't actually care about the active part, since that
 		// information is in the ExecutionEvent application context

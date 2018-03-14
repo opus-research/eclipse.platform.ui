@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -32,11 +32,11 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl#getChildren <em>Children</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl#getSelectedElement <em>Selected Element</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */
@@ -89,24 +89,26 @@ public abstract class ElementContainerImpl<T extends MUIElement> extends UIEleme
 		if (children == null) {
 			EClassifier classifier = ModelUtils.getTypeArgument(eClass(), UiPackageImpl.Literals.ELEMENT_CONTAINER__CHILDREN.getEGenericType());
 			final Class<?> clazz;
-			
+
 			if( classifier != null && classifier.getInstanceClass() != null ) {
 				clazz = classifier.getInstanceClass();
 			} else {
 				clazz = null;
 			}
-			
+
 			children = new EObjectContainmentWithInverseEList<T>(MUIElement.class, this, UiPackageImpl.ELEMENT_CONTAINER__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT) {
-				
+
 				/**
-				 * 
+				 *
 				 */
 				private static final long serialVersionUID = 1L;
 
+				@Override
 				protected boolean isInstance(Object object) {
 					return super.isInstance(object) && (clazz == null || clazz.isInstance(object));
 				}
 
+				@Override
 				protected T validate(int index, T object) {
 					if( isInstance(object) ) {
 						return object;
@@ -118,7 +120,7 @@ public abstract class ElementContainerImpl<T extends MUIElement> extends UIEleme
 		}
 		return children;
 	}
-	
+
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -155,16 +157,16 @@ public abstract class ElementContainerImpl<T extends MUIElement> extends UIEleme
 	public void setSelectedElement(T newSelectedElement) {
 		// Ensure that the new candidate is in *our* child list
 		if (newSelectedElement != null && newSelectedElement.getParent() != this) {
-			throw new IllegalArgumentException("The selected element " 
+			throw new IllegalArgumentException("The selected element "
 					+ newSelectedElement + " is not a child of this container");
 		}
-		
+
 		// Ensure that the new candidate is visible in the UI
 		if (newSelectedElement != null && !newSelectedElement.isToBeRendered()) {
-			throw new IllegalArgumentException("The selected element " 
+			throw new IllegalArgumentException("The selected element "
 					+ newSelectedElement + " must be visible in the UI presentation");
 		}
-		
+
 		T oldSelectedElement = selectedElement;
 		selectedElement = newSelectedElement;
 		if (eNotificationRequired())

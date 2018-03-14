@@ -39,17 +39,13 @@ public class MarkElementProperties implements IPropertySource {
         this.element = element;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertySource
-     */
-    public Object getEditableValue() {
+    @Override
+	public Object getEditableValue() {
         return this;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertySource
-     */
-    public IPropertyDescriptor[] getPropertyDescriptors() {
+    @Override
+	public IPropertyDescriptor[] getPropertyDescriptors() {
         // Create the property vector.
         IPropertyDescriptor[] propertyDescriptors = new IPropertyDescriptor[3];
 
@@ -70,37 +66,29 @@ public class MarkElementProperties implements IPropertySource {
         return propertyDescriptors;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertySource
-     */
-    public Object getPropertyValue(Object name) {
+    @Override
+	public Object getPropertyValue(Object name) {
         if (name.equals(PROPERTY_LINECOUNT))
-            return new Integer(element.getNumberOfLines());
+            return Integer.valueOf(element.getNumberOfLines());
         if (name.equals(PROPERTY_START))
-            return new Integer(element.getStart());
+            return Integer.valueOf(element.getStart());
         if (name.equals(PROPERTY_LENGTH))
-            return new Integer(element.getLength());
+            return Integer.valueOf(element.getLength());
         return null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertySource
-     */
-    public boolean isPropertySet(Object property) {
+    @Override
+	public boolean isPropertySet(Object property) {
         return false;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertySource
-     */
-    public void resetPropertyValue(Object property) {
+    @Override
+	public void resetPropertyValue(Object property) {
         // do nothing
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertySource
-     */
-    public void setPropertyValue(Object name, Object value) {
+    @Override
+	public void setPropertyValue(Object name, Object value) {
         // do nothing
     }
 }

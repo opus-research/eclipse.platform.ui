@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *     Robert Roth <robert.roth.off@gmail.com> - Bug 337788
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -43,7 +45,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
  * History for navigating preference pages.
- * 
+ *
  * @since 3.1
  */
 class PreferencePageHistory {
@@ -77,7 +79,7 @@ class PreferencePageHistory {
 
 	/**
 	 * Creates a new history for the given dialog.
-	 * 
+	 *
 	 * @param dialog
 	 *            the preference dialog to create a history for
 	 */
@@ -88,7 +90,7 @@ class PreferencePageHistory {
 	/**
 	 * Returns the preference page path (for now: its id) for the history at
 	 * <code>index</code>.
-	 * 
+	 *
 	 * @param index
 	 *            the index into the history
 	 * @return the preference page path at <code>index</code> or
@@ -104,7 +106,7 @@ class PreferencePageHistory {
 
 	/**
 	 * Adds the preference page path and its label to the page history.
-	 * 
+	 *
 	 * @param entry
 	 *            the preference page history entry
 	 */
@@ -120,7 +122,7 @@ class PreferencePageHistory {
 	/**
 	 * Sets the current page to be the one corresponding to the given index in
 	 * the page history.
-	 * 
+	 *
 	 * @param index
 	 *            the index into the page history
 	 */
@@ -134,7 +136,7 @@ class PreferencePageHistory {
 
 	/**
 	 * Updates the history controls.
-	 * 
+	 *
 	 */
 	private void updateHistoryControls() {
 		historyToolbar.update(false);
@@ -147,7 +149,7 @@ class PreferencePageHistory {
 
 	/**
 	 * Creates the history toolbar and initializes <code>historyToolbar</code>.
-	 * 
+	 *
 	 * @param historyBar
 	 * @param manager
 	 * @return the control of the history toolbar
@@ -236,6 +238,8 @@ class PreferencePageHistory {
 				boolean enabled = historyIndex > 0;
 				if (enabled) {
 					setToolTipText(NLS.bind(WorkbenchMessages.NavigationHistoryAction_backward_toolTipName,getHistoryEntry(historyIndex - 1).getLabel() ));
+				} else {
+					setToolTipText(WorkbenchMessages.NavigationHistoryAction_backward_toolTip);
 				}
 				return enabled;
 			}
@@ -273,6 +277,8 @@ class PreferencePageHistory {
 				boolean enabled = historyIndex < history.size() - 1;
 				if (enabled) {
 					setToolTipText(NLS.bind(WorkbenchMessages.NavigationHistoryAction_forward_toolTipName, getHistoryEntry(historyIndex + 1).getLabel() ));
+				} else {
+					setToolTipText(WorkbenchMessages.NavigationHistoryAction_forward_toolTip);
 				}
 				return enabled;
 			}
@@ -304,13 +310,13 @@ class PreferencePageHistory {
 
 	/**
 	 * Registers the given action with the workbench command support.
-	 * 
+	 *
 	 * @param action
 	 *            the action to register.
 	 */
 	private void registerKeybindings(IAction action) {
 		final IHandler handler = new ActionHandler(action);
-		final IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+		final IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
 		final IHandlerActivation activation = handlerService.activateHandler(
 				action.getActionDefinitionId(), handler,
 				new ActiveShellExpression(dialog.getShell()));
@@ -322,14 +328,14 @@ class PreferencePageHistory {
 	 *
 	 */
 	public void dispose() {
-		final IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
+		final IHandlerService handlerService = PlatformUI.getWorkbench().getService(IHandlerService.class);
 		final Iterator iterator = activations.iterator();
 		while (iterator.hasNext()) {
 			handlerService.deactivateHandler((IHandlerActivation) iterator
 					.next());
 		}
 		activations.clear();
-		
+
 	}
 
 }

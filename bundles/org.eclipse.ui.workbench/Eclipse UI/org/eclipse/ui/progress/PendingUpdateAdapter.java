@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * The PendingUpdateAdapter is a convenience object that can be used
  * by a BaseWorkbenchContentProvider that wants to show a pending update.
- * 
+ *
  * @since 3.2
  */
 public class PendingUpdateAdapter implements IWorkbenchAdapter, IAdaptable {
@@ -48,49 +48,34 @@ public class PendingUpdateAdapter implements IWorkbenchAdapter, IAdaptable {
         //No initial behavior
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-     */
-    @Override
-	public Object getAdapter(Class adapter) {
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IWorkbenchAdapter.class) {
-			return this;
+			return adapter.cast(this);
 		}
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
-     */
     @Override
 	public Object[] getChildren(Object o) {
         return new Object[0];
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
-     */
     @Override
 	public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
-     */
     @Override
 	public String getLabel(Object o) {
         return ProgressMessages.PendingUpdateAdapter_PendingLabel;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
-     */
     @Override
 	public Object getParent(Object o) {
         return null;
     }
-    
+
     /**
 	 * @since 3.4
 	 */

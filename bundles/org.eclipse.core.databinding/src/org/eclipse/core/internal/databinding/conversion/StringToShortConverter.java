@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import com.ibm.icu.text.NumberFormat;
 public class StringToShortConverter extends NumberFormatConverter {
 	private final NumberFormat numberFormat;
 	private final boolean primitive;
-	
+
 	private String outOfRangeMessage;
 
 	/**
@@ -34,11 +34,7 @@ public class StringToShortConverter extends NumberFormatConverter {
 		primitive = toType.isPrimitive();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
-	 */
+	@Override
 	public Object convert(Object fromObject) {
 		ParseResult result = StringToNumberParser.parse(fromObject,
 				numberFormat, primitive);
@@ -59,13 +55,13 @@ public class StringToShortConverter extends NumberFormatConverter {
 		if (StringToNumberParser.inShortRange(result.getNumber())) {
 			return new Short(result.getNumber().shortValue());
 		}
-		
+
 		synchronized (this) {
 			if (outOfRangeMessage == null) {
 				outOfRangeMessage = StringToNumberParser
 				.createOutOfRangeMessage(new Short(Short.MIN_VALUE), new Short(Short.MAX_VALUE), numberFormat);
 			}
-						
+
 			throw new IllegalArgumentException(outOfRangeMessage);
 		}
 	}

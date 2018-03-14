@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
  * for scrubbing local content.
  * @noextend This class is not intended to be subclassed by clients.
  */
+@Deprecated
 public class ScrubLocalAction extends WorkspaceAction {
 
     /**
@@ -49,31 +50,23 @@ public class ScrubLocalAction extends WorkspaceAction {
 				IIDEHelpContextIds.SCRUB_LOCAL_ACTION);
     }
 
-    /* (non-Javadoc)
-     * Method declared on WorkspaceAction.
-     */
-    protected String getOperationMessage() {
+    @Override
+	protected String getOperationMessage() {
         return IDEWorkbenchMessages.ScrubLocalAction_progress;
     }
 
-    /* (non-Javadoc)
-     * Method declared on WorkspaceAction.
-     */
-    protected String getProblemsMessage() {
+    @Override
+	protected String getProblemsMessage() {
         return IDEWorkbenchMessages.ScrubLocalAction_problemsMessage;
     }
 
-    /* (non-Javadoc)
-     * Method declared on WorkspaceAction.
-     */
-    protected String getProblemsTitle() {
+    @Override
+	protected String getProblemsTitle() {
         return IDEWorkbenchMessages.ScrubLocalAction_problemsTitle;
     }
 
-    /* (non-Javadoc)
-     * Method declared on WorkspaceAction.
-     */
-    protected void invokeOperation(IResource resource, IProgressMonitor monitor)
+    @Override
+	protected void invokeOperation(IResource resource, IProgressMonitor monitor)
             throws CoreException {
         resource.setLocal(false, IResource.DEPTH_INFINITE, monitor);
     }
@@ -83,7 +76,8 @@ public class ScrubLocalAction extends WorkspaceAction {
      * <code>SelectionListenerAction</code> method ensures that this action is
      * disabled if any of the selections are not resources.
      */
-    protected boolean updateSelection(IStructuredSelection s) {
+    @Override
+	protected boolean updateSelection(IStructuredSelection s) {
         return super.updateSelection(s)
                 && getSelectedNonResources().size() == 0;
     }

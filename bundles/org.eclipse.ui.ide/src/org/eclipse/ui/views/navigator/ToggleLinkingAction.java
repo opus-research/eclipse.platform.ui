@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,16 +16,17 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 /**
  * This action toggles whether this navigator links its selection to the active
  * editor.
- * 
+ *
  * @since 2.1
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
+@Deprecated
 public class ToggleLinkingAction extends ResourceNavigatorAction {
 
 
 	/**
 	 * Constructs a new action.
-	 * 
+	 *
 	 * @param navigator the resource navigator
 	 * @param label the label
 	 */
@@ -38,7 +39,8 @@ public class ToggleLinkingAction extends ResourceNavigatorAction {
     /**
      * Runs the action.
      */
-    public void run() {
+    @Override
+	public void run() {
         getNavigator().setLinkingEnabled(isChecked());
     }
 

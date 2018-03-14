@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,12 +35,12 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
     * The last valid operation.
     */
    private int lastValidOperation = DND.DROP_NONE;
-   
+
    protected WebBrowserViewDropAdapter(BrowserViewer view) {
 		this.view = view;
 	}
 
-   /* (non-Javadoc)
+   /*
     * Method declared on DropTargetAdapter.
     * The mouse has moved over the drop target.  If the
     * target item has changed, notify the action and check
@@ -50,32 +50,34 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
        //update last valid operation
        if (event.detail != DND.DROP_NONE)
            lastValidOperation = event.detail;
-       
+
        //valid drop and set event detail accordingly
        if (validateDrop(event.detail, event.currentDataType))
            currentOperation = lastValidOperation;
        else
            currentOperation = DND.DROP_NONE;
-       
+
        event.detail = currentOperation;
    }
 
-   /* (non-Javadoc)
+   /*
     * Method declared on DropTargetAdapter.
     * The drop operation has changed, see if the action
     * should still be enabled.
     */
-   public void dragOperationChanged(DropTargetEvent event) {
+   @Override
+public void dragOperationChanged(DropTargetEvent event) {
        doDropValidation(event);
    }
 
-   /* (non-Javadoc)
+   /*
     * Method declared on DropTargetAdapter.
     * The mouse has moved over the drop target.  If the
     * target item has changed, notify the action and check
     * that it is still enabled.
     */
-   public void dragOver(DropTargetEvent event) {
+   @Override
+public void dragOver(DropTargetEvent event) {
        //set the location feedback
    	 event.feedback = DND.FEEDBACK_SELECT;
 
@@ -83,27 +85,30 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
        doDropValidation(event);
    }
 
-   /* (non-Javadoc)
+   /*
     * Method declared on DropTargetAdapter.
     * The user has dropped something on the desktop viewer.
     */
-   public void drop(DropTargetEvent event) {
+   @Override
+public void drop(DropTargetEvent event) {
        //perform the drop behaviour
        if (!performDrop(event.data))
            event.detail = DND.DROP_NONE;
-       
+
        currentOperation = event.detail;
    }
 
-   /* (non-Javadoc)
+   /*
     * Method declared on DropTargetAdapter.
     * Last chance for the action to disable itself
     */
-   public void dropAccept(DropTargetEvent event) {
+   @Override
+public void dropAccept(DropTargetEvent event) {
        if (!validateDrop(event.detail, event.currentDataType))
            event.detail = DND.DROP_NONE;
    }
 
+	@Override
 	public void dragEnter(DropTargetEvent event) {
 		if (event.detail == DND.DROP_DEFAULT)
 			event.detail = DND.DROP_COPY;
@@ -118,13 +123,13 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
     * </p>
     *
     * @param data the drop data
-    * @return <code>true</code> if the drop was successful, and 
+    * @return <code>true</code> if the drop was successful, and
     *   <code>false</code> otherwise
     */
 	protected boolean performDrop(Object data) {
 		if (data instanceof String[]) {
 			String[] s = (String[]) data;
-			if (s == null || s.length == 0)
+			if (s.length == 0)
 				return true;
 			File f = new File(s[0]);
 			try {
@@ -133,17 +138,17 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
 				// TODO
 			}
 		}
-		
+
 		return true;
 	}
 
 	/**
-    * Validates dropping on the given object. This method is called whenever some 
+    * Validates dropping on the given object. This method is called whenever some
     * aspect of the drop operation changes.
     * <p>
     * Subclasses must implement this method to define which drops make sense.
     * </p>
-    * 
+    *
     * @param target the object that the mouse is currently hovering over, or
     *   <code>null</code> if the mouse is hovering over empty space
     * @param operation the current drag operation (copy, move, etc.)
@@ -158,7 +163,7 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
 			return true;
 		if (LocalSelectionTransfer.getInstance().isSupportedType(transferType))
 			return true;*/
-		
+
 		return false;
 	}
 }

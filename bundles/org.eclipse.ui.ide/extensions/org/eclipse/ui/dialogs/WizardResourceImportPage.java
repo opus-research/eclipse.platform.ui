@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Martin Boyle <martingboyle@gmail.com> - Fix for 
+ *     Martin Boyle <martingboyle@gmail.com> - Fix for
  *     		Bug 183013 [Wizards] Error importing into linked EFS folder - "undefined path variable"
+ *     Marc-Andre Laperle (Ericsson) - Bug 279902 - [Import/Export] WizardResourceImportPage.createDestinationGroup is final
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -20,13 +21,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
 import org.eclipse.jface.util.BidiUtils;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -55,7 +56,7 @@ import org.eclipse.ui.model.WorkbenchViewerComparator;
  * selection facilities.
  * </p>
  * <p>
- * Subclasses must implement 
+ * Subclasses must implement
  * <ul>
  *   <li><code>createSourceGroup</code></li>
  * </ul>
@@ -89,7 +90,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
 	 * The <code>selectionGroup</code> field should have been created with a
 	 * private modifier. Subclasses should not access this field directly.
-	 * 
+	 *
 	 * @noreference This field is not intended to be referenced by clients.
 	 */
     protected ResourceTreeAndListGroup selectionGroup;
@@ -98,11 +99,11 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     private static final String EMPTY_FOLDER_MESSAGE = IDEWorkbenchMessages.WizardImportPage_specifyFolder;
 
     private static final String EMPTY_PROJECT_MESSAGE = IDEWorkbenchMessages.WizardImportPage_specifyProject;
-    
+
     private static final String INACCESSABLE_FOLDER_MESSAGE = IDEWorkbenchMessages.WizardImportPage_folderMustExist;
 
     /**
-     * Creates an import wizard page. If the initial resource selection 
+     * Creates an import wizard page. If the initial resource selection
      * contains exactly one container resource then it will be used as the default
      * import destination.
      *
@@ -117,13 +118,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         currentResourceSelection = null;
         if (selection.size() == 1) {
             Object firstElement = selection.getFirstElement();
-            if (firstElement instanceof IAdaptable) {
-                Object resource = ((IAdaptable) firstElement)
-                        .getAdapter(IResource.class);
-                if (resource != null) {
-					currentResourceSelection = (IResource) resource;
-				}
-            }
+			currentResourceSelection = Adapters.adapt(firstElement, IResource.class);
         }
 
         if (currentResourceSelection != null) {
@@ -139,18 +134,17 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     }
 
     /**
-     * The <code>WizardResourceImportPage</code> implementation of this 
-     * <code>WizardDataTransferPage</code> method returns <code>true</code>. 
+     * The <code>WizardResourceImportPage</code> implementation of this
+     * <code>WizardDataTransferPage</code> method returns <code>true</code>.
      * Subclasses may override this method.
      */
-    protected boolean allowNewContainerName() {
+    @Override
+	protected boolean allowNewContainerName() {
         return true;
     }
 
-    /** (non-Javadoc)
-     * Method declared on IDialogPage.
-     */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
 
         initializeDialogUnits(parent);
 
@@ -180,7 +174,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      *
      * @param parent the parent control
      */
-    protected final void createDestinationGroup(Composite parent) {
+    protected void createDestinationGroup(Composite parent) {
         // container specification group
         Composite containerGroup = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
@@ -230,11 +224,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
                 getFileProvider(), new WorkbenchLabelProvider(), SWT.NONE,
                 DialogUtil.inRegularFontMode(parent));
 
-        ICheckStateListener listener = new ICheckStateListener() {
-            public void checkStateChanged(CheckStateChangedEvent event) {
-                updateWidgetEnablements();
-            }
-        };
+        ICheckStateListener listener = event -> updateWidgetEnablements();
 
         WorkbenchViewerComparator comparator = new WorkbenchViewerComparator();
         this.selectionGroup.setTreeComparator(comparator);
@@ -256,7 +246,8 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /*
      * @see WizardDataTransferPage.getErrorDialogTitle()
      */
-    protected String getErrorDialogTitle() {
+    @Override
+	protected String getErrorDialogTitle() {
         return IDEWorkbenchMessages.WizardImportPage_errorDialogTitle;
     }
 
@@ -291,13 +282,13 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     }
 
     /**
-     * Returns a content provider for <code>FileSystemElement</code>s that returns 
+     * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only files as children.
      */
     protected abstract ITreeContentProvider getFileProvider();
 
     /**
-     * Returns a content provider for <code>FileSystemElement</code>s that returns 
+     * Returns a content provider for <code>FileSystemElement</code>s that returns
      * only folders as children.
      */
     protected abstract ITreeContentProvider getFolderProvider();
@@ -307,15 +298,23 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * @return IPath
      */
     protected IPath getResourcePath() {
-        return getPathFromText(this.containerNameField);
+        if (this.containerNameField != null) {
+            return getPathFromText(this.containerNameField);
+        }
+
+        if (this.initialContainerFieldValue != null && this.initialContainerFieldValue.length() > 0) {
+            return new Path(this.initialContainerFieldValue).makeAbsolute();
+        }
+
+        return Path.EMPTY;
     }
 
     /**
-     * Returns this page's list of currently-specified resources to be 
-     * imported. This is the primary resource selection facility accessor for 
+     * Returns this page's list of currently-specified resources to be
+     * imported. This is the primary resource selection facility accessor for
      * subclasses.
      *
-     * @return a list of resources currently selected 
+     * @return a list of resources currently selected
      * for export (element type: <code>IResource</code>)
      */
     protected java.util.List getSelectedResources() {
@@ -323,7 +322,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     }
 
     /**
-     * Returns this page's list of currently-specified resources to be 
+     * Returns this page's list of currently-specified resources to be
      * imported filtered by the IElementFilter.
      * @since 3.10
      */
@@ -333,11 +332,12 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
 
     /**
      * <bold>DO NOT USE THIS METHOD</bold>
-     * Returns this page's list of currently-specified resources to be 
+     * Returns this page's list of currently-specified resources to be
      * imported filtered by the IElementFilter.
      * @deprecated Should use the API {@link IElementFilter}
      */
-    protected void getSelectedResources(org.eclipse.ui.internal.ide.dialogs.IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
+    @Deprecated
+	protected void getSelectedResources(org.eclipse.ui.internal.ide.dialogs.IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
         this.selectionGroup.getAllCheckedListItems(filter, monitor);
     }
 
@@ -357,9 +357,9 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
 				return null;
 			}
         	return (IContainer) resource;
-        	
+
         }
-            
+
 
         return null;
     }
@@ -391,12 +391,13 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     }
 
     /**
-     * The <code>WizardResourceImportPage</code> implementation of this 
+     * The <code>WizardResourceImportPage</code> implementation of this
      * <code>Listener</code> method handles all events and enablements for controls
      * on this page. Subclasses may extend.
      * @param event Event
      */
-    public void handleEvent(Event event) {
+    @Override
+	public void handleEvent(Event event) {
         Widget source = event.widget;
 
         if (source == containerBrowseButton) {
@@ -476,11 +477,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      */
     protected void updateSelections(final Map map) {
 
-        Runnable runnable = new Runnable() {
-            public void run() {
-                selectionGroup.updateSelections(map);
-            }
-        };
+        Runnable runnable = () -> selectionGroup.updateSelections(map);
 
         BusyIndicator.showWhile(getShell().getDisplay(), runnable);
     }
@@ -488,7 +485,8 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
      * Check if widgets are enabled or disabled by a change in the dialog.
      */
-    protected void updateWidgetEnablements() {
+    @Override
+	protected void updateWidgetEnablements() {
 
         boolean pageComplete = determinePageCompletion();
         setPageComplete(pageComplete);
@@ -498,10 +496,8 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         super.updateWidgetEnablements();
     }
 
-    /* (non-Javadoc)
-     * Method declared on WizardDataTransferPage.
-     */
-    protected final boolean validateDestinationGroup() {
+    @Override
+	protected final boolean validateDestinationGroup() {
 
         IPath containerPath = getContainerFullPath();
         if (containerPath == null) {
@@ -516,7 +512,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         	if(IDEWorkbenchPlugin.getPluginWorkspace().getRoot().exists(getContainerFullPath())) {
 				return false;
 			}
-        	
+
             //if it is does not exist be sure the project does
             IWorkspace workspace = IDEWorkbenchPlugin.getPluginWorkspace();
             IPath projectPath = containerPath.removeLastSegments(containerPath
@@ -527,7 +523,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
 			}
             setErrorMessage(IDEWorkbenchMessages.WizardImportPage_projectNotExist);
             return false;
-        } 
+        }
         if (!container.isAccessible()) {
              setErrorMessage(INACCESSABLE_FOLDER_MESSAGE);
              return false;
@@ -540,7 +536,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
           }
          return false;
         }
-        
+
 
         if (sourceConflictsWithDestination(containerPath)) {
             setErrorMessage(getSourceConflictMessage());
@@ -567,7 +563,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * Returns whether or not the source location conflicts
      * with the destination resource. By default this is not
      * checked, so <code>false</code> is returned.
-     * 
+     *
      * @param sourcePath the path being checked
      * @return <code>true</code> if the source location conflicts with the
      *   destination resource, <code>false</code> if not
@@ -579,8 +575,9 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /*
      * @see WizardDataTransferPage.determinePageCompletion.
      */
-    protected boolean determinePageCompletion() {
-        //Check for valid projects before making the user do anything 
+    @Override
+	protected boolean determinePageCompletion() {
+        //Check for valid projects before making the user do anything
         if (noOpenProjects()) {
             setErrorMessage(IDEWorkbenchMessages.WizardImportPage_noOpenProjects);
             return false;
@@ -589,7 +586,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     }
 
     /**
-     * Returns whether or not the passed workspace has any 
+     * Returns whether or not the passed workspace has any
      * open projects
      * @return boolean
      */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,21 +27,22 @@ import org.eclipse.jface.viewers.ViewerCell;
  * that this label provider uses for display. The default behavior is to display
  * the first attribute's value. Clients may customize by subclassing and
  * overriding {@link #update(ViewerCell)}.
- * 
+ *
  * @since 1.3
- * 
+ *
  */
 public class ObservableMapCellLabelProvider extends CellLabelProvider {
 
 	/**
 	 * Observable maps typically mapping from viewer elements to label values.
 	 * Subclasses may use these maps to provide custom labels.
-	 * 
+	 *
 	 * @since 1.4
 	 */
 	protected IObservableMap[] attributeMaps;
 
 	private IMapChangeListener mapChangeListener = new IMapChangeListener() {
+		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			Set affectedElements = event.diff.getChangedKeys();
 			LabelProviderChangedEvent newEvent = new LabelProviderChangedEvent(
@@ -53,7 +54,7 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 
 	/**
 	 * Creates a new label provider that tracks changes to one attribute.
-	 * 
+	 *
 	 * @param attributeMap
 	 */
 	public ObservableMapCellLabelProvider(IObservableMap attributeMap) {
@@ -64,7 +65,7 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 	 * Creates a new label provider that tracks changes to more than one
 	 * attribute. This constructor should be used by subclasses that override
 	 * {@link #update(ViewerCell)} and make use of more than one attribute.
-	 * 
+	 *
 	 * @param attributeMaps
 	 */
 	protected ObservableMapCellLabelProvider(IObservableMap[] attributeMaps) {
@@ -76,6 +77,7 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 		}
 	}
 
+	@Override
 	public void dispose() {
 		for (int i = 0; i < attributeMaps.length; i++) {
 			attributeMaps[i].removeMapChangeListener(mapChangeListener);
@@ -85,6 +87,7 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 		this.mapChangeListener = null;
 	}
 
+	@Override
 	public void update(ViewerCell cell) {
 		Object element = cell.getElement();
 		Object value = attributeMaps[0].get(element);

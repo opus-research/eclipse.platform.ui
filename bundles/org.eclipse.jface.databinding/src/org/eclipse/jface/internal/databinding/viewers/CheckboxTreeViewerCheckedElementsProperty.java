@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class CheckboxTreeViewerCheckedElementsProperty extends
 		CheckboxViewerCheckedElementsProperty {
@@ -31,6 +31,7 @@ public class CheckboxTreeViewerCheckedElementsProperty extends
 		super(elementType);
 	}
 
+	@Override
 	protected Set doGetSet(Object source) {
 		CheckboxTreeViewer viewer = (CheckboxTreeViewer) source;
 		Set set = createElementSet(viewer);
@@ -38,15 +39,18 @@ public class CheckboxTreeViewerCheckedElementsProperty extends
 		return set;
 	}
 
+	@Override
 	protected void doSetSet(Object source, Set set, SetDiff diff) {
 		doSetSet(source, set);
 	}
 
+	@Override
 	protected void doSetSet(Object source, Set set) {
 		CheckboxTreeViewer viewer = (CheckboxTreeViewer) source;
 		viewer.setCheckedElements(set.toArray());
 	}
 
+	@Override
 	public String toString() {
 		String s = "CheckboxTreeViewer.checkedElements{}"; //$NON-NLS-1$
 		if (getElementType() != null)

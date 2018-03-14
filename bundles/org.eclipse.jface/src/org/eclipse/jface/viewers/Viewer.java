@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430873, 475689
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -51,7 +51,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      *
      * @see #fireSelectionChanged
      */
-    private ListenerList selectionChangedListeners = new ListenerList();
+	private ListenerList<ISelectionChangedListener> selectionChangedListeners = new ListenerList<>();
 
     /**
      * List of help request listeners (element type: <code>org.eclipse.swt.events.HelpListener</code>).
@@ -59,7 +59,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      *
      * @see #handleHelpRequest
      */
-    private ListenerList helpListeners = new ListenerList();
+	private ListenerList<HelpListener> helpListeners = new ListenerList<>();
 
     /**
      * The names of this viewer's properties.
@@ -112,12 +112,7 @@ public abstract class Viewer implements IInputSelectionProvider {
             Control control = getControl();
             if (control != null && !control.isDisposed()) {
                 if (this.helpListener == null) {
-                    this.helpListener = new HelpListener() {
-                        @Override
-						public void helpRequested(HelpEvent event) {
-                            handleHelpRequest(event);
-                        }
-                    };
+					this.helpListener = this::handleHelpRequest;
                 }
                 control.addHelpListener(this.helpListener);
                 helpHooked = true;
@@ -139,9 +134,8 @@ public abstract class Viewer implements IInputSelectionProvider {
      * @see HelpListener#helpRequested(org.eclipse.swt.events.HelpEvent)
      */
     protected void fireHelpRequested(HelpEvent event) {
-        Object[] listeners = helpListeners.getListeners();
-        for (Object listener : listeners) {
-            ((HelpListener) listener).helpRequested(event);
+		for (HelpListener listener : helpListeners) {
+            listener.helpRequested(event);
         }
     }
 
@@ -154,9 +148,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      * @see ISelectionChangedListener#selectionChanged
      */
     protected void fireSelectionChanged(final SelectionChangedEvent event) {
-        Object[] listeners = selectionChangedListeners.getListeners();
-        for (Object listener : listeners) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) listener;
+		for (ISelectionChangedListener l : selectionChangedListeners) {
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -212,7 +204,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      * The default behavior is to fire a help request,
      * with the event's data modified to hold this viewer.
      * @param event the event
-     * 
+     *
      */
     protected void handleHelpRequest(HelpEvent event) {
         Object oldData = event.data;

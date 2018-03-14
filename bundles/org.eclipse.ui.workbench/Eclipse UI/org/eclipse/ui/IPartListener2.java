@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.jface.dialogs.PageChangedEvent;
  * <p>
  * This interface may be implemented by clients.
  * </p>
- * 
+ *
  * @see IPartService#addPartListener(IPartListener2)
  */
 public interface IPartListener2 {
@@ -46,7 +46,7 @@ public interface IPartListener2 {
      * <p>
      * These events occur when an editor is brought to the top in the editor area,
      * or when a view is brought to the top in a page book with multiple views.
-     * They are normally only sent when a part is brought to the top 
+     * They are normally only sent when a part is brought to the top
      * programmatically (via <code>IPerspective.bringToTop</code>). When a part is
      * activated by the user clicking on it, only <code>partActivated</code> is sent.
      * </p>

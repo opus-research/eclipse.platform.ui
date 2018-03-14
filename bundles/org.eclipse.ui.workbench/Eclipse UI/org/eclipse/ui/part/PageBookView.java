@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,14 +11,13 @@
 
 package org.eclipse.ui.part;
 
-import org.eclipse.ui.internal.testing.ContributionInfoMessages;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
@@ -47,8 +46,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.SubActionBars;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.util.Util;
-import org.eclipse.ui.testing.ContributionInfo;
 
 /**
  * Abstract superclass of all multi-page workbench views.
@@ -211,7 +208,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 		/**
 		 * Creates a new page record initialized to the given part and page.
-		 * 
+		 *
 		 * @param part
 		 * @param page
 		 */
@@ -231,7 +228,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	private static class SelectionManager extends EventManager {
 		/**
-		 * 
+		 *
 		 * @param listener
 		 *            listen
 		 */
@@ -241,7 +238,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param listener
 		 *            listen
 		 */
@@ -251,7 +248,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param event
 		 *            the event
 		 */
@@ -260,7 +257,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			Object[] listeners = getListeners();
 			for (int i = 0; i < listeners.length; ++i) {
 				final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
-				Platform.run(new SafeRunnable() {
+				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() {
 						l.selectionChanged(event);
@@ -281,18 +278,12 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 		private SelectionManager fPostSelectionListeners = new SelectionManager();
 
-		/*
-		 * (non-Javadoc) Method declared on ISelectionProvider.
-		 */
 		@Override
 		public void addSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fSelectionListener.addSelectionChangedListener(listener);
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on ISelectionProvider.
-		 */
 		@Override
 		public ISelection getSelection() {
 			// get the selection provider from the current page
@@ -313,9 +304,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			return StructuredSelection.EMPTY;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on ISelectionProvider.
-		 */
 		@Override
 		public void removeSelectionChangedListener(
 				ISelectionChangedListener listener) {
@@ -325,7 +313,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		/**
 		 * The selection has changed. Process the event, notifying selection
 		 * listeners and post selection listeners.
-		 * 
+		 *
 		 * @param event
 		 *            the change
 		 */
@@ -335,17 +323,14 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 		/**
 		 * The selection has changed, so notify any post-selection listeners.
-		 * 
+		 *
 		 * @param event
 		 *            the change
 		 */
 		public void postSelectionChanged(final SelectionChangedEvent event) {
-			fPostSelectionListeners.selectionChanged(event);			
+			fPostSelectionListeners.selectionChanged(event);
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on ISelectionProvider.
-		 */
 		@Override
 		public void setSelection(ISelection selection) {
 			// get the selection provider from the current page
@@ -366,22 +351,12 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IPostSelectionProvider#addPostSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
-		 */
 		@Override
 		public void addPostSelectionChangedListener(
 				ISelectionChangedListener listener) {
 			fPostSelectionListeners.addSelectionChangedListener(listener);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IPostSelectionProvider#removePostSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
-		 */
 		@Override
 		public void removePostSelectionChangedListener(
 				ISelectionChangedListener listener) {
@@ -406,7 +381,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <code>IPageBookViewPage</code>) before calling createControl on the
 	 * page.
 	 * </p>
-	 * 
+	 *
 	 * @param book
 	 *            the pagebook control
 	 * @return the default page
@@ -416,7 +391,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	/**
 	 * Creates a page for a given part. Adds it to the pagebook but does not
 	 * show it.
-	 * 
+	 *
 	 * @param part
 	 *            The part we are making a page for.
 	 * @return IWorkbenchPart
@@ -425,9 +400,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		PageRec rec = doCreatePage(part);
 		if (rec != null) {
 			mapPartToRec.put(part, rec);
-			rec.page.getControl().setData(
-					new ContributionInfo(part.getSite().getPluginId(),
-							ContributionInfoMessages.ContributionInfo_ViewContent, null));
 			preparePage(rec);
 		}
 		return rec;
@@ -435,7 +407,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Prepares the page in the given page rec for use in this view.
-	 * 
+	 *
 	 * @param rec
 	 */
 	private void preparePage(PageRec rec) {
@@ -457,14 +429,14 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			// for backward compability with IPage
 			rec.page.setActionBars(rec.subActionBars);
 
-			count = new Integer(0);
+			count = Integer.valueOf(0);
 		} else {
 			site = (IPageSite) mapPageToSite.get(rec.page);
 			rec.subActionBars = (SubActionBars) site.getActionBars();
 			count = ((Integer) mapPageToNumRecs.get(rec.page));
 		}
 
-		mapPageToNumRecs.put(rec.page, new Integer(count.intValue() + 1));
+		mapPageToNumRecs.put(rec.page, Integer.valueOf(count.intValue() + 1));
 	}
 
 	/**
@@ -476,7 +448,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <p>
 	 * Subclasses may override
 	 * </p>
-	 * 
+	 *
 	 * @param page
 	 *            The page to initialize
 	 */
@@ -553,7 +525,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <code>IPageBookViewPage</code>) before calling createControl on the
 	 * page.
 	 * </p>
-	 * 
+	 *
 	 * @param part
 	 *            the input part
 	 * @return the record describing a new page for this view
@@ -567,7 +539,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <p>
 	 * Subclasses must implement this method.
 	 * </p>
-	 * 
+	 *
 	 * @param part
 	 *            the input part
 	 * @param pageRecord
@@ -579,7 +551,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Returns true if the page has already been created.
-	 * 
+	 *
 	 * @param page
 	 *            the page to test
 	 * @return true if this page has already been created.
@@ -594,10 +566,10 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * implements <code>IAdaptable</code>.
 	 */
 	@Override
-	public Object getAdapter(Class key) {
+	public <T> T getAdapter(Class<T> key) {
 		// delegate to the current page, if supported
 		IPage page = getCurrentPage();
-		Object adapter = Util.getAdapter(page, key);
+		T adapter = Adapters.adapt(page, key);
 		if (adapter != null) {
 			return adapter;
 		}
@@ -619,14 +591,14 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * The default implementation returns <code>null</code>. Subclasses may
 	 * override.
 	 * </p>
-	 * 
+	 *
 	 * @param adapter
 	 *            the adapter class to look up
 	 * @return a object castable to the given class, or <code>null</code> if
 	 *         this object does not have an adapter for the given class
 	 * @since 3.2
 	 */
-	protected Object getViewAdapter(Class adapter) {
+	protected <T> T getViewAdapter(Class<T> adapter) {
 		return null;
 	}
 
@@ -644,14 +616,14 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <p>
 	 * Subclasses must implement this method.
 	 * </p>
-	 * 
+	 *
 	 * @return the active important part, or <code>null</code> if none
 	 */
 	protected abstract IWorkbenchPart getBootstrapPart();
 
 	/**
 	 * Returns the part which contributed the current page to this view.
-	 * 
+	 *
 	 * @return the part which contributed the current page or <code>null</code>
 	 *         if no part contributed the current page
 	 */
@@ -665,7 +637,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	/**
 	 * Returns the currently visible page for this view or <code>null</code>
 	 * if no page is currently visible.
-	 * 
+	 *
 	 * @return the currently visible page
 	 */
 	public IPage getCurrentPage() {
@@ -677,7 +649,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Returns the view site for the given page of this view.
-	 * 
+	 *
 	 * @param page
 	 *            the page
 	 * @return the corresponding site, or <code>null</code> if not found
@@ -688,7 +660,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Returns the default page for this view.
-	 * 
+	 *
 	 * @return the default page
 	 */
 	public IPage getDefaultPage() {
@@ -697,7 +669,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Returns the pagebook control for this view.
-	 * 
+	 *
 	 * @return the pagebook control, or <code>null</code> if not initialized
 	 */
 	protected PageBook getPageBook() {
@@ -706,7 +678,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Returns the page record for the given part.
-	 * 
+	 *
 	 * @param part
 	 *            the part
 	 * @return the corresponding page record, or <code>null</code> if not
@@ -718,7 +690,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Returns the page record for the given page of this view.
-	 * 
+	 *
 	 * @param page
 	 *            the page
 	 * @return the corresponding page record, or <code>null</code> if not
@@ -740,7 +712,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * <p>
 	 * Subclasses must implement this method.
 	 * </p>
-	 * 
+	 *
 	 * @param part
 	 *            the input part
 	 * @return <code>true</code> if the part is relevant, and
@@ -748,9 +720,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 */
 	protected abstract boolean isImportant(IWorkbenchPart part);
 
-	/*
-	 * (non-Javadoc) Method declared on IViewPart.
-	 */
 	@Override
 	public void init(IViewSite site) throws PartInitException {
 		site.setSelectionProvider(selectionProvider);
@@ -834,11 +803,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		// Do nothing.
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IPartListener#partOpened(org.eclipse.ui.IWorkbenchPart)
-	 */
 	@Override
 	public void partOpened(IWorkbenchPart part) {
 		// Do nothing by default.
@@ -869,7 +833,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	/**
 	 * Removes a page record. If it is the last reference to the page dispose of
 	 * it - otherwise just decrement the reference count.
-	 * 
+	 *
 	 * @param rec
 	 * @param doDestroy
 	 *            if <code>true</code>, also call
@@ -908,13 +872,10 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 				((PageSite) site).dispose();
 			}
 		} else {
-			mapPageToNumRecs.put(rec.page, new Integer(newCount));
+			mapPageToNumRecs.put(rec.page, Integer.valueOf(newCount));
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IWorkbenchPart.
-	 */
 	@Override
 	public void setFocus() {
 		// first set focus on the page book, in case the page
@@ -930,7 +891,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Handle page selection changes.
-	 * 
+	 *
 	 * @param event
 	 */
 	private void pageSelectionChanged(SelectionChangedEvent event) {
@@ -944,7 +905,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Handle page selection changes.
-	 * 
+	 *
 	 * @param event
 	 */
 	private void postSelectionChanged(SelectionChangedEvent event) {
@@ -974,7 +935,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * pagebook control to show the given page's control, and records that the
 	 * given page is now current. Subclasses may extend.
 	 * </p>
-	 * 
+	 *
 	 * @param pageRec
 	 *            the page record containing the page to show
 	 */
@@ -1064,13 +1025,13 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Returns the selectionProvider for this page book view.
-	 * 
+	 *
 	 * @return a SelectionProvider
 	 */
 	protected SelectionProvider getSelectionProvider() {
 		return selectionProvider;
 	}
-	
+
 	private IPartListener2 partListener = new IPartListener2() {
 		@Override
 		public void partActivated(IWorkbenchPartReference partRef) {
@@ -1164,7 +1125,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 
 	/**
 	 * Make sure that the part is not considered if it is hidden.
-	 * 
+	 *
 	 * @param part
 	 * @since 3.5
 	 */

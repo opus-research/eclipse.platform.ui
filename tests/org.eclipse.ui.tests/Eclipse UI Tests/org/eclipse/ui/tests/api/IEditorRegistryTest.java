@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 442043
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -34,7 +33,12 @@ import org.eclipse.ui.tests.TestPlugin;
 import org.eclipse.ui.tests.harness.util.ArrayUtil;
 import org.eclipse.ui.tests.harness.util.CallHistory;
 import org.eclipse.ui.tests.harness.util.FileUtil;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
+import junit.framework.TestCase;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IEditorRegistryTest extends TestCase {
 	private IEditorRegistry fReg;
 
@@ -44,10 +48,12 @@ public class IEditorRegistryTest extends TestCase {
 		super(testName);
 	}
 
+	@Override
 	public void setUp() {
 		fReg = PlatformUI.getWorkbench().getEditorRegistry();
 	}
 
+	@Override
 	public void tearDown() {
 		if (proj != null) {
 			try {
@@ -74,11 +80,11 @@ public class IEditorRegistryTest extends TestCase {
 
 		proj = FileUtil.createProject("testProject");
 
-		for (int i = 0; i < maps.length; i++) {
-			editors = fReg.getEditors(maps[i][0]);
+		for (String[] map : maps) {
+			editors = fReg.getEditors(map[0]);
 			assertEquals(editors.length, 1);
-			assertEquals(editors[0].getId(), maps[i][1]);
-			editors2 = fReg.getEditors(FileUtil.createFile(maps[i][0], proj)
+			assertEquals(editors[0].getId(), map[1]);
+			editors2 = fReg.getEditors(FileUtil.createFile(map[0], proj)
 					.getName());
 			assertEquals(ArrayUtil.equals(editors, editors2), true);
 		}
@@ -219,7 +225,7 @@ public class IEditorRegistryTest extends TestCase {
 		}
 		assertEquals(image1, image2);
 		assertEquals(image2, fReg.getImageDescriptor(file.getName()));
-		
+
 	}
 
 	public void testAddPropertyListener() throws Throwable {
@@ -397,33 +403,35 @@ public class IEditorRegistryTest extends TestCase {
 		try {
 			fReg.setDefaultEditor("*.txt", null);
 			IEditorDescriptor[] descriptors = fReg.getEditors("bogusfile.txt");
-			for (int i = 0; i < descriptors.length; i++) {
-				assertNotNull(descriptors[i]);
+			for (IEditorDescriptor descriptor : descriptors) {
+				assertNotNull(descriptor);
 			}
 		} finally {
-			if (desc != null)
+			if (desc != null) {
 				fReg.setDefaultEditor("*.txt", desc.getId());
+			}
 		}
 
 	}
 
 	public void testSwitchDefaultToExternalBug236104() {
-		IEditorDescriptor htmlDescriptor = fReg.getDefaultEditor("test.html");
-		assertNotNull(htmlDescriptor);
+		IEditorDescriptor editor = fReg.getDefaultEditor("a.mock1");
+		assertNotNull("Default editor should not be null", editor);
+		assertEquals(editor.getId(), MockEditorPart.ID1);
 
 		IFileEditorMapping[] src = fReg.getFileEditorMappings();
 		FileEditorMapping[] maps = new FileEditorMapping[src.length];
 		System.arraycopy(src, 0, maps, 0, src.length);
 		FileEditorMapping map = null;
 
-		for (int i = 0; i < maps.length; i++) {
-			if (maps[i].getExtension().equals("html")) {
-				map = maps[i];
+		for (FileEditorMapping map2 : maps) {
+			if (map2.getExtension().equals("mock1")) {
+				map = map2;
 				break;
 			}
 		}
 
-		assertNotNull(map);
+		assertNotNull("Parameter map should not be null", map);
 
 		EditorDescriptor replacementDescriptor = EditorDescriptor
 				.createForProgram("notepad.exe");
@@ -437,26 +445,32 @@ public class IEditorRegistryTest extends TestCase {
 			PrefUtil.savePrefs();
 
 			IEditorDescriptor newDescriptor = fReg
-					.getDefaultEditor("test.html");
+					.getDefaultEditor("a.mock1");
 
-			assertEquals(replacementDescriptor, newDescriptor);
-			assertFalse(replacementDescriptor.equals(htmlDescriptor));
+			assertEquals(
+					"Parameter replaceDescriptor should be the same as parameter new Descriptor",
+					replacementDescriptor, newDescriptor);
+			assertFalse(
+					"Parameter replaceDescriptor should not be equals to a.mock1 Descriptor",
+					replacementDescriptor.equals(editor));
 		} finally {
 			src = fReg.getFileEditorMappings();
 			maps = new FileEditorMapping[src.length];
 			System.arraycopy(src, 0, maps, 0, src.length);
 			map = null;
 
-			for (int i = 0; i < maps.length; i++) {
-				if (maps[i].getExtension().equals("html")) {
-					map = maps[i];
+			for (FileEditorMapping map2 : maps) {
+				if (map2.getExtension().equals("mock1")) {
+					map = map2;
 					break;
 				}
 			}
 
-			assertNotNull(map);
+			assertNotNull(
+					"Parameter map should not be null before setting the default editor",
+					map);
 
-			map.setDefaultEditor((EditorDescriptor) htmlDescriptor);
+			map.setDefaultEditor(editor);
 			((EditorRegistry) fReg).setFileEditorMappings(maps);
 			((EditorRegistry) fReg).saveAssociations();
 			PrefUtil.savePrefs();
@@ -466,7 +480,7 @@ public class IEditorRegistryTest extends TestCase {
 	public void testBug308894() throws Throwable {
 		FileEditorMapping newMapping = new FileEditorMapping("*.abc");
 		assertNull(newMapping.getDefaultEditor());
-		
+
 		FileEditorMapping[] src = (FileEditorMapping[]) fReg.getFileEditorMappings();
 		FileEditorMapping[] maps = new FileEditorMapping[src.length + 1];
 		System.arraycopy(src, 0, maps, 0, src.length);
@@ -474,6 +488,7 @@ public class IEditorRegistryTest extends TestCase {
 
 		final Throwable[] thrownException = new Throwable[1];
 		ILogListener listener = new ILogListener() {
+			@Override
 			public void logging(IStatus status, String plugin) {
 				Throwable throwable = status.getException();
 				if (throwable == null) {
@@ -497,11 +512,45 @@ public class IEditorRegistryTest extends TestCase {
 			PrefUtil.savePrefs();
 
 			Platform.removeLogListener(listener);
-			
+
 			if (thrownException[0] != null) {
 				throw thrownException[0];
 			}
 		}
 	}
 
+	public void testRemoveExtension() {
+		FileEditorMapping mapping1 = new FileEditorMapping(null, "testRemoveExtension1");
+		FileEditorMapping mapping2 = new FileEditorMapping(null, "testRemoveExtension2");
+		EditorDescriptor editor = EditorDescriptor.createForProgram("notepad.exe");
+		mapping1.addEditor(editor);
+		mapping2.addEditor(editor);
+		FileEditorMapping[] src = (FileEditorMapping[]) fReg.getFileEditorMappings();
+		FileEditorMapping[] maps = new FileEditorMapping[src.length + 2];
+		System.arraycopy(src, 0, maps, 0, src.length);
+		maps[maps.length - 1] = mapping1;
+		maps[maps.length - 2] = mapping2;
+		try {
+			((EditorRegistry) fReg).setFileEditorMappings(maps);
+			((EditorRegistry) fReg).saveAssociations();
+
+			IEditorDescriptor editor1 = fReg.getDefaultEditor("a.testRemoveExtension1");
+			assertEquals(editor, editor1);
+			IEditorDescriptor editor2 = fReg.getDefaultEditor("a.testRemoveExtension2");
+			assertEquals(editor, editor2);
+
+			EditorDescriptor[] descriptors = new EditorDescriptor[] { editor };
+			((EditorRegistry) fReg).removeExtension(null, descriptors);
+
+			editor1 = fReg.getDefaultEditor("a.testRemoveExtension1");
+			assertNull(editor1);
+			editor2 = fReg.getDefaultEditor("a.testRemoveExtension2");
+			assertNull(editor2);
+			IFileEditorMapping[] mappings = fReg.getFileEditorMappings();
+			assertEquals(src.length, mappings.length);
+		} finally {
+			((EditorRegistry) fReg).setFileEditorMappings(src);
+			((EditorRegistry) fReg).saveAssociations();
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bugs 195222, 278550
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.property;
@@ -27,59 +28,72 @@ import org.eclipse.core.databinding.property.list.ListProperty;
 import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
+ * @param <S>
+ *            type of the source object
+ * @param <T>
+ *            type of the value of the property
+ * @param <E>
+ *            type of the elements in the list
  * @since 3.3
- * 
+ *
  */
-public class ListPropertyDetailValuesList extends ListProperty {
-	private final IListProperty masterProperty;
-	private final IValueProperty detailProperty;
+public class ListPropertyDetailValuesList<S, T, E> extends ListProperty<S, E> {
+	private final IListProperty<S, T> masterProperty;
+	private final IValueProperty<? super T, E> detailProperty;
 
 	/**
 	 * @param masterProperty
 	 * @param detailProperty
 	 */
-	public ListPropertyDetailValuesList(IListProperty masterProperty,
-			IValueProperty detailProperty) {
+	public ListPropertyDetailValuesList(IListProperty<S, T> masterProperty,
+			IValueProperty<? super T, E> detailProperty) {
 		this.masterProperty = masterProperty;
 		this.detailProperty = detailProperty;
 	}
 
+	@Override
 	public Object getElementType() {
 		return detailProperty.getValueType();
 	}
 
-	protected List doGetList(Object source) {
-		List masterList = masterProperty.getList(source);
-		List detailList = new ArrayList(masterList.size());
-		for (Iterator it = masterList.iterator(); it.hasNext();)
+	@Override
+	protected List<E> doGetList(S source) {
+		List<T> masterList = masterProperty.getList(source);
+		List<E> detailList = new ArrayList<E>(masterList.size());
+		for (Iterator<T> it = masterList.iterator(); it.hasNext();)
 			detailList.add(detailProperty.getValue(it.next()));
 		return detailList;
 	}
 
-	protected void doUpdateList(Object source, ListDiff diff) {
-		final List masterList = masterProperty.getList(source);
-		diff.accept(new ListDiffVisitor() {
-			public void handleAdd(int index, Object element) {
+	@Override
+	protected void doUpdateList(S source, ListDiff<E> diff) {
+		final List<T> masterList = masterProperty.getList(source);
+		diff.accept(new ListDiffVisitor<E>() {
+			@Override
+			public void handleAdd(int index, E element) {
 				throw new UnsupportedOperationException();
 			}
 
-			public void handleRemove(int index, Object element) {
+			@Override
+			public void handleRemove(int index, E element) {
 				throw new UnsupportedOperationException();
 			}
 
-			public void handleMove(int oldIndex, int newIndex, Object element) {
+			@Override
+			public void handleMove(int oldIndex, int newIndex, E element) {
 				throw new UnsupportedOperationException();
 			}
 
-			public void handleReplace(int index, Object oldElement,
-					Object newElement) {
+			@Override
+			public void handleReplace(int index, E oldElement, E newElement) {
 				detailProperty.setValue(masterList.get(index), newElement);
 			}
 		});
 	}
 
-	public IObservableList observe(Realm realm, Object source) {
-		IObservableList masterList;
+	@Override
+	public IObservableList<E> observe(Realm realm, S source) {
+		IObservableList<T> masterList;
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -88,13 +102,14 @@ public class ListPropertyDetailValuesList extends ListProperty {
 			ObservableTracker.setIgnore(false);
 		}
 
-		IObservableList detailList = detailProperty.observeDetail(masterList);
+		IObservableList<E> detailList = detailProperty.observeDetail(masterList);
 		PropertyObservableUtil.cascadeDispose(detailList, masterList);
 		return detailList;
 	}
 
-	public IObservableList observeDetail(IObservableValue master) {
-		IObservableList masterList;
+	@Override
+	public <U extends S> IObservableList<E> observeDetail(IObservableValue<U> master) {
+		IObservableList<T> masterList;
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -103,11 +118,12 @@ public class ListPropertyDetailValuesList extends ListProperty {
 			ObservableTracker.setIgnore(false);
 		}
 
-		IObservableList detailList = detailProperty.observeDetail(masterList);
+		IObservableList<E> detailList = detailProperty.observeDetail(masterList);
 		PropertyObservableUtil.cascadeDispose(detailList, masterList);
 		return detailList;
 	}
 
+	@Override
 	public String toString() {
 		return masterProperty + " => " + detailProperty; //$NON-NLS-1$
 	}

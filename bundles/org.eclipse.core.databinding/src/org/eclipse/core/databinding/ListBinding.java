@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.Status;
 
 /**
  * @since 1.0
- * 
+ *
  */
 public class ListBinding extends Binding {
 
@@ -41,6 +41,7 @@ public class ListBinding extends Binding {
 	private boolean updatingModel;
 
 	private IListChangeListener targetChangeListener = new IListChangeListener() {
+		@Override
 		public void handleListChange(ListChangeEvent event) {
 			if (!updatingTarget) {
 				doUpdate((IObservableList) getTarget(),
@@ -50,6 +51,7 @@ public class ListBinding extends Binding {
 		}
 	};
 	private IListChangeListener modelChangeListener = new IListChangeListener() {
+		@Override
 		public void handleListChange(ListChangeEvent event) {
 			if (!updatingModel) {
 				doUpdate((IObservableList) getModel(),
@@ -83,10 +85,12 @@ public class ListBinding extends Binding {
 		}
 	}
 
+	@Override
 	public IObservableValue getValidationStatus() {
 		return validationStatusObservable;
 	}
 
+	@Override
 	protected void preInit() {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -97,6 +101,7 @@ public class ListBinding extends Binding {
 		}
 	}
 
+	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateListStrategy.POLICY_UPDATE) {
 			updateModelToTarget();
@@ -106,9 +111,11 @@ public class ListBinding extends Binding {
 		}
 	}
 
+	@Override
 	public void updateModelToTarget() {
 		final IObservableList modelList = (IObservableList) getModel();
 		modelList.getRealm().exec(new Runnable() {
+			@Override
 			public void run() {
 				ListDiff diff = Diffs.computeListDiff(Collections.EMPTY_LIST,
 						modelList);
@@ -118,9 +125,11 @@ public class ListBinding extends Binding {
 		});
 	}
 
+	@Override
 	public void updateTargetToModel() {
 		final IObservableList targetList = (IObservableList) getTarget();
 		targetList.getRealm().exec(new Runnable() {
+			@Override
 			public void run() {
 				ListDiff diff = Diffs.computeListDiff(Collections.EMPTY_LIST,
 						targetList);
@@ -130,10 +139,12 @@ public class ListBinding extends Binding {
 		});
 	}
 
+	@Override
 	public void validateModelToTarget() {
 		// nothing for now
 	}
 
+	@Override
 	public void validateTargetToModel() {
 		// nothing for now
 	}
@@ -150,6 +161,7 @@ public class ListBinding extends Binding {
 		if (policy != UpdateListStrategy.POLICY_NEVER) {
 			if (policy != UpdateListStrategy.POLICY_ON_REQUEST || explicit) {
 				destination.getRealm().exec(new Runnable() {
+					@Override
 					public void run() {
 						if (destination == getTarget()) {
 							updatingTarget = true;
@@ -166,6 +178,7 @@ public class ListBinding extends Binding {
 								boolean useMoveAndReplace = updateListStrategy
 										.useMoveAndReplace();
 
+								@Override
 								public void handleAdd(int index, Object element) {
 									IStatus setterStatus = updateListStrategy
 											.doAdd(destination,
@@ -176,6 +189,7 @@ public class ListBinding extends Binding {
 									mergeStatus(multiStatus, setterStatus);
 								}
 
+								@Override
 								public void handleRemove(int index,
 										Object element) {
 									IStatus setterStatus = updateListStrategy
@@ -184,6 +198,7 @@ public class ListBinding extends Binding {
 									mergeStatus(multiStatus, setterStatus);
 								}
 
+								@Override
 								public void handleMove(int oldIndex,
 										int newIndex, Object element) {
 									if (useMoveAndReplace) {
@@ -198,6 +213,7 @@ public class ListBinding extends Binding {
 									}
 								}
 
+								@Override
 								public void handleReplace(int index,
 										Object oldElement, Object newElement) {
 									if (useMoveAndReplace) {
@@ -215,7 +231,7 @@ public class ListBinding extends Binding {
 							// TODO - at this point, the two lists will be out
 							// of sync if an error occurred...
 						} finally {
-							validationStatusObservable.setValue(multiStatus);
+							setValidationStatus(multiStatus);
 
 							if (destination == getTarget()) {
 								updatingTarget = false;
@@ -229,10 +245,19 @@ public class ListBinding extends Binding {
 		}
 	}
 
+	private void setValidationStatus(final IStatus status) {
+		validationStatusObservable.getRealm().exec(new Runnable() {
+			@Override
+			public void run() {
+				validationStatusObservable.setValue(status);
+			}
+		});
+	}
+
 	/**
 	 * Merges the provided <code>newStatus</code> into the
 	 * <code>multiStatus</code>.
-	 * 
+	 *
 	 * @param multiStatus
 	 * @param newStatus
 	 */
@@ -242,6 +267,7 @@ public class ListBinding extends Binding {
 		}
 	}
 
+	@Override
 	public void dispose() {
 		if (targetChangeListener != null) {
 			((IObservableList) getTarget())

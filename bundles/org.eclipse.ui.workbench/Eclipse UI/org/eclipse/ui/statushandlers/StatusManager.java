@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,15 +26,17 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.internal.WorkbenchErrorHandlerProxy;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.statushandlers.StatusHandlerDescriptor;
 import org.eclipse.ui.internal.statushandlers.StatusHandlerRegistry;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.osgi.framework.BundleContext;
 
 /**
  * <p>
  * StatusManager is the entry point for all statuses to be reported in the user
  * interface.
  * </p>
- * 
+ *
  * <p>
  * Handlers shoudn't be used directly but through the StatusManager singleton
  * which keeps the status handling policy and chooses handlers.
@@ -42,7 +44,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * <code>handle(IStatus status, int style)</code> are the methods are the
  * primary access points to the StatusManager.
  * </p>
- * 
+ *
  * <p>
  * Acceptable styles (can be combined with logical OR)
  * <ul>
@@ -58,7 +60,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * window such as a {@link Dialog}</li>
  * </ul>
  * </p>
- * 
+ *
  * <p>
  * Handlers are intended to be accessed via the status manager. The
  * StatusManager chooses which handler should be used for a particular error.
@@ -68,7 +70,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * {@link WorkbenchAdvisor#getWorkbenchErrorHandler()}. If a handler is
  * associated with a product, it is used instead of this defined in advisor.
  * </p>
- * 
+ *
  * @since 3.3
  * @see AbstractStatusHandler
  */
@@ -99,7 +101,7 @@ public class StatusManager {
 	 * A typical usage of this would be to ensure that the user's actions are
 	 * blocked until they've dealt with the status in some manner. It is
 	 * therefore likely but not required that the <code>StatusHandler</code>
-	 * would achieve this through the use of a modal dialog. 
+	 * would achieve this through the use of a modal dialog.
 	 * </p><p>Due to the fact
 	 * that use of <code>BLOCK</code> will block any thread, care should be
 	 * taken in this use of this flag.
@@ -107,22 +109,27 @@ public class StatusManager {
 	 */
 	public static final int BLOCK = 0x04;
 
-	private static StatusManager MANAGER;
+	private static volatile StatusManager MANAGER;
 
-	private AbstractStatusHandler statusHandler;
+	private volatile AbstractStatusHandler statusHandler;
 
 	private List loggedStatuses = new ArrayList();
 
-	private ListenerList listeners = new ListenerList();
+	private ListenerList<INotificationListener> listeners = new ListenerList<>();
 
 	/**
 	 * Returns StatusManager singleton instance.
-	 * 
+	 *
 	 * @return the manager instance
 	 */
 	public static StatusManager getManager() {
-		if (MANAGER == null) {
-			MANAGER = new StatusManager();
+		if (MANAGER != null) {
+			return MANAGER;
+		}
+		synchronized (StatusManager.class) {
+			if (MANAGER == null) {
+				MANAGER = new StatusManager();
+			}
 		}
 		return MANAGER;
 	}
@@ -132,17 +139,32 @@ public class StatusManager {
 	}
 
 	private AbstractStatusHandler getStatusHandler(){
-		if(statusHandler == null && StatusHandlerRegistry.getDefault()
-					.getDefaultHandlerDescriptor() != null){
-			try {
-				statusHandler = StatusHandlerRegistry.getDefault()
-						.getDefaultHandlerDescriptor().getStatusHandler();
-			} catch (CoreException ex) {
-				logError("Errors during the default handler creating", ex); //$NON-NLS-1$
-			}
+		if (statusHandler != null) {
+			return statusHandler;
 		}
-		if(statusHandler == null){
-			statusHandler = new WorkbenchErrorHandlerProxy();
+		BundleContext bundleContext = WorkbenchPlugin.getDefault().getBundle().getBundleContext();
+		if (bundleContext == null) {
+			// bundle is not in the STARTING, ACTIVE, or STOPPING state: we
+			// should not do anything, most likely we are going to shut down
+			return null;
+		}
+
+		StatusHandlerDescriptor defaultHandlerDescriptor = StatusHandlerRegistry.getDefault()
+				.getDefaultHandlerDescriptor();
+
+		synchronized (this) {
+			if (statusHandler == null) {
+				if (defaultHandlerDescriptor != null) {
+					try {
+						statusHandler = defaultHandlerDescriptor.getStatusHandler();
+					} catch (CoreException ex) {
+						logError("Errors during the default handler creating", ex); //$NON-NLS-1$
+					}
+				}
+				if (statusHandler == null) {
+					statusHandler = new WorkbenchErrorHandlerProxy();
+				}
+			}
 		}
 		return statusHandler;
 	}
@@ -151,7 +173,7 @@ public class StatusManager {
 	 * depends on Workbench, this method will log the status, if Workbench isn't
 	 * initialized and the style isn't {@link #NONE}. If Workbench isn't
 	 * initialized and the style is {@link #NONE}, the manager will do nothing.
-	 * 
+	 *
 	 * @param statusAdapter
 	 *            the status adapter
 	 * @param style
@@ -186,18 +208,25 @@ public class StatusManager {
 			}
 
 			// delegates the problem to workbench handler
-			getStatusHandler().handle(statusAdapter, style);
-			
+			AbstractStatusHandler handler = getStatusHandler();
+			if (handler != null) {
+				handler.handle(statusAdapter, style);
+			} else if (style != StatusManager.NONE) {
+				logError(statusAdapter.getStatus());
+			}
+
 			// if attached status handler is not able to notify StatusManager
 			// about particular event, use the default policy and fake the
 			// notification
-			if (!getStatusHandler().supportsNotification(
+			if (handler == null || !handler.supportsNotification(
 					INotificationTypes.HANDLED)) {
 				generateFakeNotification(statusAdapter, style);
 			}
 		} catch (Throwable ex) {
 			// The used status handler failed
-			logError(statusAdapter.getStatus());
+			if (statusAdapter != null) {
+				logError(statusAdapter.getStatus());
+			}
 			logError("Error occurred during status handling", ex); //$NON-NLS-1$
 		}
 	}
@@ -205,7 +234,7 @@ public class StatusManager {
 	/**
 	 * Handles the given status adapter. The {@link #LOG} style is used when
 	 * this method is called.
-	 * 
+	 *
 	 * @param statusAdapter
 	 *            the status adapter
 	 */
@@ -218,7 +247,7 @@ public class StatusManager {
 	 * on Workbench, this method will log the status, if Workbench isn't
 	 * initialized and the style isn't {@link #NONE}. If Workbench isn't
 	 * initialized and the style is {@link #NONE}, the manager will do nothing.
-	 * 
+	 *
 	 * @param status
 	 *            the status to handle
 	 * @param style
@@ -234,7 +263,7 @@ public class StatusManager {
 	/**
 	 * Handles the given status. The {@link #LOG} style is used when this method
 	 * is called.
-	 * 
+	 *
 	 * @param status
 	 *            the status to handle
 	 */
@@ -248,14 +277,14 @@ public class StatusManager {
 	 * StatusManager.getManager().handle(coreException.getStatus());
 	 * </code><br/>
 	 * that does not print the stack trace to the log.
-	 * 
+	 *
 	 * @param coreException
 	 *            a CoreException to be handled.
 	 * @param pluginId
 	 *            the unique identifier of the relevant plug-in
 	 * @see StatusManager#handle(IStatus)
 	 * @since 3.4
-	 * 
+	 *
 	 */
 	public void handle(CoreException coreException,String pluginId) {
 		IStatus exceptionStatus = coreException.getStatus();
@@ -267,7 +296,7 @@ public class StatusManager {
 	/**
 	 * This method informs the StatusManager that this IStatus is being handled
 	 * by the handler and to ignore it when it shows up in our ILogListener.
-	 * 
+	 *
 	 * @param status
 	 *            already handled and logged status
 	 */
@@ -290,18 +319,12 @@ public class StatusManager {
 	/**
 	 * This log listener handles statuses added to a plug-in's log. If our own
 	 * WorkbenchErrorHandler inserts it into the log, then ignore it.
-	 * 
+	 *
 	 * @see #addLoggedStatus(IStatus)
 	 * @since 3.3
 	 */
 	private class StatusManagerLogListener implements ILogListener {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.runtime.ILogListener#logging(org.eclipse.core.runtime.IStatus,
-		 *      java.lang.String)
-		 */
 		@Override
 		public void logging(IStatus status, String plugin) {
 			if (!loggedStatuses.contains(status)) {
@@ -316,7 +339,7 @@ public class StatusManager {
 	 * This method should be called by custom status handlers when an event
 	 * occurs. This method has no effect if statushandler does not support
 	 * particular event type.
-	 * 
+	 *
 	 * @param type
 	 *            - type of the event.
 	 * @param adapters
@@ -326,21 +349,18 @@ public class StatusManager {
 	 * @since 3.5
 	 */
 	public void fireNotification(int type, StatusAdapter[] adapters){
-		if(getStatusHandler().supportsNotification(type)){
+		AbstractStatusHandler handler = getStatusHandler();
+		if (handler != null && handler.supportsNotification(type)) {
 			doFireNotification(type, adapters);
 		}
 	}
-	
+
 	private void doFireNotification(int type, StatusAdapter[] adapters) {
-		Object[] oListeners = listeners.getListeners();
-		for (int i = 0; i < oListeners.length; i++) {
-			if (oListeners[i] instanceof INotificationListener) {
-				((INotificationListener) oListeners[i])
-						.statusManagerNotified(type, adapters);
-			}
+		for (INotificationListener listener : listeners) {
+			listener.statusManagerNotified(type, adapters);
 		}
 	}
-	
+
 	private void generateFakeNotification(StatusAdapter statusAdapter, int style) {
 		if (((style & StatusManager.SHOW) == StatusManager.SHOW || (style & StatusManager.BLOCK) == StatusManager.BLOCK)
 				&& statusAdapter
@@ -349,10 +369,10 @@ public class StatusManager {
 					new StatusAdapter[] { statusAdapter });
 		}
 	}
-	
+
 	/**
 	 * Adds a listener to the StatusManager.
-	 * 
+	 *
 	 * @param listener
 	 *            - a listener to be added.
 	 * @since 3.5
@@ -363,7 +383,7 @@ public class StatusManager {
 
 	/**
 	 * Removes a listener from StatusManager.
-	 * 
+	 *
 	 * @param listener
 	 *            - a listener to be removed.
 	 * @since 3.5
@@ -371,7 +391,7 @@ public class StatusManager {
 	public void removeListener(INotificationListener listener){
 		this.listeners.remove(listener);
 	}
-	
+
 	/**
 	 * This interface allows for listening to status handling framework changes.
 	 * Currently it is possible to be notified when:
@@ -383,7 +403,7 @@ public class StatusManager {
 	 */
 	public interface INotificationListener{
 		/**
-		 * 
+		 *
 		 * @param type
 		 *            - a type of notification.
 		 * @param adapters
@@ -391,14 +411,14 @@ public class StatusManager {
 		 */
 		public void statusManagerNotified(int type, StatusAdapter[] adapters);
 	}
-	
+
 	/**
 	 * This interface declares types of notification.
-	 * 
+	 *
 	 * @since 3.5
 	 * @noextend This interface is not intended to be extended by clients.
 	 * @noimplement This interface is not intended to be implemented by clients.
-	 * 
+	 *
 	 */
 	public interface INotificationTypes {
 
@@ -407,6 +427,6 @@ public class StatusManager {
 		 * {@link StatusAdapter} was handled.
 		 */
 		public static final int HANDLED = 0x01;
-		
+
 	}
 }

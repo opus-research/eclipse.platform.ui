@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,14 +13,18 @@ package org.eclipse.ui.help;
 import org.eclipse.swt.events.HelpEvent;
 
 /**
- * A content computer is used to dynamically calculate help support contexts at the
- * time the user requests help.
+ * A content computer is used to dynamically calculate help support contexts at
+ * the time the user requests help.
  * <p>
  * This interface may be implemented by clients.
  * </p>
- * @deprecated nested contexts are no longer supported by the help support system
- * 
+ *
+ *
+ *
+ * @deprecated marked for deletion, see Bug 442961, nested contexts are no
+ *             longer supported by the help support system
  */
+
 @Deprecated
 public interface IContextComputer {
     /**
@@ -41,7 +45,7 @@ public interface IContextComputer {
      * method.
      * </p>
      * <p>
-     * The important concept here is that the value returned by 
+     * The important concept here is that the value returned by
      * <code>computeContexts</code> represents the complete help
      * contexts and is passed directly to the help support system.
      * </p>
@@ -49,7 +53,7 @@ public interface IContextComputer {
      * However the value returned by this method represents the
      * only the contexts for the particular control with which this
      * <code>IContextComputer</code> is associated.
-     * </p> 
+     * </p>
      * @param event the help event which triggered this request for help
      * @return a mixed-type array of context ids (type <code>String</code>)
      *   and/or help contexts (type <code>IContext</code>)

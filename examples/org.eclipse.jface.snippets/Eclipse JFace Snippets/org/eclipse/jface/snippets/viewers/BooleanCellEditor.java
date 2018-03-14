@@ -74,9 +74,6 @@ public class BooleanCellEditor extends CellEditor {
 
 		button.addKeyListener(new KeyAdapter() {
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
-			 */
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if( e.character == SWT.ESC ) {
@@ -91,7 +88,7 @@ public class BooleanCellEditor extends CellEditor {
 
 	@Override
 	protected Object doGetValue() {
-		return new Boolean(button.getSelection());
+		return Boolean.valueOf(button.getSelection());
 	}
 
 	@Override
@@ -147,9 +144,6 @@ public class BooleanCellEditor extends CellEditor {
     	super.activate(activationEvent);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.CellEditor#getDoubleClickTimeout()
-	 */
 	@Override
 	protected int getDoubleClickTimeout() {
 		return 0;

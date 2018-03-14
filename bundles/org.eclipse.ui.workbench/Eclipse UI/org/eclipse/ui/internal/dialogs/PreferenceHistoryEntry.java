@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,17 +14,17 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * A preference history entry.
- * 
+ *
  * @since 3.1
  */
 final class PreferenceHistoryEntry {
 	private String id;
 	private String label;
 	private Object argument;
-	
+
 	/**
 	 * Creates a new entry.
-	 * 
+	 *
 	 * @param id the preference page id
 	 * @param label the label to display, usually the preference page label
 	 * @param argument an argument to pass to the preference page, may be
@@ -39,7 +39,7 @@ final class PreferenceHistoryEntry {
 	}
 	/**
 	 * Returns the preference page id.
-	 * 
+	 *
 	 * @return the preference page id
 	 */
 	public String getId() {
@@ -47,7 +47,7 @@ final class PreferenceHistoryEntry {
 	}
 	/**
 	 * Returns the preference page argument.
-	 * 
+	 *
 	 * @return the preference page argument
 	 */
 	public Object getArgument() {
@@ -55,7 +55,7 @@ final class PreferenceHistoryEntry {
 	}
 	/**
 	 * Returns the preference page label.
-	 * 
+	 *
 	 * @return the preference page label
 	 */
 	public String getLabel() {

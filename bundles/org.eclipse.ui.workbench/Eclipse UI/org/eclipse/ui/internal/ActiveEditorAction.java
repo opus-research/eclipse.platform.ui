@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
  * Subclasses may extend any of the <code>IPartListener</code> methods if the
  * action availablity needs to be recalculated:
  * <ul>
- *   <li><code>partActivated</code></li> 
+ *   <li><code>partActivated</code></li>
  *   <li><code>partDeactivated</code></li>
  *   <li><code>partOpened</code></li>
  *   <li><code>partClosed</code></li>
@@ -42,7 +42,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
  * Subclasses may extend any of the <code>IPageListener</code> methods if the
  * action availablity needs to be recalculated:
  * <ul>
- *   <li><code>pageActivated</code></li> 
+ *   <li><code>pageActivated</code></li>
  *   <li><code>pageClosed</code></li>
  *   <li><code>pageOpened</code></li>
  * </ul>
@@ -53,7 +53,7 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
  * so that it can keep its enablement state up to date. Ordinarily, the
  * window's references to these listeners will be dropped automatically when
  * the window closes. However, if the client needs to get rid of an action
- * while the window is still open, the client must call 
+ * while the window is still open, the client must call
  * {@link IWorkbenchAction#dispose dispose} to give the action an
  * opportunity to deregister its listeners and to perform any other cleanup.
  * </p>
@@ -65,7 +65,7 @@ public abstract class ActiveEditorAction extends PageEventAction {
     /**
      * Creates a new action with the given text.
      *
-     * @param text the string used as the text for the action, 
+     * @param text the string used as the text for the action,
      *   or <code>null</code> if there is no text
      * @param window the workbench window this action is
      *   registered with.
@@ -103,9 +103,6 @@ public abstract class ActiveEditorAction extends PageEventAction {
         return activeEditor;
     }
 
-    /* (non-Javadoc)
-     * Method declared on PageEventAction.
-     */
     @Override
 	public void pageActivated(IWorkbenchPage page) {
         super.pageActivated(page);
@@ -113,9 +110,6 @@ public abstract class ActiveEditorAction extends PageEventAction {
         updateState();
     }
 
-    /* (non-Javadoc)
-     * Method declared on PageEventAction.
-     */
     @Override
 	public void pageClosed(IWorkbenchPage page) {
         super.pageClosed(page);
@@ -123,9 +117,6 @@ public abstract class ActiveEditorAction extends PageEventAction {
         updateState();
     }
 
-    /* (non-Javadoc)
-     * Method declared on PartEventAction.
-     */
     @Override
 	public void partActivated(IWorkbenchPart part) {
         super.partActivated(part);
@@ -135,9 +126,6 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on PartEventAction.
-     */
     @Override
 	public void partBroughtToTop(IWorkbenchPart part) {
         super.partBroughtToTop(part);
@@ -147,9 +135,6 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on PartEventAction.
-     */
     @Override
 	public void partClosed(IWorkbenchPart part) {
         super.partClosed(part);
@@ -159,9 +144,6 @@ public abstract class ActiveEditorAction extends PageEventAction {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on PartEventAction.
-     */
     @Override
 	public void partDeactivated(IWorkbenchPart part) {
         super.partDeactivated(part);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.IViewerUpdater;
 import org.eclipse.jface.viewers.AbstractListViewer;
 import org.eclipse.jface.viewers.AbstractTableViewer;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * NON-API - Abstract base class for content providers where the viewer input is
  * expected to be an {@link IObservableCollection}.
- * 
+ *
  * @since 1.2
  */
 public abstract class ObservableCollectionContentProvider implements
@@ -81,7 +81,7 @@ public abstract class ObservableCollectionContentProvider implements
 
 	/**
 	 * Constructs an ObservableCollectionContentProvider
-	 * 
+	 *
 	 * @param explicitViewerUpdater
 	 */
 	protected ObservableCollectionContentProvider(
@@ -89,15 +89,16 @@ public abstract class ObservableCollectionContentProvider implements
 		this.explicitViewerUpdater = explicitViewerUpdater;
 
 		display = Display.getDefault();
-		viewerObservable = new WritableValue(SWTObservables.getRealm(display));
+		viewerObservable = new WritableValue(DisplayRealm.getRealm(display));
 		viewerUpdater = null;
 
 		elementSetFactory = new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object target) {
 				IElementComparer comparer = null;
 				if (target instanceof StructuredViewer)
 					comparer = ((StructuredViewer) target).getComparer();
-				return ObservableViewerElementSet.withComparer(SWTObservables
+				return ObservableViewerElementSet.withComparer(DisplayRealm
 						.getRealm(display), null, comparer);
 			}
 		};
@@ -109,6 +110,7 @@ public abstract class ObservableCollectionContentProvider implements
 		observableCollection = null;
 	}
 
+	@Override
 	public Object[] getElements(Object inputElement) {
 		if (observableCollection == null)
 			return new Object[0];
@@ -127,6 +129,7 @@ public abstract class ObservableCollectionContentProvider implements
 		if (realizedElements == null)
 			return;
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (realizedElements != null) {
 					realizedElements.addAll(knownElements);
@@ -135,6 +138,7 @@ public abstract class ObservableCollectionContentProvider implements
 		});
 	}
 
+	@Override
 	public void dispose() {
 		if (observableCollection != null)
 			removeCollectionChangeListener(observableCollection);
@@ -151,6 +155,7 @@ public abstract class ObservableCollectionContentProvider implements
 		display = null;
 	}
 
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		setViewer(viewer);
 		setInput(newInput);
@@ -202,7 +207,7 @@ public abstract class ObservableCollectionContentProvider implements
 
 	/**
 	 * Throws an exception if the input is not the correct type.
-	 * 
+	 *
 	 * @param input
 	 *            the input to check
 	 */
@@ -210,7 +215,7 @@ public abstract class ObservableCollectionContentProvider implements
 
 	/**
 	 * Register for change event notification from the given collection.
-	 * 
+	 *
 	 * @param collection
 	 *            observable collection to listen to
 	 */
@@ -219,7 +224,7 @@ public abstract class ObservableCollectionContentProvider implements
 
 	/**
 	 * Deregisters from change events notification on the given collection.
-	 * 
+	 *
 	 * @param collection
 	 *            observable collection to stop listening to
 	 */
@@ -230,7 +235,7 @@ public abstract class ObservableCollectionContentProvider implements
 	 * Returns whether the viewer is disposed. Collection change listeners in
 	 * subclasses should verify that the viewer is not disposed before sending
 	 * any updates to the {@link ViewerUpdater viewer updater}.
-	 * 
+	 *
 	 * @return whether the viewer is disposed.
 	 */
 	protected final boolean isViewerDisposed() {
@@ -245,7 +250,7 @@ public abstract class ObservableCollectionContentProvider implements
 	 * before the viewer sees the added element, and notified about removals
 	 * after the element was removed from the viewer. This is intended for use
 	 * by label providers, as it will always return the items that need labels.
-	 * 
+	 *
 	 * @return unmodifiable observable set of items that will need labels
 	 */
 	public IObservableSet getKnownElements() {
@@ -256,7 +261,7 @@ public abstract class ObservableCollectionContentProvider implements
 	 * Returns the set of known elements which have been realized in the viewer.
 	 * Clients may track this set in order to perform custom actions on elements
 	 * while they are known to be present in the viewer.
-	 * 
+	 *
 	 * @return the set of known elements which have been realized in the viewer.
 	 * @since 1.3
 	 */

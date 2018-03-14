@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ package org.eclipse.ui.forms.events;
  * Classes that wish to deal with <code>ExpansionEvent</code>s can extend
  * this class and override only the methods which they are interested in.
  * </p>
- * 
+ *
  * @see IExpansionListener
  * @see ExpansionEvent
  * @since 3.0
@@ -24,18 +24,20 @@ package org.eclipse.ui.forms.events;
 public class ExpansionAdapter implements IExpansionListener {
 	/**
 	 * Sent when the link is entered. The default behaviour is to do nothing.
-	 * 
+	 *
 	 * @param e
 	 *            the event
 	 */
+	@Override
 	public void expansionStateChanging(ExpansionEvent e) {
 	}
 	/**
 	 * Sent when the link is exited. The default behaviour is to do nothing.
-	 * 
+	 *
 	 * @param e
 	 *            the event
 	 */
+	@Override
 	public void expansionStateChanged(ExpansionEvent e) {
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -37,19 +39,18 @@ import org.eclipse.ui.internal.services.RegistryPersistence;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- * 
+ *
  * @since 3.2
  */
 final public class MenuPersistence extends RegistryPersistence {
 
 	private MApplication application;
 	private IEclipseContext appContext;
-	private ArrayList<MenuAdditionCacheEntry> cacheEntries = new ArrayList<MenuAdditionCacheEntry>();
-	private ArrayList<EditorAction> editorActionContributions = new ArrayList<EditorAction>();
+	private ArrayList<MenuAdditionCacheEntry> cacheEntries = new ArrayList<>();
 
-	private ArrayList<MMenuContribution> menuContributions = new ArrayList<MMenuContribution>();
-	private ArrayList<MToolBarContribution> toolBarContributions = new ArrayList<MToolBarContribution>();
-	private ArrayList<MTrimContribution> trimContributions = new ArrayList<MTrimContribution>();
+	private ArrayList<MMenuContribution> menuContributions = new ArrayList<>();
+	private ArrayList<MToolBarContribution> toolBarContributions = new ArrayList<>();
+	private ArrayList<MTrimContribution> trimContributions = new ArrayList<>();
 
 	private final Comparator<IConfigurationElement> comparer = new Comparator<IConfigurationElement>() {
 		@Override
@@ -73,11 +74,6 @@ final public class MenuPersistence extends RegistryPersistence {
 		contributorFilter = Pattern.compile(filterRegex);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.services.RegistryPersistence#dispose()
-	 */
 	@Override
 	public void dispose() {
 		ControlContributionRegistry.clear();
@@ -86,19 +82,10 @@ final public class MenuPersistence extends RegistryPersistence {
 		application.getTrimContributions().removeAll(trimContributions);
 		menuContributions.clear();
 		cacheEntries.clear();
-		editorActionContributions.clear();
 		super.dispose();
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.tests.workbench.RegistryPersistence#isChangeImportant
-	 * (org.eclipse.core.runtime.IRegistryChangeEvent)
-	 */
 	@Override
 	protected boolean isChangeImportant(IRegistryChangeEvent event) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -111,21 +98,19 @@ final public class MenuPersistence extends RegistryPersistence {
 		super.read();
 
 		readAdditions();
-		// readActionSets();
-		readEditorActions();
 
-		ArrayList<MMenuContribution> tmp = new ArrayList<MMenuContribution>(menuContributions);
+		ArrayList<MMenuContribution> tmp = new ArrayList<>(menuContributions);
 		menuContributions.clear();
 		ContributionsAnalyzer.mergeContributions(tmp, menuContributions);
 		application.getMenuContributions().addAll(menuContributions);
 
-		ArrayList<MToolBarContribution> tmpToolbar = new ArrayList<MToolBarContribution>(
+		ArrayList<MToolBarContribution> tmpToolbar = new ArrayList<>(
 				toolBarContributions);
 		toolBarContributions.clear();
 		ContributionsAnalyzer.mergeToolBarContributions(tmpToolbar, toolBarContributions);
 		application.getToolBarContributions().addAll(toolBarContributions);
 
-		ArrayList<MTrimContribution> tmpTrim = new ArrayList<MTrimContribution>(trimContributions);
+		ArrayList<MTrimContribution> tmpTrim = new ArrayList<>(trimContributions);
 		trimContributions.clear();
 		ContributionsAnalyzer.mergeTrimContributions(tmpTrim, trimContributions);
 		application.getTrimContributions().addAll(trimContributions);
@@ -133,7 +118,7 @@ final public class MenuPersistence extends RegistryPersistence {
 
 	private void readAdditions() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
-		ArrayList<IConfigurationElement> configElements = new ArrayList<IConfigurationElement>();
+		ArrayList<IConfigurationElement> configElements = new ArrayList<>();
 
 		final IConfigurationElement[] menusExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_MENUS);
@@ -166,34 +151,6 @@ final public class MenuPersistence extends RegistryPersistence {
 				cacheEntries.add(menuContribution);
 				menuContribution.mergeIntoModel(menuContributions, toolBarContributions,
 						trimContributions);
-			}
-		}
-	}
-
-	private void readEditorActions() {
-		final IExtensionRegistry registry = Platform.getExtensionRegistry();
-		ArrayList<IConfigurationElement> configElements = new ArrayList<IConfigurationElement>();
-
-		final IConfigurationElement[] extElements = registry
-				.getConfigurationElementsFor(IWorkbenchRegistryConstants.EXTENSION_EDITOR_ACTIONS);
-		for (IConfigurationElement element : extElements) {
-			if (contributorFilter == null
-					|| contributorFilter.matcher(element.getContributor().getName()).matches()) {
-				configElements.add(element);
-			}
-		}
-
-		Collections.sort(configElements, comparer);
-
-		for (IConfigurationElement element : configElements) {
-			for (IConfigurationElement child : element.getChildren()) {
-				if (child.getName().equals(IWorkbenchRegistryConstants.TAG_ACTION)) {
-					EditorAction editorAction = new EditorAction(application, appContext, element,
-							child);
-					editorActionContributions.add(editorAction);
-					editorAction.addToModel(menuContributions, toolBarContributions,
-							trimContributions);
-				}
 			}
 		}
 	}

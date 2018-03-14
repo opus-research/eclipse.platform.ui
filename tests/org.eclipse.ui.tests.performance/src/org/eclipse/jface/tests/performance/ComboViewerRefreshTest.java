@@ -38,6 +38,7 @@ public class ComboViewerRefreshTest extends ViewerTest {
 
 	}
 
+	@Override
 	protected StructuredViewer createViewer(Shell shell) {
 
 		viewer = new ComboViewer(shell);
@@ -49,7 +50,7 @@ public class ComboViewerRefreshTest extends ViewerTest {
 
 	/**
 	 * Test the time for doing a refresh.
-	 * 
+	 *
 	 * @throws Throwable
 	 */
 	public void testRefresh() throws Throwable {
@@ -57,6 +58,7 @@ public class ComboViewerRefreshTest extends ViewerTest {
 		openBrowser();
 
 		exercise(new TestRunnable() {
+			@Override
 			public void run() {
 				startMeasuring();
 				viewer.refresh();
@@ -71,7 +73,7 @@ public class ComboViewerRefreshTest extends ViewerTest {
 
 	/**
 	 * Test the time for doing a refresh.
-	 * 
+	 *
 	 * @throws Throwable
 	 */
 	public void testRefreshSmall() throws Throwable {
@@ -79,6 +81,7 @@ public class ComboViewerRefreshTest extends ViewerTest {
 		openBrowser();
 
 		exercise(new TestRunnable() {
+			@Override
 			public void run() {
 				startMeasuring();
 				for (int i = 0; i < 1000; i++) {

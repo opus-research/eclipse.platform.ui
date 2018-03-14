@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Versant Corp. and others.
+ * Copyright (c) 2008, 2015 Versant Corp. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import org.eclipse.ui.part.ShowInContext;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class PropertyShowInContext extends ShowInContext {
 
@@ -57,9 +57,7 @@ public class PropertyShowInContext extends ShowInContext {
 		this.part = part;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -69,9 +67,7 @@ public class PropertyShowInContext extends ShowInContext {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

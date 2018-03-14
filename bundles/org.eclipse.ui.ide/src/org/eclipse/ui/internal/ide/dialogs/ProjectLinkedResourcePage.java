@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.ide.dialogs;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -45,9 +46,9 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 
 	 private PathVariablesGroup pathVariablesGroup;
 	 private LinkedResourceEditor linkedResourceEditor;
-	 
+
 	 /**
-	 * 
+	 *
 	 */
 	public ProjectLinkedResourcePage() {
 		 pathVariablesGroup = new PathVariablesGroup(true, IResource.FILE | IResource.FOLDER);
@@ -55,19 +56,20 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 		 this.noDefaultAndApplyButton();
 	 }
 
+	@Override
 	protected Control createContents(Composite parent) {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IIDEHelpContextIds.LINKED_RESOURCE_PAGE);
 
 		IAdaptable adaptable = getElement();
-		 if (adaptable.getAdapter(IProject.class) != null) {
-			 IProject project = (IProject) adaptable.getAdapter(IProject.class);
-			 pathVariablesGroup.setResource(project);
-			 linkedResourceEditor.setProject(project);
-		 }
+		IProject project = Adapters.adapt(adaptable, IProject.class);
+		if (project != null) {
+			pathVariablesGroup.setResource(project);
+			linkedResourceEditor.setProject(project);
+		}
 
-		 Font font = parent.getFont();
+		Font font = parent.getFont();
 
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IIDEHelpContextIds.LINKED_RESOURCE_PREFERENCE_PAGE);
         // define container & its gridding
@@ -86,9 +88,11 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 
         TabFolder tabFolder = new TabFolder(pageComponent, SWT.TOP);
         tabFolder.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				
+
 			}
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				TabFolder source = (TabFolder) e.getSource();
 				if (source.getSelectionIndex() == 1)
@@ -97,7 +101,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 					switchToPathVariables();
 			}
         });
-        
+
         pageComponent.setLayout(layout);
         data = new GridData();
         data.verticalAlignment = GridData.FILL;
@@ -108,7 +112,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
         tabFolder.setFont(font);
 
         TabItem variableItem = new TabItem(tabFolder, SWT.BORDER);
-        
+
         Composite variableComposite = new Composite(tabFolder, 0);
         variableComposite.setLayout(new GridLayout());
         variableComposite.setFont(font);
@@ -169,7 +173,8 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
      * Disposes the path variables group.
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         pathVariablesGroup.dispose();
         linkedResourceEditor.dispose();
         super.dispose();
@@ -177,8 +182,8 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 
     /**
      * Empty implementation. This page does not use the workbench.
-     * @param workbench 
-     * 
+     * @param workbench
+     *
      * @see IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
      */
     public void init(IWorkbench workbench) {
@@ -187,17 +192,18 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
     /**
      * Commits the temporary state to the path variable manager in response to user
      * confirmation.
-     * 
+     *
      * @see PreferencePage#performOk()
      * @see PathVariablesGroup#performOk()
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         return pathVariablesGroup.performOk() && linkedResourceEditor.performOk();
     }
 
     /**
      * Set the widget enabled state
-     * 
+     *
      * @param enableLinking the new widget enabled state
      */
     protected void updateWidgetState(boolean enableLinking) {

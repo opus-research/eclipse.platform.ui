@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -27,7 +27,8 @@ public class LabelSection
         label = "A simple section.";//$NON-NLS-1$
     }
 
-    public void createControls(Composite parent,
+    @Override
+	public void createControls(Composite parent,
             TabbedPropertySheetPage aTabbedPropertySheetPage) {
         super.createControls(parent, aTabbedPropertySheetPage);
         Composite composite = getWidgetFactory()

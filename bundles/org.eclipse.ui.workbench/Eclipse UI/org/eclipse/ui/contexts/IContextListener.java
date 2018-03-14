@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ package org.eclipse.ui.contexts;
  * <p>
  * This interface may be implemented by clients.
  * </p>
- * 
+ *
  * @since 3.0
  * @see org.eclipse.ui.contexts.IContext#addContextListener(IContextListener)
  * @see org.eclipse.ui.contexts.IContext#removeContextListener(IContextListener)
@@ -31,7 +31,7 @@ public interface IContextListener {
      * Notifies that one or more properties of an instance of
      * <code>IContext</code> have changed. Specific details are described in
      * the <code>ContextEvent</code>.
-     * 
+     *
      * @param contextEvent
      *            the context event. Guaranteed not to be <code>null</code>.
      */

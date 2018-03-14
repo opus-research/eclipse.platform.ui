@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,14 +25,14 @@ import org.eclipse.ui.activities.ICategory;
 import org.eclipse.ui.activities.NotDefinedException;
 
 /**
- * Provides labels for elements drawn from <code>IActivityManagers</code>.  
+ * Provides labels for elements drawn from <code>IActivityManagers</code>.
  * Ie:  <code>IActivity</code> and <code>ICategory</code> objects.
- * 
+ *
  * @since 3.0
  */
 public class ActivityCategoryLabelProvider extends LabelProvider {
 
-	private LocalResourceManager manager;	
+	private LocalResourceManager manager;
 	private Map descriptorMap = new HashMap();
 
 	/**
@@ -41,30 +41,27 @@ public class ActivityCategoryLabelProvider extends LabelProvider {
 	public ActivityCategoryLabelProvider() {
 		manager = new LocalResourceManager(JFaceResources.getResources());
 	}
-	
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-     */
+
     @Override
 	public Image getImage(Object element) {
     	try {
-    		ImageDescriptor descriptor = getDescriptor(element);	        
+    		ImageDescriptor descriptor = getDescriptor(element);
 	        if (descriptor != null) {
 				return manager.createImage(descriptor);
 			}
     	}
     	catch (DeviceResourceException e) {
-    		//ignore 
+    		//ignore
     	}
         return null;
     }
-    
+
     private ImageDescriptor getDescriptor(Object element) {
     	ImageDescriptor descriptor = (ImageDescriptor) descriptorMap.get(element);
     	if (descriptor != null) {
 			return descriptor;
 		}
-        
+
     	if (element instanceof ICategory) {
         	ICategory category = (ICategory) element;
 			descriptor = PlatformUI.getWorkbench().getActivitySupport()
@@ -83,9 +80,6 @@ public class ActivityCategoryLabelProvider extends LabelProvider {
     	return descriptor;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-     */
     @Override
 	public String getText(Object element) {
         if (element instanceof IActivity) {
@@ -105,12 +99,9 @@ public class ActivityCategoryLabelProvider extends LabelProvider {
         }
         return super.getText(element);
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-     */
+
     @Override
-	public void dispose() {    	
+	public void dispose() {
     	manager.dispose();
     	descriptorMap.clear();
     }

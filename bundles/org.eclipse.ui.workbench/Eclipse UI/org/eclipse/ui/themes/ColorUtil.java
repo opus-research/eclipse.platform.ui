@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.themes;
 
@@ -21,17 +22,17 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * Useful color utilities.
- * 
+ *
  * @since 3.0 - initial release
  * @since 3.2 - public API
  */
 public final class ColorUtil {
 
 	private static Field[] cachedFields;
-	
+
 	/**
 	 * Process the given string and return a corresponding RGB object.
-	 * 
+	 *
 	 * @param value
 	 *            the SWT constant <code>String</code>
 	 * @return the value of the SWT constant, or <code>SWT.COLOR_BLACK</code>
@@ -58,7 +59,7 @@ public final class ColorUtil {
 
 	/**
 	 * Get the SWT constant fields.
-	 * 
+	 *
 	 * @return the fields
 	 * @since 3.3
 	 */
@@ -66,8 +67,8 @@ public final class ColorUtil {
 		if (cachedFields == null) {
 			Class<SWT> clazz = SWT.class;
 			Field[] allFields = clazz.getDeclaredFields();
-			ArrayList<Field> applicableFields = new ArrayList<Field>(allFields.length);
-			
+			ArrayList<Field> applicableFields = new ArrayList<>(allFields.length);
+
 			for (int i = 0; i < allFields.length; i++) {
 				Field field = allFields[i];
 				if (field.getType() == Integer.TYPE
@@ -75,7 +76,7 @@ public final class ColorUtil {
 						&& Modifier.isPublic(field.getModifiers())
 						&& Modifier.isFinal(field.getModifiers())
 						&& field.getName().startsWith("COLOR")) { //$NON-NLS-1$
-				
+
 					applicableFields.add(field);
 				}
 			}
@@ -86,7 +87,7 @@ public final class ColorUtil {
 
 	/**
 	 * Blends the two color values according to the provided ratio.
-	 * 
+	 *
 	 * @param c1
 	 *            first color
 	 * @param c2
@@ -94,7 +95,7 @@ public final class ColorUtil {
 	 * @param ratio
 	 *            percentage of the first color in the blend (0-100)
 	 * @return the RGB value of the blended color
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	public static RGB blend(RGB c1, RGB c2, int ratio) {
@@ -108,11 +109,11 @@ public final class ColorUtil {
 		int b = (ratio * v1 + (100 - ratio) * v2) / 100;
 		return Math.min(255, b);
 	}
-	
+
 	/**
 	 * Blend the two color values returning a value that is halfway between
 	 * them.
-	 * 
+	 *
 	 * @param val1
 	 *            the first value
 	 * @param val2
@@ -129,7 +130,7 @@ public final class ColorUtil {
 	/**
 	 * Blend the two color values returning a value that is halfway between
 	 * them.
-	 * 
+	 *
 	 * @param temp1
 	 *            the first value
 	 * @param temp2
@@ -142,7 +143,7 @@ public final class ColorUtil {
 
 	/**
 	 * Return the system color that matches the provided SWT constant value.
-	 * 
+	 *
 	 * @param colorId
 	 *            the system color identifier
 	 * @return the RGB value of the supplied system color
@@ -153,7 +154,7 @@ public final class ColorUtil {
 
 	/**
 	 * Get the RGB value for a given color.
-	 * 
+	 *
 	 * @param rawValue
 	 *            the raw value, either an RGB triple or an SWT constant name
 	 * @return the RGB value
@@ -176,7 +177,7 @@ public final class ColorUtil {
 
 	/**
 	 * Get the RGB values for a given color array.
-	 * 
+	 *
 	 * @param rawValues
 	 *            the raw values, either RGB triple or an SWT constant
 	 * @return the RGB values
@@ -192,7 +193,7 @@ public final class ColorUtil {
 	/**
 	 * Return whether the value returned by <code>getValue()</code> is already
 	 * in RGB form.
-	 * 
+	 *
 	 * @return whether the value returned by <code>getValue()</code> is
 	 *         already in RGB form
 	 */

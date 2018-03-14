@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,13 +16,13 @@ import org.eclipse.swt.widgets.Menu;
 /**
  * Interface for something that creates and disposes of SWT menus.  Note that
  * it is the responsibility of the implementor to dispose of SWT menus it
- * creates. 
+ * creates.
  */
 public interface IMenuCreator {
     /**
      * Disposes the menu returned by <code>getMenu</code>. Does nothing
      * if there is no menu.  This method will be executed only when the
-     * parent of the menu is disposed.  
+     * parent of the menu is disposed.
      */
     public void dispose();
 

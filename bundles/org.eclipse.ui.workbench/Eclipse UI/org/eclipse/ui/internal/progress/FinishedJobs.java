@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,14 +35,14 @@ public class FinishedJobs extends EventManager {
 
 		/**
 		 * A job to be kept has finished
-		 * 
+		 *
 		 * @param jte
 		 */
 		void finished(JobTreeElement jte);
 
 		/**
 		 * A kept job has been removed.
-		 * 
+		 *
 		 * @param jte
 		 */
 		void removed(JobTreeElement jte);
@@ -364,13 +364,13 @@ public class FinishedJobs extends EventManager {
 			all = (JobTreeElement[]) keptjobinfos
 					.toArray(new JobTreeElement[keptjobinfos.size()]);
 		}
-		
+
 		return all;
 	}
 
 	/**
 	 * Get the date that indicates the finish time.
-	 * 
+	 *
 	 * @param jte
 	 * @return Date
 	 */
@@ -384,7 +384,7 @@ public class FinishedJobs extends EventManager {
 
 	/**
 	 * Return whether or not the kept infos have the element.
-	 * 
+	 *
 	 * @param element
 	 * @return boolean
 	 */

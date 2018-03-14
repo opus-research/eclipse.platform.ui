@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Policy;
+import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -59,7 +60,7 @@ import org.eclipse.swt.widgets.Shell;
  * <code>IWizardPage</code>.
  * </p>
  */
-public abstract class Wizard implements IWizard {
+public abstract class Wizard implements IWizard, IShellProvider {
     /**
      * Image registry key of the default image for wizard pages (value
      * <code>"org.eclipse.jface.wizard.Wizard.pageImage"</code>).
@@ -74,7 +75,7 @@ public abstract class Wizard implements IWizard {
     /**
      * This wizard's list of pages (element type: <code>IWizardPage</code>).
      */
-    private List<IWizardPage> pages = new ArrayList<IWizardPage>();
+    private List<IWizardPage> pages = new ArrayList<>();
 
     /**
      * Indicates whether this wizard needs a progress monitor.
@@ -129,7 +130,7 @@ public abstract class Wizard implements IWizard {
     /**
      * Adds a new page to this wizard. The page is inserted at the end of the
      * page list.
-     * 
+     *
      * @param page
      *            the new page
      */
@@ -148,9 +149,6 @@ public abstract class Wizard implements IWizard {
 	public void addPages() {
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public boolean canFinish() {
         // Default implementation is to check if all pages are complete.
@@ -210,17 +208,11 @@ public abstract class Wizard implements IWizard {
         }
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public IWizardContainer getContainer() {
         return container;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public Image getDefaultPageImage() {
         if (defaultImage == null) {
@@ -229,18 +221,11 @@ public abstract class Wizard implements IWizard {
         return defaultImage;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public IDialogSettings getDialogSettings() {
         return dialogSettings;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard. The default behavior is to
-     * return the page that was added to this wizard after the given page.
-     */
     @Override
 	public IWizardPage getNextPage(IWizardPage page) {
         int index = pages.indexOf(page);
@@ -251,9 +236,6 @@ public abstract class Wizard implements IWizard {
         return pages.get(index + 1);
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public IWizardPage getPage(String name) {
         for (int i = 0; i < pages.size(); i++) {
@@ -266,53 +248,40 @@ public abstract class Wizard implements IWizard {
         return null;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public int getPageCount() {
         return pages.size();
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public IWizardPage[] getPages() {
         return pages.toArray(new IWizardPage[pages.size()]);
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard. The default behavior is to
-     * return the page that was added to this wizard before the given page.
-     */
     @Override
 	public IWizardPage getPreviousPage(IWizardPage page) {
         int index = pages.indexOf(page);
         if (index == 0 || index == -1) {
 			// first page or page not found
             return null;
-		} 
+		}
 		return pages.get(index - 1);
     }
 
     /**
      * Returns the wizard's shell if the wizard is visible. Otherwise
      * <code>null</code> is returned.
-     * 
+     *
      * @return Shell
      */
-    public Shell getShell() {
+    @Override
+	public Shell getShell() {
         if (container == null) {
 			return null;
 		}
         return container.getShell();
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard. By default this is the first
-     * page inserted into the wizard.
-     */
     @Override
 	public IWizardPage getStartingPage() {
         if (pages.size() == 0) {
@@ -321,41 +290,26 @@ public abstract class Wizard implements IWizard {
         return pages.get(0);
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public RGB getTitleBarColor() {
         return titleBarColor;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public String getWindowTitle() {
         return windowTitle;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public boolean isHelpAvailable() {
         return isHelpAvailable;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public boolean needsPreviousAndNextButtons() {
         return forcePreviousAndNextButtons || pages.size() > 1;
     }
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public boolean needsProgressMonitor() {
         return needsProgressMonitor;
@@ -379,9 +333,6 @@ public abstract class Wizard implements IWizard {
     @Override
 	public abstract boolean performFinish();
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
     @Override
 	public void setContainer(IWizardContainer wizardContainer) {
         container = wizardContainer;
@@ -393,7 +344,7 @@ public abstract class Wizard implements IWizard {
      * This image descriptor will be used to generate an image for a page with
      * no image of its own; the image will be computed once and cached.
      * </p>
-     * 
+     *
      * @param imageDescriptor
      *            the default page image descriptor
      */
@@ -407,11 +358,11 @@ public abstract class Wizard implements IWizard {
      * The dialog settings is used to record state between wizard invocations
      * (for example, radio button selection, last import directory, etc.)
      * </p>
-     * 
+     *
      * @param settings
      *            the dialog settings, or <code>null</code> if none
      * @see #getDialogSettings
-     *  
+     *
      */
     public void setDialogSettings(IDialogSettings settings) {
         dialogSettings = settings;
@@ -424,7 +375,7 @@ public abstract class Wizard implements IWizard {
      * This flag should be set on wizards where the first wizard page adds
      * follow-on wizard pages based on user input.
      * </p>
-     * 
+     *
      * @param b
      *            <code>true</code> to always show Next and Previous buttons,
      *            and <code>false</code> to suppress Next and Previous buttons
@@ -448,7 +399,7 @@ public abstract class Wizard implements IWizard {
 	 * <strong>Note 2:</strong> In the default {@link WizardDialog} implementation, the "Help"
 	 * button only works when {@link org.eclipse.jface.dialogs.IDialogPage#performHelp()} is implemented.
 	 * </p>
-	 * 
+	 *
 	 * @param b <code>true</code> if help is available, <code>false</code> otherwise
 	 * @see #isHelpAvailable()
 	 * @see TrayDialog#isHelpAvailable()
@@ -460,7 +411,7 @@ public abstract class Wizard implements IWizard {
 
     /**
      * Sets whether this wizard needs a progress monitor.
-     * 
+     *
      * @param b
      *            <code>true</code> if a progress monitor is required, and
      *            <code>false</code> if none is needed
@@ -472,7 +423,7 @@ public abstract class Wizard implements IWizard {
 
     /**
      * Sets the title bar color for this wizard.
-     * 
+     *
      * @param color
      *            the title bar color
      */
@@ -483,7 +434,7 @@ public abstract class Wizard implements IWizard {
     /**
      * Sets the window title for the container that hosts this page to the given
      * string.
-     * 
+     *
      * @param newTitle
      *            the window title for the container
      */

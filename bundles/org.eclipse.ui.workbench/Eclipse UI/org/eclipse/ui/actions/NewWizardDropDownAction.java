@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ public class NewWizardDropDownAction extends Action implements
      * action has been <code>dispose</code>d.
      */
     private IWorkbenchWindow workbenchWindow;
-    
+
     /**
      * Tracks perspective activation, to update this action's
      * enabled state.
@@ -51,7 +51,7 @@ public class NewWizardDropDownAction extends Action implements
     private ActionFactory.IWorkbenchAction showDlgAction;
 
     private IContributionItem newWizardMenu;
-    
+
     private IMenuCreator menuCreator = new IMenuCreator() {
 
         private MenuManager dropDownMenuMgr;
@@ -66,18 +66,12 @@ public class NewWizardDropDownAction extends Action implements
             }
         }
 
-        /* (non-Javadoc)
-         * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
-         */
         @Override
 		public Menu getMenu(Control parent) {
             createDropDownMenuMgr();
             return dropDownMenuMgr.createContextMenu(parent);
         }
 
-        /* (non-Javadoc)
-         * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
-         */
         @Override
 		public Menu getMenu(Menu parent) {
             createDropDownMenuMgr();
@@ -95,9 +89,6 @@ public class NewWizardDropDownAction extends Action implements
             return menu;
         }
 
-        /* (non-Javadoc)
-         * @see org.eclipse.jface.action.IMenuCreator#dispose()
-         */
         @Override
 		public void dispose() {
 			if (dropDownMenuMgr != null) {
@@ -120,23 +111,23 @@ public class NewWizardDropDownAction extends Action implements
      * Create a new <code>NewWizardDropDownAction</code>, with the default
      * action for opening the new wizard dialog, and the default contribution item
      * for populating the drop-down menu.
-     * 
+     *
      * @param window the window in which this action appears
      */
     public NewWizardDropDownAction(IWorkbenchWindow window) {
         this(window, ActionFactory.NEW.create(window), ContributionItemFactory.NEW_WIZARD_SHORTLIST.create(window));
     }
-    
+
     /**
      * Create a new <code>NewWizardDropDownAction</code>.
-     * 
+     *
      * @param window the window in which this action appears
-     * @param showDlgAction the action to delegate to when this action is run directly, 
+     * @param showDlgAction the action to delegate to when this action is run directly,
      *   rather than being dropped down
      * @param newWizardMenu the contribution item that adds the contents to the drop-down menu
      */
     public NewWizardDropDownAction(IWorkbenchWindow window,
-            ActionFactory.IWorkbenchAction showDlgAction, 
+            ActionFactory.IWorkbenchAction showDlgAction,
             IContributionItem newWizardMenu) {
         super(WorkbenchMessages.NewWizardDropDown_text);
         if (window == null) {
@@ -146,7 +137,7 @@ public class NewWizardDropDownAction extends Action implements
         this.showDlgAction = showDlgAction;
         this.newWizardMenu = newWizardMenu;
         tracker = new PerspectiveTracker(window, this);
-        
+
         setToolTipText(showDlgAction.getToolTipText());
 
         ISharedImages sharedImages = window.getWorkbench()
@@ -159,10 +150,7 @@ public class NewWizardDropDownAction extends Action implements
         setMenuCreator(menuCreator);
     }
 
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
-     */
+
     @Override
 	public void dispose() {
         if (workbenchWindow == null) {

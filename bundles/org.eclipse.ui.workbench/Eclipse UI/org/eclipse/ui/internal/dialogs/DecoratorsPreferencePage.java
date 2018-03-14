@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,7 +87,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         return mainComposite;
     }
 
-    /** 
+    /**
      * Creates the widgets for the list of decorators.
      */
     private void createDecoratorsArea(Composite mainComposite) {
@@ -180,7 +180,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         });
     }
 
-    /** 
+    /**
      * Creates the widgets for the description.
      */
     private void createDescriptionArea(Composite mainComposite) {
@@ -195,7 +195,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         textComposite.setFont(mainFont);
 
         Label descriptionLabel = new Label(textComposite, SWT.NONE);
-        descriptionLabel.setText(WorkbenchMessages.DecoratorsPreferencePage_description); 
+        descriptionLabel.setText(WorkbenchMessages.DecoratorsPreferencePage_description);
         descriptionLabel.setFont(mainFont);
 
         descriptionText = new Text(textComposite, SWT.MULTI | SWT.WRAP
@@ -298,7 +298,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
 
     /**
      * Get the DecoratorManager being used for this page.
-     * 
+     *
      * @return the decorator manager
      */
     private DecoratorManager getDecoratorManager() {

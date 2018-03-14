@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473973
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 package org.eclipse.ui.internal.statushandlers;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
@@ -66,7 +69,7 @@ import org.eclipse.ui.views.IViewDescriptor;
  * Parent window actually does not use its Shell to build dialog on. The
  * window passes the shell to the InternalDialog, and it can do switching
  * modality and recreate the window silently.
- * 
+ *
  * @since 3.4
  */
 public class InternalDialog extends TrayDialog {
@@ -186,24 +189,21 @@ public class InternalDialog extends TrayDialog {
 		}
 		if (id == IDialogConstants.DETAILS_ID) {
 			// was the details button pressed?
-			dialogState.put(IStatusDialogConstants.DETAILS_OPENED, new Boolean(
+			dialogState.put(IStatusDialogConstants.DETAILS_OPENED, Boolean.valueOf(
 					toggleDetailsArea()));
 		} else {
 			super.buttonPressed(id);
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared in Window.
-	 */
 	@Override
 	final protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(getString(IStatusDialogConstants.TITLE));
 	}
-	
+
 	/**
-	 * Status dialog button should be aligned SWT.END. 
+	 * Status dialog button should be aligned SWT.END.
 	 */
 	@Override
 	protected void setButtonLayoutData(Button button) {
@@ -214,11 +214,6 @@ public class InternalDialog extends TrayDialog {
 		button.setLayoutData(data);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		createTitleArea(parent);
@@ -228,11 +223,6 @@ public class InternalDialog extends TrayDialog {
 		return parent;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-	 */
 	@Override
 	protected boolean isResizable() {
 		return true;
@@ -240,7 +230,7 @@ public class InternalDialog extends TrayDialog {
 
 	/**
 	 * Creates title area.
-	 * 
+	 *
 	 * @param parent
 	 *            A composite on which the title area should be created.
 	 */
@@ -280,7 +270,7 @@ public class InternalDialog extends TrayDialog {
 	/**
 	 * Create an area which allows the user to view the status if only one
 	 * is created or to select one of reported statuses when there are many.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite on which all components should be
 	 *            placed.
@@ -300,9 +290,9 @@ public class InternalDialog extends TrayDialog {
 
 	/**
 	 * This function checks if the dialog is modal.
-	 * 
+	 *
 	 * @return true if the dialog is modal, false otherwise
-	 * 
+	 *
 	 */
 	public boolean isModal() {
 		return ((getShellStyle() & SWT.APPLICATION_MODAL) == SWT.APPLICATION_MODAL);
@@ -323,11 +313,6 @@ public class InternalDialog extends TrayDialog {
 		this.supportTray = supportTray;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#open()
-	 */
 	@Override
 	public int open() {
 		boolean modalitySwitch = getBooleanValue(IStatusDialogConstants.MODALITY_SWITCH);
@@ -348,9 +333,6 @@ public class InternalDialog extends TrayDialog {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.TrayDialog#closeTray()
-	 */
 	@Override
 	public void closeTray() throws IllegalStateException {
 		if (getTray() != null) {
@@ -365,7 +347,7 @@ public class InternalDialog extends TrayDialog {
 					&& !getBooleanValue(IStatusDialogConstants.TRAY_OPENED));
 		}
 	}
-	
+
 	/**
 	 * Method which should be invoked when new errors become available for
 	 * display.
@@ -389,6 +371,9 @@ public class InternalDialog extends TrayDialog {
 	}
 
 	void refreshDialogSize() {
+		if (dialogArea == null || dialogArea.isDisposed()) {
+			return;
+		}
 		Point newSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(newSize);
 	}
@@ -422,7 +407,7 @@ public class InternalDialog extends TrayDialog {
 	/**
 	 * Toggles the unfolding of the details area. This is triggered by the
 	 * user pressing the details button.
-	 * 
+	 *
 	 */
 	private boolean toggleDetailsArea() {
 		boolean opened = false;
@@ -482,16 +467,8 @@ public class InternalDialog extends TrayDialog {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#getInitialLocation(org.eclipse.swt.graphics
-	 * .Point)
-	 */
 	@Override
 	public Point getInitialLocation(Point initialSize) {
-		// TODO Auto-generated method stub
 		return super.getInitialLocation(initialSize);
 	}
 
@@ -512,7 +489,7 @@ public class InternalDialog extends TrayDialog {
 	/**
 	 * This method creates display area for {@link StatusAdapter}s when more
 	 * is available.
-	 * 
+	 *
 	 * @param parent
 	 *            A parent composite on which all components should be
 	 *            placed.
@@ -660,9 +637,9 @@ public class InternalDialog extends TrayDialog {
 	/**
 	 * This method creates additional display area for {@link StatusAdapter}
 	 * when only one is available.
-	 * 
+	 *
 	 * It creates one label on a composite currently for secondary message.
-	 * 
+	 *
 	 * @param parent
 	 *            A parent composite on which all components should be
 	 *            placed.
@@ -733,7 +710,7 @@ public class InternalDialog extends TrayDialog {
 
 	/**
 	 * Hide the button if hide is <code>true</code>.
-	 * 
+	 *
 	 * @param button
 	 * @param hide
 	 */
@@ -869,37 +846,17 @@ public class InternalDialog extends TrayDialog {
 	 */
 	private void initContentProvider() {
 		IContentProvider provider = new IStructuredContentProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
 			@Override
 			public void dispose() {
 				// Nothing of interest here
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.IStructuredContentProvider#getElements
-			 * (java.lang.Object)
-			 */
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return ((Collection) dialogState
 						.get(IStatusDialogConstants.STATUS_ADAPTERS)).toArray();
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.IContentProvider#inputChanged(org
-			 * .eclipse.jface.viewers.Viewer, java.lang.Object,
-			 * java.lang.Object)
-			 */
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
@@ -923,7 +880,7 @@ public class InternalDialog extends TrayDialog {
 	 * <code>GridLayout</code> and the number of columns in this layout is
 	 * incremented. Subclasses may override.
 	 * </p>
-	 * 
+	 *
 	 * @param parent
 	 *            A parent composite on which all components should be
 	 *            placed.
@@ -1014,14 +971,14 @@ public class InternalDialog extends TrayDialog {
 
 	/**
 	 * Returns {@link IAction} associated with selected StatusAdapter.
-	 * 
+	 *
 	 * @return {@link IAction} that is set as {@link StatusAdapter} property
 	 *         with Job.class key.
 	 */
 	private IAction getGotoAction() {
 		Object property = null;
 
-		Job job = (Job) (getCurrentStatusAdapter().getAdapter(Job.class));
+		Job job = Adapters.adapt(getCurrentStatusAdapter(), Job.class);
 		if (job != null) {
 			property = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		}
@@ -1035,7 +992,7 @@ public class InternalDialog extends TrayDialog {
 	/**
 	 * Get the single selection. Return null if the selection is not just
 	 * one element.
-	 * 
+	 *
 	 * @return StatusAdapter or <code>null</code>.
 	 */
 	private StatusAdapter getSingleSelection() {

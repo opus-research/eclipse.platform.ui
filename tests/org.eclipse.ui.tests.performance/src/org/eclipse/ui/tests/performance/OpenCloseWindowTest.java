@@ -29,24 +29,26 @@ public class OpenCloseWindowTest extends BasicPerformanceTest {
         super("testOpenCloseWindows:" + id, tagging);
         this.id = id;
     }
-    
-    protected void runTest() throws Throwable {
+
+    @Override
+	protected void runTest() throws Throwable {
     	tagIfNecessary("UI - Open/Close Window", Dimension.ELAPSED_PROCESS);
-        
+
     	exercise(new TestRunnable() {
-            public void run() throws Exception {
+            @Override
+			public void run() throws Exception {
                 processEvents();
                 EditorTestHelper.calmDown(500, 30000, 500);
-                
+
                 startMeasuring();
                 IWorkbenchWindow window = openTestWindow(id);
-                processEvents();   
+                processEvents();
                 window.close();
-                processEvents(); 
+                processEvents();
                 stopMeasuring();
-            } 
+            }
         });
-                
+
         commitMeasurements();
         assertPerformance();
     }

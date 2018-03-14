@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.keys.KeyStroke;
 /**
  * Formats the keys in the internal key sequence grammar. This is used for
  * persistence, and is not really intended for display to the user.
- * 
+ *
  * @since 3.0
  */
 public class FormalKeyFormatter extends AbstractKeyFormatter {
@@ -31,41 +31,21 @@ public class FormalKeyFormatter extends AbstractKeyFormatter {
      */
     private static final Comparator FORMAL_MODIFIER_KEY_COMPARATOR = new AlphabeticModifierKeyComparator();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
-     */
     @Override
 	public String format(Key key) {
         return key.toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
-     */
     @Override
 	protected String getKeyDelimiter() {
         return KeyStroke.KEY_DELIMITER;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
-     */
     @Override
 	protected String getKeyStrokeDelimiter() {
         return KeySequence.KEY_STROKE_DELIMITER;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
-     */
     @Override
 	protected Comparator getModifierKeyComparator() {
         return FORMAL_MODIFIER_KEY_COMPARATOR;

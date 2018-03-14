@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.statushandlers;
@@ -91,14 +92,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				.intValue();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.statushandlers.AbstractStatusAreaProvider#createSupportArea
-	 * (org.eclipse.swt.widgets.Composite,
-	 * org.eclipse.ui.statushandlers.StatusAdapter)
-	 */
 	@Override
 	public Control createSupportArea(Composite parent,
 			StatusAdapter statusAdapter) {
@@ -122,7 +115,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		text.setLayoutData(gd);
 		// There is no support for triggering commands in the dialogs. I am
 		// trying to emulate the workbench behavior as exactly as possible.
-		IBindingService binding = (IBindingService) PlatformUI.getWorkbench()
+		IBindingService binding = PlatformUI.getWorkbench()
 				.getService(IBindingService.class);
 		// find bindings for copy action
 		final TriggerSequence ts[] = binding
@@ -278,13 +271,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		copyAction.setText(JFaceResources.getString("copy")); //$NON-NLS-1$
 		copyAction.addSelectionListener(new SelectionAdapter() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
-			 * .swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
@@ -355,7 +341,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 
 	/**
 	 * This method checks if status dialog holds more than one status.
-	 * 
+	 *
 	 * @return true if the dialog has one more than one status.
 	 */
 	private boolean isMulti() {

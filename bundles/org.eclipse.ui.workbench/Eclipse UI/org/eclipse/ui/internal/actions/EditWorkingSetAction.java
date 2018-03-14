@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 
 /**
  * Displays an IWorkingSetEditWizard for editing a working set.
- * 
+ *
  * @since 2.1
  */
 public class EditWorkingSetAction extends Action {
@@ -37,7 +37,7 @@ public class EditWorkingSetAction extends Action {
 
     /**
      * Creates a new instance of the receiver.
-     * 
+     *
      * @param actionGroup the action group this action is created in
      * @param shell the parent shell
      */
@@ -45,7 +45,7 @@ public class EditWorkingSetAction extends Action {
             Shell shell) {
         super(WorkbenchMessages.EditWorkingSetAction_text);
         Assert.isNotNull(actionGroup);
-        setToolTipText(WorkbenchMessages.EditWorkingSetAction_toolTip); 
+        setToolTipText(WorkbenchMessages.EditWorkingSetAction_toolTip);
 
         this.shell = shell;
         this.actionGroup = actionGroup;
@@ -55,7 +55,7 @@ public class EditWorkingSetAction extends Action {
 
     /**
      * Overrides method from Action
-     * 
+     *
      * @see Action#run
      */
     @Override
@@ -71,7 +71,7 @@ public class EditWorkingSetAction extends Action {
         IWorkingSetEditWizard wizard = manager
                 .createWorkingSetEditWizard(workingSet);
         if (wizard == null) {
-            String title = WorkbenchMessages.EditWorkingSetAction_error_nowizard_title; 
+            String title = WorkbenchMessages.EditWorkingSetAction_error_nowizard_title;
             String message = WorkbenchMessages.EditWorkingSetAction_error_nowizard_message;
             MessageDialog.openError(shell, title, message);
             return;

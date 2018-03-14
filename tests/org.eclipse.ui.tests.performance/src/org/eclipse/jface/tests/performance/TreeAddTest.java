@@ -87,7 +87,7 @@ public class TreeAddTest extends TreeTest {
 
 	/**
 	 * Run the test for one of the fast insertions.
-	 * 
+	 *
 	 * @param count
 	 * @throws CoreException
 	 */
@@ -97,6 +97,7 @@ public class TreeAddTest extends TreeTest {
 		openBrowser();
 
 		exercise(new TestRunnable() {
+			@Override
 			public void run() {
 
 				TestTreeElement input = new TestTreeElement(0, null);

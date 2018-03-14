@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class ContentExtensionsTab extends CustomizationTab {
 
@@ -29,10 +29,10 @@ public class ContentExtensionsTab extends CustomizationTab {
 
 	}
 
-	private void createControl() { 
-				
+	private void createControl() {
+
 		createInstructionsLabel(CommonNavigatorMessages.CommonFilterSelectionDialog_Select_the_available_extensions);
-		
+
 		createTable();
 
 		getTableViewer().setContentProvider(new ContentDescriptorContentProvider());

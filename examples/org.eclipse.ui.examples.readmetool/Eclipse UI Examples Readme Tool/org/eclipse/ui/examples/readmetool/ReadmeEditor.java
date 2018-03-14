@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,78 +44,77 @@ public class ReadmeEditor extends TextEditor {
         super();
     }
 
-    /* (non-Javadoc)
-	 * @see org.eclipse.ui.texteditor.StatusTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-		
+
 		StyledText tw = getSourceViewer().getTextWidget();
-		
+
 		// Add a 'TextTransfer' drop target to the editor
 		int ops = DND.DROP_DEFAULT | DND.DROP_COPY;
 		Transfer[] transfers = { TextTransfer.getInstance() };
 		DropTargetListener editorListener = new DropTargetListener() {
 
+			@Override
 			public void dragEnter(DropTargetEvent event) {
 				event.detail = DND.DROP_COPY;
 			}
 
+			@Override
 			public void dragLeave(DropTargetEvent event) {
 			}
 
+			@Override
 			public void dragOperationChanged(DropTargetEvent event) {
 				event.detail = DND.DROP_COPY;
 			}
 
+			@Override
 			public void dragOver(DropTargetEvent event) {
 				event.feedback = DND.FEEDBACK_SCROLL | DND.FEEDBACK_SELECT;
 			}
 
+			@Override
 			public void drop(DropTargetEvent event) {
 		        if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
 					String text = (String) event.data;
 					getSourceViewer().getTextWidget().insert(text);
-				} 
+				}
 			}
 
+			@Override
 			public void dropAccept(DropTargetEvent event) {
 			}
-			
+
 		};
-		
-		IDragAndDropService dtSvc = (IDragAndDropService) getSite().getService(IDragAndDropService.class);
+
+		IDragAndDropService dtSvc = getSite().getService(IDragAndDropService.class);
 		dtSvc.addMergedDropTarget(tw, ops, transfers, editorListener);
 	}
-	
-    /** (non-Javadoc)
-     * Method declared on IEditorPart
-     */
-    public void doSave(IProgressMonitor monitor) {
+
+    @Override
+	public void doSave(IProgressMonitor monitor) {
         super.doSave(monitor);
         if (page != null)
             page.update();
     }
 
-    /** (non-Javadoc)
-     * Method declared on IAdaptable
-     */
-    public Object getAdapter(Class key) {
+    @SuppressWarnings("unchecked")
+    @Override
+	public <T> T getAdapter(Class<T> key) {
         if (key.equals(IContentOutlinePage.class)) {
             IEditorInput input = getEditorInput();
             if (input instanceof IFileEditorInput) {
                 page = new ReadmeContentOutlinePage(((IFileEditorInput) input)
                         .getFile());
-                return page;
+                return (T) page;
             }
         }
         return super.getAdapter(key);
     }
 
-    /** (non-Javadoc)
-     * Method declared on AbstractTextEditor
-     */
-    protected void editorContextMenuAboutToShow(IMenuManager parentMenu) {
+    @Override
+	protected void editorContextMenuAboutToShow(IMenuManager parentMenu) {
         super.editorContextMenuAboutToShow(parentMenu);
         parentMenu.add(new Separator());
         IMenuManager subMenu = new MenuManager(MessageUtil.getString("Add")); //$NON-NLS-1$
@@ -123,7 +122,7 @@ public class ReadmeEditor extends TextEditor {
         if (subMenu != null) {
             // Add readme actions with various attributes
             Object[][] att = new Object[][] { { IReadmeConstants.MARKER_ATT_ID,
-                    new Integer(1234) } };
+                    Integer.valueOf(1234) } };
             subMenu
                     .add(new AddReadmeMarkerAction(
                             this,
@@ -134,7 +133,7 @@ public class ReadmeEditor extends TextEditor {
                                     .getString("Readme_marker_message_example") + " id=1234")); //$NON-NLS-1$ //$NON-NLS-2$
 
             att = new Object[][] { { IReadmeConstants.MARKER_ATT_LEVEL,
-                    new Integer(7) } };
+                    Integer.valueOf(7) } };
             subMenu
                     .add(new AddReadmeMarkerAction(
                             this,
@@ -145,7 +144,7 @@ public class ReadmeEditor extends TextEditor {
                                     .getString("Readme_marker_message_example") + " level=7")); //$NON-NLS-1$ //$NON-NLS-2$
 
             att = new Object[][] {
-                    { IReadmeConstants.MARKER_ATT_LEVEL, new Integer(7) },
+                    { IReadmeConstants.MARKER_ATT_LEVEL, Integer.valueOf(7) },
                     { IReadmeConstants.MARKER_ATT_DEPT, "infra" } }; //$NON-NLS-1$
             subMenu
                     .add(new AddReadmeMarkerAction(
@@ -178,8 +177,8 @@ public class ReadmeEditor extends TextEditor {
                                     .getString("Readme_marker_message_example") + " language=english")); //$NON-NLS-1$ //$NON-NLS-2$
 
             att = new Object[][] {
-                    { IReadmeConstants.MARKER_ATT_ID, new Integer(1234) },
-                    { IReadmeConstants.MARKER_ATT_LEVEL, new Integer(7) },
+                    { IReadmeConstants.MARKER_ATT_ID, Integer.valueOf(1234) },
+                    { IReadmeConstants.MARKER_ATT_LEVEL, Integer.valueOf(7) },
                     { IReadmeConstants.MARKER_ATT_DEPT, "infra" }, //$NON-NLS-1$
                     { IReadmeConstants.MARKER_ATT_CODE, "red" }, //$NON-NLS-1$
                     { IReadmeConstants.MARKER_ATT_LANG, "english" } }; //$NON-NLS-1$

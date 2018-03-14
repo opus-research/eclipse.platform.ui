@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -116,7 +116,7 @@ class MarkerType {
 
     /**
      * Returns whether this marker type is considered to be a subtype of
-     * the given marker type. 
+     * the given marker type.
      *
      * @return boolean <code>true</code>if this type is the same as (or a subtype of) the given type
      */

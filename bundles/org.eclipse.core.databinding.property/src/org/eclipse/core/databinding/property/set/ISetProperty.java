@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bug 195222
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.property.set;
@@ -26,7 +27,11 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
  * Interface for set-typed properties
- * 
+ *
+ * @param <S>
+ *            type of the source object
+ * @param <E>
+ *            type of the elements in the set
  * @since 1.2
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
@@ -36,11 +41,11 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
  * @see SetProperty
  * @see SimpleSetProperty
  */
-public interface ISetProperty extends IProperty {
+public interface ISetProperty<S, E> extends IProperty {
 	/**
 	 * Returns the type of the elements in the collection or <code>null</code>
 	 * if untyped
-	 * 
+	 *
 	 * @return the type of the elements in the collection or <code>null</code>
 	 *         if untyped
 	 */
@@ -49,14 +54,14 @@ public interface ISetProperty extends IProperty {
 	/**
 	 * Returns an unmodifiable Set with the current contents of the source's set
 	 * property
-	 * 
+	 *
 	 * @param source
 	 *            the property source (may be null)
 	 * @return an unmodifiable Set with the current contents of the source's set
 	 *         property
 	 * @since 1.3
 	 */
-	public Set getSet(Object source);
+	public Set<E> getSet(S source);
 
 	/**
 	 * Updates the property on the source with the specified change.
@@ -67,14 +72,14 @@ public interface ISetProperty extends IProperty {
 	 * of the change. In most cases it is preferable to modify the source
 	 * through an {@link IObservableSet} than through the property directly.
 	 * </p>
-	 * 
+	 *
 	 * @param source
 	 *            the property source (may be null)
 	 * @param set
 	 *            the new set
 	 * @since 1.3
 	 */
-	public void setSet(Object source, Set set);
+	public void setSet(S source, Set<E> set);
 
 	/**
 	 * Updates the property on the source with the specified change.
@@ -85,30 +90,30 @@ public interface ISetProperty extends IProperty {
 	 * of the change. In most cases it is preferable to modify the source
 	 * through an {@link IObservableSet} than through the property directly.
 	 * </p>
-	 * 
+	 *
 	 * @param source
 	 *            the property source (may be null)
 	 * @param diff
 	 *            a diff describing the change
 	 * @since 1.3
 	 */
-	public void updateSet(Object source, SetDiff diff);
+	public void updateSet(S source, SetDiff<E> diff);
 
 	/**
 	 * Returns an observable set observing this set property on the given
 	 * property source
-	 * 
+	 *
 	 * @param source
 	 *            the property source
 	 * @return an observable set observing this set property on the given
 	 *         property source
 	 */
-	public IObservableSet observe(Object source);
+	public IObservableSet<E> observe(S source);
 
 	/**
 	 * Returns an observable set observing this set property on the given
 	 * property source
-	 * 
+	 *
 	 * @param realm
 	 *            the observable's realm
 	 * @param source
@@ -116,39 +121,39 @@ public interface ISetProperty extends IProperty {
 	 * @return an observable set observing this set property on the given
 	 *         property source
 	 */
-	public IObservableSet observe(Realm realm, Object source);
+	public IObservableSet<E> observe(Realm realm, S source);
 
 	/**
 	 * Returns a factory for creating observable sets tracking this property of
 	 * a particular property source.
-	 * 
+	 *
 	 * @return a factory for creating observable sets tracking this property of
 	 *         a particular property source.
 	 */
-	public IObservableFactory setFactory();
+	public IObservableFactory<S, IObservableSet<E>> setFactory();
 
 	/**
 	 * Returns a factory for creating observable sets in the given realm,
 	 * tracking this property of a particular property source.
-	 * 
+	 *
 	 * @param realm
 	 *            the realm
-	 * 
+	 *
 	 * @return a factory for creating observable sets in the given realm,
 	 *         tracking this property of a particular property source.
 	 */
-	public IObservableFactory setFactory(Realm realm);
+	public IObservableFactory<S, IObservableSet<E>> setFactory(Realm realm);
 
 	/**
 	 * Returns an observable set on the master observable's realm which tracks
 	 * this property of the current value of <code>master</code>.
-	 * 
+	 *
 	 * @param master
 	 *            the master observable
 	 * @return an observable set on the given realm which tracks this property
 	 *         of the current value of <code>master</code>.
 	 */
-	public IObservableSet observeDetail(IObservableValue master);
+	public <U extends S> IObservableSet<E> observeDetail(IObservableValue<U> master);
 
 	/**
 	 * Returns the nested combination of this property and the specified detail
@@ -160,11 +165,11 @@ public interface ISetProperty extends IProperty {
 	 * set. Modifications made through the returned property are delegated to
 	 * the detail property, using the corresponding set element from the master
 	 * property as the source.
-	 * 
+	 *
 	 * @param detailValues
 	 *            the detail property
 	 * @return the nested combination of the master set and detail value
 	 *         properties
 	 */
-	public IMapProperty values(IValueProperty detailValues);
+	public <T> IMapProperty<S, E, T> values(IValueProperty<? super E, T> detailValues);
 }

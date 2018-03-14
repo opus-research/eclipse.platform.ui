@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -16,107 +17,126 @@ import java.util.Iterator;
 
 /**
  * An observable collection which decorates another observable collection
- * 
+ *
+ * @param <E>
+ *
  * @since 1.2
  */
-public class DecoratingObservableCollection extends DecoratingObservable
-		implements IObservableCollection {
-	private IObservableCollection decorated;
+public class DecoratingObservableCollection<E> extends DecoratingObservable implements IObservableCollection<E> {
+	private IObservableCollection<E> decorated;
 
 	/**
 	 * @param decorated
 	 * @param disposeDecoratedOnDispose
 	 */
-	public DecoratingObservableCollection(IObservableCollection decorated,
+	public DecoratingObservableCollection(IObservableCollection<E> decorated,
 			boolean disposeDecoratedOnDispose) {
 		super(decorated, disposeDecoratedOnDispose);
 		this.decorated = decorated;
 	}
 
-	public boolean add(Object o) {
+	@Override
+        public boolean add(E o) {
 		getterCalled();
 		return decorated.add(o);
 	}
 
-	public boolean addAll(Collection c) {
+	@Override
+	public boolean addAll(Collection<? extends E> c) {
 		getterCalled();
 		return decorated.addAll(c);
 	}
 
+	@Override
 	public void clear() {
 		checkRealm();
 		decorated.clear();
 	}
 
+	@Override
 	public boolean contains(Object o) {
 		getterCalled();
 		return decorated.contains(o);
 	}
 
-	public boolean containsAll(Collection c) {
+	@Override
+	public boolean containsAll(Collection<?> c) {
 		getterCalled();
 		return decorated.containsAll(c);
 	}
 
+	@Override
 	public boolean isEmpty() {
 		getterCalled();
 		return decorated.isEmpty();
 	}
 
-	public Iterator iterator() {
+	@Override
+	public Iterator<E> iterator() {
 		getterCalled();
-		final Iterator decoratedIterator = decorated.iterator();
-		return new Iterator() {
+		final Iterator<E> decoratedIterator = decorated.iterator();
+		return new Iterator<E>() {
+			@Override
 			public void remove() {
 				decoratedIterator.remove();
 			}
 
+			@Override
 			public boolean hasNext() {
 				getterCalled();
 				return decoratedIterator.hasNext();
 			}
 
-			public Object next() {
+			@Override
+			public E next() {
 				getterCalled();
 				return decoratedIterator.next();
 			}
 		};
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		getterCalled();
 		return decorated.remove(o);
 	}
 
-	public boolean removeAll(Collection c) {
+	@Override
+	public boolean removeAll(Collection<?> c) {
 		getterCalled();
 		return decorated.removeAll(c);
 	}
 
-	public boolean retainAll(Collection c) {
+	@Override
+	public boolean retainAll(Collection<?> c) {
 		getterCalled();
 		return decorated.retainAll(c);
 	}
 
+	@Override
 	public int size() {
 		getterCalled();
 		return decorated.size();
 	}
 
+	@Override
 	public Object[] toArray() {
 		getterCalled();
 		return decorated.toArray();
 	}
 
-	public Object[] toArray(Object[] a) {
+	@Override
+	public <T> T[] toArray(T[] a) {
 		getterCalled();
 		return decorated.toArray(a);
 	}
 
+	@Override
 	public Object getElementType() {
 		return decorated.getElementType();
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		getterCalled();
 		if (this == obj) {
@@ -125,16 +145,19 @@ public class DecoratingObservableCollection extends DecoratingObservable
 		return decorated.equals(obj);
 	}
 
+	@Override
 	public int hashCode() {
 		getterCalled();
 		return decorated.hashCode();
 	}
 
+	@Override
 	public String toString() {
 		getterCalled();
 		return decorated.toString();
 	}
 
+	@Override
 	public synchronized void dispose() {
 		decorated = null;
 		super.dispose();

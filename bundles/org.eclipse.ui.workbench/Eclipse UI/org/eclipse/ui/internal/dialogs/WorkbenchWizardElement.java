@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 public class WorkbenchWizardElement extends WorkbenchAdapter implements
         IAdaptable, IPluginContribution, IWizardDescriptor {
     private String id;
-    
+
     private ImageDescriptor imageDescriptor;
 
     private SelectionEnabler selectionEnabler;
@@ -49,9 +49,9 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
     private IConfigurationElement configurationElement;
 
     private ImageDescriptor descriptionImage;
-    
+
     private WizardCollectionElement parentCategory;
-    
+
 	/**
 	 * TODO: DO we need to  make this API?
 	 */
@@ -63,10 +63,10 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 
 	private String[] keywordLabels;
 
-    
+
     /**
      * Create a new instance of this class
-     * 
+     *
      * @param configurationElement
      * @since 3.1
      */
@@ -78,7 +78,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
     /**
      * Answer a boolean indicating whether the receiver is able to handle the
      * passed selection
-     * 
+     *
      * @return boolean
      * @param selection
      *            IStructuredSelection
@@ -92,7 +92,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
      * the selection. If it can return the selection. If it can handle the
      * adapted to IResource value of the selection. If it satisfies neither of
      * these conditions return an empty IStructuredSelection.
-     * 
+     *
      * @return IStructuredSelection
      * @param selection
      *            IStructuredSelection
@@ -117,7 +117,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
      * element. That is, create the instance of the class the isv supplied in
      * the extension point.
      * @return the new object
-     * @throws CoreException 
+     * @throws CoreException
      */
     public Object createExecutableExtension() throws CoreException {
         return WorkbenchPlugin.createExtension(configurationElement,
@@ -129,18 +129,18 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
      * with this object. Returns <code>null</code> if no such object can be
      * found.
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
         if (adapter == IWorkbenchAdapter.class
                 || adapter == IWorkbenchAdapter2.class
                 || adapter == IWorkbenchAdapter3.class) {
-            return this;
+			return adapter.cast(this);
         }
         else if (adapter == IPluginContribution.class) {
-        	return this;
+			return adapter.cast(this);
         }
         else if (adapter == IConfigurationElement.class) {
-        	return configurationElement;
+			return adapter.cast(configurationElement);
         }
         return Platform.getAdapterManager().getAdapter(this, adapter);
     }
@@ -154,7 +154,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 
     /**
      * Answer the description parameter of this element
-     * 
+     *
      * @return java.lang.String
      */
     @Override
@@ -174,7 +174,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 				return null;
 			}
             imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
-                    configurationElement.getNamespaceIdentifier(), iconName);    
+                    configurationElement.getNamespaceIdentifier(), iconName);
     	}
         return imageDescriptor;
     }
@@ -186,7 +186,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 	public ImageDescriptor getImageDescriptor(Object element) {
         return getImageDescriptor();
     }
-    
+
     /**
      * Returns the name of this wizard element.
      */
@@ -212,7 +212,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
      * resource). If all elements in the initial selection can be converted to
      * resources then answer a new selection containing these resources;
      * otherwise answer an empty selection.
-     * 
+     *
      * @param originalSelection the original selection
      * @return the converted selection or an empty selection
      */
@@ -227,28 +227,17 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 				.convertToResources(originalSelection);
     }
 
-    /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
-	 */
     @Override
 	public String getLocalId() {
         return getId();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPluginContribution#getPluginId()
-     */
     @Override
 	public String getPluginId() {
         return (configurationElement != null) ? configurationElement
                 .getNamespaceIdentifier() : null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.wizards.INewWizardDescriptor#getDescriptionImage()
-     */
     @Override
 	public ImageDescriptor getDescriptionImage() {
     	if (descriptionImage == null) {
@@ -262,49 +251,34 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
         return descriptionImage;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.wizards.INewWizardDescriptor#getHelpHref()
-     */
     @Override
 	public String getHelpHref() {
         return configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_HELP_HREF);
     }
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.wizards.INewWizardDescriptor#createWizard()
-	 */
+
 	@Override
 	public IWorkbenchWizard createWizard() throws CoreException {
 		return (IWorkbenchWizard) createExecutableExtension();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPartDescriptor#getId()
-	 */
 	@Override
 	public String getId() {
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPartDescriptor#getLabel()
-	 */
 	@Override
-	public String getLabel() {		
+	public String getLabel() {
 		return getLabel(this);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.wizards.INewWizardDescriptor#getCategory()
-	 */
+
 	@Override
 	public IWizardCategory getCategory() {
 		return (IWizardCategory) getParent(this);
 	}
-	
+
 	/**
 	 * Return the collection.
-	 * 
+	 *
 	 * @return the collection
 	 * @since 3.1
 	 */
@@ -312,23 +286,17 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 		return (WizardCollectionElement) getParent(this);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.wizards.IWizardDescriptor#getTags()
-	 */
 	@Override
 	public String [] getTags() {
- 
+
         String flag = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_PROJECT);
         if (Boolean.valueOf(flag).booleanValue()) {
         	return PROJECT_TAGS;
         }
-        
+
         return EMPTY_TAGS;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
-	 */
+
 	@Override
 	public Object getParent(Object object) {
 		return parentCategory;
@@ -336,7 +304,7 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 
 	/**
 	 * Set the parent category.
-	 * 
+	 *
 	 * @param parent the parent category
 	 * @since 3.1
 	 */
@@ -344,17 +312,11 @@ public class WorkbenchWizardElement extends WorkbenchAdapter implements
 		parentCategory = parent;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.wizards.IWizardDescriptor#canFinishEarly()
-	 */
 	@Override
 	public boolean canFinishEarly() {
 		return Boolean.valueOf(configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_CAN_FINISH_EARLY)).booleanValue();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.wizards.IWizardDescriptor#hasPages()
-	 */
 	@Override
 	public boolean hasPages() {
 		String hasPagesString = configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_HAS_PAGES);

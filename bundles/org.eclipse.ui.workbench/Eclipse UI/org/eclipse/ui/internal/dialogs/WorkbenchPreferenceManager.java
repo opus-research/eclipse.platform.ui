@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,12 +41,12 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	/**
 	 * Create a new instance of the receiver with the specified seperatorChar
-	 * 
+	 *
 	 * @param separatorChar
 	 */
 	public WorkbenchPreferenceManager(char separatorChar) {
 		super(separatorChar, new WorkbenchPreferenceExpressionNode("")); //$NON-NLS-1$
-        
+
 		IExtensionTracker tracker = PlatformUI.getWorkbench().getExtensionTracker();
 		tracker.registerHandler(this, ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
 
@@ -54,11 +54,6 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 		Platform.getExtensionRegistry().addRegistryChangeListener(
 				new IRegistryChangeListener() {
 
-					/*
-					 * (non-Javadoc)
-					 * 
-					 * @see org.eclipse.core.runtime.IRegistryChangeListener#registryChanged(org.eclipse.core.runtime.IRegistryChangeEvent)
-					 */
 					@Override
 					public void registryChanged(IRegistryChangeEvent event) {
 						if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
@@ -76,7 +71,7 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	/**
 	 * Add the pages and the groups to the receiver.
-	 * 
+	 *
 	 * @param pageContributions
 	 */
 	public void addPages(Collection pageContributions) {
@@ -96,7 +91,7 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	/**
 	 * Register a node with the extension tracker.
-	 * 
+	 *
 	 * @param node
 	 *            register the given node and its subnodes with the extension
 	 *            tracker
@@ -112,9 +107,6 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
-	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement[] elements = extension.getConfigurationElements();
@@ -141,7 +133,7 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 				}
 				if (parent == null) {
 					// Could not find the parent - log
-					String message = "Invalid preference category path: " + category + " (bundle: " + node.getPluginId() + ", page: " + node.getId() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
+					String message = "Invalid preference category path: " + category + " (bundle: " + node.getPluginId() + ", page: " + node.getId() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING, message, null));
 					addToRoot(node);
 				} else {
@@ -151,19 +143,11 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionAdditionHandler#getExtensionPointFilter()
-	 */
 	private IExtensionPoint getExtensionPointFilter() {
 		return Platform.getExtensionRegistry().getExtensionPoint(
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_PREFERENCES);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
-	 */
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
@@ -177,7 +161,7 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 	/**
 	 * Removes the node from the manager, searching through all subnodes.
-	 * 
+	 *
 	 * @param parent
 	 *            the node to search
 	 * @param nodeToRemove

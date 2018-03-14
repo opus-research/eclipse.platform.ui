@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Alexander Kurtakov <akurtako@redhat.com> - Bug 459761
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -17,20 +18,20 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * A decorating label provider is a label provider which combines 
+ * A decorating label provider is a label provider which combines
  * a nested label provider and an optional decorator.
- * The decorator decorates the label text, image, font and colors provided by 
+ * The decorator decorates the label text, image, font and colors provided by
  * the nested label provider.
  */
-public class DecoratingLabelProvider extends LabelProvider implements
-        ILabelProvider, IViewerLabelProvider, IColorProvider, IFontProvider, ITreePathLabelProvider {
+public class DecoratingLabelProvider extends LabelProvider implements IViewerLabelProvider, IColorProvider,
+		IFontProvider, ITreePathLabelProvider {
 
     private ILabelProvider provider;
 
     private ILabelDecorator decorator;
 
     // Need to keep our own list of listeners
-    private ListenerList listeners = new ListenerList();
+	private ListenerList<ILabelProviderListener> listeners = new ListenerList<>();
 
 	private IDecorationContext decorationContext = DecorationContext.DEFAULT_CONTEXT;
 
@@ -77,9 +78,9 @@ public class DecoratingLabelProvider extends LabelProvider implements
     }
 
     /**
-     * The <code>DecoratingLabelProvider</code> implementation of this 
+     * The <code>DecoratingLabelProvider</code> implementation of this
      * <code>ILabelProvider</code> method returns the image provided
-     * by the nested label provider's <code>getImage</code> method, 
+     * by the nested label provider's <code>getImage</code> method,
      * decorated with the decoration provided by the label decorator's
      * <code>decorateImage</code> method.
      */
@@ -122,9 +123,9 @@ public class DecoratingLabelProvider extends LabelProvider implements
     }
 
     /**
-     * The <code>DecoratingLabelProvider</code> implementation of this 
+     * The <code>DecoratingLabelProvider</code> implementation of this
      * <code>ILabelProvider</code> method returns the text label provided
-     * by the nested label provider's <code>getText</code> method, 
+     * by the nested label provider's <code>getText</code> method,
      * decorated with the decoration provided by the label decorator's
      * <code>decorateText</code> method.
      */
@@ -149,9 +150,9 @@ public class DecoratingLabelProvider extends LabelProvider implements
     }
 
     /**
-     * The <code>DecoratingLabelProvider</code> implementation of this 
+     * The <code>DecoratingLabelProvider</code> implementation of this
      * <code>IBaseLabelProvider</code> method returns <code>true</code> if the corresponding method
-     * on the nested label provider returns <code>true</code> or if the corresponding method on the 
+     * on the nested label provider returns <code>true</code> or if the corresponding method on the
      * decorator returns <code>true</code>.
      */
     @Override
@@ -193,18 +194,15 @@ public class DecoratingLabelProvider extends LabelProvider implements
     public void setLabelDecorator(ILabelDecorator decorator) {
         ILabelDecorator oldDecorator = this.decorator;
         if (oldDecorator != decorator) {
-            Object[] listenerList = this.listeners.getListeners();
             if (oldDecorator != null) {
-                for (int i = 0; i < listenerList.length; ++i) {
-                    oldDecorator
-                            .removeListener((ILabelProviderListener) listenerList[i]);
+				for (ILabelProviderListener l : listeners) {
+					oldDecorator.removeListener(l);
                 }
             }
             this.decorator = decorator;
             if (decorator != null) {
-                for (int i = 0; i < listenerList.length; ++i) {
-                    decorator
-                            .addListener((ILabelProviderListener) listenerList[i]);
+				for (ILabelProviderListener l : listeners) {
+					decorator.addListener(l);
                 }
             }
             fireLabelProviderChanged(new LabelProviderChangedEvent(this));
@@ -235,7 +233,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
         if (decorationReady || oldImage == null) {
             settings.setImage(getImage(element));
         }
- 
+
         if(decorationReady) {
 			updateForDecorationReady(settings,element);
 		}
@@ -255,7 +253,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
 			settings.setBackground(colorDecorator.decorateBackground(element));
 			settings.setForeground(colorDecorator.decorateForeground(element));
 		}
-		
+
 		if(decorator instanceof IFontDecorator) {
 			settings.setFont(((IFontDecorator) decorator).decorateFont(element));
 		}
@@ -288,10 +286,10 @@ public class DecoratingLabelProvider extends LabelProvider implements
 
     /**
      * Return the decoration context associated with this label provider.
-     * It will be passed to the decorator if the decorator is an 
+     * It will be passed to the decorator if the decorator is an
      * instance of {@link LabelDecorator}.
      * @return the decoration context associated with this label provider
-     * 
+     *
      * @since 3.2
      */
     public IDecorationContext getDecorationContext() {
@@ -299,10 +297,10 @@ public class DecoratingLabelProvider extends LabelProvider implements
 	}
 
     /**
-     * Set the decoration context that will be based to the decorator 
+     * Set the decoration context that will be based to the decorator
      * for this label provider if that decorator implements {@link LabelDecorator}.
      * @param decorationContext the decoration context.
-     * 
+     *
      * @since 3.2
      */
 	public void setDecorationContext(IDecorationContext decorationContext) {
@@ -349,7 +347,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
 	        if (decorationReady || oldImage == null) {
 	            settings.setImage(getImage(element));
 	        }
-	 
+
 	        if(decorationReady) {
 				updateForDecorationReady(settings,element);
 			}

@@ -41,6 +41,7 @@ public class UnmodifiableObservableListTest extends
 	IObservableList unmodifiable;
 	ObservableList mutable;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -132,11 +133,7 @@ public class UnmodifiableObservableListTest extends
 			super(wrappedList, elementType);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.internal.databinding.provisional.observable.list.ObservableList#add(java.lang.Object)
-		 */
+		@Override
 		public boolean add(Object o) {
 			boolean result = wrappedList.add(o);
 			fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(
@@ -157,6 +154,7 @@ public class UnmodifiableObservableListTest extends
 			AbstractObservableCollectionContractDelegate {
 		private Object elementType = new Object();
 
+		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			IObservableList backingList = new WritableList(realm,
@@ -168,14 +166,17 @@ public class UnmodifiableObservableListTest extends
 			return result;
 		}
 
+		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
+		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return elementType;
 		}
 
+		@Override
 		public void change(IObservable observable) {
 			UnmodifiableObservableListStub unmodifiableList = (UnmodifiableObservableListStub) observable;
 			IObservableList wrappedList = unmodifiableList.wrappedList;

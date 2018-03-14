@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 /**
  * YesNoCancelListSelectionDialog is a list selection dialog that also allows
  * the user to select no as a result.
- * 
+ *
  * @deprecated Providing Cancel in addition to Yes/No is confusing. It is better
  *             to subclass the regular ListSelectionDialog, which uses
  *             OK/Cancel, and provide a separate checkbox if necessary.
@@ -27,9 +27,9 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 @Deprecated
 public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
     /**
-     * 
-     * Create a list selection dialog with a possible Yes/No or Cancel result. 
-     * 
+     *
+     * Create a list selection dialog with a possible Yes/No or Cancel result.
+     *
      * @param parentShell
      * @param input
      * @param contentProvider
@@ -47,9 +47,6 @@ public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
         super(parentShell, input, contentProvider, labelProvider, message);
     }
 
-    /*
-     * (non-Javadoc) Method declared on Dialog.
-     */
     @Override
 	protected void buttonPressed(int buttonId) {
         switch (buttonId) {
@@ -68,9 +65,6 @@ public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
         }
     }
 
-    /*
-     * (non-Javadoc) Method declared in Window.
-     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -78,9 +72,6 @@ public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
                 IWorkbenchHelpContextIds.YES_NO_CANCEL_LIST_SELECTION_DIALOG);
     }
 
-    /*
-     * (non-Javadoc) Method declared on Dialog.
-     */
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.YES_ID,

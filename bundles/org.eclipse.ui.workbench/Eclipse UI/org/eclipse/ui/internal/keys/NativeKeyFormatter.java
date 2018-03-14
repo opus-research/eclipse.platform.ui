@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.keys.SpecialKey;
  * Formats the key sequences and key strokes into the native human-readable
  * format. This is typically what you would see on the menus for the given
  * platform and locale.
- * 
+ *
  * @since 3.0
  */
 public class NativeKeyFormatter extends AbstractKeyFormatter {
@@ -88,7 +88,7 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
      * Formats an individual key into a human readable format. This uses an
      * internationalization resource bundle to look up the key. This does the
      * platform-specific formatting for Carbon.
-     * 
+     *
      * @param key
      *            The key to format; must not be <code>null</code>.
      * @return The key formatted as a string; should not be <code>null</code>.
@@ -98,7 +98,7 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
         String name = key.toString();
 
         // TODO consider platform-specific resource bundles
-        if (org.eclipse.jface.util.Util.isMac()) {    	
+        if (org.eclipse.jface.util.Util.isMac()) {
             String formattedName = (String) CARBON_KEY_LOOK_UP.get(name);
             if (formattedName != null) {
                 return formattedName;
@@ -108,11 +108,6 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
         return super.format(key);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
-     */
     @Override
 	protected String getKeyDelimiter() {
         // We must do the look up every time, as our locale might change.
@@ -126,11 +121,6 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
-     */
     @Override
 	protected String getKeyStrokeDelimiter() {
         // We must do the look up every time, as our locale might change.
@@ -145,11 +135,6 @@ public class NativeKeyFormatter extends AbstractKeyFormatter {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
-     */
     @Override
 	protected Comparator getModifierKeyComparator() {
         return MODIFIER_KEY_COMPARATOR;

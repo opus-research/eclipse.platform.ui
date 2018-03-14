@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,10 +48,8 @@ public class FileEditorInputFactory implements IElementFactory {
     public FileEditorInputFactory() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on IElementFactory.
-     */
-    public IAdaptable createElement(IMemento memento) {
+    @Override
+	public IAdaptable createElement(IMemento memento) {
         // Get the file name.
         String fileName = memento.getString(TAG_PATH);
         if (fileName == null) {
@@ -70,7 +68,7 @@ public class FileEditorInputFactory implements IElementFactory {
 
     /**
      * Returns the element factory id for this class.
-     * 
+     *
      * @return the element factory id
      */
     public static String getFactoryId() {

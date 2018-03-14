@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,8 +51,8 @@ public class ResourceFactory implements IElementFactory, IPersistableElement {
     /**
      * Create a ResourceFactory.  This constructor is typically used
      * for our IPersistableElement side.
-     * 
-     * @param input the resource of this factory 
+     *
+     * @param input the resource of this factory
      */
     public ResourceFactory(IResource input) {
         res = input;
@@ -61,7 +61,8 @@ public class ResourceFactory implements IElementFactory, IPersistableElement {
     /**
      * @see IElementFactory
      */
-    public IAdaptable createElement(IMemento memento) {
+    @Override
+	public IAdaptable createElement(IMemento memento) {
         // Get the file name.
         String fileName = memento.getString(TAG_PATH);
         if (fileName == null) {
@@ -71,7 +72,7 @@ public class ResourceFactory implements IElementFactory, IPersistableElement {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
         String type = memento.getString(TAG_TYPE);
         if (type == null) {
-            // Old format memento. Create an IResource using findMember. 
+            // Old format memento. Create an IResource using findMember.
             // Will return null for resources in closed projects.
             res = root.findMember(new Path(fileName));
         } else {
@@ -93,14 +94,16 @@ public class ResourceFactory implements IElementFactory, IPersistableElement {
     /**
      * @see IPersistableElement
      */
-    public String getFactoryId() {
+    @Override
+	public String getFactoryId() {
         return FACTORY_ID;
     }
 
     /**
      * @see IPersistableElement
      */
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
         memento.putString(TAG_PATH, res.getFullPath().toString());
         memento.putString(TAG_TYPE, Integer.toString(res.getType()));
     }

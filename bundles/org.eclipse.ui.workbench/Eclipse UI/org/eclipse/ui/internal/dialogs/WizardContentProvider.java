@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,28 +18,18 @@ import org.eclipse.ui.model.AdaptableList;
 
 /**
  * Provider used by the NewWizardNewPage.
- * 
+ *
  * @since 3.0
  */
 public class WizardContentProvider implements ITreeContentProvider {
 
     private AdaptableList input;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-     */
     @Override
 	public void dispose() {
         input = null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
-     */
     @Override
 	public Object[] getChildren(Object parentElement) {
         if (parentElement instanceof WizardCollectionElement) {
@@ -75,28 +65,18 @@ public class WizardContentProvider implements ITreeContentProvider {
             		&& list.get(0) instanceof WizardCollectionElement) {
                 return getChildren(list.get(0));
             }
-                
+
             return list.toArray();
         } else {
 			return new Object[0];
 		}
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-     */
     @Override
 	public Object[] getElements(Object inputElement) {
         return getChildren(inputElement);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-     */
     @Override
 	public Object getParent(Object element) {
         if (element instanceof WizardCollectionElement) {
@@ -107,13 +87,13 @@ public class WizardContentProvider implements ITreeContentProvider {
 				}
             }
             return ((WizardCollectionElement) element).getParent(element);
-        } 
+        }
         return null;
     }
 
     /**
      * Adds the item to the list, unless it's a collection element without any children.
-     * 
+     *
      * @param element the element to test and add
      * @param list the <code>Collection</code> to add to.
      * @since 3.0
@@ -128,11 +108,6 @@ public class WizardContentProvider implements ITreeContentProvider {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
-     */
     @Override
 	public boolean hasChildren(Object element) {
         if (element instanceof WizardCollectionElement) {
@@ -143,12 +118,6 @@ public class WizardContentProvider implements ITreeContentProvider {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-     *      java.lang.Object, java.lang.Object)
-     */
     @Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         input = (AdaptableList) newInput;

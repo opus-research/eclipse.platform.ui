@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * Implementers of this interface will receive notifications when objects are dragged over
- * a particular SWT control. 
+ * a particular SWT control.
  */
 public interface IDragOverListener {
 
@@ -24,7 +24,7 @@ public interface IDragOverListener {
      * Notifies the receiver that the given object has been dragged over
      * the given position. Returns a drop target if the object may be
      * dropped in this position. Returns null otherwise.
-     * 
+     *
      * @param draggedObject object being dragged over this location
      * @param position location of the cursor
      * @param dragRectangle current drag rectangle (may be an empty rectangle if none)

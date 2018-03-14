@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -27,39 +28,34 @@ import org.eclipse.ui.menus.IMenuService;
 
 /**
  * Default implementation.
- * 
+ *
  * @since 3.3
  */
 final class ContributionRoot implements
 		IContributionRoot {
 
 	private List topLevelItems = new ArrayList();
-	private Map<IContributionItem, Expression> itemsToExpressions = new HashMap<IContributionItem, Expression>();
-	// private WorkbenchMenuService menuService;
+	private Map<IContributionItem, Expression> itemsToExpressions = new HashMap<>();
 	Set restriction;
 	private ContributionManager mgr;
 	private AbstractContributionFactory factory;
 
 	public ContributionRoot(IMenuService menuService, Set restriction,
 			ContributionManager mgr, AbstractContributionFactory factory) {
-		// this.menuService = (WorkbenchMenuService) menuService;
 		this.restriction = restriction;
 		this.mgr = mgr;
 		this.factory = factory;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.menus.IContributionRoot#addContributionItem(org.eclipse.jface.action.IContributionItem, org.eclipse.core.expressions.Expression, org.eclipse.core.expressions.Expression)
-	 */
 	@Override
 	public void addContributionItem(IContributionItem item,
 			Expression visibleWhen) {
 		if (item == null)
 			throw new IllegalArgumentException();
 		topLevelItems.add(item);
-		if (visibleWhen == null) 
+		if (visibleWhen == null)
 			visibleWhen = AlwaysEnabledExpression.INSTANCE;
-		
+
 		// menuService.registerVisibleWhen(item, visibleWhen, restriction,
 		// createIdentifierId(item));
 		itemsToExpressions.put(item, visibleWhen);
@@ -102,19 +98,12 @@ final class ContributionRoot implements
 		topLevelItems.clear();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.menus.IContributionRoot#registerVisibilityForChild(org.eclipse.jface.action.IContributionItem,
-	 *      org.eclipse.core.expressions.Expression,
-	 *      org.eclipse.core.expressions.Expression)
-	 */
 	@Override
 	public void registerVisibilityForChild(IContributionItem item,
 			Expression visibleWhen) {
 		if (item == null)
 			throw new IllegalArgumentException();
-		if (visibleWhen == null) 
+		if (visibleWhen == null)
 			visibleWhen = AlwaysEnabledExpression.INSTANCE;
 		// menuService.registerVisibleWhen(item, visibleWhen, restriction,
 		// createIdentifierId(item));

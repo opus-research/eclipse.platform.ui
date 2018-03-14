@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -25,7 +25,7 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributo
 /**
  * An element for the dynamic tests view. We build an element for one of the
  * icons. For example, "icons/blue_circle.gif" becomes a "Blue Circle" element.
- * 
+ *
  * @author Anthony Hunter
  */
 public class DynamicTestsElement implements
@@ -94,10 +94,12 @@ public class DynamicTestsElement implements
 		propertyDescriptors.add(propertyDescriptor);
 	}
 
+	@Override
 	public String getContributorId() {
 		return view.getContributorId();
 	}
 
+	@Override
 	public Object getEditableValue() {
 		return this;
 	}
@@ -116,11 +118,13 @@ public class DynamicTestsElement implements
 		return name;
 	}
 
+	@Override
 	public IPropertyDescriptor[] getPropertyDescriptors() {
 		return (IPropertyDescriptor[]) propertyDescriptors
 				.toArray(new IPropertyDescriptor[0]);
 	}
 
+	@Override
 	public Object getPropertyValue(Object id) {
 		if (id.equals(ID_COLOR)) {
 			return dynamicTestsColor;
@@ -134,14 +138,17 @@ public class DynamicTestsElement implements
 		return null;
 	}
 
+	@Override
 	public boolean isPropertySet(Object id) {
 		return true;
 	}
 
+	@Override
 	public void resetPropertyValue(Object id) {
 		// Not implemented, read only properties
 	}
 
+	@Override
 	public void setPropertyValue(Object id, Object value) {
 		// Not implemented, read only properties
 	}

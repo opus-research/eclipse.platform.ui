@@ -46,12 +46,13 @@ public class FileImageDescriptorTest extends BasicPerformanceTest {
 
 	/**
 	 * Test the time for doing a refresh.
-	 * 
+	 *
 	 * @throws Throwable
 	 */
 	public void testRefresh() throws Throwable {
 
 		exercise(new TestRunnable() {
+			@Override
 			public void run() {
 				Class missing = null;
 				ArrayList images = new ArrayList();
@@ -60,20 +61,20 @@ public class FileImageDescriptorTest extends BasicPerformanceTest {
 				Enumeration bundleEntries = bundle
 						.getEntryPaths(IMAGES_DIRECTORY);
 
-				
+
 				while (bundleEntries.hasMoreElements()) {
 					ImageDescriptor descriptor;
 					String localImagePath = (String) bundleEntries
 							.nextElement();
-					
+
 					if(localImagePath.indexOf('.') < 0)
 						continue;
-					
+
 					URL[] files = FileLocator.findEntries(bundle, new Path(
 							localImagePath));
 
 					for (int i = 0; i < files.length; i++) {
-						
+
 						startMeasuring();
 
 						try {
@@ -86,9 +87,9 @@ public class FileImageDescriptorTest extends BasicPerformanceTest {
 
 						for (int j = 0; j < 10; j++) {
 							Image image = descriptor.createImage();
-							images.add(image);							
+							images.add(image);
 						}
-						
+
 						processEvents();
 						stopMeasuring();
 
@@ -96,7 +97,7 @@ public class FileImageDescriptorTest extends BasicPerformanceTest {
 
 				}
 
-			
+
 				Iterator imageIterator = images.iterator();
 				while (imageIterator.hasNext()) {
 					((Image) imageIterator.next()).dispose();

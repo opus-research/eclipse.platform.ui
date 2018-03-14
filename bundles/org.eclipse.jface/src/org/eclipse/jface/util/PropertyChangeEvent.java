@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Assert;
  * also be subclassed if required.
  * </p>
  * <p>
- * The JFace frameworks contain classes that report property 
+ * The JFace frameworks contain classes that report property
  * change events for internal state changes that may be of interest
  * to external parties. A special listener interface
  * (<code>IPropertyChangeListener</code>) is defined for this purpose,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ovidio Mallo and others.
+ * Copyright (c) 2009, 2014 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 		this.validationStatusProviders = dbc.getValidationStatusProviders();
 	}
 
+	@Override
 	protected Object calculate() {
 		int maxSeverity = IStatus.OK;
 		ValidationStatusProvider maxSeverityProvider = null;
@@ -44,6 +45,7 @@ import org.eclipse.core.runtime.IStatus;
 		return maxSeverityProvider;
 	}
 
+	@Override
 	public synchronized void dispose() {
 		validationStatusProviders = null;
 		super.dispose();
