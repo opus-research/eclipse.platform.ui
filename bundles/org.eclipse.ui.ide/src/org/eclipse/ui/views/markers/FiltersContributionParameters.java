@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,18 +21,18 @@ import java.util.Map;
  *
  */
 public abstract class FiltersContributionParameters {
-	
+
 	/**
-	 * Returns a map keyed names for parameter values. The values should be 
+	 * Returns a map keyed names for parameter values. The values should be
 	 * actual values that will be interpreted by the {@link MarkerFieldFilter}
 	 * these parameters are designed for.
-	 * 
+	 *
 	 * Note that these parameters will be sent to the MarkerFieldFilter for
 	 * every visible {@link MarkerField} in a markers view.
-	 * 
-	 * 
+	 *
+	 *
 	 * @return A map of the name of the parameter value (<code>String</code>)
 	 *         to the actual value of the parameter (<code>String</code>).
 	 */
-	public abstract Map getParameterValues();
+	public abstract Map/*<String, String>*/ getParameterValues();
 }
