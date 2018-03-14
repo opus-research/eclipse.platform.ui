@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -46,8 +45,8 @@ public class DefaultSaveable extends Saveable {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		ISaveablePart saveable = SaveableHelper.getSaveable(part);
-		if (saveable != null) {
+		if (part instanceof ISaveablePart) {
+			ISaveablePart saveable = (ISaveablePart) part;
 			saveable.doSave(monitor);
 		}
 	}
@@ -76,9 +75,8 @@ public class DefaultSaveable extends Saveable {
 
 	@Override
 	public boolean isDirty() {
-		ISaveablePart saveable = SaveableHelper.getSaveable(part);
-		if (saveable != null) {
-			return saveable.isDirty();
+		if (part instanceof ISaveablePart) {
+			return ((ISaveablePart) part).isDirty();
 		}
 		return false;
 	}

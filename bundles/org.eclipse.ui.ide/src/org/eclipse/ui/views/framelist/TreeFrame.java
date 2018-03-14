@@ -187,7 +187,8 @@ public class TreeFrame extends Frame {
     private void saveElements(Object[] elements, IMemento memento) {
         for (int i = 0; i < elements.length; i++) {
             if (elements[i] instanceof IAdaptable) {
-                IPersistableElement persistable = ((IAdaptable) elements[i]).getAdapter(IPersistableElement.class);
+                IPersistableElement persistable = (IPersistableElement) ((IAdaptable) elements[i])
+                        .getAdapter(IPersistableElement.class);
                 if (persistable != null) {
                     IMemento elementMem = memento.createChild(TAG_ELEMENT);
                     elementMem.putString(TAG_FACTORY_ID, persistable
@@ -208,7 +209,8 @@ public class TreeFrame extends Frame {
 			return;
 		}
 
-        IPersistableElement persistable = ((IAdaptable) input).getAdapter(IPersistableElement.class);
+        IPersistableElement persistable = (IPersistableElement) ((IAdaptable) input)
+                .getAdapter(IPersistableElement.class);
         if (persistable != null) {
             IMemento frameMemento = memento.createChild(TAG_FRAME_INPUT);
 

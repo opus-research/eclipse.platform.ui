@@ -483,7 +483,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ViewsPreference_currentThemeDescription;
 	public static String ViewsPreference_currentThemeFormat;
 	public static String ViewsPreference_enableAnimations;
-	public static String ViewsPreference_visibleTabs_description;
 	public static String ViewsPreference_enableMRU;
 	public static String ViewsPreference_useColoredLabels;
 	// public static String ViewsPreference_override;
@@ -521,7 +520,6 @@ public class WorkbenchMessages extends NLS {
 	public static String EditorSelection_chooseAnEditor;
 	public static String EditorSelection_internal;
 	public static String EditorSelection_external;
-	public static String EditorSelection_rememberEditor;
 	public static String EditorSelection_browse;
 	public static String EditorSelection_title;
 

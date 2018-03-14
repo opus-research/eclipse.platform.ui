@@ -12,6 +12,8 @@
 
 package org.eclipse.ui.views.tasklist;
 
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +27,6 @@ import org.eclipse.jface.viewers.IBasicPropertyConstants;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.views.tasklist.TaskListMessages;
-
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.MessageFormat;
 
 /**
  * Utility class for accessing marker attributes.
@@ -156,8 +155,9 @@ class MarkerUtil implements IMarkerConstants {
         if (isMarkerType(marker, IMarker.TASK)) {
             if (isComplete(marker)) {
 				return TaskListMessages.TaskList_completed;
+			} else {
+				return TaskListMessages.TaskList_notCompleted;
 			}
-			return TaskListMessages.TaskList_notCompleted;
         }
         return ""; //$NON-NLS-1$
     }
@@ -273,13 +273,18 @@ class MarkerUtil implements IMarkerConstants {
         if (lineNumber == -1) {
             if (location.equals("")) {//$NON-NLS-1$
                 return "";//$NON-NLS-1$
+            } else {
+                return location;
             }
-			return location;
+        } else {
+            if (location.equals("")) {//$NON-NLS-1$
+                return line
+                        .format(new Object[] { Integer.toString(lineNumber) });
+            } else {
+                return lineAndLocation.format(new Object[] {
+                        Integer.toString(lineNumber), location });
+            }
         }
-		if (location.equals("")) {//$NON-NLS-1$
-			return line.format(new Object[] { Integer.toString(lineNumber) });
-		}
-		return lineAndLocation.format(new Object[] { Integer.toString(lineNumber), location });
     }
 
     /**

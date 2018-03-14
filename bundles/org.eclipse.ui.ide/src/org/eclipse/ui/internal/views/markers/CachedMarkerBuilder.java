@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,7 @@ public class CachedMarkerBuilder {
 	private Markers markers;
 	private Markers markersClone;
 
-	final Object MARKER_INCREMENTAL_UPDATE_FAMILY = new Object();
+	final Object MARKER_INCREMENTAL_UPDATE_FAMILY =new Object();
 	final Object CACHE_UPDATE_FAMILY = new Object();
 	final Object MARKERSVIEW_UPDATE_JOB_FAMILY;
 
@@ -85,34 +85,37 @@ public class CachedMarkerBuilder {
 		scheduler = new MarkerUpdateScheduler(view, this);
 	}
 
-	void restoreState(IMemento m) {
-		if (m == null) {
+	void restoreState(IMemento memento) {
+		if (memento == null)
 			setDefaultCategoryGroup(getGenerator());
-		} else {
+		else {
 			// Set up the category group if it has been set or set a default.
-			String categoryGroupID = m.getString(TAG_CATEGORY_GROUP);
-			if (categoryGroupID == null) {
+			String categoryGroupID = memento.getString(TAG_CATEGORY_GROUP);
+			if (categoryGroupID == null)
 				setDefaultCategoryGroup(getGenerator());
-			} else {
-				if (categoryGroupID.equals(VALUE_NONE)) {
+			else {
+				if (categoryGroupID.equals(VALUE_NONE))
 					this.categoryGroup = null;
-				} else {
-					MarkerGroup newGroup = getGenerator().getMarkerGroup(categoryGroupID);
-					if (newGroup == null) {
+				else {
+					MarkerGroup newGroup = getGenerator().getMarkerGroup(
+							categoryGroupID);
+					if (newGroup == null)
 						setDefaultCategoryGroup(getGenerator());
-					} else {
+					else
 						this.categoryGroup = newGroup;
-					}
 				}
 			}
 		}
-		this.memento = m;
+		this.memento=memento;
 	}
-
+	/**
+	 *
+	 */
 	void start() {
 		active = true;
 		registerTypesToListener();
-		PlatformUI.getWorkbench().getWorkingSetManager().addPropertyChangeListener(getWorkingSetListener());
+		PlatformUI.getWorkbench().getWorkingSetManager()
+				.addPropertyChangeListener(getWorkingSetListener());
 
 		markerListener.start();
 		scheduleUpdate();
@@ -123,15 +126,16 @@ public class CachedMarkerBuilder {
 	 */
 	void dispose() {
 		markerListener.stop();
-		active = false;
+		active=false;
 		Job.getJobManager().cancel(MARKERSVIEW_UPDATE_JOB_FAMILY);
 
-		if (workingSetListener != null) {
-			PlatformUI.getWorkbench().getWorkingSetManager().removePropertyChangeListener(getWorkingSetListener());
+		if(workingSetListener!=null){
+			PlatformUI.getWorkbench().getWorkingSetManager()
+			.removePropertyChangeListener(getWorkingSetListener());
 		}
 
 		if (isIncremental()) {
-			if (incrementJob != null) {
+			if(incrementJob!=null){
 				incrementJob.clearEntries();
 			}
 		}
@@ -152,11 +156,10 @@ public class CachedMarkerBuilder {
 	 * @return MarkerComparator
 	 */
 	MarkerComparator getComparator() {
-		if (comparator == null) {
+		if(comparator==null){
 			MarkerField field = null;
-			if (getCategoryGroup() != null) {
+			if (getCategoryGroup() != null)
 				field = getCategoryGroup().getMarkerField();
-			}
 			comparator = new MarkerComparator(field, generator.getAllFields());
 			if (memento != null) {
 				comparator.restore(memento);
@@ -191,9 +194,8 @@ public class CachedMarkerBuilder {
 	 *         {@link MarkerComparator#DESCENDING}
 	 */
 	int getSortDirection(MarkerField field) {
-		if (getComparator().descendingFields.contains(field)) {
+		if (getComparator().descendingFields.contains(field))
 			return MarkerComparator.DESCENDING;
-		}
 		return MarkerComparator.ASCENDING;
 	}
 
@@ -211,11 +213,10 @@ public class CachedMarkerBuilder {
 	 *
 	 * @return int
 	 */
-	static int getTotalMarkerCount(Markers markers) {
+	int getTotalMarkerCount(Markers markers) {
 		MarkerSupportItem[] elements = markers.getElements();
-		if (elements.length == 0 || elements[0].isConcrete()) {
+		if (elements.length == 0 || elements[0].isConcrete())
 			return elements.length;
-		}
 		int length = 0;
 		for (int i = 0; i < elements.length; i++) {
 			length += elements[i].getChildren().length;
@@ -230,14 +231,14 @@ public class CachedMarkerBuilder {
 	 * @return boolean
 	 */
 	boolean isBuilding() {
-		return building || markerListener.isReceivingChange();
+		return building|| markerListener.isReceivingChange();
 	}
 
 	/**
 	 * Update the flag that indicates if the markers are building/changing
 	 */
 	void setBuilding(boolean building) {
-		this.building = building;
+		this.building =building;
 	}
 
 	/**
@@ -251,25 +252,30 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Refresh the sort order and categories of the receiver.
+	 *
 	 */
 	void refreshContents(IWorkbenchSiteProgressService service) {
 		try {
 			service.busyCursorWhile(new IRunnableWithProgress() {
 				@Override
 				public void run(IProgressMonitor monitor) {
-					SortingJob job = new SortingJob(CachedMarkerBuilder.this);
+					SortingJob job=new SortingJob(CachedMarkerBuilder.this);
 					job.run(monitor);
 				}
 			});
 		} catch (InvocationTargetException e) {
-			StatusManager.getManager().handle(StatusUtil.newStatus(IStatus.ERROR, e.getLocalizedMessage(), e));
+			StatusManager.getManager().handle(
+					StatusUtil.newStatus(IStatus.ERROR,
+							e.getLocalizedMessage(), e));
 		} catch (InterruptedException e) {
-			StatusManager.getManager().handle(StatusUtil.newStatus(IStatus.ERROR, e.getLocalizedMessage(), e));
+			StatusManager.getManager().handle(
+					StatusUtil.newStatus(IStatus.ERROR,
+							e.getLocalizedMessage(), e));
 		}
 	}
-
 	/**
 	 * Refresh the sort order and categories of the receiver.
+	 *
 	 */
 	void refreshContents() {
 		SortingJob job=new SortingJob(CachedMarkerBuilder.this);
@@ -286,15 +292,14 @@ public class CachedMarkerBuilder {
 	/**
 	 * Save the state of the receiver to memento
 	 *
-	 * @param m
+	 * @param memento
 	 */
-	void saveState(IMemento m) {
-		getComparator().saveState(m);
-		if (categoryGroup == null) {
-			m.putString(TAG_CATEGORY_GROUP, VALUE_NONE);
-		} else {
-			m.putString(TAG_CATEGORY_GROUP, getCategoryGroup().getId());
-		}
+	void saveState(IMemento memento) {
+		getComparator().saveState(memento);
+		if (categoryGroup == null)
+			memento.putString(TAG_CATEGORY_GROUP, VALUE_NONE);
+		else
+			memento.putString(TAG_CATEGORY_GROUP, getCategoryGroup().getId());
 	}
 
 	/**
@@ -345,12 +350,12 @@ public class CachedMarkerBuilder {
 	 */
 	void setCategoryGroup(MarkerGroup group) {
 		this.categoryGroup = group;
-		if (group == null) {
+		if (group == null)
 			getComparator().setCategory(null);
-		} else {
+		else
 			getComparator().setCategory(group.getMarkerField());
-		}
 		scheduleUpdate();
+
 	}
 
 	/**
@@ -362,10 +367,10 @@ public class CachedMarkerBuilder {
 		String categoryName = contentGenerator.getCategoryName();
 		if (categoryName != null) {
 			MarkerGroup group = contentGenerator.getMarkerGroup(categoryName);
-			if (group != null) {
+			if (group != null)
 				categoryGroup = group;
-			}
 		}
+
 	}
 
 	/**
@@ -388,13 +393,14 @@ public class CachedMarkerBuilder {
 	 * @param field
 	 */
 	void setPrimarySortField(MarkerField field) {
+
 		getComparator().setPrimarySortField(field);
+
 	}
 
 	MarkerUpdateScheduler getUpdateScheduler(){
 		return scheduler;
 	}
-
 	/**
 	 * Set the progress service for the receiver.
 	 *
@@ -403,13 +409,16 @@ public class CachedMarkerBuilder {
 	void setProgressService(IWorkbenchSiteProgressService service) {
 		progressService = service;
 		if (service != null) {
-			service.showBusyForFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
-			service.showBusyForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
-			service.showBusyForFamily(CACHE_UPDATE_FAMILY);
-			service.showBusyForFamily(MARKERSVIEW_UPDATE_JOB_FAMILY);
+			service
+					.showBusyForFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
+			service
+					.showBusyForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
+			service
+					.showBusyForFamily(CACHE_UPDATE_FAMILY);
+			service
+					.showBusyForFamily(MARKERSVIEW_UPDATE_JOB_FAMILY);
 		}
 	}
-
 	/**
 	 * @return Returns the progressService.
 	 */
@@ -424,9 +433,9 @@ public class CachedMarkerBuilder {
 	 * schedules marker update job
 	 */
 	MarkerUpdateJob scheduleUpdateJob(long delay) {
-		return scheduleUpdateJob(delay, false, new boolean[] { true, false, false });
+		return scheduleUpdateJob(delay, false, new boolean[] { true, false,
+				false });
 	}
-
 	/**
 	 * The method should not be called directly, see
 	 * {@link MarkerUpdateScheduler}
@@ -434,19 +443,21 @@ public class CachedMarkerBuilder {
 	 * schedules marker update job
 	 */
 	 MarkerUpdateJob scheduleUpdateJob(long delay, boolean clean) {
-		return scheduleUpdateJob(delay, clean, new boolean[] { true, false, false });
+		return scheduleUpdateJob(delay, clean,new boolean[] { true, false,
+				false });
 	}
 
-	/**
-	 * The method should not be called directly, see
+	 /**
+	  * The method should not be called directly, see
 	 * {@link MarkerUpdateScheduler}
 	 *
 	 * schedules marker update job
 	 */
-	MarkerUpdateJob scheduleUpdateJob(long delay, boolean clean, boolean[] newChangeFlags) {
+	MarkerUpdateJob scheduleUpdateJob(long delay, boolean clean,
+			boolean[] changeFlags) {
 
 		setBuilding(true);
-		updateChangeFlags(newChangeFlags);
+		updateChangeFlags(changeFlags);
 
 		synchronized (getUpdateScheduler().getSchedulingLock()) {
 			if (generator == null || !active) {
@@ -520,11 +531,12 @@ public class CachedMarkerBuilder {
 	 * every delta is wasteful.
 	 */
 	void registerTypesToListener() {
-		MarkerContentGenerator gen = getGenerator();
-		if (gen == null) {
+		MarkerContentGenerator generator =getGenerator();
+		if (generator == null) {
 			return;
 		}
-		getMarkerListener().listenToTypes(gen.getTypes(), includeMarkerSubTypes());
+		getMarkerListener().listenToTypes(generator.getTypes(),
+				includeMarkerSubTypes());
 	}
 
 	/**
@@ -631,11 +643,12 @@ public class CachedMarkerBuilder {
 	}
 
 	/**
-	 * @param newChangeFlags
+	 * @param changeFlags
+	 *
 	 */
-	void updateChangeFlags(boolean[] newChangeFlags) {
-		for (int i = 0; i < newChangeFlags.length; i++) {
-			this.changeFlags[i] = this.changeFlags[i] | newChangeFlags[i];
+	void updateChangeFlags(boolean[] changeFlags) {
+		for (int i = 0; i < changeFlags.length; i++) {
+			this.changeFlags[i]=this.changeFlags[i]|changeFlags[i];
 		}
 	}
 
@@ -661,6 +674,13 @@ public class CachedMarkerBuilder {
 	 *
 	 */
 	private class WorkingSetListener implements IPropertyChangeListener{
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see
+		 * org.eclipse.jface.util.IPropertyChangeListener#propertyChange
+		 * (org.eclipse.jface.util.PropertyChangeEvent)
+		 */
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			boolean needsUpdate=false;
@@ -668,9 +688,11 @@ public class CachedMarkerBuilder {
 					.getProperty()
 					.equals(
 							IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE)) {
-				Iterator<MarkerFieldFilterGroup> iterator = generator.getEnabledFilters().iterator();
+				Iterator iterator = generator.getEnabledFilters()
+						.iterator();
 				while (iterator.hasNext()) {
-					MarkerFieldFilterGroup group = iterator.next();
+					MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) iterator
+							.next();
 					if (group.getScope() == MarkerFieldFilterGroup.ON_WORKING_SET) {
 						IWorkingSet wSet = group.getWorkingSet();
 						if (wSet!=null&&wSet.equals(event.getNewValue())) {
@@ -680,10 +702,12 @@ public class CachedMarkerBuilder {
 					}
 				}
 			}
-			if (event.getProperty().equals(IWorkingSetManager.CHANGE_WORKING_SET_REMOVE)) {
-				Iterator<MarkerFieldFilterGroup> iterator = generator.getAllFilters().iterator();
+			if (event.getProperty().equals(
+					IWorkingSetManager.CHANGE_WORKING_SET_REMOVE)) {
+				Iterator iterator = generator.getAllFilters().iterator();
 				while (iterator.hasNext()) {
-					MarkerFieldFilterGroup group = iterator.next();
+					MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) iterator
+							.next();
 					if (group.getScope() == MarkerFieldFilterGroup.ON_WORKING_SET) {
 						IWorkingSet wSet = group.getWorkingSet();
 						if (wSet!=null && wSet.equals(event.getOldValue())) {

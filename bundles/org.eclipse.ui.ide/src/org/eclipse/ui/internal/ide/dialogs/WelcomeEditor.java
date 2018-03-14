@@ -60,7 +60,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -146,14 +145,16 @@ public class WelcomeEditor extends EditorPart {
         int index = 0;
         if (text == null) {
 			return (StyledText) texts.get(0);
+		} else {
+			index = texts.indexOf(text);
 		}
-		index = texts.indexOf(text);
 
         //If we are not at the end....
         if (index < texts.size() - 1) {
 			return (StyledText) texts.get(index + 1);
+		} else {
+			return (StyledText) texts.get(0);
 		}
-		return (StyledText) texts.get(0);
     }
 
     /**
@@ -163,14 +164,16 @@ public class WelcomeEditor extends EditorPart {
         int index = 0;
         if (text == null) {
 			return (StyledText) texts.get(0);
+		} else {
+			index = texts.indexOf(text);
 		}
-		index = texts.indexOf(text);
 
         //If we are at the beginning....
         if (index == 0) {
 			return (StyledText) texts.get(texts.size() - 1);
+		} else {
+			return (StyledText) texts.get(index - 1);
 		}
-		return (StyledText) texts.get(index - 1);
     }
 
     /**
@@ -329,11 +332,12 @@ public class WelcomeEditor extends EditorPart {
                     if ((e.stateMask & SWT.CTRL) != 0) {
                         if (e.widget == lastText) {
 							return;
-						}
-						e.doit = false;
-						nextTabAbortTraversal = true;
-						lastText.traverse(SWT.TRAVERSE_TAB_NEXT);
-						return;
+						} else {
+                            e.doit = false;
+                            nextTabAbortTraversal = true;
+                            lastText.traverse(SWT.TRAVERSE_TAB_NEXT);
+                            return;
+                        }
                     }
                     if (nextTabAbortTraversal) {
                         nextTabAbortTraversal = false;
@@ -360,11 +364,12 @@ public class WelcomeEditor extends EditorPart {
                     if ((e.stateMask & SWT.CTRL) != 0) {
                         if (e.widget == firstText) {
 							return;
-						}
-						e.doit = false;
-						previousTabAbortTraversal = true;
-						firstText.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
-						return;
+						} else {
+                            e.doit = false;
+                            previousTabAbortTraversal = true;
+                            firstText.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
+                            return;
+                        }
                     }
                     if (previousTabAbortTraversal) {
                         previousTabAbortTraversal = false;

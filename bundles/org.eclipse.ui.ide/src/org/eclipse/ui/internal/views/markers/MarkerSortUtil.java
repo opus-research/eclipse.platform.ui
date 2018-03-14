@@ -33,7 +33,6 @@ import java.util.Comparator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.ui.views.markers.MarkerItem;
 
 /**
  * @since 3.5
@@ -76,8 +75,8 @@ public class MarkerSortUtil {
 	 * @param last
 	 * @param comparator
 	 */
-	private static void partiallySort(MarkerEntry[] array, int first, int middle, int last,
-			Comparator<MarkerItem> comparator) {
+	private static void partiallySort(MarkerEntry[] array, int first,
+			int middle, int last, Comparator comparator) {
 		heapify(array, first, middle, comparator);
 
 		adjustMaxElement(array, first, middle, last, comparator);
@@ -94,8 +93,8 @@ public class MarkerSortUtil {
 	 * @param last
 	 * @param comparator
 	 */
-	private static void adjustMaxElement(MarkerEntry[] heapArray, int first, int heapSize, int last,
-			Comparator<MarkerItem> comparator) {
+	private static void adjustMaxElement(MarkerEntry[] heapArray, int first,
+			int heapSize, int last, Comparator comparator) {
 		/*
 		 * we do not clear caches for heap elements when re-adjusting and
 		 * sorting this will ensure sorting remains fast
@@ -128,8 +127,7 @@ public class MarkerSortUtil {
 	 * @param comparator
 	 */
 	private static void adjustHeap(MarkerEntry[] array, int first,
- int position, int last,
-			Comparator<MarkerItem> comparator) {
+			int position, int last, Comparator comparator) {
 		MarkerEntry hole = array[position];
 		int holeIndex = position;
 		holeIndex = leafSearch(array, first, holeIndex, last, comparator);
@@ -149,8 +147,7 @@ public class MarkerSortUtil {
 	 * @return new holeIndex
 	 */
 	private static int leafSearch(MarkerEntry[] array, int first, int position,
- int last,
-			Comparator<MarkerItem> comparator) {
+			int last, Comparator comparator) {
 		int holeOffset = position - first;
 		int len = last - first;
 		int childOffset = 2 * holeOffset + 2;
@@ -184,8 +181,7 @@ public class MarkerSortUtil {
 	 * @return new holeIndex
 	 */
 	private static int bottomUpSearch(MarkerEntry[] array, int first, int fromIndex,
- int toIndex, MarkerEntry hole,
-			int last, Comparator<MarkerItem> comparator) {
+			int toIndex, MarkerEntry hole, int last, Comparator comparator) {
 		int holeOffset = fromIndex - first;
 		int parent = (holeOffset - 1) / 2;
 		int top = toIndex - first;
@@ -259,7 +255,7 @@ public class MarkerSortUtil {
 	 * @param comparator
 	 */
 	private static void heapify(MarkerEntry[] array, int first, int last,
- Comparator<MarkerItem> comparator) {
+			Comparator comparator) {
 		if (last - first < 2)
 			return;
 		int parent = (last - first - 2) / 2;
@@ -278,7 +274,7 @@ public class MarkerSortUtil {
 	 *
 	 */
 	private static void heapToSortedArray(MarkerEntry[] array, int first,
- int last, Comparator<MarkerItem> comparator) {
+			int last, Comparator comparator) {
 		//TODO:Use mergesort to convert the heap to sorted array?
 
 		while (last - first > 1) {
@@ -312,8 +308,7 @@ public class MarkerSortUtil {
 	 * @param monitor
 	 */
 	public static void sortStartingKElement(MarkerEntry[] entries,
- Comparator<MarkerItem> comparator, int from, int to,
-			int k, IProgressMonitor monitor) {
+			Comparator comparator, int from, int to, int k,IProgressMonitor monitor) {
 		// check range valid
 		int last = from + k-1;
 		if (entries.length == 0 || from < 0 || from >= to || last < from
@@ -371,8 +366,7 @@ public class MarkerSortUtil {
 	 * @param limit
 	 */
 	public static void sortStartingKElement(MockMarkerEntry[] fArray1,
- Comparator<MarkerItem> comparator, int from,
-			int k, int limit) {
+			Comparator comparator, int from, int k, int limit) {
 		sortStartingKElement(fArray1, comparator, from, k, limit,new NullProgressMonitor());
 	}
 	/**
@@ -390,8 +384,7 @@ public class MarkerSortUtil {
 	 * @param monitor
 	 */
 	public static void sortStartingKElement(MarkerEntry[] entries,
- Comparator<MarkerItem> comparator, int k,
-			IProgressMonitor monitor) {
+			Comparator comparator, int k,IProgressMonitor monitor) {
 		sortStartingKElement(entries, comparator, 0, entries.length - 1, k,monitor);
 	}
 
@@ -412,8 +405,7 @@ public class MarkerSortUtil {
 	 * @param monitor
 	 */
 	public static void sortStartingKElement(MarkerEntry[] entries,
- Comparator<MarkerItem> comparator, int from, int k,
-			IProgressMonitor monitor) {
+			Comparator comparator, int from, int k, IProgressMonitor monitor) {
 		sortStartingKElement(entries, comparator, from, entries.length - 1, k,monitor);
 	}
 

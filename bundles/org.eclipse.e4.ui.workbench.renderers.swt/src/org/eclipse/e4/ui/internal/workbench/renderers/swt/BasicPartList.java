@@ -104,26 +104,14 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
-			StackRenderer renderer, boolean mru) {
+			StackRenderer renderer, boolean alphabetical) {
 		super(parent, shellStyle, treeStyler);
 		this.partService = partService;
 		this.input = input;
 		this.renderer = renderer;
 		// this.saveHandler = saveHandler;
-		if (mru && getTableViewer() != null) {
-			getTableViewer().setComparator(new ViewerComparator() {
-				@Override
-				public int category(Object element) {
-					if (element instanceof MPart) {
-						MPart part = (MPart) element;
-						CTabItem item = BasicPartList.this.renderer.findItemForPart(part);
-						if (item != null && !item.isShowing()) {
-							return -1;
-						}
-					}
-					return 0;
-				}
-			});
+		if (alphabetical && getTableViewer() != null) {
+			getTableViewer().setComparator(new ViewerComparator());
 		}
 	}
 

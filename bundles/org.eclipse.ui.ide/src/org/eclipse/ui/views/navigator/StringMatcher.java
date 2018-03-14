@@ -221,9 +221,10 @@ import java.util.Vector;
         if (!fHasLeadingStar) {
             if (!regExpRegionMatches(text, start, current, 0, segLength)) {
                 return false;
+            } else {
+                ++i;
+                tCurPos = tCurPos + segLength;
             }
-			++i;
-			tCurPos = tCurPos + segLength;
         }
         if ((fSegments.length == 1) && (!fHasLeadingStar)
                 && (!fHasTrailingStar)) {

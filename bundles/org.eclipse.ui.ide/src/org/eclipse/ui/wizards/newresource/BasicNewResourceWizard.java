@@ -164,7 +164,8 @@ public abstract class BasicNewResourceWizard extends Wizard implements
             if (part instanceof ISetSelectionTarget) {
 				target = (ISetSelectionTarget) part;
 			} else {
-				target = part.getAdapter(ISetSelectionTarget.class);
+				target = (ISetSelectionTarget) part
+                        .getAdapter(ISetSelectionTarget.class);
 			}
 
             if (target != null) {
