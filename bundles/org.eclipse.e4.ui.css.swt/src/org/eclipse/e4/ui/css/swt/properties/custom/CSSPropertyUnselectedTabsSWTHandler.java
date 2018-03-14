@@ -30,8 +30,7 @@ public class CSSPropertyUnselectedTabsSWTHandler extends AbstractCSSPropertySWTH
 	@Override
 	protected void applyCSSProperty(Control control, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
-		if (!(control instanceof CTabFolder)
-				|| !isUnselectedTabsColorProp(property)) {
+		if (!(control instanceof CTabFolder)) {
 			return;
 		}
 		CTabFolder folder = ((CTabFolder) control);
@@ -59,8 +58,10 @@ public class CSSPropertyUnselectedTabsSWTHandler extends AbstractCSSPropertySWTH
 						control.getDisplay(), engine);
 				percents = CSSSWTColorHelper.getPercents(grad);
 			}
-			((ICTabRendering) renderer)
-			.setUnselectedTabsColor(colors, percents);
+			if (isUnselectedTabsColorProp(property)) {
+				((ICTabRendering) renderer).setUnselectedTabsColor(colors,
+						percents);
+			}
 			folder.setBackground(colors, percents, true);
 		}
 	}
