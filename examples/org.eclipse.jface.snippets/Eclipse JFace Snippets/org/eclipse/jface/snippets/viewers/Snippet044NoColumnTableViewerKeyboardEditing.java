@@ -50,7 +50,6 @@ public class Snippet044NoColumnTableViewerKeyboardEditing {
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (MyModel[]) inputElement;
 		}
@@ -60,7 +59,6 @@ public class Snippet044NoColumnTableViewerKeyboardEditing {
 		 * 
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 
 		}
@@ -71,7 +69,6 @@ public class Snippet044NoColumnTableViewerKeyboardEditing {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -87,7 +84,6 @@ public class Snippet044NoColumnTableViewerKeyboardEditing {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -97,27 +93,22 @@ public class Snippet044NoColumnTableViewerKeyboardEditing {
 			ITableLabelProvider, ITableFontProvider, ITableColorProvider {
 		FontRegistry registry = new FontRegistry();
 
-		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
-		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 
-		@Override
 		public Font getFont(Object element, int columnIndex) {
 			return null;
 		}
 
-		@Override
 		public Color getBackground(Object element, int columnIndex) {
 			return null;
 		}
 
-		@Override
 		public Color getForeground(Object element, int columnIndex) {
 			return null;
 		}
@@ -132,17 +123,14 @@ public class Snippet044NoColumnTableViewerKeyboardEditing {
 		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()) });
 		v.setCellModifier(new ICellModifier() {
 
-			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
-			@Override
 			public Object getValue(Object element, String property) {
 				return "Column " + property + " => " + element.toString();
 			}
 
-			@Override
 			public void modify(Object element, String property, Object value) {
 				
 			}
@@ -153,7 +141,6 @@ public class Snippet044NoColumnTableViewerKeyboardEditing {
 		
 		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(v,new FocusBorderCellHighlighter(v));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
-			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL

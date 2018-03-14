@@ -271,12 +271,10 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		display.addFilter(SWT.Hide, rendererFilter);
 		display.addFilter(SWT.Dispose, rendererFilter);
 		context.set(MenuManagerRendererFilter.class, rendererFilter);
-		MenuManagerEventHelper.getInstance().setShowHelper(
-				ContextInjectionFactory.make(MenuManagerShowProcessor.class,
-						context));
-		MenuManagerEventHelper.getInstance().setHideHelper(
-				ContextInjectionFactory.make(MenuManagerHideProcessor.class,
-						context));
+		MenuManagerEventHelper.showHelper = ContextInjectionFactory.make(
+				MenuManagerShowProcessor.class, context);
+		MenuManagerEventHelper.hideHelper = ContextInjectionFactory.make(
+				MenuManagerHideProcessor.class, context);
 
 	}
 
@@ -288,15 +286,12 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
 
-		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance()
-				.getShowHelper(),
+		ContextInjectionFactory.uninject(MenuManagerEventHelper.showHelper,
 				context);
-		MenuManagerEventHelper.getInstance().setShowHelper(null);
-		ContextInjectionFactory.uninject(
-MenuManagerEventHelper.getInstance()
-				.getHideHelper(),
+		MenuManagerEventHelper.showHelper = null;
+		ContextInjectionFactory.uninject(MenuManagerEventHelper.hideHelper,
 				context);
-		MenuManagerEventHelper.getInstance().setHideHelper(null);
+		MenuManagerEventHelper.hideHelper = null;
 
 		context.remove(MenuManagerRendererFilter.class);
 		Display display = context.get(Display.class);

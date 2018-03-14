@@ -61,8 +61,7 @@ public final class LocalResourceManager extends AbstractResourceManager {
 	        /* (non-Javadoc)
 	         * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	         */
-	        @Override
-			public void widgetDisposed(DisposeEvent e) {
+	        public void widgetDisposed(DisposeEvent e) {
 	            LocalResourceManager.this.dispose();
 	        } 
         });
