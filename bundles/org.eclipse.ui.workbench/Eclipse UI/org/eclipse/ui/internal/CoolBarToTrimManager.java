@@ -116,6 +116,18 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	}
 
 	private void add(MTrimBar trimBar, int idx, IContributionItem item) {
+
+		if (idx == -1) {
+			List<MTrimElement> trimBarElements = trimBar.getChildren();
+			idx = trimBarElements.size() - 1;
+			while (idx > -1) {
+				if ("PerspectiveSpacer".equals(trimBarElements.get(idx).getElementId())) { //$NON-NLS-1$
+					break;
+				}
+				idx--;
+			}
+		}
+
 		if (item instanceof IToolBarContributionItem) {
 			IToolBarManager mgr = ((IToolBarContributionItem) item).getToolBarManager();
 			if (!(mgr instanceof ToolBarManager)) {
