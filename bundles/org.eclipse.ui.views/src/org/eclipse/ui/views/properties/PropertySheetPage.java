@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
+ *     Patrick Tasse - [Bug 109617] Allow PropertySheetPage to be subclassed
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -57,32 +58,31 @@ import org.eclipse.ui.part.CellEditorActionHandler;
 import org.eclipse.ui.part.Page;
 
 /**
- * The standard implementation of property sheet page which presents
- * a table of property names and values obtained from the current selection
- * in the active workbench part.
+ * The standard implementation of property sheet page which presents a table of
+ * property names and values obtained from the current selection in the active
+ * workbench part.
  * <p>
- * This page obtains the information about what properties to display from
- * the current selection (which it tracks).
+ * This page obtains the information about what properties to display from the
+ * current selection (which it tracks).
  * </p>
  * <p>
  * The model for this page is a hierarchy of <code>IPropertySheetEntry</code>.
  * The page may be configured with a custom model by setting the root entry.
  * <p>
  * If no root entry is set then a default model is created which uses the
- * <code>IPropertySource</code> interface to obtain the properties of
- * the current selection. This requires that the selected objects provide an
+ * <code>IPropertySource</code> interface to obtain the properties of the
+ * current selection. This requires that the selected objects provide an
  * <code>IPropertySource</code> adapter (or implement
- * <code>IPropertySource</code> directly). This restiction can be overcome
- * by providing this page with an <code>IPropertySourceProvider</code>. If
+ * <code>IPropertySource</code> directly). This restriction can be overcome by
+ * providing this page with an <code>IPropertySourceProvider</code>. If
  * supplied, this provider will be used by the default model to obtain a
  * property source for the current selection
  * </p>
  * <p>
- * This class may be instantiated; it is not intended to be subclassed.
+ * This class may be instantiated.
  * </p>
  *
  * @see IPropertySource
- * @noextend This class is not intended to be subclassed by clients.
  */
 public class PropertySheetPage extends Page implements IPropertySheetPage, IAdaptable {
     /**
