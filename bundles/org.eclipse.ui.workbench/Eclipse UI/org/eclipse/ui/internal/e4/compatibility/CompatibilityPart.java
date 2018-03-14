@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 436908
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -17,10 +18,12 @@ import javax.inject.Inject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -130,6 +133,11 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	CompatibilityPart(MPart part) {
 		this.part = part;
+	}
+
+	@PersistState
+	void persistState() {
+		ContextInjectionFactory.invoke(wrapped, PersistState.class, part.getContext(), null);
 	}
 
 	public abstract WorkbenchPartReference getReference();
@@ -407,6 +415,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			SaveableHelper.savePart((ISaveablePart) wrapped, wrapped, getReference().getSite()
 					.getWorkbenchWindow(), false);
 		}
+		// ContextInjectionFactory.invoke(wrapped, Persist.class, part.getContext(), null);
 	}
 
 	public IWorkbenchPart getPart() {

@@ -79,6 +79,7 @@
     </iu>
     <iu id='org.eclipse.pde.api.tools.ee.feature.feature.group' name='API Tools Execution Environment Descriptions' >
       <repositories size='2'>
+        <repository location='http://download.eclipse.org/eclipse/updates/4.5-I-builds'/>
         <repository location='http://download.eclipse.org/releases/luna'/>
       </repositories>
     </iu>
