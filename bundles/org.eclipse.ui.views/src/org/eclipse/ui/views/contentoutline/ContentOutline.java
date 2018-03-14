@@ -124,7 +124,7 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     @Override
 	protected PageRec doCreatePage(IWorkbenchPart part) {
         // Try to get an outline page.
-		IContentOutlinePage page = Adapters.getAdapter(part, IContentOutlinePage.class, true);
+		IContentOutlinePage page = Adapters.getAdapter(part, IContentOutlinePage.class, false);
 		if (page != null) {
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);

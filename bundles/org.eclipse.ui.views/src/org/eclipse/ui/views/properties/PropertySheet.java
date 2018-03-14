@@ -136,7 +136,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected IPage createDefaultPage(PageBook book) {
-		IPageBookViewPage page = (IPageBookViewPage) Adapters.getAdapter(this, IPropertySheetPage.class, true);
+		IPageBookViewPage page = (IPageBookViewPage) Adapters.getAdapter(this, IPropertySheetPage.class, false);
         if(page == null) {
         	page = new PropertySheetPage();
         }
@@ -198,7 +198,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
     	if(part instanceof PropertySheet) {
     		return null;
     	}
-		IPropertySheetPage page = Adapters.getAdapter(part, IPropertySheetPage.class, true);
+		IPropertySheetPage page = Adapters.getAdapter(part, IPropertySheetPage.class, false);
         if (page != null) {
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);
