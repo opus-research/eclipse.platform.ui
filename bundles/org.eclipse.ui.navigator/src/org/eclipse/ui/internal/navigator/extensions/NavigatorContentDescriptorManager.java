@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2011, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.extensions;
 
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
@@ -32,6 +35,7 @@ import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.internal.navigator.NavigatorSafeRunnable;
 import org.eclipse.ui.internal.navigator.Policy;
 import org.eclipse.ui.internal.navigator.VisibilityAssistant;
+import org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener;
 import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 import org.eclipse.ui.navigator.OverridePolicy;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -46,6 +50,165 @@ public class NavigatorContentDescriptorManager {
 	private final Map<String, NavigatorContentDescriptor> firstClassDescriptorsMap = new HashMap<String, NavigatorContentDescriptor>();
 
 	private final Map<String, NavigatorContentDescriptor> allDescriptors = new HashMap<String, NavigatorContentDescriptor>();
+
+	/**
+	 * A cache for evaluated ContentDescriptors.
+	 * Not part of the public API.
+	 * @since 3.2
+	 * @version 4.5
+	 */
+	// @VisibleForTesting
+	public static class EvaluationCache implements VisibilityListener {
+
+		// TODO Have an LRU cache with max size as well as SoftReferences, to help prevent pathological GC performance
+		// that can happen where there are a large number of softly reachable objects, as well as helping to
+		// reduce dependence on the GC from keeping this cache's size in line in the first place.
+		private final Map<EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>> evaluations =
+				new HashMap<EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>>();
+		private final Map<EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>> evaluationsWithOverrides =
+				new HashMap<EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>>();
+
+		private final ReferenceQueue<Object> evaluationsQueue = new ReferenceQueue<Object>();
+		private final ReferenceQueue<Object> evaluationsWithOverridesQueue = new ReferenceQueue<Object>();
+
+		/**
+		 * Not part of the public API.
+		 * @param anAssistant the VisisbilityAssistant to register with, must be non-null
+		 */
+		// @VisibleForTesting
+		protected EvaluationCache(VisibilityAssistant anAssistant) {
+			anAssistant.addListener(this);
+		}
+
+		private void cleanUpStaleEntries() {
+			// TODO Only clean up to a certain number of entries per call when merely accessing or setting?
+			// TODO Periodic task to run this every now and then, ala org.eclipse.core.runtime.jobs.Job?
+			// If this is done, will need to make this class thread safe.
+
+			// Not thread safe, but this whole class isn't, so that is fine.
+			Reference<?> r;
+			// Reference#poll thankfully does not block if there is nothing available.
+			while ((r = evaluationsQueue.poll()) != null) {
+				processStaleEntry(r, evaluations);
+			}
+			while ((r = evaluationsWithOverridesQueue.poll()) != null) {
+				processStaleEntry(r, evaluationsWithOverrides);
+			}
+		}
+
+		private static void processStaleEntry(Reference<?> r,
+				Map<? extends Reference<?>, ? extends Reference<?>> fromMap) {
+			if (r instanceof EvaluationReference) {
+				// Key has been collected; clear its entry.
+				EvaluationValueReference<?> oldVal = (EvaluationValueReference<?>) fromMap.remove(r);
+				if (oldVal != null) {
+					// Clear the key from the value so we don't try to prematurely remove any potential new mapping upon cleanUpStaleEntries()
+					oldVal.clear();
+				}
+			}
+			if (r instanceof EvaluationValueReference) {
+				// If the value has been collected, get its key, and then remove that entry.
+				EvaluationReference<?> key = ((EvaluationValueReference<?>)r).getKey();
+				if (key != null) {
+					fromMap.remove(key);
+				}
+			}
+			// All other Reference types we just leave alone.
+		}
+
+		protected final NavigatorContentDescriptor[] getDescriptors(Object anElement) {
+			return getDescriptors(anElement, true);
+		}
+
+		protected final void setDescriptors(Object anElement, NavigatorContentDescriptor[] theDescriptors) {
+			setDescriptors(anElement, theDescriptors, true);
+		}
+
+		private static NavigatorContentDescriptor[] getDescriptorsFromMap (Object anElement,
+				Map<EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>> map) {
+			// Need to wrap in the reference type before querying, else it won't be found by HashMap.
+			EvaluationReference<Object> key = new EvaluationReference<Object>(anElement);
+			NavigatorContentDescriptor[] cachedDescriptors = null;
+			Reference<NavigatorContentDescriptor[]> cache = map.get(key);
+			if (cache != null && (cachedDescriptors = cache.get()) == null) {
+				// There was an entry, but it has been collected; remove stale mapping.
+				EvaluationValueReference<NavigatorContentDescriptor[]> value = map.remove(key);
+				if (value != null) {
+					// Clear the key from the value so we don't try to prematurely remove any potential new mapping upon cleanUpStaleEntries()
+					value.clear();
+				}
+			}
+			return cachedDescriptors;
+		}
+
+		protected final NavigatorContentDescriptor[] getDescriptors(Object anElement, boolean toComputeOverrides) {
+			cleanUpStaleEntries();
+			if (anElement == null)
+				return null;
+
+			if (toComputeOverrides) {
+				return getDescriptorsFromMap(anElement, evaluations);
+			}
+			return getDescriptorsFromMap(anElement, evaluationsWithOverrides);
+		}
+
+		private static void setDescriptorsInMap(Object anElement, NavigatorContentDescriptor[] theDescriptors,
+				Map<EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>> map,
+				ReferenceQueue<Object> queue) {
+			// Ideally, we would use a WeakReference wrapper if the object given uses identity equality
+			// (we can test if the class uses Object's equals or has its own override), and only use a SoftReference
+			// if the object overrides equals, but that is a bit too unwieldy to check (it would require
+			// checking reflective data) to be worth it.
+			EvaluationReference<Object> key = new EvaluationReference<Object>(anElement, queue);
+			EvaluationValueReference<NavigatorContentDescriptor[]> newValue =
+					new EvaluationValueReference<NavigatorContentDescriptor[]>(theDescriptors, key, queue);
+			EvaluationValueReference<NavigatorContentDescriptor[]> oldValue = map.put(key, newValue);
+			if (oldValue != null) {
+				// "Swap" the correct key instance when swapping the value, or else the above, temporary
+				// lookup key will be collected too early (not the actual anElement, but the Reference object).
+				// Not truly needed, but it will help the point of this field not go to waste.
+				newValue.swapKey(oldValue);
+				// Clear the key so we don't try to prematurely remove the new mapping upon cleanUpStaleEntries()
+				oldValue.clear();
+			}
+		}
+
+		protected final void setDescriptors(Object anElement, NavigatorContentDescriptor[] theDescriptors, boolean toComputeOverrides) {
+			cleanUpStaleEntries();
+			if (anElement != null) {
+				if (toComputeOverrides)
+					setDescriptorsInMap(anElement, theDescriptors, evaluations, evaluationsQueue);
+				else
+					setDescriptorsInMap(anElement, theDescriptors, evaluationsWithOverrides, evaluationsWithOverridesQueue);
+			}
+		}
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener#onVisibilityOrActivationChange()
+		 */
+		public void onVisibilityOrActivationChange() {
+			// Dump everything in the reference queues.
+			// Don't bother removing from the map based on references, we are about to clear everything anyways.
+			// This might lead to some premature removals because yet to be collected values are not clearing
+			// their key reference, but that is worth having a fast clearing of the maps.
+			// Thankfully, this should be rare, as when reference objects themselves are GCed before being added
+			// to a reference queue, they don't get added at all.
+			while (evaluationsQueue.poll() != null) {}
+			while (evaluationsWithOverridesQueue.poll() != null) {}
+			evaluations.clear();
+			evaluationsWithOverrides.clear();
+		}
+	}
+
+	/* Map of (VisibilityAssistant, EvaluationCache)-pairs */
+	private final Map<VisibilityAssistant, EvaluationCache> cachedTriggerPointEvaluations =
+			new WeakHashMap<VisibilityAssistant, EvaluationCache>();
+
+	/* Map of (VisibilityAssistant, EvaluationCache)-pairs */
+	private final Map<VisibilityAssistant, EvaluationCache> cachedPossibleChildrenEvaluations =
+			new WeakHashMap<VisibilityAssistant, EvaluationCache>();
 
 	private ImageRegistry imageRegistry;
 
@@ -120,7 +283,7 @@ public class NavigatorContentDescriptorManager {
 	 */
 	public Set<NavigatorContentDescriptor> findDescriptorsForTriggerPoint(Object anElement,
 			VisibilityAssistant aVisibilityAssistant, boolean considerOverrides) {
-		return findDescriptors(anElement, aVisibilityAssistant, considerOverrides, !POSSIBLE_CHILD);
+		return findDescriptors(anElement, cachedTriggerPointEvaluations, aVisibilityAssistant, considerOverrides, !POSSIBLE_CHILD);
 	}
 
 
@@ -139,25 +302,31 @@ public class NavigatorContentDescriptorManager {
 	 */
 	public Set<NavigatorContentDescriptor> findDescriptorsForPossibleChild(Object anElement,
 			VisibilityAssistant aVisibilityAssistant, boolean toComputeOverrides) {
-		return findDescriptors(anElement, aVisibilityAssistant, toComputeOverrides, POSSIBLE_CHILD);
+		return findDescriptors(anElement, cachedPossibleChildrenEvaluations, aVisibilityAssistant, toComputeOverrides, POSSIBLE_CHILD);
 	}
 
 	private static final boolean POSSIBLE_CHILD = true;
 
-
 	private Set<NavigatorContentDescriptor> findDescriptors(Object anElement,
+			Map<VisibilityAssistant, EvaluationCache> cachedEvaluations,
 			VisibilityAssistant aVisibilityAssistant, boolean considerOverrides, boolean possibleChild) {
 
+		EvaluationCache cache = getEvaluationCache(cachedEvaluations, aVisibilityAssistant);
 		Set<NavigatorContentDescriptor> descriptors = new TreeSet<NavigatorContentDescriptor>(ExtensionSequenceNumberComparator.INSTANCE);
+
+		NavigatorContentDescriptor[] cachedDescriptors = null;
+		if ((cachedDescriptors = cache.getDescriptors(anElement, considerOverrides)) != null) {
+			descriptors.addAll(Arrays.asList(cachedDescriptors));
+			if (Policy.DEBUG_RESOLUTION) {
+				System.out.println("Find descriptors for : " + Policy.getObjectString(anElement) + //$NON-NLS-1$
+						(considerOverrides ? " (with overrides)" : "") + " (cached): " + descriptors); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+			return descriptors;
+		}
 
 		if (considerOverrides) {
 			addDescriptorsConsideringOverrides(anElement, firstClassDescriptorsSet, aVisibilityAssistant, descriptors, possibleChild);
-			if (Policy.DEBUG_RESOLUTION) {
-				System.out.println("Find descriptors for: " + Policy.getObjectString(anElement) + //$NON-NLS-1$
-						": " + descriptors); //$NON-NLS-1$
-			}
 		} else {
-
 			/* Find other ContentProviders which enable for this object */
 			for (Iterator<NavigatorContentDescriptor> contentDescriptorsItr = firstClassDescriptorsSet.iterator(); contentDescriptorsItr.hasNext();) {
 				NavigatorContentDescriptor descriptor = contentDescriptorsItr.next();
@@ -169,7 +338,23 @@ public class NavigatorContentDescriptorManager {
 			}
 		}
 
+		if (Policy.DEBUG_RESOLUTION) {
+			System.out.println("Find descriptors for: " + Policy.getObjectString(anElement) + //$NON-NLS-1$
+					(considerOverrides ? " (with overrides)" : "") + ": " + descriptors); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
+		cache.setDescriptors(anElement, (NavigatorContentDescriptor[]) descriptors.toArray(new NavigatorContentDescriptor[descriptors.size()]), considerOverrides);
+
 		return descriptors;
+	}
+
+	private EvaluationCache getEvaluationCache(Map<VisibilityAssistant, EvaluationCache> anEvaluationMap,
+			VisibilityAssistant aVisibilityAssistant) {
+		EvaluationCache c = anEvaluationMap.get(aVisibilityAssistant);
+		if (c == null) {
+			anEvaluationMap.put(aVisibilityAssistant, c = new EvaluationCache(
+					aVisibilityAssistant));
+		}
+		return c;
 	}
 
 	private boolean addDescriptorsConsideringOverrides(Object anElement,
@@ -425,6 +610,11 @@ public class NavigatorContentDescriptorManager {
 			NavigatorContentRegistryReader {
 
 		@Override
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.ui.internal.navigator.extensions.RegistryReader#readRegistry()
+		 */
 		public void readRegistry() {
 			super.readRegistry();
 			computeSequenceNumbers();
