@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 433232
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -208,15 +207,8 @@ public class ModelServiceImpl implements EModelService {
 				} else if ((searchFlags & IN_PART) != 0) {
 					 List<MPart> parts = findElements((MUIElement) searchRoot, null, MPart.class, null);
 					 for (MPart part : parts) {
-
-						// search for handlers in the part
 						for (MHandler handler : part.getHandlers()) {
 							findElementsRecursive(handler, clazz, matcher, elements, searchFlags);
-						}
-						// search for menu elements in the part
-						List<MMenu> menus = part.getMenus();
-						for (MMenu menu : menus) {
-							findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
 						}
 					 }
 				 }
@@ -284,10 +276,6 @@ public class ModelServiceImpl implements EModelService {
 
 			if (searchFlags != IN_MAIN_MENU) {
 				for (MMenu menu : part.getMenus()) {
-					if (menu.getElementId().equals("org.eclipse.egit.ui.RepositoriesView")) { //$NON-NLS-1$ 
-						System.out.println(menu);
-					}
-
 					findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
 				}
 			}

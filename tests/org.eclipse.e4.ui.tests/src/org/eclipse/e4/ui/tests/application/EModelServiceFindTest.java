@@ -34,7 +34,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -158,7 +157,7 @@ public class EModelServiceFindTest extends TestCase {
 				EModelService.ANYWHERE | EModelService.IN_MAIN_MENU
 						| EModelService.IN_PART,
 				getSelector(MMenuElement.class));
-		assertEquals(15, elements.size());
+		assertEquals(13, elements.size());
 
 		elements = modelService.findElements(application,
 				MToolBarElement.class, EModelService.ANYWHERE
@@ -170,7 +169,7 @@ public class EModelServiceFindTest extends TestCase {
 		elements = modelService.findElements(application, null,
 				EModelService.ANYWHERE | EModelService.IN_MAIN_MENU
 						| EModelService.IN_PART, getSelector());
-		assertEquals(42, elements.size());
+		assertEquals(40, elements.size());
 
 		// Should match 0 since String is not an MUIElement
 		List<String> strings = modelService.findElements(application, null,
@@ -314,34 +313,29 @@ public class EModelServiceFindTest extends TestCase {
 				EModelService.ANYWHERE, getSelector(clazz));
 		assertEquals(2, elements.size());
 
-		// search for menu elements
 		clazz = MMenuElement.class;
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE, getSelector(clazz));
-		assertEquals(6, elements.size());
+		assertEquals(4, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_PART,
 				getSelector(clazz));
-		assertEquals(6, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_PART, getSelector(clazz));
-		assertEquals(6, elements.size());
+		assertEquals(4, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ACTIVE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(5, elements.size());
+		assertEquals(3, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ACTIVE_PERSPECTIVE | EModelService.IN_PART,
 				getSelector(clazz));
-		assertEquals(5, elements.size());
+		assertEquals(3, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_MAIN_MENU,
 				getSelector(clazz));
-		assertEquals(15, elements.size());
+		assertEquals(13, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_MAIN_MENU, getSelector(clazz));
@@ -397,18 +391,6 @@ public class EModelServiceFindTest extends TestCase {
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_SHARED_AREA, getSelector(clazz));
 		assertEquals(1, elements.size());
-	}
-
-	public void testFind_ViewMenus() {
-		MApplication application = createApplication();
-		EModelService modelService = (EModelService) application.getContext()
-				.get(EModelService.class.getName());
-		assertNotNull(modelService);
-		List<? extends MApplicationElement> elements;
-		elements = modelService.findElements(application, MPopupMenu.class,
-				EModelService.IN_PART, getSelector(MPopupMenu.class));
-		assertEquals(1, elements.size());
-
 	}
 
 	public void testBug314685() {
