@@ -4,19 +4,22 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.basic;
 
-import org.eclipse.e4.ui.model.application.ui.MGenericTile;
-import org.eclipse.e4.ui.model.application.ui.MUILabel;
+import org.eclipse.e4.ui.model.application.commands.MBindings;
+import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 
+import org.eclipse.e4.ui.model.application.ui.MContext;
+import org.eclipse.e4.ui.model.application.ui.MElementContainer;
+import org.eclipse.e4.ui.model.application.ui.MUILabel;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Dialog</b></em>'.
+ * A representation of the model object '<em><b>Frame</b></em>'.
  * <!-- end-user-doc -->
  *
  * <!-- begin-model-doc -->
@@ -32,17 +35,16 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
  * The following features are supported:
  * </p>
  * <ul>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getX <em>X</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getY <em>Y</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getWidth <em>Width</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getHeight <em>Height</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getX <em>X</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getY <em>Y</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getWidth <em>Width</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getHeight <em>Height</em>}</li>
  * </ul>
  *
  * @model
  * @generated
  */
-public interface MDialog extends MUILabel, MGenericTile<MPartSashContainerElement>, MFrameElement {
-
+public interface MFrame extends MElementContainer<MFrameElement>, MUILabel, MContext, MHandlerContainer, MBindings {
 	/**
 	 * Returns the value of the '<em><b>X</b></em>' attribute.
 	 * The default value is <code>"-2147483648"</code>.
@@ -61,7 +63,7 @@ public interface MDialog extends MUILabel, MGenericTile<MPartSashContainerElemen
 	int getX();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getX <em>X</em>}' attribute.
+	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getX <em>X</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>X</em>' attribute.
@@ -88,7 +90,7 @@ public interface MDialog extends MUILabel, MGenericTile<MPartSashContainerElemen
 	int getY();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getY <em>Y</em>}' attribute.
+	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getY <em>Y</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Y</em>' attribute.
@@ -115,7 +117,7 @@ public interface MDialog extends MUILabel, MGenericTile<MPartSashContainerElemen
 	int getWidth();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getWidth <em>Width</em>}' attribute.
+	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getWidth <em>Width</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Width</em>' attribute.
@@ -142,7 +144,7 @@ public interface MDialog extends MUILabel, MGenericTile<MPartSashContainerElemen
 	int getHeight();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog#getHeight <em>Height</em>}' attribute.
+	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.basic.MFrame#getHeight <em>Height</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Height</em>' attribute.
@@ -150,4 +152,5 @@ public interface MDialog extends MUILabel, MGenericTile<MPartSashContainerElemen
 	 * @generated
 	 */
 	void setHeight(int value);
-} // MDialog
+
+} // MFrame

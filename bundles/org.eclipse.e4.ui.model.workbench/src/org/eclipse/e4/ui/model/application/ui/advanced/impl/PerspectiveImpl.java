@@ -21,6 +21,7 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
@@ -56,6 +57,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getVariables <em>Variables</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getProperties <em>Properties</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getWindows <em>Windows</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
  *
  * @generated
@@ -190,6 +192,16 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	 * @ordered
 	 */
 	protected EList<MWindow> windows;
+
+	/**
+	 * The cached value of the '{@link #getDialogs() <em>Dialogs</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getDialogs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<MFrame> dialogs;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -358,6 +370,18 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public List<MFrame> getDialogs() {
+		if (dialogs == null) {
+			dialogs = new EObjectContainmentEList<MFrame>(MFrame.class, this, AdvancedPackageImpl.PERSPECTIVE__DIALOGS);
+		}
+		return dialogs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 */
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
@@ -396,6 +420,8 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				return ((InternalEList<?>)((EMap.InternalMapView<String, String>)getProperties()).eMap()).basicRemove(otherEnd, msgs);
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return ((InternalEList<?>)getWindows()).basicRemove(otherEnd, msgs);
+			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
+				return ((InternalEList<?>)getDialogs()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -427,6 +453,8 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				else return getProperties();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return getWindows();
+			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
+				return getDialogs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -463,6 +491,10 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				getWindows().clear();
 				getWindows().addAll((Collection<? extends MWindow>)newValue);
 				return;
+			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
+				getDialogs().clear();
+				getDialogs().addAll((Collection<? extends MFrame>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -496,6 +528,9 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				getWindows().clear();
 				return;
+			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
+				getDialogs().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -526,6 +561,8 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				return properties != null && !properties.isEmpty();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return windows != null && !windows.isEmpty();
+			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
+				return dialogs != null && !dialogs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
