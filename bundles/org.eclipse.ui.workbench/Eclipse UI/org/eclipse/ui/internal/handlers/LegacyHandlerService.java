@@ -155,9 +155,6 @@ public class LegacyHandlerService implements IHandlerService {
 			String id, final String cmdId, IHandler handler, Expression activeWhen, String helpContextId) {
 		ECommandService cs = (ECommandService) context.get(ECommandService.class.getName());
 		Command command = cs.getCommand(cmdId);
-		if (command.getHandler() == null) {
-			command.setHandler(HandlerServiceImpl.getHandler(cmdId));
-		}
 		boolean handled = command.isHandled();
 		boolean enabled = command.isEnabled();
 		E4HandlerProxy handlerProxy = new E4HandlerProxy(command, handler);
