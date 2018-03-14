@@ -581,7 +581,7 @@ public class PopupDialog extends Window {
 
 		shell.addListener(SWT.Deactivate, event -> {
 			/*
-			 * Close if we are deactivating and have no child shells. If we
+			 * Close if we are deactivating and have no child shells. If we 
 			 * have child shells, we are deactivating due to their opening.
 			 * On X, we receive this when a menu child (such as the system
 			 * menu) of the shell opens, but I have not found a way to
@@ -589,7 +589,9 @@ public class PopupDialog extends Window {
 			 */
 			if (listenToDeactivate && event.widget == getShell()
 					&& getShell().getShells().length == 0) {
-				asyncClose();
+				if (!Util.isGtk()) {
+					asyncClose();
+				}
 			} else {
 				/*
 				 * We typically ignore deactivates to work around
