@@ -290,10 +290,16 @@ public class CleanDialog extends MessageDialog {
         data.heightHint = IDialogConstants.ENTRY_FIELD_WIDTH;
         projectNames.getTable().setLayoutData(data);
         projectNames.setCheckedElements(selection);
-        Object[] checked = projectNames.getCheckedElements();
+        final Object[] checked = projectNames.getCheckedElements();
         // reveal first checked project unless in "all projects" mode
         if (checked.length > 0 && !allButton.getSelection()) {
-            projectNames.reveal(checked[0]);
+        	projectNames.getTable().getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					if (!projectNames.getTable().isDisposed()) {
+						projectNames.reveal(checked[0]);
+					}
+				}
+			});
         }
         //table is disabled to start because all button is selected
         projectNames.getTable().setEnabled(selectedButton.getSelection());
