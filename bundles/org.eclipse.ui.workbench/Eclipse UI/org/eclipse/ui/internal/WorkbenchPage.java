@@ -2723,7 +2723,23 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 		restoreWorkingSets();
 		restoreShowInMruPartIdsList();
+		configureExistingWindows();
     }
+
+	/*
+	 * Provide any configuration required on existing windows.
+	 */
+	private void configureExistingWindows() {
+		// Check for existing windows to avoid Bug 454056 - [DND] Editor area
+		// transfer/drop listener not added when loading from persisted state
+		List<MArea> elements = modelService.findElements(window, null, MArea.class, null);
+		for (MArea area : elements) {
+			Object widget = area.getWidget();
+			if (widget instanceof Control) {
+				installAreaDropSupport((Control) widget);
+			}
+		}
+	}
 
 	public void restoreWorkingSets() {
 		String workingSetName = getWindowModel().getPersistedState().get(
