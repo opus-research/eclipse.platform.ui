@@ -12,10 +12,9 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661, 456897
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
- *     Snjezana Peco <snjeza.peco@gmail.com> - Bug 405542
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -74,6 +73,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -289,6 +289,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private static final String WORKBENCH_AUTO_SAVE_BACKGROUND_JOB = "Workbench Auto-Save Background Job"; //$NON-NLS-1$
 
+	private JobGroup jobGroupWorkbenchAutoSave = new JobGroup(WORKBENCH_AUTO_SAVE_JOB, 1, 1);
+
 	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
 
 	private static final String PROP_VM = "eclipse.vm"; //$NON-NLS-1$
@@ -467,8 +469,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private IEventBroker eventBroker;
 
-	private IExtensionRegistry registry;
-
 	boolean initializationDone = false;
 
 	private WorkbenchWindow windowBeingCreated = null;
@@ -480,10 +480,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private String id;
 	private ServiceRegistration<?> e4WorkbenchService;
 
-
 	/**
 	 * Creates a new workbench.
-	 *
+	 * 
 	 * @param display
 	 *            the display to be used for all UI interactions with the
 	 *            workbench
@@ -492,7 +491,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 *            specializes this workbench instance
 	 * @since 3.0
 	 */
-	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app, IEclipseContext appContext) {
+	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app,
+			IEclipseContext appContext) {
 		super();
 		this.id = createId();
 		StartupThreading.setWorkbench(this);
@@ -507,7 +507,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		e4Context = appContext;
 		Workbench.instance = this;
 		eventBroker = e4Context.get(IEventBroker.class);
-		registry = e4Context.get(IExtensionRegistry.class);
 
 		appContext.set(getClass().getName(), this);
 		appContext.set(IWorkbench.class, this);
@@ -538,7 +537,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// dialog is
 		// to show the user a nice dialog describing the addition.]
 		extensionEventHandler = new ExtensionEventHandler(this);
-		registry.addRegistryChangeListener(extensionEventHandler);
+		Platform.getExtensionRegistry().addRegistryChangeListener(extensionEventHandler);
 		IServiceLocatorCreator slc = new ServiceLocatorCreator();
 		serviceLocator = (ServiceLocator) slc.createServiceLocator(null, null, new IDisposable() {
 			@Override
@@ -560,7 +559,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	/**
 	 * Returns the one and only instance of the workbench, if there is one.
-	 *
+	 * 
 	 * @return the workbench, or <code>null</code> if the workbench has not been
 	 *         created, or has been created and already completed
 	 */
@@ -1273,9 +1272,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * part of persist(false) during auto-save.
 	 */
 	private void persistWorkbenchModel() {
-		if (Job.getJobManager().find(WORKBENCH_AUTO_SAVE_JOB).length > 0) {
-			return;
-		}
 		final MApplication appCopy = (MApplication) EcoreUtil.copy((EObject) application);
 		if (detectWorkbenchCorruption(appCopy)) {
 			return;
@@ -1300,14 +1296,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 				return Status.OK_STATUS;
 			}
 
-			@Override
-			public boolean belongsTo(Object family) {
-				return WORKBENCH_AUTO_SAVE_JOB.equals(family);
-			}
-
 		};
 		cleanAndSaveJob.setPriority(Job.SHORT);
 		cleanAndSaveJob.setSystem(true);
+		cleanAndSaveJob.setJobGroup(jobGroupWorkbenchAutoSave);
 		cleanAndSaveJob.schedule();
 	}
 
@@ -2746,12 +2738,12 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * @return the ids of all plug-ins containing 1 or more startup extensions
 	 */
 	public ContributionInfo[] getEarlyActivatedPlugins() {
-		IExtensionPoint point = registry
-				.getExtensionPoint(PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
+		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
+				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
 		IExtension[] extensions = point.getExtensions();
 		ArrayList<String> pluginIds = new ArrayList<String>(extensions.length);
-		for (IExtension extension : extensions) {
-			String id = extension.getNamespaceIdentifier();
+		for (int i = 0; i < extensions.length; i++) {
+			String id = extensions[i].getNamespaceIdentifier();
 			if (!pluginIds.contains(id)) {
 				pluginIds.add(id);
 			}
@@ -2784,6 +2776,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * page.
 	 */
 	private void startPlugins() {
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+
 		// bug 55901: don't use getConfigElements directly, for pre-3.0
 		// compat, make sure to allow both missing class
 		// attribute and a missing startup element
@@ -3163,8 +3157,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 		e4WorkbenchService = null;
 
 		// for dynamic UI
-		registry.removeRegistryChangeListener(extensionEventHandler);
-		registry.removeRegistryChangeListener(startupRegistryListener);
+		Platform.getExtensionRegistry().removeRegistryChangeListener(extensionEventHandler);
+		Platform.getExtensionRegistry().removeRegistryChangeListener(startupRegistryListener);
 
 		((GrabFocus) Tweaklets.get(GrabFocus.KEY)).dispose();
 
@@ -3539,10 +3533,11 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	/**
 	 * Adds the listener that handles startup plugins
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private void addStartupRegistryListener() {
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		registry.addRegistryChangeListener(startupRegistryListener);
 	}
 
