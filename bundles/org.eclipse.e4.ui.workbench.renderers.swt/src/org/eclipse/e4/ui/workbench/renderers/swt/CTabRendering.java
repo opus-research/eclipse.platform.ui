@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -941,10 +941,8 @@ public class CTabRendering extends CTabFolderRenderer {
 	public void setOuterKeyline(Color color) {
 		this.outerKeyline = color;
 		// TODO: HACK! Should be set based on pseudo-state.
-		if (color != null) {
-			setActive(!(color.getRed() == 255 && color.getGreen() == 255 && color
+		setActive(!(color.getRed() == 255 && color.getGreen() == 255 && color
 				.getBlue() == 255));
-		}
 		parent.redraw();
 	}
 

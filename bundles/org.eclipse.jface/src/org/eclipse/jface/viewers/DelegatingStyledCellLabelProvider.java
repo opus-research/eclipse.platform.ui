@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Robin Stocker - Bug 236006 - [Viewers] Add tooltip support for DelegatingStyledCellLabelProvider
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -34,12 +33,6 @@ import org.eclipse.swt.graphics.Image;
  * The {@link DelegatingStyledCellLabelProvider.IStyledLabelProvider} can
  * optionally implement {@link IColorProvider} and {@link IFontProvider} to
  * provide foreground and background color and a default font.
- * </p>
- *
- * <p>
- * Since 3.10, {@link DelegatingStyledCellLabelProvider.IStyledLabelProvider}
- * can optionally implement {@link IToolTipProvider} to provide tooltip
- * support.
  * </p>
  * 
  * @since 3.4
@@ -176,14 +169,6 @@ public class DelegatingStyledCellLabelProvider extends StyledCellLabelProvider {
 			return ((IFontProvider) this.styledLabelProvider).getFont(element);
 		}
 		return null;
-	}
-
-	@Override
-	public String getToolTipText(Object element) {
-		if (styledLabelProvider instanceof IToolTipProvider) {
-			return ((IToolTipProvider) this.styledLabelProvider).getToolTipText(element);
-		}
-		return super.getToolTipText(element);
 	}
 
 	/**
