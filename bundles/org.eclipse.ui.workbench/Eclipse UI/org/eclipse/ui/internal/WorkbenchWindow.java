@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1565,11 +1565,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				// Reset the internal flags if window was not closed.
 				closing = false;
 				updateDisabled = false;
-			} else {
-				firePageClosed();
-				fireWindowClosed();
 			}
-
 		}
 
 		if (windowClosed && tracker != null) {
@@ -1946,6 +1942,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					}
 				}
 			}
+			if (getActivePage() != null) {
+				firePageClosed();
+			}
+			fireWindowClosed();
 		} finally {
 
 			try {
