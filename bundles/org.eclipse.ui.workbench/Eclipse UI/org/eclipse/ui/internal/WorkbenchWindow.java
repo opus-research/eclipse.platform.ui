@@ -248,7 +248,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private PerspectiveListenerList perspectiveListeners = new PerspectiveListenerList();
 
-	private PartService partService = new WWinPartService();
+	private PartService partService = new PartService();
 
 	private WWinActionBars actionBars;
 
@@ -2391,7 +2391,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private ListenerList backgroundSaveListeners = new ListenerList(ListenerList.IDENTITY);
 
-	private SelectionService selectionService;
+	private ISelectionService selectionService;
 
 	private ITrimManager trimManager;
 
@@ -3045,15 +3045,5 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public CustomizePerspectiveDialog createCustomizePerspectiveDialog(Perspective persp,
 			IEclipseContext context) {
 		return new CustomizePerspectiveDialog(getWindowConfigurer(), persp, context);
-	}
-
-	private class WWinPartService extends PartService {
-
-		@Override
-		public void partActivated(IWorkbenchPart part) {
-			super.partActivated(part);
-			selectionService.notifyListeners(part);
-		}
-
 	}
 }
