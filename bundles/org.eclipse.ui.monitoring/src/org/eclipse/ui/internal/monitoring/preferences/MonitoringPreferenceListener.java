@@ -49,8 +49,7 @@ public class MonitoringPreferenceListener implements IPropertyChangeListener {
 				&& !property.equals(PreferenceConstants.LONG_EVENT_WARNING_THRESHOLD_MILLIS)
 				&& !property.equals(PreferenceConstants.LOG_TO_ERROR_LOG)
 				&& !property.equals(PreferenceConstants.MAX_STACK_SAMPLES)
-				&& !property.equals(PreferenceConstants.UI_THREAD_FILTER)
-				&& !property.equals(PreferenceConstants.NONINTERESTING_THREAD_FILTER)) {
+				&& !property.equals(PreferenceConstants.FILTER_TRACES)) {
 			return;
 		}
 

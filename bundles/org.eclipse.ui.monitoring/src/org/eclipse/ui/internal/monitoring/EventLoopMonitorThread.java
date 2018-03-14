@@ -45,7 +45,7 @@ import org.eclipse.ui.monitoring.UiFreezeEvent;
  * log.
  */
 public class EventLoopMonitorThread extends Thread {
-	private static final int EVENT_HISTORY_SIZE = 100;
+	private static final int EVENT_HISTORY_SIZE = 50;
 	private static final String EXTENSION_ID = "org.eclipse.ui.monitoring.logger"; //$NON-NLS-1$
 	private static final String NEW_LINE_AND_BULLET = "\n* "; //$NON-NLS-1$
 	private static final String TRACE_EVENT_MONITOR = "/debug/event_monitor"; //$NON-NLS-1$
@@ -73,13 +73,11 @@ public class EventLoopMonitorThread extends Thread {
 		public int maxStackSamples;
 		/** If true, log freeze events to the Eclipse error log on the local machine. */
 		public boolean logToErrorLog;
-		/** @see org.eclipse.ui.monitoring.PreferenceConstants#UI_THREAD_FILTER */
-		public String uiThreadFilter;
-		/** @see org.eclipse.ui.monitoring.PreferenceConstants#NONINTERESTING_THREAD_FILTER */
-		public String noninterestingThreadFilter;
+		/** Contains the list of fully qualified methods to filter out. */
+		public String filterTraces;
 
 		/**
-		 * Checks if the values of parameters for UI responsiveness monitoring are valid.
+		 * Checks if parameters for plug-in are valid before startup.
 		 *
 		 * @throws IllegalArgumentException if the parameter values are invalid or inconsistent.
 		 */
@@ -160,65 +158,38 @@ public class EventLoopMonitorThread extends Thread {
 			 */
 			switch (event.type) {
 			case SWT.PreEvent:
-				if (!doesEventIndicateResponsiveUI(event.detail)) {
-					break;  // Ignore events that may be produced during a UI freeze.
+				if (eventHistory != null) {
+					eventHistory.recordEvent(event.type);
 				}
 				nestingLevel++;
-				if (eventHistory != null) {
-					eventHistory.recordEvent(event.type, event.detail, nestingLevel);
-				}
 				// Log a long interval, start the timer.
 				handleEventTransition(true, true);
 				break;
 			case SWT.PostEvent:
-				if (!doesEventIndicateResponsiveUI(event.detail)) {
-					break;  // Ignore events that may be produced during a UI freeze.
-				}
-				if (--nestingLevel < 0) {
-					// This may happen if some PreEvent events had occurred before we
-					// started listening to SWT events.
-					nestingLevel = 0;
-				}
 				if (eventHistory != null) {
-					eventHistory.recordEvent(event.type, event.detail, nestingLevel);
+					eventHistory.recordEvent(event.type);
 				}
+				nestingLevel--;
 				 // Log a long interval, start the timer if inside another event.
 				handleEventTransition(true, nestingLevel > 0);
 				break;
 			case SWT.PreExternalEventDispatch:
-				saveAndResetNestingLevel();
 				if (eventHistory != null) {
-					eventHistory.recordEvent(event.type, event.detail, nestingLevel);
+					eventHistory.recordEvent(event.type);
 				}
+				saveAndResetNestingLevel();
 				// Log a long interval, stop the timer.
 				handleEventTransition(true, false);
 				break;
 			case SWT.PostExternalEventDispatch:
-				restoreNestingLevel();
 				if (eventHistory != null) {
-					eventHistory.recordEvent(event.type, event.detail, nestingLevel);
+					eventHistory.recordEvent(event.type);
 				}
+				restoreNestingLevel();
 				// Don't log a long interval, start the timer if inside another event.
 				handleEventTransition(false, nestingLevel > 0);
 				break;
 			default:
-				break;
-			}
-		}
-
-		/**
-		 * Returns {@code true} if dispatching of an event of the given type indicates that the UI
-		 * is responsive. Events that may be produced during UI freezes are irrelevant to UI
-		 * responsiveness monitoring.
-		 */
-		private boolean doesEventIndicateResponsiveUI(int eventType) {
-			switch (eventType) {
-			case SWT.Skin:
-			case SWT.MeasureItem:
-			case SWT.Dispose:
-				return false;
-			default:
-				return true;
 			}
 		}
 
@@ -268,7 +239,7 @@ public class EventLoopMonitorThread extends Thread {
 
 			if (!haveAlreadyLoggedPossibleDeadlock && lastActive > 0 &&
 					totalDuration > deadlockThreshold &&
-					uiThreadFilter.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
+					filterHandler.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
 				stackSamples = Arrays.copyOf(stackSamples, numSamples);
 				logEvent(new UiFreezeEvent(lastActive, totalDuration,
 						Arrays.copyOf(stackSamples, numSamples), true));
@@ -295,8 +266,6 @@ public class EventLoopMonitorThread extends Thread {
 		private static class EventInfo {
 			long timestamp;
 			int eventType;
-			int detail;
-			int nestingLevel;
 		}
 
 		private final EventInfo[] buffer;
@@ -310,13 +279,11 @@ public class EventLoopMonitorThread extends Thread {
 			}
 		}
 
-		synchronized void recordEvent(int eventType, int detail, int nestingLevel) {
+		synchronized void recordEvent(int eventType) {
 			int j = (start + size) % buffer.length;
 			EventInfo event = buffer[j];
 			event.timestamp = System.currentTimeMillis();
 			event.eventType = eventType;
-			event.detail = detail;
-			event.nestingLevel = nestingLevel;
 			if (size < buffer.length) {
 				size++;
 			} else if (++start >= buffer.length) {
@@ -348,10 +315,6 @@ public class EventLoopMonitorThread extends Thread {
 					buf.append("Event "); //$NON-NLS-1$
 					buf.append(eventInfo.eventType);
 				}
-				buf.append(' ');
-				buf.append(eventInfo.detail);
-				buf.append(" nesting level: "); //$NON-NLS-1$
-				buf.append(eventInfo.nestingLevel);
 				buf.append('\n');
 			}
 			size = 0;
@@ -385,8 +348,7 @@ public class EventLoopMonitorThread extends Thread {
 			new ArrayList<IUiFreezeEventLogger>();
 	private DefaultUiFreezeEventLogger defaultLogger;
 	private final Display display;
-	private final FilterHandler uiThreadFilter;
-	private final FilterHandler noninterestingThreadFilter;
+	private final FilterHandler filterHandler;
 	private final int longEventErrorThreshold;
 	private final long sampleInterval;
 	private final long allThreadsSampleInterval;
@@ -431,8 +393,7 @@ public class EventLoopMonitorThread extends Thread {
 		allThreadsSampleInterval = longEventErrorThreshold * 2 / 3;
 		deadlockThreshold = args.deadlockThreshold;
 		logToErrorLog = args.logToErrorLog;
-		uiThreadFilter = new FilterHandler(args.uiThreadFilter);
-		noninterestingThreadFilter = new FilterHandler(args.noninterestingThreadFilter);
+		filterHandler = new FilterHandler(args.filterTraces);
 		sleepMonitor = new Object();
 	}
 
@@ -642,7 +603,7 @@ public class EventLoopMonitorThread extends Thread {
 						numSamples = maxLoggedStackSamples;
 					}
 
-					if (uiThreadFilter.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
+					if (filterHandler.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
 						logEvent(new UiFreezeEvent(eventSnapshot.start, eventSnapshot.duration,
 								Arrays.copyOf(stackSamples, numSamples), false));
 					}
@@ -657,45 +618,33 @@ public class EventLoopMonitorThread extends Thread {
 	}
 
 	private ThreadInfo[] captureThreadStacks(boolean dumpAllThreads) {
+		ThreadInfo[] threadStacks;
 		if (dumpAllThreads) {
-			ThreadInfo[] threadStacks =
+			ThreadInfo[] rawThreadStacks =
 					threadMXBean.dumpAllThreads(dumpLockedMonitors, dumpLockedSynchronizers);
 			// Remove the info for the monitoring thread.
+			threadStacks = new ThreadInfo[rawThreadStacks.length - 1];
 			int index = 0;
-			for (int i = 0; i < threadStacks.length; i++) {
-				ThreadInfo thread = threadStacks[i];
+
+			for (int i = 0; i < rawThreadStacks.length; i++) {
+				ThreadInfo thread = rawThreadStacks[i];
 				long threadId = thread.getThreadId();
 				// Skip the stack trace of the event loop monitoring thread.
 				if (threadId != monitoringThreadId) {
-					if (threadId == uiThreadId) {
-						// Swap the UI thread to first slot in the array if it is not there already.
-						if (index != 0) {
-							thread = threadStacks[0];
-							threadStacks[0] = threadStacks[i];
-						}
-					} else if (!isInteresting(thread)) {
-						continue; // Skip the non-interesting thread.
+					if (threadId == uiThreadId && i != 0) {
+						// Swap the UI thread to first slot in the array if it is not
+						// there already.
+						thread = threadStacks[0];
+						threadStacks[0] = rawThreadStacks[i];
 					}
 					threadStacks[index++] = thread;
 				}
 			}
-			return Arrays.copyOf(threadStacks, index);
 		} else {
-			return new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
+			threadStacks =
+					new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
 		}
-	}
-
-	/**
-	 * A thread is considered interesting if its stack trace includes at least one frame not
-	 * matching any of the methods in {@link #noninterestingThreadFilter}.
-	 */
-	private boolean isInteresting(ThreadInfo thread) {
-		for (StackTraceElement element : thread.getStackTrace()) {
-			if (!noninterestingThreadFilter.matchesFilter(element)) {
-				return true;
-			}
-		}
-		return false;
+		return threadStacks;
 	}
 
 	private static Display getDisplay() throws IllegalStateException {
