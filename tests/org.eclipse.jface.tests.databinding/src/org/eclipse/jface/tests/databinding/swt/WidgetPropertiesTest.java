@@ -79,8 +79,11 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 	}
 
 	@Override
-	protected Shell createShell() {
-		return new Shell(SWT.V_SCROLL);
+	protected Shell getShell() {
+		if (shell == null) {
+			shell = new Shell(SWT.V_SCROLL);
+		}
+		return shell;
 	}
 
 	public void testImage_ObserveButton() {
