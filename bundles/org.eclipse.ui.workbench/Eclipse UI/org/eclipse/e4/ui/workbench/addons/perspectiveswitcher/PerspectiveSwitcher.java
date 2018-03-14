@@ -7,10 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.perspectiveswitcher;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -222,6 +225,26 @@ public class PerspectiveSwitcher {
 			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 				String newTTip = (String) newValue;
 				ti.setToolTipText(newTTip);
+			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+				// dispose old image
+				Image currentImage = ti.getImage();
+				if (currentImage != null)
+					currentImage.dispose();
+				String uri = (String) newValue;
+				URL url = null;
+				try {
+					url = new URL(uri);
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+					ti.setImage(null);
+					return;
+				}
+				ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
+				if (descriptor == null) {
+					ti.setImage(null);
+				} else {
+					ti.setImage(descriptor.createImage());
+				}
 			}
 		}
 	};
