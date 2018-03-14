@@ -344,7 +344,8 @@ public class MultiEditorTest extends UITestCase {
 		assertNotNull(outline);
 
 		// find out who is contributing the outline view.
-		IContributedContentsView view = outline.getAdapter(IContributedContentsView.class);
+		IContributedContentsView view = (IContributedContentsView) outline
+				.getAdapter(IContributedContentsView.class);
 		IWorkbenchPart part = view.getContributingPart();
 		assertNotNull("The Outline view has not been updated by the editor",
 				part);
@@ -362,7 +363,8 @@ public class MultiEditorTest extends UITestCase {
 		page.closeEditor(editor, false);
 		chewUpEvents();
 
-		view = outline.getAdapter(IContributedContentsView.class);
+		view = (IContributedContentsView) outline
+				.getAdapter(IContributedContentsView.class);
 		assertNull(view.getContributingPart());
 	}
 
