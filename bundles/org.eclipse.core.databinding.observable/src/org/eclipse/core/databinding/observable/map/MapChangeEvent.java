@@ -18,14 +18,10 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * Map change event describing an incremental change of an
  * {@link IObservableMap} object.
  *
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
  * @since 1.0
  *
  */
-public class MapChangeEvent<K, V> extends ObservableEvent {
+public class MapChangeEvent extends ObservableEvent {
 
 	/**
 	 *
@@ -37,13 +33,7 @@ public class MapChangeEvent<K, V> extends ObservableEvent {
 	 * Description of the change to the source observable map. Listeners must
 	 * not change this field.
 	 */
-	public MapDiff<K, V> diff;
-
-	/**
-	 * Always identical to <code>EventObject.source</code> but the type
-	 * information is maintained.
-	 */
-	private IObservableMap<K, V> typedSource;
+	public MapDiff diff;
 
 	/**
 	 * Creates a new map change event
@@ -53,9 +43,8 @@ public class MapChangeEvent<K, V> extends ObservableEvent {
 	 * @param diff
 	 *            the map change
 	 */
-	public MapChangeEvent(IObservableMap<K, V> source, MapDiff<K, V> diff) {
+	public MapChangeEvent(IObservableMap source, MapDiff diff) {
 		super(source);
-		this.typedSource = source;
 		this.diff = diff;
 	}
 
@@ -64,13 +53,13 @@ public class MapChangeEvent<K, V> extends ObservableEvent {
 	 *
 	 * @return the observable map from which this event originated
 	 */
-	public IObservableMap<K, V> getObservableMap() {
-		return typedSource;
+	public IObservableMap getObservableMap() {
+		return (IObservableMap) getSource();
 	}
 
 	@Override
 	protected void dispatch(IObservablesListener listener) {
-		((IMapChangeListener<K, V>) listener).handleMapChange(this);
+		((IMapChangeListener) listener).handleMapChange(this);
 	}
 
 	@Override

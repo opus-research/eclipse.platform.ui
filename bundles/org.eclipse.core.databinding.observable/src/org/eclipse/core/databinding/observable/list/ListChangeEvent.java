@@ -18,11 +18,9 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * List change event describing an incremental change of an
  * {@link IObservableList} object.
  *
- * @param <E>
- *
  * @since 1.0
  */
-public class ListChangeEvent<E> extends ObservableEvent {
+public class ListChangeEvent extends ObservableEvent {
 
 	/**
 	 *
@@ -35,13 +33,7 @@ public class ListChangeEvent<E> extends ObservableEvent {
 	 * Description of the change to the source observable list. Listeners must
 	 * not change this field.
 	 */
-	public ListDiff<E> diff;
-
-	/**
-	 * Always identical to <code>EventObject.source</code> but the type
-	 * information is maintained.
-	 */
-	private IObservableList<E> typedSource;
+	public ListDiff diff;
 
 	/**
 	 * Creates a new list change event.
@@ -51,9 +43,8 @@ public class ListChangeEvent<E> extends ObservableEvent {
 	 * @param diff
 	 *            the list change
 	 */
-	public ListChangeEvent(IObservableList<E> source, ListDiff<E> diff) {
+	public ListChangeEvent(IObservableList source, ListDiff diff) {
 		super(source);
-		this.typedSource = source;
 		this.diff = diff;
 	}
 
@@ -62,13 +53,13 @@ public class ListChangeEvent<E> extends ObservableEvent {
 	 *
 	 * @return the observable list from which this event originated
 	 */
-	public IObservableList<E> getObservableList() {
-		return typedSource;
+	public IObservableList getObservableList() {
+		return (IObservableList) getSource();
 	}
 
 	@Override
 	protected void dispatch(IObservablesListener listener) {
-		((IListChangeListener<E>) listener).handleListChange(this);
+		((IListChangeListener) listener).handleListChange(this);
 	}
 
 	@Override

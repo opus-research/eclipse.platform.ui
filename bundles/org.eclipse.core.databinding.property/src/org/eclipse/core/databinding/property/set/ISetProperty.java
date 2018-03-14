@@ -26,11 +26,7 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
  * Interface for set-typed properties
- * 
- * @param <S>
- *            type of the source object
- * @param <E>
- *            type of the elements in the set
+ *
  * @since 1.2
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
@@ -40,7 +36,7 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
  * @see SetProperty
  * @see SimpleSetProperty
  */
-public interface ISetProperty<S, E> extends IProperty {
+public interface ISetProperty extends IProperty {
 	/**
 	 * Returns the type of the elements in the collection or <code>null</code>
 	 * if untyped
@@ -60,7 +56,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 *         property
 	 * @since 1.3
 	 */
-	public Set<E> getSet(S source);
+	public Set getSet(Object source);
 
 	/**
 	 * Updates the property on the source with the specified change.
@@ -78,7 +74,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 *            the new set
 	 * @since 1.3
 	 */
-	public void setSet(S source, Set<E> set);
+	public void setSet(Object source, Set set);
 
 	/**
 	 * Updates the property on the source with the specified change.
@@ -96,7 +92,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 *            a diff describing the change
 	 * @since 1.3
 	 */
-	public void updateSet(S source, SetDiff<E> diff);
+	public void updateSet(Object source, SetDiff diff);
 
 	/**
 	 * Returns an observable set observing this set property on the given
@@ -107,7 +103,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 * @return an observable set observing this set property on the given
 	 *         property source
 	 */
-	public IObservableSet<E> observe(S source);
+	public IObservableSet observe(Object source);
 
 	/**
 	 * Returns an observable set observing this set property on the given
@@ -120,7 +116,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 * @return an observable set observing this set property on the given
 	 *         property source
 	 */
-	public IObservableSet<E> observe(Realm realm, S source);
+	public IObservableSet observe(Realm realm, Object source);
 
 	/**
 	 * Returns a factory for creating observable sets tracking this property of
@@ -129,7 +125,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 * @return a factory for creating observable sets tracking this property of
 	 *         a particular property source.
 	 */
-	public IObservableFactory<S, IObservableSet<E>> setFactory();
+	public IObservableFactory setFactory();
 
 	/**
 	 * Returns a factory for creating observable sets in the given realm,
@@ -141,7 +137,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 * @return a factory for creating observable sets in the given realm,
 	 *         tracking this property of a particular property source.
 	 */
-	public IObservableFactory<S, IObservableSet<E>> setFactory(Realm realm);
+	public IObservableFactory setFactory(Realm realm);
 
 	/**
 	 * Returns an observable set on the master observable's realm which tracks
@@ -152,8 +148,7 @@ public interface ISetProperty<S, E> extends IProperty {
 	 * @return an observable set on the given realm which tracks this property
 	 *         of the current value of <code>master</code>.
 	 */
-	public <U extends S> IObservableSet<E> observeDetail(
-			IObservableValue<U> master);
+	public IObservableSet observeDetail(IObservableValue master);
 
 	/**
 	 * Returns the nested combination of this property and the specified detail
@@ -171,6 +166,5 @@ public interface ISetProperty<S, E> extends IProperty {
 	 * @return the nested combination of the master set and detail value
 	 *         properties
 	 */
-	public <T> IMapProperty<S, E, T> values(
-			IValueProperty<? super E, T> detailValues);
+	public IMapProperty values(IValueProperty detailValues);
 }
