@@ -13,7 +13,7 @@
    height="16"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="eclipse.svg"
    inkscape:export-filename="/home/tmccrary/git/eclipse-svg/eclipse-svg/src/main/resources/org.eclipse.ant.ui/icons/full/obj16/eclipse_obj2.png"
    inkscape:export-xdpi="90"
@@ -28,22 +28,18 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="32"
-     inkscape:cx="10.906583"
+     inkscape:cx="8.3440829"
      inkscape:cy="7.9706008"
      inkscape:document-units="px"
      inkscape:current-layer="g4926"
-     showgrid="true"
+     showgrid="false"
      inkscape:window-width="1171"
      inkscape:window-height="959"
-     inkscape:window-x="809"
-     inkscape:window-y="424"
+     inkscape:window-x="1384"
+     inkscape:window-y="24"
      inkscape:window-maximized="0"
      showguides="true"
-     inkscape:guide-bbox="true">
-    <inkscape:grid
-       type="xygrid"
-       id="grid4137" />
-  </sodipodi:namedview>
+     inkscape:guide-bbox="true" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -64,31 +60,30 @@
      transform="translate(0,-1036.3622)">
     <g
        id="g4926">
-      <g
-         id="g4149"
-         transform="translate(0.96875,0.9375)">
-        <ellipse
-           ry="6.5"
-           rx="6.53125"
-           cy="1043.8623"
-           cx="7.5"
-           style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#5a5194;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.44999999;marker:none;enable-background:accumulate"
-           id="path4880" />
-        <rect
-           style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#7386ef;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.44999999;marker:none;enable-background:accumulate"
-           id="rect4882"
-           width="15.03125"
-           height="1.09375"
-           x="0"
-           y="1042.3934" />
-        <rect
-           style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#7386ef;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.44999999;marker:none;enable-background:accumulate"
-           id="rect4882-2"
-           width="15.03125"
-           height="1.09375"
-           x="0"
-           y="1044.3622" />
-      </g>
+      <path
+         transform="translate(-0.12500001,1036.331)"
+         d="m 14.75,8.1875 c 0,3.658886 -2.966114,6.625 -6.625,6.625 -3.6588865,0 -6.625,-2.966114 -6.625,-6.625 0,-3.6588865 2.9661135,-6.625 6.625,-6.625 3.658886,0 6.625,2.9661135 6.625,6.625 z"
+         sodipodi:ry="6.625"
+         sodipodi:rx="6.625"
+         sodipodi:cy="8.1875"
+         sodipodi:cx="8.125"
+         id="path4880"
+         style="color:#000000;fill:#5a5194;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.44999999;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         sodipodi:type="arc" />
+      <rect
+         y="1042.6747"
+         x="0.46875"
+         height="1.09375"
+         width="15.03125"
+         id="rect4882"
+         style="color:#000000;fill:#7386ef;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.44999999;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="1045.0184"
+         x="0.46875"
+         height="1.09375"
+         width="15.03125"
+         id="rect4882-2"
+         style="color:#000000;fill:#7386ef;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.44999999;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
     </g>
   </g>
 </svg>
