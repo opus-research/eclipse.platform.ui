@@ -31,7 +31,7 @@ import org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicPackageImp
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
@@ -254,7 +254,7 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<MFrame> dialogs;
+	protected EList<MDialog> dialogs;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -494,9 +494,9 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<MFrame> getDialogs() {
+	public List<MDialog> getDialogs() {
 		if (dialogs == null) {
-			dialogs = new EObjectResolvingEList<MFrame>(MFrame.class, this, ApplicationPackageImpl.APPLICATION__DIALOGS);
+			dialogs = new EObjectResolvingEList<MDialog>(MDialog.class, this, ApplicationPackageImpl.APPLICATION__DIALOGS);
 		}
 		return dialogs;
 	}
@@ -651,7 +651,7 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return;
 			case ApplicationPackageImpl.APPLICATION__DIALOGS:
 				getDialogs().clear();
-				getDialogs().addAll((Collection<? extends MFrame>)newValue);
+				getDialogs().addAll((Collection<? extends MDialog>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);

@@ -34,9 +34,8 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.BidiUtils;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -210,7 +209,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(locationLabel);
 		Text workspacePath = new Text(groupComposite, SWT.READ_ONLY);
 		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		workspacePath.setText(Platform.getLocation().toOSString());
+		workspacePath.setText(TextProcessor.process(Platform.getLocation().toOSString()));
 		workspacePath.setSelection(workspacePath.getText().length());
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.hint(convertHorizontalDLUsToPixels(200), SWT.DEFAULT).applyTo(workspacePath);
@@ -269,15 +268,11 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         long interval = description.getSnapshotInterval() / 60000;
         saveInterval.setStringValue(Long.toString(interval));
 
-        saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
-
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(saveInterval.isValid());
-				}
-            }
-        });
+        saveInterval.setPropertyChangeListener(event -> {
+		    if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				setValid(saveInterval.isValid());
+			}
+		});
 
     }
 
@@ -346,14 +341,11 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		encodingEditor.setPage(this);
 		encodingEditor.load();
-		encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(encodingEditor.isValid());
-				}
-
+		encodingEditor.setPropertyChangeListener(event -> {
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				setValid(encodingEditor.isValid());
 			}
+
 		});
     }
 
@@ -403,12 +395,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		systemExplorer.load();
 
-		systemExplorer.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(systemExplorer.isValid());
-				}
+		systemExplorer.setPropertyChangeListener(event -> {
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				setValid(systemExplorer.isValid());
 			}
 		});
 	}

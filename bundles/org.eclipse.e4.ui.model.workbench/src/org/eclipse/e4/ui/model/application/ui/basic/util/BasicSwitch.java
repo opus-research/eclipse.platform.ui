@@ -251,52 +251,36 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case BasicPackageImpl.FRAME: {
-				MFrame frame = (MFrame)theEObject;
-				T1 result = caseFrame(frame);
-				if (result == null) result = caseElementContainer(frame);
-				if (result == null) result = caseUILabel(frame);
-				if (result == null) result = caseContext(frame);
-				if (result == null) result = caseHandlerContainer(frame);
-				if (result == null) result = caseBindings(frame);
-				if (result == null) result = caseUIElement(frame);
-				if (result == null) result = caseApplicationElement(frame);
-				if (result == null) result = caseLocalizable(frame);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case BasicPackageImpl.FRAME_ELEMENT: {
-				MFrameElement frameElement = (MFrameElement)theEObject;
-				T1 result = caseFrameElement(frameElement);
-				if (result == null) result = caseUIElement(frameElement);
-				if (result == null) result = caseApplicationElement(frameElement);
-				if (result == null) result = caseLocalizable(frameElement);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case BasicPackageImpl.DIALOG: {
 				MDialog dialog = (MDialog)theEObject;
 				T1 result = caseDialog(dialog);
-				if (result == null) result = caseUILabel(dialog);
-				if (result == null) result = caseGenericTile(dialog);
-				if (result == null) result = caseFrameElement(dialog);
+				if (result == null) result = caseWindow(dialog);
 				if (result == null) result = caseElementContainer(dialog);
+				if (result == null) result = caseUILabel(dialog);
+				if (result == null) result = caseContext(dialog);
+				if (result == null) result = caseHandlerContainer(dialog);
+				if (result == null) result = caseBindings(dialog);
+				if (result == null) result = caseSnippetContainer(dialog);
 				if (result == null) result = caseUIElement(dialog);
-				if (result == null) result = caseLocalizable(dialog);
 				if (result == null) result = caseApplicationElement(dialog);
+				if (result == null) result = caseLocalizable(dialog);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case BasicPackageImpl.WIZARD: {
-				MWizard wizard = (MWizard)theEObject;
-				T1 result = caseWizard(wizard);
-				if (result == null) result = caseUILabel(wizard);
-				if (result == null) result = caseGenericStack(wizard);
-				if (result == null) result = caseFrameElement(wizard);
-				if (result == null) result = caseElementContainer(wizard);
-				if (result == null) result = caseUIElement(wizard);
-				if (result == null) result = caseLocalizable(wizard);
-				if (result == null) result = caseApplicationElement(wizard);
+			case BasicPackageImpl.WIZARD_DIALOG: {
+				MWizardDialog wizardDialog = (MWizardDialog)theEObject;
+				T1 result = caseWizardDialog(wizardDialog);
+				if (result == null) result = caseDialog(wizardDialog);
+				if (result == null) result = caseWindow(wizardDialog);
+				if (result == null) result = caseElementContainer(wizardDialog);
+				if (result == null) result = caseUILabel(wizardDialog);
+				if (result == null) result = caseContext(wizardDialog);
+				if (result == null) result = caseHandlerContainer(wizardDialog);
+				if (result == null) result = caseBindings(wizardDialog);
+				if (result == null) result = caseSnippetContainer(wizardDialog);
+				if (result == null) result = caseUIElement(wizardDialog);
+				if (result == null) result = caseApplicationElement(wizardDialog);
+				if (result == null) result = caseLocalizable(wizardDialog);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -485,36 +469,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Frame</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Frame</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseFrame(MFrame object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Frame Element</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Frame Element</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseFrameElement(MFrameElement object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Dialog</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -530,17 +484,17 @@ public class BasicSwitch<T1> extends Switch<T1> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Wizard</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Wizard Dialog</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Wizard</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Wizard Dialog</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T1 caseWizard(MWizard object) {
+	public T1 caseWizardDialog(MWizardDialog object) {
 		return null;
 	}
 

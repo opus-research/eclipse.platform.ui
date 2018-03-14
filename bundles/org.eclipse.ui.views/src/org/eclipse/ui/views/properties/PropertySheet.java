@@ -11,11 +11,13 @@
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 272564
  *     Craig Foote (Footeware.ca) - https://bugs.eclipse.org/325743
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 417447
  *******************************************************************************/
 package org.eclipse.ui.views.properties;
 
 import java.util.HashSet;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -39,7 +41,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.internal.views.ViewsPlugin;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.part.IPage;
@@ -133,8 +134,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected IPage createDefaultPage(PageBook book) {
-        IPageBookViewPage page = (IPageBookViewPage) ViewsPlugin.getAdapter(this,
-                IPropertySheetPage.class, false);
+		IPageBookViewPage page = (IPageBookViewPage) Adapters.adapt(this, IPropertySheetPage.class);
         if(page == null) {
         	page = new PropertySheetPage();
         }
@@ -196,8 +196,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
     	if(part instanceof PropertySheet) {
     		return null;
     	}
-		IPropertySheetPage page = ViewsPlugin.getAdapter(part,
-                IPropertySheetPage.class, false);
+		IPropertySheetPage page = Adapters.adapt(part, IPropertySheetPage.class);
         if (page != null) {
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);
@@ -281,10 +280,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
      */
     @Override
 	public void partActivated(IWorkbenchPart part) {
-    	// Look for a declaratively-contributed adapter - including not yet loaded adapter factories.
-    	// See bug 86362 [PropertiesView] Can not access AdapterFactory, when plugin is not loaded.
-		IContributedContentsView view = ViewsPlugin.getAdapter(part,
-                IContributedContentsView.class, true);
+		IContributedContentsView view = Adapters.adapt(part, IContributedContentsView.class);
         IWorkbenchPart source = null;
         if (view != null) {
 			source = view.getContributingPart();
@@ -312,15 +308,21 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
     }
 
     @Override
-	public void selectionChanged(IWorkbenchPart part, ISelection sel) {
-        // we ignore null selection, or if we are pinned, or our own selection or same selection
-		if (sel == null || !isImportant(part) || sel.equals(currentSelection)) {
+    public void selectionChanged(IWorkbenchPart part, ISelection sel) {
+		// we ignore selection if we are hidden OR selection is coming from
+		// another source as the last one
+		if (part == null || !part.equals(currentPart)) {
+			return;
+		}
+		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
+		if (!visible) {
 			return;
 		}
 
-		// we ignore selection if we are hidden OR selection is coming from another source as the last one
-		if(part == null || !part.equals(currentPart)){
-		    return;
+		// we ignore null selection, or if we are pinned, or our own selection
+		// or same selection
+		if (sel == null || !isImportant(part) || sel.equals(currentSelection)) {
+			return;
 		}
 
         currentPart = part;

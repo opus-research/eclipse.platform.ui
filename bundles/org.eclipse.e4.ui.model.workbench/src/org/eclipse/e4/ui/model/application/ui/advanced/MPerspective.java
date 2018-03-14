@@ -11,10 +11,10 @@
 package org.eclipse.e4.ui.model.application.ui.advanced;
 
 import java.util.List;
+import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
-import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 
@@ -38,13 +38,12 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getWindows <em>Windows</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getDialogs <em>Dialogs</em>}</li>
  * </ul>
  *
  * @model
  * @generated
  */
-public interface MPerspective extends MElementContainer<MPartSashContainerElement>, MUILabel, MContext {
+public interface MPerspective extends MElementContainer<MPartSashContainerElement>, MUILabel, MContext, MHandlerContainer {
 	/**
 	 * Returns the value of the '<em><b>Windows</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MWindow}.
@@ -63,22 +62,5 @@ public interface MPerspective extends MElementContainer<MPartSashContainerElemen
 	 * @generated
 	 */
 	List<MWindow> getWindows();
-
-	/**
-	 * Returns the value of the '<em><b>Dialogs</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MFrame}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * This is the ordered list of MDialogs for this model.
-	 * </p>
-	 * @since 1.1
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Dialogs</em>' containment reference list.
-	 * @model containment="true"
-	 * @generated
-	 */
-	List<MFrame> getDialogs();
 
 } // MPerspective

@@ -520,22 +520,22 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PERSPECTIVE__PROPERTIES = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 7;
 
 	/**
+	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int PERSPECTIVE__HANDLERS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 8;
+
+	/**
 	 * The feature id for the '<em><b>Windows</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int PERSPECTIVE__WINDOWS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 8;
-
-	/**
-	 * The feature id for the '<em><b>Dialogs</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__DIALOGS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 9;
+	public static final int PERSPECTIVE__WINDOWS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 9;
 
 	/**
 	 * The number of structural features of the '<em>Perspective</em>' class.
@@ -1191,20 +1191,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	}
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getDialogs <em>Dialogs</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Dialogs</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getDialogs()
-	 * @see #getPerspective()
-	 * @generated
-	 */
-	public EReference getPerspective_Dialogs() {
-		return (EReference)perspectiveEClass.getEStructuralFeatures().get(1);
-	}
-
-
-	/**
 	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack <em>Perspective Stack</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1264,7 +1250,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 
 		perspectiveEClass = createEClass(PERSPECTIVE);
 		createEReference(perspectiveEClass, PERSPECTIVE__WINDOWS);
-		createEReference(perspectiveEClass, PERSPECTIVE__DIALOGS);
 
 		perspectiveStackEClass = createEClass(PERSPECTIVE_STACK);
 
@@ -1297,6 +1282,7 @@ public class AdvancedPackageImpl extends EPackageImpl {
 		// Obtain other dependent packages
 		UiPackageImpl theUiPackage = (UiPackageImpl)EPackage.Registry.INSTANCE.getEPackage(UiPackageImpl.eNS_URI);
 		BasicPackageImpl theBasicPackage = (BasicPackageImpl)EPackage.Registry.INSTANCE.getEPackage(BasicPackageImpl.eNS_URI);
+		CommandsPackageImpl theCommandsPackage = (CommandsPackageImpl)EPackage.Registry.INSTANCE.getEPackage(CommandsPackageImpl.eNS_URI);
 
 		// Create type parameters
 
@@ -1313,6 +1299,8 @@ public class AdvancedPackageImpl extends EPackageImpl {
 		g1 = createEGenericType(theUiPackage.getUILabel());
 		perspectiveEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getContext());
+		perspectiveEClass.getEGenericSuperTypes().add(g1);
+		g1 = createEGenericType(theCommandsPackage.getHandlerContainer());
 		perspectiveEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(theUiPackage.getUIElement());
 		perspectiveStackEClass.getEGenericSuperTypes().add(g1);
@@ -1334,7 +1322,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 
 		initEClass(perspectiveEClass, MPerspective.class, "Perspective", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(getPerspective_Windows(), theBasicPackage.getWindow(), null, "windows", null, 0, -1, MPerspective.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEReference(getPerspective_Dialogs(), theBasicPackage.getFrame(), null, "dialogs", null, 0, -1, MPerspective.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(perspectiveStackEClass, MPerspectiveStack.class, "PerspectiveStack", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
@@ -1397,14 +1384,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EReference PERSPECTIVE__WINDOWS = eINSTANCE.getPerspective_Windows();
-
-		/**
-		 * The meta object literal for the '<em><b>Dialogs</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		public static final EReference PERSPECTIVE__DIALOGS = eINSTANCE.getPerspective_Dialogs();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveStackImpl <em>Perspective Stack</em>}' class.

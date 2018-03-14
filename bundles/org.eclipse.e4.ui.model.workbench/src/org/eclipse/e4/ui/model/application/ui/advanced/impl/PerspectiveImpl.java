@@ -15,13 +15,15 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.LocalizationHelper;
+import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
+import org.eclipse.e4.ui.model.application.commands.impl.CommandsPackageImpl;
 import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.e4.ui.model.application.impl.StringToStringMapImpl;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
@@ -56,8 +58,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getContext <em>Context</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getVariables <em>Variables</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getProperties <em>Properties</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getHandlers <em>Handlers</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getWindows <em>Windows</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.impl.PerspectiveImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
  *
  * @generated
@@ -184,6 +186,16 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	protected EMap<String, String> properties;
 
 	/**
+	 * The cached value of the '{@link #getHandlers() <em>Handlers</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getHandlers()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<MHandler> handlers;
+
+	/**
 	 * The cached value of the '{@link #getWindows() <em>Windows</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -192,16 +204,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	 * @ordered
 	 */
 	protected EList<MWindow> windows;
-
-	/**
-	 * The cached value of the '{@link #getDialogs() <em>Dialogs</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDialogs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MFrame> dialogs;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -360,6 +362,18 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public List<MHandler> getHandlers() {
+		if (handlers == null) {
+			handlers = new EObjectContainmentEList<MHandler>(MHandler.class, this, AdvancedPackageImpl.PERSPECTIVE__HANDLERS);
+		}
+		return handlers;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public List<MWindow> getWindows() {
 		if (windows == null) {
 			windows = new EObjectContainmentEList<MWindow>(MWindow.class, this, AdvancedPackageImpl.PERSPECTIVE__WINDOWS);
@@ -370,19 +384,8 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
 	 */
-	public List<MFrame> getDialogs() {
-		if (dialogs == null) {
-			dialogs = new EObjectContainmentEList<MFrame>(MFrame.class, this, AdvancedPackageImpl.PERSPECTIVE__DIALOGS);
-		}
-		return dialogs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 */
+	@Override
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(
@@ -418,10 +421,10 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 		switch (featureID) {
 			case AdvancedPackageImpl.PERSPECTIVE__PROPERTIES:
 				return ((InternalEList<?>)((EMap.InternalMapView<String, String>)getProperties()).eMap()).basicRemove(otherEnd, msgs);
+			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
+				return ((InternalEList<?>)getHandlers()).basicRemove(otherEnd, msgs);
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return ((InternalEList<?>)getWindows()).basicRemove(otherEnd, msgs);
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				return ((InternalEList<?>)getDialogs()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -451,10 +454,10 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 			case AdvancedPackageImpl.PERSPECTIVE__PROPERTIES:
 				if (coreType) return ((EMap.InternalMapView<String, String>)getProperties()).eMap();
 				else return getProperties();
+			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
+				return getHandlers();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return getWindows();
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				return getDialogs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -487,13 +490,13 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 			case AdvancedPackageImpl.PERSPECTIVE__PROPERTIES:
 				((EStructuralFeature.Setting)((EMap.InternalMapView<String, String>)getProperties()).eMap()).set(newValue);
 				return;
+			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
+				getHandlers().clear();
+				getHandlers().addAll((Collection<? extends MHandler>)newValue);
+				return;
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				getWindows().clear();
 				getWindows().addAll((Collection<? extends MWindow>)newValue);
-				return;
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				getDialogs().clear();
-				getDialogs().addAll((Collection<? extends MFrame>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -525,11 +528,11 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 			case AdvancedPackageImpl.PERSPECTIVE__PROPERTIES:
 				getProperties().clear();
 				return;
+			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
+				getHandlers().clear();
+				return;
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				getWindows().clear();
-				return;
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				getDialogs().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -559,10 +562,10 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				return variables != null && !variables.isEmpty();
 			case AdvancedPackageImpl.PERSPECTIVE__PROPERTIES:
 				return properties != null && !properties.isEmpty();
+			case AdvancedPackageImpl.PERSPECTIVE__HANDLERS:
+				return handlers != null && !handlers.isEmpty();
 			case AdvancedPackageImpl.PERSPECTIVE__WINDOWS:
 				return windows != null && !windows.isEmpty();
-			case AdvancedPackageImpl.PERSPECTIVE__DIALOGS:
-				return dialogs != null && !dialogs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -592,6 +595,12 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				default: return -1;
 			}
 		}
+		if (baseClass == MHandlerContainer.class) {
+			switch (derivedFeatureID) {
+				case AdvancedPackageImpl.PERSPECTIVE__HANDLERS: return CommandsPackageImpl.HANDLER_CONTAINER__HANDLERS;
+				default: return -1;
+			}
+		}
 		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
 	}
 
@@ -617,6 +626,12 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 				case UiPackageImpl.CONTEXT__CONTEXT: return AdvancedPackageImpl.PERSPECTIVE__CONTEXT;
 				case UiPackageImpl.CONTEXT__VARIABLES: return AdvancedPackageImpl.PERSPECTIVE__VARIABLES;
 				case UiPackageImpl.CONTEXT__PROPERTIES: return AdvancedPackageImpl.PERSPECTIVE__PROPERTIES;
+				default: return -1;
+			}
+		}
+		if (baseClass == MHandlerContainer.class) {
+			switch (baseFeatureID) {
+				case CommandsPackageImpl.HANDLER_CONTAINER__HANDLERS: return AdvancedPackageImpl.PERSPECTIVE__HANDLERS;
 				default: return -1;
 			}
 		}

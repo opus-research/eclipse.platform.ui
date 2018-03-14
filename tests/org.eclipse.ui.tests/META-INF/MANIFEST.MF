@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Eclipse UI Tests
 Bundle-SymbolicName: org.eclipse.ui.tests; singleton:=true
-Bundle-Version: 3.10.100.qualifier
+Bundle-Version: 3.11.0.qualifier
 Eclipse-BundleShape: dir
 Bundle-Activator: org.eclipse.ui.tests.TestPlugin
 Bundle-Vendor: Eclipse.org
@@ -47,4 +47,4 @@ Require-Bundle: org.eclipse.core.resources,
 Eclipse-AutoStart: true
 Export-Package: org.eclipse.ui.tests.api,
  org.eclipse.ui.tests.menus
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
