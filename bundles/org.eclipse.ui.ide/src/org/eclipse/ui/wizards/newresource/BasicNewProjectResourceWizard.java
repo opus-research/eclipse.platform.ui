@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
@@ -82,14 +83,14 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * </p>
  * <p>
  * Example:
- *
+ * 
  * <pre>
  * IWorkbenchWizard wizard = new BasicNewProjectResourceWizard();
  * wizard.init(workbench, selection);
  * WizardDialog dialog = new WizardDialog(shell, wizard);
  * dialog.open();
  * </pre>
- *
+ * 
  * During the call to <code>open</code>, the wizard dialog is presented to
  * the user. When the user hits Finish, a project resource with the
  * user-specified name is created, the dialog closes, and the call to
@@ -99,13 +100,13 @@ import org.eclipse.ui.statushandlers.StatusManager;
  */
 public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		implements IExecutableExtension {
-
+	
 	/**
 	 * The wizard id for creating new projects in the workspace.
 	 * @since 3.4
 	 */
 	public static final String WIZARD_ID = "org.eclipse.ui.wizards.new.project"; //$NON-NLS-1$
-
+	
 	private WizardNewProjectCreationPage mainPage;
 
 	private WizardNewProjectReferencePage referencePage;
@@ -145,12 +146,18 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		setDialogSettings(section);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
 	public void addPages() {
 		super.addPages();
 
 		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage") { //$NON-NLS-1$
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.dialogs.WizardNewProjectCreationPage#createControl(org.eclipse.swt.widgets.Composite)
+			 */
 			public void createControl(Composite parent) {
 				super.createControl(parent);
 				createWorkingSetGroup(
@@ -159,7 +166,7 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 						new String[] { "org.eclipse.ui.resourceWorkingSetPage" }); //$NON-NLS-1$
 				Dialog.applyDialogFont(getControl());
 			}
-		};
+		}; 
 		mainPage.setTitle(ResourceMessages.NewProject_title);
 		mainPage.setDescription(ResourceMessages.NewProject_description);
 		this.addPage(mainPage);
@@ -187,7 +194,7 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 	 * successfully created; subsequent invocations of this method will answer
 	 * the same project resource without attempting to create it again.
 	 * </p>
-	 *
+	 * 
 	 * @return the created project resource, or <code>null</code> if the
 	 *         project was not created
 	 */
@@ -219,20 +226,23 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		}
 
 		// create the new project operation
-		IRunnableWithProgress op = monitor -> {
-CreateProjectOperation op1 = new CreateProjectOperation(
-			description, ResourceMessages.NewProject_windowTitle);
-try {
-		// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-		// directly execute the operation so that the undo state is
-		// not preserved.  Making this undoable resulted in too many
-		// accidental file deletions.
-		op1.execute(monitor, WorkspaceUndoUtil
-			.getUIInfoAdapter(getShell()));
-} catch (ExecutionException e) {
-		throw new InvocationTargetException(e);
-}
-};
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor)
+					throws InvocationTargetException {
+				CreateProjectOperation op = new CreateProjectOperation(
+						description, ResourceMessages.NewProject_windowTitle);
+				try {
+					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+					// directly execute the operation so that the undo state is
+					// not preserved.  Making this undoable resulted in too many 
+					// accidental file deletions.
+					op.execute(monitor, WorkspaceUndoUtil
+						.getUIInfoAdapter(getShell()));
+				} catch (ExecutionException e) {
+					throw new InvocationTargetException(e);
+				}
+			}
+		};
 
 		// run the new project creation operation
 		try {
@@ -284,7 +294,7 @@ try {
 
 	/**
 	 * Returns the newly created project.
-	 *
+	 * 
 	 * @return the created project, or <code>null</code> if project not
 	 *         created
 	 */
@@ -292,20 +302,27 @@ try {
 		return newProject;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IWorkbenchWizard.
+	 */
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		super.init(workbench, currentSelection);
 		setNeedsProgressMonitor(true);
 		setWindowTitle(ResourceMessages.NewProject_windowTitle);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on BasicNewResourceWizard.
+	 */
 	protected void initializeDefaultPageImageDescriptor() {
 		ImageDescriptor desc = IDEWorkbenchPlugin
 				.getIDEImageDescriptor("wizban/newprj_wiz.png");//$NON-NLS-1$
 		setDefaultPageImageDescriptor(desc);
 	}
 
+	/*
+	 * (non-Javadoc) Opens a new window with a particular perspective and input.
+	 */
 	private static void openInNewWindow(IPerspectiveDescriptor desc) {
 
 		// Open the page.
@@ -322,24 +339,29 @@ try {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
 	public boolean performFinish() {
 		createNewProject();
 
 		if (newProject == null) {
 			return false;
 		}
-
+		
 		IWorkingSet[] workingSets = mainPage.getSelectedWorkingSets();
 		getWorkbench().getWorkingSetManager().addToWorkingSets(newProject,
 				workingSets);
-
+        
 		updatePerspective();
 		selectAndReveal(newProject);
 
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc) Replaces the current perspective with the new one.
+	 */
 	private static void replaceCurrentPerspective(IPerspectiveDescriptor persp) {
 
 		// Get the active page.
@@ -361,7 +383,6 @@ try {
 	 * Stores the configuration element for the wizard. The config element will
 	 * be used in <code>performFinish</code> to set the result perspective.
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement cfig,
 			String propertyName, Object data) {
 		configElement = cfig;
@@ -377,7 +398,7 @@ try {
 	/**
 	 * Updates the perspective based on the current settings in the
 	 * Workbench/Perspectives preference page.
-	 *
+	 * 
 	 * Use the setting for the new perspective opening if we are set to open in
 	 * a new perspective.
 	 * <p>
@@ -386,10 +407,10 @@ try {
 	 * wizard's <code>IConfigurationElement</code>. That is the configuration
 	 * element to pass into this method.
 	 * </p>
-	 *
+	 * 
 	 * @param configElement -
 	 *            the element we are updating with
-	 *
+	 * 
 	 * @see IPreferenceConstants#OPM_NEW_WINDOW
 	 * @see IPreferenceConstants#OPM_ACTIVE_PAGE
 	 * @see IWorkbenchPreferenceConstants#NO_NEW_PERSPECTIVE
@@ -510,7 +531,7 @@ try {
 	/**
 	 * Adds to the list all perspective IDs in the Workbench who's original ID
 	 * matches the given ID.
-	 *
+	 * 
 	 * @param perspectiveIds
 	 *            the list of perspective IDs to supplement.
 	 * @param id
@@ -534,13 +555,13 @@ try {
 
 	/**
 	 * Prompts the user for whether to switch perspectives.
-	 *
+	 * 
 	 * @param window
 	 *            The workbench window in which to switch perspectives; must not
 	 *            be <code>null</code>
 	 * @param finalPersp
 	 *            The perspective to switch to; must not be <code>null</code>.
-	 *
+	 * 
 	 * @return <code>true</code> if it's OK to switch, <code>false</code>
 	 *         otherwise
 	 */

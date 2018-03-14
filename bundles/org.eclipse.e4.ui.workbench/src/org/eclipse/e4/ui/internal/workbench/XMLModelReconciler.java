@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -109,7 +108,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * The version of the model deltas.
-	 *
+	 * 
 	 * <ul>
 	 * <li>1.1 - introduced direct references to binding contexts instead of using string ids (see
 	 * bug 320171 and bug 338444)</li>
@@ -141,7 +140,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	/**
 	 * A map of all the objects that were originally defined in the model.
 	 */
-	private WeakHashMap<EObject, EObject> originalObjects = new WeakHashMap<>();
+	private WeakHashMap<EObject, EObject> originalObjects = new WeakHashMap<EObject, EObject>();
 
 	/**
 	 * Records all of the objects in the original model so that we can determine whether an element
@@ -180,7 +179,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	static List<Object> getReferences(Object object) {
 		Iterator<EObject> it = ((EObject) object).eAllContents();
-		List<Object> references = new LinkedList<>();
+		List<Object> references = new LinkedList<Object>();
 		while (it.hasNext()) {
 			Object reference = it.next();
 			references.add(reference);
@@ -195,7 +194,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 		Document document = (Document) serializedState;
 
-		Collection<ModelDelta> deltas = new LinkedList<>();
+		Collection<ModelDelta> deltas = new LinkedList<ModelDelta>();
 
 		Element rootElement = document.getDocumentElement();
 		String version = rootElement.getAttribute(VERSION_ATTNAME);
@@ -514,7 +513,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	private ModelDelta createMapDelta(EObject object, Element innerElement,
 			EStructuralFeature feature) {
-		Map<String, String> deltaMap = new HashMap<>();
+		Map<String, String> deltaMap = new HashMap<String, String>();
 		NodeList attributes = (NodeList) innerElement;
 		for (int j = 0; j < attributes.getLength(); j++) {
 			Node entry = attributes.item(j);
@@ -541,11 +540,11 @@ public class XMLModelReconciler extends ModelReconciler {
 
 		if (userSize == 0) {
 			// the user removed all the original parts
-			List<Object> collectedReferences = new ArrayList<>(currentReferences);
+			List<Object> collectedReferences = new ArrayList<Object>(currentReferences);
 			collectedReferences.removeAll(originalReferences);
 			return collectedReferences;
 		} else if (originalSize == 0) {
-			List<Object> collectedReferences = new ArrayList<>(userReferences);
+			List<Object> collectedReferences = new ArrayList<Object>(userReferences);
 			collectedReferences.addAll(currentReferences);
 			return collectedReferences;
 		} else if (currentReferences.isEmpty()) {
@@ -559,16 +558,16 @@ public class XMLModelReconciler extends ModelReconciler {
 
 		if (originalReferences.containsAll(userReferences)
 				&& !userReferences.containsAll(originalReferences)) {
-			List<Object> collectedReferences2 = new ArrayList<>(originalReferences);
+			List<Object> collectedReferences2 = new ArrayList<Object>(originalReferences);
 			collectedReferences2.removeAll(userReferences);
 
-			List<Object> collectedReferences = new ArrayList<>(currentReferences);
+			List<Object> collectedReferences = new ArrayList<Object>(currentReferences);
 			collectedReferences.removeAll(collectedReferences2);
 
 			return collectedReferences;
 		}
 
-		List<Position> positions = new ArrayList<>();
+		List<Position> positions = new ArrayList<Position>();
 
 		for (int i = 0; i < userReferences.size(); i++) {
 			Object user = userReferences.get(i);
@@ -579,7 +578,7 @@ public class XMLModelReconciler extends ModelReconciler {
 			}
 		}
 
-		List<Object> collectedRefs = new ArrayList<>(currentReferences);
+		List<Object> collectedRefs = new ArrayList<Object>(currentReferences);
 
 		for (Position position : positions) {
 			Object after = position.getAfter();
@@ -656,8 +655,8 @@ public class XMLModelReconciler extends ModelReconciler {
 	private ModelDelta createMultiReferenceDelta(Collection<ModelDelta> deltas,
 			List<Object> references, EObject eObject, EStructuralFeature feature, Element node) {
 		NodeList referencedIds = (NodeList) node;
-		List<Object> originalReferences = new ArrayList<>();
-		List<Object> userReferences = new ArrayList<>();
+		List<Object> originalReferences = new ArrayList<Object>();
+		List<Object> userReferences = new ArrayList<Object>();
 		List<?> currentReferences = (List<?>) eObject.eGet(feature);
 
 		for (int i = 0; i < referencedIds.getLength(); i++) {
@@ -758,7 +757,7 @@ public class XMLModelReconciler extends ModelReconciler {
 								compositeDelta.add(delta);
 							}
 						} else if (isChainedReference(attributeName)) {
-							List<Object> objectReferences = new ArrayList<>();
+							List<Object> objectReferences = new ArrayList<Object>();
 							NodeList objectReferenceNodes = (NodeList) item;
 
 							for (int j = 0; j < objectReferenceNodes.getLength(); j++) {
@@ -781,8 +780,7 @@ public class XMLModelReconciler extends ModelReconciler {
 							deltas.add(delta);
 						} else if (isStringToStringMap(attributeName)) {
 							EStructuralFeature feature = getStructuralFeature(object, attributeName);
-							@SuppressWarnings("unchecked")
-							EMap<String, String> map = (EMap<String, String>) object.eGet(feature);
+							EMap map = (EMap) object.eGet(feature);
 
 							NodeList attributes = (NodeList) item;
 							for (int j = 0; j < attributes.getLength(); j++) {
@@ -811,7 +809,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	private ModelDelta createUnorderedChainedAttributeDelta(EObject object,
 			EStructuralFeature feature, Element node, String featureName) {
-		Set<Object> values = new HashSet<>();
+		Set<Object> values = new HashSet<Object>();
 		NodeList attributes = (NodeList) node;
 		for (int j = 0; j < attributes.getLength(); j++) {
 			Node item = attributes.item(j);
@@ -825,7 +823,7 @@ public class XMLModelReconciler extends ModelReconciler {
 		List<?> currentValues = (List<?>) object.eGet(feature);
 		values.addAll(currentValues);
 
-		return new EMFModelDeltaSet(object, feature, new ArrayList<>(values));
+		return new EMFModelDeltaSet(object, feature, new ArrayList<Object>(values));
 	}
 
 	private ModelDelta createAttributeDelta(EObject eObject, EStructuralFeature feature,
@@ -876,7 +874,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	/**
 	 * Returns an XML representation of the changes that have occurred in the specified object. Or
 	 * <code>null</code> if changes pertaining to this object should not be persisted
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param entry
@@ -986,7 +984,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Retrieves the id of the object by querying for it from the resource.
-	 *
+	 * 
 	 * @param object
 	 *            the object to retrieve the id for
 	 * @param container
@@ -1036,7 +1034,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	/**
 	 * Retrieves the original containing parent object of the specified reference. If
 	 * <code>null</code> is returned, the object was not initially known by the change recorder.
-	 *
+	 * 
 	 * @param reference
 	 *            the object to find its original container for
 	 * @return the original parent container of the object, or <code>null</code> if it did not
@@ -1571,7 +1569,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * {@link #recordChanges(Object)}. The identifier for the object will be queried from the
 	 * resource. If the object did not exist was not known when changes began recording,
 	 * <code>null</code> will be returned.
-	 *
+	 * 
 	 * @param object
 	 *            the object to query an id for
 	 * @return an id suitable for looking up the object, or <code>null</code> if the object did not
@@ -1601,7 +1599,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Creates an XML element that will capture the delta that occurred in the object.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param object
@@ -1668,7 +1666,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * there when the application started prior to the applying of any deltas. It should be noted
 	 * that an object that was originally referenced will not necessarily be dereferenced after any
 	 * deltas have been applied.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param reference
@@ -1693,7 +1691,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Creates a new element that defines a reference to another object.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param eObject
@@ -1768,7 +1766,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Creates an element that describes the state of the feature in the specified object.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML element document
 	 * @param object
@@ -1853,7 +1851,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * An example of a direct reference would be a window's main menu. The menu is "owned" by the
 	 * window and cannot be one of the menus in a part.
 	 * </p>
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the interested feature
 	 * @return <code>true</code> if this particular feature directly references and "owns" the
@@ -1882,7 +1880,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * case, the element container's contains the active child in its list of children and both this
 	 * listing and the active child reference is a containment feature.
 	 * </p>
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the interested feature
 	 * @return <code>true</code> if this particular feature directly references and "owns" the
@@ -1904,7 +1902,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Returns whether the feature is a reference to another object.
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the feature
 	 * @return <code>true</code> if this particular feature is a reference to another object,
@@ -1916,7 +1914,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Returns whether the feature is a list of object references.
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the feature
 	 * @return <code>true</code> if this particular feature is referring to a list of object
@@ -1965,7 +1963,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Returns whether this feature should be persisted.
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the feature
 	 * @return <code>true</code> if this particular feature should be persisted, <code>false</code>

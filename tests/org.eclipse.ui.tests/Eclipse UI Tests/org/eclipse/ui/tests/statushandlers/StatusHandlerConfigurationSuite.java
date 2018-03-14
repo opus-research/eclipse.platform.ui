@@ -25,13 +25,12 @@ public class StatusHandlerConfigurationSuite extends WorkbenchSessionTest {
 		super(dataLocation);
 		System.out.println("initalization1");
 	}
-
+	
 	public StatusHandlerConfigurationSuite(String dataLocation, Class clazz){
 		super(dataLocation, clazz);
 		System.out.println("initalization2");
 	}
 
-	@Override
 	protected Setup newSetup() throws SetupException {
 		Setup base = super.newSetup();
 		System.out.println(base);
@@ -40,7 +39,7 @@ public class StatusHandlerConfigurationSuite extends WorkbenchSessionTest {
 		System.out.println(base);
 		return base;
 	}
-
-
+	
+	
 
 }

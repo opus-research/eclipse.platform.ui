@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ public class UpAction extends FrameAction {
 
 	/**
      * Constructs a new action for the specified frame list.
-     *
+     * 
      * @param frameList the frame list
      */
     public UpAction(FrameList frameList) {
@@ -60,8 +60,7 @@ public class UpAction extends FrameAction {
      * Calls <code>gotoFrame</code> on the frame list with a frame
      * representing the parent of the current input.
      */
-    @Override
-	public void run() {
+    public void run() {
         Frame parentFrame = getParentFrame(IFrameSource.FULL_CONTEXT);
         if (parentFrame != null) {
             getFrameList().gotoFrame(parentFrame);
@@ -75,8 +74,7 @@ public class UpAction extends FrameAction {
      * The tool tip text is "Up to " plus the tool tip text for the parent
      * frame.
      */
-    @Override
-	public void update() {
+    public void update() {
         super.update();
         Frame parentFrame = getParentFrame(0);
         setEnabled(parentFrame != null);

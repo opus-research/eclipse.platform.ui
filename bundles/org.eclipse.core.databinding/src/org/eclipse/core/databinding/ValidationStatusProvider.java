@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,9 @@ import org.eclipse.core.runtime.IStatus;
  * A validation status provider tracks the state of zero or more target
  * observables and zero or more model observables and produces a validation
  * result.
- *
+ * 
  * @since 1.1
- *
+ * 
  */
 public abstract class ValidationStatusProvider {
 
@@ -39,7 +39,7 @@ public abstract class ValidationStatusProvider {
 	 * Returns an {@link IObservableList} &lt; {@link IObservable} &gt;
 	 * containing the target observables (if any) that are being tracked by this
 	 * validation status provider.
-	 *
+	 * 
 	 * @return an {@link IObservableList} &lt; {@link IObservable} &gt; (may be
 	 *         empty)
 	 */
@@ -49,7 +49,7 @@ public abstract class ValidationStatusProvider {
 	 * Returns an {@link IObservableList} &lt; {@link IObservable} &gt;
 	 * containing the model observables (if any) that are being tracked by this
 	 * validation status provider.
-	 *
+	 * 
 	 * @return an {@link IObservableList} &lt; {@link IObservable} &gt; (may be
 	 *         empty)
 	 */

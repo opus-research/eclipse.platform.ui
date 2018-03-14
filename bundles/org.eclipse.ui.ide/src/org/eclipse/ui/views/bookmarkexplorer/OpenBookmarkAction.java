@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ class OpenBookmarkAction extends BookmarkAction {
 
     /**
      * Create a new instance of this class.
-     *
+     * 
      * @param view the view
      */
     public OpenBookmarkAction(BookmarkNavigator view) {
@@ -44,8 +44,7 @@ class OpenBookmarkAction extends BookmarkAction {
         setEnabled(false);
     }
 
-    @Override
-	public void run() {
+    public void run() {
         IWorkbenchPage page = getView().getSite().getPage();
         for (Iterator i = getStructuredSelection().iterator(); i.hasNext();) {
             IMarker marker = (IMarker) i.next();
@@ -81,8 +80,7 @@ class OpenBookmarkAction extends BookmarkAction {
         }
     }
 
-    @Override
-	public void selectionChanged(IStructuredSelection sel) {
+    public void selectionChanged(IStructuredSelection sel) {
         setEnabled(!sel.isEmpty());
     }
 }

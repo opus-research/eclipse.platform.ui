@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,23 +24,23 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * <li>Round to nearest integer</li>
  * <li>Do nothing</li>
  * </ul>
- *
+ * 
  * @since 1.0
  */
-public class SomeMathFunction<K> extends ComputedObservableMap<K, Double> {
+public class SomeMathFunction extends ComputedObservableMap {
 
 	/**
-	 *
+	 * 
 	 */
 	public static final int OP_IDENTITY = 0;
 
 	/**
-	 *
+	 * 
 	 */
 	public static final int OP_MULTIPLY = 1;
 
 	/**
-	 *
+	 * 
 	 */
 	public static final int OP_ROUND = 2;
 
@@ -49,7 +49,7 @@ public class SomeMathFunction<K> extends ComputedObservableMap<K, Double> {
 	/**
 	 * @param domain
 	 */
-	public SomeMathFunction(IObservableSet<K> domain) {
+	public SomeMathFunction(IObservableSet domain) {
 		super(domain);
 		init();
 	}
@@ -69,64 +69,64 @@ public class SomeMathFunction<K> extends ComputedObservableMap<K, Double> {
 		// would include
 		// the subset of affected elements rather than using
 		// domain.toCollection()
-		fireMapChange(new MapDiff<K, Double>() {
+		fireMapChange(new MapDiff() {
 
 			@Override
-			public Set<K> getAddedKeys() {
+			public Set getAddedKeys() {
 				return Collections.EMPTY_SET;
 			}
 
 			@Override
-			public Set<K> getChangedKeys() {
+			public Set getChangedKeys() {
 				return keySet();
 			}
 
 			@Override
-			public Double getNewValue(Object key) {
+			public Object getNewValue(Object key) {
 				return doComputeResult(key, operation);
 			}
 
 			@Override
-			public Double getOldValue(Object key) {
+			public Object getOldValue(Object key) {
 				return doComputeResult(key, oldOp);
 			}
 
 			@Override
-			public Set<K> getRemovedKeys() {
+			public Set getRemovedKeys() {
 				return Collections.EMPTY_SET;
 			}
 		});
 	}
 
-	private Double doComputeResult(Object element, int op) {
+	private Object doComputeResult(Object element, int op) {
 		switch (op) {
 		case OP_IDENTITY:
-			return (Double) element;
+			return element;
 		case OP_MULTIPLY:
 			return new Double((((Double) element).doubleValue() * 2.0));
 		case OP_ROUND:
 			return new Double(Math.floor((((Double) element).doubleValue())));
 		}
-		return (Double) element;
+		return element;
 	}
 
 	@Override
-	protected Double doGet(K key) {
+	protected Object doGet(Object key) {
 		return doComputeResult(key, this.op);
 	}
 
 	@Override
-	protected Double doPut(K key, Double value) {
+	protected Object doPut(Object key, Object value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	protected void hookListener(K addedKey) {
+	protected void hookListener(Object addedKey) {
 		// ignore, no need to listen to immutable Double objects
 	}
 
 	@Override
-	protected void unhookListener(K removedKey) {
+	protected void unhookListener(Object removedKey) {
 		// ignore, no need to listen to immutable Double objects
 	}
 

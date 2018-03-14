@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,18 +26,18 @@ import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
 
 /**
- * A <code>MarkerTransfer</code> is used to transfer an array of
- * <code>IMarker</code>s from one part to another in a drag and drop
+ * A <code>MarkerTransfer</code> is used to transfer an array of 
+ * <code>IMarker</code>s from one part to another in a drag and drop 
  * operation.
  * <p>
- * In every drag and drop operation there is a <code>DragSource</code> and
- * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is
- * used to marshall the drag data from the source into a byte array.  If a drop
+ * In every drag and drop operation there is a <code>DragSource</code> and 
+ * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is 
+ * used to marshall the drag data from the source into a byte array.  If a drop 
  * occurs another <code>Transfer</code> is used to marshall the byte array into
  * drop data for the target.
  * </p><p>
  * This class can be used for a <code>Viewer<code> or an SWT component directly.
- * A singleton is provided which may be serially reused (see <code>getInstance</code>).
+ * A singleton is provided which may be serially reused (see <code>getInstance</code>).  
  * It is not intended to be subclassed.
  * </p>
  *
@@ -93,24 +93,29 @@ public class MarkerTransfer extends ByteArrayTransfer {
         return instance;
     }
 
-    @Override
-	protected int[] getTypeIds() {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    protected int[] getTypeIds() {
         return new int[] { TYPEID };
     }
 
-    @Override
-	protected String[] getTypeNames() {
+    /* (non-Javadoc)
+     * Returns the type names.
+     *
+     * @return the list of type names
+     */
+    protected String[] getTypeNames() {
         return new String[] { TYPE_NAME };
     }
 
-	/*
-	 * On a successful conversion, the transferData.result field will be set to
-	 * OLE.S_OK. If this transfer agent is unable to perform the conversion, the
-	 * transferData.result field will be set to the failure value of
-	 * OLE.DV_E_TYMED.
-	 */
-    @Override
-	protected void javaToNative(Object object, TransferData transferData) {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     * On a successful conversion, the transferData.result field will be set to
+     * OLE.S_OK. If this transfer agent is unable to perform the conversion, the
+     * transferData.result field will be set to the failure value of OLE.DV_E_TYMED.
+     */
+    protected void javaToNative(Object object, TransferData transferData) {
         /**
          * Transfer data is an array of markers.  Serialized version is:
          * (int) number of markers
@@ -158,8 +163,10 @@ public class MarkerTransfer extends ByteArrayTransfer {
         }
     }
 
-    @Override
-	protected Object nativeToJava(TransferData transferData) {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    protected Object nativeToJava(TransferData transferData) {
         byte[] bytes = (byte[]) super.nativeToJava(transferData);
         DataInputStream in = new DataInputStream(
                 new ByteArrayInputStream(bytes));

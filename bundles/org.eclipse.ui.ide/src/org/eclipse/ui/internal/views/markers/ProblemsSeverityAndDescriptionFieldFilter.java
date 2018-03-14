@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,15 +19,17 @@ import org.eclipse.ui.views.markers.internal.ProblemFilter;
 /**
  * ProblemsSeverityAndDescriptionFieldFilter is the filter used by the problems
  * view.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class ProblemsSeverityAndDescriptionFieldFilter extends
 		SeverityAndDescriptionFieldFilter {
 
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.views.markers.DescriptionFieldFilter#select(org.eclipse.ui.views.markers.MarkerItem)
+	 */
 	public boolean select(MarkerItem item) {
 
 		IMarker marker = item.getMarker();
@@ -43,7 +45,9 @@ public class ProblemsSeverityAndDescriptionFieldFilter extends
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.views.markers.DescriptionFieldFilter#loadLegacySettings(org.eclipse.ui.IMemento, org.eclipse.ui.internal.views.markers.MarkerContentGenerator)
+	 */
 	void loadLegacySettings(IMemento memento, MarkerContentGenerator generator) {
 
 		super.loadLegacySettings(memento,generator);
@@ -54,9 +58,13 @@ public class ProblemsSeverityAndDescriptionFieldFilter extends
 			selectedSeverities = severitySetting.intValue();
 		}
 
-
+	
 	}
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.DescriptionFieldFilter#initialize(org.eclipse.ui.views.markers.internal.ProblemFilter)
+	 */
 	public void initialize(ProblemFilter problemFilter) {
 		super.initialize(problemFilter);
 		if (problemFilter.getSeverity() > 0)

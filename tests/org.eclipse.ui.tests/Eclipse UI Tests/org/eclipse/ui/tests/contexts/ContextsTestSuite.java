@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.contexts;
 
-import org.junit.runner.RunWith;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -20,10 +18,9 @@ import junit.framework.TestSuite;
  * and the "org.eclise.ui.contexts" Java API. This includes tests dealing with
  * other extension points or elements in other extension points that have been
  * deprecated to be replaced by this one.
- *
+ * 
  * @since 3.0
  */
-@RunWith(org.junit.runners.AllTests.class)
 public final class ContextsTestSuite extends TestSuite {
 
     /**

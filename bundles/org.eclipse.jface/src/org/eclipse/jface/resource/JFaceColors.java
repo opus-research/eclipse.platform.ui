@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,8 +101,8 @@ public class JFaceColors {
      * may be disposed. Users of the colors in this class should add a IPropertyChangeListener
      * to detect when any of these colors change.
      * @param colorName name of the color
-     *
-     * @deprecated JFaceColors no longer maintains a cache of colors.  This job
+     * 
+     * @deprecated JFaceColors no longer maintains a cache of colors.  This job 
      * is now handled by the ColorRegistry.
      */
     @Deprecated
@@ -113,8 +113,8 @@ public class JFaceColors {
     /**
      * Dispose of all allocated colors. Called on workbench
      * shutdown.
-     *
-     * @deprecated JFaceColors no longer maintains a cache of colors.  This job
+     * 
+     * @deprecated JFaceColors no longer maintains a cache of colors.  This job 
      * is now handled by the ColorRegistry.
      */
     @Deprecated
@@ -125,9 +125,9 @@ public class JFaceColors {
     /**
      * Set the foreground and background colors of the
      * control to the specified values. If the values are
-     * null than ignore them.
+     * null than ignore them. 
      * @param control the control the foreground and/or background color should be set
-     *
+     * 
      * @param foreground Color the foreground color (maybe <code>null</code>)
      * @param background Color the background color (maybe <code>null</code>)
      */

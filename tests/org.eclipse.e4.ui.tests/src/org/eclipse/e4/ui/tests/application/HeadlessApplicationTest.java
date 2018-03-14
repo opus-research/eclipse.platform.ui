@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,6 @@
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +32,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -46,9 +42,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public abstract class HeadlessApplicationTest extends
 		HeadlessApplicationElementTest {
@@ -57,9 +50,8 @@ public abstract class HeadlessApplicationTest extends
 
 	protected IPresentationEngine renderer;
 
-	@Before
 	@Override
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		application = (MApplication) applicationElement;
@@ -73,9 +65,8 @@ public abstract class HeadlessApplicationTest extends
 		}
 	}
 
-	@After
 	@Override
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 		for (MWindow window : application.getChildren()) {
 			renderer.removeGui(window);
 		}
@@ -90,35 +81,72 @@ public abstract class HeadlessApplicationTest extends
 	private void addActiveChildEventHandling() {
 	}
 
-	@Test
 	public void testGet_ActiveContexts() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNotNull(context.get(IServiceConstants.ACTIVE_CONTEXTS));
 	}
 
-	@Test
 	public void testGet_Selection() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNull(context.get(IServiceConstants.ACTIVE_SELECTION));
 	}
 
-	@Test
 	public void testGet_ActiveChild() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNull(context.getActiveChild());
 	}
 
-	@Test
 	public void testGet_ActivePart() throws Exception {
 		IEclipseContext context = application.getContext();
 
 		assertNull(context.get(IServiceConstants.ACTIVE_PART));
 	}
 
-	@Test
+	// public void test_SwitchActiveChildInContext() {
+	// IEclipseContext context = application.getContext();
+	//
+	// MPart[] parts = getTwoParts();
+	//
+	// parts[0].getParent().setActiveChild(parts[0]);
+	//
+	// IEclipseContext activeChildContext = (IEclipseContext) context
+	// .get(IContextConstants.ACTIVE_CHILD);
+	// while (activeChildContext != null) {
+	// if (parts[0].getContext().equals(activeChildContext)) {
+	// break;
+	// }
+	//
+	// activeChildContext = (IEclipseContext) activeChildContext
+	// .get(IContextConstants.ACTIVE_CHILD);
+	// }
+	//
+	// assertEquals(parts[0].getContext(), activeChildContext);
+	//
+	// // the OSGi context should not have been affected by the recursion
+	// assertEquals(null, osgiContext.get(IContextConstants.ACTIVE_CHILD));
+	//
+	// parts[1].getParent().setActiveChild(parts[1]);
+	//
+	// activeChildContext = (IEclipseContext) context
+	// .get(IContextConstants.ACTIVE_CHILD);
+	// while (activeChildContext != null) {
+	// if (parts[1].getContext().equals(activeChildContext)) {
+	// break;
+	// }
+	//
+	// activeChildContext = (IEclipseContext) activeChildContext
+	// .get(IContextConstants.ACTIVE_CHILD);
+	// }
+	//
+	// assertEquals(parts[1].getContext(), activeChildContext);
+	//
+	// // the OSGi context should not have been affected by the recursion
+	// assertEquals(null, osgiContext.get(IContextConstants.ACTIVE_CHILD));
+	// }
+
 	public void test_SwitchActivePartsInContext() throws Exception {
 		IEclipseContext context = application.getContext();
 
@@ -149,14 +177,12 @@ public abstract class HeadlessApplicationTest extends
 		assertNotNull(context.getContext());
 	}
 
-	@Test
 	public void testGetFirstPart_GetContext() {
 		// set the active part to ensure that it's actually been rendered
 		getFirstPart().getParent().setSelectedElement(getFirstPart());
 		test_GetContext(getFirstPart());
 	}
 
-	@Test
 	public void testGetSecondPart_GetContext() {
 		// set the active part to ensure that it's actually been rendered
 		getSecondPart().getParent().setSelectedElement(getSecondPart());
@@ -174,13 +200,11 @@ public abstract class HeadlessApplicationTest extends
 		}
 	}
 
-	@Test
 	public void testModify() {
 		testGetFirstPart_GetContext();
 		testModify(getFirstPart());
 	}
 
-	@Test
 	public void testModify2() {
 		testGetSecondPart_GetContext();
 		testModify(getSecondPart());
@@ -254,7 +278,7 @@ public abstract class HeadlessApplicationTest extends
 
 		MApplication application = (MApplication) resource.getContents().get(0);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application); // XXX
+		appContext.set(MApplication.class.getName(), application); // XXX
 		appContext.set(EModelService.class, new ModelServiceImpl(appContext));
 
 		ECommandService cs = (ECommandService) appContext
@@ -294,7 +318,7 @@ public abstract class HeadlessApplicationTest extends
 				.getConfigurationElementsFor(extId);
 
 		for (int i = 0; i < parts.length; i++) {
-			MPart part = ems.createModelElement(MPart.class);
+			MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 			part.setLabel(parts[i].getAttribute("label")); //$NON-NLS-1$
 			part.setIconURI("platform:/plugin/" //$NON-NLS-1$
 					+ parts[i].getContributor().getName() + "/" //$NON-NLS-1$

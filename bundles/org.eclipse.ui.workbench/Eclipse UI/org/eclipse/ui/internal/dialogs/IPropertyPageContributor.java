@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 223808
+ *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 223808 
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -26,7 +26,7 @@ public interface IPropertyPageContributor extends IObjectContributor {
      * property page manager.
      * @param manager the contributor manager onto which to contribute the
      * property page.
-     * @param object the type for which page should be contributed.
+     * @param object the type for which page should be contributed. 
      * @return true the page that was added, <code>null</code> if no page was added.
      */
     public PreferenceNode contributePropertyPage(PropertyPageManager manager,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.core.databinding.property.set.SimpleSetProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class BeanSetProperty extends SimpleSetProperty {
 	private final PropertyDescriptor propertyDescriptor;
@@ -46,12 +46,10 @@ public class BeanSetProperty extends SimpleSetProperty {
 				: elementType;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	protected Set doGetSet(Object source) {
 		return asSet(BeanPropertyHelper
 				.readProperty(source, propertyDescriptor));
@@ -65,12 +63,10 @@ public class BeanSetProperty extends SimpleSetProperty {
 		return (Set) propertyValue;
 	}
 
-	@Override
 	protected void doSetSet(Object source, Set set, SetDiff diff) {
 		doSetSet(source, set);
 	}
 
-	@Override
 	protected void doSetSet(Object source, Set set) {
 		BeanPropertyHelper.writeProperty(source, propertyDescriptor,
 				convertSetToBeanPropertyType(set));
@@ -88,18 +84,15 @@ public class BeanSetProperty extends SimpleSetProperty {
 		return propertyValue;
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			final ISimplePropertyListener listener) {
 		return new BeanPropertyListener(this, propertyDescriptor, listener) {
-			@Override
 			protected IDiff computeDiff(Object oldValue, Object newValue) {
 				return Diffs.computeSetDiff(asSet(oldValue), asSet(newValue));
 			}
 		};
 	}
 
-	@Override
 	public String toString() {
 		String s = BeanPropertyHelper.propertyName(propertyDescriptor) + "{}"; //$NON-NLS-1$
 		if (elementType != null)

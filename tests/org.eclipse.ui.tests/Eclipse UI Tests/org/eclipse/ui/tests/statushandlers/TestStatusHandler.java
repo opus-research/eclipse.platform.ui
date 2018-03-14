@@ -18,7 +18,7 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 /**
  * The handler should be used during tests. It allows for checking the status
  * and style used during last handling.
- *
+ * 
  * @since 3.3
  */
 public class TestStatusHandler extends AbstractStatusHandler {
@@ -29,7 +29,12 @@ public class TestStatusHandler extends AbstractStatusHandler {
 
 	private static AbstractStatusHandler workbenchHandler;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#handle(org.eclipse.ui.statushandlers.StatusAdapter,
+	 *      int)
+	 */
 	public void handle(StatusAdapter statusAdapter, int style) {
 		lastHandledStatusAdapter = statusAdapter;
 		lastHandledStyle = style;
@@ -44,7 +49,7 @@ public class TestStatusHandler extends AbstractStatusHandler {
 
 	/**
 	 * Returns the status used during last handling
-	 *
+	 * 
 	 * @return the status
 	 */
 	public static StatusAdapter getLastHandledStatusAdapter() {
@@ -53,7 +58,7 @@ public class TestStatusHandler extends AbstractStatusHandler {
 
 	/**
 	 * Returns the style used during last handling
-	 *
+	 * 
 	 * @return the style
 	 */
 	public static int getLastHandledStyle() {

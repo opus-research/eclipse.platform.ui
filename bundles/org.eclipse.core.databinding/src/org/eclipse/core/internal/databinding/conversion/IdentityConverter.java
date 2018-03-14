@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2005, 2015 db4objects Inc.  http://www.db4o.com  and others.
- *
+ * Copyright (C) 2005, 2007 db4objects Inc.  http://www.db4o.com  and others.
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,11 @@ public class IdentityConverter implements IConverter {
 			{ Boolean.TYPE, Boolean.class },
 			{ Character.TYPE, Character.class } };
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.binding.converter.IConverter#convert(java.lang.Object)
+	 */
 	public Object convert(Object source) {
 		if (toType.isPrimitive()) {
 			if (source == null) {
@@ -75,7 +79,7 @@ public class IdentityConverter implements IConverter {
 
 	/**
 	 * (Non-API) isPrimitiveTypeMatchedWithBoxed.
-	 *
+	 * 
 	 * @param sourceClass
 	 * @param toClass
 	 * @return true if sourceClass and toType are matched primitive/boxed types
@@ -95,12 +99,10 @@ public class IdentityConverter implements IConverter {
 		return false;
 	}
 
-	@Override
 	public Object getFromType() {
 		return fromType;
 	}
 
-	@Override
 	public Object getToType() {
 		return toType;
 	}

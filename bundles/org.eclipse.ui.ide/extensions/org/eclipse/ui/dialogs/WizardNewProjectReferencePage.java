@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * Standard project reference page for a wizard that creates a
+ * Standard project reference page for a wizard that creates a 
  * project resource.
  * <p>
  * This page may be used by clients as-is; it may be also be
@@ -64,8 +64,10 @@ public class WizardNewProjectReferencePage extends WizardPage {
         super(pageName);
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
+    public void createControl(Composite parent) {
 
         Font font = parent.getFont();
 
@@ -106,8 +108,7 @@ public class WizardNewProjectReferencePage extends WizardPage {
      */
     protected IStructuredContentProvider getContentProvider() {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object element) {
+            public Object[] getChildren(Object element) {
                 if (!(element instanceof IWorkspace)) {
 					return new Object[0];
 				}

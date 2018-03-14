@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,6 @@
 
 package org.eclipse.e4.ui.tests.reconciler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Collection;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.MAddon;
@@ -24,21 +18,22 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
+import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
+import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 
-	@Test
 	public void testApplicationElement_Id_Changed() {
 		MApplication application = createApplication();
 
@@ -68,7 +63,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals("customName", window.getLabel());
 	}
 
-	@Test
 	public void testApplicationElement_Id_Changed2() {
 		MApplication application = createApplication();
 
@@ -108,13 +102,12 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * "customName".</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Name_NameChangeFromUser_UserWins() {
 		MApplication application = createApplication();
 
 		MWindow window = createWindow(application);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setLabel("name");
 
 		window.getChildren().add(part);
@@ -156,13 +149,12 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * renamed "customName" per user intervention.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Visibility_TrueFalseFromApplication_ApplicationWins() {
 		MApplication application = createApplication();
 
 		MWindow window = createWindow(application);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setLabel("name");
 		part.setToBeRendered(true);
 
@@ -208,13 +200,12 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * should still occur.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Visibility_TrueFalseFromUser_UserWins() {
 		MApplication application = createApplication();
 
 		MWindow window = createWindow(application);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setLabel("name");
 		part.setToBeRendered(true);
 
@@ -250,17 +241,16 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals("name2", part.getLabel());
 	}
 
-	@Test
 	public void testPart_Addition_PlacedAfterHiddenPart_UserWins() {
 		MApplication application = createApplication();
 
 		MWindow window = createWindow(application);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setToBeRendered(true);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setToBeRendered(true);
-		MPart partD = ems.createModelElement(MPart.class);
+		MPart partD = BasicFactoryImpl.eINSTANCE.createPart();
 		partD.setToBeRendered(true);
 
 		window.getChildren().add(partA);
@@ -283,7 +273,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		partB = (MPart) window.getChildren().get(1);
 		partD = (MPart) window.getChildren().get(2);
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partC.setToBeRendered(true);
 
 		window.getChildren().add(2, partC);
@@ -313,15 +303,14 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be three parts, A, B, and D.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Addition_PlacedAfterRemovedPart_UserWins() {
 		MApplication application = createApplication();
 
 		MWindow window = createWindow(application);
 
-		MPart partA = ems.createModelElement(MPart.class);
-		MPart partB = ems.createModelElement(MPart.class);
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 
 		window.getChildren().add(partA);
 		window.getChildren().add(partB);
@@ -343,7 +332,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		partB = (MPart) window.getChildren().get(1);
 		partC = (MPart) window.getChildren().get(2);
 
-		MPart partD = ems.createModelElement(MPart.class);
+		MPart partD = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partD);
 
 		Collection<ModelDelta> deltas = constructDeltas(application, state);
@@ -373,14 +362,13 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be only one part, part C.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Addition_PlacedAfterRemovedPart_UserWins2() {
 		MApplication application = createApplication();
 
 		MWindow window = createWindow(application);
 
-		MPart partA = ems.createModelElement(MPart.class);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 
 		window.getChildren().add(partA);
 		window.getChildren().add(partB);
@@ -401,7 +389,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		partA = (MPart) window.getChildren().get(0);
 		partB = (MPart) window.getChildren().get(1);
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partC);
 
 		Collection<ModelDelta> deltas = constructDeltas(application,
@@ -427,16 +415,15 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * places part A in it.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPartStack_Addition_ContainsExistingPart() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPartStack stack1 = ems.createModelElement(MPartStack.class);
+		MPartStack stack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack1);
 
-		MPart part1 = ems.createModelElement(MPart.class);
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		stack1.getChildren().add(part1);
 		stack1.getChildren().add(part2);
 
@@ -445,7 +432,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MPartStack stack2 = ems.createModelElement(MPartStack.class);
+		MPartStack stack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(0, stack2);
 		stack2.getChildren().add(part1);
 
@@ -482,16 +469,15 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * places part A in it.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPartStack_Addition_ContainsExistingPart2() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPartStack stack1 = ems.createModelElement(MPartStack.class);
+		MPartStack stack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack1);
 
-		MPart part1 = ems.createModelElement(MPart.class);
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		stack1.getChildren().add(part1);
 		stack1.getChildren().add(part2);
 
@@ -500,7 +486,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MPartStack stack2 = ems.createModelElement(MPartStack.class);
+		MPartStack stack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack2);
 		stack2.getChildren().add(part1);
 
@@ -545,13 +531,13 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPartStack stack1 = ems.createModelElement(MPartStack.class);
+		MPartStack stack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack1);
 
 		// stack with three children in it
-		MPart partA = ems.createModelElement(MPart.class);
-		MPart partB = ems.createModelElement(MPart.class);
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		stack1.getChildren().add(partA);
 		stack1.getChildren().add(partB);
 		stack1.getChildren().add(partC);
@@ -561,7 +547,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MPartStack stack2 = ems.createModelElement(MPartStack.class);
+		MPartStack stack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		// add a new stack at the end of the existing stack
 		window.getChildren().add(stack2);
 		// put A in it
@@ -577,7 +563,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		partC = (MPart) stack1.getChildren().get(2);
 
 		// create a new stack
-		MPartStack stack3 = ems.createModelElement(MPartStack.class);
+		MPartStack stack3 = BasicFactoryImpl.eINSTANCE.createPartStack();
 
 		if (performMoveFirst) {
 			// place part C in the new stack first
@@ -621,12 +607,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(partA, stack2.getChildren().get(0));
 	}
 
-	@Test
 	public void testPartStack_AdditionInBack_ApplicationHasNewStackInFront_True() {
 		testPartStack_AdditionInBack_ApplicationHasNewStackInFront(true);
 	}
 
-	@Test
 	public void testPartStack_AdditionInBack_ApplicationHasNewStackInFront_False() {
 		testPartStack_AdditionInBack_ApplicationHasNewStackInFront(false);
 	}
@@ -648,13 +632,13 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPartStack stack1 = ems.createModelElement(MPartStack.class);
+		MPartStack stack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack1);
 
 		// stack with three children in it
-		MPart partA = ems.createModelElement(MPart.class);
-		MPart partB = ems.createModelElement(MPart.class);
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		stack1.getChildren().add(partA);
 		stack1.getChildren().add(partB);
 		stack1.getChildren().add(partC);
@@ -664,7 +648,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MPartStack stack2 = ems.createModelElement(MPartStack.class);
+		MPartStack stack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		// add a new stack to the left of the existing stack
 		window.getChildren().add(0, stack2);
 		// put A in it
@@ -680,7 +664,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		partC = (MPart) stack1.getChildren().get(2);
 
 		// create a new stack
-		MPartStack stack3 = ems.createModelElement(MPartStack.class);
+		MPartStack stack3 = BasicFactoryImpl.eINSTANCE.createPartStack();
 
 		if (performMoveFirst) {
 			// place part C in the new stack first
@@ -724,12 +708,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(partC, stack3.getChildren().get(0));
 	}
 
-	@Test
 	public void testPartStack_AdditionInFront_ApplicationHasNewStackInBack_True() {
 		testPartStack_AdditionInFront_ApplicationHasNewStackInBack(true);
 	}
 
-	@Test
 	public void testPartStack_AdditionInFront_ApplicationHasNewStackInBack_False() {
 		testPartStack_AdditionInFront_ApplicationHasNewStackInBack(false);
 	}
@@ -747,23 +729,22 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * the second stack has C, B, and D, in that order from left to right.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_MoveFromExistingStackToExistingStack_ToStackHasNewPart() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPartStack stack1 = ems.createModelElement(MPartStack.class);
+		MPartStack stack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack1);
 
-		MPart partA = ems.createModelElement(MPart.class);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		stack1.getChildren().add(partA);
 		stack1.getChildren().add(partB);
 
-		MPartStack stack2 = ems.createModelElement(MPartStack.class);
+		MPartStack stack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stack2);
 
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		stack2.getChildren().add(partC);
 
 		saveModel();
@@ -784,7 +765,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		stack2 = (MPartStack) window.getChildren().get(1);
 		partC = (MPart) stack2.getChildren().get(0);
 
-		MPart partD = ems.createModelElement(MPart.class);
+		MPart partD = BasicFactoryImpl.eINSTANCE.createPart();
 		stack2.getChildren().add(partD);
 
 		Collection<ModelDelta> deltas = constructDeltas(application, state);
@@ -816,10 +797,9 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(partD, stack2.getChildren().get(2));
 	}
 
-	@Test
 	public void testElementContainer_ActiveChild_New() {
 		MApplication application = createApplication();
-		MWindow window1 = ems.createModelElement(MWindow.class);
+		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window1);
 
 		saveModel();
@@ -827,7 +807,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window2);
 		application.setSelectedElement(window2);
 
@@ -852,11 +832,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 				application.getSelectedElement());
 	}
 
-	@Test
 	public void testElementContainer_ActiveChild_Removed() {
 		MApplication application = createApplication();
-		MWindow window1 = ems.createModelElement(MWindow.class);
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window1);
 		application.getChildren().add(window2);
 
@@ -887,17 +866,16 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(window1, application.getChildren().get(0));
 	}
 
-	@Test
 	public void testElementContainer_ActiveChild_Removed2() {
 		MApplication application = createApplication();
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack partStack1 = ems.createModelElement(MPartStack.class);
+		MPartStack partStack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack1);
 
-		MPart part1 = ems.createModelElement(MPart.class);
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack1.getChildren().add(part1);
 		partStack1.getChildren().add(part2);
 
@@ -906,7 +884,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MPartStack partStack2 = ems.createModelElement(MPartStack.class);
+		MPartStack partStack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack2);
 
 		partStack2.getChildren().add(part2);
@@ -949,23 +927,22 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertNull(partStack2.getSelectedElement());
 	}
 
-	@Test
 	public void testElementContainer_Children_Move_IdenticalToUserChange() {
 		MApplication application = createApplication();
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack partStack1 = ems.createModelElement(MPartStack.class);
-		MPartStack partStack2 = ems.createModelElement(MPartStack.class);
+		MPartStack partStack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
+		MPartStack partStack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack1);
 		window.getChildren().add(partStack2);
 
-		MPart part1 = ems.createModelElement(MPart.class);
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack1.getChildren().add(part1);
 		partStack1.getChildren().add(part2);
 
-		MPart part3 = ems.createModelElement(MPart.class);
+		MPart part3 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack2.getChildren().add(part3);
 
 		saveModel();
@@ -1021,23 +998,22 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(part2, partStack2.getChildren().get(1));
 	}
 
-	@Test
 	public void testElementContainer_Children_Move_NewHasSameChildren() {
 		MApplication application = createApplication();
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPartStack partStack1 = ems.createModelElement(MPartStack.class);
-		MPartStack partStack2 = ems.createModelElement(MPartStack.class);
+		MPartStack partStack1 = BasicFactoryImpl.eINSTANCE.createPartStack();
+		MPartStack partStack2 = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(partStack1);
 		window.getChildren().add(partStack2);
 
-		MPart part1 = ems.createModelElement(MPart.class);
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part1 = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack1.getChildren().add(part1);
 		partStack1.getChildren().add(part2);
 
-		MPart part3 = ems.createModelElement(MPart.class);
+		MPart part3 = BasicFactoryImpl.eINSTANCE.createPart();
 		partStack2.getChildren().add(part3);
 
 		saveModel();
@@ -1101,7 +1077,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be only one window, window A.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testElementContainer_Children_AddMultipleThenRemove() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1111,10 +1086,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window2);
 
-		MPart editor = ems.createModelElement(MPart.class);
+		MPart editor = BasicFactoryImpl.eINSTANCE.createPart();
 		window2.getChildren().add(editor);
 
 		application.getChildren().remove(window2);
@@ -1149,7 +1124,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * application should not have an active window.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testElementContainer_Children_AddMultipleThenRemove2() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1159,7 +1133,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window2);
 		application.setSelectedElement(window2);
 
@@ -1196,7 +1170,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be only one window, window A.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testElementContainer_Children_AddMultipleThenRemove3() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1206,10 +1179,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window2);
 
-		MPart editor = ems.createModelElement(MPart.class);
+		MPart editor = BasicFactoryImpl.eINSTANCE.createPart();
 		window2.getChildren().add(editor);
 		editor.setLabel("editor");
 
@@ -1235,20 +1208,22 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(0, window.getChildren().size());
 	}
 
-	@Test
 	public void testMenu_MenuOrdering() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menu);
 
-		MMenuItem fileMenuItem = ems.createModelElement(MDirectMenuItem.class);
+		MMenuItem fileMenuItem = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		fileMenuItem.setLabel("File");
 
-		MMenuItem editMenuItem = ems.createModelElement(MDirectMenuItem.class);
+		MMenuItem editMenuItem = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		editMenuItem.setLabel("Edit");
 
-		MMenuItem helpMenuItem = ems.createModelElement(MDirectMenuItem.class);
+		MMenuItem helpMenuItem = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		helpMenuItem.setLabel("Help");
 
 		menu.getChildren().add(fileMenuItem);
@@ -1260,7 +1235,8 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MMenuItem cvsMenuItem = ems.createModelElement(MDirectMenuItem.class);
+		MMenuItem cvsMenuItem = MenuFactoryImpl.eINSTANCE
+				.createDirectMenuItem();
 		cvsMenuItem.setLabel("CVS");
 		menu.getChildren().add(2, cvsMenuItem);
 
@@ -1273,7 +1249,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		editMenuItem = (MMenuItem) menu.getChildren().get(1);
 		helpMenuItem = (MMenuItem) menu.getChildren().get(2);
 
-		MMenuItem e4MenuItem = ems.createModelElement(MDirectMenuItem.class);
+		MMenuItem e4MenuItem = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
 		e4MenuItem.setLabel("e4");
 		menu.getChildren().add(2, e4MenuItem);
 
@@ -1307,11 +1283,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * Tests that the addition of a part to a window and the alteration of the
 	 * window's main menu will be reconciled appropriately.
 	 */
-	@Test
 	public void testWindow_AddPartAndChangeMenu() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
-		MMenu menu = ems.createModelElement(MMenu.class);
+		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
 		window.setMainMenu(menu);
 
 		saveModel();
@@ -1321,7 +1296,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 
 		menu.setLabel("menuLabel");
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 
 		Object state = reconciler.serialize();
@@ -1348,22 +1323,22 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertTrue(window.getChildren().get(0) instanceof MPart);
 	}
 
-	@Test
 	public void testBug338707() {
 		MApplication application = createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartSashContainer container = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer container = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		window.getChildren().add(container);
 		window.setSelectedElement(container);
 
-		MPartStack partStackA = ems.createModelElement(MPartStack.class);
+		MPartStack partStackA = BasicFactoryImpl.eINSTANCE.createPartStack();
 		container.getChildren().add(partStackA);
 
-		MPartStack partStackB = ems.createModelElement(MPartStack.class);
+		MPartStack partStackB = BasicFactoryImpl.eINSTANCE.createPartStack();
 		container.getChildren().add(partStackB);
 
 		saveModel();
@@ -1371,8 +1346,9 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MPartSashContainer newContainer = ems.createModelElement(MPartSashContainer.class);
-		MPartStack partStackC = ems.createModelElement(MPartStack.class);
+		MPartSashContainer newContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
+		MPartStack partStackC = BasicFactoryImpl.eINSTANCE.createPartStack();
 		newContainer.getChildren().add(partStackC);
 		newContainer.getChildren().add(partStackB);
 
@@ -1429,7 +1405,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	private void testBug361851(String originalValue, String newValue) {
 		MApplication application = createApplication();
 
-		MAddon addon = ems.createModelElement(MAddon.class);
+		MAddon addon = ApplicationFactoryImpl.eINSTANCE.createAddon();
 		application.getAddons().add(addon);
 		addon.getPersistedState().put("key", originalValue);
 
@@ -1454,52 +1430,42 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(newValue, addon.getPersistedState().get("key"));
 	}
 
-	@Test
 	public void testBug361851_NullNull() {
 		testBug361851(null, null);
 	}
 
-	@Test
 	public void testBug361851_NullEmpty() {
 		testBug361851(null, "");
 	}
 
-	@Test
 	public void testBug361851_NullString() {
 		testBug361851(null, "string");
 	}
 
-	@Test
 	public void testBug361851_EmptyNull() {
 		testBug361851("", null);
 	}
 
-	@Test
 	public void testBug361851_EmptyEmpty() {
 		testBug361851("", "");
 	}
 
-	@Test
 	public void testBug361851_EmptyString() {
 		testBug361851("", "string");
 	}
 
-	@Test
 	public void testBug361851_StringNull() {
 		testBug361851("string", null);
 	}
 
-	@Test
 	public void testBug361851_StringEmpty() {
 		testBug361851("string", "");
 	}
 
-	@Test
 	public void testBug361851_StringStringUnchanged() {
 		testBug361851("string", "string");
 	}
 
-	@Test
 	public void testBug361851_StringStringChanged() {
 		testBug361851("string", "string2");
 	}
@@ -1516,7 +1482,7 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * This is an important test as key bindings themselves do not have an id so
 	 * they have to rely on their command's id.
 	 * </p>
-	 *
+	 * 
 	 * @param originalApplicationKeyBindingSequence
 	 *            the key binding that has been defined for the application
 	 * @param userApplicationKeyBindingSequence
@@ -1534,19 +1500,23 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 			String userWindowKeyBindingSequence) {
 		MApplication application = createApplication();
 
-		MBindingTable bindingTable = ems.createModelElement(MBindingTable.class);
-		MBindingTable bindingTable2 = ems.createModelElement(MBindingTable.class);
+		MBindingTable bindingTable = CommandsFactoryImpl.eINSTANCE
+				.createBindingTable();
+		MBindingTable bindingTable2 = CommandsFactoryImpl.eINSTANCE
+				.createBindingTable();
 		application.getBindingTables().add(bindingTable);
 		application.getBindingTables().add(bindingTable2);
 
-		MCommand command = ems.createModelElement(MCommand.class);
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 		application.getCommands().add(command);
 
-		MKeyBinding keyBinding = ems.createModelElement(MKeyBinding.class);
+		MKeyBinding keyBinding = CommandsFactoryImpl.eINSTANCE
+				.createKeyBinding();
 		keyBinding.setCommand(command);
 		keyBinding.setKeySequence(originalApplicationKeyBindingSequence);
 
-		MKeyBinding keyBinding2 = ems.createModelElement(MKeyBinding.class);
+		MKeyBinding keyBinding2 = CommandsFactoryImpl.eINSTANCE
+				.createKeyBinding();
 		keyBinding2.setCommand(command);
 		keyBinding2.setKeySequence(originalWindowKeyBindingSequence);
 
@@ -1586,557 +1556,457 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(userWindowKeyBindingSequence, keyBinding2.getKeySequence());
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", null,
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", "Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, null,
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", "Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S", "",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S", "",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", "Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D", "",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D", "",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", "Ctrl+D");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.ui.internal.misc.Policy;
 /**
  * A handler that wraps a legacy handler. This provide backward compatibility
  * with the handlers release in Eclipse 3.0.
- *
+ * 
  * @since 3.1
  */
 public final class LegacyHandlerWrapper implements IHandler {
@@ -40,7 +40,7 @@ public final class LegacyHandlerWrapper implements IHandler {
 
 	/**
 	 * Constructs a new instance of <code>HandlerWrapper</code>.
-	 *
+	 * 
 	 * @param handler
 	 *            The handler that should be wrapped; must not be
 	 *            <code>null</code>.
@@ -54,12 +54,22 @@ public final class LegacyHandlerWrapper implements IHandler {
 		this.handler = handler;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#addHandlerListener(org.eclipse.core.commands.IHandlerListener)
+	 */
 	@Override
 	public final void addHandlerListener(final IHandlerListener handlerListener) {
 		handler.addHandlerListener(new LegacyHandlerListenerWrapper(this,
 				handlerListener));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#dispose()
+	 */
 	@Override
 	public final void dispose() {
 		handler.dispose();
@@ -78,6 +88,11 @@ public final class LegacyHandlerWrapper implements IHandler {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {

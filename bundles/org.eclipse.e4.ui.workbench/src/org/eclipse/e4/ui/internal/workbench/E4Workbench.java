@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 BestSolution.at and others.
+ * Copyright (c) 2008, 2013 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Christian Georgi (SAP) - Bug 432480
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -82,13 +80,6 @@ public class E4Workbench implements IWorkbench {
 	public static final String FORCED_PERSPECTIVE_ID = "forcedPerspetiveId"; //$NON-NLS-1$
 
 	public static final String NO_SAVED_MODEL_FOUND = "NO_SAVED_MODEL_FOUND"; //$NON-NLS-1$
-	/**
-	 * The argument for the whether to forcefully show the location in the window title (set on the
-	 * command line)<br>
-	 * <br>
-	 * Value is: <code>forcedShowLocation</code>
-	 */
-	public static final String FORCED_SHOW_LOCATION = "forcedShowLocation"; //$NON-NLS-1$
 
 	private final String id;
 	private ServiceRegistration<?> osgiRegistration;
@@ -130,7 +121,7 @@ public class E4Workbench implements IWorkbench {
 		uiEventPublisher = new UIEventPublisher(appContext);
 		appContext.set(UIEventPublisher.class, uiEventPublisher);
 		((Notifier) uiRoot).eAdapters().add(uiEventPublisher);
-		Hashtable<String, Object> properties = new Hashtable<>();
+		Hashtable<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("id", getId()); //$NON-NLS-1$
 
 		osgiRegistration = Activator.getDefault().getContext()

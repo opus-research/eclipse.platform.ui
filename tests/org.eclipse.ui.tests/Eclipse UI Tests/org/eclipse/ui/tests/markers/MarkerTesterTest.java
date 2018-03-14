@@ -25,10 +25,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- *
+ * 
  * @since 3.5
  * @author Prakash G.R.
- *
+ * 
  */
 public class MarkerTesterTest extends UITestCase {
 
@@ -39,25 +39,20 @@ public class MarkerTesterTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		project = ResourcesPlugin.getWorkspace().getRoot().getProject("tests");
-		if (!project.exists()) {
+		if (!project.exists())
 			project.create(null);
-		}
 
-		if (!project.isOpen()) {
+		if (!project.isOpen())
 			project.open(null);
-		}
 	}
 
-	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
-		if (project.exists()) {
+		if (project.exists())
 			project.delete(true, null);
-		}
 	}
 
 	public void testSeverity() throws Exception {

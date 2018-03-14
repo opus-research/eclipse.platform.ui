@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,7 +57,7 @@ public abstract class WorkbenchWizardListSelectionPage extends
 
     /**
      * Creates a <code>WorkbenchWizardListSelectionPage</code>.
-     *
+     * 
      * @param aWorkbench the current workbench
      * @param currentSelection the workbench's current resource selection
      * @param wizardElements the collection of <code>WorkbenchWizardElements</code>
@@ -74,6 +74,11 @@ public abstract class WorkbenchWizardListSelectionPage extends
         this.message = message;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	public void createControl(Composite parent) {
 
@@ -100,7 +105,7 @@ public abstract class WorkbenchWizardListSelectionPage extends
 
     /**
      * Create a new viewer in the parent.
-     *
+     * 
      * @param parent the parent <code>Composite</code>.
      */
     private void createViewer(Composite parent) {
@@ -122,7 +127,7 @@ public abstract class WorkbenchWizardListSelectionPage extends
      * Returns an <code>IWizardNode</code> representing the specified
      * workbench wizard which has been selected by the user. <b>Subclasses
      * </b> must override this abstract implementation.
-     *
+     * 
      * @param element the wizard element that an <code>IWizardNode</code> is
      *            needed for
      * @return org.eclipse.jface.wizards.IWizardNode
@@ -142,7 +147,7 @@ public abstract class WorkbenchWizardListSelectionPage extends
 
     /**
      * Layout the top control.
-     *
+     * 
      * @param control the control.
      * @since 3.0
      */
@@ -200,7 +205,7 @@ public abstract class WorkbenchWizardListSelectionPage extends
     /**
      * Notes the newly-selected wizard element and updates the page
      * accordingly.
-     *
+     * 
      * @param event the selection changed event
      */
     @Override

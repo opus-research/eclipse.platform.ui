@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,14 +13,14 @@ package org.eclipse.core.internal.databinding.beans;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class Util {
 
 	/**
 	 * Checks whether the two objects are <code>null</code> -- allowing for
 	 * <code>null</code>.
-	 *
+	 * 
 	 * @param left
 	 *            The left object to compare; may be <code>null</code>.
 	 * @param right

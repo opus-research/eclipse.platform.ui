@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.ui.actions.RetargetAction;
 
 /**
  * An <code>EditorMenuManager</code> is used to sort the contributions
- * made by an editor so that they always appear after the action sets.
+ * made by an editor so that they always appear after the action sets.  
  */
 public class EditorMenuManager extends SubMenuManager {
     private ArrayList wrappers;
@@ -85,7 +85,10 @@ public class EditorMenuManager extends SubMenuManager {
 		public String getText(IContributionItem item) {
             return getParentMenuManager().getOverrides().getText(item);
         }
-
+        
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.action.IContributionManagerOverrides#getVisible(org.eclipse.jface.action.IContributionItem)
+         */
         @Override
 		public Boolean getVisible(IContributionItem item) {
         	return getParentMenuManager().getOverrides().getVisible(item);
@@ -101,25 +104,39 @@ public class EditorMenuManager extends SubMenuManager {
         super(mgr);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
     @Override
 	public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
     @Override
 	public IContributionManagerOverrides getOverrides() {
         return overrides;
     }
 
-	/*
-	 * Inserts the new item after any action set contributions which may exist
-	 * within the toolbar to ensure a consistent order for actions.
-	 */
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     * Inserts the new item after any action set contributions which may
+     * exist within the toolbar to ensure a consistent order for actions.
+     */
     @Override
 	public void prependToGroup(String groupName, IContributionItem item) {
         insertAfter(groupName, item);
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.SubContributionManager#appendToGroup(java.lang
+	 * .String, org.eclipse.jface.action.IContributionItem)
+	 */
 	@Override
 	public void appendToGroup(String groupName, IContributionItem item) {
 		try {
@@ -147,7 +164,7 @@ public class EditorMenuManager extends SubMenuManager {
     public void setVisible(boolean visible, boolean forceVisibility) {
         if (visible) {
             if (forceVisibility) {
-                // Make the items visible
+                // Make the items visible 
                 if (!enabledAllowed) {
 					setEnabledAllowed(true);
 				}
@@ -184,6 +201,9 @@ public class EditorMenuManager extends SubMenuManager {
         overrides.updateEnabledAllowed();
     }
 
+    /* (non-Javadoc)
+     * Method declared on SubMenuManager.
+     */
     @Override
 	protected SubMenuManager wrapMenu(IMenuManager menu) {
         if (wrappers == null) {

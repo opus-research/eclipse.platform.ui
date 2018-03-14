@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,13 +19,13 @@ import org.eclipse.swt.events.TraverseEvent;
 
 /**
  * This event is passed on when a cell-editor is going to be activated
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class ColumnViewerEditorActivationEvent extends EventObject {
 	/**
-	 *
+	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -96,11 +96,11 @@ public class ColumnViewerEditorActivationEvent extends EventObject {
 	 * Cancel the event (=> editor is not activated)
 	 */
 	public boolean cancel = false;
-
+	
 	/**
 	 * This constructor can be used when no event exists. The type set is
 	 * {@link #PROGRAMMATIC}
-	 *
+	 * 
 	 * @param cell
 	 *            the cell
 	 */
@@ -113,7 +113,7 @@ public class ColumnViewerEditorActivationEvent extends EventObject {
 	 * This constructor is used for all types of mouse events. Currently the
 	 * type is can be {@link #MOUSE_CLICK_SELECTION} and
 	 * {@link #MOUSE_DOUBLE_CLICK_SELECTION}
-	 *
+	 * 
 	 * @param cell
 	 *            the cell source of the event
 	 * @param event
@@ -150,7 +150,7 @@ public class ColumnViewerEditorActivationEvent extends EventObject {
 
 	/**
 	 * This constructor is used to mark the activation triggered by a traversal
-	 *
+	 * 
 	 * @param cell
 	 *            the cell source of the event
 	 * @param event

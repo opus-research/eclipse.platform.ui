@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -58,7 +59,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	/**
 	 * Creates a dialog instance. Note that the dialog will have no visual
 	 * representation (no widgets) until it is told to open.
-	 *
+	 * 
 	 * @param parentShell
 	 *            the parent shell
 	 */
@@ -66,6 +67,9 @@ public abstract class SelectionDialog extends TrayDialog {
 		super(parentShell);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -74,10 +78,15 @@ public abstract class SelectionDialog extends TrayDialog {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+				true);
+		createButton(parent, IDialogConstants.CANCEL_ID,
+				IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	/**
@@ -86,7 +95,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * This method is provided to allow subclasses to decide where the message
 	 * will appear on the screen.
 	 * </p>
-	 *
+	 * 
 	 * @param composite
 	 *            the parent composite
 	 * @return the message label
@@ -102,7 +111,7 @@ public abstract class SelectionDialog extends TrayDialog {
 
 	/**
 	 * Returns the initial selection in this selection dialog.
-	 *
+	 * 
 	 * @deprecated use getInitialElementSelections() instead
 	 * @return the list of initial selected elements or null
 	 */
@@ -116,7 +125,7 @@ public abstract class SelectionDialog extends TrayDialog {
 
 	/**
 	 * Returns the list of initial element selections.
-	 *
+	 * 
 	 * @return List
 	 */
 	protected List getInitialElementSelections() {
@@ -125,7 +134,7 @@ public abstract class SelectionDialog extends TrayDialog {
 
 	/**
 	 * Returns the message for this dialog.
-	 *
+	 * 
 	 * @return the message for this dialog
 	 */
 	protected String getMessage() {
@@ -134,7 +143,7 @@ public abstract class SelectionDialog extends TrayDialog {
 
 	/**
 	 * Returns the ok button.
-	 *
+	 * 
 	 * @return the ok button or <code>null</code> if the button is not created
 	 *         yet.
 	 */
@@ -145,7 +154,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	/**
 	 * Returns the list of selections made by the user, or <code>null</code>
 	 * if the selection was canceled.
-	 *
+	 * 
 	 * @return the array of selected elements, or <code>null</code> if Cancel
 	 *         was pressed
 	 */
@@ -156,7 +165,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	/**
 	 * Sets the initial selection in this selection dialog to the given
 	 * elements.
-	 *
+	 * 
 	 * @param selectedElements
 	 *            the array of elements to select
 	 */
@@ -170,7 +179,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	/**
 	 * Sets the initial selection in this selection dialog to the given
 	 * elements.
-	 *
+	 * 
 	 * @param selectedElements
 	 *            the List of elements to select
 	 */
@@ -180,7 +189,7 @@ public abstract class SelectionDialog extends TrayDialog {
 
 	/**
 	 * Sets the message for this dialog.
-	 *
+	 * 
 	 * @param message
 	 *            the message
 	 */
@@ -191,7 +200,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	/**
 	 * Set the selections made by the user, or <code>null</code> if the
 	 * selection was canceled.
-	 *
+	 * 
 	 * @param newResult
 	 *            list of selected elements, or <code>null</code> if Cancel
 	 *            was pressed
@@ -211,7 +220,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * <p>
 	 * The selections may accessed using <code>getResult</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param newResult -
 	 *            the new values
 	 * @since 2.0
@@ -222,7 +231,7 @@ public abstract class SelectionDialog extends TrayDialog {
 
 	/**
 	 * Sets the title for this dialog.
-	 *
+	 * 
 	 * @param title
 	 *            the title
 	 */
@@ -235,18 +244,18 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * dialog. This method is provided so that clients that directly use
 	 * SelectionDialogs without subclassing them may specify how the bounds of
 	 * the dialog are to be saved.
-	 *
+	 * 
 	 * @param settings
 	 *            the {@link IDialogSettings} that should be used to store the
 	 *            bounds of the dialog
-	 *
+	 * 
 	 * @param strategy
 	 *            the integer constant specifying how the bounds are saved.
 	 *            Specified using {@link Dialog#DIALOG_PERSISTLOCATION}
 	 *            and {@link Dialog#DIALOG_PERSISTSIZE}.
-	 *
+	 * 
 	 * @since 3.2
-	 *
+	 * 
 	 * @see Dialog#getDialogBoundsStrategy()
 	 * @see Dialog#getDialogBoundsSettings()
 	 */
@@ -260,13 +269,13 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * of the dialog, according to the dialog bounds strategy. Overridden to
 	 * provide the dialog settings that were set using
 	 * {@link #setDialogBoundsSettings(IDialogSettings, int)}.
-	 *
+	 * 
 	 * @return the dialog settings used to store the dialog's location and/or
 	 *         size, or <code>null</code> if the dialog's bounds should not be
 	 *         stored.
-	 *
+	 * 
 	 * @since 3.2
-	 *
+	 * 
 	 * @see Dialog#getDialogBoundsStrategy()
 	 * @see #setDialogBoundsSettings(IDialogSettings, int)
 	 */
@@ -279,10 +288,10 @@ public abstract class SelectionDialog extends TrayDialog {
 	 * Get the integer constant that describes the strategy for persisting the
 	 * dialog bounds. Overridden to provide the dialog bounds strategy that was
 	 * set using {@link #setDialogBoundsSettings(IDialogSettings, int)}.
-	 *
+	 * 
 	 * @return the constant describing the strategy for persisting the dialog
 	 *         bounds.
-	 *
+	 * 
 	 * @since 3.2
 	 * @see Dialog#DIALOG_PERSISTLOCATION
 	 * @see Dialog#DIALOG_PERSISTSIZE
@@ -293,7 +302,7 @@ public abstract class SelectionDialog extends TrayDialog {
 	protected int getDialogBoundsStrategy() {
 		return dialogBoundsStrategy;
 	}
-
+	
     /**
 	 * @since 3.4
 	 */

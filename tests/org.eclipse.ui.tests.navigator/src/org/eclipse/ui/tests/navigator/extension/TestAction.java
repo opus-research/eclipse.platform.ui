@@ -29,7 +29,6 @@ public class TestAction extends Action implements IAction {
 		shell = aShell;
 	}
 
-	@Override
 	public void run() {
 		MessageDialog.openInformation(shell, "Shell", "The " + getText()
 				+ " ran!");

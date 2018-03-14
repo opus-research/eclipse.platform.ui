@@ -6,35 +6,32 @@
  *
  * Contributors:
  *   Stefan Winkler <stefan@winklerweb.net> - initial API and implementation
- *   Lars Vogel <Lars.Vogel@gmail.com> - Bug 430468
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.css.core.parser;
-
-import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 
+import junit.framework.TestCase;
+
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.impl.dom.DocumentCSSImpl;
 import org.eclipse.e4.ui.css.core.impl.dom.ViewCSSImpl;
 import org.eclipse.e4.ui.tests.css.core.util.ParserTestUtil;
 import org.eclipse.e4.ui.tests.css.core.util.TestElement;
-import org.junit.Before;
-import org.junit.Test;
 import org.w3c.css.sac.InputSource;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.ViewCSS;
 import org.w3c.dom.stylesheets.StyleSheet;
 
-public class ImportTest {
+public class ImportTest extends TestCase {
 
 	private CSSEngine engine;
 
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		engine = ParserTestUtil.createEngine();
 	}
 
@@ -43,7 +40,6 @@ public class ImportTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testOverrideImportedRule() throws Exception {
 		String importedCss = ".ClassAlpha {\n" //
 				+ "     property: value;\n" //
