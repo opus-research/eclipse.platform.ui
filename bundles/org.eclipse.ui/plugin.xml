@@ -313,6 +313,10 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <!-- Cmd+M is used for Minimize Window in cocoa -->
       <key
+            commandId="org.eclipse.ui.window.hidetrimbars"
+            sequence="M1+M2+M"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />   
+      <key
             platform="cocoa"
             sequence="M1+M"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
@@ -1162,6 +1166,12 @@
             description="%command.maximizePart.description"
             categoryId="org.eclipse.ui.category.window"
             id="org.eclipse.ui.window.maximizePart" />
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="org.eclipse.ui.internal.handlers.HideTrimBarsHandler"
+            description="%command.windowsHideTrimbars.description"
+            id="org.eclipse.ui.window.hidetrimbars"
+            name="%command.windowsHideTrimbars.name"/>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="org.eclipse.ui.internal.handlers.MinimizePartHandler"
@@ -2257,16 +2267,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.ui.internal.handlers.MaximizePartHandler"
+            class="org.eclipse.ui.internal.handlers.HideTrimBarsHandler"
             commandId="org.eclipse.ui.window.maximizePart">
-         <enabledWhen>
-            <with
-                  variable="activePart">
-               <instanceof
-                     value="org.eclipse.ui.IWorkbenchPart">
-               </instanceof>
-            </with>
-         </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ui.internal.handlers.PinEditorHandler"
