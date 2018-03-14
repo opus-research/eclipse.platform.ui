@@ -24,7 +24,7 @@ import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * Filter used to determine whether resources are to be shown or not.
- *
+ * 
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
@@ -132,7 +132,7 @@ public class ResourcePatternFilter extends ViewerFilter {
             resource = (IResource) element;
         } else if (element instanceof IAdaptable) {
             IAdaptable adaptable = (IAdaptable) element;
-            resource = adaptable.getAdapter(IResource.class);
+            resource = (IResource) adaptable.getAdapter(IResource.class);
         }
         if (resource != null) {
             String name = resource.getName();

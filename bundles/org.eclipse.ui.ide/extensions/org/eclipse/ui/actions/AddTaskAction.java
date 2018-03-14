@@ -44,7 +44,7 @@ public class AddTaskAction extends SelectionListenerAction {
 
     /**
      * Creates a new instance of the receiver.
-     *
+     * 
      * @param shell shell to use to show any dialogs
      * @deprecated See {@link #AddTaskAction(IShellProvider)}
      */
@@ -59,10 +59,10 @@ public class AddTaskAction extends SelectionListenerAction {
 			} };
         initAction();
     }
-
+    
     /**
 	 * Creates a new instance of the receiver.
-	 *
+	 * 
 	 * @param provider
 	 *            the IShellProvider to show any dialogs
 	 * @since 3.4
@@ -95,7 +95,8 @@ public class AddTaskAction extends SelectionListenerAction {
 			resource = (IResource) element;
 		}
         if (element instanceof IAdaptable) {
-			resource = ((IAdaptable) element).getAdapter(IResource.class);
+			resource = (IResource) ((IAdaptable) element)
+                    .getAdapter(IResource.class);
 		}
 
         if (resource != null && resource instanceof IProject) {
@@ -123,7 +124,7 @@ public class AddTaskAction extends SelectionListenerAction {
      * <code>SelectionListenerAction</code> method enables the action only
      * if the selection contains a single resource and the resource is
      * not a closed project.
-     *
+     * 
      * @param selection the selection to update the enabled state for
      */
     @Override
