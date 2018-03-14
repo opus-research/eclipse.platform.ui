@@ -21,8 +21,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -139,22 +137,6 @@ public class SashLayout extends Layout {
 
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
-			}
-		});
-
-		host.addPaintListener(new PaintListener() {
-			@Override
-			public void paintControl(PaintEvent e) {
-				// for (SashRect sr : sashes) {
-				// Color color;
-				// if (sr.container.isHorizontal())
-				// color = e.display.getSystemColor(SWT.COLOR_MAGENTA);
-				// else
-				// color = e.display.getSystemColor(SWT.COLOR_CYAN);
-				// e.gc.setForeground(color);
-				// e.gc.setBackground(color);
-				// e.gc.fillRectangle(sr.rect);
-				// }
 			}
 		});
 	}
