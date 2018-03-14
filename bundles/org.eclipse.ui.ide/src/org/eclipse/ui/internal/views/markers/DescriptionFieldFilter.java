@@ -39,6 +39,11 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter#loadSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void loadSettings(IMemento memento) {
 		String modifier = memento.getString(TAG_CONTAINS_MODIFIER);
@@ -52,6 +57,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#loadLegacySettings(org.eclipse.ui.IMemento, org.eclipse.ui.internal.views.markers.MarkerContentGenerator)
+	 */
 	@Override
 	void loadLegacySettings(IMemento memento, MarkerContentGenerator generator) {
 
@@ -71,6 +79,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#saveSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveSettings(IMemento memento) {
 		memento.putString(TAG_CONTAINS_MODIFIER, containsModifier);
@@ -78,6 +89,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#select(org.eclipse.ui.views.markers.MarkerItem)
+	 */
 	@Override
 	public boolean select(MarkerItem item) {
 		if (containsText.length() == 0)
@@ -91,6 +105,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#populateWorkingCopy(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	@Override
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);
@@ -140,6 +157,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#initialize(java.util.Map)
+	 */
 	@Override
 	public void initialize(Map values) {
 		super.initialize(values);
@@ -155,6 +175,11 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#initialize(org.eclipse.ui.views.markers.internal.ProblemFilter)
+	 */
 	@Override
 	public void initialize(ProblemFilter problemFilter) {
 		containsModifier = problemFilter.getContains() ? MarkerSupportConstants.CONTAINS_KEY
