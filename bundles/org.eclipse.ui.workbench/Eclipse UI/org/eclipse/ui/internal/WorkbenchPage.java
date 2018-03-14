@@ -40,7 +40,6 @@ import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -421,7 +420,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return Adapters.getAdapter(sourcePart, IShowInSource.class, true);
+		return Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {
@@ -2414,7 +2413,7 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public String getLabel() {
         String label = WorkbenchMessages.WorkbenchPage_UnknownLabel;
-        IWorkbenchAdapter adapter = Adapters.getAdapter(input, IWorkbenchAdapter.class, true);
+        IWorkbenchAdapter adapter = Util.getAdapter(input, IWorkbenchAdapter.class);
         if (adapter != null) {
 			label = adapter.getLabel(input);
 		}
@@ -5282,7 +5281,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private IPathEditorInput getPathEditorInput(IEditorInput input) {
 		if (input instanceof IPathEditorInput)
 			return (IPathEditorInput) input;
-		return Adapters.getAdapter(input, IPathEditorInput.class, true);
+		return Util.getAdapter(input, IPathEditorInput.class);
 	}
 
 	/**
