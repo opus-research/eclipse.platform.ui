@@ -31,12 +31,12 @@ public class PatternFilter extends ViewerFilter {
 	/*
 	 * Cache of filtered elements in the tree
 	 */
-	private Map<Object, Object[]> cache = new HashMap<Object, Object[]>();
+	private Map<Object, Object[]> cache = new HashMap<>();
 
 	/*
 	 * Maps parent elements to TRUE or FALSE
 	 */
-	private Map<Object, Boolean> foundAnyCache = new HashMap<Object, Boolean>();
+	private Map<Object, Boolean> foundAnyCache = new HashMap<>();
 
 	private boolean useCache = false;
 
@@ -290,7 +290,7 @@ public class PatternFilter extends ViewerFilter {
 	 * @return an array of words
 	 */
 	private String[] getWords(String text) {
-		List<String> words = new ArrayList<String>();
+		List<String> words = new ArrayList<>();
 		// Break the text up into words, separating based on whitespace and
 		// common punctuation.
 		// Previously used String.split(..., "\\W"), where "\W" is a regular
