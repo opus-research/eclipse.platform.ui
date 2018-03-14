@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,6 +42,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
+import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
@@ -97,6 +98,41 @@ public class PartServiceImpl implements EPartService {
 					}
 				}
 			}
+		}
+	};
+
+	private EventHandler minimalizedPartHandler = new EventHandler() {
+		public void handleEvent(Event event) {
+			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+			if (!(element instanceof MPartStack)) {
+				return;
+			}
+
+			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
+			Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
+
+			boolean minimizedTagAdded = UIEvents.isADD(event)
+					&& IPresentationEngine.MINIMIZED.equals(newValue);
+			boolean minimizedTagRemoved = UIEvents.isREMOVE(event)
+					&& IPresentationEngine.MINIMIZED.equals(oldValue);
+
+			if (!(minimizedTagAdded || minimizedTagRemoved)) {
+				return;
+			}
+
+			for (MStackElement stackElement : ((MPartStack) element).getChildren()) {
+				MPart part = toPart(stackElement);
+				if (part.isToBeRendered() && minimizedTagAdded) {
+					firePartHidden(part);
+				} else if (part.isToBeRendered()) {
+					firePartVisible(part);
+				}
+			}
+		}
+
+		private MPart toPart(MStackElement stackElement) {
+			return stackElement instanceof MPlaceholder ? (MPart) ((MPlaceholder) stackElement)
+					.getRef() : (MPart) stackElement;
 		}
 	};
 
@@ -170,6 +206,7 @@ public class PartServiceImpl implements EPartService {
 	@PostConstruct
 	void postConstruct() {
 		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT, selectedHandler);
+		eventBroker.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS, minimalizedPartHandler);
 		constructed = true;
 		partActivationHistory = new PartActivationHistory(this, modelService);
 		if (activePart != null) {
@@ -181,6 +218,7 @@ public class PartServiceImpl implements EPartService {
 	void preDestroy() {
 		constructed = false;
 		eventBroker.unsubscribe(selectedHandler);
+		eventBroker.unsubscribe(minimalizedPartHandler);
 		partActivationHistory.clear();
 	}
 
