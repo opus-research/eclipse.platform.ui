@@ -79,14 +79,19 @@ public abstract class Page implements IPageBookViewPage {
     @Override
 	public abstract Control getControl();
 
-    /*
-     * This method exists for backward compatibility.
-     * Subclasses should reimplement <code>init</code>.
-     */
+	/**
+	 * This method exists for backward compatibility. Subclasses should
+	 * reimplement <code>init</code>.
+	 */
     public void makeContributions(IMenuManager menuManager,
             IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
     }
 
+
+	/**
+	 * This method exists for backward compatibility. Subclasses should
+	 * reimplement <code>init</code>.
+	 */
     @Override
 	public void setActionBars(IActionBars actionBars) {
         makeContributions(actionBars.getMenuManager(), actionBars
