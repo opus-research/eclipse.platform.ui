@@ -64,7 +64,7 @@ import org.eclipse.ui.internal.util.BundleUtility;
  */
 public/*final*/class WorkbenchImages {
 
-    private static Map<String, ImageDescriptor> descriptors;
+    private static Map descriptors;
 
     private static ImageRegistry imageRegistry;
 
@@ -147,7 +147,8 @@ public/*final*/class WorkbenchImages {
 
         // other toolbar buttons
 
-		declareImage(ISharedImages.IMG_ETOOL_SAVE_EDIT, PATH_ETOOL + "save_edit.png", true); //$NON-NLS-1$
+        declareImage(ISharedImages.IMG_ETOOL_SAVE_EDIT, PATH_ETOOL
+ + "save_edit.png", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_SAVE_EDIT_DISABLED, PATH_DTOOL
  + "save_edit.png", true); //$NON-NLS-1$
 
@@ -519,7 +520,7 @@ public/*final*/class WorkbenchImages {
      *
      * @return the map from symbolic name to ImageDescriptor.
      */
-    public static Map<String, ImageDescriptor> getDescriptors() {
+    public static Map getDescriptors() {
         if (descriptors == null) {
             initializeImageRegistry();
         }
@@ -557,7 +558,7 @@ public/*final*/class WorkbenchImages {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String symbolicName) {
-        return getDescriptors().get(symbolicName);
+        return (ImageDescriptor) getDescriptors().get(symbolicName);
     }
 
     /**
@@ -625,7 +626,7 @@ public/*final*/class WorkbenchImages {
 	 */
     private static void initializeImageRegistry() {
         imageRegistry = new ImageRegistry();
-		descriptors = new HashMap<>();
+        descriptors = new HashMap();
         declareImages();
     }
 
