@@ -1268,18 +1268,16 @@ public class WorkbenchPage implements IWorkbenchPage {
 			part.setCurSharedRef(ph);
 		}
 
-		MPart shownPart = showPart(mode, part);
+		part = showPart(mode, part);
 
-		ViewReference ref = getViewReference(shownPart);
-		if (ref == null) {
-			throw new PartInitException(NLS.bind(WorkbenchMessages.ViewFactory_couldNotCreate, viewId));
-		}
+		ViewReference ref = getViewReference(part);
+
 		return (IViewPart) ref.getPart(true);
 	}
 	private MPart showPart(int mode, MPart part) {
 		switch (mode) {
 		case VIEW_ACTIVATE:
-			part = partService.showPart(part, PartState.ACTIVATE);
+			partService.showPart(part, PartState.ACTIVATE);
 			if (part.getObject() instanceof CompatibilityView) {
 				CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
 				actionSwitcher.updateActivePart(compatibilityView.getPart());
@@ -1288,7 +1286,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		case VIEW_VISIBLE:
 			MPart activePart = partService.getActivePart();
 			if (activePart == null) {
-				part = partService.showPart(part, PartState.ACTIVATE);
+				partService.showPart(part, PartState.ACTIVATE);
 				if (part.getObject() instanceof CompatibilityView) {
 					CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
 					actionSwitcher.updateActivePart(compatibilityView.getPart());
@@ -1298,14 +1296,14 @@ public class WorkbenchPage implements IWorkbenchPage {
 				MPlaceholder activePlaceholder = activePart.getCurSharedRef();
 				MUIElement activePartParent = activePlaceholder == null ? activePart
 						.getParent() : activePlaceholder.getParent();
-				part = partService.showPart(part, PartState.CREATE);
+				partService.showPart(part, PartState.CREATE);
 				if (part.getCurSharedRef() == null || part.getCurSharedRef().getParent() != activePartParent) {
 					partService.bringToTop(part);
 				}
 			}
 			break;
 		case VIEW_CREATE:
-			part = partService.showPart(part, PartState.CREATE);
+			partService.showPart(part, PartState.CREATE);
 
 			// Report the visibility of the created part
 			MStackElement sElement = part;
