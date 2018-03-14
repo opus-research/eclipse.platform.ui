@@ -103,9 +103,7 @@ public class EventBroker implements IEventBroker {
 	@SuppressWarnings("unchecked")
 	private Event constructEvent(String topic, Object data) {
 		Event event;
-		if (data instanceof Event){
-			event= (Event) data;
-		} else if (data instanceof Dictionary<?,?>) {
+		if (data instanceof Dictionary<?,?>) {
 			event = new Event(topic, (Dictionary<String,?>)data);
 		} else if (data instanceof Map<?,?>) {
 			event = new Event(topic, (Map<String,?>)data);
