@@ -7,7 +7,8 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471						  
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
+ *     Sopot Cela <sopotcela@gmail.com>
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -59,6 +60,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -123,6 +125,29 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
+	private EventHandler labelUpdater = new EventHandler() {
+		public void handleEvent(Event event) {
+			// Ensure that this event is for a MMenu
+			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu))
+				return;
+
+			String attName = (String) event
+					.getProperty(UIEvents.EventTags.ATTNAME);
+			MMenu model = (MMenu) event.getProperty(UIEvents.EventTags.ELEMENT);
+			MenuManager manager = getManager(model);
+			if ((manager == null))
+				return;
+			if (UIEvents.UILabel.LABEL.equals(attName)) {
+				manager.setMenuText(getText(model));
+				manager.update(IAction.TEXT);
+			}
+			if (UIEvents.UILabel.ICONURI.equals(attName)) {
+				manager.setImageDescriptor(getImageDescriptor(model));
+				manager.update(IAction.IMAGE);
+			}
+		}
+	};
+
 	private EventHandler toBeRenderedUpdater = new EventHandler() {
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
@@ -152,6 +177,22 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					}
 				}
 			}
+
+			if (element instanceof MPart) {
+				MPart part = (MPart) element;
+				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
+					boolean tbr = (Boolean) event
+							.getProperty(UIEvents.EventTags.NEW_VALUE);
+					if (!tbr) {
+						List<MMenu> menus = part.getMenus();
+						for (MMenu menu : menus) {
+							if (menu instanceof MPopupMenu)
+								unlinkMenu(menu);
+						}
+					}
+				}
+			}
+
 			if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 				if (element instanceof MMenu) {
 					MMenu menuModel = (MMenu) element;
@@ -214,6 +255,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	@PostConstruct
 	public void init() {
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
+		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, labelUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
@@ -237,6 +279,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
+		eventBroker.unsubscribe(labelUpdater);
 		eventBroker.unsubscribe(selectionUpdater);
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
@@ -360,8 +403,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			}
 		}
 
-		// The cleanup() is called recursively via cleanUpCopy(), hence
-		// the need to do a separate pass to remove disposed records:
 		Iterator<Entry<MMenuElement, ContributionRecord>> iterator = modelContributionToRecord
 				.entrySet().iterator();
 		for (; iterator.hasNext();) {
@@ -1035,5 +1076,20 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			}
 			menuManager.remove(ici);
 		}
+	}
+
+	private void unlinkMenu(MMenu menu) {
+
+		List<MMenuElement> children = menu.getChildren();
+		for (MMenuElement child : children) {
+			if (child instanceof MMenu)
+				unlinkMenu((MMenu) child);
+			else {
+				IContributionItem contribution = getContribution(child);
+				clearModelToContribution(child, contribution);
+			}
+		}
+		MenuManager mm = getManager(menu);
+		clearModelToManager(menu, mm);
 	}
 }
