@@ -36,6 +36,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         }
     }
 
+	@Override
 	protected void assertSelectionEquals(String message, TestElement expected) {
 	    ISelection selection = fViewer.getSelection();
 	    assertTrue(selection instanceof IStructuredSelection);
@@ -117,22 +118,6 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         assertNotNull("first2 is visible", fViewer.testFindItem(first2));
     }
 
-    public void testExpandElementAgain() {
-        TestElement first = fRootElement.getFirstChild();
-        TestElement first2 = first.getFirstChild();
-        TestElement first3 = first2.getFirstChild();
-        fTreeViewer.expandToLevel(first3, 0);
-        assertTrue("first is expanded", fTreeViewer.getExpandedState(first));
-        assertTrue("first2 is expanded", fTreeViewer.getExpandedState(first2));
-        assertNotNull("first3 is visible", fViewer.testFindItem(first3));
-        
-        fTreeViewer.setExpandedState(first, false);
-        fTreeViewer.expandToLevel(first3, 0);
-        assertTrue("first is expanded", fTreeViewer.getExpandedState(first)); // bug 54116
-        assertTrue("first2 is expanded", fTreeViewer.getExpandedState(first2));
-        assertNotNull("first3 is visible", fViewer.testFindItem(first3));
-    }
-
     public void testExpandToLevel() {
         TestElement first = fRootElement.getFirstChild();
         TestElement first2 = first.getFirstChild();
@@ -193,7 +178,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         // On some platforms (namely GTK), removing all children causes the
         // parent to collapse (actually it's worse than that: GTK doesn't
         // allow there to be an empty expanded tree item, even if you do a
-        // setExpanded(true)).  
+        // setExpanded(true)).
         // This behaviour makes it impossible to do this regression test.
         // See bug 40797 for more details.
         processEvents();
@@ -222,7 +207,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
     /**
      * Regression test for Bug 3840 [Viewers] free expansion of jar happening when deleting projects (1GEV2FL)
      * Problem was:
-     *   - node has children A and B 
+     *   - node has children A and B
      *   - A is expanded, B is not
      *   - A gets deleted
      *   - B gets expanded because it reused A's item
@@ -259,7 +244,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
      * Regression test for Bug 26698 [Viewers] stack overflow during debug session, causing IDE to crash
      * Problem was:
      *   - node A has child A
-     *   - setExpanded with A in the list caused an infinite recursion 
+     *   - setExpanded with A in the list caused an infinite recursion
      */
     public void testSetExpandedWithCycle() {
         TestElement first = fRootElement.getFirstChild();
@@ -271,7 +256,7 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
 
     /**
      * Test for Bug 41710 - assertion that an object may not be added to a given
-     * TreeItem more than once.     
+     * TreeItem more than once.
      */
     public void testSetDuplicateChild() {
         //Widget root = fViewer.testFindItem(fRootElement);
@@ -285,11 +270,9 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
         assertEquals("Same element added to a parent twice.", initialCount,
                 postCount);
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.tests.viewers.ViewerTestCase#tearDown()
-     */
-    public void tearDown() {
+
+    @Override
+	public void tearDown() {
     	super.tearDown();
     	fTreeViewer = null;
     }

@@ -29,6 +29,7 @@ public class PerspectiveSwitcherTest extends UITestCase {
 		super(testName);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		apiPreferenceStore = PrefUtil.getAPIPreferenceStore();
@@ -40,6 +41,7 @@ public class PerspectiveSwitcherTest extends UITestCase {
 				.getString(IWorkbenchPreferenceConstants.DOCK_PERSPECTIVE_BAR);
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		// reset values so we don't screw any assumptions up for other tests
 		// down the line
@@ -100,7 +102,7 @@ public class PerspectiveSwitcherTest extends UITestCase {
 				"The perspective bar should have been created successfully", //$NON-NLS-1$
 				getPerspectiveSwitcher(window));
 	}
-	
+
 	private static Object getPerspectiveSwitcher(WorkbenchWindow window) {
 		EModelService modelService = (EModelService) window.getService(EModelService.class);
 		return modelService.find("PerspectiveSwitcher", window.getModel());

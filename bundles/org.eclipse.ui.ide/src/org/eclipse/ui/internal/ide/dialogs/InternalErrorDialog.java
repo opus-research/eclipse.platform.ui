@@ -72,7 +72,8 @@ public class InternalErrorDialog extends MessageDialog {
 
     //Workaround. SWT does not seem to set rigth the default button if 
     //there is not control with focus. Bug: 14668
-    public int open() {
+    @Override
+	public int open() {
         create();
         Button b = getButton(defaultButtonIndex);
         b.setFocus();
@@ -88,10 +89,8 @@ public class InternalErrorDialog extends MessageDialog {
         detailButtonID = index;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected void buttonPressed(int buttonId) {
+    @Override
+	protected void buttonPressed(int buttonId) {
         if (buttonId == detailButtonID) {
             toggleDetailsArea();
         } else {
