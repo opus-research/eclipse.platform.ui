@@ -900,6 +900,48 @@ public class ModelServiceImpl implements EModelService {
 
 	public void resetPerspectiveModel(MPerspective persp, MWindow window) {
 		resetPerspectiveModel(persp, window, true);
+
+		/*
+		 * Restore of the state is called only in the public method, because the private
+		 * resetPerspectiveModel() method is also called during removePerspectiveModel() which will
+		 * remove the Perspective anyhow and so a previous reset to the old state isn't necessary.
+		 */
+
+		// restore old state (will only work in new e4 applications not in the IDE legacy one!)
+		String stateToRestore = persp.getPersistedState().get(E4Workbench.PERSPECTIVE_RESET_STATE);
+		if (stateToRestore != null && stateToRestore.length() > 0) {
+			MPerspective state = (MPerspective) ModelUtils
+					.base64StringToModelElement(stateToRestore);
+			// remember the state on the new MPerspective object so it can be restored again
+			// (otherwise it would be a one-hit-wonder action)
+			state.getPersistedState().put(E4Workbench.PERSPECTIVE_RESET_STATE, stateToRestore);
+
+			/*
+			 * Un-render the perspective (destroy the parts) must be done before it is replaced,
+			 * because otherwise the @PreDestroy methods on the parts are not invoked! (shared
+			 * elements are excluded if they are already opened in other perspectives)
+			 */
+			persp.setToBeRendered(false);
+
+			// replace the current perspective with the stored state
+			EcoreUtil.replace((EObject) persp, (EObject) state);
+
+			/*
+			 * Activate the restored perspective This will re-create the parts based on all the
+			 * model settings which exists before the perspective was changed. (shared elements are
+			 * reused if they are already opened in other perspectives)
+			 */
+			/*
+			 * TODO: Maybe check if the perspective was visible before we switch to it? (Maybe wants
+			 * to reset the perspective in the background?)
+			 */
+			/*
+			 * FIXME: sometimes the window doesn't have a context and so NPE is raised (fix only the
+			 * switchPerspective() should be kept here)
+			 */
+			EPartService ps = window.getContext().get(EPartService.class);
+			ps.switchPerspective(state); // no null-check, because we want to fail early
+		}
 	}
 
 	private void resetPerspectiveModel(MPerspective persp, MWindow window,
