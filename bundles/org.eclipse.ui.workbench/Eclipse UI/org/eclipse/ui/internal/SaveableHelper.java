@@ -115,13 +115,13 @@ public class SaveableHelper {
 					String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion,
 							LegacyActionTools.escapeMnemonics(part.getTitle()));
 					// Show a dialog.
-					String[] buttons = new String[] {
-							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL,
-							IDialogConstants.CANCEL_LABEL };
 					MessageDialog d = new MessageDialog(window.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, buttons, 0) {
+							MessageDialog.QUESTION, 
+							0, 
+							IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL,
+							IDialogConstants.CANCEL_LABEL) {
 						@Override
 						protected int getShellStyle() {
 							return super.getShellStyle() | SWT.SHEET;
@@ -497,7 +497,7 @@ public class SaveableHelper {
 	}
 
 	public static ISaveablePart getSaveable(Object o) {
-		return Adapters.getAdapter(o, ISaveablePart.class, true);
+		return Adapters.adapt(o, ISaveablePart.class);
 	}
 
 	public static boolean isSaveable(Object o) {
@@ -509,7 +509,7 @@ public class SaveableHelper {
 		if (saveable instanceof ISaveablePart2) {
 			return (ISaveablePart2) saveable;
 		}
-		return Adapters.getAdapter(o, ISaveablePart2.class, true);
+		return Adapters.adapt(o, ISaveablePart2.class);
 	}
 
 	public static boolean isSaveable2(Object o) {
