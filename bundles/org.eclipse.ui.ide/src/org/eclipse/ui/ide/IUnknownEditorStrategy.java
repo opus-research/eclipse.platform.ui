@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016 Red Hat Inc. and others
+ * Copyright (c) 2015 Red Hat Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,9 @@
  *
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 
@@ -33,11 +31,5 @@ public interface IUnknownEditorStrategy {
 	 *         or null if no editor was resolved for that file name.
 	 */
 	IEditorDescriptor getEditorDescriptor(String fileName, IEditorRegistry editorRegistry);
-
-	/**
-	 * @return {@link IStatus#OK} if editor is resolved; {@link IStatus#CANCEL}
-	 *         if user canceled selection or {@link IStatus#ERROR} otherwise
-	 */
-	int getStatus();
 
 }
