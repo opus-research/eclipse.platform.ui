@@ -7,22 +7,25 @@
  *
  * Contributors:
  *     Sergey Prigogin (Google) - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 443391
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Test suite for {@code org.eclipse.ui.monitoring} plug-in.
  * The tests in {@link EventLoopMonitorThreadManualTests} are not included in this
  * suite due to their flakiness.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-	EventLoopMonitorThreadTests.class,
-	FilterHandlerTests.class,
-	DefaultLoggerTests.class})
-public class MonitoringTestSuite {
+public class MonitoringTestSuite extends TestSuite {
+	public static Test suite() {
+		return new MonitoringTestSuite();
+	}
+
+	public MonitoringTestSuite() {
+		addTestSuite(EventLoopMonitorThreadTests.class);
+		addTestSuite(FilterHandlerTests.class);
+		addTestSuite(DefaultLoggerTests.class);
+	}
 }
