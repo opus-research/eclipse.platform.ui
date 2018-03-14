@@ -115,15 +115,7 @@ public class ContainerGenerator {
             IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
 		projectHandle.create(subMonitor.split(1));
-		if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
-
 		projectHandle.open(subMonitor.split(1));
-		if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
-
         return projectHandle;
     }
 
