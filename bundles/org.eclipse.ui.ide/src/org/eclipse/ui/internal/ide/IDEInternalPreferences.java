@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     Christian Georgi (SAP)             -  bug 432480
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 34076
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -21,9 +20,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
  * The IDEInternalPreferences are the internal constants used by the Workbench.
  */
 public interface IDEInternalPreferences {
-	// (boolean) Save all dirty editors automatically
-	public static final String SAVE_AUTOMATICALLY = "SAVE_AUTOMATICALLY"; //$NON-NLS-1$
-
     // (boolean) Save all dirty editors before running a full or incremental build 
     public static final String SAVE_ALL_BEFORE_BUILD = "SAVE_ALL_BEFORE_BUILD"; //$NON-NLS-1$
 

@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 34076
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -63,13 +62,12 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
  *Note:This class extends from PreferencePage,and there's no WorkspacePreferencePage class.
  *Hence when the IDE settings doesn't appear in this preference page, this page will be empty.
  */
-public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
-
-	private Button autoSaveButton;
+public class IDEWorkspacePreferencePage extends PreferencePage
+        implements IWorkbenchPreferencePage{
 
 	private Button autoBuildButton;
 
-    private Button autoSaveBeforeBuildButton;
+    private Button autoSaveAllButton;
 
     private IntegerFieldEditor saveInterval;
 
@@ -109,7 +107,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		area.getControl().setLayoutData(data);
 
 		createSpace(composite);
-		createAutoSavePref(composite);
         createAutoBuildPref(composite);
         createAutoRefreshControls(composite);
         createSaveAllBeforeBuildPref(composite);
@@ -174,23 +171,11 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		closeUnrelatedProjectButton.setSelection(getIDEPreferenceStore().getBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS));
 	}
 
-	protected void createAutoSavePref(Composite composite) {
-		autoSaveButton = new Button(composite, SWT.CHECK);
-		autoSaveButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_autoSaveEditors);
-		autoSaveButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_autoSaveEditorsToolTip);
-		autoSaveButton
-.setSelection(getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SAVE_AUTOMATICALLY));
-																													// define
-																													// and
-																													// use
-																													// default
-	}
-
 	protected void createSaveAllBeforeBuildPref(Composite composite) {
-        autoSaveBeforeBuildButton = new Button(composite, SWT.CHECK);
-        autoSaveBeforeBuildButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuilding);
-        autoSaveBeforeBuildButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuildingToolTip);
-        autoSaveBeforeBuildButton.setSelection(getIDEPreferenceStore().getBoolean(
+        autoSaveAllButton = new Button(composite, SWT.CHECK);
+        autoSaveAllButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuilding);
+        autoSaveAllButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_savePriorToBuildingToolTip);
+        autoSaveAllButton.setSelection(getIDEPreferenceStore().getBoolean(
                 IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
     }
 
@@ -473,19 +458,13 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
     @Override
 	protected void performDefaults() {
 
-
         // core holds onto this preference.
         boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
                 .getDefaultBoolean(ResourcesPlugin.PREF_AUTO_BUILDING);
         autoBuildButton.setSelection(autoBuild);
 
-		IPreferenceStore store = getIDEPreferenceStore();
-
-		boolean autoSave = ResourcesPlugin.getPlugin().getPluginPreferences()
-				.getDefaultBoolean(IDEInternalPreferences.SAVE_AUTOMATICALLY);
-		autoSaveButton.setSelection(autoSave);
-
-        autoSaveBeforeBuildButton
+        IPreferenceStore store = getIDEPreferenceStore();
+        autoSaveAllButton
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
@@ -539,12 +518,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
         IPreferenceStore store = getIDEPreferenceStore();
 
-		// store the save all dirty editors
-		store.setValue(IDEInternalPreferences.SAVE_AUTOMATICALLY, autoSaveButton.getSelection());
-
         // store the save all prior to build setting
         store.setValue(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD,
-                autoSaveBeforeBuildButton.getSelection());
+                autoSaveAllButton.getSelection());
 
         // store the workspace save interval
         // @issue we should drop our preference constant and let clients use
