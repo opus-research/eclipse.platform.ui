@@ -271,6 +271,9 @@ public abstract class AbstractTreeViewerTest extends StructuredItemViewerTest {
                 postCount);
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.tests.viewers.ViewerTestCase#tearDown()
+     */
     @Override
 	public void tearDown() {
     	super.tearDown();

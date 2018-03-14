@@ -34,14 +34,12 @@ public class BindingTestSetup extends TestSetup {
 		super(test);
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		oldLocale = Locale.getDefault();
 		Locale.setDefault(Locale.US);
 		oldLogger = Policy.getLog();
 		Policy.setLog(new ILogger() {
-			@Override
 			public void log(IStatus status) {
 				// we are not expecting anything in the log while we test.
 				if (status.getException() != null) {
@@ -52,7 +50,6 @@ public class BindingTestSetup extends TestSetup {
 		});
 		oldJFaceLogger = org.eclipse.jface.util.Policy.getLog();
 		org.eclipse.jface.util.Policy.setLog(new org.eclipse.jface.util.ILogger(){
-			@Override
 			public void log(IStatus status) {
 				// we are not expecting anything in the log while we test.
 				if (status.getException() != null) {
@@ -63,7 +60,6 @@ public class BindingTestSetup extends TestSetup {
 		});
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		Locale.setDefault(oldLocale);
 		Policy.setLog(oldLogger);

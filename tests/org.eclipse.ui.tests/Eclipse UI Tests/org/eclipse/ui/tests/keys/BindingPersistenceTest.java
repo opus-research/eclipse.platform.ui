@@ -595,6 +595,11 @@ public final class BindingPersistenceTest extends UITestCase {
 		assertEquals(EMACS_SCHEME_ID, pasteBinding.getSchemeId());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		final IPreferenceStore store = WorkbenchPlugin.getDefault()

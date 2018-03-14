@@ -44,7 +44,6 @@ public class UnmodifiableObservableValueTest extends
 		return suite;
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -84,29 +83,24 @@ public class UnmodifiableObservableValueTest extends
 			AbstractObservableValueContractDelegate {
 		private Object valueType = new Object();
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return new UnmodifiableObservableValueStub(new WrappedObservableValue(realm,
 					null, valueType));
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return valueType;
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return new Object();
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			UnmodifiableObservableValueStub wrapper = (UnmodifiableObservableValueStub) observable;
 			wrapper.wrappedValue.setValue(createValue(wrapper));
 		}
 
-		@Override
 		public void setStale(IObservable observable, boolean stale) {
 			UnmodifiableObservableValueStub wrapper = (UnmodifiableObservableValueStub) observable;
 			wrapper.wrappedValue.setStale(stale);
@@ -131,7 +125,6 @@ public class UnmodifiableObservableValueTest extends
 			super(realm, initialValue, valueType);
 		}
 
-		@Override
 		public boolean isStale() {
 			ObservableTracker.getterCalled(this);
 			return stale;
