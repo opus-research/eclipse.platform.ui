@@ -38,7 +38,7 @@ public class CompatibilityWorkbenchWindowControlContribution {
 
 	/**
 	 * Constructs the control contribution that this proxy represents.
-	 * 
+	 *
 	 * @param window
 	 *            the window that this control contribution is under
 	 * @param toolControl
@@ -63,23 +63,28 @@ public class CompatibilityWorkbenchWindowControlContribution {
 				}
 
 				MUIElement parent = toolControl.getParent();
-				while (!(parent instanceof MTrimBar)) {
+				while (!(parent instanceof MTrimBar) && parent != null) {
 					parent = parent.getParent();
 				}
 
-				switch (((MTrimBar) parent).getSide()) {
-				case BOTTOM:
-					contribution.setCurSide(SWT.BOTTOM);
-					break;
-				case LEFT:
-					contribution.setCurSide(SWT.LEFT);
-					break;
-				case RIGHT:
-					contribution.setCurSide(SWT.RIGHT);
-					break;
-				case TOP:
+				if (parent instanceof MTrimBar) {
+					switch (((MTrimBar) parent).getSide()) {
+					case BOTTOM:
+						contribution.setCurSide(SWT.BOTTOM);
+						break;
+					case LEFT:
+						contribution.setCurSide(SWT.LEFT);
+						break;
+					case RIGHT:
+						contribution.setCurSide(SWT.RIGHT);
+						break;
+					case TOP:
+						contribution.setCurSide(SWT.TOP);
+						break;
+					}
+				} else {
+					// default position
 					contribution.setCurSide(SWT.TOP);
-					break;
 				}
 
 				contribution.delegateCreateControl(composite);

@@ -8,10 +8,10 @@
  * Contributors:
  * IBM Corporation - initial API and implementation
  * Bug 349224 Navigator content provider "appearsBefore" creates hard reference to named id - paul.fullbright@oracle.com
+ * C. Sean Young <csyoung@google.com> - Bug 436645
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.extensions;
 
-import java.lang.ref.SoftReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
@@ -33,7 +32,6 @@ import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.internal.navigator.NavigatorSafeRunnable;
 import org.eclipse.ui.internal.navigator.Policy;
 import org.eclipse.ui.internal.navigator.VisibilityAssistant;
-import org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener;
 import org.eclipse.ui.navigator.INavigatorContentDescriptor;
 import org.eclipse.ui.navigator.OverridePolicy;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -45,81 +43,19 @@ public class NavigatorContentDescriptorManager {
 
 	private static final NavigatorContentDescriptorManager INSTANCE = new NavigatorContentDescriptorManager();
 
-	private final Map firstClassDescriptorsMap = new HashMap();
+	private final Map<String, NavigatorContentDescriptor> firstClassDescriptorsMap = new HashMap<String, NavigatorContentDescriptor>();
 
-	private final Map allDescriptors = new HashMap();
-
-	private class EvaluationCache implements VisibilityListener {
-
-		private final Map evaluations/* <Object, NavigatorContentDescriptor[]> */= new HashMap();
-		private final Map evaluationsWithOverrides/*<Object, NavigatorContentDescriptor[]>*/ = new HashMap();
-
-		EvaluationCache(VisibilityAssistant anAssistant) {
-			anAssistant.addListener(this);
-		}
-
-		protected final NavigatorContentDescriptor[] getDescriptors(Object anElement) {
-			return getDescriptors(anElement, true);
-		}
-
-		protected final void setDescriptors(Object anElement, NavigatorContentDescriptor[] theDescriptors) {
-			setDescriptors(anElement, theDescriptors, true);
-		}
-
-		protected final NavigatorContentDescriptor[] getDescriptors(Object anElement, boolean toComputeOverrides) {
-
-			if (anElement == null)
-				return null;
-
-			NavigatorContentDescriptor[] cachedDescriptors = null;
-			if (toComputeOverrides) {
-				SoftReference cache = (SoftReference) evaluations.get(anElement);
-				if (cache != null && (cachedDescriptors = (NavigatorContentDescriptor[]) cache.get()) == null)
-					evaluations.remove(anElement);
-				return cachedDescriptors;
-			}
-			SoftReference cache = (SoftReference) evaluationsWithOverrides.get(anElement);
-			if (cache != null && (cachedDescriptors = (NavigatorContentDescriptor[]) cache.get()) == null)
-				evaluationsWithOverrides.remove(anElement);
-			return cachedDescriptors;
-
-		}
-
-		protected final void setDescriptors(Object anElement, NavigatorContentDescriptor[] theDescriptors, boolean toComputeOverrides) {
-			if (anElement != null) {
-				if (toComputeOverrides)
-					evaluations.put(new EvalutationReference(anElement), new SoftReference(theDescriptors));
-				else
-					evaluationsWithOverrides.put(new EvalutationReference(anElement), new SoftReference(theDescriptors));
-			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener#onVisibilityOrActivationChange()
-		 */
-		public void onVisibilityOrActivationChange() {
-			evaluations.clear();
-			evaluationsWithOverrides.clear();
-		}
-	}
-
-	/* Map of (VisibilityAssistant, EvaluationCache)-pairs */
-	private final Map cachedTriggerPointEvaluations = new WeakHashMap();
-
-	/* Map of (VisibilityAssistant, EvaluationCache)-pairs */
-	private final Map cachedPossibleChildrenEvaluations = new WeakHashMap();
+	private final Map<String, NavigatorContentDescriptor> allDescriptors = new HashMap<String, NavigatorContentDescriptor>();
 
 	private ImageRegistry imageRegistry;
 
-	private final Set overridingDescriptors = new HashSet();
+	private final Set<NavigatorContentDescriptor> overridingDescriptors = new HashSet<NavigatorContentDescriptor>();
 
-	private final Set saveablesProviderDescriptors = new HashSet();
+	private final Set<NavigatorContentDescriptor> saveablesProviderDescriptors = new HashSet<NavigatorContentDescriptor>();
 
-	private final Set sortOnlyDescriptors = new HashSet();
+	private final Set<NavigatorContentDescriptor> sortOnlyDescriptors = new HashSet<NavigatorContentDescriptor>();
 
-	private final Set firstClassDescriptorsSet = new HashSet();
+	private final Set<NavigatorContentDescriptor> firstClassDescriptorsSet = new HashSet<NavigatorContentDescriptor>();
 
 	/**
 	 * @return the singleton instance of the manager
@@ -133,19 +69,19 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return Returns all content descriptor(s).
 	 */
 	public NavigatorContentDescriptor[] getAllContentDescriptors() {
 		NavigatorContentDescriptor[] finalDescriptors = new NavigatorContentDescriptor[allDescriptors
 				.size()];
-		finalDescriptors = (NavigatorContentDescriptor[]) allDescriptors.values().toArray(finalDescriptors);
+		finalDescriptors = allDescriptors.values().toArray(finalDescriptors);
 		Arrays.sort(finalDescriptors, ExtensionSequenceNumberComparator.INSTANCE);
 		return finalDescriptors;
 	}
 
 	/**
-	 * 
+	 *
 	 * @return Returns all content descriptors that provide saveables.
 	 */
 	public NavigatorContentDescriptor[] getContentDescriptorsWithSaveables() {
@@ -157,7 +93,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return Returns all content descriptors that are sort only
 	 */
 	public NavigatorContentDescriptor[] getSortOnlyContentDescriptors() {
@@ -170,55 +106,49 @@ public class NavigatorContentDescriptorManager {
 
 
 	/**
-	 * 
+	 *
 	 * Returns all content descriptor(s) which enable for the given element.
-	 * 
+	 *
 	 * @param anElement
 	 *            the element to return the best content descriptor for
-	 * 
+	 *
 	 * @param aVisibilityAssistant
 	 *            The relevant viewer assistant; used to filter out unbound
 	 *            content descriptors.
-	 * @param considerOverrides 
+	 * @param considerOverrides
 	 * @return the best content descriptor for the given element.
 	 */
-	public Set findDescriptorsForTriggerPoint(Object anElement,
+	public Set<NavigatorContentDescriptor> findDescriptorsForTriggerPoint(Object anElement,
 			VisibilityAssistant aVisibilityAssistant, boolean considerOverrides) {
-		return findDescriptors(anElement, cachedTriggerPointEvaluations, aVisibilityAssistant, considerOverrides, !POSSIBLE_CHILD);
+		return findDescriptors(anElement, aVisibilityAssistant, considerOverrides, !POSSIBLE_CHILD);
 	}
 
 
 	/**
-	 * 
+	 *
 	 * Returns all content descriptor(s) which enable for the given element.
-	 * 
+	 *
 	 * @param anElement
 	 *            the element to return the best content descriptor for
-	 * 
+	 *
 	 * @param aVisibilityAssistant
 	 *            The relevant viewer assistant; used to filter out unbound
 	 *            content descriptors.
 	 * @param toComputeOverrides
 	 * @return the best content descriptor for the given element.
 	 */
-	public Set findDescriptorsForPossibleChild(Object anElement,
+	public Set<NavigatorContentDescriptor> findDescriptorsForPossibleChild(Object anElement,
 			VisibilityAssistant aVisibilityAssistant, boolean toComputeOverrides) {
-		return findDescriptors(anElement, cachedPossibleChildrenEvaluations, aVisibilityAssistant, toComputeOverrides, POSSIBLE_CHILD);
+		return findDescriptors(anElement, aVisibilityAssistant, toComputeOverrides, POSSIBLE_CHILD);
 	}
 
 	private static final boolean POSSIBLE_CHILD = true;
-	
 
-	private Set findDescriptors(Object anElement,
-			Map cachedEvaluations, VisibilityAssistant aVisibilityAssistant, boolean considerOverrides, boolean possibleChild) {
-		EvaluationCache cache = getEvaluationCache(
-				cachedEvaluations, aVisibilityAssistant);
 
-		Set descriptors = new TreeSet(ExtensionSequenceNumberComparator.INSTANCE);
-		NavigatorContentDescriptor[] cachedDescriptors = null;
-		if ((cachedDescriptors = cache.getDescriptors(anElement)) != null) {
-			descriptors.addAll(Arrays.asList(cachedDescriptors));
-		}
+	private Set<NavigatorContentDescriptor> findDescriptors(Object anElement,
+			VisibilityAssistant aVisibilityAssistant, boolean considerOverrides, boolean possibleChild) {
+
+		Set<NavigatorContentDescriptor> descriptors = new TreeSet<NavigatorContentDescriptor>(ExtensionSequenceNumberComparator.INSTANCE);
 
 		if (considerOverrides) {
 			addDescriptorsConsideringOverrides(anElement, firstClassDescriptorsSet, aVisibilityAssistant, descriptors, possibleChild);
@@ -229,8 +159,8 @@ public class NavigatorContentDescriptorManager {
 		} else {
 
 			/* Find other ContentProviders which enable for this object */
-			for (Iterator contentDescriptorsItr = firstClassDescriptorsSet.iterator(); contentDescriptorsItr.hasNext();) {
-				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) contentDescriptorsItr.next();
+			for (Iterator<NavigatorContentDescriptor> contentDescriptorsItr = firstClassDescriptorsSet.iterator(); contentDescriptorsItr.hasNext();) {
+				NavigatorContentDescriptor descriptor = contentDescriptorsItr.next();
 
 				if (aVisibilityAssistant.isActive(descriptor) && aVisibilityAssistant.isVisible(descriptor)
 						&& (possibleChild ? descriptor.isPossibleChild(anElement) : descriptor.isTriggerPoint(anElement))) {
@@ -238,33 +168,20 @@ public class NavigatorContentDescriptorManager {
 				}
 			}
 		}
-		cache.setDescriptors(anElement, (NavigatorContentDescriptor[]) descriptors.toArray(new NavigatorContentDescriptor[descriptors.size()]));
 
 		return descriptors;
 	}
 
-	private EvaluationCache getEvaluationCache(Map anEvaluationMap,
-			VisibilityAssistant aVisibilityAssistant) {
-		EvaluationCache c = (EvaluationCache) anEvaluationMap
-				.get(aVisibilityAssistant);
-		if (c == null) {
-			anEvaluationMap.put(aVisibilityAssistant, c = new EvaluationCache(
-					aVisibilityAssistant));
-		}
-		return c;
-
-	}
-
 	private boolean addDescriptorsConsideringOverrides(Object anElement,
-			Set theChildDescriptors, VisibilityAssistant aVisibilityAssistant,
-			Set theFoundDescriptors, boolean possibleChild) {
+			Set<NavigatorContentDescriptor> theChildDescriptors, VisibilityAssistant aVisibilityAssistant,
+			Set<NavigatorContentDescriptor> theFoundDescriptors, boolean possibleChild) {
 		int initialSize = theFoundDescriptors.size();
 
 		NavigatorContentDescriptor descriptor;
 		/* Find other ContentProviders which enable for this object */
-		for (Iterator contentDescriptorsItr = theChildDescriptors.iterator(); contentDescriptorsItr
+		for (Iterator<NavigatorContentDescriptor> contentDescriptorsItr = theChildDescriptors.iterator(); contentDescriptorsItr
 				.hasNext();) {
-			descriptor = (NavigatorContentDescriptor) contentDescriptorsItr
+			descriptor = contentDescriptorsItr
 					.next();
 
 			boolean isApplicable = aVisibilityAssistant.isActive(descriptor)
@@ -275,7 +192,7 @@ public class NavigatorContentDescriptorManager {
 
 				boolean isOverridden;
 
-				Set overridingDescriptors = new TreeSet(ExtensionSequenceNumberComparator.INSTANCE);
+				Set<NavigatorContentDescriptor> overridingDescriptors = new TreeSet<NavigatorContentDescriptor>(ExtensionSequenceNumberComparator.INSTANCE);
 				isOverridden = addDescriptorsConsideringOverrides(anElement, descriptor.getOverriddingExtensions(),
 						aVisibilityAssistant, overridingDescriptors, possibleChild);
 
@@ -296,17 +213,17 @@ public class NavigatorContentDescriptorManager {
 
 	/**
 	 * Returns the navigator content descriptor with the given id.
-	 * 
+	 *
 	 * @param id
 	 *            The id of the content descriptor that should be returned
 	 * @return The content descriptor of the given id
 	 */
 	public NavigatorContentDescriptor getContentDescriptor(String id) {
-		return (NavigatorContentDescriptor) allDescriptors.get(id);
+		return allDescriptors.get(id);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param descriptorId
 	 *            The unique id of a particular descriptor
 	 * @return The name (value of the 'name' attribute) of the given descriptor
@@ -320,7 +237,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param descriptorId
 	 *            The unique id of a particular descriptor
 	 * @return The image (corresponding to the value of the 'icon' attribute) of
@@ -398,17 +315,17 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void computeOverrides() {
 		if (overridingDescriptors.size() > 0) {
 			NavigatorContentDescriptor descriptor;
 			NavigatorContentDescriptor overriddenDescriptor;
-			for (Iterator overridingIterator = overridingDescriptors.iterator(); overridingIterator
+			for (Iterator<NavigatorContentDescriptor> overridingIterator = overridingDescriptors.iterator(); overridingIterator
 					.hasNext();) {
-				descriptor = (NavigatorContentDescriptor) overridingIterator
+				descriptor = overridingIterator
 						.next();
-				overriddenDescriptor = (NavigatorContentDescriptor) allDescriptors
+				overriddenDescriptor = allDescriptors
 						.get(descriptor.getSuppressedExtensionId());
 				if (overriddenDescriptor != null) {
 
@@ -436,7 +353,7 @@ public class NavigatorContentDescriptorManager {
 					}
 
 				} else {
-					String message = 
+					String message =
 							"Invalid suppressedExtensionId \"" //$NON-NLS-1$
 									+ descriptor.getSuppressedExtensionId()
 									+ "\" specified from \"" //$NON-NLS-1$
@@ -451,10 +368,10 @@ public class NavigatorContentDescriptorManager {
 			}
 		}
 	}
-	
-	private int findId(List list, String id) {
+
+	private int findId(List<NavigatorContentDescriptor> list, String id) {
 		for (int i = 0, len = list.size(); i < len; i++) {
-			NavigatorContentDescriptor desc = (NavigatorContentDescriptor) list.get(i);
+			NavigatorContentDescriptor desc = list.get(i);
 			if (desc.getId().equals(id))
 				return i;
 		}
@@ -467,16 +384,16 @@ public class NavigatorContentDescriptorManager {
 	private void computeSequenceNumbers() {
 		NavigatorContentDescriptor[] descs = getAllContentDescriptors();
 
-		LinkedList list = new LinkedList();
+		LinkedList<NavigatorContentDescriptor> list = new LinkedList<NavigatorContentDescriptor>();
 		for (int i = 0; i < descs.length; i++) {
 			list.add(descs[i]);
 		}
-		
+
 		boolean changed = true;
 		while (changed) {
 			changed = false;
 			for (int i = 0, len = list.size(); i < len; i++) {
-				NavigatorContentDescriptor desc = (NavigatorContentDescriptor) list.get(i);
+				NavigatorContentDescriptor desc = list.get(i);
 				if (desc.getAppearsBeforeId() != null) {
 					int beforeInd = findId(list, desc.getAppearsBeforeId());
 					if (beforeInd >= 0 && beforeInd < i) {
@@ -487,9 +404,9 @@ public class NavigatorContentDescriptorManager {
 				}
 			}
 		}
-		
+
 		for (int i = 0, len = list.size(); i < len; i++) {
-			NavigatorContentDescriptor desc = (NavigatorContentDescriptor) list.get(i);
+			NavigatorContentDescriptor desc = list.get(i);
 			desc.setSequenceNumber(i);
 			if (Policy.DEBUG_EXTENSION_SETUP) {
 				System.out.println("Descriptors by sequence: " + desc); //$NON-NLS-1$
@@ -507,20 +424,18 @@ public class NavigatorContentDescriptorManager {
 	private class NavigatorContentDescriptorRegistry extends
 			NavigatorContentRegistryReader {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.navigator.extensions.RegistryReader#readRegistry()
-		 */
+		@Override
 		public void readRegistry() {
 			super.readRegistry();
 			computeSequenceNumbers();
 			computeOverrides();
 		}
 
+		@Override
 		protected boolean readElement(final IConfigurationElement anElement) {
 			if (TAG_NAVIGATOR_CONTENT.equals(anElement.getName())) {
 				SafeRunner.run(new NavigatorSafeRunnable(anElement) {
+					@Override
 					public void run() throws Exception {
 						addNavigatorContentDescriptor(new NavigatorContentDescriptor(anElement));
 					}

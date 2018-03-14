@@ -35,14 +35,14 @@ public class EditorSite extends PartSite implements IEditorSite {
     //private ListenerList propChangeListeners = new ListenerList(1);
 
     private SubActionBars ab = null;
-    
+
     /**
      * Constructs an EditorSite for an editor.
      */
 	public EditorSite(MPart model, IWorkbenchPart part, IWorkbenchPartReference ref,
 			IConfigurationElement element) {
 		super(model, part, ref, element);
-        
+
 		// Initialize the services specific to this editor site.
         initializeDefaultServices();
     }
@@ -51,36 +51,40 @@ public class EditorSite extends PartSite implements IEditorSite {
 	 * Initialize the local services.
 	 */
 	private void initializeDefaultServices() {
-		// Register an implementation of the service appropriate for the 
+		// Register an implementation of the service appropriate for the
 		// EditorSite.
 		final IDragAndDropService editorDTService = new EditorSiteDragAndDropServiceImpl();
 		serviceLocator.registerService(IDragAndDropService.class, editorDTService);
+		serviceLocator.registerService(IEditorPart.class, (IEditorPart) getPart());
 	}
-	
-    public void setActionBars(SubActionBars bars) {
+
+    @Override
+	public void setActionBars(SubActionBars bars) {
         super.setActionBars(bars);
-        
+
         if (bars instanceof IActionBars2) {
             ab = new SubActionBars2((IActionBars2)bars, this);
         } else {
             ab = new SubActionBars(bars, this);
         }
     }
-    
-    public void activateActionBars(boolean forceVisibility) {
+
+    @Override
+	public void activateActionBars(boolean forceVisibility) {
         if (ab != null) {
             ab.activate(forceVisibility);
         }
         super.activateActionBars(forceVisibility);
     }
 
-    public void deactivateActionBars(boolean forceHide) {
+    @Override
+	public void deactivateActionBars(boolean forceHide) {
         if (ab != null) {
             ab.deactivate(forceHide);
         }
         super.deactivateActionBars(forceHide);
     }
-    
+
     /**
      * Returns the editor action bar contributor for this editor.
      * <p>
@@ -92,12 +96,13 @@ public class EditorSite extends PartSite implements IEditorSite {
      *
      * @return the editor action bar contributor
      */
-    public IEditorActionBarContributor getActionBarContributor() {
+    @Override
+	public IEditorActionBarContributor getActionBarContributor() {
         EditorActionBars bars = (EditorActionBars) getActionBars();
         if (bars != null) {
 			return bars.getEditorContributor();
 		}
-        
+
         return null;
     }
 
@@ -109,7 +114,7 @@ public class EditorSite extends PartSite implements IEditorSite {
         if (bars != null) {
 			return bars.getExtensionContributor();
 		}
-        
+
         return null;
     }
 
@@ -120,34 +125,38 @@ public class EditorSite extends PartSite implements IEditorSite {
         return (IEditorPart) getPart();
     }
 
-    protected String getInitialScopeId() {
+    @Override
+	protected String getInitialScopeId() {
         return "org.eclipse.ui.textEditorScope"; //$NON-NLS-1$
     }
-    
-    public void dispose() {
+
+    @Override
+	public void dispose() {
         super.dispose();
-        
+
         if (ab != null) {
             ab.dispose();
 			ab = null;
         }
     }
-    
-    public final void registerContextMenu(final MenuManager menuManager,
+
+    @Override
+	public final void registerContextMenu(final MenuManager menuManager,
             final ISelectionProvider selectionProvider,
             final boolean includeEditorInput) {
         registerContextMenu(getId(), menuManager, selectionProvider,
                 includeEditorInput);
     }
-    
-    public final void registerContextMenu(final String menuId,
+
+    @Override
+	public final void registerContextMenu(final String menuId,
             final MenuManager menuManager,
             final ISelectionProvider selectionProvider,
             final boolean includeEditorInput) {
         if (menuExtenders == null) {
             menuExtenders = new ArrayList(1);
         }
-        
+
 		PartSite.registerContextMenu(menuId, menuManager, selectionProvider, includeEditorInput,
 				getPart(), getModel().getContext(), menuExtenders);
     }

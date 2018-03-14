@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010,2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,6 +47,7 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	private ServiceTracker debugTracker;
 	private DebugTrace trace;
 
+
 	/**
 	 * Get the default activator.
 	 * 
@@ -63,11 +64,13 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		return context;
 	}
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
 	}
 
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		saveDialogSettings();
 		if (pkgAdminTracker != null) {

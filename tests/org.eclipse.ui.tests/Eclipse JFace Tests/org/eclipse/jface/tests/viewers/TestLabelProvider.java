@@ -22,17 +22,20 @@ public class TestLabelProvider extends LabelProvider {
      *
      */
     public static Image getImage() {
-        if (fgImage == null)
-            fgImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
+        if (fgImage == null) {
+			fgImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
                     "images/java.gif").createImage();
+		}
         return fgImage;
     }
 
-    public Image getImage(Object element) {
+    @Override
+	public Image getImage(Object element) {
         return getImage();
     }
 
-    public String getText(Object element) {
+    @Override
+	public String getText(Object element) {
         String label = element.toString();
         return label + " <rendered>";
     }

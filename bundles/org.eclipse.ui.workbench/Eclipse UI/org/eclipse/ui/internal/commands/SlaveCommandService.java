@@ -43,7 +43,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public class SlaveCommandService implements ICommandService, IUpdateService {
@@ -52,7 +52,7 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/**
 	 * The collection of ICallbackReferences added through this service.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private Set fCallbackCache = new HashSet();
@@ -62,7 +62,7 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 	/**
 	 * The scoping constant added to callback registrations submitted through
 	 * this service.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private String fScopingName;
@@ -70,7 +70,7 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 	/**
 	 * The object to scope. In theory, the service locator that would find this
 	 * service.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private IServiceLocator fScopingValue;
@@ -79,7 +79,7 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/**
 	 * Build the slave service.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent service. This must not be <code>null</code>.
 	 */
@@ -102,9 +102,10 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#addExecutionListener(org.eclipse.core.commands.IExecutionListener)
 	 */
+	@Override
 	public void addExecutionListener(IExecutionListener listener) {
 		if (!fExecutionListeners.contains(listener)) {
 			fExecutionListeners.add(listener);
@@ -114,19 +115,21 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#defineUncategorizedCategory(java.lang.String,
 	 *      java.lang.String)
 	 */
+	@Override
 	public void defineUncategorizedCategory(String name, String description) {
 		fParentService.defineUncategorizedCategory(name, description);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#deserialize(java.lang.String)
 	 */
+	@Override
 	public ParameterizedCommand deserialize(
 			String serializedParameterizedCommand) throws NotDefinedException,
 			SerializationException {
@@ -135,9 +138,10 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.services.IDisposable#dispose()
 	 */
+	@Override
 	public void dispose() {
 		if (!fExecutionListeners.isEmpty()) {
 			Object[] array = fExecutionListeners.toArray();
@@ -156,81 +160,91 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getCategory(java.lang.String)
 	 */
+	@Override
 	public Category getCategory(String categoryId) {
 		return fParentService.getCategory(categoryId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getCommand(java.lang.String)
 	 */
+	@Override
 	public Command getCommand(String commandId) {
 		return fParentService.getCommand(commandId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getDefinedCategories()
 	 */
+	@Override
 	public Category[] getDefinedCategories() {
 		return fParentService.getDefinedCategories();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getDefinedCategoryIds()
 	 */
+	@Override
 	public Collection getDefinedCategoryIds() {
 		return fParentService.getDefinedCategoryIds();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getDefinedCommandIds()
 	 */
+	@Override
 	public Collection getDefinedCommandIds() {
 		return fParentService.getDefinedCommandIds();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getDefinedCommands()
 	 */
+	@Override
 	public Command[] getDefinedCommands() {
 		return fParentService.getDefinedCommands();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getDefinedParameterTypeIds()
 	 */
+	@Override
 	public Collection getDefinedParameterTypeIds() {
 		return fParentService.getDefinedParameterTypeIds();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getDefinedParameterTypes()
 	 */
+	@Override
 	public ParameterType[] getDefinedParameterTypes() {
 		return fParentService.getDefinedParameterTypes();
 	}
 
+	@Override
 	public final String getHelpContextId(final Command command)
 			throws NotDefinedException {
 		return fParentService.getHelpContextId(command);
 	}
 
+	@Override
 	public final String getHelpContextId(final String commandId)
 			throws NotDefinedException {
 		return fParentService.getHelpContextId(commandId);
@@ -238,32 +252,36 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#getParameterType(java.lang.String)
 	 */
+	@Override
 	public ParameterType getParameterType(String parameterTypeId) {
 		return fParentService.getParameterType(parameterTypeId);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#readRegistry()
 	 */
+	@Override
 	public void readRegistry() {
 		fParentService.readRegistry();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#removeExecutionListener(org.eclipse.core.commands.IExecutionListener)
 	 */
+	@Override
 	public void removeExecutionListener(IExecutionListener listener) {
 		fExecutionListeners.remove(listener);
 		fParentService.removeExecutionListener(listener);
 	}
 
+	@Override
 	public final void setHelpContextId(final IHandler handler,
 			final String helpContextId) {
 		fParentService.setHelpContextId(handler, helpContextId);
@@ -271,20 +289,22 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#refreshElements(java.lang.String,
 	 *      java.util.Map)
 	 */
+	@Override
 	public void refreshElements(String commandId, Map filter) {
 		fParentService.refreshElements(commandId, filter);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#registerElementForCommand(org.eclipse.core.commands.ParameterizedCommand,
 	 *      org.eclipse.ui.menus.UIElement)
 	 */
+	@Override
 	public IElementReference registerElementForCommand(
 			ParameterizedCommand command, UIElement element)
 			throws NotDefinedException {
@@ -306,9 +326,10 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#registerElement(org.eclipse.ui.commands.IElementReference)
 	 */
+	@Override
 	public void registerElement(IElementReference elementReference) {
 		fCallbackCache.add(elementReference);
 		elementReference.getParameters().put(fScopingName, fScopingValue);
@@ -317,9 +338,10 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.commands.ICommandService#unregisterElement(org.eclipse.ui.commands.IElementReference)
 	 */
+	@Override
 	public void unregisterElement(IElementReference elementReference) {
 		fCallbackCache.remove(elementReference);
 		fParentService.unregisterElement(elementReference);
@@ -327,11 +349,12 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService#
 	 * registerElementForUpdate(org.eclipse.core.commands.ParameterizedCommand,
 	 * org.eclipse.e4.ui.model.application.ui.menu.MItem)
 	 */
+	@Override
 	public Runnable registerElementForUpdate(ParameterizedCommand parameterizedCommand,
 			final MItem item) {
 		UIElement element = new UIElement(fScopingValue) {
@@ -372,6 +395,7 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 			final IElementReference reference = registerElementForCommand(parameterizedCommand,
 					element);
 			return new Runnable() {
+				@Override
 				public void run() {
 					unregisterElement(reference);
 				}

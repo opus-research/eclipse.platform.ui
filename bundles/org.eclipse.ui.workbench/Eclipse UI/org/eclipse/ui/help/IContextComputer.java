@@ -19,8 +19,9 @@ import org.eclipse.swt.events.HelpEvent;
  * This interface may be implemented by clients.
  * </p>
  * @deprecated nested contexts are no longer supported by the help support system
- * 
+ *
  */
+@Deprecated
 public interface IContextComputer {
     /**
      * Computes contexts for the help system.
@@ -40,7 +41,7 @@ public interface IContextComputer {
      * method.
      * </p>
      * <p>
-     * The important concept here is that the value returned by 
+     * The important concept here is that the value returned by
      * <code>computeContexts</code> represents the complete help
      * contexts and is passed directly to the help support system.
      * </p>
@@ -48,7 +49,7 @@ public interface IContextComputer {
      * However the value returned by this method represents the
      * only the contexts for the particular control with which this
      * <code>IContextComputer</code> is associated.
-     * </p> 
+     * </p>
      * @param event the help event which triggered this request for help
      * @return a mixed-type array of context ids (type <code>String</code>)
      *   and/or help contexts (type <code>IContext</code>)

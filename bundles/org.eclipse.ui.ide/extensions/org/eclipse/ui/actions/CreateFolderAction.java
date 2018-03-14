@@ -31,10 +31,11 @@ import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @deprecated should use NewWizardMenu to populate a New submenu instead (see Navigator view)
  * @noextend This class is not intended to be subclassed by clients.
  */
+@Deprecated
 public class CreateFolderAction extends SelectionListenerAction {
 
     /**
@@ -47,19 +48,21 @@ public class CreateFolderAction extends SelectionListenerAction {
      * The shell in which to show any dialogs.
      */
     protected IShellProvider shellProvider;
-    
+
     /**
      * Creates a new action for creating a folder resource.
      *
      * @param shell the shell for any dialogs
-     * 
+     *
      * @deprecated {@link #CreateFolderAction(IShellProvider)}
      */
-    public CreateFolderAction(final Shell shell) {
+    @Deprecated
+	public CreateFolderAction(final Shell shell) {
         super(IDEWorkbenchMessages.CreateFolderAction_text);
         Assert.isNotNull(shell);
         shellProvider = new IShellProvider(){
-        	public Shell getShell(){
+        	@Override
+			public Shell getShell(){
         		return shell;
         	}
         };
@@ -68,19 +71,20 @@ public class CreateFolderAction extends SelectionListenerAction {
 
     /**
      * Creates a new action for creating a folder resource.
-     * 
+     *
      * @param provider the shell for any dialogs
-     * 
+     *
      * @deprecated see deprecated tag on class
      * @since 3.4
      */
-    public CreateFolderAction(IShellProvider provider){
+    @Deprecated
+	public CreateFolderAction(IShellProvider provider){
     	super(IDEWorkbenchMessages.CreateFolderAction_text);
     	Assert.isNotNull(provider);
     	shellProvider = provider;
     	initAction();
     }
-    
+
     /**
      * Initializes for the constructor.
      */
@@ -92,13 +96,14 @@ public class CreateFolderAction extends SelectionListenerAction {
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 				IIDEHelpContextIds.CREATE_FOLDER_ACTION);
     }
-    
+
     /**
      * The <code>CreateFolderAction</code> implementation of this
      * <code>IAction</code> method opens a <code>BasicNewFolderResourceWizard</code>
      * in a wizard dialog under the shell passed to the constructor.
      */
-    public void run() {
+    @Override
+	public void run() {
         BasicNewFolderResourceWizard wizard = new BasicNewFolderResourceWizard();
         wizard.init(PlatformUI.getWorkbench(), getStructuredSelection());
         wizard.setNeedsProgressMonitor(true);
@@ -117,7 +122,8 @@ public class CreateFolderAction extends SelectionListenerAction {
      * <code>SelectionListenerAction</code> method enables the action only
      * if the selection contains folders and open projects.
      */
-    protected boolean updateSelection(IStructuredSelection s) {
+    @Override
+	protected boolean updateSelection(IStructuredSelection s) {
         if (!super.updateSelection(s)) {
             return false;
         }

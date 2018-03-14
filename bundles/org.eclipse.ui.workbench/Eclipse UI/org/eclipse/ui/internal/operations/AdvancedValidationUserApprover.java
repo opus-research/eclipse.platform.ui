@@ -52,15 +52,15 @@ import org.eclipse.ui.internal.util.Util;
  * <p>
  * Since 3.3, this operation approver also checks the validity of a proposed
  * execute by determining whether the redo is viable.
- * 
+ *
  * @since 3.1
  */
 public class AdvancedValidationUserApprover implements IOperationApprover,
 		IOperationApprover2 {
-	
+
     /**
      * Static to prevent opening of error dialogs for automated testing.
-     * 
+     *
      * @since 3.3
      */
     public static boolean AUTOMATED_MODE = false;
@@ -93,6 +93,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 		// The casts to IAdvancedUndoableOperation and
 		// IAdvancedUndoableOperation2 are safe because these types were checked
 		// in the call chain.
+		@Override
 		public void run(IProgressMonitor pm) {
 			try {
 				switch (doing) {
@@ -125,7 +126,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 	 * Create an AdvancedValidationUserApprover that performs advanced
 	 * validations on proposed undo and redo operations for a given undo
 	 * context.
-	 * 
+	 *
 	 * @param context -
 	 *            the undo context of operations in question.
 	 */
@@ -136,11 +137,12 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	public IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 		return proceedWithOperation(operation, history, uiInfo, REDOING);
@@ -148,11 +150,12 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedUndoing(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	public IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 
@@ -161,11 +164,12 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.operations.IOperationApprover2#proceedExecuting(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
+	@Override
 	public IStatus proceedExecuting(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 		return proceedWithOperation(operation, history, uiInfo, EXECUTING);
@@ -199,6 +203,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 		// whole thing up in a syncExec.
 		final IStatus[] status = new IStatus[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				// Compute the undoable or redoable status
 				status[0] = computeOperationStatus(operation, history, uiInfo,
@@ -290,7 +295,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 			}
 			return status;
 		}
-		
+
 		// CANCEL status is assumed to be initiated by the user, so there
 		// is nothing to report.
 		if (status.getSeverity() == IStatus.CANCEL) {

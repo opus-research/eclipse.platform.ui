@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2012 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSP
 
 	private static final String CSS_CTABITEM_SELECTED_SHOW_CLOSE_LISTENER_KEY = "CSS_CTABFOLDER_SELECTED_SHOW_CLOSE_LISTENER_KEY"; //$NON-NLS-1$
 
+	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
@@ -65,6 +66,7 @@ public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSP
 		return false;
 	}
 
+	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
@@ -93,6 +95,7 @@ public class CSSPropertyShowCloseHandler extends CTabETabHelper implements ICSSP
 			this.engine = engine;
 		}
 
+		@Override
 		public void handleEvent(Event e) {
 			
 			Item selection = getSelection(e.widget);

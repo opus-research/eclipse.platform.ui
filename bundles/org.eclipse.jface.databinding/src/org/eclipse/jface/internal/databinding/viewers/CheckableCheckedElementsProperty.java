@@ -19,7 +19,7 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.SetDiff;
 import org.eclipse.core.databinding.property.set.SetProperty;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.StructuredViewer;
@@ -39,21 +39,25 @@ public class CheckableCheckedElementsProperty extends SetProperty {
 		this.elementType = elementType;
 	}
 
+	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
+	@Override
 	protected Set doGetSet(Object source) {
 		throw new UnsupportedOperationException(
 				"Cannot query the checked elements on an ICheckable"); //$NON-NLS-1$
 	}
 
+	@Override
 	protected void doSetSet(Object source, Set set) {
 		throw new UnsupportedOperationException(
 				"Cannot batch replace the checked elements on an ICheckable.  " + //$NON-NLS-1$
 						"Use updateSet(SetDiff) instead"); //$NON-NLS-1$
 	}
 
+	@Override
 	protected void doUpdateSet(Object source, SetDiff diff) {
 		ICheckable checkable = (ICheckable) source;
 		for (Iterator it = diff.getAdditions().iterator(); it.hasNext();)
@@ -62,14 +66,16 @@ public class CheckableCheckedElementsProperty extends SetProperty {
 			checkable.setChecked(it.next(), false);
 	}
 
+	@Override
 	public IObservableSet observe(Object source) {
 		if (source instanceof Viewer) {
-			return observe(SWTObservables.getRealm(((Viewer) source)
+			return observe(DisplayRealm.getRealm(((Viewer) source)
 					.getControl().getDisplay()), source);
 		}
 		return super.observe(source);
 	}
 
+	@Override
 	public IObservableSet observe(Realm realm, Object source) {
 		IElementComparer comparer = null;
 		if (source instanceof StructuredViewer)

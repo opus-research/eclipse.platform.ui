@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
 
     /**
      * Create a descriptor from a configuration element.
-     * 
+     *
      * @param configElement the configuration element
      * @throws CoreException thrown if there is an issue creating the descriptor
      */
@@ -76,7 +76,8 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      *
      * @return the action set
      */
-    public IActionSet createActionSet() throws CoreException {
+    @Override
+	public IActionSet createActionSet() throws CoreException {
         return new PluginActionSet(this);
     }
 
@@ -85,7 +86,8 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      * associated with this object. Returns <code>null</code> if
      * no such object can be found.
      */
-    public Object getAdapter(Class adapter) {
+    @Override
+	public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
 			return this;
 		}
@@ -95,7 +97,8 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /**
      * @see IWorkbenchAdapter#getChildren
      */
-    public Object[] getChildren(Object o) {
+    @Override
+	public Object[] getChildren(Object o) {
 
 
         return NO_CHILDREN;
@@ -105,45 +108,50 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.IActionSetDescriptor#getConfigurationElement()
      */
-    public IConfigurationElement getConfigurationElement() {
+    @Override
+	public IConfigurationElement getConfigurationElement() {
         return configElement;
     }
 
     /**
-     * Returns this action set's description. 
+     * Returns this action set's description.
      * This is the value of its <code>"description"</code> attribute.
      *
      * @return the description
      */
-    public String getDescription() {
+    @Override
+	public String getDescription() {
         return description;
     }
 
     /**
-     * Returns this action set's id. 
+     * Returns this action set's id.
      * This is the value of its <code>"id"</code> attribute.
      * <p>
      *
      * @return the action set id
      */
-    public String getId() {
+    @Override
+	public String getId() {
         return id;
     }
 
     /**
-     * Returns this action set's label. 
+     * Returns this action set's label.
      * This is the value of its <code>"label"</code> attribute.
      *
      * @return the label
      */
-    public String getLabel() {
+    @Override
+	public String getLabel() {
         return label;
     }
 
     /**
      * @see IWorkbenchAdapter#getLabel
      */
-    public String getLabel(Object o) {
+    @Override
+	public String getLabel(Object o) {
         if (o == this) {
 			return getLabel();
 		}
@@ -153,7 +161,8 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /**
      * Returns whether this action set is initially visible.
      */
-    public boolean isInitiallyVisible() {
+    @Override
+	public boolean isInitiallyVisible() {
         if (id == null) {
 			return visible;
 		}
@@ -168,10 +177,11 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /**
      * Sets whether this action set is initially visible.
      * If the action set identifier is undefined, then this is ignored.
-     * 
+     *
      * @since 3.0
      */
-    public void setInitiallyVisible(boolean newValue) {
+    @Override
+	public void setInitiallyVisible(boolean newValue) {
         if (id == null) {
 			return;
 		}
@@ -183,42 +193,54 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
      */
-    public ImageDescriptor getImageDescriptor(Object object) {
+    @Override
+	public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
      */
-    public Object getParent(Object o) {
+    @Override
+	public Object getParent(Object o) {
         return null;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getLocalId()
      */
-    public String getLocalId() {
+    @Override
+	public String getLocalId() {
         return id;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getPluginId()
      */
-    public String getPluginId() {
+    @Override
+	public String getPluginId() {
         return pluginId;
     }
-    
-    public boolean equals(Object arg0) {
+
+    @Override
+	public boolean equals(Object arg0) {
         if (!(arg0 instanceof ActionSetDescriptor)) {
             return false;
         }
-        
+
         ActionSetDescriptor descr = (ActionSetDescriptor) arg0;
-        
+
         return id.equals(descr.id) && descr.pluginId.equals(pluginId);
     }
-    
-    public int hashCode() {
+
+    @Override
+	public int hashCode() {
         return id.hashCode() + pluginId.hashCode();
     }
+
+	@Override
+	public String toString() {
+		return "ActionSetDescriptor [id=" + id + ", visible=" + visible + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 }

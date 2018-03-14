@@ -23,18 +23,18 @@ import org.eclipse.ui.operations.IWorkbenchOperationSupport;
 
 /**
  * <p>
- * Provides undoable operation support for the workbench.  This includes  providing access to the default 
+ * Provides undoable operation support for the workbench.  This includes  providing access to the default
  * operation history and installing a workbench-specific operation approver that enforces a linear
  * undo strategy.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public class WorkbenchOperationSupport implements IWorkbenchOperationSupport {
 
 	private ObjectUndoContext undoContext;
 	private IOperationApprover approver;
-	
+
 	// initialize debug options
 	static {
 		DefaultOperationHistory.DEBUG_OPERATION_HISTORY_UNEXPECTED = Policy.DEBUG_OPERATIONS;
@@ -50,7 +50,7 @@ public class WorkbenchOperationSupport implements IWorkbenchOperationSupport {
 	public void dispose() {
 		/*
 		 * uninstall the operation approver that we added to the operation history
-		 */ 
+		 */
 		getOperationHistory().removeOperationApprover(approver);
 		/*
 		 * dispose of all operations using our context
@@ -61,11 +61,12 @@ public class WorkbenchOperationSupport implements IWorkbenchOperationSupport {
 	/**
 	 * Returns the undo context for workbench operations.
 	 * The workbench configures an undo context with the appropriate policies
-	 * for the workbench undo model.  
-	 * 
+	 * for the workbench undo model.
+	 *
 	 * @return the workbench operation context.
 	 * @since 3.1
 	 */
+	@Override
 	public IUndoContext getUndoContext() {
 		if (undoContext == null) {
 			undoContext = new ObjectUndoContext(PlatformUI.getWorkbench(),
@@ -76,10 +77,11 @@ public class WorkbenchOperationSupport implements IWorkbenchOperationSupport {
 
 	/**
 	 * Returns the workbench operation history.
-	 * 
+	 *
 	 * @return the operation history for workbench operations.
 	 * @since 3.1
 	 */
+	@Override
 	public IOperationHistory getOperationHistory() {
 		IOperationHistory history = OperationHistoryFactory.getOperationHistory();
 		/*

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
@@ -55,7 +56,7 @@ public final class XMLMemento implements IMemento {
      * <p>
      * Same as calling createReadRoot(reader, null)
      * </p>
-     * 
+     *
      * @param reader the <code>Reader</code> used to create the memento's document
      * @return a memento on the first <code>Element</code> for reading the document
      * @throws WorkbenchException if IO problems, invalid format, or no element.
@@ -69,7 +70,7 @@ public final class XMLMemento implements IMemento {
      * Creates a <code>Document</code> from the <code>Reader</code>
      * and returns a memento on the first <code>Element</code> for reading
      * the document.
-     * 
+     *
      * @param reader the <code>Reader</code> used to create the memento's document
      * @param baseDir the directory used to resolve relative file names
      * 		in the XML document. This directory must exist and include the
@@ -97,6 +98,7 @@ public final class XMLMemento implements IMemento {
 				/**
 				 * @throws SAXException
 				 */
+				@Override
 				public void warning(SAXParseException exception) throws SAXException {
 					// ignore
 				}
@@ -104,10 +106,12 @@ public final class XMLMemento implements IMemento {
 				/**
 				 * @throws SAXException
 				 */
+				@Override
 				public void error(SAXParseException exception) throws SAXException {
 					// ignore
 				}
 
+				@Override
 				public void fatalError(SAXParseException exception) throws SAXException {
 					throw exception;
 				}
@@ -126,10 +130,10 @@ public final class XMLMemento implements IMemento {
             errorMessage = WorkbenchMessages.XMLMemento_parserConfigError;
         } catch (IOException e) {
             exception = e;
-            errorMessage = WorkbenchMessages.XMLMemento_ioError; 
+            errorMessage = WorkbenchMessages.XMLMemento_ioError;
         } catch (SAXException e) {
             exception = e;
-            errorMessage = WorkbenchMessages.XMLMemento_formatError; 
+            errorMessage = WorkbenchMessages.XMLMemento_formatError;
         }
 
         String problemText = null;
@@ -139,13 +143,13 @@ public final class XMLMemento implements IMemento {
         if (problemText == null || problemText.length() == 0) {
 			problemText = errorMessage != null ? errorMessage
                     : WorkbenchMessages.XMLMemento_noElement;
-		} 
+		}
         throw new WorkbenchException(problemText, exception);
     }
 
     /**
 	 * Returns a root memento for writing a document.
-	 * 
+	 *
 	 * @param type
 	 *            the element node type to create on the document
 	 * @return the root memento for writing a document
@@ -172,7 +176,7 @@ public final class XMLMemento implements IMemento {
      * <code>createWriteRoot</code> to create the initial
      * memento on a document.
      * </p>
-     * 
+     *
      * @param document the document for the memento
      * @param element the element node for the memento
      */
@@ -188,7 +192,7 @@ public final class XMLMemento implements IMemento {
 	 * The <code>getChild</code> and <code>getChildren</code> methods are used
 	 * to retrieve children of a given type.
 	 * </p>
-	 * 
+	 *
 	 * @param type
 	 *            the type
 	 * @return a new child memento
@@ -197,6 +201,7 @@ public final class XMLMemento implements IMemento {
 	 * @throws DOMException
 	 *             if the child cannot be created
 	 */
+	@Override
 	public IMemento createChild(String type) throws DOMException {
         Element child = factory.createElement(type);
         element.appendChild(child);
@@ -211,7 +216,7 @@ public final class XMLMemento implements IMemento {
 	 * The <code>getChild</code> and <code>getChildren</code> methods are used
 	 * to retrieve children of a given type.
 	 * </p>
-	 * 
+	 *
 	 * @param type
 	 *            the type
 	 * @param id
@@ -221,6 +226,7 @@ public final class XMLMemento implements IMemento {
 	 * @throws DOMException
 	 *             if the child cannot be created
 	 */
+	@Override
 	public IMemento createChild(String type, String id) throws DOMException {
         Element child = factory.createElement(type);
         child.setAttribute(TAG_ID, id == null ? "" : id); //$NON-NLS-1$
@@ -230,7 +236,7 @@ public final class XMLMemento implements IMemento {
 
 	/**
 	 * Create a copy of the child node and append it to this node.
-	 * 
+	 *
 	 * @param child
 	 * @return An IMenento for the new child node.
 	 * @throws DOMException
@@ -243,10 +249,8 @@ public final class XMLMemento implements IMemento {
         return new XMLMemento(factory, newElement);
     }
 
-    /* (non-Javadoc)
-     * Method declared in IMemento.
-     */
-    public IMemento getChild(String type) {
+    @Override
+	public IMemento getChild(String type) {
 
         // Get the nodes.
         NodeList nodes = element.getChildNodes();
@@ -270,9 +274,7 @@ public final class XMLMemento implements IMemento {
         return null;
     }
 
-	/*
-	 * (non-Javadoc) Method declared in IMemento.
-	 */
+	@Override
 	public IMemento[] getChildren() {
 
 		// Get the nodes.
@@ -299,10 +301,8 @@ public final class XMLMemento implements IMemento {
 		return results;
 	}
 
-    /* (non-Javadoc)
-     * Method declared in IMemento.
-     */
-    public IMemento[] getChildren(String type) {
+    @Override
+	public IMemento[] getChildren(String type) {
 
         // Get the nodes.
         NodeList nodes = element.getChildNodes();
@@ -332,10 +332,8 @@ public final class XMLMemento implements IMemento {
         return results;
     }
 
-    /* (non-Javadoc)
-     * Method declared in IMemento.
-     */
-    public Float getFloat(String key) {
+    @Override
+	public Float getFloat(String key) {
         Attr attr = element.getAttributeNode(key);
         if (attr == null) {
 			return null;
@@ -353,21 +351,18 @@ public final class XMLMemento implements IMemento {
 	/**
 	 * @since 3.4
 	 */
+	@Override
 	public String getType() {
 		return element.getNodeName();
 	}
 
-    /* (non-Javadoc)
-     * Method declared in IMemento.
-     */
-    public String getID() {
+    @Override
+	public String getID() {
         return element.getAttribute(TAG_ID);
     }
 
-    /* (non-Javadoc)
-     * Method declared in IMemento.
-     */
-    public Integer getInteger(String key) {
+    @Override
+	public Integer getInteger(String key) {
         Attr attr = element.getAttributeNode(key);
         if (attr == null) {
 			return null;
@@ -383,10 +378,8 @@ public final class XMLMemento implements IMemento {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared in IMemento.
-     */
-    public String getString(String key) {
+    @Override
+	public String getString(String key) {
         Attr attr = element.getAttributeNode(key);
         if (attr == null) {
 			return null;
@@ -397,6 +390,7 @@ public final class XMLMemento implements IMemento {
 	/**
 	 * @since 3.4
 	 */
+	@Override
 	public Boolean getBoolean(String key) {
         Attr attr = element.getAttributeNode(key);
         if (attr == null) {
@@ -408,13 +402,14 @@ public final class XMLMemento implements IMemento {
 	/**
 	 * Returns the data of the Text node of the memento. Each memento is allowed
 	 * only one Text node.
-	 * 
+	 *
 	 * @return the data of the Text node of the memento, or <code>null</code> if
 	 *         the memento has no Text node.
 	 * @since 2.0
 	 * @throws DOMException
 	 *             if the text node is too big
 	 */
+	@Override
 	public String getTextData() throws DOMException {
         Text textNode = getTextNode();
         if (textNode != null) {
@@ -426,6 +421,7 @@ public final class XMLMemento implements IMemento {
 	/**
 	 * @since 3.4
 	 */
+	@Override
 	public String[] getAttributeKeys() {
 		NamedNodeMap map = element.getAttributes();
 		int size = map.getLength();
@@ -438,9 +434,9 @@ public final class XMLMemento implements IMemento {
 	}
 
     /**
-     * Returns the Text node of the memento. Each memento is allowed only 
+     * Returns the Text node of the memento. Each memento is allowed only
      * one Text node.
-     * 
+     *
      * @return the Text node of the memento, or <code>null</code> if
      * the memento has no Text node.
      */
@@ -463,7 +459,7 @@ public final class XMLMemento implements IMemento {
 
     /**
 	 * Places the element's attributes into the document.
-	 * 
+	 *
 	 * @param copyText
 	 *            true if the first text node should be copied
 	 * @throws DOMException
@@ -496,7 +492,7 @@ public final class XMLMemento implements IMemento {
 
 	/**
 	 * Sets the value of the given key to the given floating point number.
-	 * 
+	 *
 	 * @param key
 	 *            the key
 	 * @param f
@@ -504,13 +500,14 @@ public final class XMLMemento implements IMemento {
 	 * @throws DOMException
 	 *             if the attribute cannot be set
 	 */
+	@Override
 	public void putFloat(String key, float f) throws DOMException {
         element.setAttribute(key, String.valueOf(f));
     }
 
 	/**
 	 * Sets the value of the given key to the given integer.
-	 * 
+	 *
 	 * @param key
 	 *            the key
 	 * @param n
@@ -518,6 +515,7 @@ public final class XMLMemento implements IMemento {
 	 * @throws DOMException
 	 *             if the attribute cannot be set
 	 */
+	@Override
 	public void putInteger(String key, int n) throws DOMException {
         element.setAttribute(key, String.valueOf(n));
     }
@@ -525,12 +523,13 @@ public final class XMLMemento implements IMemento {
 	/**
 	 * Copy the attributes and children from <code>memento</code> to the
 	 * receiver.
-	 * 
+	 *
 	 * @param memento
 	 *            the IMemento to be copied.
 	 * @throws DOMException
 	 *             if the attributes or children cannot be copied to this node.
 	 */
+	@Override
 	public void putMemento(IMemento memento) throws DOMException {
     	// Do not copy the element's top level text node (this would overwrite the existing text).
     	// Text nodes of children are copied.
@@ -539,7 +538,7 @@ public final class XMLMemento implements IMemento {
 
 	/**
 	 * Sets the value of the given key to the given string.
-	 * 
+	 *
 	 * @param key
 	 *            the key
 	 * @param value
@@ -547,6 +546,7 @@ public final class XMLMemento implements IMemento {
 	 * @throws DOMException
 	 *             if the attribute cannot be set
 	 */
+	@Override
 	public void putString(String key, String value) throws DOMException {
         if (value == null) {
 			return;
@@ -556,7 +556,7 @@ public final class XMLMemento implements IMemento {
 
 	/**
 	 * Sets the value of the given key to the given boolean value.
-	 * 
+	 *
 	 * @param key
 	 *            the key
 	 * @param value
@@ -565,6 +565,7 @@ public final class XMLMemento implements IMemento {
 	 * @throws DOMException
 	 *             if the attribute cannot be set
 	 */
+	@Override
 	public void putBoolean(String key, boolean value) throws DOMException {
 		element.setAttribute(key, value ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -573,18 +574,19 @@ public final class XMLMemento implements IMemento {
 	 * Sets the memento's Text node to contain the given data. Creates the Text
 	 * node if none exists. If a Text node does exist, it's current contents are
 	 * replaced. Each memento is allowed only one text node.
-	 * 
+	 *
 	 * @param data
 	 *            the data to be placed on the Text node
 	 * @since 2.0
 	 * @throws DOMException
 	 *             if the text node cannot be created under this node.
 	 */
+	@Override
 	public void putTextData(String data) throws DOMException {
         Text textNode = getTextNode();
         if (textNode == null) {
             textNode = factory.createTextNode(data);
-			// Always add the text node as the first child (fixes bug 93718) 
+			// Always add the text node as the first child (fixes bug 93718)
 			element.insertBefore(textNode, element.getFirstChild());
         } else {
             textNode.setData(data);
@@ -593,8 +595,8 @@ public final class XMLMemento implements IMemento {
 
     /**
      * Saves this memento's document current values to the
-     * specified writer. 
-     * 
+     * specified writer.
+     *
      * @param writer the writer used to save the memento's document
      * @throws IOException if there is a problem serializing the document to the stream.
      */
@@ -607,18 +609,29 @@ public final class XMLMemento implements IMemento {
     	}
 	}
 
+	@Override
+	public String toString() {
+		try {
+			StringWriter writer = new StringWriter();
+			save(writer);
+			return writer.toString();
+		} catch (IOException e) {
+			return super.toString();
+		}
+	}
+
 	/**
      * A simple XML writer.  Using this instead of the javax.xml.transform classes allows
-     * compilation against JCL Foundation (bug 80053). 
+     * compilation against JCL Foundation (bug 80053).
      */
     private static final class DOMWriter extends PrintWriter {
-    	
+
     	/* constants */
     	private static final String XML_VERSION = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"; //$NON-NLS-1$
 
     	/**
     	 * Creates a new DOM writer on the given output writer.
-    	 * 
+    	 *
     	 * @param output the output writer
     	 */
     	public DOMWriter(Writer output) {
@@ -628,7 +641,7 @@ public final class XMLMemento implements IMemento {
 
     	/**
     	 * Prints the given element.
-    	 * 
+    	 *
     	 * @param element the element to print
     	 */
         public void print(Element element) {
@@ -685,7 +698,7 @@ public final class XMLMemento implements IMemento {
     		sb.append(">"); //$NON-NLS-1$
    			print(sb.toString());
     	}
-    	
+
     	private static void appendEscapedChar(StringBuffer buffer, char c) {
     		String replacement = getReplacement(c);
     		if (replacement != null) {

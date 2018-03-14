@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.widgets.ImageBasedFrame;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -60,8 +61,6 @@ class DnDManager {
 	DnDInfo info;
 	DragAgent dragAgent;
 
-	DropAgent dropAgent;
-
 	private MWindow dragWindow;
 
 	private Shell dragHost;
@@ -74,6 +73,7 @@ class DnDManager {
 	private List<Rectangle> frames = new ArrayList<Rectangle>();
 
 	DragDetectListener dragDetector = new DragDetectListener() {
+		@Override
 		public void dragDetected(DragDetectEvent e) {
 			if (dragging || e.widget.isDisposed())
 				return;
@@ -116,7 +116,7 @@ class DnDManager {
 		dragAgents.add(new PartDragAgent(this));
 
 		dropAgents.add(new StackDropAgent(this));
-		dropAgents.add(new SplitDropAgent(this));
+		dropAgents.add(new SplitDropAgent2(this));
 		dropAgents.add(new DetachedDropAgent(this));
 
 		// dragging trim
@@ -127,6 +127,7 @@ class DnDManager {
 		hookWidgets();
 
 		getDragShell().addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				dispose();
 			}
@@ -139,8 +140,14 @@ class DnDManager {
 	 */
 	private void hookWidgets() {
 		EventHandler stackWidgetHandler = new EventHandler() {
+			@Override
 			public void handleEvent(org.osgi.service.event.Event event) {
 				MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+
+				// Only add listeners for stacks in *this* window
+				MWindow elementWin = getModelService().getTopLevelWindowFor(element);
+				if (elementWin != dragWindow)
+					return;
 
 				// Listen for drags starting in CTabFolders
 				if (element.getWidget() instanceof CTabFolder
@@ -180,6 +187,7 @@ class DnDManager {
 
 	private void track() {
 		Display.getCurrent().syncExec(new Runnable() {
+			@Override
 			public void run() {
 				info.update();
 				dragAgent.track(info);
@@ -197,6 +205,7 @@ class DnDManager {
 		setRectangle(offScreenRect);
 
 		tracker.addKeyListener(new KeyListener() {
+			@Override
 			public void keyReleased(KeyEvent e) {
 				if (e.keyCode == SWT.MOD1) {
 					isModified = false;
@@ -204,6 +213,7 @@ class DnDManager {
 				}
 			}
 
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.MOD1) {
 					isModified = true;
@@ -213,6 +223,7 @@ class DnDManager {
 		});
 
 		tracker.addListener(SWT.Move, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				track();
 			}
@@ -386,7 +397,12 @@ class DnDManager {
 			overlayFrame.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
 			overlayFrame.setAlpha(150);
 
+			IStylingEngine stylingEngine = dragWindow.getContext().get(IStylingEngine.class);
+			stylingEngine.setClassname(overlayFrame, "DragFeedback"); //$NON-NLS-1$
+			stylingEngine.style(overlayFrame);
+
 			overlayFrame.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent e) {
 					for (int i = 0; i < images.size(); i++) {
 						Image image = images.get(i);

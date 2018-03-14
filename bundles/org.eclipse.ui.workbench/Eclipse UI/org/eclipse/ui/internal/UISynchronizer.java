@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 
 public class UISynchronizer extends Synchronizer {
     protected UILockListener lockListener;
-    
+
     /**
 	 * Indicates that the UI is in startup mode and that no non-workbench
 	 * runnables should be invoked.
@@ -36,7 +36,7 @@ public class UISynchronizer extends Synchronizer {
 	 * If this boolean is set to true the synchronizer will fall back to the
 	 * behaviour it had prior to 3.3/3.4. Ie: there will be no restriction on
 	 * what runnables may be run via a/syncExec calls.
-	 * 
+	 *
 	 * @see IPreferenceConstants#USE_32_THREADING
 	 */
 	private boolean use32Threading = false;
@@ -47,29 +47,25 @@ public class UISynchronizer extends Synchronizer {
 	 */
 	public static final ThreadLocal startupThread = new ThreadLocal() {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.ThreadLocal#initialValue()
-		 */
+		@Override
 		protected Object initialValue() {
 			return Boolean.FALSE;
 		}
-		
-		/* (non-Javadoc)
-		 * @see java.lang.ThreadLocal#set(java.lang.Object)
-		 */
+
+		@Override
 		public void set(Object value) {
 			if (value != Boolean.TRUE && value != Boolean.FALSE)
 				throw new IllegalArgumentException();
 			super.set(value);
 		}
 	};
-	
+
 	public static final ThreadLocal overrideThread = new ThreadLocal() {
+		@Override
 		protected Object initialValue() {
 			return Boolean.FALSE;
 		}
+		@Override
 		public void set(Object value) {
 			if (value != Boolean.TRUE && value != Boolean.FALSE)
 				throw new IllegalArgumentException();
@@ -80,7 +76,7 @@ public class UISynchronizer extends Synchronizer {
 			super.set(value);
 		}
 	};
-	
+
     public UISynchronizer(Display display, UILockListener lock) {
         super(display);
         this.lockListener = lock;
@@ -88,7 +84,7 @@ public class UISynchronizer extends Synchronizer {
 				.getPreferenceStore().getBoolean(
 						IPreferenceConstants.USE_32_THREADING);
     }
-    
+
     public void started() {
     	synchronized (this) {
 			if (!isStarting)
@@ -106,13 +102,11 @@ public class UISynchronizer extends Synchronizer {
 			pendingStartup = null;
 			// wake up all pending syncExecs
 			this.notifyAll();
-    	}    	
+    	}
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Synchronizer#asyncExec(java.lang.Runnable)
-     */
-    protected void asyncExec(Runnable runnable) {
+
+    @Override
+	protected void asyncExec(Runnable runnable) {
     	// the following block should not be invoked if we're using 3.2 threading.
     	if (runnable != null && !use32Threading) {
 			synchronized (this) {
@@ -129,8 +123,9 @@ public class UISynchronizer extends Synchronizer {
     	super.asyncExec(runnable);
     }
 
+	@Override
 	public void syncExec(Runnable runnable) {
-		
+
 		synchronized (this) {
 			// the following block should not be invoked if we're using 3.2 threading.
 			if (isStarting && !use32Threading && startupThread.get() == Boolean.FALSE
@@ -143,7 +138,7 @@ public class UISynchronizer extends Synchronizer {
 				} while (isStarting);
 			}
 		}
-		
+
         //if this thread is the UI or this thread does not own any locks, just do the syncExec
         if ((runnable == null) || lockListener.isUI()
                 || !lockListener.isLockOwner()) {
@@ -154,7 +149,8 @@ public class UISynchronizer extends Synchronizer {
         work.setOperationThread(Thread.currentThread());
         lockListener.addPendingWork(work);
         asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 lockListener.doPendingWork();
             }
         });

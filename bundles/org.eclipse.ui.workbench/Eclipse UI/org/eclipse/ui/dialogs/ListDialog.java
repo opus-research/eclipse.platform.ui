@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Table;
  * A dialog that prompts for one element out of a list of elements. Uses
  * <code>IStructuredContentProvider</code> to provide the elements and
  * <code>ILabelProvider</code> to provide their labels.
- * 
+ *
  * @since 2.1
  */
 public class ListDialog extends SelectionDialog {
@@ -93,7 +93,8 @@ public class ListDialog extends SelectionDialog {
         return fTableViewer;
     }
 
-    protected void createButtonsForButtonBar(Composite parent) {
+    @Override
+	protected void createButtonsForButtonBar(Composite parent) {
         if (!fAddCancelButton) {
 			createButton(parent, IDialogConstants.OK_ID,
                     IDialogConstants.OK_LABEL, true);
@@ -102,7 +103,8 @@ public class ListDialog extends SelectionDialog {
 		}
     }
 
-    protected Control createDialogArea(Composite container) {
+    @Override
+	protected Control createDialogArea(Composite container) {
         Composite parent = (Composite) super.createDialogArea(container);
         createMessageArea(parent);
         fTableViewer = new TableViewer(parent, getTableStyle());
@@ -110,7 +112,8 @@ public class ListDialog extends SelectionDialog {
         fTableViewer.setLabelProvider(fLabelProvider);
         fTableViewer.setInput(fInput);
         fTableViewer.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
                 if (fAddCancelButton) {
 					okPressed();
 				}
@@ -141,7 +144,8 @@ public class ListDialog extends SelectionDialog {
     /*
      * Overrides method from Dialog
      */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         // Build a list of selected children.
         IStructuredSelection selection = (IStructuredSelection) fTableViewer
                 .getSelection();
@@ -151,7 +155,7 @@ public class ListDialog extends SelectionDialog {
 
     /**
      * Returns the initial height of the dialog in number of characters.
-     * 
+     *
      * @return the initial height of the dialog in number of characters
      */
     public int getHeightInChars() {
@@ -160,7 +164,7 @@ public class ListDialog extends SelectionDialog {
 
     /**
      * Returns the initial width of the dialog in number of characters.
-     * 
+     *
      * @return the initial width of the dialog in number of characters
      */
     public int getWidthInChars() {
@@ -169,7 +173,7 @@ public class ListDialog extends SelectionDialog {
 
     /**
      * Sets the initial height of the dialog in number of characters.
-     * 
+     *
      * @param heightInChars
      *            the initialheight of the dialog in number of characters
      */
@@ -179,7 +183,7 @@ public class ListDialog extends SelectionDialog {
 
     /**
      * Sets the initial width of the dialog in number of characters.
-     * 
+     *
      * @param widthInChars
      *            the initial width of the dialog in number of characters
      */

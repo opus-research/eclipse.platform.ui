@@ -31,14 +31,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 
-public class ObservableSetTreeContentProviderTest extends
-		AbstractDefaultRealmTestCase {
+public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTestCase {
 	private Shell shell;
 	private TreeViewer viewer;
 	private Tree tree;
 	private ObservableSetTreeContentProvider contentProvider;
 	private Object input;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
@@ -47,6 +47,7 @@ public class ObservableSetTreeContentProviderTest extends
 		input = new Object();
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		tree = null;
@@ -73,44 +74,44 @@ public class ObservableSetTreeContentProviderTest extends
 		final IObservableSet elements = new WritableSet();
 		final Object input = new Object();
 		initContentProvider(new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object target) {
 				return target == input ? elements : null;
 			}
 		});
 
-		assertTrue(Arrays.equals(new Object[0], contentProvider
-				.getElements("unknown input")));
+		assertTrue(Arrays.equals(new Object[0], contentProvider.getElements("unknown input")));
 
 		Object element0 = new Object();
 		elements.add(element0);
 
-		assertTrue(Arrays.equals(new Object[] { element0 }, contentProvider
-				.getElements(input)));
+		assertTrue(Arrays.equals(new Object[] { element0 }, contentProvider.getElements(input)));
 
 		Object element1 = new Object();
 		elements.add(element1);
 
-		List elementList = Arrays.asList(contentProvider.getElements(input));
+		List<Object> elementList = Arrays.asList(contentProvider.getElements(input));
 		assertEquals(2, elementList.size());
-		assertTrue(elementList.containsAll(Arrays.asList(new Object[] {
-				element0, element1 })));
+		assertTrue(elementList.containsAll(Arrays.asList(new Object[] { element0, element1 })));
 	}
 
 	public void testViewerUpdate_RemoveElementAfterMutation() {
 		IElementComparer comparer = new IElementComparer() {
+			@Override
 			public boolean equals(Object a, Object b) {
 				return a == b;
 			}
 
+			@Override
 			public int hashCode(Object element) {
 				return System.identityHashCode(element);
 			}
 		};
 		viewer.setComparer(comparer);
 
-		final IObservableSet children = ObservableViewerElementSet
-				.withComparer(Realm.getDefault(), null, comparer);
+		final IObservableSet children = ObservableViewerElementSet.withComparer(Realm.getDefault(), null, comparer);
 		initContentProvider(new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object target) {
 				return target == input ? children : null;
 			}
@@ -132,6 +133,7 @@ public class ObservableSetTreeContentProviderTest extends
 		final IObservableSet children = new WritableSet();
 		final IObservableSet children2 = new WritableSet();
 		initContentProvider(new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object target) {
 				if (target == input)
 					return children;
@@ -157,6 +159,7 @@ public class ObservableSetTreeContentProviderTest extends
 		final IObservableSet children = new WritableSet();
 		final IObservableSet children2 = new WritableSet();
 		initContentProvider(new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object target) {
 				if (target == input)
 					return children;
@@ -193,6 +196,7 @@ public class ObservableSetTreeContentProviderTest extends
 			id++;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			if (obj == this)
 				return true;
@@ -204,6 +208,7 @@ public class ObservableSetTreeContentProviderTest extends
 			return this.id == that.id;
 		}
 
+		@Override
 		public int hashCode() {
 			return id;
 		}

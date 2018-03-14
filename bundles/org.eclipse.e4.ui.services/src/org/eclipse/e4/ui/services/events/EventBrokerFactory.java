@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,14 +20,10 @@ import org.eclipse.e4.ui.services.internal.events.EventBroker;
 
 /**
  * Use this class to obtain an instance of {@link IEventBroker}.
- * 
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @noextend This class is not intended to be sub-classed by clients.
  */
-
 public class EventBrokerFactory extends ContextFunction {
 	@Override
-	public Object compute(IEclipseContext context) {
+	public Object compute(IEclipseContext context, String contextKey) {
         EventBroker broker = context.getLocal(EventBroker.class);
 		if (broker == null) {
             broker = ContextInjectionFactory.make(EventBroker.class, context);

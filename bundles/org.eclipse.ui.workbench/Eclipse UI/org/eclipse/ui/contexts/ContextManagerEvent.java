@@ -21,12 +21,13 @@ import org.eclipse.ui.internal.util.Util;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- * 
+ *
  * @since 3.0
  * @see IContextManagerListener#contextManagerChanged(ContextManagerEvent)
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.contexts.ContextManagerEvent
  */
+@Deprecated
 public final class ContextManagerEvent {
 
     /**
@@ -61,7 +62,7 @@ public final class ContextManagerEvent {
 
     /**
      * Creates a new instance of this class.
-     * 
+     *
      * @param contextManager
      *            the instance of the interface that changed.
      * @param definedContextIdsChanged
@@ -119,7 +120,7 @@ public final class ContextManagerEvent {
 
     /**
      * Returns the instance of the interface that changed.
-     * 
+     *
      * @return the instance of the interface that changed. Guaranteed not to be
      *         <code>null</code>.
      */
@@ -129,7 +130,7 @@ public final class ContextManagerEvent {
 
     /**
      * Returns the set of identifiers to previously defined contexts.
-     * 
+     *
      * @return the set of identifiers to previously defined contexts. This set
      *         may be empty. If this set is not empty, it is guaranteed to only
      *         contain instances of <code>String</code>. This set is
@@ -144,7 +145,7 @@ public final class ContextManagerEvent {
 
     /**
      * Returns the set of identifiers to previously enabled contexts.
-     * 
+     *
      * @return the set of identifiers to previously enabled contexts. This set
      *         may be empty. If this set is not empty, it is guaranteed to only
      *         contain instances of <code>String</code>. This set is
@@ -159,7 +160,7 @@ public final class ContextManagerEvent {
 
     /**
      * Returns whether or not the definedContextIds property changed.
-     * 
+     *
      * @return true, iff the definedContextIds property changed.
      */
     public boolean haveDefinedContextIdsChanged() {
@@ -168,7 +169,7 @@ public final class ContextManagerEvent {
 
     /**
      * Returns whether or not the enabledContextIds property changed.
-     * 
+     *
      * @return true, iff the enabledContextIds property changed.
      */
     public boolean haveEnabledContextIdsChanged() {

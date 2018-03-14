@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -50,43 +51,43 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Helper class for prompting to save dirty views or editors.
- * 
+ *
  * @since 3.0.1
  */
 public class SaveableHelper {
-	
+
 	/**
 	 * The helper must prompt.
 	 */
 	public static final int USER_RESPONSE = -1;
-	
-	private static int AutomatedResponse = USER_RESPONSE; 
-	
+
+	private static int AutomatedResponse = USER_RESPONSE;
+
 	/**
 	 * FOR USE BY THE AUTOMATED TEST HARNESS ONLY.
-	 * 
-	 * Sets the response to use when <code>savePart</code> is called with <code>confirm=true</code>. 
-	 * 
+	 *
+	 * Sets the response to use when <code>savePart</code> is called with <code>confirm=true</code>.
+	 *
 	 * @param response 0 for yes, 1 for no, 2 for cancel, -1 for default (prompt)
 	 */
 	public static void testSetAutomatedResponse(int response) {
 		AutomatedResponse = response;
 	}
-	
+
 	/**
 	 * FOR USE BY THE AUTOMATED TEST HARNESS ONLY.
-	 * 
-	 * Sets the response to use when <code>savePart</code> is called with <code>confirm=true</code>. 
-	 * 
+	 *
+	 * Sets the response to use when <code>savePart</code> is called with <code>confirm=true</code>.
+	 *
 	 * @return 0 for yes, 1 for no, 2 for cancel, -1 for default (prompt)
 	 */
 	public static int testGetAutomatedResponse() {
 		return AutomatedResponse;
 	}
-	
+
 	/**
 	 * Saves the workbench part.
-	 * 
+	 *
 	 * @param saveable the part
 	 * @param part the same part
 	 * @param window the workbench window
@@ -104,12 +105,13 @@ public class SaveableHelper {
 		// If confirmation is required ..
 		if (confirm) {
 			int choice = AutomatedResponse;
-			if (choice == USER_RESPONSE) {				
+			if (choice == USER_RESPONSE) {
 				if (saveable instanceof ISaveablePart2) {
 					choice = ((ISaveablePart2)saveable).promptToSaveOnClose();
 				}
 				if (choice == USER_RESPONSE || choice == ISaveablePart2.DEFAULT) {
-					String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion, part.getTitle()); 
+					String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion,
+							LegacyActionTools.escapeMnemonics(part.getTitle()));
 					// Show a dialog.
 					String[] buttons = new String[] {
 							IDialogConstants.YES_LABEL,
@@ -118,6 +120,7 @@ public class SaveableHelper {
 					MessageDialog d = new MessageDialog(window.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
 							MessageDialog.QUESTION, buttons, 0) {
+						@Override
 						protected int getShellStyle() {
 							return super.getShellStyle() | SWT.SHEET;
 						}
@@ -145,6 +148,7 @@ public class SaveableHelper {
 
 		// Create save block.
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
 				saveable.doSave(monitorWrap);
@@ -152,15 +156,15 @@ public class SaveableHelper {
 		};
 
 		// Do the save.
-		return runProgressMonitorOperation(WorkbenchMessages.Save, progressOp, window); 
+		return runProgressMonitorOperation(WorkbenchMessages.Save, progressOp, window);
 	}
-	
+
 	/**
 	 * Saves the selected dirty models from the given model source.
-	 * 
+	 *
 	 * @param modelSource the model source
 	 * @param window the workbench window
-	 * @param confirm 
+	 * @param confirm
 	 * @return <code>true</code> for continue, <code>false</code> if the operation
 	 *   was canceled or an error occurred while saving.
 	 */
@@ -176,9 +180,10 @@ public class SaveableHelper {
 		if (dirtyModels.isEmpty()) {
 			return true;
 		}
-		
+
 		// Create save block.
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
 				monitorWrap.beginTask(WorkbenchMessages.Save, dirtyModels.size());
@@ -203,22 +208,22 @@ public class SaveableHelper {
 		};
 
 		// Do the save.
-		return runProgressMonitorOperation(WorkbenchMessages.Save, progressOp, window); 
+		return runProgressMonitorOperation(WorkbenchMessages.Save, progressOp, window);
 	}
 
 	/**
-	 * Saves the workbench part ... this is similar to 
+	 * Saves the workbench part ... this is similar to
 	 * {@link SaveableHelper#savePart(ISaveablePart, IWorkbenchPart, IWorkbenchWindow, boolean) }
 	 * except that the {@link ISaveablePart2#DEFAULT } case must cause the
 	 * calling function to allow this part to participate in the default saving
 	 * mechanism.
-	 * 
+	 *
 	 * @param saveable the part
 	 * @param window the workbench window
 	 * @param confirm request confirmation
 	 * @return the ISaveablePart2 constant
 	 */
-	static int savePart(final ISaveablePart2 saveable, 
+	static int savePart(final ISaveablePart2 saveable,
 			IWorkbenchWindow window, boolean confirm) {
 		// Short circuit.
 		if (!saveable.isDirty()) {
@@ -241,6 +246,7 @@ public class SaveableHelper {
 
 		// Create save block.
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
 				saveable.doSave(monitorWrap);
@@ -253,7 +259,7 @@ public class SaveableHelper {
 		}
 		return ISaveablePart2.YES;
 	}
-	
+
 	/**
 	 * Runs a progress monitor operation. Returns true if success, false if
 	 * canceled.
@@ -262,7 +268,7 @@ public class SaveableHelper {
 			IRunnableWithProgress progressOp, IWorkbenchWindow window) {
 		return runProgressMonitorOperation(opName, progressOp, window, window);
 	}
-	
+
 	/**
 	 * Runs a progress monitor operation.
 	 * Returns true if success, false if canceled or an error occurred.
@@ -272,6 +278,7 @@ public class SaveableHelper {
 			final IRunnableContext runnableContext, final IShellProvider shellProvider) {
 		final boolean[] success = new boolean[] { false };
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				progressOp.run(monitor);
 				// Only indicate success if the monitor wasn't canceled
@@ -283,10 +290,10 @@ public class SaveableHelper {
 		try {
 			runnableContext.run(false, true, runnable);
 		} catch (InvocationTargetException e) {
-			String title = NLS.bind(WorkbenchMessages.EditorManager_operationFailed, opName ); 
+			String title = NLS.bind(WorkbenchMessages.EditorManager_operationFailed, opName );
 			Throwable targetExc = e.getTargetException();
 			WorkbenchPlugin.log(title, new Status(IStatus.WARNING,
-					PlatformUI.PLUGIN_ID, 0, title, targetExc));			
+					PlatformUI.PLUGIN_ID, 0, title, targetExc));
 			StatusUtil.handleStatus(title, targetExc, StatusManager.SHOW,
 					shellProvider.getShell());
 			// Fall through to return failure
@@ -300,9 +307,9 @@ public class SaveableHelper {
 
 	/**
 	 * Returns whether the model source needs saving. This is true if any of
-	 * the active models are dirty. This logic must correspond with 
+	 * the active models are dirty. This logic must correspond with
 	 * {@link #saveModels} above.
-	 * 
+	 *
 	 * @param modelSource
 	 *            the model source
 	 * @return <code>true</code> if save is required, <code>false</code>
@@ -369,6 +376,7 @@ public class SaveableHelper {
 				Job saveJob = new Job(NLS.bind(
 						WorkbenchMessages.EditorManager_backgroundSaveJobName,
 						model.getName())) {
+					@Override
 					public boolean belongsTo(Object family) {
 						if (family instanceof DynamicFamily) {
 							return ((DynamicFamily)family).contains(model);
@@ -376,6 +384,7 @@ public class SaveableHelper {
 						return family.equals(model);
 					}
 
+					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						return backgroundSaveRunnable[0].run(monitor);
 					}
@@ -401,10 +410,12 @@ public class SaveableHelper {
 				// finished, and for displaying an error dialog if
 				// necessary.
 				saveJob.addJobChangeListener(new JobChangeAdapter() {
+					@Override
 					public void done(final IJobChangeEvent event) {
 						((InternalSaveable) model).setBackgroundSaveJob(null);
 						shellProvider.getShell().getDisplay().asyncExec(
 								new Runnable() {
+									@Override
 									public void run() {
 										notifySaveAction(parts);
 										model.enableUI(parts);
@@ -442,7 +453,7 @@ public class SaveableHelper {
 	/**
 	 * Waits for the background save job (if any) of the given saveable to complete.
 	 * This may open a progress dialog with the option to cancel.
-	 * 
+	 *
 	 * @param modelToSave
 	 * @return true if the user canceled.
 	 */
@@ -451,11 +462,11 @@ public class SaveableHelper {
 		models.add(model);
 		return waitForBackgroundSaveJobs(models);
 	}
-	
+
 	/**
 	 * Waits for the background save jobs (if any) of the given saveables to complete.
 	 * This may open a progress dialog with the option to cancel.
-	 * 
+	 *
 	 * @param modelsToSave
 	 * @return true if the user canceled.
 	 */
@@ -463,6 +474,7 @@ public class SaveableHelper {
 		// block if any of the saveables is still saving in the background
 		try {
 			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+				@Override
 				public void run(IProgressMonitor monitor) throws InterruptedException {
 					Job.getJobManager().join(new DynamicFamily(modelsToSave), monitor);
 				}
@@ -481,7 +493,7 @@ public class SaveableHelper {
 		}
 		return false;
 	}
-	
+
 	private static class DynamicFamily extends HashSet {
 		private static final long serialVersionUID = 1L;
 		public DynamicFamily(Collection collection) {

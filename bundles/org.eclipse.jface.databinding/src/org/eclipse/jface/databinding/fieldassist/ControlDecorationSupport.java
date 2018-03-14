@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Matthew Hall and others.
+ * Copyright (c) 2009, 2014 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 268472)
  *     Matthew Hall - bug 300953
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.fieldassist;
@@ -139,24 +140,29 @@ public class ControlDecorationSupport {
 	private IObservableList targets;
 
 	private IDisposeListener disposeListener = new IDisposeListener() {
+		@Override
 		public void handleDispose(DisposeEvent staleEvent) {
 			dispose();
 		}
 	};
 
 	private IValueChangeListener statusChangeListener = new IValueChangeListener() {
+		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			statusChanged((IStatus) validationStatus.getValue());
 		}
 	};
 
 	private IListChangeListener targetsChangeListener = new IListChangeListener() {
+		@Override
 		public void handleListChange(ListChangeEvent event) {
 			event.diff.accept(new ListDiffVisitor() {
+				@Override
 				public void handleAdd(int index, Object element) {
 					targetAdded((IObservable) element);
 				}
 
+				@Override
 				public void handleRemove(int index, Object element) {
 					targetRemoved((IObservable) element);
 				}
@@ -175,7 +181,7 @@ public class ControlDecorationSupport {
 		}
 	}
 
-	private List targetDecorations;
+	private List<TargetDecoration> targetDecorations;
 
 	private ControlDecorationSupport(
 			ValidationStatusProvider validationStatusProvider, int position,
@@ -190,7 +196,7 @@ public class ControlDecorationSupport {
 		this.targets = validationStatusProvider.getTargets();
 		Assert.isTrue(!this.targets.isDisposed());
 
-		this.targetDecorations = new ArrayList();
+		this.targetDecorations = new ArrayList<TargetDecoration>();
 
 		validationStatus.addDisposeListener(disposeListener);
 		validationStatus.addValueChangeListener(statusChangeListener);
@@ -198,7 +204,7 @@ public class ControlDecorationSupport {
 		targets.addDisposeListener(disposeListener);
 		targets.addListChangeListener(targetsChangeListener);
 
-		for (Iterator it = targets.iterator(); it.hasNext();)
+		for (Iterator<?> it = targets.iterator(); it.hasNext();)
 			targetAdded((IObservable) it.next());
 
 		statusChanged((IStatus) validationStatus.getValue());
@@ -212,8 +218,8 @@ public class ControlDecorationSupport {
 	}
 
 	private void targetRemoved(IObservable target) {
-		for (Iterator it = targetDecorations.iterator(); it.hasNext();) {
-			TargetDecoration targetDecoration = (TargetDecoration) it.next();
+		for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
+			TargetDecoration targetDecoration = it.next();
 			if (targetDecoration.target == target) {
 				targetDecoration.decoration.dispose();
 				it.remove();
@@ -251,8 +257,8 @@ public class ControlDecorationSupport {
 	}
 
 	private void statusChanged(IStatus status) {
-		for (Iterator it = targetDecorations.iterator(); it.hasNext();) {
-			TargetDecoration targetDecoration = (TargetDecoration) it.next();
+		for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
+			TargetDecoration targetDecoration = it.next();
 			ControlDecoration decoration = targetDecoration.decoration;
 			updater.update(decoration, status);
 		}
@@ -281,8 +287,8 @@ public class ControlDecorationSupport {
 		targetsChangeListener = null;
 
 		if (targetDecorations != null) {
-			for (Iterator it = targetDecorations.iterator(); it.hasNext();) {
-				TargetDecoration targetDecoration = (TargetDecoration) it
+			for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
+				TargetDecoration targetDecoration = it
 						.next();
 				targetDecoration.decoration.dispose();
 			}

@@ -57,6 +57,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		/*
 		 * @see ISafeRunnable.handleException(Throwable).
 		 */
+		@Override
 		public void handleException(Throwable exception) {
 			IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
 					.getMessage(), exception);
@@ -77,6 +78,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		/*
 		 * @see ISafeRunnable.run
 		 */
+		@Override
 		public void run() throws Exception {
 			decorator.decorate(element, decoration);
 			clearReferences();
@@ -84,7 +86,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 		/**
 		 * Clear all of the references in the receiver.
-		 * 
+		 *
 		 * @since 3.1
 		 */
 		void clearReferences() {
@@ -109,7 +111,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the lightweight definitions for the receiver.
-	 * 
+	 *
 	 * @return LightweightDecoratorDefinition[]
 	 */
 	LightweightDecoratorDefinition[] getDefinitions() {
@@ -132,7 +134,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * For dynamic UI
-	 * 
+	 *
 	 * @param decorator
 	 *            the definition to add
 	 * @return whether the definition was added
@@ -157,7 +159,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the name of the types that a decorator is registered for.
-	 * 
+	 *
 	 * @param decorator
 	 * @return String[]
 	 */
@@ -167,7 +169,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * For dynamic-ui
-	 * 
+	 *
 	 * @param decorator
 	 *            the definition to remove
 	 * @return whether the definition was removed
@@ -195,7 +197,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the LightweightDecoratorDefinition with the supplied id
-	 * 
+	 *
 	 * @return LightweightDecoratorDefinition or <code>null</code> if it is
 	 *         not found
 	 * @param decoratorId
@@ -213,7 +215,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Return the index of the definition in the array.
-	 * 
+	 *
 	 * @param decoratorId
 	 *            the id
 	 * @return the index of the definition in the array or <code>-1</code>
@@ -230,7 +232,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Return the enabled lightweight decorator definitions.
-	 * 
+	 *
 	 * @return LightweightDecoratorDefinition[]
 	 */
 	LightweightDecoratorDefinition[] enabledDefinitions() {
@@ -248,7 +250,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Return whether there are enabled lightwieght decorators
-	 * 
+	 *
 	 * @return boolean
 	 */
 	boolean hasEnabledDefinitions() {
@@ -283,7 +285,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the LightweightDecoratorDefinition with the supplied id
-	 * 
+	 *
 	 * @return LightweightDecoratorDefinition or <code>null</code> if it is
 	 *         not found
 	 * @param decoratorId
@@ -328,7 +330,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Fill the decoration with all of the results of the decorators.
-	 * 
+	 *
 	 * @param element
 	 *            The source element
 	 * @param decoration
@@ -350,7 +352,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Decorate the element receiver in a SafeRunnable.
-	 * 
+	 *
 	 * @param element
 	 *            The Object to be decorated
 	 * @param decoration
@@ -365,10 +367,10 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		SafeRunner.run(runnable);
 	}
 
-	
+
 	/**
 	 * Method for use by test cases
-	 * 
+	 *
 	 * @param object
 	 *            the object to be decorated
 	 * @return the decoration result
@@ -382,10 +384,11 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
 	 *      org.eclipse.core.runtime.IExtension)
 	 */
+	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		// Do nothing as this is handled by the DecoratorManager
 		// This is not called as canHandleExtensionTracking returns

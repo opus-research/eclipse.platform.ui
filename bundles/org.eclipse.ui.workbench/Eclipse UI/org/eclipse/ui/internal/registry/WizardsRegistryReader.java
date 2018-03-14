@@ -40,7 +40,7 @@ import com.ibm.icu.text.Collator;
 public class WizardsRegistryReader extends RegistryReader {
 
 	private String pluginPoint;
-    
+
     private WizardCollectionElement wizardElements = null;
 
     private ArrayList deferWizards = null;
@@ -52,7 +52,7 @@ public class WizardsRegistryReader extends RegistryReader {
     // constants
     /**
      * Examples wizard category id
-     */    
+     */
     public final static String FULL_EXAMPLES_WIZARD_CATEGORY = "org.eclipse.ui.Examples";//$NON-NLS-1$
     /**
      * Other wizard category id
@@ -64,11 +64,11 @@ public class WizardsRegistryReader extends RegistryReader {
     final public static String GENERAL_WIZARD_CATEGORY = "org.eclipse.ui.Basic";	//$NON-NLS-1$
 
     final private static String UNCATEGORIZED_WIZARD_CATEGORY_LABEL = WorkbenchMessages.NewWizardsRegistryReader_otherCategory;
-    
+
     private final static String CATEGORY_SEPARATOR = "/";//$NON-NLS-1$
 
     private WorkbenchWizardElement[] primaryWizards = new WorkbenchWizardElement[0];
-    
+
     private class CategoryNode {
         private Category category;
 
@@ -98,7 +98,8 @@ public class WizardsRegistryReader extends RegistryReader {
     private static final Comparator comparer = new Comparator() {
         private Collator collator = Collator.getInstance();
 
-        public int compare(Object arg0, Object arg1) {
+        @Override
+		public int compare(Object arg0, Object arg1) {
             String s1 = ((CategoryNode) arg0).getPath();
             String s2 = ((CategoryNode) arg1).getPath();
             return collator.compare(s1, s2);
@@ -121,7 +122,7 @@ public class WizardsRegistryReader extends RegistryReader {
     }
 
     /* (non-Javadoc)
-     * Method declared on WizardRegistryReader.  
+     * Method declared on WizardRegistryReader.
      * <p>
      * This implementation uses a defering strategy.  For more info see
      * <code>readWizards</code>.
@@ -134,7 +135,7 @@ public class WizardsRegistryReader extends RegistryReader {
     }
 
     /**
-     * 
+     *
      * @param parent
      * @param element
      * @since 3.1
@@ -144,7 +145,7 @@ public class WizardsRegistryReader extends RegistryReader {
 				element, parent);
 
         parent.add(newElement);
-        return newElement;		
+        return newElement;
 	}
     /**
      *	Create and answer a new WizardCollectionElement, configured as a
@@ -173,10 +174,10 @@ public class WizardsRegistryReader extends RegistryReader {
     protected void createEmptyWizardCollection() {
         wizardElements = new WizardCollectionElement("root", null, "root", null);//$NON-NLS-2$//$NON-NLS-1$
     }
-    
+
     /**
      * Set the initial wizard set for supplemental reading via dynamic plugin loading.
-     * 
+     *
      * @param wizards the wizards
      * @since 3.1
      */
@@ -250,7 +251,7 @@ public class WizardsRegistryReader extends RegistryReader {
         String[] categoryPath = category.getParentPath();
         WizardCollectionElement parent = wizardElements; // ie.- root
 
-        // Traverse down into parent category.	
+        // Traverse down into parent category.
         if (categoryPath != null) {
             for (int i = 0; i < categoryPath.length; i++) {
                 WizardCollectionElement tempElement = getChildWithID(parent,
@@ -324,7 +325,7 @@ public class WizardsRegistryReader extends RegistryReader {
             if (tempCollectionElement == null) { // can't find the path; bump it to uncategorized
                 moveToOther = true;
                 break;
-            } 
+            }
             currentCollectionElement = tempCollectionElement;
         }
 
@@ -404,7 +405,7 @@ public class WizardsRegistryReader extends RegistryReader {
     }
 
     /**
-     * Removes the empty categories from a wizard collection. 
+     * Removes the empty categories from a wizard collection.
      */
     private void pruneEmptyCategories(WizardCollectionElement parent) {
         Object[] children = parent.getChildren(null);
@@ -421,7 +422,8 @@ public class WizardsRegistryReader extends RegistryReader {
     /**
      * Implement this method to read element attributes.
      */
-    public boolean readElement(IConfigurationElement element) {
+    @Override
+	public boolean readElement(IConfigurationElement element) {
         if (element.getName().equals(IWorkbenchRegistryConstants.TAG_CATEGORY)) {
             deferCategory(element);
             return true;
@@ -445,10 +447,10 @@ public class WizardsRegistryReader extends RegistryReader {
     }
 
     /**
-     * Reads the wizards in a registry.  
+     * Reads the wizards in a registry.
      * <p>
-     * This implementation uses a defering strategy.  All of the elements 
-     * (categories, wizards) are read.  The categories are created as the read occurs. 
+     * This implementation uses a defering strategy.  All of the elements
+     * (categories, wizards) are read.  The categories are created as the read occurs.
      * The wizards are just stored for later addition after the read completes.
      * This ensures that wizard categorization is performed after all categories
      * have been read.
@@ -472,10 +474,10 @@ public class WizardsRegistryReader extends RegistryReader {
 
     /**
      * Returns the list of wizards that are considered 'primary'.
-     * 
+     *
      * The return value for this method is cached since computing its value
-     * requires non-trivial work.  
-     * 
+     * requires non-trivial work.
+     *
      * @return the primary wizards
      */
     public WorkbenchWizardElement [] getPrimaryWizards() {
@@ -497,8 +499,8 @@ public class WizardsRegistryReader extends RegistryReader {
      * Returns a list of wizards, project and not.
      *
      * The return value for this method is cached since computing its value
-     * requires non-trivial work.  
-     * 
+     * requires non-trivial work.
+     *
      * @return the wizard collection
      */
     public WizardCollectionElement getWizardElements() {
@@ -514,12 +516,12 @@ public class WizardsRegistryReader extends RegistryReader {
         }
         return wizardElements.getChildren();
     }
-    
+
     /**
      * Returns a new WorkbenchWizardElement configured according to the parameters
-     * contained in the passed Registry.  
+     * contained in the passed Registry.
      *
-     * May answer null if there was not enough information in the Extension to create 
+     * May answer null if there was not enough information in the Extension to create
      * an adequate wizard
      */
     protected WorkbenchWizardElement createWizardElement(
@@ -529,8 +531,8 @@ public class WizardsRegistryReader extends RegistryReader {
             logMissingAttribute(element, IWorkbenchRegistryConstants.ATT_NAME);
             return null;
         }
-        
-        if (getClassValue(element, IWorkbenchRegistryConstants.ATT_CLASS) == null) {       
+
+        if (getClassValue(element, IWorkbenchRegistryConstants.ATT_CLASS) == null) {
             logMissingAttribute(element, IWorkbenchRegistryConstants.ATT_CLASS);
             return null;
         }
@@ -539,7 +541,7 @@ public class WizardsRegistryReader extends RegistryReader {
 
     /**
      * Returns the first wizard with a given id.
-     * 
+     *
      * @param id wizard id to search for
      * @return WorkbenchWizardElement matching the given id, if found; null otherwise
      */

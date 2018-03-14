@@ -46,7 +46,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 public class FileEditorInput extends PlatformObject implements IFileEditorInput, IPathEditorInput, IURIEditorInput,
 		IPersistableElement {
 	private IFile file;
-	
+
 	/**
 	 * Return whether or not file is local. Only {@link IFile}s with a local
 	 * value should call {@link IPathEditorInput#getPath()}
@@ -79,7 +79,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 					"Failed to obtain file store for resource", e); //$NON-NLS-1$
 			return false;
 		}
-	
+
 	}
 
 	/**
@@ -91,12 +91,13 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 		if (file == null)
 			throw new IllegalArgumentException();
 		this.file = file;
-	
+
 	}
 
 	/* (non-Javadoc)
 	 * Method declared on Object.
 	 */
+	@Override
 	public int hashCode() {
 		return file.hashCode();
 	}
@@ -108,6 +109,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	 * method bases the equality of two <code>FileEditorInput</code> objects on the
 	 * equality of their underlying <code>IFile</code> resources.
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -122,6 +124,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
+	@Override
 	public boolean exists() {
 		return file.exists();
 	}
@@ -129,6 +132,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IPersistableElement.
 	 */
+	@Override
 	public String getFactoryId() {
 		return FileEditorInputFactory.getFactoryId();
 	}
@@ -136,6 +140,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IFileEditorInput.
 	 */
+	@Override
 	public IFile getFile() {
 		return file;
 	}
@@ -143,6 +148,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		IContentType contentType = IDE.getContentType(file);
 		return PlatformUI.getWorkbench().getEditorRegistry()
@@ -152,6 +158,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
+	@Override
 	public String getName() {
 		return file.getName();
 	}
@@ -159,6 +166,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
+	@Override
 	public IPersistableElement getPersistable() {
 		return this;
 	}
@@ -166,6 +174,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IStorageEditorInput.
 	 */
+	@Override
 	public IStorage getStorage() {
 		return file;
 	}
@@ -173,6 +182,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
+	@Override
 	public String getToolTipText() {
 		return file.getFullPath().makeRelative().toString();
 	}
@@ -180,23 +190,26 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IPersistableElement.
 	 */
+	@Override
 	public void saveState(IMemento memento) {
 		FileEditorInputFactory.saveState(memento, this);
 	}
 
-	
+
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IURIEditorInput#getURI()
 	 */
+	@Override
 	public URI getURI() {
 		return file.getLocationURI();
 	}
-	
-	
+
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPathEditorInput#getPath()
 	 */
+	@Override
 	public IPath getPath() {
 		IPath location = file.getLocation();
 		if (location != null)
@@ -227,33 +240,39 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return getClass().getName() + "(" + getFile().getFullPath() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/*
 	 * Allows for the return of an {@link IWorkbenchAdapter} adapter.
-	 * 
+	 *
 	 * @since 3.5
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
+	@Override
 	public Object getAdapter(Class adapter) {
 		if (IWorkbenchAdapter.class.equals(adapter)) {
 			return new IWorkbenchAdapter() {
 
+				@Override
 				public Object[] getChildren(Object o) {
 					return new Object[0];
 				}
 
+				@Override
 				public ImageDescriptor getImageDescriptor(Object object) {
 					return FileEditorInput.this.getImageDescriptor();
 				}
 
+				@Override
 				public String getLabel(Object o) {
 					return FileEditorInput.this.getName();
 				}
 
+				@Override
 				public Object getParent(Object o) {
 					return FileEditorInput.this.getFile().getParent();
 				}

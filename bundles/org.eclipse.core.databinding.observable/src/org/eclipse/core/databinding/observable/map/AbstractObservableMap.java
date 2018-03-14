@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,13 +29,13 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.AssertionFailedException;
 
 /**
- * 
+ *
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @since 1.0
  */
 public abstract class AbstractObservableMap extends AbstractMap implements
@@ -46,14 +46,17 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 			super(realm);
 		}
 
+		@Override
 		protected void firstListenerAdded() {
 			AbstractObservableMap.this.firstListenerAdded();
 		}
 
+		@Override
 		protected void lastListenerRemoved() {
 			AbstractObservableMap.this.lastListenerRemoved();
 		}
 
+		@Override
 		protected boolean hasListeners() {
 			return super.hasListeners();
 		}
@@ -72,13 +75,13 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void lastListenerRemoved() {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void firstListenerAdded() {
 	}
@@ -93,24 +96,28 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 		changeSupport = new PrivateChangeSupport(realm);
 	}
 
+	@Override
 	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		if (!disposed) {
 			changeSupport.addListener(MapChangeEvent.TYPE, listener);
 		}
 	}
 
+	@Override
 	public synchronized void removeMapChangeListener(IMapChangeListener listener) {
 		if (!disposed) {
 			changeSupport.removeListener(MapChangeEvent.TYPE, listener);
 		}
 	}
 
+	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		if (!disposed) {
 			changeSupport.addChangeListener(listener);
 		}
 	}
 
+	@Override
 	public synchronized void addStaleListener(IStaleListener listener) {
 		if (!disposed) {
 			changeSupport.addStaleListener(listener);
@@ -128,6 +135,7 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public synchronized void addDisposeListener(IDisposeListener listener) {
 		if (!disposed) {
 			changeSupport.addDisposeListener(listener);
@@ -137,6 +145,7 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public synchronized void removeDisposeListener(IDisposeListener listener) {
 		if (!disposed) {
 			changeSupport.removeDisposeListener(listener);
@@ -146,10 +155,12 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public synchronized boolean isDisposed() {
 		return disposed;
 	}
 
+	@Override
 	public synchronized void dispose() {
 		if (!disposed) {
 			disposed = true;
@@ -159,10 +170,12 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 		}
 	}
 
+	@Override
 	public Realm getRealm() {
 		return realm;
 	}
 
+	@Override
 	public boolean isStale() {
 		checkRealm();
 		return stale;
@@ -171,6 +184,7 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public Object getKeyType() {
 		return null;
 	}
@@ -178,16 +192,19 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 	/**
 	 * @since 1.2
 	 */
+	@Override
 	public Object getValueType() {
 		return null;
 	}
 
+	@Override
 	public synchronized void removeChangeListener(IChangeListener listener) {
 		if (!disposed) {
 			changeSupport.removeChangeListener(listener);
 		}
 	}
 
+	@Override
 	public synchronized void removeStaleListener(IStaleListener listener) {
 		if (!disposed) {
 			changeSupport.removeStaleListener(listener);
@@ -196,7 +213,7 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 
 	/**
 	 * Sets the stale state. Must be invoked from the current realm.
-	 * 
+	 *
 	 * @param stale
 	 */
 	public void setStale(boolean stale) {
@@ -225,7 +242,7 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 
 	/**
 	 * Fires map change events. Must be invoked from current realm.
-	 * 
+	 *
 	 * @param diff
 	 */
 	protected void fireMapChange(MapDiff diff) {
@@ -236,7 +253,7 @@ public abstract class AbstractObservableMap extends AbstractMap implements
 
 	/**
 	 * Asserts that the realm is the current realm.
-	 * 
+	 *
 	 * @see Realm#isCurrent()
 	 * @throws AssertionFailedException
 	 *             if the realm is not the current realm

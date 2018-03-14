@@ -21,7 +21,7 @@ import org.eclipse.ui.internal.util.Util;
 
 /**
  * Opens a perspective.
- * 
+ *
  * @since 3.1
  */
 public final class OpenPerspectiveAction extends Action implements
@@ -42,7 +42,7 @@ public final class OpenPerspectiveAction extends Action implements
 
     /**
      * Constructs a new instance of <code>OpenPerspectiveAction</code>
-     * 
+     *
      * @param window
      *            The workbench window in which this action is created; should
      *            not be <code>null</code>.
@@ -70,29 +70,19 @@ public final class OpenPerspectiveAction extends Action implements
                 IWorkbenchHelpContextIds.OPEN_PERSPECTIVE_ACTION);
     }
 
-  
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IAction#runWithEvent(org.eclipse.swt.widgets.Event)
-     */
-    public final void runWithEvent(final Event event) {
+
+    @Override
+	public final void runWithEvent(final Event event) {
         callback.run(descriptor, new SelectionEvent(event));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
-     */
-    public String getLocalId() {
+    @Override
+	public String getLocalId() {
         return descriptor.getId();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
-     */
-    public String getPluginId() {
+    @Override
+	public String getPluginId() {
         return descriptor instanceof IPluginContribution ? ((IPluginContribution) descriptor)
                 .getPluginId()
                 : null;

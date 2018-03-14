@@ -30,6 +30,7 @@ public class Bug87211Test extends TestCase {
 
 	private IWorkbenchWindow fWindow;
 
+	@Override
 	protected void setUp() throws Exception {
 		fWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		fPage = (WorkbenchPage) fWindow.getActivePage();
@@ -39,7 +40,7 @@ public class Bug87211Test extends TestCase {
 	 * Tests dragging a standalone view to a new position, then dragging
 	 * another view on top of it.  The views should still be in their
 	 * separate stacks.
-	 * 
+	 *
 	 * @throws Throwable
 	 */
 	public void testDragStandaloneView() throws Throwable {

@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
- * The RunnableDecoratorDefinition is the definition for 
+ * The RunnableDecoratorDefinition is the definition for
  * decorators that have an ILabelDecorator class to instantiate.
  */
 
@@ -57,8 +57,9 @@ class FullDecoratorDefinition extends DecoratorDefinition {
         if (decorator == null) {
             Platform
                     .run(new SafeRunnable(
-                            NLS.bind(WorkbenchMessages.DecoratorManager_ErrorActivatingDecorator, getName() )) { 
-                        public void run() {
+                            NLS.bind(WorkbenchMessages.DecoratorManager_ErrorActivatingDecorator, getName() )) {
+                        @Override
+						public void run() {
                             try {
                                 decorator = (ILabelDecorator) WorkbenchPlugin
                                         .createExtension(
@@ -90,7 +91,8 @@ class FullDecoratorDefinition extends DecoratorDefinition {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#refreshDecorator()
      */
-    protected void refreshDecorator() {
+    @Override
+	protected void refreshDecorator() {
         //Only do something if disabled so as to prevent
         //gratutitous activation
         if (!this.enabled && decorator != null) {
@@ -141,7 +143,7 @@ class FullDecoratorDefinition extends DecoratorDefinition {
 
     /**
      * Returns the decorator, or <code>null</code> if not enabled.
-     * 
+     *
      * @return the decorator, or <code>null</code> if not enabled
      */
     public ILabelDecorator getDecorator() {
@@ -151,7 +153,8 @@ class FullDecoratorDefinition extends DecoratorDefinition {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#internalGetLabelProvider()
      */
-    protected IBaseLabelProvider internalGetLabelProvider()
+    @Override
+	protected IBaseLabelProvider internalGetLabelProvider()
             throws CoreException {
         return internalGetDecorator();
     }
@@ -159,7 +162,8 @@ class FullDecoratorDefinition extends DecoratorDefinition {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#isFull()
      */
-    public boolean isFull() {
+    @Override
+	public boolean isFull() {
         return true;
     }
 

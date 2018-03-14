@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,12 +24,12 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * The UIUpdateJob runs in the UI thread and is responsible updating the Markers
  * view UI with newly updated markers.
- * 
+ *
  * @since 3.6
- * 
+ *
  */
 class UIUpdateJob extends WorkbenchJob {
-	
+
 	private ExtendedMarkersView view;
 
 	private boolean updating;
@@ -49,11 +49,12 @@ class UIUpdateJob extends WorkbenchJob {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.
 	 * IProgressMonitor)
 	 */
+	@Override
 	public IStatus runInUIThread(IProgressMonitor monitor) {
 		if(monitor.isCanceled()){
 			return Status.CANCEL_STATUS;
@@ -62,7 +63,7 @@ class UIUpdateJob extends WorkbenchJob {
 		if (viewer.getControl().isDisposed()) {
 			return Status.CANCEL_STATUS;
 		}
-		
+
 		Markers clone = view.getActiveViewerInputClone();
 		try {
 			updating = true;
@@ -72,7 +73,7 @@ class UIUpdateJob extends WorkbenchJob {
 			if (monitor.isCanceled()) {
 				return Status.CANCEL_STATUS;
 			}
-			
+
 			//view.indicateUpdating(MarkerMessages.MarkerView_19,
 			//		true);
 
@@ -88,39 +89,46 @@ class UIUpdateJob extends WorkbenchJob {
 
 			if (monitor.isCanceled())
 				return Status.CANCEL_STATUS;
-			/* 
+			/*
 			 * always use a clone for Thread safety. We avoid setting the clone
 			 * as new input as we would offset the benefits of optimization in
 			 * TreeViewer.
 			 */
-			clone = view.createViewerInputClone();
+			clone= view.createViewerInputClone();
 			if (clone == null) {
 				// do not update yet,we are changing
 				return Status.CANCEL_STATUS;
 			}
-			/*
-			 * we prefer not to check for cancellation beyond this since we
-			 * have to show correct marker counts on UI, not an updating message.
-			 */
-			IContentProvider contentProvider = viewer.getContentProvider();
-			contentProvider.inputChanged(viewer, view.getViewerInput(), clone);
-			viewer.getTree().setRedraw(false);
-			viewer.refresh(true);
-			if (!monitor.isCanceled()) {
-				//do not expand if canceled
-				view.reexpandCategories();
+
+			if (view.isVisible()) {
+				/*
+				 * we prefer not to check for cancellation beyond this since we have to show correct
+				 * marker counts on UI, not an updating message.
+				 */
+				IContentProvider contentProvider= viewer.getContentProvider();
+				contentProvider.inputChanged(viewer, view.getViewerInput(), clone);
+
+				viewer.getTree().setRedraw(false);
+				viewer.refresh(true);
+				if (!monitor.isCanceled()) {
+					//do not expand if canceled
+					view.reexpandCategories();
+				}
+				if (view.getBuilder().readChangeFlags()[0]) {
+					// indicate changes
+				}
 			}
-			if (view.getBuilder().readChangeFlags()[0]) {
-				// indicate changes
-			}
-			//show new counts
+
+			// show new counts
 			view.updateTitle();
 
 			lastUpdateTime = System.currentTimeMillis();
 		} finally {
-			viewer.getTree().setRedraw(true);
-			view.updateStatusLine((IStructuredSelection) viewer.getSelection());
-			//view.updateCategoryLabels();
+			if (view.isVisible()) {
+				viewer.getTree().setRedraw(true);
+				view.updateStatusLine((IStructuredSelection)viewer.getSelection());
+//				view.updateCategoryLabels();
+			}
 			updating = false;
 		}
 		monitor.done();
@@ -136,9 +144,10 @@ class UIUpdateJob extends WorkbenchJob {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
 	 */
+	@Override
 	public boolean shouldRun() {
 		if (!PlatformUI.isWorkbenchRunning()) {
 			return false;
@@ -148,9 +157,10 @@ class UIUpdateJob extends WorkbenchJob {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 	 */
+	@Override
 	public boolean belongsTo(Object family) {
 		if (family.equals(view.MARKERSVIEW_UPDATE_JOB_FAMILY)) {
 			return true;

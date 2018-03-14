@@ -23,34 +23,21 @@ public class PerspContentProvider implements IStructuredContentProvider {
         //no-op
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         //no-op
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-     */
-    public Object[] getElements(Object element) {
+    @Override
+	public Object[] getElements(Object element) {
         if (element instanceof IPerspectiveRegistry) {
             return ((IPerspectiveRegistry) element).getPerspectives();
         }
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-     *      java.lang.Object, java.lang.Object)
-     */
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    @Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         //no-op
     }
 }

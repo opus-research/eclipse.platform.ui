@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui;
 
 import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -50,7 +49,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * 
+ *
  * @see IWorkbenchPage
  * @noimplement This interface is not intended to be implemented by clients.
  */
@@ -62,7 +61,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * If the window has an open editor with unsaved content, the user will be
      * given the opportunity to save it.
      * </p>
-     * 
+     *
      * @return <code>true</code> if the window was successfully closed, and
      *         <code>false</code> if it is still open
      */
@@ -70,10 +69,11 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
 
     /**
      * Returns the currently active page for this workbench window.
-     * 
+     *
      * @return the active page, or <code>null</code> if none
      */
-    public IWorkbenchPage getActivePage();
+    @Override
+	public IWorkbenchPage getActivePage();
 
     /**
      * Returns a list of the pages in this workbench window.
@@ -81,7 +81,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * Note that each window has its own pages; pages are never shared between
      * different windows.
      * </p>
-     * 
+     *
      * @return a list of pages
      */
     public IWorkbenchPage[] getPages();
@@ -89,7 +89,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
     /**
      * Returns the part service which tracks part activation within this
      * workbench window.
-     * 
+     *
      * @return the part service
      */
     public IPartService getPartService();
@@ -97,22 +97,23 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
     /**
      * Returns the selection service which tracks selection within this
      * workbench window.
-     * 
+     *
      * @return the selection service
      */
     public ISelectionService getSelectionService();
 
     /**
      * Returns this workbench window's shell.
-     * 
+     *
      * @return the shell containing this window's controls or <code>null</code>
      *   if the shell has not been created yet or if the window has been closed
      */
-    public Shell getShell();
+    @Override
+	public Shell getShell();
 
     /**
      * Returns the workbench for this window.
-     * 
+     *
      * @return the workbench
      */
     public IWorkbench getWorkbench();
@@ -127,7 +128,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * should be preserved during menu merging. All other menus may be removed
      * from the window.
      * </p>
-     * 
+     *
      * @param menuId
      *            the menu id
      * @return <code>true</code> if the specified menu is an application
@@ -145,7 +146,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * recommended to use the <code>IWorkbench.showPerspective</code> APIs to
      * programmatically show a perspective.
      * </p>
-     * 
+     *
      * @param perspectiveId
      *            the perspective id for the window's initial page
      * @param input
@@ -155,7 +156,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * @return the new workbench page
      * @exception WorkbenchException
      *                if a page could not be opened
-     * 
+     *
      * @see IWorkbench#showPerspective(String, IWorkbenchWindow, IAdaptable)
      */
     public IWorkbenchPage openPage(String perspectiveId, IAdaptable input)
@@ -171,7 +172,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * recommended to use the <code>IWorkbench.showPerspective</code> APIs to
      * programmatically show a perspective.
      * </p>
-     * 
+     *
      * @param input
      *            the page input, or <code>null</code> if there is no current
      *            input. This is used to seed the input for the new page's
@@ -179,7 +180,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * @return the new workbench window
      * @exception WorkbenchException
      *                if a page could not be opened
-     * 
+     *
      * @see IWorkbench#showPerspective(String, IWorkbenchWindow, IAdaptable)
      */
     public IWorkbenchPage openPage(IAdaptable input) throws WorkbenchException;
@@ -193,19 +194,20 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
      * the runnable will run in the UI thread and it is the runnable's
      * responsibility to call <code>Display.readAndDispatch()</code>
      * to ensure UI responsiveness.
-     * 
+     *
      * @since 3.2
      */
-    public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable) throws InvocationTargetException, InterruptedException;
+    @Override
+	public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable) throws InvocationTargetException, InterruptedException;
 
     /**
-     * Sets or clears the currently active page for this workbench window.
-     * 
-     * @param page
-     *            the new active page
-     */
+	 * Sets or clears the currently active page for this workbench window.
+	 *
+	 * @param page
+	 *            the new active page, or <code>null</code> for no active page
+	 */
     public void setActivePage(IWorkbenchPage page);
-    
+
     /**
 	 * <p>
 	 * Return the extension tracker for the workbench. This tracker may be used
@@ -217,7 +219,7 @@ public interface IWorkbenchWindow extends IPageService, IRunnableContext,
 	 * action objects corresponding to new wizards contributed by plug-ins fall
 	 * into this category.
 	 * </p>
-	 * 
+	 *
 	 * @return the extension tracker
 	 * @see IWorkbench#getExtensionTracker()
 	 * @see IWorkbenchPage#getExtensionTracker()

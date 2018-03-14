@@ -28,12 +28,12 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public abstract class AbstractSelectionService implements ISelectionService {
 
-    /** 
+    /**
      * The list of selection listeners (not per-part).
      */
     private ListenerList listeners = new ListenerList();
 
-    /** 
+    /**
      * The list of post selection listeners (not per-part).
      */
     private ListenerList postListeners = new ListenerList();
@@ -44,7 +44,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
     private IWorkbenchPart activePart;
 
     /**
-     * The active part's selection provider, remembered in case the part 
+     * The active part's selection provider, remembered in case the part
      * replaces its selection provider after we hooked a listener.
      */
     private ISelectionProvider activeProvider;
@@ -58,7 +58,8 @@ public abstract class AbstractSelectionService implements ISelectionService {
      * The JFace selection listener to hook on the active part's selection provider.
      */
     private ISelectionChangedListener selListener = new ISelectionChangedListener() {
-        public void selectionChanged(SelectionChangedEvent event) {
+        @Override
+		public void selectionChanged(SelectionChangedEvent event) {
             fireSelection(activePart, event.getSelection());
         }
     };
@@ -67,7 +68,8 @@ public abstract class AbstractSelectionService implements ISelectionService {
      * The JFace post selection listener to hook on the active part's selection provider.
      */
     private ISelectionChangedListener postSelListener = new ISelectionChangedListener() {
-        public void selectionChanged(SelectionChangedEvent event) {
+        @Override
+		public void selectionChanged(SelectionChangedEvent event) {
             firePostSelection(activePart, event.getSelection());
         }
     };
@@ -78,70 +80,52 @@ public abstract class AbstractSelectionService implements ISelectionService {
     protected AbstractSelectionService() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionService.
-     */
-    public void addSelectionListener(ISelectionListener l) {
+    @Override
+	public void addSelectionListener(ISelectionListener l) {
         listeners.add(l);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionService.
-     */
-    public void addSelectionListener(String partId, ISelectionListener listener) {
+    @Override
+	public void addSelectionListener(String partId, ISelectionListener listener) {
         getPerPartTracker(partId).addSelectionListener(listener);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionService.
-     */
-    public void addPostSelectionListener(ISelectionListener l) {
+    @Override
+	public void addPostSelectionListener(ISelectionListener l) {
         postListeners.add(l);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionService.
-     */
-    public void addPostSelectionListener(String partId,
+    @Override
+	public void addPostSelectionListener(String partId,
             ISelectionListener listener) {
         getPerPartTracker(partId).addPostSelectionListener(listener);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionService.
-     */
-    public void removeSelectionListener(ISelectionListener l) {
+    @Override
+	public void removeSelectionListener(ISelectionListener l) {
         listeners.remove(l);
     }
 
-    /*
-     * (non-Javadoc)
-     * Method declared on ISelectionListener.
-     */
-    public void removePostSelectionListener(String partId,
+    @Override
+	public void removePostSelectionListener(String partId,
             ISelectionListener listener) {
         getPerPartTracker(partId).removePostSelectionListener(listener);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionService.
-     */
-    public void removePostSelectionListener(ISelectionListener l) {
+    @Override
+	public void removePostSelectionListener(ISelectionListener l) {
         postListeners.remove(l);
     }
 
-    /*
-     * (non-Javadoc)
-     * Method declared on ISelectionListener.
-     */
-    public void removeSelectionListener(String partId,
+    @Override
+	public void removeSelectionListener(String partId,
             ISelectionListener listener) {
         getPerPartTracker(partId).removeSelectionListener(listener);
     }
 
     /**
      * Fires a selection event to the given listeners.
-     * 
+     *
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      */
@@ -151,7 +135,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
             final ISelectionListener l = (ISelectionListener) array[i];
             if ((part != null && sel != null)
                     || l instanceof INullSelectionListener) {
-                
+
                 try {
                     l.selectionChanged(part, sel);
                 } catch (Exception e) {
@@ -163,7 +147,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
 
     /**
      * Fires a selection event to the given listeners.
-     * 
+     *
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      */
@@ -174,7 +158,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
             final ISelectionListener l = (ISelectionListener) array[i];
             if ((part != null && sel != null)
                     || l instanceof INullSelectionListener) {
-                
+
                 try {
                     l.selectionChanged(part, sel);
                 } catch (Exception e) {
@@ -186,7 +170,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
 
     /**
      * Returns the per-part selection tracker for the given part id.
-     * 
+     *
      * @param partId part identifier
      * @return per-part selection tracker
      */
@@ -205,7 +189,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
 
     /**
      * Creates a new per-part selection tracker for the given part id.
-     * 
+     *
      * @param partId part identifier
      * @return per-part selection tracker
      */
@@ -215,7 +199,8 @@ public abstract class AbstractSelectionService implements ISelectionService {
     /**
      * Returns the selection.
      */
-    public ISelection getSelection() {
+    @Override
+	public ISelection getSelection() {
         if (activeProvider != null) {
 			return activeProvider.getSelection();
 		} else {
@@ -226,14 +211,15 @@ public abstract class AbstractSelectionService implements ISelectionService {
     /*
      * @see ISelectionService#getSelection(String)
      */
-    public ISelection getSelection(String partId) {
+    @Override
+	public ISelection getSelection(String partId) {
         return getPerPartTracker(partId).getSelection();
     }
 
     /**
      * Sets the current-active part (or null if none)
-     * 
-     * @since 3.1 
+     *
+     * @since 3.1
      *
      * @param newPart the new active part (or null if none)
      */
@@ -242,21 +228,21 @@ public abstract class AbstractSelectionService implements ISelectionService {
         if (newPart == activePart) {
 			return;
 		}
-        
+
         ISelectionProvider selectionProvider = null;
-        
+
         if (newPart != null) {
             selectionProvider = newPart.getSite().getSelectionProvider();
-            
+
             if (selectionProvider == null) {
                 newPart = null;
             }
         }
-        
+
         if (newPart == activePart) {
 			return;
 		}
-        
+
         if (activePart != null) {
             if (activeProvider != null) {
                 activeProvider.removeSelectionChangedListener(selListener);
@@ -273,7 +259,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
         }
 
         activePart = newPart;
-        
+
         if (newPart != null) {
             activeProvider = selectionProvider;
             // Fire an event if there's an active provider
@@ -292,7 +278,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
             firePostSelection(null, null);
         }
     }
-    
+
 //    /**
 //     * Notifies the listener that a part has been activated.
 //     */

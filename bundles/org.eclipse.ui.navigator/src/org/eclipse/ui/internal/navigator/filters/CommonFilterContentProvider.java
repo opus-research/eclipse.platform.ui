@@ -33,17 +33,14 @@ public class CommonFilterContentProvider implements IStructuredContentProvider {
 	private Object[] NO_ELEMENTS = new Object[0];
  
  
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput instanceof INavigatorContentService) {
 			contentService = (INavigatorContentService) newInput;
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-	 */
+	@Override
 	public Object[] getElements(Object inputElement) {
 		if(contentService != null) {
 			NavigatorFilterService filterService = (NavigatorFilterService) contentService.getFilterService();
@@ -53,11 +50,7 @@ public class CommonFilterContentProvider implements IStructuredContentProvider {
 		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
+	@Override
 	public void dispose() {
 
 	}

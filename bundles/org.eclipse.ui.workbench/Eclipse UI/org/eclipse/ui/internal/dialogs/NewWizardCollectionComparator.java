@@ -40,11 +40,8 @@ class NewWizardCollectionComparator extends ViewerComparator {
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ViewerSorter#category(java.lang.Object)
-     */
-    public int category(Object element) {
+    @Override
+	public int category(Object element) {
     	if (element instanceof WorkbenchWizardElement) {
 			return -1;
 		}
@@ -61,14 +58,15 @@ class NewWizardCollectionComparator extends ViewerComparator {
 			}
     		return 2;
     	}
-    	return super.category(element);	
+    	return super.category(element);
 	}
 
 	/**
-     *	Return true if this sorter is affected by a property 
+     *	Return true if this sorter is affected by a property
      *	change of propertyName on the specified element.
      */
-    public boolean isSorterProperty(Object object, String propertyId) {
+    @Override
+	public boolean isSorterProperty(Object object, String propertyId) {
         return propertyId.equals(IBasicPropertyConstants.P_TEXT);
     }
 }

@@ -38,7 +38,7 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableColl
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.SetChangeEventTracker;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Display;
 
@@ -53,6 +53,7 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 	private String propertyName;
 	private SetChangeEventTracker listener;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -62,7 +63,7 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 				propertyName)).getPropertyDescriptor();
 
 		observableSet = BeansObservables
-				.observeSet(SWTObservables.getRealm(Display.getDefault()),
+				.observeSet(DisplayRealm.getRealm(Display.getDefault()),
 						bean, propertyName, Bean.class);
 		beanObservable = (IBeanObservable) observableSet;
 		listener = new SetChangeEventTracker();
@@ -218,6 +219,7 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 
 	private static class Delegate extends
 			AbstractObservableCollectionContractDelegate {
+		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			Bean bean = new Bean();
@@ -230,14 +232,17 @@ public class JavaBeanObservableSetTest extends AbstractDefaultRealmTestCase {
 			return set;
 		}
 
+		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
+		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
 
+		@Override
 		public void change(IObservable observable) {
 			IObservableSet set = (IObservableSet) observable;
 			set.add(createElement(set));

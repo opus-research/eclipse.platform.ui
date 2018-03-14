@@ -59,19 +59,20 @@ public class ProjectReferencePage extends PropertyPage {
     /*
      * @see PreferencePage#createContents
      */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
                 IIDEHelpContextIds.PROJECT_REFERENCE_PROPERTY_PAGE);
-    	
+
         Composite composite = new Composite(parent, SWT.NONE);
-        
+
         initialize();
 
         createDescriptionLabel(composite);
 
         listViewer = CheckboxTableViewer.newCheckList(composite, SWT.TOP
                 | SWT.BORDER);
-        
+
         if(!project.isOpen())
         	listViewer.getControl().setEnabled(false);
 
@@ -89,15 +90,16 @@ public class ProjectReferencePage extends PropertyPage {
 
         //check for initial modification to avoid work if no changes are made
         listViewer.addCheckStateListener(new ICheckStateListener() {
-            public void checkStateChanged(CheckStateChangedEvent event) {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
                 modified = true;
             }
         });
 
         applyDialogFont(composite);
-        
+
         GridLayoutFactory.fillDefaults().generateLayout(composite);
-        
+
         return composite;
     }
 
@@ -113,7 +115,8 @@ public class ProjectReferencePage extends PropertyPage {
     protected IStructuredContentProvider getContentProvider(
             final IProject project) {
         return new WorkbenchContentProvider() {
-            public Object[] getChildren(Object o) {
+            @Override
+			public Object[] getChildren(Object o) {
                 if (!(o instanceof IWorkspace)) {
                     return new Object[0];
                 }
@@ -179,7 +182,8 @@ public class ProjectReferencePage extends PropertyPage {
     /**
      * @see PreferencePage#performOk
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         if (!modified) {
 			return true;
 		}
@@ -187,7 +191,8 @@ public class ProjectReferencePage extends PropertyPage {
         final IProject[] refs = new IProject[checked.length];
         System.arraycopy(checked, 0, refs, 0, checked.length);
         IRunnableWithProgress runnable = new IRunnableWithProgress() {
-            public void run(IProgressMonitor monitor)
+            @Override
+			public void run(IProgressMonitor monitor)
                     throws InvocationTargetException {
 
                 try {

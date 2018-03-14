@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * A <code>SubContributionManager</code> is used to define a set of contribution
- * items within a parent manager.  Once defined, the visibility of the entire set can 
+ * items within a parent manager.  Once defined, the visibility of the entire set can
  * be changed as a unit.
  */
 public abstract class SubContributionManager implements IContributionManager {
@@ -27,10 +27,10 @@ public abstract class SubContributionManager implements IContributionManager {
     private IContributionManager parentMgr;
 
     /**
-     * Maps each item in the manager to a wrapper.  The wrapper is used to 
+     * Maps each item in the manager to a wrapper.  The wrapper is used to
      * control the visibility of each item.
      */
-    private Map mapItemToWrapper = new HashMap();
+    private Map<IContributionItem, SubContributionItem> mapItemToWrapper = new HashMap<IContributionItem, SubContributionItem>();
 
     /**
      * The visibility of the manager,
@@ -49,34 +49,26 @@ public abstract class SubContributionManager implements IContributionManager {
         parentMgr = mgr;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void add(IAction action) {
+    @Override
+	public void add(IAction action) {
         add(new ActionContributionItem(action));
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void add(IContributionItem item) {
+    @Override
+	public void add(IContributionItem item) {
         SubContributionItem wrap = wrap(item);
         wrap.setVisible(visible);
         parentMgr.add(wrap);
         itemAdded(item, wrap);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void appendToGroup(String groupName, IAction action) {
+    @Override
+	public void appendToGroup(String groupName, IAction action) {
         appendToGroup(groupName, new ActionContributionItem(action));
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void appendToGroup(String groupName, IContributionItem item) {
+    @Override
+	public void appendToGroup(String groupName, IContributionItem item) {
         SubContributionItem wrap = wrap(item);
         wrap.setVisible(visible);
         parentMgr.appendToGroup(groupName, wrap);
@@ -88,39 +80,31 @@ public abstract class SubContributionManager implements IContributionManager {
      * and cleaning up any other resources allocated by it.
      * This must leave no trace of this sub contribution manager
      * in the parent manager.  Subclasses may extend.
-     * 
+     *
      * @since 3.0
      */
     public void disposeManager() {
-        Iterator it = mapItemToWrapper.values().iterator();
+        Iterator<SubContributionItem> it = mapItemToWrapper.values().iterator();
         // Dispose items in addition to removing them.
         // See bugs 64024 and 73715 for details.
 	    // Do not use getItems() here as subclasses can override that in bad ways.
         while (it.hasNext()) {
-            IContributionItem item = (IContributionItem) it.next();
+            IContributionItem item = it.next();
             item.dispose();
         }
         removeAll();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     *
-     * Returns the item passed to us, not the wrapper.
-     */
-    public IContributionItem find(String id) {
+    @Override
+	public IContributionItem find(String id) {
         IContributionItem item = parentMgr.find(id);
         // Return the item passed to us, not the wrapper.
         item = unwrap(item);
         return item;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     *
-     * Returns the items passed to us, not the wrappers.
-     */
-    public IContributionItem[] getItems() {
+    @Override
+	public IContributionItem[] getItems() {
         IContributionItem[] result = new IContributionItem[mapItemToWrapper
                 .size()];
         mapItemToWrapper.keySet().toArray(result);
@@ -136,64 +120,50 @@ public abstract class SubContributionManager implements IContributionManager {
         return parentMgr;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public IContributionManagerOverrides getOverrides() {
+    @Override
+	public IContributionManagerOverrides getOverrides() {
         return parentMgr.getOverrides();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void insertAfter(String id, IAction action) {
+    @Override
+	public void insertAfter(String id, IAction action) {
         insertAfter(id, new ActionContributionItem(action));
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void insertAfter(String id, IContributionItem item) {
+    @Override
+	public void insertAfter(String id, IContributionItem item) {
         SubContributionItem wrap = wrap(item);
         wrap.setVisible(visible);
         parentMgr.insertAfter(id, wrap);
         itemAdded(item, wrap);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void insertBefore(String id, IAction action) {
+    @Override
+	public void insertBefore(String id, IAction action) {
         insertBefore(id, new ActionContributionItem(action));
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void insertBefore(String id, IContributionItem item) {
+    @Override
+	public void insertBefore(String id, IContributionItem item) {
         SubContributionItem wrap = wrap(item);
         wrap.setVisible(visible);
         parentMgr.insertBefore(id, wrap);
         itemAdded(item, wrap);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public boolean isDirty() {
+    @Override
+	public boolean isDirty() {
         return parentMgr.isDirty();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public boolean isEmpty() {
+    @Override
+	public boolean isEmpty() {
         return parentMgr.isEmpty();
     }
 
     /**
      * Returns whether the contribution list is visible.
-     * If the visibility is <code>true</code> then each item within the manager 
+     * If the visibility is <code>true</code> then each item within the manager
      * appears within the parent manager.  Otherwise, the items are not visible.
      *
      * @return <code>true</code> if the manager is visible
@@ -234,47 +204,42 @@ public abstract class SubContributionManager implements IContributionManager {
      * @return fetch all enumeration of wrappers for the item
      * @deprecated Use getItems(String value) instead.
      */
-    public Enumeration items() {
-        final Iterator i = mapItemToWrapper.values().iterator();
-        return new Enumeration() {
-            public boolean hasMoreElements() {
+    @Deprecated
+	public Enumeration<SubContributionItem> items() {
+        final Iterator<SubContributionItem> i = mapItemToWrapper.values().iterator();
+        return new Enumeration<SubContributionItem>() {
+            @Override
+			public boolean hasMoreElements() {
                 return i.hasNext();
             }
 
-            public Object nextElement() {
+            @Override
+			public SubContributionItem nextElement() {
                 return i.next();
             }
         };
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void markDirty() {
+    @Override
+	public void markDirty() {
         parentMgr.markDirty();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void prependToGroup(String groupName, IAction action) {
+    @Override
+	public void prependToGroup(String groupName, IAction action) {
         prependToGroup(groupName, new ActionContributionItem(action));
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void prependToGroup(String groupName, IContributionItem item) {
+    @Override
+	public void prependToGroup(String groupName, IContributionItem item) {
         SubContributionItem wrap = wrap(item);
         wrap.setVisible(visible);
         parentMgr.prependToGroup(groupName, wrap);
         itemAdded(item, wrap);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public IContributionItem remove(String id) {
+    @Override
+	public IContributionItem remove(String id) {
         IContributionItem result = parentMgr.remove(id);
         // result is the wrapped item
         if (result != null) {
@@ -284,11 +249,9 @@ public abstract class SubContributionManager implements IContributionManager {
         return result;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public IContributionItem remove(IContributionItem item) {
-        SubContributionItem wrap = (SubContributionItem) mapItemToWrapper
+    @Override
+	public IContributionItem remove(IContributionItem item) {
+        SubContributionItem wrap = mapItemToWrapper
                 .get(item);
         if (wrap == null) {
 			return null;
@@ -301,10 +264,8 @@ public abstract class SubContributionManager implements IContributionManager {
         return item;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContributionManager.
-     */
-    public void removeAll() {
+    @Override
+	public void removeAll() {
     	Object[] array = mapItemToWrapper.keySet().toArray();
     	for (int i = 0; i < array.length; i++) {
 			IContributionItem item = (IContributionItem) array[i];
@@ -323,9 +284,9 @@ public abstract class SubContributionManager implements IContributionManager {
     public void setVisible(boolean visible) {
         this.visible = visible;
         if (mapItemToWrapper.size() > 0) {
-            Iterator it = mapItemToWrapper.values().iterator();
+            Iterator<SubContributionItem> it = mapItemToWrapper.values().iterator();
             while (it.hasNext()) {
-                IContributionItem item = (IContributionItem) it.next();
+                IContributionItem item = it.next();
                 item.setVisible(visible);
             }
             parentMgr.markDirty();
@@ -345,7 +306,7 @@ public abstract class SubContributionManager implements IContributionManager {
      * Unwraps a nested contribution item. If the contribution item is an
      * instance of <code>SubContributionItem</code>, then its inner item is
      * returned. Otherwise, the item itself is returned.
-     * 
+     *
      * @param item
      *            The item to unwrap; may be <code>null</code>.
      * @return The inner item of <code>item</code>, if <code>item</code> is

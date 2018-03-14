@@ -19,7 +19,7 @@ import java.util.Collection;
  * <p>
  * This interface is not intended to be extended or implemented by clients.
  * </p>
- * 
+ *
  * @since 3.0
  * @deprecated Please use <code>ICommandService</code> and
  *             <code>IHandlerService</code> instead.
@@ -27,6 +27,8 @@ import java.util.Collection;
  * @see org.eclipse.ui.handlers.IHandlerService
  * @noimplement This interface is not intended to be implemented by clients.
  */
+@Deprecated
+@SuppressWarnings("all")
 public interface IWorkbenchCommandSupport {
 
 	/**
@@ -35,10 +37,11 @@ public interface IWorkbenchCommandSupport {
 	 * handler should become active. The workbench, however, ultimately decides
 	 * which handler becomes active (in the event of conflicts or changes in
 	 * state). This could cause the handlers for one or more commands to change.
-	 * 
+	 *
 	 * @param handlerSubmission
 	 *            The submission to be added; must not be <code>null</code>.
 	 */
+	@Deprecated
 	void addHandlerSubmission(HandlerSubmission handlerSubmission);
 
 	/**
@@ -48,20 +51,22 @@ public interface IWorkbenchCommandSupport {
 	 * ultimately decides which handler becomes active (in the event of
 	 * conflicts or changes in state). This could cause the handlers for one or
 	 * more commands to change.
-	 * 
+	 *
 	 * @param handlerSubmissions
 	 *            The submissions to be added; must not be <code>null</code>,
 	 *            and must contain zero or more instances of
 	 *            <code>HandlerSubmission</code>.
 	 */
+	@Deprecated
 	void addHandlerSubmissions(Collection handlerSubmissions);
 
 	/**
 	 * Returns the command manager for the workbench.
-	 * 
+	 *
 	 * @return the command manager for the workbench. Guaranteed not to be
 	 *         <code>null</code>.
 	 */
+	@Deprecated
 	ICommandManager getCommandManager();
 
 	/**
@@ -69,10 +74,11 @@ public interface IWorkbenchCommandSupport {
 	 * The handler submission must be the same as the one added (not just
 	 * equivalent). This could cause the handlers for one or more commands to
 	 * change.
-	 * 
+	 *
 	 * @param handlerSubmission
 	 *            The submission to be removed; must not be <code>null</code>.
 	 */
+	@Deprecated
 	void removeHandlerSubmission(HandlerSubmission handlerSubmission);
 
 	/**
@@ -80,11 +86,12 @@ public interface IWorkbenchCommandSupport {
 	 * The handler submission must be the same as the one added (not just
 	 * equivalent). This could cause the handlers for one or more commands to
 	 * change.
-	 * 
+	 *
 	 * @param handlerSubmissions
 	 *            The submissions to be removed; must not be <code>null</code>,
 	 *            and must contain instances of <code>HandlerSubmission</code>
 	 *            only.
 	 */
+	@Deprecated
 	void removeHandlerSubmissions(Collection handlerSubmissions);
 }

@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -19,6 +19,13 @@ import java.util.List;
  * A representation of the literals of the enumeration '<em><b>Side Value</b></em>',
  * and utility methods for working with them.
  * <!-- end-user-doc -->
+ * <!-- begin-model-doc -->
+ * <p>
+ * An enum providing the specific values determining the side of a trimmedWindow
+ * on which particular trim bars should be displayed.
+ * </p>
+ * @since 1.0
+ * <!-- end-model-doc -->
  * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getSideValue()
  * @model
  * @generated
@@ -264,7 +271,7 @@ public enum SideValue implements InternalSideValue {
 	public String toString() {
 		return literal;
 	}
-	
+
 } //SideValue
 
 /**
@@ -274,5 +281,5 @@ public enum SideValue implements InternalSideValue {
  * @generated
  */
 interface InternalSideValue extends org.eclipse.emf.common.util.Enumerator {
-	// Empty 
+	// Empty
 }

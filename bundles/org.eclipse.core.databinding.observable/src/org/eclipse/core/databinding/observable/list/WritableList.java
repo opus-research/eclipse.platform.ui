@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,13 +27,13 @@ import org.eclipse.core.databinding.observable.Realm;
 
 /**
  * Mutable observable list backed by an ArrayList.
- * 
+ *
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @since 1.0
  */
 public class WritableList extends ObservableList {
@@ -41,7 +41,7 @@ public class WritableList extends ObservableList {
 	/**
 	 * Creates an empty writable list in the default realm with a
 	 * <code>null</code> element type.
-	 * 
+	 *
 	 */
 	public WritableList() {
 		this(Realm.getDefault());
@@ -49,7 +49,7 @@ public class WritableList extends ObservableList {
 
 	/**
 	 * Creates an empty writable list with a <code>null</code> element type.
-	 * 
+	 *
 	 * @param realm
 	 *            the observable's realm
 	 */
@@ -63,7 +63,7 @@ public class WritableList extends ObservableList {
 	 * change with the contents of the given list. If this is not desired,
 	 * {@link #WritableList(Collection, Object)} should be used by casting the
 	 * first argument to {@link Collection}.
-	 * 
+	 *
 	 * @param toWrap
 	 *            The java.util.List to wrap
 	 * @param elementType
@@ -77,7 +77,7 @@ public class WritableList extends ObservableList {
 	 * Constructs a new instance in the default realm containing the elements of
 	 * the given collection. Changes to the given collection after calling this
 	 * method do not affect the contents of the created WritableList.
-	 * 
+	 *
 	 * @param collection
 	 *            the collection to copy
 	 * @param elementType
@@ -95,7 +95,7 @@ public class WritableList extends ObservableList {
 	 * contents of the given list. If this is not desired,
 	 * {@link #WritableList(Realm, Collection, Object)} should be used by
 	 * casting the second argument to {@link Collection}.
-	 * 
+	 *
 	 * @param realm
 	 *            the observable's realm
 	 * @param toWrap
@@ -111,7 +111,7 @@ public class WritableList extends ObservableList {
 	 * Constructs a new instance in the default realm containing the elements of
 	 * the given collection. Changes to the given collection after calling this
 	 * method do not affect the contents of the created WritableList.
-	 * 
+	 *
 	 * @param realm
 	 *            the observable's realm
 	 * @param collection
@@ -124,6 +124,7 @@ public class WritableList extends ObservableList {
 		super(realm, new ArrayList(collection), elementType);
 	}
 
+	@Override
 	public Object set(int index, Object element) {
 		checkRealm();
 		Object oldElement = wrappedList.set(index, element);
@@ -136,6 +137,7 @@ public class WritableList extends ObservableList {
 	/**
 	 * @since 1.1
 	 */
+	@Override
 	public Object move(int oldIndex, int newIndex) {
 		checkRealm();
 		int size = wrappedList.size();
@@ -155,6 +157,7 @@ public class WritableList extends ObservableList {
 		return element;
 	}
 
+	@Override
 	public Object remove(int index) {
 		checkRealm();
 		Object oldElement = wrappedList.remove(index);
@@ -163,6 +166,7 @@ public class WritableList extends ObservableList {
 		return oldElement;
 	}
 
+	@Override
 	public boolean add(Object element) {
 		checkRealm();
 		boolean added = wrappedList.add(element);
@@ -173,6 +177,7 @@ public class WritableList extends ObservableList {
 		return added;
 	}
 
+	@Override
 	public void add(int index, Object element) {
 		checkRealm();
 		wrappedList.add(index, element);
@@ -180,6 +185,7 @@ public class WritableList extends ObservableList {
 				true, element)));
 	}
 
+	@Override
 	public boolean addAll(Collection c) {
 		checkRealm();
 		ListDiffEntry[] entries = new ListDiffEntry[c.size()];
@@ -194,6 +200,7 @@ public class WritableList extends ObservableList {
 		return added;
 	}
 
+	@Override
 	public boolean addAll(int index, Collection c) {
 		checkRealm();
 		ListDiffEntry[] entries = new ListDiffEntry[c.size()];
@@ -208,6 +215,7 @@ public class WritableList extends ObservableList {
 		return added;
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		checkRealm();
 		int index = wrappedList.indexOf(o);
@@ -220,6 +228,7 @@ public class WritableList extends ObservableList {
 		return true;
 	}
 
+	@Override
 	public boolean removeAll(Collection c) {
 		checkRealm();
 		List entries = new ArrayList();
@@ -238,6 +247,7 @@ public class WritableList extends ObservableList {
 		return entries.size() > 0;
 	}
 
+	@Override
 	public boolean retainAll(Collection c) {
 		checkRealm();
 		List entries = new ArrayList();
@@ -259,6 +269,7 @@ public class WritableList extends ObservableList {
 		return entries.size() > 0;
 	}
 
+	@Override
 	public void clear() {
 		checkRealm();
 		// We remove the elements from back to front which is typically much

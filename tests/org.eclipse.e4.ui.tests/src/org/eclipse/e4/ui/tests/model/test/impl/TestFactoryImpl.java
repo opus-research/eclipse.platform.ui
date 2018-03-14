@@ -18,20 +18,20 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
- * 
+ *
  * @generated
  */
 public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 	/**
 	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	public static MTestFactory init() {
 		try {
 			MTestFactory theTestFactory = (MTestFactory) EPackage.Registry.INSTANCE
-					.getEFactory("http://www.eclipse.org/ui/2010/Test/UIModel/test");
+					.getEFactory(MTestPackage.eNS_URI);
 			if (theTestFactory != null) {
 				return theTestFactory;
 			}
@@ -44,7 +44,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 	/**
 	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	public TestFactoryImpl() {
@@ -53,7 +53,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	@Override
@@ -69,7 +69,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	public MTestHarness createTestHarness() {
@@ -79,7 +79,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @generated
 	 */
 	public MTestPackage getTestPackage() {
@@ -88,7 +88,7 @@ public class TestFactoryImpl extends EFactoryImpl implements MTestFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 *
 	 * @deprecated
 	 * @generated
 	 */

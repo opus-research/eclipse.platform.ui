@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,10 +45,12 @@ public class ReflectionContributionFactory implements IContributionFactory {
 		processLanguages();
 	}
 
+	@Override
 	public Object create(String uriString, IEclipseContext context, IEclipseContext staticContext) {
 		return doCreate(uriString, context, staticContext);
 	}
 
+	@Override
 	public Object create(String uriString, IEclipseContext context) {
 		return doCreate(uriString, context, null);
 	}
@@ -151,6 +153,7 @@ public class ReflectionContributionFactory implements IContributionFactory {
 		return Activator.getDefault().getBundleForName(platformURI.authority());
 	}
 
+	@Override
 	public Bundle getBundle(String uriString) {
 		URI uri = URI.createURI(uriString);
 		return getBundle(uri);

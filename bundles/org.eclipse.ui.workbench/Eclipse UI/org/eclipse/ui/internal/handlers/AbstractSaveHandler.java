@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,18 +38,21 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 			dirtyStateTracker = new DirtyStateTracker();
 	}
 
+	@Override
 	protected Expression getEnabledWhenExpression() {
 		if (enabledWhen == null) {
 			enabledWhen = new Expression() {
+				@Override
 				public EvaluationResult evaluate(IEvaluationContext context) {
 					return AbstractSaveHandler.this.evaluate(context);
 				}
-	
+
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
 				 */
+				@Override
 				public void collectExpressionInfo(ExpressionInfo info) {
 					info.addVariableNameAccess(ISources.ACTIVE_PART_NAME);
 				}
@@ -57,9 +60,9 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 		}
 		return enabledWhen;
 	}
-	
+
 	protected abstract EvaluationResult evaluate(IEvaluationContext context);
-	
+
 	protected ISaveablePart getSaveablePart(IEvaluationContext context) {
 		IWorkbenchPart activePart = InternalHandlerUtil.getActivePart(context);
 
@@ -72,7 +75,7 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 
 		return InternalHandlerUtil.getActiveEditor(context);
 	}
-	
+
 	protected ISaveablePart getSaveablePart(ExecutionEvent event) {
 
 		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);

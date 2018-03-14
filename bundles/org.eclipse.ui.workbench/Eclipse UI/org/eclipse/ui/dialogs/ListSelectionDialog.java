@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- * 	   Sebastian Davids <sdavids@gmx.de> - Fix for bug 90273 - [Dialogs] 
+ * 	   Sebastian Davids <sdavids@gmx.de> - Fix for bug 90273 - [Dialogs]
  * 			ListSelectionDialog dialog alignment
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
@@ -98,7 +98,7 @@ public class ListSelectionDialog extends SelectionDialog {
 			setMessage(message);
 		} else {
 			setMessage(WorkbenchMessages.ListSelection_message);
-		} 
+		}
     }
 
     /**
@@ -118,7 +118,8 @@ public class ListSelectionDialog extends SelectionDialog {
                 IDialogConstants.SELECT_ALL_ID, SELECT_ALL_TITLE, false);
 
         SelectionListener listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 listViewer.setAllChecked(true);
             }
         };
@@ -128,7 +129,8 @@ public class ListSelectionDialog extends SelectionDialog {
                 IDialogConstants.DESELECT_ALL_ID, DESELECT_ALL_TITLE, false);
 
         listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 listViewer.setAllChecked(false);
             }
         };
@@ -136,7 +138,7 @@ public class ListSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * Visually checks the previously-specified elements in this dialog's list 
+     * Visually checks the previously-specified elements in this dialog's list
      * viewer.
      */
     private void checkInitialSelections() {
@@ -147,25 +149,20 @@ public class ListSelectionDialog extends SelectionDialog {
 		}
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
-        
+
         initializeDialogUnits(composite);
-        
+
         createMessageArea(composite);
 
         listViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER);
@@ -187,13 +184,13 @@ public class ListSelectionDialog extends SelectionDialog {
 		}
 
         Dialog.applyDialogFont(composite);
-        
+
         return composite;
     }
 
     /**
      * Returns the viewer used to show the list.
-     * 
+     *
      * @return the viewer, or <code>null</code> if not yet created
      */
     protected CheckboxTableViewer getViewer() {
@@ -208,11 +205,12 @@ public class ListSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * The <code>ListSelectionDialog</code> implementation of this 
+     * The <code>ListSelectionDialog</code> implementation of this
      * <code>Dialog</code> method builds a list of the selected elements for later
      * retrieval by the client and closes this dialog.
      */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
 
         // Get the input children.
         Object[] children = contentProvider.getElements(inputElement);

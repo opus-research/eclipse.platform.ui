@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,15 +31,13 @@ public class SavePerspectiveAction extends PerspectiveAction {
         setText(WorkbenchMessages.SavePerspective_text);
         setActionDefinitionId(IWorkbenchCommandConstants.WINDOW_SAVE_PERSPECTIVE_AS);
         // @issue missing action id
-        setToolTipText(WorkbenchMessages.SavePerspective_toolTip); 
+        setToolTipText(WorkbenchMessages.SavePerspective_toolTip);
         window.getWorkbench().getHelpSystem().setHelp(this,
 				IWorkbenchHelpContextIds.SAVE_PERSPECTIVE_ACTION);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PerspectiveAction.
-     */
-    protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
+    @Override
+	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         PerspectiveDescriptor desc = (PerspectiveDescriptor) persp;
         if (desc != null) {
 			// saveNonSingleton(page, desc);

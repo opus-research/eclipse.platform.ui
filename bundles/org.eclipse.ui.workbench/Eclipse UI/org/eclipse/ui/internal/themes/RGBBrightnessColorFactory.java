@@ -21,7 +21,7 @@ import org.eclipse.ui.themes.IColorFactory;
 
 /**
  * @since 3.105
- * 
+ *
  */
 public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExtension {
 
@@ -30,6 +30,7 @@ public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExte
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.themes.IColorFactory#createColor()
 	 */
+	@Override
 	public RGB createColor() {
 		RGB rgb = ColorUtil.getColorValue(color);
 		float scale = Float.parseFloat(scaleFactor);
@@ -50,16 +51,17 @@ public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExte
 	 * either be RGB triples or SWT constants) and <code>scaleFactor</code>
 	 * which is the brightness scale factor with 1.0 having the same brightness
 	 * as the original color.
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
+	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
 			throws CoreException {
 		if (data instanceof Hashtable) {
 			Hashtable table = (Hashtable) data;
 			color = (String) table.get("color"); //$NON-NLS-1$
-			scaleFactor = (String) table.get("scaleFactor"); //$NON-NLS-1$            
+			scaleFactor = (String) table.get("scaleFactor"); //$NON-NLS-1$
 		}
 	}
 

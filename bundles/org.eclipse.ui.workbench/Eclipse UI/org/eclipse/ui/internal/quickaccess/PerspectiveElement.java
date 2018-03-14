@@ -27,7 +27,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class PerspectiveElement extends QuickAccessElement {
 
@@ -38,6 +38,7 @@ public class PerspectiveElement extends QuickAccessElement {
 		this.descriptor = descriptor;
 	}
 
+	@Override
 	public void execute() {
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		IWorkbenchWindow window = workbench
@@ -59,18 +60,22 @@ public class PerspectiveElement extends QuickAccessElement {
 		}
 	}
 
+	@Override
 	public String getId() {
 		return descriptor.getId();
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return descriptor.getImageDescriptor();
 	}
 
+	@Override
 	public String getLabel() {
 		return descriptor.getLabel();
 	}
 
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -79,6 +84,7 @@ public class PerspectiveElement extends QuickAccessElement {
 		return result;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

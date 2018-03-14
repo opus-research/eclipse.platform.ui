@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -23,37 +24,25 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 /**
  * Adapts ISelection instances to either IIterable or ICountable. For use with
  * core expressions.
- * 
+ *
  * @since 3.3
  */
 public class SelectionAdapterFactory implements IAdapterFactory {
 	private static final ICountable ICOUNT_0 = new ICountable() {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.expressions.ICountable#count()
-		 */
+		@Override
 		public int count() {
 			return 0;
 		}
 	};
 	private static final ICountable ICOUNT_1 = new ICountable() {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.expressions.ICountable#count()
-		 */
+		@Override
 		public int count() {
 			return 1;
 		}
 	};
 	private static final IIterable ITERATE_EMPTY = new IIterable() {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.expressions.IIterable#iterator()
-		 */
-		public Iterator iterator() {
+		@Override
+		public Iterator<?> iterator() {
 			return Collections.EMPTY_LIST.iterator();
 		}
 	};
@@ -61,15 +50,16 @@ public class SelectionAdapterFactory implements IAdapterFactory {
 	/**
 	 * The classes we can adapt to.
 	 */
-	private static final Class[] CLASSES = new Class[] { IIterable.class,
+	private static final Class<?>[] CLASSES = new Class[] { IIterable.class,
 			ICountable.class };
 
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
+	@Override
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		if (adaptableObject instanceof ISelection) {
 			if (adapterType == IIterable.class) {
-				return iterable((ISelection) adaptableObject);
+				return adapterType.cast(iterable((ISelection) adaptableObject));
 			} else if (adapterType == ICountable.class) {
-				return countable((ISelection) adaptableObject);
+				return adapterType.cast(countable((ISelection) adaptableObject));
 			}
 		}
 		return null;
@@ -81,15 +71,17 @@ public class SelectionAdapterFactory implements IAdapterFactory {
 		}
 		if (sel instanceof IStructuredSelection) {
 			return new IIterable() {
-				public Iterator iterator() {
+				@Override
+				public Iterator<?> iterator() {
 					return ((IStructuredSelection) sel).iterator();
 				}
 			};
 		}
-		final List list = Arrays.asList(new Object[] { sel });
+		final List<?> list = Arrays.asList(new Object[] { sel });
 		return new IIterable() {
 
-			public Iterator iterator() {
+			@Override
+			public Iterator<?> iterator() {
 				return list.iterator();
 			}
 		};
@@ -102,6 +94,7 @@ public class SelectionAdapterFactory implements IAdapterFactory {
 		if (sel instanceof IStructuredSelection) {
 			final IStructuredSelection ss = (IStructuredSelection) sel;
 			return new ICountable() {
+				@Override
 				public int count() {
 					return ss.size();
 				}
@@ -110,7 +103,8 @@ public class SelectionAdapterFactory implements IAdapterFactory {
 		return ICOUNT_1;
 	}
 
-	public Class[] getAdapterList() {
+	@Override
+	public Class<?>[] getAdapterList() {
 		return CLASSES;
 	}
 }

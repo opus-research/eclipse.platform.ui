@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,9 +44,9 @@ import org.eclipse.ui.views.markers.internal.Util;
 
 /**
  * MarkersPropertyPage is the property page for a marker.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class MarkersPropertyPage extends PropertyPage {
 
@@ -62,6 +62,7 @@ public class MarkersPropertyPage extends PropertyPage {
 		super();
 	}
 
+	@Override
 	protected Control createContents(Composite parent) {
 		// initialize resources/properties
 
@@ -115,7 +116,7 @@ public class MarkersPropertyPage extends PropertyPage {
 
 	/**
 	 * Method createCreationTimeArea.
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void createCreationTimeArea(Composite parent) {
@@ -149,7 +150,7 @@ public class MarkersPropertyPage extends PropertyPage {
 	/**
 	 * This method is intended to be overridden by subclasses. The attributes
 	 * area is created between the creation time area and the resource area.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -167,7 +168,7 @@ public class MarkersPropertyPage extends PropertyPage {
 
 	/**
 	 * Create the attributes area for editing a task
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void createTaskAttributes(Composite parent) {
@@ -198,9 +199,9 @@ public class MarkersPropertyPage extends PropertyPage {
 		GridData gridData = new GridData();
 		gridData.horizontalIndent = convertHorizontalDLUsToPixels(20);
 		completedCheckbox.setLayoutData(gridData);
-		
+
 		completedCheckbox.setEnabled(Util.isEditable(marker));
-		
+
 		Object done;
 		try {
 			done = marker.getAttribute(IMarker.DONE);
@@ -215,7 +216,7 @@ public class MarkersPropertyPage extends PropertyPage {
 
 	/**
 	 * Create the attributes area for problems
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void createProblemAttributes(Composite parent) {
@@ -279,17 +280,24 @@ public class MarkersPropertyPage extends PropertyPage {
 		locationText.setLayoutData(gridData);
 
 		String line = Util.getProperty(IMarker.LINE_NUMBER, marker);
-		if (line.length()==0)
-			locationText.setText(MarkerSupportInternalUtilities.EMPTY_STRING);
-		else
+		if (line.length() == 0) {
+			String location = Util.getProperty(IMarker.LOCATION, marker);
+			if (location.length() == 0) {
+				locationText.setText(MarkerSupportInternalUtilities.EMPTY_STRING);
+			} else {
+				locationText.setText(location);
+			}
+		} else {
 			locationText.setText(NLS
 					.bind(MarkerMessages.label_lineNumber, line));
+		}
 
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
+	@Override
 	public boolean performOk() {
 		if (marker == null || Util.isEditable(marker)) {
 			saveChanges();

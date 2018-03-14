@@ -46,7 +46,7 @@ public class ActionExpression {
 		 * from the expression and returns the object classes. The expression is
 		 * not changed and a <code>null</code> is returned if no object class
 		 * is found.
-		 * 
+		 *
 		 * @return String[] the object class names or <code>null</code> if
 		 *         none was found.
 		 */
@@ -56,7 +56,7 @@ public class ActionExpression {
 
 		/**
 		 * Returns whether the expression is valid for the given object.
-		 * 
+		 *
 		 * @param object
 		 *            the object to validate against (can be <code>null</code>)
 		 * @return boolean whether the expression is valid for the object.
@@ -67,7 +67,7 @@ public class ActionExpression {
 		 * Returns whether or not the receiver is potentially valid for the
 		 * object via just the extension type. Currently the only supported
 		 * expression type is <code>EXP_TYPE_OBJECT_CLASS</code>.
-		 * 
+		 *
 		 * @param object
 		 *            the object to validate against (can be <code>null</code>)
 		 * @param expressionType
@@ -84,7 +84,7 @@ public class ActionExpression {
 		 * Return the value of the expression type that the receiver is enabled
 		 * for. If the receiver is not enabled for the expressionType then
 		 * return <code>null</code>.
-		 * 
+		 *
 		 * @param expressionType
 		 *            the expression type to consider
 		 * @return Collection of String if there are values for this expression
@@ -101,7 +101,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element that will be used to determine the expressions
 		 *            for And.
@@ -113,6 +113,7 @@ public class ActionExpression {
 			super(element);
 		}
 
+		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof AndExpression) {
 				final AndExpression that = (AndExpression) object;
@@ -122,9 +123,7 @@ public class ActionExpression {
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			Iterator iter = list.iterator();
 			while (iter.hasNext()) {
@@ -140,14 +139,14 @@ public class ActionExpression {
 	private static abstract class CompositeExpression extends
 			AbstractExpression {
 		/**
-		 * 
+		 *
 		 */
 		protected ArrayList list;
 
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The composite element we will create the expression from.
 		 * @throws IllegalStateException
@@ -175,11 +174,7 @@ public class ActionExpression {
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
-		 */
+		@Override
 		public String[] extractObjectClasses() {
 			Iterator iterator = list.iterator();
 			List classNames = null;
@@ -206,9 +201,10 @@ public class ActionExpression {
 
 		/**
 		 * Computes the hash code for this object based on the id.
-		 * 
+		 *
 		 * @return The hash code for this object.
 		 */
+		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(list);
@@ -219,9 +215,7 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
 			Iterator iterator = list.iterator();
@@ -234,11 +228,7 @@ public class ActionExpression {
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
-		 */
+		@Override
 		public Collection valuesForExpression(String expressionType) {
 			Iterator iterator = list.iterator();
 			Collection allValues = null;
@@ -263,7 +253,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element that will be used to create the definition for
 		 *            the receiver.
@@ -275,9 +265,7 @@ public class ActionExpression {
 			super(element);
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			return !super.isEnabledFor(object);
 		}
@@ -291,7 +279,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element that will be used to determine the expressions
 		 *            for objectClass.
@@ -312,7 +300,7 @@ public class ActionExpression {
 		/**
 		 * Create an ObjectClass expression based on the className. Added for
 		 * backwards compatibility.
-		 * 
+		 *
 		 * @param className
 		 */
 		public ObjectClassExpression(String className) {
@@ -329,7 +317,7 @@ public class ActionExpression {
 		/**
 		 * Check the interfaces the whole way up. If one of them matches
 		 * className return <code>true</code>.
-		 * 
+		 *
 		 * @param interfaceToCheck
 		 *            The interface whose name we are testing against.
 		 * @return <code>true</code> if one of the interfaces in the hierarchy
@@ -348,6 +336,7 @@ public class ActionExpression {
 			return false;
 		}
 
+		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof ObjectClassExpression) {
 				final ObjectClassExpression that = (ObjectClassExpression) object;
@@ -358,11 +347,7 @@ public class ActionExpression {
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
-		 */
+		@Override
 		public String[] extractObjectClasses() {
 			extracted = true;
 			return new String[] { className };
@@ -370,9 +355,10 @@ public class ActionExpression {
 
 		/**
 		 * Computes the hash code for this object based on the id.
-		 * 
+		 *
 		 * @return The hash code for this object.
 		 */
+		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR
@@ -385,9 +371,7 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			if (object == null) {
 				return false;
@@ -418,9 +402,7 @@ public class ActionExpression {
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
 			if (expressionType.equals(EXP_TYPE_OBJECT_CLASS)) {
@@ -438,7 +420,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element that will be used to determine the expressions
 		 *            for objectState.
@@ -457,6 +439,7 @@ public class ActionExpression {
 			}
 		}
 
+		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof ObjectStateExpression) {
 				final ObjectStateExpression that = (ObjectStateExpression) object;
@@ -473,9 +456,10 @@ public class ActionExpression {
 
 		/**
 		 * Computes the hash code for this object based on the id.
-		 * 
+		 *
 		 * @return The hash code for this object.
 		 */
+		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(name);
@@ -487,9 +471,7 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			if (object == null) {
 				return false;
@@ -530,11 +512,7 @@ public class ActionExpression {
 			return filter.testAttribute(object, name, value);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
-		 */
+		@Override
 		public Collection valuesForExpression(String expressionType) {
 			if (expressionType.equals(name)) {
 				Collection returnValue = new HashSet();
@@ -551,7 +529,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element that will be used to determine the expressions
 		 *            for Or.
@@ -563,6 +541,7 @@ public class ActionExpression {
 			super(element);
 		}
 
+		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof OrExpression) {
 				final OrExpression that = (OrExpression) object;
@@ -572,9 +551,7 @@ public class ActionExpression {
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			Iterator iter = list.iterator();
 			while (iter.hasNext()) {
@@ -595,7 +572,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element that will be used to determine the expressions
 		 *            for pluginState.
@@ -614,6 +591,7 @@ public class ActionExpression {
 			}
 		}
 
+		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof PluginStateExpression) {
 				final PluginStateExpression that = (PluginStateExpression) object;
@@ -626,9 +604,10 @@ public class ActionExpression {
 
 		/**
 		 * Computes the hash code for this object based on the id.
-		 * 
+		 *
 		 * @return The hash code for this object.
 		 */
+		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(id);
@@ -640,9 +619,7 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			Bundle bundle = Platform.getBundle(id);
 			if (!BundleUtility.isReady(bundle)) {
@@ -663,7 +640,7 @@ public class ActionExpression {
 
 		/**
 		 * Create a single expression from the abstract definition.
-		 * 
+		 *
 		 * @param expression
 		 *            The expression that will be the child of the new single
 		 *            expression.
@@ -685,7 +662,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element to create the expression from.
 		 * @throws IllegalStateException
@@ -703,6 +680,7 @@ public class ActionExpression {
 			child = createExpression(children[0]);
 		}
 
+		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof SingleExpression) {
 				final SingleExpression that = (SingleExpression) object;
@@ -712,20 +690,17 @@ public class ActionExpression {
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
-		 */
+		@Override
 		public String[] extractObjectClasses() {
 			return child.extractObjectClasses();
 		}
 
 		/**
 		 * Computes the hash code for this object based on the id.
-		 * 
+		 *
 		 * @return The hash code for this object.
 		 */
+		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(child);
@@ -736,26 +711,18 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			return child.isEnabledFor(object);
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
 			return child.isEnabledForExpression(object, expressionType);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
-		 */
+		@Override
 		public Collection valuesForExpression(String expressionType) {
 			return child.valuesForExpression(expressionType);
 		}
@@ -770,7 +737,7 @@ public class ActionExpression {
 		/**
 		 * Creates and populates the expression from the attributes and sub-
 		 * elements of the configuration element.
-		 * 
+		 *
 		 * @param element
 		 *            The element that will be used to determine the expressions
 		 *            for systemProperty.
@@ -789,9 +756,7 @@ public class ActionExpression {
 			}
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on AbstractExpression.
-		 */
+		@Override
 		public boolean isEnabledFor(Object object) {
 			String str = System.getProperty(name);
 			if (str == null) {
@@ -800,6 +765,7 @@ public class ActionExpression {
 			return value.equals(str);
 		}
 
+		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof SystemPropertyExpression) {
 				final SystemPropertyExpression that = (SystemPropertyExpression) object;
@@ -812,9 +778,10 @@ public class ActionExpression {
 
 		/**
 		 * Computes the hash code for this object based on the id.
-		 * 
+		 *
 		 * @return The hash code for this object.
 		 */
+		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(name);
@@ -835,45 +802,45 @@ public class ActionExpression {
 
 	/**
 	 * Constant definition for AND.
-	 * 
+	 *
 	 */
 	public static final String EXP_TYPE_AND = "and"; //$NON-NLS-1$
 
 	/**
 	 * Constant definition for NOT.
-	 * 
+	 *
 	 */
 	public static final String EXP_TYPE_NOT = "not"; //$NON-NLS-1$
 
 	/**
 	 * Constant definition for objectClass.
-	 * 
+	 *
 	 */
 	public static final String EXP_TYPE_OBJECT_CLASS = "objectClass"; //$NON-NLS-1$
 
 	/**
 	 * Constant definition for objectState.
-	 * 
+	 *
 	 */
 	public static final String EXP_TYPE_OBJECT_STATE = "objectState"; //$NON-NLS-1$
 
 	/**
 	 * Constant definition for OR.
-	 * 
+	 *
 	 */
 	public static final String EXP_TYPE_OR = "or"; //$NON-NLS-1$
 
 	/**
 	 * Constant definition for pluginState.
-	 * 
+	 *
 	 */
 	public static final String EXP_TYPE_PLUG_IN_STATE = "pluginState"; //$NON-NLS-1$
 
 	/**
 	 * Constant definition for systemProperty.
-	 * 
+	 *
 	 */
-	public static final String EXP_TYPE_SYSTEM_PROPERTY = "systemProperty"; //$NON-NLS-1$	
+	public static final String EXP_TYPE_SYSTEM_PROPERTY = "systemProperty"; //$NON-NLS-1$
 
 	/**
 	 * The constant integer hash code value meaning the hash code has not yet
@@ -899,7 +866,7 @@ public class ActionExpression {
 	/**
 	 * Create an expression from the attributes and sub-elements of the
 	 * configuration element.
-	 * 
+	 *
 	 * @param element
 	 *            The IConfigurationElement with a tag defined in the public
 	 *            constants.
@@ -946,7 +913,7 @@ public class ActionExpression {
 
 	/**
 	 * Creates an action expression for the given configuration element.
-	 * 
+	 *
 	 * @param element
 	 *            The element to build the expression from.
 	 */
@@ -963,7 +930,7 @@ public class ActionExpression {
 	 * Create an instance of the receiver with the given expression type and
 	 * value. Currently the only supported expression type is
 	 * <code>EXP_TYPE_OBJECT_CLASS</code>.
-	 * 
+	 *
 	 * @param expressionType
 	 *            The expression constant we are creating an instance of.
 	 * @param expressionValue
@@ -976,6 +943,7 @@ public class ActionExpression {
 		}
 	}
 
+	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof ActionExpression) {
 			final ActionExpression that = (ActionExpression) object;
@@ -991,7 +959,7 @@ public class ActionExpression {
 	 * optimized way. This method removes the objectClass test from the
 	 * expression and returns the object class. The expression is not changed
 	 * and a <code>null</code> is returned if no object class is found.
-	 * 
+	 *
 	 * @return the object class or <code>null</code> if none was found.
 	 */
 	public String[] extractObjectClasses() {
@@ -1000,9 +968,10 @@ public class ActionExpression {
 
 	/**
 	 * Computes the hash code for this object based on the id.
-	 * 
+	 *
 	 * @return The hash code for this object.
 	 */
+	@Override
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(root);
@@ -1016,7 +985,7 @@ public class ActionExpression {
 	/**
 	 * Returns whether the expression is valid for all elements of the given
 	 * selection.
-	 * 
+	 *
 	 * @param selection
 	 *            the structured selection to use
 	 * @return boolean whether the expression is valid for the selection.
@@ -1041,7 +1010,7 @@ public class ActionExpression {
 
 	/**
 	 * Returns whether the expression is valid for the given object.
-	 * 
+	 *
 	 * @param object
 	 *            the object to validate against (can be <code>null</code>)
 	 * @return boolean whether the expression is valid for the object.
@@ -1057,7 +1026,7 @@ public class ActionExpression {
 	 * Returns whether or not the receiver is potentially valid for the object
 	 * via just the extension type. Currently the only supported expression type
 	 * is <code>EXP_TYPE_OBJECT_CLASS</code>.
-	 * 
+	 *
 	 * @param object
 	 *            the object to validate against (can be <code>null</code>)
 	 * @param expressionType
@@ -1076,7 +1045,7 @@ public class ActionExpression {
 	 * Return the values of the expression type that the receiver is enabled
 	 * for. If the receiver is not enabled for the expressionType then return
 	 * <code>null</code>.
-	 * 
+	 *
 	 * @param expressionType
 	 *            the expression type to consider
 	 * @return Collection if there are values for this expression or

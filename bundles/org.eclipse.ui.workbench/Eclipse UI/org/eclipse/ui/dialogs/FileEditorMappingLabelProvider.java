@@ -24,12 +24,12 @@ import org.eclipse.ui.IFileEditorMapping;
  * A label provider for displaying of <code>IFileEditorMapping</code>
  * objects in viewers.
  * <p>
- * This class has a singleton instance, 
+ * This class has a singleton instance,
  * <code>FileEditorMappingLabelProvider.INSTANCE</code>,
  * which can be used any place this kind of label provider is needed.
  * </p>
  * <p>
- * The singleton instance hangs on to images, which get freed up when 
+ * The singleton instance hangs on to images, which get freed up when
  * <code>dispose</code> is called.
  * </p>
  *
@@ -56,10 +56,8 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         super();
     }
 
-    /* (non-Javadoc)
-     * Method declared on ILabelProvider.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         for (Iterator e = imagesToDispose.iterator(); e.hasNext();) {
             ((Image) e.next()).dispose();
@@ -69,18 +67,17 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
 
     /**
      * The <code>ResourceTypeEditorMappingLabelProvider</code> implementation of this
-     * <code>ITableLabelProvider</code> method creates and returns an new image. The 
+     * <code>ITableLabelProvider</code> method creates and returns an new image. The
      * image is remembered internally and will be deallocated by
      * <code>dispose</code>.
      */
-    public Image getColumnImage(Object element, int row) {
+    @Override
+	public Image getColumnImage(Object element, int row) {
         return getImage(element);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ITableLabelProvider.
-     */
-    public String getColumnText(Object element, int row) {
+    @Override
+	public String getColumnText(Object element, int row) {
         return getText(element);
     }
 
@@ -89,7 +86,8 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
      * <code>ILabelProvider</code> method creates and returns an new image. The image
      * is remembered internally and will be deallocated by <code>dispose</code>.
      */
-    public Image getImage(Object element) {
+    @Override
+	public Image getImage(Object element) {
         if (element instanceof IFileEditorMapping) {
             Image image = ((IFileEditorMapping) element).getImageDescriptor()
                     .createImage();
@@ -99,10 +97,8 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         return null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on ILabelProvider.
-     */
-    public String getText(Object element) {
+    @Override
+	public String getText(Object element) {
         if (element instanceof IFileEditorMapping) {
 			return TextProcessor.process(((IFileEditorMapping) element)
 					.getLabel(), "*."); //$NON-NLS-1$
