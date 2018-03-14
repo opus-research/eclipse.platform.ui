@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
-
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
-
-import org.eclipse.jface.util.SafeRunnable;
 
 /**
  * A viewer is a model-based adapter on a widget.
@@ -126,9 +125,6 @@ public abstract class Viewer implements IInputSelectionProvider {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionProvider.
-     */
     @Override
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.add(listener);
@@ -144,8 +140,8 @@ public abstract class Viewer implements IInputSelectionProvider {
      */
     protected void fireHelpRequested(HelpEvent event) {
         Object[] listeners = helpListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            ((HelpListener) listeners[i]).helpRequested(event);
+        for (Object listener : listeners) {
+            ((HelpListener) listener).helpRequested(event);
         }
     }
 
@@ -159,8 +155,8 @@ public abstract class Viewer implements IInputSelectionProvider {
      */
     protected void fireSelectionChanged(final SelectionChangedEvent event) {
         Object[] listeners = selectionChangedListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
+        for (Object listener : listeners) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listener;
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -205,15 +201,9 @@ public abstract class Viewer implements IInputSelectionProvider {
         return null;
     }
 
-    /* (non-Javadoc)
-     * Copy-down of method declared on <code>IInputProvider</code>.
-     */
     @Override
 	public abstract Object getInput();
 
-    /* (non-Javadoc)
-     * Copy-down of method declared on <code>ISelectionProvider</code>.
-     */
     @Override
 	public abstract ISelection getSelection();
 
@@ -270,9 +260,6 @@ public abstract class Viewer implements IInputSelectionProvider {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionProvider.
-     */
     @Override
 	public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
