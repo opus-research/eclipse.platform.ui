@@ -101,11 +101,6 @@ import org.osgi.service.event.EventHandler;
 import org.w3c.dom.css.CSSValue;
 
 public class StackRenderer extends LazyStackRenderer {
-	/**
-	 * 
-	 */
-	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
-
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
 	Map<MUIElement, Set<MPlaceholder>> renderedMap;
@@ -115,7 +110,7 @@ public class StackRenderer extends LazyStackRenderer {
 	private static final String STACK_SELECTED_PART = "stack_selected_part"; //$NON-NLS-1$
 
 	/**
-	 * Add this tag to prevent the next tab's activation from granting focus toac
+	 * Add this tag to prevent the next tab's activation from granting focus to
 	 * the part. This is used to keep the focus on the CTF when traversing the
 	 * tabs using the keyboard.
 	 */
@@ -706,7 +701,7 @@ public class StackRenderer extends LazyStackRenderer {
 			// Gather the parameters...old part, new part...
 			MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
 			MUIElement element = stack.getSelectedElement();
-			MPart curPart = (MPart) ctf.getTopRight().getData(THE_PART_KEY);
+			MPart curPart = (MPart) ctf.getTopRight().getData("thePart"); //$NON-NLS-1$
 			MPart part = null;
 			if (element != null) {
 				part = (MPart) ((element instanceof MPart) ? element
@@ -737,13 +732,13 @@ public class StackRenderer extends LazyStackRenderer {
 			// visible or not
 			RowData rd = (RowData) menuTB.getLayoutData();
 			if (needsMenu) {
-				menuTB.getItem(0).setData(THE_PART_KEY, part);
+				menuTB.getItem(0).setData("thePart", part); //$NON-NLS-1$
 				menuTB.moveBelow(null);
 				menuTB.pack();
 				rd.exclude = false;
 				menuTB.setVisible(true);
 			} else {
-				menuTB.getItem(0).setData(THE_PART_KEY, null);
+				menuTB.getItem(0).setData("thePart", null); //$NON-NLS-1$
 				rd.exclude = true;
 				menuTB.setVisible(false);
 			}
@@ -765,11 +760,11 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 
 			if (needsMenu || needsTB) {
-				ctf.getTopRight().setData(THE_PART_KEY, part);
+				ctf.getTopRight().setData("thePart", part); //$NON-NLS-1$
 				ctf.getTopRight().pack(true);
 				ctf.getTopRight().setVisible(true);
 			} else {
-				ctf.getTopRight().setData(THE_PART_KEY, null);
+				ctf.getTopRight().setData("thePart", null); //$NON-NLS-1$
 				ctf.getTopRight().setVisible(false);
 			}
 
@@ -1245,10 +1240,7 @@ public class StackRenderer extends LazyStackRenderer {
 	 * @param item
 	 */
 	protected void showMenu(ToolItem item) {
-		MPart part = (MPart) item.getData(THE_PART_KEY);
-		if (part == null) {
-			return;
-		}
+		MPart part = (MPart) item.getData("thePart"); //$NON-NLS-1$
 		Control ctrl = (Control) part.getWidget();
 		MMenu menuModel = getViewMenu(part);
 		if (menuModel == null || !menuModel.isToBeRendered())
@@ -1273,7 +1265,7 @@ public class StackRenderer extends LazyStackRenderer {
 		swtMenu.setLocation(displayAt);
 		swtMenu.setVisible(true);
 
-		Display display = swtMenu.getDisplay();
+		Display display = Display.getCurrent();
 		while (!swtMenu.isDisposed() && swtMenu.isVisible()) {
 			if (!display.readAndDispatch())
 				display.sleep();
