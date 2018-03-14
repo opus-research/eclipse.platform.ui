@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080, 431464
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080
  *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
  ******************************************************************************/
 
@@ -39,7 +39,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.fragment.MModelFragment;
 import org.eclipse.e4.ui.model.fragment.MModelFragments;
 import org.eclipse.e4.ui.model.fragment.impl.FragmentPackageImpl;
-import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -72,14 +71,10 @@ public class ModelAssembler {
 
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
-	//	private static final String ALWAYS = "always"; //$NON-NLS-1$
-	private static final String INITIAL = "initial"; //$NON-NLS-1$ 
-	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$ 
-
 	/**
 	 * Process the model
 	 */
-	public void processModel(boolean initial) {
+	public void processModel() {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = topoSort(extPoint.getExtensions());
 
@@ -87,10 +82,10 @@ public class ModelAssembler {
 		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
 
 		// run processors which are marked to run before fragments
-		runProcessors(extensions, initial, false);
-		processFragments(extensions, imports, addedElements, initial);
+		runProcessors(extensions, false);
+		processFragments(extensions, imports, addedElements);
 		// run processors which are marked to run after fragments
-		runProcessors(extensions, initial, true);
+		runProcessors(extensions, true);
 
 		resolveImports(imports, addedElements);
 	}
@@ -101,22 +96,20 @@ public class ModelAssembler {
 	 * @param addedElements
 	 */
 	private void processFragments(IExtension[] extensions, List<MApplicationElement> imports,
-			List<MApplicationElement> addedElements, boolean initial) {
+			List<MApplicationElement> addedElements) {
 
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if ("fragment".equals(ce.getName())) { //$NON-NLS-1$
-					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
-						processFragment(ce, imports, addedElements, initial);
-					}
+					processFragment(ce, imports, addedElements);
 				}
 			}
 		}
 	}
 
 	private void processFragment(IConfigurationElement ce, List<MApplicationElement> imports,
-			List<MApplicationElement> addedElements, boolean initial) {
+			List<MApplicationElement> addedElements) {
 		E4XMIResource applicationResource = (E4XMIResource) ((EObject) application).eResource();
 		ResourceSet resourceSet = applicationResource.getResourceSet();
 		IContributor contributor = ce.getContributor();
@@ -164,7 +157,6 @@ public class ModelAssembler {
 					contributor.getName());
 			return;
 		}
-		boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$ 
 
 		MModelFragments fragmentsContainer = (MModelFragments) extensionRoot;
 		List<MModelFragment> fragments = fragmentsContainer.getFragments();
@@ -179,11 +171,6 @@ public class ModelAssembler {
 				EObject o = (EObject) el;
 
 				E4XMIResource r = (E4XMIResource) o.eResource();
-
-				if (checkExist && applicationResource.getIDToEObjectMap().containsKey(r.getID(o))) {
-					continue;
-				}
-
 				applicationResource.setID(o, r.getID(o));
 
 				if (contributorURI != null)
@@ -222,16 +209,15 @@ public class ModelAssembler {
 	 * @param extensions
 	 * @param afterFragments
 	 */
-	private void runProcessors(IExtension[] extensions, boolean initial, Boolean afterFragments) {
+	private void runProcessors(IExtension[] extensions, Boolean afterFragments) {
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				boolean parseBoolean = Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
 				if ("processor".equals(ce.getName()) && !afterFragments.equals(parseBoolean)) { //$NON-NLS-1$
-					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
-						runProcessor(ce);
-					}
+					runProcessor(ce);
 				}
+
 			}
 		}
 	}
@@ -253,7 +239,7 @@ public class ModelAssembler {
 				key = id;
 			}
 
-			MApplicationElement el = ModelUtils.findElementById(application, id);
+			MApplicationElement el = findElementById(application, id);
 			if (el == null) {
 				logger.warn("Could not find element with id '" + id + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -281,7 +267,7 @@ public class ModelAssembler {
 		// now that we have all components loaded, resolve imports
 		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<MApplicationElement, MApplicationElement>();
 		for (MApplicationElement importedElement : imports) {
-			MApplicationElement realElement = ModelUtils.findElementById(application,
+			MApplicationElement realElement = findElementById(application,
 					importedElement.getElementId());
 			if (realElement == null) {
 				logger.warn("Could not resolve an import element for '" + realElement + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -316,7 +302,6 @@ public class ModelAssembler {
 
 					commands.add(new Runnable() {
 
-						@Override
 						public void run() {
 							if (internalFeature.isMany()) {
 								System.err.println("Replacing"); //$NON-NLS-1$
@@ -421,7 +406,6 @@ public class ModelAssembler {
 		// to explicitly resort anyways
 		List<String> sortedByOutdegree = new ArrayList<String>(requires.keySet());
 		Comparator<String> outdegreeSorter = new Comparator<String>() {
-			@Override
 			public int compare(String o1, String o2) {
 				assert requires.containsKey(o1) && requires.containsKey(o2);
 				return requires.get(o1).size() - requires.get(o2).size();
@@ -512,4 +496,22 @@ public class ModelAssembler {
 		}
 	}
 
+	// FIXME Should we not reuse ModelUtils???
+	private static MApplicationElement findElementById(MApplicationElement element, String id) {
+		if (id == null || id.length() == 0)
+			return null;
+		// is it me?
+		if (id.equals(element.getElementId()))
+			return element;
+		// Recurse if this is a container
+		EList<EObject> elements = ((EObject) element).eContents();
+		for (EObject childElement : elements) {
+			if (!(childElement instanceof MApplicationElement))
+				continue;
+			MApplicationElement result = findElementById((MApplicationElement) childElement, id);
+			if (result != null)
+				return result;
+		}
+		return null;
+	}
 }

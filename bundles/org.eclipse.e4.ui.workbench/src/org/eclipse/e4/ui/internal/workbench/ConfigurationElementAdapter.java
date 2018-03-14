@@ -23,12 +23,10 @@ public class ConfigurationElementAdapter extends ModelHandlerBase implements IAd
 		super();
 	}
 
-	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		return this;
 	}
 
-	@Override
 	public Class[] getAdapterList() {
 		return new Class[] { ModelHandlerBase.class };
 	}
