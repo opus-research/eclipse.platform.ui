@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
+ *     Wayne Beaton (The Eclipse Foundation) - Bug 162006
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
+import org.eclipse.core.runtime.IRegistryChangeListener;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -69,6 +76,10 @@ import org.eclipse.ui.themes.ColorUtil;
  */
 public abstract class QuickAccessContents {
 	/**
+	 * 
+	 */
+	static final String QUICK_ACCESS_EXTENSION_POINT = "org.eclipse.ui.workbench.quickAccess"; //$NON-NLS-1$
+	/**
 	 * When opened in a popup we were given the command used to open it. Now
 	 * that we have a shell, we are just using a hard coded command id.
 	 */
@@ -78,7 +89,21 @@ public abstract class QuickAccessContents {
 
 	protected Text filterText;
 
+	private QuickAccessProvider[] baseProviders;
 	private QuickAccessProvider[] providers;
+	private IEclipseContext context;
+
+	/**
+	 * When the extension registry changes, recompute the providers.
+	 */
+	private IRegistryChangeListener registryChangeListener = new IRegistryChangeListener() {
+		@Override
+		public void registryChanged(IRegistryChangeEvent event) {
+			// TODO Clean up the PreviousPicksProvider
+			computeProviders();
+			resetProviders();
+		}
+	};
 
 	protected Table table;
 	protected Label infoLabel;
@@ -98,8 +123,33 @@ public abstract class QuickAccessContents {
 	protected boolean resized = false;
 	private TriggerSequence keySequence;
 
-	public QuickAccessContents(QuickAccessProvider[] providers) {
-		this.providers = providers;
+	public QuickAccessContents(QuickAccessProvider[] providers, IEclipseContext context) {
+		baseProviders = providers;
+		this.context = context;
+		computeProviders();
+
+		Platform.getExtensionRegistry().addRegistryChangeListener(registryChangeListener, "org.eclipse.ui.workbench"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Computes the full set of providers starting with the base
+	 * (built-in/system) providers, then adding providers contributed via the
+	 * "quickAccess" extension point. This method destructively modifies the
+	 * {@link QuickAccessContents#providers} field with up-to-date information
+	 * based on information provided from the extension registry.
+	 */
+	private void computeProviders() {
+		List<QuickAccessProvider> extensionProviders = new ArrayList<QuickAccessProvider>();
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IConfigurationElement[] config = registry.getConfigurationElementsFor(QUICK_ACCESS_EXTENSION_POINT);
+		for (IConfigurationElement element : config) {
+			extensionProviders.add(new ExtensionQuickAccessProvider(element, context));
+		}
+
+		providers = new QuickAccessProvider[baseProviders.length + extensionProviders.size()];
+		System.arraycopy(baseProviders, 0, providers, 0, baseProviders.length);
+		for (int index = 0; index < extensionProviders.size(); index++)
+			providers[index + baseProviders.length] = extensionProviders.get(index);
 	}
 
 	/**
@@ -429,6 +479,9 @@ public abstract class QuickAccessContents {
 			resourceManager.dispose();
 			resourceManager = null;
 		}
+
+		Platform.getExtensionRegistry().removeRegistryChangeListener(registryChangeListener);
+
 	}
 
 	protected IDialogSettings getDialogSettings() {
@@ -713,6 +766,13 @@ public abstract class QuickAccessContents {
 		for (QuickAccessProvider provider : providers) {
 			provider.reset();
 		}
+	}
+
+	/**
+	 * @return
+	 */
+	public QuickAccessProvider[] getProviders() {
+		return providers;
 	}
 
 }
