@@ -222,12 +222,12 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	/** @return the currently selected theme or null if there are no themes */
 	private ITheme getSelectedTheme() {
-		return (ITheme) (themeIdCombo.getStructuredSelection().getFirstElement());
+		return (ITheme) ((IStructuredSelection) themeIdCombo.getSelection()).getFirstElement();
 	}
 
 	@Override
 	public void init(IWorkbench workbench) {
-		MApplication application = workbench.getService(MApplication.class);
+		MApplication application = (MApplication) workbench.getService(MApplication.class);
 		IEclipseContext context = application.getContext();
 		defaultTheme = (String) context.get(E4Application.THEME_ID);
 		engine = context.get(IThemeEngine.class);
@@ -462,7 +462,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private ColorsAndFontsTheme getSelectedColorsAndFontsTheme() {
-		return (ColorsAndFontsTheme) colorsAndFontsThemeCombo.getStructuredSelection().getFirstElement();
+		return (ColorsAndFontsTheme) ((IStructuredSelection) colorsAndFontsThemeCombo
+				.getSelection()).getFirstElement();
 	}
 
 	private ColorsAndFontsTheme getCurrentColorsAndFontsTheme() {
