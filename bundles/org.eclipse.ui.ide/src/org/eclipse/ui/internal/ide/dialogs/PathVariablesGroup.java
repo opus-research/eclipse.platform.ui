@@ -41,6 +41,7 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
@@ -634,6 +635,12 @@ public class PathVariablesGroup {
 		public Object[] getElements(Object inputElement) {
 			return tempPathVariables.keySet().toArray();
 		}
+
+		@Override
+		public void dispose() { }
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) { }
 	}
 
 	/**

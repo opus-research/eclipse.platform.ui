@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
@@ -94,7 +93,7 @@ public class ProgressManager extends ProgressProvider implements
 
 	private static ProgressManager singleton;
 
-	final private Map<Job, JobInfo> jobs = Collections.synchronizedMap(new HashMap<>());
+	final private Map jobs = Collections.synchronizedMap(new HashMap());
 
 	final private Map familyListeners = Collections
 			.synchronizedMap(new HashMap());
@@ -314,7 +313,6 @@ public class ProgressManager extends ProgressProvider implements
 				listener.setBlocked(reason);
 			}
 		}
-
 	}
 
 	/**
@@ -637,7 +635,7 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return JobInfo
 	 */
 	JobInfo internalGetJobInfo(Job job) {
-		return jobs.get(job);
+		return (JobInfo) jobs.get(job);
 	}
 
 	/**
@@ -793,10 +791,12 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public JobInfo[] getJobInfos(boolean debug) {
 		synchronized (jobs) {
-			Collection<JobInfo> result = new ArrayList<>();
-			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
-				if (!isCurrentDisplaying(entry.getKey(), debug)) {
-					result.add(entry.getValue());
+			Iterator iterator = jobs.keySet().iterator();
+			Collection result = new ArrayList();
+			while (iterator.hasNext()) {
+				Job next = (Job) iterator.next();
+				if (!isCurrentDisplaying(next, debug)) {
+					result.add(jobs.get(next));
 				}
 			}
 			JobInfo[] infos = new JobInfo[result.size()];
@@ -813,10 +813,12 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public JobTreeElement[] getRootElements(boolean debug) {
 		synchronized (jobs) {
-			Collection<JobTreeElement> result = new HashSet<>();
-			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
-				if (!isCurrentDisplaying(entry.getKey(), debug)) {
-					JobInfo jobInfo = entry.getValue();
+			Iterator iterator = jobs.keySet().iterator();
+			Collection result = new HashSet();
+			while (iterator.hasNext()) {
+				Job next = (Job) iterator.next();
+				if (!isCurrentDisplaying(next, debug)) {
+					JobInfo jobInfo = (JobInfo) jobs.get(next);
 					GroupInfo group = jobInfo.getGroupInfo();
 					if (group == null) {
 						result.add(jobInfo);
@@ -838,7 +840,11 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public boolean hasJobInfos() {
 		synchronized (jobs) {
-			return !jobs.isEmpty();
+			Iterator iterator = jobs.keySet().iterator();
+			while (iterator.hasNext()) {
+				return true;
+			}
+			return false;
 		}
 	}
 
