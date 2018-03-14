@@ -1,26 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2013 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.helpers;
 
 import static org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelper.getFontData;
-import static org.junit.Assert.assertEquals;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
-import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
-	@Test
-	public void testGetFontData() {
+	public void testGetFontData() throws Exception {
 		FontData result = getFontData(fontProperties("Times", 11, SWT.NORMAL),
 				new FontData());
 
@@ -29,8 +25,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 		assertEquals(SWT.NORMAL, result.getStyle());
 	}
 
-	@Test
-	public void testGetFontDataWhenMissingFamilyInCss() {
+	public void testGetFontDataWhenMissingFamilyInCss() throws Exception {
 		FontData result = getFontData(fontProperties(null, 11, SWT.NORMAL),
 				new FontData("Courier", 5, SWT.ITALIC));
 
@@ -39,8 +34,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 		assertEquals(SWT.NORMAL, result.getStyle());
 	}
 
-	@Test
-	public void testGetFontDataWhenMissingSizeInCss() {
+	public void testGetFontDataWhenMissingSizeInCss() throws Exception {
 		FontData result = getFontData(fontProperties("Arial", null, SWT.NORMAL),
 				new FontData("Courier", 5, SWT.ITALIC));
 
@@ -49,8 +43,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 		assertEquals(SWT.NORMAL, result.getStyle());
 	}
 
-	@Test
-	public void testGetFontDataWhenMissingStyleInCss() {
+	public void testGetFontDataWhenMissingStyleInCss() throws Exception {
 		FontData result = getFontData(fontProperties("Times", 11, null),
 				new FontData("Courier", 5, SWT.ITALIC));
 
@@ -59,8 +52,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 		assertEquals(SWT.ITALIC, result.getStyle());
 	}
 
-	@Test
-	public void testGetFontDataWhenFontFamilyFromDefinition() {
+	public void testGetFontDataWhenFontFamilyFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 
 		FontData result = getFontData(
@@ -74,8 +66,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 		assertEquals(SWT.ITALIC, result.getStyle());
 	}
 
-	@Test
-	public void testGetFontDataWhenFontFamilyAndSizeFromDefinition() {
+	public void testGetFontDataWhenFontFamilyAndSizeFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 
 		FontData result = getFontData(
@@ -89,8 +80,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 		assertEquals(SWT.ITALIC, result.getStyle());
 	}
 
-	@Test
-	public void testGetFontDataWhenFontFamilySizeAndStyleFromDefinition() {
+	public void testGetFontDataWhenFontFamilySizeAndStyleFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 
 		FontData result = getFontData(
