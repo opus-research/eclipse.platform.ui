@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -172,7 +171,6 @@ public class EditorTestHelper {
 		runEventQueue(minTime);
 
 		DisplayHelper helper= new DisplayHelper() {
-			@Override
 			public boolean condition() {
 				return allJobsQuiet();
 			}
@@ -235,12 +233,12 @@ public class EditorTestHelper {
 
 
 	public static IFile[] findFiles(IResource resource) throws CoreException {
-		List<IResource> files= new ArrayList<IResource>();
+		List files= new ArrayList();
 		findFiles(resource, files);
-		return files.toArray(new IFile[files.size()]);
+		return (IFile[]) files.toArray(new IFile[files.size()]);
 	}
 
-	private static void findFiles(IResource resource, List<IResource> files) throws CoreException {
+	private static void findFiles(IResource resource, List files) throws CoreException {
 		if (resource instanceof IFile) {
 			files.add(resource);
 			return;

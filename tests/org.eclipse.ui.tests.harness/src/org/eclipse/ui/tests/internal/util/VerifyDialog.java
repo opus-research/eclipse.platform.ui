@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
@@ -212,7 +211,7 @@ public class VerifyDialog extends TitleAreaDialog {
         IDialogTestPass test = _dialogTests[TEST_TYPE];
         setTitle(test.title());
         setMessage(test.description());
-		Iterator<?> iterator = test.checkListTexts().iterator();
+        Iterator iterator = test.checkListTexts().iterator();
         for (int i = 0; i < _checkList.length; i++) {
             if (iterator.hasNext()) {
                 _checkList[i].setText(iterator.next().toString());
