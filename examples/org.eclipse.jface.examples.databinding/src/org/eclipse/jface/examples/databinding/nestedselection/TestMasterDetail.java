@@ -57,7 +57,6 @@ public class TestMasterDetail {
 	 */
 	private static final class CustomUpdateValueStrategy extends
 			UpdateValueStrategy {
-		@Override
 		protected IStatus doSet(IObservableValue observableValue, Object value) {
 			IStatus result = super.doSet(observableValue, value);
 			if (result.isOK()) {
@@ -198,7 +197,6 @@ public class TestMasterDetail {
 		final Display display = new Display();
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				createShell();
 				bind(shell);
@@ -228,30 +226,25 @@ public class TestMasterDetail {
 				.observeSingleSelection(peopleViewer);
 
 		DataBindingContext dbc = new DataBindingContext(realm) {
-			@Override
 			protected UpdateValueStrategy createTargetToModelUpdateValueStrategy(
 					IObservableValue fromValue, IObservableValue toValue) {
 				return new CustomUpdateValueStrategy();
 			}
 		};
 		IConverter upperCaseConverter = new IConverter() {
-			@Override
 			public Object convert(Object fromObject) {
 				return ((String) fromObject).toUpperCase();
 			}
 
-			@Override
 			public Object getFromType() {
 				return String.class;
 			}
 
-			@Override
 			public Object getToType() {
 				return String.class;
 			}
 		};
 		IValidator vowelValidator = new IValidator() {
-			@Override
 			public IStatus validate(Object value) {
 				String s = (String) value;
 				if (!s.matches("[aeiouAEIOU]*")) {

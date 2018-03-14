@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -458,7 +458,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @param tree
 	 *            the table tree control
 	 */
-	@Deprecated
 	public TableTreeViewer(TableTree tree) {
 		super();
 		tableTree = tree;
@@ -477,7 +476,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @param parent
 	 *            the parent control
 	 */
-	@Deprecated
 	public TableTreeViewer(Composite parent) {
 		this(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 	}
@@ -493,7 +491,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @param style
 	 *            the SWT style bits
 	 */
-	@Deprecated
 	public TableTreeViewer(Composite parent, int style) {
 		this(new TableTree(parent, style));
 	}
@@ -504,7 +501,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	@Deprecated
 	public void cancelEditing() {
 		tableEditorImpl.cancelEditing();
 	}
@@ -566,19 +562,16 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	@Deprecated
 	public void editElement(Object element, int column) {
 		tableEditorImpl.editElement(element, column);
 	}
 
 	@Override
-	@Deprecated
 	public CellEditor[] getCellEditors() {
 		return tableEditorImpl.getCellEditors();
 	}
 
 	@Override
-	@Deprecated
 	public ICellModifier getCellModifier() {
 		return tableEditorImpl.getCellModifier();
 	}
@@ -606,13 +599,11 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	@Deprecated
 	public Object[] getColumnProperties() {
 		return tableEditorImpl.getColumnProperties();
 	}
 
 	@Override
-	@Deprecated
 	public Control getControl() {
 		return tableTree;
 	}
@@ -629,7 +620,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * @return the element at the given index, or <code>null</code> if the
 	 *         index is out of range
 	 */
-	@Deprecated
 	public Object getElementAt(int index) {
 		// XXX: Workaround for 1GBCSB1: SWT:WIN2000 - TableTree should have
 		// getItem(int index)
@@ -677,7 +667,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * image for the first column, and any remaining columns are blank.
 	 */
 	@Override
-	@Deprecated
 	public IBaseLabelProvider getLabelProvider() {
 		return super.getLabelProvider();
 	}
@@ -697,7 +686,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	 * 
 	 * @return the table tree control
 	 */
-	@Deprecated
 	public TableTree getTableTree() {
 		return tableTree;
 	}
@@ -731,7 +719,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	@Deprecated
 	public boolean isCellEditorActive() {
 		return tableEditorImpl.isCellEditorActive();
 	}
@@ -761,31 +748,26 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	@Deprecated
 	public void setCellEditors(CellEditor[] editors) {
 		tableEditorImpl.setCellEditors(editors);
 	}
 
 	@Override
-	@Deprecated
 	public void setCellModifier(ICellModifier modifier) {
 		tableEditorImpl.setCellModifier(modifier);
 	}
 
 	@Override
-	@Deprecated
 	public void setColumnProperties(String[] columnProperties) {
 		tableEditorImpl.setColumnProperties(columnProperties);
 	}
 
 	@Override
-	@Deprecated
 	protected void setExpanded(Item node, boolean expand) {
 		((TableTreeItem) node).setExpanded(expand);
 	}
 
 	@Override
-	@Deprecated
 	protected void setSelection(List items) {
 		TableTreeItem[] newItems = new TableTreeItem[items.size()];
 		items.toArray(newItems);
@@ -793,7 +775,6 @@ public class TableTreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	@Deprecated
 	protected void showItem(Item item) {
 		getTableTree().showItem((TableTreeItem) item);
 	}

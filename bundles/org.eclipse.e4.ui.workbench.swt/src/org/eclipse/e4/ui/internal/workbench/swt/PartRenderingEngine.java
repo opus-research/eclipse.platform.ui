@@ -15,10 +15,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -27,8 +25,6 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -42,7 +38,6 @@ import org.eclipse.e4.ui.bindings.keys.KeyBindingDispatcher;
 import org.eclipse.e4.ui.css.core.util.impl.resources.OSGiResourceLocator;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.css.swt.engine.CSSSWTEngineImpl;
-import org.eclipse.e4.ui.css.swt.helpers.EclipsePreferencesHelper;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.e4.ui.di.Focus;
@@ -83,12 +78,9 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.testing.TestableObject;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.w3c.dom.Element;
@@ -112,7 +104,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	// Life Cycle handlers
 	private EventHandler toBeRenderedHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 
 			MUIElement changedElement = (MUIElement) event
@@ -165,7 +156,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 	};
 
 	private EventHandler visibilityHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			MUIElement changedElement = (MUIElement) event
 					.getProperty(UIEvents.EventTags.ELEMENT);
@@ -223,7 +213,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 	};
 
 	private EventHandler trimHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
 			if (!(changedObj instanceof MTrimmedWindow))
@@ -253,7 +242,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 	};
 
 	private EventHandler childrenHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 
 			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
@@ -342,13 +330,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 	};
 
 	private EventHandler windowsHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			childrenHandler.handleEvent(event);
 		}
 	};
-
-	private StylingPreferencesHandler cssThemeChangedHandler;
 
 	private IEclipseContext appContext;
 
@@ -480,11 +465,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					windowsHandler);
 			eventBroker.subscribe(UIEvents.TrimmedWindow.TOPIC_TRIMBARS,
 					trimHandler);
-
-			cssThemeChangedHandler = new StylingPreferencesHandler(
-					context.get(Display.class));
-			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED,
-					cssThemeChangedHandler);
 		}
 	}
 
@@ -496,7 +476,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(childrenHandler);
 		eventBroker.unsubscribe(trimHandler);
-		eventBroker.unsubscribe(cssThemeChangedHandler);
 	}
 
 	private static void populateModelInterfaces(MContext contextModel,
@@ -522,14 +501,12 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return builder.toString();
 	}
 
-	@Override
 	public Object createGui(final MUIElement element,
 			final Object parentWidget, final IEclipseContext parentContext) {
 		final Object[] gui = { null };
 		// wrap the handling in a SafeRunner so that exceptions do not prevent
 		// the renderer from processing other elements
 		SafeRunner.run(new ISafeRunnable() {
-			@Override
 			public void handleException(Throwable e) {
 				if (e instanceof Error) {
 					// errors are deadly, we shouldn't ignore these
@@ -542,7 +519,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 			}
 
-			@Override
 			public void run() throws Exception {
 				gui[0] = safeCreateGui(element, parentWidget, parentContext);
 			}
@@ -707,13 +683,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return modelService.getContainingContext(parent);
 	}
 
-	@Override
 	public Object createGui(final MUIElement element) {
 		final Object[] gui = { null };
 		// wrap the handling in a SafeRunner so that exceptions do not prevent
 		// the renderer from processing other elements
 		SafeRunner.run(new ISafeRunnable() {
-			@Override
 			public void handleException(Throwable e) {
 				if (e instanceof Error) {
 					// errors are deadly, we shouldn't ignore these
@@ -726,7 +700,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 			}
 
-			@Override
 			public void run() throws Exception {
 				gui[0] = safeCreateGui(element);
 			}
@@ -773,7 +746,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 	 * org.eclipse.e4.ui.workbench.IPresentationEngine#focusGui(org.eclipse.
 	 * e4.ui.model.application.ui.MUIElement)
 	 */
-	@Override
 	public void focusGui(MUIElement element) {
 		AbstractPartRenderer renderer = (AbstractPartRenderer) element
 				.getRenderer();
@@ -834,12 +806,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 	/**
 	 * @param element
 	 */
-	@Override
 	public void removeGui(final MUIElement element) {
 		// wrap the handling in a SafeRunner so that exceptions do not prevent
 		// the menu from being shown
 		SafeRunner.run(new ISafeRunnable() {
-			@Override
 			public void handleException(Throwable e) {
 				if (e instanceof Error) {
 					// errors are deadly, we shouldn't ignore these
@@ -852,7 +822,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 			}
 
-			@Override
 			public void run() throws Exception {
 				safeRemoveGui(element);
 			}
@@ -1019,7 +988,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return (AbstractPartRenderer) element.getRenderer();
 	}
 
-	@Override
 	public Object run(final MApplicationElement uiRoot,
 			final IEclipseContext runContext) {
 		final Display display;
@@ -1031,7 +999,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 
-			@Override
 			public void run() {
 				initializeStyling(display, runContext);
 
@@ -1124,12 +1091,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 						IEventLoopAdvisor.class);
 				if (advisor == null) {
 					advisor = new IEventLoopAdvisor() {
-						@Override
 						public void eventLoopIdle(Display display) {
 							display.sleep();
 						}
 
-						@Override
 						public void eventLoopException(Throwable exception) {
 							StatusReporter statusReporter = (StatusReporter) appContext
 									.get(StatusReporter.class.getName());
@@ -1210,7 +1175,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return false;
 	}
 
-	@Override
 	public void stop() {
 		// FIXME Without this call the test-suite fails
 		cleanUp();
@@ -1249,37 +1213,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
-		if ("none".equals(cssTheme)) {
-			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
-				@Override
-				public void setClassname(Object widget, String classname) {
-					WidgetElement.setCSSClass((Widget) widget, classname);
-				}
+		final IThemeEngine themeEngine = createThemeEngine(display, appContext);
 
-				@Override
-				public void setId(Object widget, String id) {
-					WidgetElement.setID((Widget) widget, id);
-				}
-
-				@Override
-				public void style(Object widget) {
-				}
-
-				@Override
-				public CSSStyleDeclaration getStyle(Object widget) {
-					return null;
-				}
-
-				@Override
-				public void setClassnameAndId(Object widget, String classname,
-						String id) {
-					WidgetElement.setCSSClass((Widget) widget, classname);
-					WidgetElement.setID((Widget) widget, id);
-				}
-			});
-		} else if (cssTheme != null) {
-			final IThemeEngine themeEngine = createThemeEngine(display,
-					appContext);
+		if (cssTheme != null) {
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
@@ -1289,31 +1225,28 @@ public class PartRenderingEngine implements IPresentationEngine {
 				themeEngine.registerResourceLocator(new OSGiResourceLocator(
 						cssResourcesURI));
 			}
-			
+
+			themeEngine.restore(cssTheme);
+
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
-				@Override
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					themeEngine.applyStyles(widget, true);
 				}
 
-				@Override
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
 					themeEngine.applyStyles(widget, true);
 				}
 
-				@Override
 				public void style(Object widget) {
 					themeEngine.applyStyles(widget, true);
 				}
 
-				@Override
 				public CSSStyleDeclaration getStyle(Object widget) {
 					return themeEngine.getStyle(widget);
 				}
 
-				@Override
 				public void setClassnameAndId(Object widget, String classname,
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
@@ -1321,9 +1254,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					themeEngine.applyStyles(widget, true);
 				}
 			});
-
-			setCSSTheme(display, themeEngine, cssTheme);
-
 		} else if (cssURI != null) {
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
@@ -1337,24 +1267,20 @@ public class PartRenderingEngine implements IPresentationEngine {
 			// FIXME: is this needed?
 			display.setData("org.eclipse.e4.ui.css.context", appContext); //$NON-NLS-1$
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
-				@Override
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					cssEngine.applyStyles(widget, true);
 				}
 
-				@Override
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
 					cssEngine.applyStyles(widget, true);
 				}
 
-				@Override
 				public void style(Object widget) {
 					cssEngine.applyStyles(widget, true);
 				}
 
-				@Override
 				public CSSStyleDeclaration getStyle(Object widget) {
 					Element e = cssEngine.getCSSElementContext(widget)
 							.getElement();
@@ -1364,13 +1290,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 					return cssEngine.getViewCSS().getComputedStyle(e, null);
 				}
 
-				@Override
 				public void setClassnameAndId(Object widget, String classname,
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
 					cssEngine.applyStyles(widget, true);
 				}
+
 			});
 
 			URL url;
@@ -1414,6 +1340,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 		CSSRenderingUtils cssUtils = ContextInjectionFactory.make(
 				CSSRenderingUtils.class, appContext);
 		appContext.set(CSSRenderingUtils.class, cssUtils);
+
+		IEventBroker broker = appContext.get(IEventBroker.class);
+		if (broker != null) {
+			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
+		}
 	}
 
 	private static IThemeEngine createThemeEngine(Display display, IEclipseContext appContext) {
@@ -1429,93 +1360,5 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		appContext.set(IThemeEngine.class.getName(), themeEngine);
 		return themeEngine;
-	}
-
-	private static void setCSSTheme(Display display, IThemeEngine themeEngine,
-			String cssTheme) {
-		if (display.getHighContrast()) {
-			themeEngine.setTheme(cssTheme, false);
-		} else {
-			themeEngine.restore(cssTheme);
-		}
-	}
-
-	public static class StylingPreferencesHandler implements EventHandler {
-		private HashSet<IEclipsePreferences> prefs = null;
-
-		public StylingPreferencesHandler(Display display) {
-			if (display != null) {
-				display.addListener(SWT.Dispose,
-						createOnDisplayDisposedListener());
-			}
-		}
-
-		protected Listener createOnDisplayDisposedListener() {
-			return new Listener() {
-					@Override
-					public void handleEvent(org.eclipse.swt.widgets.Event event) {
-						resetOverriddenPreferences();
-					}
-			};
-		}
-
-		@Override
-		public void handleEvent(Event event) {
-			resetOverriddenPreferences();
-			overridePreferences(getThemeEngine(event));
-		}
-
-		protected void resetOverriddenPreferences() {
-			for (IEclipsePreferences preferences : getPreferences()) {
-				resetOverriddenPreferences(preferences);
-			}
-		}
-
-		protected void resetOverriddenPreferences(
-				IEclipsePreferences preferences) {
-			for (String name : getOverriddenPropertyNames(preferences)) {
-				preferences.remove(name);
-			}
-			removeOverriddenPropertyNames(preferences);
-		}
-
-		protected void removeOverriddenPropertyNames(
-				IEclipsePreferences preferences) {
-			EclipsePreferencesHelper.removeOverriddenPropertyNames(preferences);
-		}
-
-		protected List<String> getOverriddenPropertyNames(
-				IEclipsePreferences preferences) {
-			return EclipsePreferencesHelper
-					.getOverriddenPropertyNames(preferences);
-		}
-
-		protected Set<IEclipsePreferences> getPreferences() {
-			if (prefs == null) {
-				prefs = new HashSet<IEclipsePreferences>();
-				BundleContext context = WorkbenchSWTActivator.getDefault()
-						.getContext();
-				for (Bundle bundle : context.getBundles()) {
-					if (bundle.getSymbolicName() != null) {
-						prefs.add(InstanceScope.INSTANCE.getNode(bundle
-								.getSymbolicName()));
-					}
-				}
-			}
-			return prefs;
-		}
-
-		private void overridePreferences(IThemeEngine themeEngine) {
-			if (themeEngine != null) {
-				for (IEclipsePreferences preferences : getPreferences()) {
-					themeEngine.applyStyles(preferences, false);
-				}
-			}
-		}
-
-		private IThemeEngine getThemeEngine(Event event) {
-			return (IThemeEngine) event
-					.getProperty(IThemeEngine.Events.THEME_ENGINE);
-		}
 	}
 }

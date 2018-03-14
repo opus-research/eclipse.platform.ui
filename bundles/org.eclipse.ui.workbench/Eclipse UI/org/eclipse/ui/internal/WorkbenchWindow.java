@@ -8,11 +8,10 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Zhongwei Zhao - Bug 379495 - Two "Run" on top menu
- *     Patrick Chuong - Bug 391481 - Contributing perspectiveExtension, hiddenMenuItem
+ *     Patrick Chuong - Bug 391481 - Contributing perspectiveExtension, hiddenMenuItem 
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446, 433979
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -52,7 +51,6 @@ import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
@@ -74,6 +72,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.model.internal.Position;
 import org.eclipse.e4.ui.model.internal.PositionInfo;
 import org.eclipse.e4.ui.services.EContextService;
@@ -202,11 +201,6 @@ import org.osgi.service.event.EventHandler;
  * A window within the workbench.
  */
 public class WorkbenchWindow implements IWorkbenchWindow {
-
-	/**
-	 * The 'elementId' of the spacer used to right-align it in the trim
-	 */
-	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
 
 	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
@@ -667,7 +661,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			Shell shell = (Shell) model.getWidget();
 			if (model.getMainMenu() == null) {
-				final MMenu mainMenu = modelService.createModelElement(MMenu.class);
+				final MMenu mainMenu = MenuFactoryImpl.eINSTANCE.createMenu();
 				mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
 
 				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory
@@ -812,7 +806,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	void populateTopTrimContributions() {
 		getCoolBarManager2().update(true);
-		getCoolBarManager2().add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		final MTrimBar trimBar = getTopTrim();
 		// TODO why aren't these added as trim contributions
@@ -828,45 +821,26 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		 * and so on, buttons which are normally placed at the beginning of the
 		 * trimbar (left) would be moved to the end of it (right).)
 		 */
-		MToolControl spacerControl = (MToolControl) modelService.find(PERSPECTIVE_SPACER_ID, model);
+		MToolControl spacerControl = (MToolControl) modelService.find("PerspectiveSpacer", model); //$NON-NLS-1$
 		if (spacerControl == null) {
-			spacerControl = modelService.createModelElement(MToolControl.class);
-			spacerControl.setElementId(PERSPECTIVE_SPACER_ID);
+			spacerControl = MenuFactoryImpl.eINSTANCE.createToolControl();
+			spacerControl.setElementId("PerspectiveSpacer"); //$NON-NLS-1$
 			spacerControl
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			spacerControl.getTags().add(TrimBarLayout.SPACER);
-			spacerControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
 			trimBar.getChildren().add(spacerControl);
-		} else {
-			if (!spacerControl.getTags().contains("SHOW_RESTORE_MENU")) { //$NON-NLS-1$
-				spacerControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
-			}
 		}
 
 		MToolControl switcherControl = (MToolControl) modelService.find(
 				"PerspectiveSwitcher", model); //$NON-NLS-1$
-		if (switcherControl == null && getWindowConfigurer().getShowPerspectiveBar()) {
-			switcherControl = modelService.createModelElement(MToolControl.class);
+		if (switcherControl == null) {
+			switcherControl = MenuFactoryImpl.eINSTANCE.createToolControl();
 			switcherControl.setToBeRendered(getWindowConfigurer().getShowPerspectiveBar());
 			switcherControl.setElementId("PerspectiveSwitcher"); //$NON-NLS-1$
 			switcherControl.getTags().add(IPresentationEngine.DRAGGABLE);
-			switcherControl.getTags().add("HIDEABLE"); //$NON-NLS-1$
-			switcherControl.getTags().add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
 			switcherControl
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.e4.ui.workbench.addons.perspectiveswitcher.PerspectiveSwitcher"); //$NON-NLS-1$
 			trimBar.getChildren().add(switcherControl);
-		} else if (switcherControl != null) {
-			if (!getWindowConfigurer().getShowPerspectiveBar()) {
-				trimBar.getChildren().remove(switcherControl);
-			} else {
-				List<String> tags = switcherControl.getTags();
-				if (!tags.contains("HIDEABLE")) { //$NON-NLS-1$
-					tags.add("HIDEABLE"); //$NON-NLS-1$
-				}
-				if (!tags.contains("SHOW_RESTORE_MENU")) { //$NON-NLS-1$
-					tags.add("SHOW_RESTORE_MENU"); //$NON-NLS-1$
-				}
-			}
 		}
 
 		// render now after everything has been added so contributions can be
@@ -919,51 +893,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					quickAccessElementId, model);
 			if (quickAccessElement != null) {
 				moveControl(quickAccessElement.getParent(), quickAccessElement);
-
-				// target the quick access field specifically
-				if (QUICK_ACCESS_ID.equals(quickAccessElement.getElementId())) {
-					if (model.getTags().contains(QUICK_ACCESS_HIDDEN)) {
-						if (!quickAccessElement.getTags().contains(
-								IPresentationEngine.HIDDEN_EXPLICITLY)) {
-							quickAccessElement.getTags().add(IPresentationEngine.HIDDEN_EXPLICITLY);
-						}
-					}
-				}
 			}
 		}
 
-	}
-
-	private static final String QUICK_ACCESS_ID = "SearchField"; //$NON-NLS-1$
-	private static final String QUICK_ACCESS_HIDDEN = "QUICK_ACCESS_HIDDEN"; //$NON-NLS-1$
-
-	@Inject
-	private void hideQuickAccess(
-			@Optional @UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
-		if (event == null) {
-			return;
-		}
-		Object origin = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(origin instanceof MToolControl)) {
-			return;
-		}
-		MToolControl control = (MToolControl) origin;
-		if (!QUICK_ACCESS_ID.equals(control.getElementId())) {
-			return;
-		}
-		if (UIEvents.isADD(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
-				if (!model.getTags().contains(QUICK_ACCESS_HIDDEN)) {
-					model.getTags().add(QUICK_ACCESS_HIDDEN);
-				}
-			}
-		} else if (UIEvents.isREMOVE(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					IPresentationEngine.HIDDEN_EXPLICITLY)) {
-				model.getTags().remove(QUICK_ACCESS_HIDDEN);
-			}
-		}
 	}
 
 	/**
@@ -1087,7 +1019,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		MToolControl slElement = (MToolControl) modelService.find(
 				"org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
 		if (slElement == null) {
-			slElement = modelService.createModelElement(MToolControl.class);
+			slElement = MenuFactoryImpl.eINSTANCE.createToolControl();
 			slElement.setElementId("org.eclipse.ui.StatusLine"); //$NON-NLS-1$
 			slElement
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
@@ -1100,7 +1032,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		MToolControl hsElement = (MToolControl) modelService.find(
 				"org.eclipse.ui.HeapStatus", model); //$NON-NLS-1$
 		if (hsElement == null) {
-			hsElement = modelService.createModelElement(MToolControl.class);
+			hsElement = MenuFactoryImpl.eINSTANCE.createToolControl();
 			hsElement.setElementId("org.eclipse.ui.HeapStatus"); //$NON-NLS-1$
 			hsElement
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
@@ -1113,7 +1045,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		MToolControl pbElement = (MToolControl) modelService.find(
 				"org.eclipse.ui.ProgressBar", model); //$NON-NLS-1$
 		if (pbElement == null) {
-			pbElement = modelService.createModelElement(MToolControl.class);
+			pbElement = MenuFactoryImpl.eINSTANCE.createToolControl();
 			pbElement.setElementId("org.eclipse.ui.ProgressBar"); //$NON-NLS-1$
 			pbElement.getTags().add(IPresentationEngine.DRAGGABLE);
 			pbElement
@@ -1205,7 +1137,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				insertIndex++;
 		}
 
-		MToolControl newTrimElement = modelService.createModelElement(MToolControl.class);
+		MToolControl newTrimElement = MenuFactoryImpl.eINSTANCE.createToolControl();
 		newTrimElement.setElementId(id);
 		newTrimElement.setToBeRendered(classSpec != null);
 		if (classSpec != null) {
@@ -1256,7 +1188,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					menu.getChildren().add(menuItem);
 				}
 			} else if (item instanceof AbstractGroupMarker) {
-				MMenuSeparator separator = modelService.createModelElement(MMenuSeparator.class);
+				MMenuSeparator separator = MenuFactoryImpl.eINSTANCE.createMenuSeparator();
 				separator.setVisible(item.isVisible());
 				separator.setElementId(item.getId());
 				if (item instanceof GroupMarker) {
@@ -1915,7 +1847,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			getActionBarAdvisor().dispose();
 			getWindowAdvisor().dispose();
-			coolbarToTrim.dispose();
 
 			// Null out the progress region. Bug 64024.
 			progressRegion = null;

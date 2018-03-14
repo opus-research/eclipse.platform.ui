@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -34,7 +32,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -48,9 +45,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.PartServiceImpl;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -61,19 +56,17 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
-import org.eclipse.e4.ui.workbench.addons.minmax.TrimStack;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
@@ -184,8 +177,7 @@ import org.osgi.service.event.EventHandler;
 /**
  * A collection of views and editors in a workbench.
  */
-public class WorkbenchPage extends CompatibleWorkbenchPage implements
-        IWorkbenchPage {
+public class WorkbenchPage implements IWorkbenchPage {
 
 	private static final String ATT_AGGREGATE_WORKING_SET_ID = "aggregateWorkingSetId"; //$NON-NLS-1$
 
@@ -878,52 +870,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		}
 	};
 
-	@Inject
-	@Optional
-	private void handleMinimizedStacks(
-			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
-		Object changedObj = event.getProperty(EventTags.ELEMENT);
-
-		if (!(changedObj instanceof MToolControl))
-			return;
-
-		final MToolControl minimizedStack = (MToolControl) changedObj;
-
-		if (!(minimizedStack.getObject() instanceof TrimStack))
-			return;
-
-		TrimStack ts = (TrimStack) minimizedStack.getObject();
-		if (!(ts.getMinimizedElement() instanceof MPartStack))
-			return;
-
-		MPartStack stack = (MPartStack) ts.getMinimizedElement();
-		MUIElement stackSel = stack.getSelectedElement();
-		MPart thePart = null;
-		if (stackSel instanceof MPart) {
-			thePart = (MPart) stackSel;
-		} else if (stackSel instanceof MPlaceholder) {
-			MPlaceholder ph = (MPlaceholder) stackSel;
-			if (ph.getRef() instanceof MPart) {
-				thePart = (MPart) ph.getRef();
-			}
-		}
-
-		if (thePart == null)
-			return;
-
-		if (UIEvents.isADD(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					TrimStack.MINIMIZED_AND_SHOWING)) {
-				firePartVisible(thePart);
-			}
-		} else if (UIEvents.isREMOVE(event)) {
-			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					TrimStack.MINIMIZED_AND_SHOWING)) {
-				firePartHidden(thePart);
-			}
-		}
-	}
-
 	/**
 	 * Boolean field to determine whether DND support has been added to the
 	 * shared area yet.
@@ -1006,12 +952,18 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
         propertyChangeListeners.add(listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void addSelectionListener(ISelectionListener listener) {
 		selectionListeners.add(listener);
 		getWorkbenchWindow().getSelectionService().addSelectionListener(listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void addSelectionListener(String partId, ISelectionListener listener) {
 		List<ISelectionListener> listeners = targetedSelectionListeners.get(partId);
@@ -1023,12 +975,18 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		getWorkbenchWindow().getSelectionService().addSelectionListener(partId, listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void addPostSelectionListener(ISelectionListener listener) {
 		postSelectionListeners.add(listener);
 		getWorkbenchWindow().getSelectionService().addPostSelectionListener(listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void addPostSelectionListener(String partId,
             ISelectionListener listener) {
@@ -1192,10 +1150,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			editorReference.setPage(this);
 		}
 
-		// Avoid dups
-		if (!editorReferences.contains(editorReference)) {
-			editorReferences.add(editorReference);
-		}
+		editorReferences.add(editorReference);
 	}
 
 	MPartDescriptor findDescriptor(String id) {
@@ -1302,23 +1257,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			break;
 		case VIEW_CREATE:
 			partService.showPart(part, PartState.CREATE);
-
-			// Report the visibility of the created part
-			MStackElement sElement = part;
-			if (part.getCurSharedRef() != null)
-				sElement = part.getCurSharedRef();
-			MUIElement parentElement = sElement.getParent();
-			if (parentElement instanceof MPartStack) {
-				MPartStack partStack = (MPartStack) parentElement;
-				if (partStack.getSelectedElement() == sElement
-						&& !partStack.getTags().contains(IPresentationEngine.MINIMIZED)) {
-					firePartVisible(part);
-				} else {
-					firePartHidden(part);
-				}
-			} else {
-				firePartVisible(part); // Stand-alone part
-			}
 			break;
 		}
 		return part;
@@ -1714,6 +1652,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#closePerspective(org.eclipse.ui.
+	 * IPerspectiveDescriptor, boolean, boolean)
+	 */
 	@Override
 	public void closePerspective(IPerspectiveDescriptor desc, boolean saveParts, boolean closePage) {
 		closePerspective(desc, desc.getId(), saveParts, closePage);
@@ -1739,6 +1683,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#closeAllPerspectives(boolean, boolean)
+	 */
 	@Override
 	public void closeAllPerspectives(boolean saveEditors, boolean closePage) {
 		boolean okToProceed = closeAllEditors(true);
@@ -1979,6 +1928,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
         return ref.getView(true);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchPage
+     */
     @Override
 	public IViewReference findViewReference(String viewId) {
 		for (IViewReference reference : getViewReferences()) {
@@ -1990,6 +1944,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return null;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchPage
+     */
     @Override
 	public IViewReference findViewReference(String viewId, String secondaryId) {
 		String compoundId = viewId;
@@ -2229,6 +2188,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return getWorkbenchPart(part);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPartService#getActivePartReference()
+	 */
 	@Override
 	public IWorkbenchPartReference getActivePartReference() {
 		IWorkbenchPart part = getActivePart();
@@ -2239,6 +2203,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return composite;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getDirtyEditors()
+	 */
 	@Override
 	public IEditorPart[] getDirtyEditors() {
 		List<IEditorPart> dirtyEditors = new ArrayList<IEditorPart>();
@@ -2251,12 +2220,25 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return dirtyEditors.toArray(new IEditorPart[dirtyEditors.size()]);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPage#findEditor(org.eclipse.ui.IEditorInput)
+	 */
 	@Override
 	public IEditorPart findEditor(IEditorInput input) {
 		IEditorReference[] references = findEditors(input, null, MATCH_INPUT);
 		return references.length == 0 ? null : references[0].getEditor(true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPage#findEditors(org.eclipse.ui.IEditorInput,
+	 * java.lang.String, int)
+	 */
 	@Override
 	public IEditorReference[] findEditors(IEditorInput input, String editorId, int matchFlags) {
 		List<EditorReference> filteredReferences = getSortedEditorReferences();
@@ -2325,6 +2307,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getEditors()
+	 */
 	@Override
 	public IEditorPart[] getEditors() {
 		final IEditorReference[] editorReferences = getEditorReferences();
@@ -2336,6 +2323,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return editors;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getEditorReferences()
+	 */
 	@Override
 	public IEditorReference[] getEditorReferences() {
 		List<EditorReference> references = getOrderedEditorReferences();
@@ -2456,11 +2448,17 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return desc;
 	}
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionService
+     */
     @Override
 	public ISelection getSelection() {
 		return getWorkbenchWindow().getSelectionService().getSelection();
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionService
+     */
     @Override
 	public ISelection getSelection(String partId) {
 		return getWorkbenchWindow().getSelectionService().getSelection(partId);
@@ -2585,6 +2583,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		addHiddenItems(tag);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchPage#hideView(org.eclipse.ui.IViewReference)
+     */
 	@Override
 	public void hideView(IViewReference view) {
     	if (view != null) {
@@ -2781,7 +2784,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			IPerspectiveDescriptor desc = getWorkbenchWindow().getWorkbench()
 					.getPerspectiveRegistry().findPerspectiveWithId(id);
 			if (desc != null) {
-				MPerspective temporary = modelService.createModelElement(MPerspective.class);
+				MPerspective temporary = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 				ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
 						partService, temporary, desc, this, true);
 
@@ -2798,7 +2801,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		IPerspectiveDescriptor desc = getWorkbenchWindow().getWorkbench().getPerspectiveRegistry()
 				.findPerspectiveWithId(id);
 		if (desc != null) {
-			MPerspective temporary = modelService.createModelElement(MPerspective.class);
+			MPerspective temporary = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
 					partService, temporary, desc, this, true);
 
@@ -2967,6 +2970,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return find == null ? false : find.isVisible() && find.isToBeRendered();
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#isPageZoomed()
+	 */
     @Override
 	public boolean isPageZoomed() {
 		List<String> maxTag = new ArrayList<String>();
@@ -3249,12 +3257,18 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
         propertyChangeListeners.remove(listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void removeSelectionListener(ISelectionListener listener) {
 		selectionListeners.remove(listener);
 		getWorkbenchWindow().getSelectionService().removeSelectionListener(listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void removeSelectionListener(String partId,
             ISelectionListener listener) {
@@ -3265,12 +3279,18 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		getWorkbenchWindow().getSelectionService().removeSelectionListener(partId, listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void removePostSelectionListener(ISelectionListener listener) {
 		postSelectionListeners.remove(listener);
 		getWorkbenchWindow().getSelectionService().removePostSelectionListener(listener);
     }
 
+    /*
+     * (non-Javadoc) Method declared on ISelectionListener.
+     */
     @Override
 	public void removePostSelectionListener(String partId,
             ISelectionListener listener) {
@@ -3371,7 +3391,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		if (dummyPerspective == null) {
 			// instantiate a dummy perspective perspective
-			dummyPerspective = modelService.createModelElement(MPerspective.class);
+			dummyPerspective = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 			dummyPerspective.setElementId(persp.getElementId());
 
 			IPerspectiveFactory factory = ((PerspectiveDescriptor) desc).createFactory();
@@ -3431,18 +3451,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		tags.clear();
 		tags.addAll(dummyPerspective.getTags());
 
-		// remove HIDDEN_EXPLICITLY tag from trim elements
-		List<MTrimElement> trimElements = modelService.findElements(window, null,
-				MTrimElement.class, null);
-		for (MTrimElement mTrimElement : trimElements) {
-			mTrimElement.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
-		}
-
 		partService.requestActivation();
 
 		// reset complete
 		legacyWindow.firePerspectiveChanged(this, desc, CHANGE_RESET_COMPLETE);
-		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_RESET, persp);
 	}
 
 	private void initActionSetListener() {
@@ -3866,11 +3878,22 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return saveSaveable(editor, editor, confirm, false);
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#savePerspective()
+	 */
 	@Override
 	public void savePerspective() {
 		throw new UnsupportedOperationException();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#savePerspectiveAs(org.eclipse.ui.
+	 * IPerspectiveDescriptor)
+	 */
 	@Override
 	public void savePerspectiveAs(IPerspectiveDescriptor perspective) {
 		MPerspective visiblePerspective = getPerspectiveStack().getSelectedElement();
@@ -3894,6 +3917,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_SAVED, visiblePerspective);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#setEditorAreaVisible(boolean)
+	 */
 	@Override
 	public void setEditorAreaVisible(boolean showEditorArea) {
 		MUIElement find = findSharedArea();
@@ -3928,6 +3956,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return modelToPerspectiveMapping.get(mperspective);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#setPerspective(org.eclipse.ui.
+	 * IPerspectiveDescriptor)
+	 */
 	@Override
 	public void setPerspective(IPerspectiveDescriptor perspective) {
 		if (perspective == null) {
@@ -3960,7 +3994,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (modelPerspective == null) {
 
 			// couldn't find the perspective, create a new one
-			modelPerspective = modelService.createModelElement(MPerspective.class);
+			modelPerspective = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 
 			// tag it with the same id
 			modelPerspective.setElementId(perspective.getId());
@@ -4016,9 +4050,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
-		if (_perspectiveStack != null) {
-			return _perspectiveStack;
-		}
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -4033,15 +4064,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			}
 		}
 
-		MPartSashContainer stickySash = modelService.createModelElement(MPartSashContainer.class);
+		MPartSashContainer stickySash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 		stickySash.setHorizontal(true);
 
-		MPerspectiveStack perspectiveStack = modelService
-				.createModelElement(MPerspectiveStack.class);
-		perspectiveStack.setElementId(IWorkbenchConstants.PERSPECTIVE_STACK_ID);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE.createPerspectiveStack();
 		perspectiveStack.setContainerData("7500"); //$NON-NLS-1$
 
-		MPartStack stickyFolder = modelService.createModelElement(MPartStack.class);
+		MPartStack stickyFolder = BasicFactoryImpl.eINSTANCE.createPartStack();
 		stickyFolder.setContainerData("2500"); //$NON-NLS-1$
 		stickyFolder.setElementId("stickyFolderRight"); //$NON-NLS-1$
 		stickyFolder.setToBeRendered(false);
@@ -4121,6 +4150,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
         return showView(viewID, null, VIEW_ACTIVATE);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchPage#showView(java.lang.String,
+     *      java.lang.String, int)
+     */
 	@Override
 	public IViewPart showView(final String viewID, final String secondaryID, final int mode)
 			throws PartInitException {
@@ -4199,6 +4234,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return element;
 	}
     
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#setPartState(org.eclipse.ui.
+	 * IWorkbenchPartReference, int)
+	 */
 	@Override
 	public void setPartState(IWorkbenchPartReference ref, int iState) {
 		MUIElement element = getActiveElement(ref);
@@ -4212,6 +4253,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		setPartState(element, state);
 	}
 	
+    /*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getPartState(org.eclipse.ui.
+	 * IWorkbenchPartReference)
+	 */
     @Override
 	public int getPartState(IWorkbenchPartReference ref) {
 		int state = STATE_RESTORED;
@@ -4251,12 +4298,22 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		legacyWindow.updateActionBars();
     }
 
+
     
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPage#zoomOut()
+     */
     @Override
 	public void zoomOut() {
 		// TODO compat: what does the zoom do?
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#toggleZoom(org.eclipse.ui.
+	 * IWorkbenchPartReference)
+	 */
 	@Override
 	public void toggleZoom(IWorkbenchPartReference ref) {
 		MUIElement element = getActiveElement(ref);
@@ -4270,6 +4327,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getOpenPerspectives()
+	 */
 	@Override
 	public IPerspectiveDescriptor[] getOpenPerspectives() {
 		MPerspectiveStack perspectiveStack = modelService.findElements(window, null,
@@ -4291,6 +4353,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return descs;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getSortedPerspectives()
+	 */
 	@Override
 	public IPerspectiveDescriptor[] getSortedPerspectives() {
 		return sortedPerspectives.toArray(new IPerspectiveDescriptor[sortedPerspectives.size()]);
@@ -4326,6 +4393,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return getPerspective(getCurrentPerspective());
 	}
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchPage#getViewStack(org.eclipse.ui.IViewPart)
+     */
 	@Override
 	public IViewPart[] getViewStack(IViewPart part) {
 		MPart mpart = partService.findPart(part.getSite().getId());
@@ -4377,6 +4449,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPage#getExtensionTracker()
+	 */
 	@Override
 	public IExtensionTracker getExtensionTracker() {
 		if (tracker == null) {
@@ -4402,16 +4477,31 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return ModeledPageLayout.getIds(perspective, tagPrefix);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getNewWizardShortcuts()
+	 */
 	@Override
 	public String[] getNewWizardShortcuts() {
 		return getArrayForTag(ModeledPageLayout.NEW_WIZARD_TAG);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getPerspectiveShortcuts()
+	 */
 	@Override
 	public String[] getPerspectiveShortcuts() {
 		return getArrayForTag(ModeledPageLayout.PERSP_SHORTCUT_TAG);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getShowViewShortcuts()
+	 */
 	@Override
 	public String[] getShowViewShortcuts() {
 		return getArrayForTag(ModeledPageLayout.SHOW_VIEW_TAG);
@@ -4514,6 +4604,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPage#showEditor(org.eclipse.ui.IEditorReference)
+	 */
 	@Override
 	public void showEditor(IEditorReference ref) {
 		// FIXME compat showEditor
@@ -4521,6 +4617,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPage#hideEditor(org.eclipse.ui.IEditorReference)
+	 */
 	@Override
 	public void hideEditor(IEditorReference ref) {
 		// FIXME compat hideEditor
@@ -4541,6 +4643,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return iconURI;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPage#getEditorState(org.eclipse.ui.IEditorReference
+	 * [])
+	 */
 	@Override
 	public IMemento[] getEditorState(IEditorReference[] editorRefs, boolean includeInputState) {
 		IMemento[] m = new IMemento[editorRefs.length];
@@ -4553,11 +4662,25 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		return m;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPage#openEditors(org.eclipse.ui.IEditorInput[],
+	 * java.lang.String[], int)
+	 */
 	@Override
 	public IEditorReference[] openEditors(IEditorInput[] inputs, String[] editorIDs, int matchFlags) throws MultiPartInitException {
 		return openEditors(inputs, editorIDs, null, matchFlags, 0);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPage#openEditors(org.eclipse.ui.IEditorInput[],
+	 * java.lang.String[], org.eclipse.ui.IMemento[], int)
+	 */
 	@Override
 	public IEditorReference[] openEditors(IEditorInput[] inputs, String[] editorIDs,
 			IMemento[] mementos, int matchFlags, int activationIndex)
@@ -5091,12 +5214,22 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#getEditorReuseThreshold()
+	 */
 	@Override
 	public int getEditorReuseThreshold() {
 		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 		return store.getInt(IPreferenceConstants.REUSE_EDITORS);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPage#setEditorReuseThreshold(int)
+	 */
 	@Override
 	public void setEditorReuseThreshold(int openEditors) {
 		// this is an empty implementation in 3.x, see IPageLayout's
@@ -5191,9 +5324,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 */
 	private void unzoomSharedArea() {
 		MPerspective curPersp = getPerspectiveStack().getSelectedElement();
-		if (curPersp == null)
-			return;
-
 		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, curPersp);
 		for (MPart part : modelService.findElements(eaPH, null, MPart.class, null)) {
 			if (part.isToBeRendered()) {

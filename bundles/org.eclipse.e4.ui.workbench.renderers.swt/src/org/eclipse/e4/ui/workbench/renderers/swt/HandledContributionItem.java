@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -36,7 +35,6 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
-import org.eclipse.e4.ui.internal.workbench.IHelpService;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -132,21 +130,11 @@ public class HandledContributionItem extends ContributionItem {
 	@Optional
 	private IUpdateService updateService;
 
-	@Inject
-	@Optional
-	private IHelpService helpService;
-
-	@Inject
-	@Optional
-	@SuppressWarnings("restriction")
-	private ICommandHelpService commandHelpService;
-
 	private Runnable unreferenceRunnable;
 
 	private ISWTResourceUtilities resUtils = null;
 
 	private IStateListener stateListener = new IStateListener() {
-		@Override
 		public void handleStateChange(State state, Object oldValue) {
 			updateState();
 		}
@@ -160,7 +148,6 @@ public class HandledContributionItem extends ContributionItem {
 	private ISafeRunnable getUpdateRunner() {
 		if (updateRunner == null) {
 			updateRunner = new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					boolean shouldEnable = canExecuteItem(null);
 					if (shouldEnable != model.isEnabled()) {
@@ -169,7 +156,6 @@ public class HandledContributionItem extends ContributionItem {
 					}
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					if (!logged) {
 						logged = true;
@@ -197,7 +183,6 @@ public class HandledContributionItem extends ContributionItem {
 	}
 
 	private IMenuListener menuListener = new IMenuListener() {
-		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			update(null);
 		}
@@ -232,7 +217,7 @@ public class HandledContributionItem extends ContributionItem {
 		if (model.getCommand() != null && model.getWbCommand() == null) {
 			String cmdId = model.getCommand().getElementId();
 			List<MParameter> modelParms = model.getParameters();
-			Map<String, Object> parameters = new HashMap<String, Object>(4);
+			Map<String, String> parameters = new HashMap<String, String>(4);
 			for (MParameter mParm : modelParms) {
 				parameters.put(mParm.getName(), mParm.getValue());
 			}
@@ -312,7 +297,6 @@ public class HandledContributionItem extends ContributionItem {
 		item.addListener(SWT.Dispose, getItemListener());
 		item.addListener(SWT.Selection, getItemListener());
 		item.addListener(SWT.DefaultSelection, getItemListener());
-		item.addListener(SWT.Help, getItemListener());
 
 		widget = item;
 		model.setWidget(widget);
@@ -601,7 +585,6 @@ public class HandledContributionItem extends ContributionItem {
 	private Listener getItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -612,9 +595,6 @@ public class HandledContributionItem extends ContributionItem {
 						if (event.widget != null) {
 							handleWidgetSelection(event);
 						}
-						break;
-					case SWT.Help:
-						handleHelpRequest();
 						break;
 					}
 				}
@@ -641,7 +621,6 @@ public class HandledContributionItem extends ContributionItem {
 			widget.removeListener(SWT.Selection, getItemListener());
 			widget.removeListener(SWT.Dispose, getItemListener());
 			widget.removeListener(SWT.DefaultSelection, getItemListener());
-			widget.removeListener(SWT.Help, getItemListener());
 			widget = null;
 			model.setWidget(null);
 			disposeOldImages();
@@ -703,21 +682,6 @@ public class HandledContributionItem extends ContributionItem {
 		}
 	}
 
-	@SuppressWarnings("restriction")
-	private void handleHelpRequest() {
-		MCommand command = model.getCommand();
-		if (command == null || helpService == null
-				|| commandHelpService == null) {
-			return;
-		}
-
-		String contextHelpId = commandHelpService.getHelpContextId(
-				command.getElementId(), getContext(model));
-		if (contextHelpId != null) {
-			helpService.displayHelp(contextHelpId);
-		}
-	}
-
 	/**
 	 * @param event
 	 * @return
@@ -769,7 +733,6 @@ public class HandledContributionItem extends ContributionItem {
 						.getShell());
 				if (menu != null) {
 					toolItem.addDisposeListener(new DisposeListener() {
-						@Override
 						public void widgetDisposed(DisposeEvent e) {
 							if (menu != null && !menu.isDisposed()) {
 								creator.dispose();
@@ -839,7 +802,6 @@ public class HandledContributionItem extends ContributionItem {
 		return service.canExecute(cmd, staticContext);
 	}
 
-	@Override
 	public void setParent(IContributionManager parent) {
 		if (getParent() instanceof IMenuManager) {
 			IMenuManager menuMgr = (IMenuManager) getParent();

@@ -34,7 +34,6 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#getResource(java.lang.Object,
 	 *      java.lang.Object)
 	 */
-	@Override
 	public Object getResource(Object type, Object key) {
 		if (allResourcesMap == null) {
 			return null;
@@ -52,7 +51,6 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#registerResource(java.lang.Object,
 	 *      java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public void registerResource(Object type, Object key, Object resource) {
 		if (allResourcesMap == null) {
 			allResourcesMap = new HashMap();
@@ -81,7 +79,6 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#unregisterResource(java.lang.Object,
 	 *      java.lang.Object)
 	 */
-	@Override
 	public void unregisterResource(Object type, Object key) {
 		if (allResourcesMap == null) {
 			return;
@@ -115,7 +112,6 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 	 *
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (allResourcesMap == null) {
 			return;
