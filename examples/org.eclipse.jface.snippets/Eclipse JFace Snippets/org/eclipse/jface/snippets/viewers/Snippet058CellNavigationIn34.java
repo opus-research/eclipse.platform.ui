@@ -10,9 +10,13 @@
  *     Niels Lippke - initial API and implementation
  *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
@@ -96,17 +100,17 @@ public class Snippet058CellNavigationIn34 {
 	}
 
 	public Snippet058CellNavigationIn34(Shell shell) {
-		final TableViewer v = new TableViewer(shell, SWT.BORDER
-				| SWT.FULL_SELECTION);
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		final TableViewer<Person, List<Person>> v = new TableViewer<Person, List<Person>>(
+				shell, SWT.BORDER | SWT.FULL_SELECTION);
+		v.setContentProvider(ArrayContentProvider.getInstance(Person.class));
 
-		TableViewerColumn column = null;
+		TableViewerColumn<Person, List<Person>> column = null;
 		column = createColumnFor(v, "Givenname");
-		column.setLabelProvider(new ColumnLabelProvider() {
+    column.setLabelProvider(new ColumnLabelProvider<Person>() {
 
 			@Override
-			public String getText(Object element) {
-				return ((Person) element).givenname;
+			public String getText(Person element) {
+				return element.givenname;
 			}
 		});
 		column.setEditingSupport(new AbstractEditingSupport(v) {
@@ -124,11 +128,11 @@ public class Snippet058CellNavigationIn34 {
 		});
 
 		column = createColumnFor(v, "Surname");
-		column.setLabelProvider(new ColumnLabelProvider() {
+    column.setLabelProvider(new ColumnLabelProvider<Person>() {
 
 			@Override
-			public String getText(Object element) {
-				return ((Person) element).surname;
+			public String getText(Person element) {
+				return element.surname;
 			}
 
 		});
@@ -147,11 +151,11 @@ public class Snippet058CellNavigationIn34 {
 		});
 
 		column = createColumnFor(v, "E-Mail");
-		column.setLabelProvider(new ColumnLabelProvider() {
+    column.setLabelProvider(new ColumnLabelProvider<Person>() {
 
 			@Override
-			public String getText(Object element) {
-				return ((Person) element).email;
+			public String getText(Person element) {
+				return element.email;
 			}
 
 		});
@@ -169,11 +173,11 @@ public class Snippet058CellNavigationIn34 {
 
 		});
 		column = createColumnFor(v, "Gender");
-		column.setLabelProvider(new ColumnLabelProvider() {
+    column.setLabelProvider(new ColumnLabelProvider<Person>() {
 
 			@Override
-			public String getText(Object element) {
-				return ((Person) element).gender;
+			public String getText(Person element) {
+				return element.gender;
 			}
 
 		});
@@ -272,32 +276,36 @@ public class Snippet058CellNavigationIn34 {
 
 				});
 
-		Person[] model = createModel();
+		List<Person> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private TableViewerColumn createColumnFor(final TableViewer v, String label) {
-		TableViewerColumn column;
-		column = new TableViewerColumn(v, SWT.NONE);
+	private TableViewerColumn<Person, List<Person>> createColumnFor(
+			final TableViewer<Person, List<Person>> v, String label) {
+		TableViewerColumn<Person, List<Person>> column = new TableViewerColumn<Person, List<Person>>(
+				v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText(label);
 		column.getColumn().setMoveable(true);
 		return column;
 	}
 
-	private Person[] createModel() {
-		return new Person[] {
-				new Person("Tom", "Schindl", "tom.schindl@bestsolution.at", "M"),
-				new Person("Boris", "Bokowski", "Boris_Bokowski@ca.ibm.com",
-						"M"),
-				new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com", "M"),
-				new Person("Wayne", "Beaton", "wayne@eclipse.org", "M"),
-				new Person("Jeanderson", "Candido", "jeandersonbc@gmail.com",
-						"M"),
-				new Person("Lars", "Vogel", "lars.vogel@gmail.com", "M"),
-				new Person("Hendrik", "Still", "hendrik.still@vogella.com", "M") };
+	private List<Person> createModel() {
+		return Arrays
+				.asList(new Person("Tom", "Schindl",
+						"tom.schindl@bestsolution.at", "M"), new Person(
+						"Boris", "Bokowski", "Boris_Bokowski@ca.ibm.com", "M"),
+						new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com",
+								"M"), new Person("Wayne", "Beaton",
+								"wayne@eclipse.org", "M"), new Person(
+								"Jeanderson", "Candido",
+								"jeandersonbc@gmail.com", "M"), new Person(
+								"Lars", "Vogel", "lars.vogel@gmail.com", "M"),
+						new Person("Hendrik", "Still",
+								"hendrik.still@vogella.com", "M"));
+
 	}
 
 	/**

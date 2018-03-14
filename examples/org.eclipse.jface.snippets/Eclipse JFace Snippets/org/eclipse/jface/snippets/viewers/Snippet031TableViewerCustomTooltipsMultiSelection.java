@@ -9,6 +9,7 @@
  *     Adam Neal - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 414565, 475361
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -47,26 +48,26 @@ import org.eclipse.swt.widgets.TableItem;
  *
  */
 public class Snippet031TableViewerCustomTooltipsMultiSelection {
-	public class MyLableProvider implements ITableLabelProvider {
+	public class MyLableProvider implements ITableLabelProvider<MyModel> {
 
 		@Override
-		public Image getColumnImage(Object element, int columnIndex) {
+		public Image getColumnImage(MyModel element, int columnIndex) {
 			return null;
 		}
 
 		@Override
-		public String getColumnText(Object element, int columnIndex) {
-			if (element instanceof MyModel) {
-				switch (columnIndex) {
-					case 0: return ((MyModel)element).col1;
-					case 1: return ((MyModel)element).col2;
-				}
+		public String getColumnText(MyModel element, int columnIndex) {
+			switch (columnIndex) {
+			case 0:
+				return element.col1;
+			case 1:
+				return element.col2;
 			}
 			return "";
 		}
 
 		@Override
-		public void addListener(ILabelProviderListener listener) {
+		public void addListener(ILabelProviderListener<MyModel> listener) {
 			/* Ignore */
 		}
 
@@ -76,12 +77,12 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 		}
 
 		@Override
-		public boolean isLabelProperty(Object element, String property) {
+		public boolean isLabelProperty(MyModel element, String property) {
 			return false;
 		}
 
 		@Override
-		public void removeListener(ILabelProviderListener listener) {
+		public void removeListener(ILabelProviderListener<MyModel> listener) {
 			/* Ignore */
 		}
 
@@ -107,7 +108,7 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 		table.setHeaderVisible(true);
         table.setLinesVisible(true);
 
-		final TableViewer v = new TableViewer(table);
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(table);
 		TableColumn tableColumn1 = new TableColumn(table, SWT.NONE);
 		TableColumn tableColumn2 = new TableColumn(table, SWT.NONE);
 
@@ -120,7 +121,7 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 
         v.setColumnProperties(new String[] { column1, column2 });
 		v.setLabelProvider(new MyLableProvider());
-		v.setContentProvider(new ArrayContentProvider());
+		v.setContentProvider(new ArrayContentProvider<MyModel>(MyModel.class));
 		v.setInput(createModel());
 
 		/**
@@ -266,8 +267,6 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 				   		break;
 			   }
 	    }};
-
-
 
 	private List<MyModel> createModel() {
 		List<MyModel> list = new ArrayList<>();
