@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 441244
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
@@ -75,29 +76,23 @@ public class VerifyDialog extends TitleAreaDialog {
         _dialogTests[2] = new AccessibilityTestPass();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Window.
-     */
-    protected void configureShell(Shell newShell) {
+    @Override
+	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Dialog Verification");
         setShellStyle(SWT.NONE);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected void createButtonsForButtonBar(Composite parent) {
+    @Override
+	protected void createButtonsForButtonBar(Composite parent) {
         _yesButton = createButton(parent, IDialogConstants.YES_ID,
                 IDialogConstants.YES_LABEL, true);
         createButton(parent, IDialogConstants.NO_ID,
                 IDialogConstants.NO_LABEL, false);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected void buttonPressed(int buttonId) {
+    @Override
+	protected void buttonPressed(int buttonId) {
         if (IDialogConstants.YES_ID == buttonId) {
             setReturnCode(IDialogConstants.YES_ID);
             if (_testDialog.getShell() != null) {
@@ -109,10 +104,8 @@ public class VerifyDialog extends TitleAreaDialog {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         // top level composite
         Composite parentComposite = (Composite) super.createDialogArea(parent);
 
@@ -152,7 +145,8 @@ public class VerifyDialog extends TitleAreaDialog {
             radio.setText(_dialogTests[i].label());
             final int testID = _dialogTests[i].getID();
             radio.addSelectionListener(new SelectionAdapter() {
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     TEST_TYPE = testID;
                     initializeTest();
                     _yesButton.setEnabled(true);
@@ -183,7 +177,8 @@ public class VerifyDialog extends TitleAreaDialog {
         }
         _checkList = new Button[checkListSize];
         SelectionAdapter selectionAdapter = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 checkYesEnable();
             }
         };
@@ -242,7 +237,8 @@ public class VerifyDialog extends TitleAreaDialog {
      * opening.  Should use open(Dialog) instead.
      *
      */
-    public int open() {
+    @Override
+	public int open() {
         _failureText = "Testing dialog is required, use VerifyDialog::open(Dialog)";
         return IDialogConstants.NO_ID;
     }
@@ -278,7 +274,8 @@ public class VerifyDialog extends TitleAreaDialog {
         _testDialog.getShell().setLocation(getShell().getSize().x + 1, 0);
         _testDialog.getShell().setSize(_testDialogSize);
         _testDialog.getShell().addShellListener(new ShellAdapter() {
-            public void shellClosed(ShellEvent e) {
+            @Override
+			public void shellClosed(ShellEvent e) {
                 e.doit = false;
             }
 
@@ -321,7 +318,8 @@ public class VerifyDialog extends TitleAreaDialog {
      * In case the shell was closed by a means other than
      * the NO button.
      */
-    protected void handleShellCloseEvent() {
+    @Override
+	protected void handleShellCloseEvent() {
         handleFailure();
     }
 }
