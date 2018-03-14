@@ -7,12 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484, 457132
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484, 457132, 473947
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
 import com.ibm.icu.text.MessageFormat;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IStatus;
@@ -51,7 +50,7 @@ public class EarlyStartupRunnable extends SafeRunnable {
         // look for the startup tag in each element and run the extension
         for (IConfigurationElement element : configElements) {
             if (element != null&& element.getName().equals(IWorkbenchConstants.TAG_STARTUP)) {
-                runEarlyStartup(getExecutableExtension(element));
+                runEarlyStartup(WorkbenchPlugin.createExtension(element, IWorkbenchConstants.TAG_CLASS));
             }
         }
     }
@@ -91,14 +90,4 @@ public class EarlyStartupRunnable extends SafeRunnable {
         }
     }
 
-    /**
-     * In 3.0 the class attribute is a mandatory element of the startup element.
-     *
-     * @return an executable extension for this startup element or null if an
-     *         extension (or plugin) could not be found
-     */
-    private Object getExecutableExtension(IConfigurationElement element)
-            throws CoreException {
-		return WorkbenchPlugin.createExtension(element, IWorkbenchConstants.TAG_CLASS);
-    }
 }
