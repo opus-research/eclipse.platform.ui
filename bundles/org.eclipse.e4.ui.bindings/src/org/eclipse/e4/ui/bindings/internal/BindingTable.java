@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,7 +147,8 @@ public class BindingTable {
 
 	public Collection<Binding> getConflicts() {
 		Collection<Binding> conflictsList = new ArrayList<Binding>();
-		for (ArrayList<Binding> conflictsForTrigger : conflicts.values()) {
+		for (TriggerSequence key : conflicts.keySet()) {
+			ArrayList<Binding> conflictsForTrigger = conflicts.get(key);
 			if (conflictsForTrigger != null) {
 				conflictsList.addAll(conflictsForTrigger);
 			}
@@ -325,7 +326,6 @@ public class BindingTable {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<Binding> getSequencesFor(ParameterizedCommand command) {
 		ArrayList<Binding> triggers = bindingsByCommand.get(command);
 		return (Collection<Binding>) (triggers == null ? Collections.EMPTY_LIST : triggers.clone());

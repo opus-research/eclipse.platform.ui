@@ -36,17 +36,14 @@ public class AdvancedTestOperation extends TestOperation implements
 		super("A very long string that exceeds the menu label limit");
 	}
 
-	@Override
 	public void aboutToNotify(OperationHistoryEvent event) {
 		// do nothing
 	}
 
-	@Override
 	public Object[] getAffectedObjects() {
 		return null;
 	}
 
-	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {
 		switch (status) {
 		case INFO:
@@ -59,7 +56,6 @@ public class AdvancedTestOperation extends TestOperation implements
 		return Status.OK_STATUS;
 	}
 
-	@Override
 	public IStatus computeRedoableStatus(IProgressMonitor monitor) {
 		switch (status) {
 		case INFO:

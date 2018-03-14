@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205, 170381
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 481490
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
@@ -39,39 +38,45 @@ public class VirtualTableViewerTest extends TableViewerTest {
 	 * The virtual trees and tables rely on SWT.SetData event which is only sent if OS requests
 	 * information about the tree / table. If the window is not visible (obscured by another window,
 	 * outside of visible area, or OS determined that it can skip drawing), then OS request won't
-	 * be send, causing automated tests to fail.
-	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=118919 .
+	 * be send, causing automated tests to fail. 
+	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=118919 .  
 	 */
 	protected boolean setDataCalled = false;
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param name
 	 */
 	public VirtualTableViewerTest(String name) {
 		super(name);
 	}
 
-	@Override
 	public void setUp() {
 		super.setUp();
 		processEvents(); // run events for SetData precondition test
 	}
 
-	@Override
 	protected int getShellStyle() {
 		return super.getShellStyle() | SWT.ON_TOP;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.TableViewerTest#createTableViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	protected TableViewer createTableViewer(Composite parent) {
 		visibleItems = new HashSet();
 		TableViewer viewer = new TableViewer(parent, SWT.VIRTUAL | SWT.MULTI);
 		viewer.setUseHashlookup(true);
 		final Table table = viewer.getTable();
 		table.addListener(SWT.SetData, new Listener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
 			public void handleEvent(Event event) {
 				setDataCalled = true;
 				TableItem item = (TableItem) event.item;
@@ -80,25 +85,24 @@ public class VirtualTableViewerTest extends TableViewerTest {
 		});
 		return viewer;
 	}
-
+	
 	/**
 	 * Checks if update occurred. Updates for virtual items will be skipped
-	 * if, for instance, another window is in the foreground.
+	 * if, for instance, another window is in the foreground.  
 	 * @return <code>true</code> if update occurred
 	 */
 	protected boolean updateTable() {
 		setDataCalled = false;
 		((TableViewer) fViewer).getControl().update();
-		if (setDataCalled) {
+		if (setDataCalled)
 			return true;
-		}
 		System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 		return false;
 	}
 
 	/**
 	 * Get the collection of currently visible table items.
-	 *
+	 * 
 	 * @return TableItem[]
 	 */
 	private TableItem[] getVisibleItems() {
@@ -116,106 +120,134 @@ public class VirtualTableViewerTest extends TableViewerTest {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.TableViewerTest#getItemCount()
+	 */
 	protected int getItemCount() {
 		return getVisibleItems().length;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testFilter()
+	 */
 	public void testFilter() {
 		ViewerFilter filter = new TestLabelFilter();
 		visibleItems = new HashSet();
 		fViewer.addFilter(filter);
-		if (!updateTable()) {
+		if (!updateTable())
 			return;
-		}
 		assertEquals("filtered count", 5, getItemCount());
 
 		visibleItems = new HashSet();
 		fViewer.removeFilter(filter);
-		if (!updateTable()) {
+		if (!updateTable())
 			return;
-		}
 		assertEquals("unfiltered count", 10, getItemCount());
 	}
 
-	@Override
 	public void testSetFilters() {
 		ViewerFilter filter = new TestLabelFilter();
 		visibleItems = new HashSet();
-		fViewer.setFilters(filter, new TestLabelFilter2());
-		if (!updateTable()) {
+		fViewer.setFilters(new ViewerFilter[] { filter, new TestLabelFilter2() });
+		if (!updateTable())
 			return;
-		}
 		assertEquals("2 filters count",1, getItemCount());
 
 		visibleItems = new HashSet();
-		fViewer.setFilters(filter);
-		if (!updateTable()) {
+		fViewer.setFilters(new ViewerFilter[] { filter });
+		if (!updateTable())
 			return;
-		}
 		assertEquals("1 filtered count",5, getItemCount());
 
 		visibleItems = new HashSet();
-		fViewer.setFilters();
-		if (!updateTable()) {
+		fViewer.setFilters(new ViewerFilter[0]);
+		if (!updateTable())
 			return;
-		}
 		assertEquals("unfiltered count",10, getItemCount());
 	}
-
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testInsertSibling()
+	 */
 	public void testInsertSibling() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testInsertSiblingReveal()
+	 */
 	public void testInsertSiblingReveal() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testInsertSiblings()
+	 */
 	public void testInsertSiblings() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testInsertSiblingWithFilterFiltered()
+	 */
 	public void testInsertSiblingWithFilterFiltered() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testInsertSiblingWithFilterNotFiltered()
+	 */
 	public void testInsertSiblingWithFilterNotFiltered() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testInsertSiblingWithSorter()
+	 */
 	public void testInsertSiblingWithSorter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testRenameWithFilter()
+	 */
 	public void testRenameWithFilter() {
 		if (!setDataCalled) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
 		}
 		fViewer.addFilter(new TestLabelFilter());
-		if (!updateTable()) {
+		if (!updateTable())
 			return;
-		}
         TestElement first = fRootElement.getFirstChild();
         first.setLabel("name-1111"); // should disappear
         ((TableViewer) fViewer).getControl().update();
@@ -228,13 +260,16 @@ public class VirtualTableViewerTest extends TableViewerTest {
                 .testFindItem(first));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testSetInput()
+	 */
 	public void testSetInput() {
 		// This test us based on findItem assuming all items
 		// are created so it is not valid.
 	}
 
-	@Override
 	public void testRenameWithSorter() {
 		// Call update to make sure the viewer is in a correct state
 		// At least on MacOSX I get failures without this call
@@ -247,7 +282,11 @@ public class VirtualTableViewerTest extends TableViewerTest {
 		assertEquals("sorted first", newElementLabel, getItemText(0));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testSorter()
+	 */
 	public void testSorter() {
 		TestElement first = fRootElement.getFirstChild();
 		TestElement last = fRootElement.getLastChild();
@@ -267,41 +306,57 @@ public class VirtualTableViewerTest extends TableViewerTest {
 		assertEquals("unsorted", firstLabel, getItemText(0));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testInsertSiblingSelectExpanded()
+	 */
 	public void testInsertSiblingSelectExpanded() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testSomeChildrenChanged()
+	 */
 	public void testSomeChildrenChanged() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testWorldChanged()
+	 */
 	public void testWorldChanged() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testDeleteSibling()
+	 */
 	public void testDeleteSibling() {
 		//Force creation of the item first
 		((TableViewer) fViewer).getTable().getItem(0).getText();
 		super.testDeleteSibling();
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testSetSelection()
+	 */
 	public void testSetSelection() {
 		//Force creation of the item first
 		((TableViewer) fViewer).getTable().getItem(0).getText();
 		super.testSetSelection();
 	}
-
+	
 	/**
 	 * Test selecting all elements.
 	 */

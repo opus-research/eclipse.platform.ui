@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ListeningLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  * Tests UpdatableTreeContentProvider and DirtyIndicationLabelProvider. Creates
  * a tree containing three randomly-generated sets of integers, and one node
  * that contains the union of the other sets.
- *
+ * 
  * @since 1.0
  */
 public class LabelProviderTest2 {
@@ -51,7 +51,7 @@ public class LabelProviderTest2 {
 
 	private ListViewer list;
 
-	private WritableList<RenamableItem> listOfRenamables;
+	private WritableList listOfRenamables;
 
 	private Button addButton;
 
@@ -60,7 +60,11 @@ public class LabelProviderTest2 {
 	private Button renameButton;
 
 	private SelectionListener buttonSelectionListener = new SelectionAdapter() {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		 */
 		public void widgetSelected(SelectionEvent e) {
 			Button pressed = (Button) e.widget;
 			if (pressed == addButton) {
@@ -75,17 +79,17 @@ public class LabelProviderTest2 {
 		}
 	};
 
-	private IObservableValue<RenamableItem> selectedRenamable;
+	private IObservableValue selectedRenamable;
 
 	/**
-	 *
+	 * 
 	 */
 	public LabelProviderTest2() {
 
 		// Create shell
 		shell = new Shell(Display.getCurrent());
 		{ // Initialize shell
-			listOfRenamables = new WritableList<>();
+			listOfRenamables = new WritableList();
 
 			list = new ListViewer(shell);
 			ObservableListContentProvider contentProvider = new ObservableListContentProvider();
@@ -93,13 +97,17 @@ public class LabelProviderTest2 {
 			list.setLabelProvider(new ListeningLabelProvider(contentProvider
 					.getKnownElements()) {
 				RenamableItem.Listener listener = new RenamableItem.Listener() {
-					@Override
 					public void handleChanged(RenamableItem item) {
 						fireChangeEvent(Collections.singleton(item));
 					}
 				};
 
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.databinding.viewers.ViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
+				 *      java.lang.Object)
+				 */
 				public void updateLabel(ViewerLabel label, Object element) {
 					if (element instanceof RenamableItem) {
 						RenamableItem item = (RenamableItem) element;
@@ -108,14 +116,12 @@ public class LabelProviderTest2 {
 					}
 				}
 
-				@Override
 				protected void addListenerTo(Object next) {
 					RenamableItem item = (RenamableItem) next;
 
 					item.addListener(listener);
 				}
 
-				@Override
 				protected void removeListenerFrom(Object next) {
 					RenamableItem item = (RenamableItem) next;
 
@@ -138,14 +144,15 @@ public class LabelProviderTest2 {
 				renameButton.addSelectionListener(buttonSelectionListener);
 				renameButton.setText("Rename"); //$NON-NLS-1$
 
-				selectedRenamable.addValueChangeListener(new IValueChangeListener<RenamableItem>() {
-					@Override
-					public void handleValueChange(ValueChangeEvent<? extends RenamableItem> event) {
-						boolean shouldEnable = selectedRenamable.getValue() != null;
-						removeButton.setEnabled(shouldEnable);
-						renameButton.setEnabled(shouldEnable);
-					}
-				});
+				selectedRenamable
+						.addValueChangeListener(new IValueChangeListener() {
+							public void handleValueChange(ValueChangeEvent event) {
+								boolean shouldEnable = selectedRenamable
+										.getValue() != null;
+								removeButton.setEnabled(shouldEnable);
+								renameButton.setEnabled(shouldEnable);
+							}
+						});
 				removeButton.setEnabled(false);
 				renameButton.setEnabled(false);
 
@@ -173,7 +180,7 @@ public class LabelProviderTest2 {
 	 * @return
 	 */
 	protected RenamableItem getCurrentSelection() {
-		return selectedRenamable.getValue();
+		return (RenamableItem) selectedRenamable.getValue();
 	}
 
 	/**
@@ -181,14 +188,13 @@ public class LabelProviderTest2 {
 	 */
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
-			@Override
+        Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			public void run() {
 				LabelProviderTest2 test = new LabelProviderTest2();
 				Shell s = test.getShell();
 				s.pack();
 				s.setVisible(true);
-
+				
 				while (!s.isDisposed()) {
 					if (!display.readAndDispatch())
 						display.sleep();

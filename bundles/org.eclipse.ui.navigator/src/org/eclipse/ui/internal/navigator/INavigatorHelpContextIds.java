@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,9 @@ import org.eclipse.ui.PlatformUI;
 /**
  * The help context ids used by the Common Navigator. These are defined in the
  * workbench plugin. There is no separate help for the Common Navigator.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public interface INavigatorHelpContextIds {
 

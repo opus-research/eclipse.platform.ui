@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.ImageData;
  * <p>
  * Use <code>MissingImageDescriptor.getInstance</code> to
  * access the singleton instance maintained in an
- * internal state variable.
+ * internal state variable. 
  * </p>
  */
 class MissingImageDescriptor extends ImageDescriptor {
@@ -30,6 +30,9 @@ class MissingImageDescriptor extends ImageDescriptor {
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on ImageDesciptor.
+     */
     @Override
 	public ImageData getImageData() {
         return DEFAULT_IMAGE_DATA;

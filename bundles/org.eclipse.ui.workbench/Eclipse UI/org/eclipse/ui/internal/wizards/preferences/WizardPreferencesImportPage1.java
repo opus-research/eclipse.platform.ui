@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,8 +28,8 @@ import org.eclipse.ui.internal.preferences.PreferenceTransferElement;
 
 /**
  * Page 1 of the base preference import Wizard
- *
- *
+ * 
+ * 
  * @since 3.1
  */
 public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
@@ -51,17 +51,26 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
         this("preferencesImportPage1");//$NON-NLS-1$
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getAllButtonText()
+     */
     @Override
 	protected String getAllButtonText() {
         return PreferencesMessages.WizardPreferencesImportPage1_all;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getChooseButtonText()
+     */
     @Override
 	protected String getChooseButtonText() {
         return PreferencesMessages.WizardPreferencesImportPage1_choose;
     }
 
-
+   
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getTransfers()
+     */
     @Override
 	protected PreferenceTransferElement[] getTransfers() {
         if (validFromFile()) {
@@ -92,7 +101,7 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
                         PreferenceTransferElement element = transfers[j];
                         if (element.getFilter().equals(filter)) {
 							returnTransfers[index++] = element;
-						}
+						}                        
                     }
                 }
 
@@ -126,8 +135,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
 
     @Override
 	protected void setPreferenceTransfers() {
-    	super.setPreferenceTransfers();
-
+    	super.setPreferenceTransfers();	
+    	
 		if (validFromFile()
 				&& (transfersTree.getViewer().getTree().getItemCount() == 0)) {
 			descText
@@ -136,7 +145,10 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
 			descText.setText(""); //$NON-NLS-1$
 		}
 	}
-
+  
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#createTransferArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected void createTransferArea(Composite composite) {
         createDestinationGroup(composite);
@@ -145,7 +157,7 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
 
     /**
      * Answer the string to display in self as the destination type
-     *
+     * 
      * @return java.lang.String
      */
     @Override
@@ -168,20 +180,20 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
                     fis = new FileInputStream(importFile);
                 } catch (FileNotFoundException e) {
                     WorkbenchPlugin.log(e.getMessage(), e);
-					MessageDialog.open(MessageDialog.ERROR, getControl().getShell(), "", //$NON-NLS-1$
-							e.getLocalizedMessage(),
+					MessageDialog.open(MessageDialog.ERROR, getControl()
+							.getShell(), new String(), e.getLocalizedMessage(),
 							SWT.SHEET);
                     return false;
                 }
                 IPreferencesService service = Platform.getPreferencesService();
                 try {
                     IExportedPreferences prefs = service.readPreferences(fis);
-
+                    
                     service.applyPreferences(prefs, filters);
                 } catch (CoreException e) {
                     WorkbenchPlugin.log(e.getMessage(), e);
 					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), "", e.getLocalizedMessage(), //$NON-NLS-1$
+							.getShell(), new String(), e.getLocalizedMessage(),
 							SWT.SHEET);
                     return false;
                 }
@@ -193,7 +205,7 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
                 } catch (IOException e) {
                 	WorkbenchPlugin.log(e.getMessage(), e);
 					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), "", e.getLocalizedMessage(), //$NON-NLS-1$
+							.getShell(), new String(), e.getLocalizedMessage(),
 							SWT.SHEET);
                 }
 			}
@@ -203,7 +215,7 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
 
     /**
      * Handle events and enablements for widgets in this page
-     *
+     * 
      * @param e
      *            Event
      */
@@ -215,27 +227,45 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
 
         super.handleEvent(e);
     }
-
+	
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getFileDialogTitle()
+     */
     @Override
 	protected String getFileDialogTitle(){
 		return PreferencesMessages.WizardPreferencesImportPage1_title;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getFileDialogStyle()
+	 */
 	@Override
 	protected int getFileDialogStyle() {
 		return SWT.OPEN | SWT.SHEET;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#validDestination()
+	 */
 	@Override
 	protected boolean validDestination() {
 		return super.validDestination() && validFromFile();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getInvalidDestinationMessage()
+	 */
 	@Override
 	protected String getInvalidDestinationMessage() {
 		return PreferencesMessages.WizardPreferencesImportPage1_invalidPrefFile;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#
+	 * shouldSaveTransferAll()
+	 */
 	@Override
 	protected boolean shouldSaveTransferAll() {
 		return false;

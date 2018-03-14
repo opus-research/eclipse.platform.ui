@@ -23,15 +23,21 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 		IPipelinedTreeContentProvider2 {
 
 	public static boolean _throw;
-
+	
 	public static void resetTest() {
 		_throw = false;
 	}
-
+	
 	public TestContentProviderPipelined() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedChildren
+	 * (java.lang.Object, java.util.Set)
+	 */
 	public void getPipelinedChildren(Object aParent, Set theCurrentChildren) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
@@ -40,28 +46,48 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedElements
+	 * (java.lang.Object, java.util.Set)
+	 */
 	public void getPipelinedElements(Object anInput, Set theCurrentElements) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
 		getPipelinedChildren(anInput, theCurrentElements);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProviderHasChildren#hasPipelinedChildren(java.lang.Object, boolean)
+	 */
 	public boolean hasPipelinedChildren(Object anInput, boolean currentHasChildren) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
 		return currentHasChildren;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedParent
+	 * (java.lang.Object, java.lang.Object)
+	 */
 	public Object getPipelinedParent(Object anObject, Object aSuggestedParent) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
 		return aSuggestedParent;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptAdd(org
+	 * .eclipse.ui.navigator.PipelinedShapeModification)
+	 */
 	public PipelinedShapeModification interceptAdd(
 			PipelinedShapeModification anAddModification) {
 		if (_throw)
@@ -69,7 +95,13 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 		return anAddModification;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRefresh
+	 * (org.eclipse.ui.navigator.PipelinedViewerUpdate)
+	 */
 	public boolean interceptRefresh(
 			PipelinedViewerUpdate aRefreshSynchronization) {
 		if (_throw)
@@ -77,7 +109,13 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRemove
+	 * (org.eclipse.ui.navigator.PipelinedShapeModification)
+	 */
 	public PipelinedShapeModification interceptRemove(
 			PipelinedShapeModification aRemoveModification) {
 		if (_throw)
@@ -85,24 +123,47 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 		return aRemoveModification;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptUpdate
+	 * (org.eclipse.ui.navigator.PipelinedViewerUpdate)
+	 */
 	public boolean interceptUpdate(PipelinedViewerUpdate anUpdateSynchronization) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator
+	 * .ICommonContentExtensionSite)
+	 */
 	public void init(ICommonContentExtensionSite aConfig) {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento
+	 * )
+	 */
 	public void restoreState(IMemento aMemento) {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
+	 */
 	public void saveState(IMemento aMemento) {
 
 	}

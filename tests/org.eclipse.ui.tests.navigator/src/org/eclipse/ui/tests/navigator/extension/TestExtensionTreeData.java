@@ -12,6 +12,7 @@ package org.eclipse.ui.tests.navigator.extension;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -20,7 +21,7 @@ import org.eclipse.core.resources.IFile;
 
 public class TestExtensionTreeData {
 
-	private final Map<String, TestExtensionTreeData> children = new HashMap<>();
+	private final Map children = new HashMap();
 
 	private TestExtensionTreeData parent;
 
@@ -68,24 +69,25 @@ public class TestExtensionTreeData {
 		return name;
 	}
 
-	@Override
 	public int hashCode() {
 		return name.hashCode();
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof TestExtensionTreeData
 				&& ((TestExtensionTreeData) obj).getName().equals(name);
 	}
 
-	@Override
 	public String toString() {
 		StringBuffer toString = new StringBuffer(getName()).append(":");
 
 		toString.append("[");
 		// update local children to remove any stale kids
-		for (TestExtensionTreeData child : children.values()) {
+		for (Iterator childIterator = children.keySet().iterator(); childIterator
+				.hasNext();) {
+			String childName = (String) childIterator.next();
+			TestExtensionTreeData child = (TestExtensionTreeData) children
+					.get(childName);
 			toString.append(child.toString());
 		}
 		toString.append("]");
@@ -95,7 +97,7 @@ public class TestExtensionTreeData {
 	/**
 	 * @return
 	 */
-	public IFile getFile() {
+	public IFile getFile() { 
 		return container;
 	}
 

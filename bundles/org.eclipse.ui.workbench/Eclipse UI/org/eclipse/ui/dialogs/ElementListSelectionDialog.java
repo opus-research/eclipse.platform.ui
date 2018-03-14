@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui.dialogs;
 
 import java.util.Arrays;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -18,10 +19,11 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * A class to select elements out of a list of elements.
- *
+ * 
  * @since 2.0
  */
-public class ElementListSelectionDialog extends AbstractElementListSelectionDialog {
+public class ElementListSelectionDialog extends
+        AbstractElementListSelectionDialog {
 
     private Object[] fElements;
 
@@ -42,11 +44,17 @@ public class ElementListSelectionDialog extends AbstractElementListSelectionDial
         fElements = elements;
     }
 
+    /*
+     * @see SelectionStatusDialog#computeResult()
+     */
     @Override
 	protected void computeResult() {
         setResult(Arrays.asList(getSelectedElements()));
     }
 
+    /*
+     * @see Dialog#createDialogArea(Composite)
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite contents = (Composite) super.createDialogArea(parent);

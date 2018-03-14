@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,8 +26,7 @@ public class WorkbenchFolder extends WorkbenchResource {
      *	considering the passed open status as well iff appropriate for the type of
      *	passed resource
      */
-    @Override
-	protected ImageDescriptor getBaseImage(IResource resource) {
+    protected ImageDescriptor getBaseImage(IResource resource) {
         return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
                 ISharedImages.IMG_OBJ_FOLDER);
     }
@@ -35,8 +34,7 @@ public class WorkbenchFolder extends WorkbenchResource {
     /**
      * Returns the children of this container.
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
         try {
             return ((IContainer) o).members();
         } catch (CoreException e) {

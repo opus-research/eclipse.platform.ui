@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,6 @@
  *     Red Hat Inc. (mistria) - Fixes suggested by FindBugs
  *     Red Hat Inc. (mistria) - Bug 413348: fix stream leak
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428715
- *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 479896
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500402
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
 
@@ -34,7 +31,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
-import org.eclipse.e4.ui.css.core.dom.ChildVisibilityAwareElement;
 import org.eclipse.e4.ui.css.core.dom.ExtendedCSSRule;
 import org.eclipse.e4.ui.css.core.dom.ExtendedDocumentCSS;
 import org.eclipse.e4.ui.css.core.dom.IElementProvider;
@@ -60,15 +56,12 @@ import org.eclipse.e4.ui.css.core.util.impl.resources.ResourcesLocatorManager;
 import org.eclipse.e4.ui.css.core.util.resources.IResourcesLocatorManager;
 import org.eclipse.e4.ui.css.core.utils.StringUtils;
 import org.w3c.css.sac.AttributeCondition;
-import org.w3c.css.sac.CombinatorCondition;
 import org.w3c.css.sac.Condition;
 import org.w3c.css.sac.ConditionalSelector;
-import org.w3c.css.sac.DescendantSelector;
 import org.w3c.css.sac.InputSource;
 import org.w3c.css.sac.Selector;
 import org.w3c.css.sac.SelectorList;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.css.CSSImportRule;
 import org.w3c.dom.css.CSSRule;
@@ -93,11 +86,6 @@ import org.w3c.dom.stylesheets.StyleSheet;
  *
  */
 public abstract class AbstractCSSEngine implements CSSEngine {
-
-	/**
-	 * Archives are deliberately identified by exclamation mark in URLs
-	 */
-	private static final String ARCHIVE_IDENTIFIER = "!";
 
 	/**
 	 * Default {@link IResourcesLocatorManager} used to get InputStream, Reader
@@ -199,11 +187,11 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			} else {
 				Path p = new Path(source.getURI());
 				IPath trim = p.removeLastSegments(1);
-				boolean isArchive = source.getURI().contains(ARCHIVE_IDENTIFIER);
+
 				url = FileLocator.resolve(new URL(trim.addTrailingSeparator()
 						.toString() + ((CSSImportRule) rule).getHref()));
 				File testFile = new File(url.getFile());
-				if (!isArchive&&!testFile.exists()) {
+				if (!testFile.exists()) {
 					// look in platform default
 					String path = getResourcesLocatorManager().resolve(
 							(importRule).getHref());
@@ -368,10 +356,6 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			boolean computeDefaultStyle) {
 		Element elt = getElement(element);
 		if (elt != null) {
-			if (!isVisible(elt)) {
-				return;
-			}
-
 			/*
 			 * Compute new Style to apply.
 			 */
@@ -432,8 +416,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				/*
 				 * Style all children recursive.
 				 */
-				NodeList nodes = elt instanceof ChildVisibilityAwareElement
-						? ((ChildVisibilityAwareElement) elt).getVisibleChildNodes() : elt.getChildNodes();
+				NodeList nodes = elt.getChildNodes();
 				if (nodes != null) {
 					for (int k = 0; k < nodes.getLength(); k++) {
 						applyStyles(nodes.item(k), applyStylesToChildNodes);
@@ -445,63 +428,20 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	}
 
-	/**
-	 * Allow the CSS engine to skip particular elements if they are not visible.
-	 * Elements need to be restyled when they become visible.
-	 *
-	 * @param elt
-	 * @return true if the element is visible, false if not visible.
-	 */
-	protected boolean isVisible(Element elt) {
-		Node parentNode = elt.getParentNode();
-		if (parentNode instanceof ChildVisibilityAwareElement) {
-			NodeList l = ((ChildVisibilityAwareElement) parentNode)
-					.getVisibleChildNodes();
-			if (l != null) {
-				for (int i = 0; i < l.getLength(); i++) {
-					if (l.item(i) == elt) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-		return true;
-	}
-
 	private void applyConditionalPseudoStyle(ExtendedCSSRule parentRule, String pseudoInstance, Object element, CSSStyleDeclaration styleWithPseudoInstance) {
 		SelectorList selectorList = parentRule.getSelectorList();
 		for (int j = 0; j < selectorList.getLength(); j++) {
 			Selector item = selectorList.item(j);
 			// search for conditional selectors
-			ConditionalSelector conditional = null;
 			if (item instanceof ConditionalSelector) {
-				conditional = (ConditionalSelector) item;
-			} else if (item instanceof DescendantSelector) {
-				if (((DescendantSelector) item).getSimpleSelector() instanceof ConditionalSelector) {
-					conditional = (ConditionalSelector) ((DescendantSelector) item).getSimpleSelector();
-				} else if (((DescendantSelector) item).getAncestorSelector() instanceof ConditionalSelector) {
-					conditional = (ConditionalSelector) ((DescendantSelector) item).getAncestorSelector();
-				}
-			}
-			if (conditional != null) {
-				Condition condition = conditional.getCondition();
+				Condition condition = ((ConditionalSelector) item).getCondition();
 				// we're only interested in attribute selector conditions
-				AttributeCondition attr = null;
 				if (condition instanceof AttributeCondition) {
-					attr = (AttributeCondition) condition;
-				} else if (condition instanceof CombinatorCondition) {
-					if (((CombinatorCondition) condition).getSecondCondition() instanceof AttributeCondition) {
-						attr = (AttributeCondition) ((CombinatorCondition) condition).getSecondCondition();
-					} else if (((CombinatorCondition) condition).getFirstCondition() instanceof AttributeCondition) {
-						attr = (AttributeCondition) ((CombinatorCondition) condition).getFirstCondition();
-					}
-				}
-				if (attr != null) {
-					String value = attr.getValue();
+					String value = ((AttributeCondition) condition).getValue();
 					if (value.equals(pseudoInstance)) {
 						// if we match the pseudo, apply the style
-						applyStyleDeclaration(element, styleWithPseudoInstance, pseudoInstance);
+						applyStyleDeclaration(element, styleWithPseudoInstance,
+								pseudoInstance);
 						return;
 					}
 				}
@@ -574,7 +514,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		if (handlers2 != null) {
 			for (ICSSPropertyHandler2 handler2 : handlers2) {
 				try {
-					handler2.onAllCSSPropertiesApplyed(element, this, pseudo);
+					handler2.onAllCSSPropertiesApplyed(element, this);
 				} catch (Exception e) {
 					handleExceptions(e);
 				}
@@ -739,18 +679,6 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		}
 
 		element = getElement(element); // in case we're passed a node
-		if ("inherit".equals(value.getCssText())) {
-			// go to parent node
-			Element actualElement = (Element) element;
-			Node parentNode = actualElement.getParentNode();
-			// get CSS property value
-			String parentValueString = retrieveCSSProperty(parentNode,
-					property, pseudo);
-			// and convert it to a CSS value, overriding the "inherit" setting
-			// with the parent value
-			value = parsePropertyValue(parentValueString);
-		}
-
 		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
 			Collection<ICSSPropertyHandler> handlers = provider
 					.getCSSPropertyHandlers(element, property);

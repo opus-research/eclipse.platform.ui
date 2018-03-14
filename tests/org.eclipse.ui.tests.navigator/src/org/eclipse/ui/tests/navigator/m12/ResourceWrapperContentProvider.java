@@ -39,25 +39,21 @@ public abstract class ResourceWrapperContentProvider implements
 		_counters = new HashMap();
 	}
 
-	@Override
 	public void getPipelinedChildren(Object aParent, Set theCurrentChildren) {
 		// Nothing to do, we replaced IProjects with ModelProjects in
 		// getPipelinedElements
 		// and from there children are provided by getChildren.
 	}
 
-	@Override
 	public void getPipelinedElements(Object input, Set currentElements) {
 
 	}
 
-	@Override
 	public Object getPipelinedParent(Object object, Object suggestedParent) {
 		return (object instanceof ResourceWrapper) ? ((ResourceWrapper) object)
 				.getParent() : suggestedParent;
 	}
 
-	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 		// ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
 		// IResourceChangeEvent.PRE_BUILD |
@@ -67,12 +63,10 @@ public abstract class ResourceWrapperContentProvider implements
 		// IResourceChangeEvent.PRE_CLOSE);
 	}
 
-	@Override
 	public Object[] getChildren(Object parentElement) {
 		return NO_CHILDREN;
 	}
 
-	@Override
 	public Object getParent(Object element) {
 		if (element instanceof ResourceWrapper) {
 			return ((ResourceWrapper) element).getParent();
@@ -81,7 +75,6 @@ public abstract class ResourceWrapperContentProvider implements
 		}
 	}
 
-	@Override
 	public boolean hasChildren(Object element) {
 		try {
 			return ((ResourceWrapper) element).hasChildren();
@@ -91,32 +84,26 @@ public abstract class ResourceWrapperContentProvider implements
 		}
 	}
 
-	@Override
 	public Object[] getElements(Object inputElement) {
 		return NO_CHILDREN;
 	}
 
-	@Override
 	public void dispose() {
 		// not implemented
 	}
 
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		// _viewer = viewer;
 	}
 
-	@Override
 	public void restoreState(IMemento aMemento) {
 		// not implemented
 	}
 
-	@Override
 	public void saveState(IMemento aMemento) {
 		// not implemented
 	}
 
-	@Override
 	public PipelinedShapeModification interceptAdd(
 			PipelinedShapeModification modification) {
 		_convertToModelObjects(modification);
@@ -124,7 +111,6 @@ public abstract class ResourceWrapperContentProvider implements
 		return modification;
 	}
 
-	@Override
 	public PipelinedShapeModification interceptRemove(
 			PipelinedShapeModification modification) {
 		_incrementCounter(INTERCEPT_REMOVE);
@@ -132,14 +118,12 @@ public abstract class ResourceWrapperContentProvider implements
 		return modification;
 	}
 
-	@Override
 	public boolean interceptRefresh(PipelinedViewerUpdate refreshSynchronization) {
 		_incrementCounter(INTERCEPT_REFRESH);
 		return _convertToModelObjects(refreshSynchronization
 				.getRefreshTargets());
 	}
 
-	@Override
 	public boolean interceptUpdate(PipelinedViewerUpdate update) {
 		_incrementCounter(INTERCEPT_UPDATE);
 		return _convertToModelObjects(update.getRefreshTargets());
@@ -153,9 +137,9 @@ public abstract class ResourceWrapperContentProvider implements
 		}
 		Integer current = (Integer) counters.get(counterId);
 		if (current == null) {
-			counters.put(counterId, Integer.valueOf(1));
+			counters.put(counterId, new Integer(1));
 		} else {
-			counters.put(counterId, Integer.valueOf(current.intValue() + 1));
+			counters.put(counterId, new Integer(current.intValue() + 1));
 		}
 	}
 

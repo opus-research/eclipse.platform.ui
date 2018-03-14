@@ -13,11 +13,9 @@ public class M1Resource extends ResourceWrapper {
 	public M1Resource(IResource resource) {
 		super(resource);
 	}
-	@Override
 	protected ResourceWrapper getModelObject(IResource resource) {
 		return M1Core.getModelObject(resource);
 	}
-	@Override
 	public String getModelId() {
 		return "M1";
 	}

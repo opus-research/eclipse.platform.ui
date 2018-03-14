@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Terry Parker <tparker@google.com> - Bug 416673
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 393171
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -21,11 +19,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.eclipse.core.internal.runtime.PlatformURLPluginConnection;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -42,6 +42,9 @@ import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.e4.ui.workbench.modeling.IModelReconcilingService;
+import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
+import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -51,6 +54,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.Bundle;
+import org.w3c.dom.Document;
 
 /**
  * This class is responsible to load and save the model
@@ -78,22 +82,26 @@ public class ResourceHandler implements IModelResourceHandler {
 	/**
 	 * Dictates whether the model should be stored using EMF or with the merging algorithm.
 	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=295524
-	 *
+	 * 
 	 */
+	final private boolean deltaRestore;
 	final private boolean saveAndRestore;
 	final private boolean clearPersistedState;
 
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param saveAndRestore
 	 * @param clearPersistedState
+	 * @param deltaRestore
 	 */
 	@Inject
 	public ResourceHandler(@Named(IWorkbench.PERSIST_STATE) boolean saveAndRestore,
-			@Named(IWorkbench.CLEAR_PERSISTED_STATE) boolean clearPersistedState) {
+			@Named(IWorkbench.CLEAR_PERSISTED_STATE) boolean clearPersistedState,
+			@Named(E4Workbench.DELTA_RESTORE) boolean deltaRestore) {
 		this.saveAndRestore = saveAndRestore;
 		this.clearPersistedState = clearPersistedState;
+		this.deltaRestore = deltaRestore;
 	}
 
 	@PostConstruct
@@ -120,28 +128,57 @@ public class ResourceHandler implements IModelResourceHandler {
 
 	}
 
-	/**
-	 * @return {@code true} if the current application model has top-level windows.
-	 */
-	public boolean hasTopLevelWindows() {
-		return hasTopLevelWindows(resource);
-	}
-
-	/**
-	 * @return {@code true} if the specified application model has top-level windows.
-	 */
-	private boolean hasTopLevelWindows(Resource applicationResource) {
-		if (applicationResource == null || applicationResource.getContents() == null) {
-			// If the application resource doesn't exist or has no contents, then it has no
-			// top-level windows (and we are in an error state).
-			return false;
-		}
-		MApplication application = (MApplication) applicationResource.getContents().get(0);
-		return !application.getChildren().isEmpty();
-	}
-
 	@Override
 	public Resource loadMostRecentModel() {
+		// This is temporary code to migrate existing delta files into full models
+		if (deltaRestore && saveAndRestore && !clearPersistedState) {
+			File baseLocation = getBaseLocation();
+			File deltaFile = new File(baseLocation, "deltas.xml"); //$NON-NLS-1$
+
+			if (deltaFile.exists()) {
+				MApplication appElement = null;
+				try {
+					// create new resource in case code below fails somewhere
+					File workbenchData = getWorkbenchSaveLocation();
+					URI restoreLocationNew = URI.createFileURI(workbenchData.getAbsolutePath());
+					resource = resourceSetImpl.createResource(restoreLocationNew);
+
+					Resource oldResource = loadResource(applicationDefinitionInstance);
+					appElement = (MApplication) oldResource.getContents().get(0);
+
+					context.set(MApplication.class, appElement);
+					ModelAssembler contribProcessor = ContextInjectionFactory.make(
+							ModelAssembler.class, context);
+					contribProcessor.processModel(true);
+
+					File deltaOldFile = new File(baseLocation, "deltas_42M7migration.xml"); //$NON-NLS-1$
+					deltaFile.renameTo(deltaOldFile);
+					URI restoreLocation = URI.createFileURI(deltaOldFile.getAbsolutePath());
+
+					File file = new File(restoreLocation.toFileString());
+
+					if (file.exists()) {
+						Document document = DocumentBuilderFactory.newInstance()
+								.newDocumentBuilder().parse(file);
+						IModelReconcilingService modelReconcilingService = new ModelReconcilingService();
+						ModelReconciler modelReconciler = modelReconcilingService
+								.createModelReconciler();
+						document.normalizeDocument();
+						Collection<ModelDelta> deltas = modelReconciler.constructDeltas(oldResource
+								.getContents().get(0), document);
+						modelReconcilingService.applyDeltas(deltas);
+					}
+				} catch (Exception e) {
+					if (logger != null) {
+						logger.error(e);
+					}
+				}
+				if (appElement != null)
+					resource.getContents().add((EObject) appElement);
+				return resource;
+			}
+		}
+
 		File workbenchData = null;
 		URI restoreLocation = null;
 
@@ -167,15 +204,6 @@ public class ResourceHandler implements IModelResourceHandler {
 		resource = null;
 		if (restore && saveAndRestore) {
 			resource = loadResource(restoreLocation);
-			// If the saved model does not have any top-level windows, Eclipse will exit
-			// immediately, so throw out the persisted state and reinitialize with the defaults.
-			if (!hasTopLevelWindows(resource)) {
-				if (logger != null) {
-					logger.error(new Exception(), // log a stack trace to help debug the corruption
-							"The persisted workbench has no top-level windows, so reinitializing with defaults."); //$NON-NLS-1$
-				}
-				resource = null;
-			}
 		}
 		if (resource == null) {
 			Resource applicationResource = loadResource(applicationDefinitionInstance);
@@ -196,13 +224,6 @@ public class ResourceHandler implements IModelResourceHandler {
 				context);
 		contribProcessor.processModel(initialModel);
 
-		if (!hasTopLevelWindows(resource) && logger != null) {
-			logger.error(new Exception(), // log a stack trace to help debug the
-											// corruption
-					"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
-							+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
-		}
-
 		if (!clearPersistedState) {
 			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
 					CommandLineOptionModelProcessor.class, context);
@@ -220,7 +241,7 @@ public class ResourceHandler implements IModelResourceHandler {
 
 	/**
 	 * Creates a resource with an app Model, used for saving copies of the main app model.
-	 *
+	 * 
 	 * @param theApp
 	 *            the application model to add to the resource
 	 * @return a resource with a proper save path with the model as contents

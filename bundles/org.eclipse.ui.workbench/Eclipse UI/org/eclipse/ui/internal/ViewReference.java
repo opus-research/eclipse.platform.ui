@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -88,9 +87,17 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 
 	@Override
 	public boolean isFastView() {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#createPart
+	 * ()
+	 */
 	@Override
 	public IWorkbenchPart createPart() throws PartInitException {
 		try {
@@ -109,7 +116,7 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 	@Override
 	IWorkbenchPart createErrorPart() {
 		IStatus status = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, NLS.bind(
-				WorkbenchMessages.ViewFactory_initException, getModel().getElementId()), new Exception());
+				WorkbenchMessages.ViewFactory_initException, getModel().getElementId()));
 		return createErrorPart(status);
 	}
 
@@ -118,6 +125,13 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		return new ErrorViewPart(status);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#initialize
+	 * (org.eclipse.ui.IWorkbenchPart)
+	 */
 	@Override
 	public void initialize(IWorkbenchPart part) throws PartInitException {
 		ViewSite viewSite = new ViewSite(getModel(), part, this, descriptor == null ? null

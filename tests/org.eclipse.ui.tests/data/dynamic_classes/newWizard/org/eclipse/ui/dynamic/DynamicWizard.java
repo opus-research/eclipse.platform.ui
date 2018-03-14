@@ -26,114 +26,158 @@ import org.eclipse.ui.IWorkbench;
 public class DynamicWizard implements INewWizard {
 
 	/**
-	 *
+	 * 
 	 */
 	public DynamicWizard() {
 		super();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#addPages()
+	 */
 	public void addPages() {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#canFinish()
+	 */
 	public boolean canFinish() {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#createPageControls(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPageControls(Composite pageContainer) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#dispose()
+	 */
 	public void dispose() {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getContainer()
+	 */
 	public IWizardContainer getContainer() {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getDefaultPageImage()
+	 */
 	public Image getDefaultPageImage() {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getDialogSettings()
+	 */
 	public IDialogSettings getDialogSettings() {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getNextPage(org.eclipse.jface.wizard.IWizardPage)
+	 */
 	public IWizardPage getNextPage(IWizardPage page) {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getPage(java.lang.String)
+	 */
 	public IWizardPage getPage(String pageName) {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getPageCount()
+	 */
 	public int getPageCount() {
 		return 0;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getPages()
+	 */
 	public IWizardPage[] getPages() {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getPreviousPage(org.eclipse.jface.wizard.IWizardPage)
+	 */
 	public IWizardPage getPreviousPage(IWizardPage page) {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getStartingPage()
+	 */
 	public IWizardPage getStartingPage() {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getTitleBarColor()
+	 */
 	public RGB getTitleBarColor() {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#getWindowTitle()
+	 */
 	public String getWindowTitle() {
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#isHelpAvailable()
+	 */
 	public boolean isHelpAvailable() {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#needsPreviousAndNextButtons()
+	 */
 	public boolean needsPreviousAndNextButtons() {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#needsProgressMonitor()
+	 */
 	public boolean needsProgressMonitor() {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#performCancel()
+	 */
 	public boolean performCancel() {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#performFinish()
+	 */
 	public boolean performFinish() {
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.wizard.IWizard#setContainer(org.eclipse.jface.wizard.IWizardContainer)
+	 */
 	public void setContainer(IWizardContainer wizardContainer) {
 	}
 

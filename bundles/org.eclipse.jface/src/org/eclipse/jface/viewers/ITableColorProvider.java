@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ public interface ITableColorProvider {
 
     /**
      * Provides a foreground color for the given element.
-     *
+     * 
      * @param element the element
      * @param columnIndex the zero-based index of the column in which
      * 	the color appears
@@ -34,12 +34,12 @@ public interface ITableColorProvider {
 
     /**
      * Provides a background color for the given element at the specified index
-     *
+     * 
      * @param element the element
      * @param columnIndex the zero-based index of the column in which the color appears
      * @return the background color for the element, or <code>null</code> to
      *         use the default background color
-     *
+     *  
      */
     Color getBackground(Object element, int columnIndex);
 }

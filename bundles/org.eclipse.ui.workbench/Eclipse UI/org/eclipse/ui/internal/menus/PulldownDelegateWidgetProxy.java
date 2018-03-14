@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -53,7 +52,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 final class PulldownDelegateWidgetProxy implements IWidget {
@@ -89,7 +88,7 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 
 		/**
 		 * Constructs a new instance of <code>MenuLoader</code>
-		 *
+		 * 
 		 * @param delegate
 		 *            The delegate from which the menu will be loaded; this
 		 *            value must not be <code>null</code>.
@@ -106,7 +105,7 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 
 		/**
 		 * Constructs a new instance of <code>MenuLoader</code>
-		 *
+		 * 
 		 * @param delegate
 		 *            The delegate from which the menu will be loaded; this
 		 *            value must not be <code>null</code>.
@@ -123,7 +122,7 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 
 		/**
 		 * Returns the menu loaded, if any.
-		 *
+		 * 
 		 * @return the loaded menu, or <code>null</code> if none.
 		 */
 		private Menu getMenu() {
@@ -231,7 +230,7 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 				}
 			}
 
-			final IHandlerService service = locator
+			final IHandlerService service = (IHandlerService) locator
 					.getService(IHandlerService.class);
 			try {
 				service.executeCommand(command, event);
@@ -256,7 +255,7 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 	 * Constructs a new instance of <code>PulldownDelegateWidgetProxy</code>
 	 * with all the information it needs to try to avoid loading until it is
 	 * needed.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which the real class can be
 	 *            loaded at run-time; must not be <code>null</code>.
@@ -393,7 +392,7 @@ final class PulldownDelegateWidgetProxy implements IWidget {
 	/**
 	 * Loads the delegate, if possible. If the delegate is loaded, then the
 	 * member variables are updated accordingly.
-	 *
+	 * 
 	 * @return <code>true</code> if the delegate is now non-null;
 	 *         <code>false</code> otherwise.
 	 */

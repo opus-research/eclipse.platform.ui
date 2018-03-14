@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation; bug 153993
  *												   fix in bug 163317, 151295, 167323, 167858, 184346, 187826, 201905
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -33,13 +32,12 @@ import org.eclipse.swt.widgets.Widget;
  * (e.g., AbstractTreeViewer and AbstractTableViewer). Concrete subclasses of
  * {@link ColumnViewer} should implement a matching concrete subclass of {@link
  * ViewerColumn}.
- * <p>
+ * 
  * <strong> This class is not intended to be subclassed outside of the JFace
  * viewers framework.</strong>
- * </p>
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public abstract class ColumnViewer extends StructuredViewer {
 	private CellEditor[] cellEditors;
@@ -79,7 +77,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Hook up the editing support. Subclasses may override.
-	 *
+	 * 
 	 * @param control
 	 * 		the control you want to hook on
 	 */
@@ -110,7 +108,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Creates the viewer editor used for editing cell contents. To be
 	 * implemented by subclasses.
-	 *
+	 * 
 	 * @return the editor, or <code>null</code> if this viewer does not support
 	 * 	editing cell contents.
 	 */
@@ -119,12 +117,12 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Returns the viewer cell at the given widget-relative coordinates, or
 	 * <code>null</code> if there is no cell at that location
-	 *
+	 * 
 	 * @param point
 	 * 		the widget-relative coordinates
 	 * @return the cell or <code>null</code> if no cell is found at the given
 	 * 	point
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	public ViewerCell getCell(Point point) {
@@ -138,7 +136,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Returns the viewer row at the given widget-relative coordinates.
-	 *
+	 * 
 	 * @param point
 	 * 		the widget-relative coordinates of the viewer row
 	 * @return ViewerRow the row or <code>null</code> if no row is found at the
@@ -159,7 +157,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * Implementations may re-use the same instance for different row widgets;
 	 * callers can only use the viewer row locally and until the next call to
 	 * this method.
-	 *
+	 * 
 	 * @param item
 	 * 		the row widget
 	 * @return ViewerRow a viewer row object
@@ -168,7 +166,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Returns the column widget at the given column index.
-	 *
+	 * 
 	 * @param columnIndex
 	 * 		the column index
 	 * @return Widget the column widget
@@ -177,7 +175,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Returns the viewer column for the given column index.
-	 *
+	 * 
 	 * @param columnIndex
 	 * 		the column index
 	 * @return the viewer column at the given index, or <code>null</code> if
@@ -211,7 +209,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Sets up editing support for the given column based on the "old" cell
 	 * editor API.
-	 *
+	 * 
 	 * @param columnIndex
 	 * @param viewer
 	 */
@@ -274,7 +272,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Creates a generic viewer column for the given column widget, based on the
 	 * given label provider.
-	 *
+	 * 
 	 * @param columnOwner
 	 * 		the column widget
 	 * @param labelProvider
@@ -291,7 +289,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Update the cached cell object with the given row and column.
-	 *
+	 * 
 	 * @param rowItem
 	 * @param column
 	 * @return ViewerCell
@@ -305,7 +303,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Returns the {@link Item} at the given widget-relative coordinates, or
 	 * <code>null</code> if there is no item at the given coordinates.
-	 *
+	 * 
 	 * @param point
 	 * 		the widget-relative coordinates
 	 * @return the {@link Item} at the coordinates or <code>null</code> if there
@@ -337,7 +335,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * may also implement {@link IColorProvider} and/or {@link IFontProvider} to
 	 * provide colors and/or fonts.
 	 * </p>
-	 *
+	 * 
 	 */
 	@Override
 	public void setLabelProvider(IBaseLabelProvider labelProvider) {
@@ -346,10 +344,10 @@ public abstract class ColumnViewer extends StructuredViewer {
 				|| labelProvider instanceof CellLabelProvider);
 		updateColumnParts(labelProvider);// Reset the label providers in the
 		// columns
+		super.setLabelProvider(labelProvider);
 		if (labelProvider instanceof CellLabelProvider) {
 			((CellLabelProvider) labelProvider).initialize(this, null);
 		}
-		super.setLabelProvider(labelProvider);
 	}
 
 	@Override
@@ -377,7 +375,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Cancels a currently active cell editor if one is active. All changes
 	 * already done in the cell editor are lost.
-	 *
+	 * 
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 */
 	public void cancelEditing() {
@@ -388,10 +386,10 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Apply the value of the active cell editor if one is active.
-	 *
-	 * @since 3.11 (public - protected since 3.3)
+	 * 
+	 * @since 3.3
 	 */
-	public void applyEditorValue() {
+	protected void applyEditorValue() {
 		if (viewerEditor != null) {
 			viewerEditor.applyEditorValue();
 		}
@@ -399,7 +397,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Starts editing the given element at the given column index.
-	 *
+	 * 
 	 * @param element
 	 * 		the model element
 	 * @param column
@@ -439,8 +437,8 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
 	 * of editing values in a column viewer.
 	 * </p>
-	 *
-	 *
+	 * 
+	 * 
 	 * @return CellEditor[]
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
@@ -453,13 +451,13 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Returns the cell modifier of this viewer, or <code>null</code> if none
 	 * has been set.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
 	 * of editing values in a column viewer.
 	 * </p>
-	 *
+	 * 
 	 * @return the cell modifier, or <code>null</code>
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
@@ -473,13 +471,13 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * Returns the column properties of this table viewer. The properties must
 	 * correspond with the columns of the table control. They are used to
 	 * identify the column in a cell modifier.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
 	 * of editing values in a column viewer.
 	 * </p>
-	 *
+	 * 
 	 * @return the list of column properties
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
@@ -491,13 +489,13 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 	/**
 	 * Returns whether there is an active cell editor.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
 	 * of editing values in a column viewer.
 	 * </p>
-	 *
+	 * 
 	 * @return <code>true</code> if there is an active cell editor, and
 	 * 	<code>false</code> otherwise
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
@@ -545,7 +543,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Sets the cell editors of this column viewer. If editing is not supported
 	 * by this viewer the call simply has no effect.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
@@ -568,7 +566,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Sets the cell modifier for this column viewer. This method does nothing
 	 * if editing is not supported by this viewer.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
@@ -593,7 +591,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * correspond with the columns of the control. They are used to identify the
 	 * column in a cell modifier. If editing is not supported by this viewer the
 	 * call simply has no effect.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
@@ -619,9 +617,9 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * visually, one column of items may be visible. This occurs when the
 	 * programmer uses the column viewer like a list, adding elements but never
 	 * creating a column.
-	 *
+	 * 
 	 * @return the number of columns
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	protected abstract int doGetColumnCount();
@@ -629,12 +627,12 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Returns the label provider associated with the column at the given index
 	 * or <code>null</code> if no column with this index is known.
-	 *
+	 * 
 	 * @param columnIndex
 	 * 		the column index
 	 * @return the label provider associated with the column or
 	 * 	<code>null</code> if no column with this index is known
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	public CellLabelProvider getLabelProvider(int columnIndex) {
@@ -668,7 +666,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * enable the editor but before this event is passed to {@link
 	 * ColumnViewerEditorActivationStrategy} to see if this event should really
 	 * trigger editor activation
-	 *
+	 * 
 	 * @param event
 	 * 		the activation event
 	 */
@@ -737,13 +735,13 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * if the viewer is busy. It is recommended that this method be used by
 	 * subclasses to determine whether the viewer is busy to return early from
 	 * state-changing methods.
-	 *
+	 * 
 	 * <p>
 	 * This method is not intended to be overridden by subclasses.
 	 * </p>
-	 *
+	 * 
 	 * @return <code>true</code> if the viewer is busy.
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	protected boolean checkBusy() {
@@ -769,7 +767,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * Sets the busy state of this viewer. Subclasses MUST use <code>try</code>
 	 * ...<code>finally</code> as follows to ensure that the busy flag is reset
 	 * to its original value:
-	 *
+	 * 
 	 * <pre>
 	 * boolean oldBusy = isBusy();
 	 * setBusy(true);
@@ -779,14 +777,14 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * 	setBusy(oldBusy);
 	 * }
 	 * </pre>
-	 *
+	 * 
 	 * <p>
 	 * This method is not intended to be overridden by subclasses.
 	 * </p>
-	 *
+	 * 
 	 * @param busy
 	 * 		the new value of the busy flag
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	protected void setBusy(boolean busy) {
@@ -802,13 +800,13 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * method if they can ensure by other means that they will not make
 	 * reentrant calls to methods like the ones listed above. See bug 184991 for
 	 * background discussion.
-	 *
+	 * 
 	 * <p>
 	 * This method is not intended to be overridden by subclasses.
 	 * </p>
-	 *
+	 * 
 	 * @return Returns whether this viewer is busy.
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	public boolean isBusy() {

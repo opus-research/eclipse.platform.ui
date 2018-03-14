@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * This class defines internal constants for images that intended to be
- * available only within the IDE UI proper. Use
+ * This class defines internal constants for images that intended to be 
+ * available only within the IDE UI proper. Use 
  * <code>IDEInternalWorkbenchImages.getImageDescriptor} to retrieve image
  * descriptors for any of the images named in this class.
  * <p>
@@ -57,10 +57,8 @@ public final class IDEInternalWorkbenchImages {
 
 	public final static String IMG_ETOOL_PROBLEMS_VIEW_WARNING= "IMG_ETOOL_PROBLEMS_VIEW_WARNING"; //$NON-NLS-1$
 
-	public final static String IMG_ETOOL_PROBLEMS_VIEW_INFO = "IMG_ETOOL_PROBLEMS_VIEW_INFO"; //$NON-NLS-1$
-
     public final static String IMG_LCL_FLAT_LAYOUT = "IMG_LCL_FLAT_LAYOUT"; //$NON-NLS-1$
-
+    
     public final static String IMG_LCL_HIERARCHICAL_LAYOUT = "IMG_LCL_HIERARCHICAL_LAYOUT"; //$NON-NLS-1$
 
     //wizard images
@@ -79,16 +77,16 @@ public final class IDEInternalWorkbenchImages {
     public final static String IMG_WIZBAN_EXPORTZIP_WIZ = "IMG_WIZBAN_EXPORTZIP_WIZ"; //$NON-NLS-1$
 
     public final static String IMG_WIZBAN_RESOURCEWORKINGSET_WIZ = "IMG_WIZBAN_EXPORTZIP_WIZ"; //$NON-NLS-1$
-
+    
     public final static String IMG_DLGBAN_SAVEAS_DLG = "IMG_DLGBAN_SAVEAS_DLG"; //$NON-NLS-1$
-
+    
     public final static String IMG_DLGBAN_QUICKFIX_DLG = "IMG_DLGBAN_QUICKFIX_DLG"; //$NON-NLS-1$
 
     // task objects
     public final static String IMG_OBJS_COMPLETE_TSK = "IMG_OBJS_COMPLETE_TSK"; //$NON-NLS-1$
 
     public final static String IMG_OBJS_INCOMPLETE_TSK = "IMG_OBJS_INCOMPLETE_TSK"; //$NON-NLS-1$
-
+    
     //problems images
     public static final String IMG_OBJS_ERROR_PATH = "IMG_OBJS_ERROR_PATH"; //$NON-NLS-1$
 
@@ -101,7 +99,7 @@ public final class IDEInternalWorkbenchImages {
 
     // welcome
     public final static String IMG_OBJS_WELCOME_ITEM = "IMG_OBJS_WELCOME_ITEM"; //$NON-NLS-1$
-
+    
     public final static String IMG_OBJS_WELCOME_BANNER = "IMG_OBJS_WELCOME_BANNER"; //$NON-NLS-1$
 
     //Quick fix images
@@ -109,8 +107,7 @@ public final class IDEInternalWorkbenchImages {
 	public static final String IMG_ELCL_QUICK_FIX_ENABLED = "IMG_ELCL_QUICK_FIX_ENABLED"; //$NON-NLS-1$
 	public static final String IMG_OBJS_FIXABLE_WARNING= "IMG_OBJS_FIXABLE_WARNING"; //$NON-NLS-1$
 	public static final String IMG_OBJS_FIXABLE_ERROR= "IMG_OBJS_FIXABLE_ERROR"; //$NON-NLS-1$
-	public static final String IMG_OBJS_FIXABLE_INFO = "IMG_OBJS_FIXABLE_INFO"; //$NON-NLS-1$
-
+	
 
     /**
      * Returns the image descriptor for the workbench image with the given

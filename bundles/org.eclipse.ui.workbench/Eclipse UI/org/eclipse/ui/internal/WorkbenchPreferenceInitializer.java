@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Denis Zygann <d.zygann@web.de> - Bug 330453
- *     Axel Richard <axel.richard@obeo.fr> - Bug 486644
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 146205
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -36,27 +33,30 @@ import org.osgi.service.prefs.BackingStoreException;
  * plugin's preferences to be initialized properly when running without
  * org.eclipse.core.runtime.compatibility. For more details, see bug 58975 - New
  * preference mechanism does not properly initialize defaults.
- *
+ * 
  * @since 3.0
  */
-public class WorkbenchPreferenceInitializer extends AbstractPreferenceInitializer {
-
-
+public class WorkbenchPreferenceInitializer extends
+		AbstractPreferenceInitializer {
+	
+	
 
 	@Override
 	public void initializeDefaultPreferences() {
-		IScopeContext context = DefaultScope.INSTANCE;
+		IScopeContext context = new DefaultScope();
 		IEclipsePreferences node = context.getNode(WorkbenchPlugin
 				.getDefault().getBundle().getSymbolicName());
 
-		node.putBoolean(IPreferenceConstants.RUN_IN_BACKGROUND, true);
-		node.putBoolean(IPreferenceConstants.SHOULD_PROMPT_FOR_ENABLEMENT, true);
+		node
+				.putBoolean(IPreferenceConstants.SHOULD_PROMPT_FOR_ENABLEMENT,
+						true);
 
 		node.putBoolean(IPreferenceConstants.EDITORLIST_PULLDOWN_ACTIVE, false);
 		node.putBoolean(IPreferenceConstants.EDITORLIST_DISPLAY_FULL_NAME,
 				false);
 		node.putBoolean(IPreferenceConstants.STICKY_CYCLE, false);
 		node.putBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN, false);
+		node.putBoolean(IPreferenceConstants.REUSE_DIRTY_EDITORS, true);
 		node.putInt(IPreferenceConstants.REUSE_EDITORS, 8);
 		node.putBoolean(IPreferenceConstants.OPEN_ON_SINGLE_CLICK, false);
 		node.putBoolean(IPreferenceConstants.SELECT_ON_HOVER, false);
@@ -66,16 +66,19 @@ public class WorkbenchPreferenceInitializer extends AbstractPreferenceInitialize
 		// FIXME this does not actually set the default since it is the wrong
 		// node. It works because the default-default is false.
 		node.putBoolean(IWorkbenchPreferenceConstants.DISABLE_OPEN_EDITOR_IN_PLACE, false);
-
+		
 		// 5 minute workbench save interval
 		node.putInt(IPreferenceConstants.WORKBENCH_SAVE_INTERVAL, 5);
 
 		node.putBoolean(IPreferenceConstants.USE_IPERSISTABLE_EDITORS, true);
-
+		
 		node.putBoolean(IPreferenceConstants.COOLBAR_VISIBLE, true);
 		node.putBoolean(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE, true);
 
 		node.putInt(IPreferenceConstants.EDITOR_TAB_WIDTH, 3); // high
+		node.putInt(IPreferenceConstants.OPEN_VIEW_MODE,
+				IPreferenceConstants.OVM_EMBED);
+		node.putBoolean(IPreferenceConstants.FVB_HIDE, false);
 		node.putInt(IPreferenceConstants.OPEN_PERSP_MODE,
 				IPreferenceConstants.OPM_ACTIVE_PAGE);
 		node.put(IPreferenceConstants.ENABLED_DECORATORS, ""); //$NON-NLS-1$
@@ -96,7 +99,7 @@ public class WorkbenchPreferenceInitializer extends AbstractPreferenceInitialize
 		// Temporary option to enable cool bars
 		node.putBoolean("ENABLE_COOL_BARS", true); //$NON-NLS-1$
 		// Temporary option to enable new menu organization
-		node.putBoolean("ENABLE_NEW_MENUS", true); //$NON-NLS-1$
+		node.putBoolean("ENABLE_NEW_MENUS", true); //$NON-NLS-1$   
 		//Temporary option to turn off the dialog font
 		node.putBoolean("DISABLE_DIALOG_FONT", false); //$NON-NLS-1$
 
@@ -107,16 +110,12 @@ public class WorkbenchPreferenceInitializer extends AbstractPreferenceInitialize
 		node.putInt(IHeapStatusConstants.PREF_UPDATE_INTERVAL, 500);
 		node.putBoolean(IHeapStatusConstants.PREF_SHOW_MAX, false);
 		node.putBoolean(IPreferenceConstants.OVERRIDE_PRESENTATION, false);
-
+		
 		// Globalization preferences
 		node.put(IPreferenceConstants.NL_EXTENSIONS, ""); //$NON-NLS-1$
 		node.putInt(IPreferenceConstants.LAYOUT_DIRECTION, SWT.NONE);
 		node.putBoolean(IPreferenceConstants.BIDI_SUPPORT, false);
 		node.put(IPreferenceConstants.TEXT_DIRECTION, ""); //$NON-NLS-1$
-
-		// Auto-save
-		node.putBoolean(IPreferenceConstants.SAVE_AUTOMATICALLY, false);
-		node.putInt(IPreferenceConstants.SAVE_AUTOMATICALLY_INTERVAL, 20);
 
 		IEclipsePreferences rootNode = (IEclipsePreferences) Platform
 				.getPreferencesService().getRootNode()
@@ -136,7 +135,7 @@ public class WorkbenchPreferenceInitializer extends AbstractPreferenceInitialize
 					e.getLocalizedMessage(), e);
 			WorkbenchPlugin.getDefault().getLog().log(status);
 		}
-
+	
 	}
 
 }

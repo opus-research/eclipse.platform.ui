@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Shell;
@@ -24,75 +23,67 @@ import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 
 /**
  * Provides a delegate implementation of {@link ICommonViewerWorkbenchSite}.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class CommonViewerSiteIViewSiteDelegate implements ICommonViewerWorkbenchSite {
 
-	private IViewSite viewSite;
+	private IViewSite viewSite; 
 
 	/**
-	 *
+	 * 
 	 * @param aViewSite
 	 */
 	public CommonViewerSiteIViewSiteDelegate(IViewSite aViewSite) {
-		viewSite = aViewSite;
+		viewSite = aViewSite; 
 	}
 
-	@Override
 	public String getId() {
 		return viewSite.getId();
 	}
 
-	@Override
 	public IActionBars getActionBars() {
 		return viewSite.getActionBars();
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
-		return Adapters.adapt(viewSite, adapter);
+	public Object getAdapter(Class adapter) {
+		return viewSite.getAdapter(adapter);
 	}
 
-	@Override
 	public IWorkbenchPage getPage() {
 		return viewSite.getPage();
 	}
 
-	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return viewSite.getSelectionProvider();
 	}
 
-	@Override
 	public void setSelectionProvider(ISelectionProvider aSelectionProvider) {
 		viewSite.setSelectionProvider(aSelectionProvider);
 	}
 
-	@Override
 	public Shell getShell() {
 		return viewSite.getShell();
 	}
 
-	@Override
 	public IWorkbenchWindow getWorkbenchWindow() {
 		return viewSite.getWorkbenchWindow();
 	}
 
-	@Override
 	public void registerContextMenu(String menuId, MenuManager menuManager,
 			ISelectionProvider selectionProvider) {
 		viewSite.registerContextMenu(menuId, menuManager, selectionProvider);
 	}
-
-	@Override
-	public IWorkbenchPart getPart() {
+ 
+	public IWorkbenchPart getPart() { 
 		return viewSite.getPart();
 	}
 
-	@Override
-	public IWorkbenchPartSite getSite() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonViewerWorkbenchSite#getSite()
+	 */
+	public IWorkbenchPartSite getSite() { 
 		return viewSite;
 	}
 

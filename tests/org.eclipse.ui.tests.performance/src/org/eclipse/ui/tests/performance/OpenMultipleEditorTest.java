@@ -31,19 +31,18 @@ public class OpenMultipleEditorTest extends BasicPerformanceTest {
      */
     public OpenMultipleEditorTest(String extension, boolean closeAll, int tagging) {
         super ("testOpenMultipleEditors:" + extension + (closeAll ? "[closeAll]" : "[closeEach]"), tagging);
-        this.extension = extension;
+        this.extension = extension;        
         this.closeAll = closeAll;
     }
-
-    @Override
-	protected void runTest() throws Throwable {
+    
+    protected void runTest() throws Throwable {
 		IWorkbenchWindow window = openTestWindow(UIPerformanceTestSetup.PERSPECTIVE1);
 		IWorkbenchPage activePage = window.getActivePage();
-
+        
         tagIfNecessary("UI - Open Multiple Editors",Dimension.ELAPSED_PROCESS);
-
-        startMeasuring();
-
+        
+        startMeasuring();      
+                
         for (int i = 0; i < 100; i++) {
             IFile file = getProject().getFile(i + "." + extension);
             IDE.openEditor(activePage, file, true);
@@ -60,7 +59,7 @@ public class OpenMultipleEditorTest extends BasicPerformanceTest {
         }
         stopMeasuring();
         commitMeasurements();
-        assertPerformance();
+        assertPerformance();        
     }
 
 }

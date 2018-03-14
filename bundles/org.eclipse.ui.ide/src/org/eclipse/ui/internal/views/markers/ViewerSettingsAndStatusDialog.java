@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,24 +47,37 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 		super(parentShell);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
+	 * .Shell)
+	 */
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#getShellStyle()
+	 */
 	protected int getShellStyle() {
 		return super.getShellStyle() | SWT.RESIZE;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#getInitialSize()
+	 */
 	protected Point getInitialSize() {
 		Point size = super.getInitialSize();
 		size.y += convertHeightInCharsToPixels(3);
 		return size;
 	}
 
-	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -92,7 +105,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 	protected abstract Control createDialogContentArea(Composite dialogArea);
 
 	/**
-	 *
+	 * 
 	 */
 	protected void initializeDialog() {
 		handleStatusUdpate(IStatus.INFO, getDefaultMessage());
@@ -100,7 +113,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 
 	/**
 	 * Create message area.
-	 *
+	 * 
 	 * @param parent
 	 */
 	Control createMessageArea(Composite parent) {
@@ -126,7 +139,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 
 	/**
 	 * Display the message and an appropriate icon.
-	 *
+	 * 
 	 * @param status
 	 */
 	protected void handleStatusUdpate(IStatus status) {
@@ -135,7 +148,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 
 	/**
 	 * Display the message and an appropriate icon.
-	 *
+	 * 
 	 * @param messgage
 	 * @param severity
 	 */
@@ -198,7 +211,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected Image getMessageImage() {
 		if (imageLabel != null) {
@@ -217,7 +230,7 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param visible
 	 */
 	protected void handleMessageAreaVisibility(boolean visible) {
@@ -272,17 +285,14 @@ public abstract class ViewerSettingsAndStatusDialog extends ViewSettingsDialog {
 		return JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_ERROR);
 	}
 
-	@Override
 	protected void performDefaults() {
 		super.performDefaults();
 	}
 
-	@Override
 	protected boolean isResizable() {
 		return true;
 	}
 
-	@Override
 	protected void okPressed() {
 		super.okPressed();
 	}

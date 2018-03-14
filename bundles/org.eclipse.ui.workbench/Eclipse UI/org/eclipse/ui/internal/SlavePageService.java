@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,13 +20,13 @@ import org.eclipse.ui.services.IDisposable;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class SlavePageService implements IPageService, IDisposable {
 
 	private IPageService parent;
-	private ListenerList<IPageListener> pageListeners = new ListenerList<>(ListenerList.IDENTITY);
-	private ListenerList<IPerspectiveListener> perspectiveListeners = new ListenerList<>(
+	private ListenerList pageListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList perspectiveListeners = new ListenerList(
 			ListenerList.IDENTITY);
 
 	public SlavePageService(IPageService parent) {
@@ -68,14 +68,16 @@ public class SlavePageService implements IPageService, IDisposable {
 
 	@Override
 	public void dispose() {
-
-		for (IPageListener listener : pageListeners) {
-			parent.removePageListener(listener);
+		Object[] listeners = pageListeners.getListeners();
+		
+		for(int i = 0; i < listeners.length; i++) {
+			parent.removePageListener((IPageListener) listeners[i]);
 		}
 		pageListeners.clear();
-
-		for (IPerspectiveListener listener : perspectiveListeners) {
-			parent.removePerspectiveListener(listener);
+		
+		listeners = perspectiveListeners.getListeners();
+		for(int i = 0; i < listeners.length; i++) {
+			parent.removePerspectiveListener((IPerspectiveListener) listeners[i]);
 		}
 		perspectiveListeners.clear();
 	}

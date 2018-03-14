@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Oakland Software (Francis Upton - francisu@ieee.org)
+ *     Oakland Software (Francis Upton - francisu@ieee.org) 
  *        bug 214271 Undo/redo not enabled if nothing selected
  ******************************************************************************/
 
@@ -23,9 +23,9 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 
 /**
  * Provides the Go Into action for the {@link ProjectExplorer}
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class GoIntoActionProvider extends CommonActionProvider {
 

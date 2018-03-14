@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Kiryl Kazakevich, Intel - bug 88359
  *     Tonny Madsen, RCP Company - bug 201055
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485313
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -20,9 +18,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
@@ -36,16 +34,15 @@ import org.osgi.service.prefs.BackingStoreException;
  * initialized properly when running without
  * org.eclipse.core.runtime.compatibility. For more details, see bug 58975 - New
  * preference mechanism does not properly initialize defaults.
- *
+ * 
  * @since 3.0
  */
 public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	@Override
 	public void initializeDefaultPreferences() {
 
-
-		IScopeContext context = DefaultScope.INSTANCE;
+		
+		IScopeContext context = new DefaultScope();
 		IEclipsePreferences node = context.getNode(UIPlugin.getDefault()
 				.getBundle().getSymbolicName());
 		node.put(IWorkbenchPreferenceConstants.OPEN_NEW_PERSPECTIVE,
@@ -67,6 +64,9 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 		node.putBoolean(IWorkbenchPreferenceConstants.LINK_NAVIGATOR_TO_EDITOR,
 				false);
 
+		// Appearance / Presentation preferences
+		node.put(IWorkbenchPreferenceConstants.PRESENTATION_FACTORY_ID,
+				IWorkbenchConstants.DEFAULT_PRESENTATION_ID);
 		node
 				.putBoolean(
 						IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
@@ -77,7 +77,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 				IWorkbenchPreferenceConstants.TOP_LEFT);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR,
-				false);
+				true);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_OTHER_IN_PERSPECTIVE_MENU,
 				true);
@@ -152,7 +152,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 		node.putInt(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION, SWT.TOP);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS, true);
-
+		
 		node.putInt(IWorkbenchPreferenceConstants.RECENTLY_USED_WORKINGSETS_SIZE, 5);
 
 		migrateInternalPreferences();
@@ -178,8 +178,15 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 		rootNode
 				.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
-
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #added(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
 					public void added(NodeChangeEvent event) {
 						if (!event.getChild().name().equals(uiName)) {
 							return;
@@ -190,7 +197,15 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 					}
 
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #removed(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
 					public void removed(NodeChangeEvent event) {
 						// Nothing to do here
 
@@ -214,12 +229,12 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 					internalStore.getInt(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION));
 			internalStore
 				.setToDefault(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION);
-		}
+		}		
 
 		// Is there a value there?
 		if (internalStore
 				.contains(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION)) {
-
+				
 			apiStore.setValue(
 					IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION,
 					internalStore.getInt(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION));

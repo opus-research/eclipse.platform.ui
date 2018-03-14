@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import com.ibm.icu.text.NumberFormat;
  * <p>
  * This class is thread safe.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public abstract class NumberToNumberConverter extends Converter {
@@ -37,12 +37,16 @@ public abstract class NumberToNumberConverter extends Converter {
 		this.primitive = toType.isPrimitive();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
+	 */
 	public final Object convert(Object fromObject) {
 		if (fromObject == null) {
 			if (primitive) {
 				throw new IllegalArgumentException(
-						"Parameter 'fromObject' cannot be null."); //$NON-NLS-1$
+						"Parameter 'fromObject' cannot be null."); //$NON-NLS-1$	
 			}
 
 			return null;
@@ -73,7 +77,7 @@ public abstract class NumberToNumberConverter extends Converter {
 
 	/**
 	 * Invoked when the number should converted.
-	 *
+	 * 
 	 * @param number
 	 * @return number if conversion was successfule, <code>null</code> if the
 	 *         number was out of range
@@ -83,7 +87,7 @@ public abstract class NumberToNumberConverter extends Converter {
 	/**
 	 * NumberFormat being used by the converter. Access to the format must be
 	 * synchronized on the number format instance.
-	 *
+	 * 
 	 * @return number format
 	 */
 	public NumberFormat getNumberFormat() {

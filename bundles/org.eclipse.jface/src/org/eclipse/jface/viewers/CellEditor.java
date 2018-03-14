@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,16 +12,18 @@
 
 package org.eclipse.jface.viewers;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
+
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.util.SafeRunnable;
 
 /**
  * Abstract base class for cell editors. Implements property change listener
@@ -45,13 +47,13 @@ public abstract class CellEditor {
 	 * List of cell editor listeners (element type:
 	 * <code>ICellEditorListener</code>).
 	 */
-	private ListenerList<ICellEditorListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	/**
 	 * List of cell editor property change listeners (element type:
 	 * <code>IPropertyChangeListener</code>).
 	 */
-	private ListenerList<IPropertyChangeListener> propertyChangeListeners = new ListenerList<>();
+	private ListenerList propertyChangeListeners = new ListenerList();
 
 	/**
 	 * Indicates whether this cell editor's current value is valid.
@@ -92,7 +94,7 @@ public abstract class CellEditor {
 	/**
 	 * Struct-like layout data for cell editors, with reasonable defaults for
 	 * all fields.
-	 *
+	 * 
 	 * @noextend This class is not intended to be subclassed by clients.
 	 */
 	public static class LayoutData {
@@ -325,7 +327,9 @@ public abstract class CellEditor {
 	 * @see ICellEditorListener#applyEditorValue
 	 */
 	protected void fireApplyEditorValue() {
-		for (ICellEditorListener l : listeners) {
+		Object[] array = listeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final ICellEditorListener l = (ICellEditorListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -342,7 +346,9 @@ public abstract class CellEditor {
 	 * @see ICellEditorListener#cancelEditor
 	 */
 	protected void fireCancelEditor() {
-		for (ICellEditorListener l : listeners) {
+		Object[] array = listeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final ICellEditorListener l = (ICellEditorListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -363,7 +369,9 @@ public abstract class CellEditor {
 	 */
 	protected void fireEditorValueChanged(final boolean oldValidState,
 			final boolean newValidState) {
-		for (ICellEditorListener l : listeners) {
+		Object[] array = listeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final ICellEditorListener l = (ICellEditorListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -380,7 +388,9 @@ public abstract class CellEditor {
 	 *            the id indicating what action's enablement has changed.
 	 */
 	protected void fireEnablementChanged(final String actionId) {
-		for (IPropertyChangeListener l : propertyChangeListeners) {
+		Object[] array = propertyChangeListeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final IPropertyChangeListener l = (IPropertyChangeListener) array[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {

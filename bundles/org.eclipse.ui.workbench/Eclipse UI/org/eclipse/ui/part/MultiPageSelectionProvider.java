@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.IEditorPart;
  * notifications are sent to all registered listeners.
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
- * The base implementation of <code>MultiPageEditor.init</code> creates
+ * The base implementation of <code>MultiPageEditor.init</code> creates 
  * an instance of this class.
  * </p>
  * @noextend This class is not intended to be subclassed by clients.
@@ -36,15 +36,15 @@ import org.eclipse.ui.IEditorPart;
 public class MultiPageSelectionProvider implements IPostSelectionProvider {
 
     /**
-     * Registered selection changed listeners (element type:
+     * Registered selection changed listeners (element type: 
      * <code>ISelectionChangedListener</code>).
      */
-	private ListenerList<ISelectionChangedListener> listeners = new ListenerList<>();
-
+    private ListenerList listeners = new ListenerList();
+    
     /**
      * Registered post selection changed listeners.
      */
-	private ListenerList<ISelectionChangedListener> postListeners = new ListenerList<>();
+    private ListenerList postListeners = new ListenerList();
 
     /**
      * The multi-page editor.
@@ -61,6 +61,9 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
         this.multiPageEditor = multiPageEditor;
     }
 
+    /* (non-Javadoc)
+     * Method declared on <code>ISelectionProvider</code>.
+     */
     @Override
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
         listeners.add(listener);
@@ -78,30 +81,32 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
 	}
 
 	/**
-     * Notifies all registered selection changed listeners that the editor's
+     * Notifies all registered selection changed listeners that the editor's 
      * selection has changed. Only listeners registered at the time this method is
      * called are notified.
      *
      * @param event the selection changed event
      */
     public void fireSelectionChanged(final SelectionChangedEvent event) {
+        Object[] listeners = this.listeners.getListeners();
         fireEventChange(event, listeners);
     }
 
     /**
      * Notifies all post selection changed listeners that the editor's
      * selection has changed.
-     *
+     * 
      * @param event the event to propogate.
      * @since 3.2
      */
     public void firePostSelectionChanged(final SelectionChangedEvent event) {
-		fireEventChange(event, postListeners);
+		Object[] listeners = postListeners.getListeners();
+		fireEventChange(event, listeners);
 	}
 
-	private void fireEventChange(final SelectionChangedEvent event,
-			ListenerList<ISelectionChangedListener> listenersList) {
-		for (final ISelectionChangedListener l : listenersList) {
+	private void fireEventChange(final SelectionChangedEvent event, Object[] listeners) {
+		for (int i = 0; i < listeners.length; ++i) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -110,7 +115,7 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
             });
         }
 	}
-
+    
     /**
 	 * Returns the multi-page editor.
 	 * @return the multi-page editor.
@@ -119,6 +124,9 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
         return multiPageEditor;
     }
 
+    /* (non-Javadoc)
+     * Method declared on <code>ISelectionProvider</code>.
+     */
     @Override
 	public ISelection getSelection() {
         IEditorPart activeEditor = multiPageEditor.getActiveEditor();
@@ -132,12 +140,15 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
         return StructuredSelection.EMPTY;
     }
 
+    /* (non-JavaDoc)
+     * Method declaed on <code>ISelectionProvider</code>.
+     */
     @Override
 	public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
         listeners.remove(listener);
     }
-
+    
     /**
      * Removes a listener for post selection changes in this multi page selection provider.
      *
@@ -149,6 +160,9 @@ public class MultiPageSelectionProvider implements IPostSelectionProvider {
     	postListeners.remove(listener);
 	}
 
+	/* (non-Javadoc)
+     * Method declared on <code>ISelectionProvider</code>.
+     */
     @Override
 	public void setSelection(ISelection selection) {
         IEditorPart activeEditor = multiPageEditor.getActiveEditor();

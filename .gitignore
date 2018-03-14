@@ -1,3 +1,4 @@
+/.project
 /*/*/bin/
 /*/*/target
 *~
@@ -7,6 +8,3 @@ javacore.*
 heapdump.*
 core.*
 Snap.*
-/.settings/
-.project
-.DS_Store

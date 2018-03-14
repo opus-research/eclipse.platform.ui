@@ -1,33 +1,29 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Fair Isaac Corporation.
+ * Copyright (c) 2009, 2013 Fair Isaac Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  * Contributors:
  *     Fair Isaac Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
  ******************************************************************************/
 package org.eclipse.ui.tests.navigator;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.eclipse.swt.widgets.TreeItem;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.swt.widgets.TreeItem;
+
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.m12.M1ContentProvider;
 import org.eclipse.ui.tests.navigator.m12.M2ContentProvider;
 import org.eclipse.ui.tests.navigator.m12.model.M1Project;
 import org.eclipse.ui.tests.navigator.m12.model.M2File;
-import org.junit.Test;
 
 /**
  * M1/M2 tests. Those tests configure the M1 content provider override policy as
@@ -57,7 +53,6 @@ public class M12Tests extends NavigatorTestBase {
 	 * This test passes in Ganymede, but fails in Galileo due to changes in
 	 * pipelineChildren. See bug #285353
 	 */
-	@Test
 	public void testM1ChildrenAreThere() throws Exception {
 		_initContent();
 
@@ -80,7 +75,6 @@ public class M12Tests extends NavigatorTestBase {
 	}
 
 	/** Test that when M2 is not active F1 has two children. */
-	@Test
 	public void testM1ChildrenAreThereWithoutM2() throws Exception {
 		String[] EXTENSIONS = new String[] { COMMON_NAVIGATOR_RESOURCE_EXT,
 		// Note: should be using TEST_CONTENT_M12_M1_CONTENT_FIRST_CLASS
@@ -105,7 +99,6 @@ public class M12Tests extends NavigatorTestBase {
 	}
 
 	/** Tests that file2.txt in p2 is provided by M2 content provider. */
-	@Test
 	public void testM2Override() throws Exception {
 		_initContent();
 
@@ -130,10 +123,9 @@ public class M12Tests extends NavigatorTestBase {
 	 * Verifies that M1 interceptAdd is called when the resourceContent provider
 	 * invokes viewer.add(IResource). As of Galileo, add(IResource) is correctly
 	 * pipelined but remove is not.
-	 *
+	 * 
 	 * @throws CoreException
 	 */
-	@Test
 	public void testInterceptAdd() throws CoreException {
 		final String NEW_FOLDER_1 = "newFolder1";
 
@@ -157,7 +149,7 @@ public class M12Tests extends NavigatorTestBase {
 	 * Verifies that M1 interceptRemove is called when the resourceContent
 	 * provider invokes viewer.remove(IResource). Currently fails in Ganymede
 	 * and Galileo due to defect #285529.
-	 *
+	 * 
 	 * @throws CoreException
 	 */
 	// Turned off until 285529 is fixed
@@ -193,7 +185,7 @@ public class M12Tests extends NavigatorTestBase {
 	 * IResource as possible children. M1 replaces IResources with M1Resources,
 	 * its interceptRefresh method should be called when
 	 * viewer.refresh(IResource) is called.
-	 *
+	 * 
 	 * @throws CoreException
 	 */
 	// Turned off until 285529 is fixed
@@ -204,7 +196,6 @@ public class M12Tests extends NavigatorTestBase {
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
-			@Override
 			public void run(IProgressMonitor monitor) throws CoreException {
 				file2.delete(true, new NullProgressMonitor());
 				file2.create(null, true, null);

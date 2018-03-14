@@ -38,7 +38,7 @@ import org.apache.commons.jxpath.ri.model.NodePointer;
  * regular NodePointer into an invalid state.  Just create a NullElementPointer
  * with index 2 (= 3 - 1) and a "foo" pointer as the parent.
  *
- *
+ * 
  */
 public class NullElementPointer extends CollectionPointer {
 
@@ -54,28 +54,23 @@ public class NullElementPointer extends CollectionPointer {
         this.index = index;
     }
 
-    @Override
-	public QName getName() {
+    public QName getName() {
         return null;
     }
 
-    @Override
-	public Object getBaseValue() {
+    public Object getBaseValue() {
         return null;
     }
 
-    @Override
-	public Object getImmediateNode() {
+    public Object getImmediateNode() {
         return null;
     }
 
-    @Override
-	public boolean isLeaf() {
+    public boolean isLeaf() {
         return true;
     }
 
-    @Override
-	public boolean isCollection() {
+    public boolean isCollection() {
         return false;
     }
 
@@ -87,44 +82,36 @@ public class NullElementPointer extends CollectionPointer {
         return new NullEStructuralFeaturePointer(this);
     }
 
-    @Override
-	public NodePointer getValuePointer() {
+    public NodePointer getValuePointer() {
         return new NullPointer(this, getName());
     }
 
-    @Override
-	public void setValue(Object value) {
+    public void setValue(Object value) {
         throw new UnsupportedOperationException(
             "Collection element does not exist: " + this);
     }
 
-    @Override
-	public boolean isActual() {
+    public boolean isActual() {
         return false;
     }
 
-    @Override
-	public boolean isContainer() {
+    public boolean isContainer() {
         return true;
     }
 
-    @Override
-	public NodePointer createPath(JXPathContext context) {
+    public NodePointer createPath(JXPathContext context) {
         return parent.createChild(context, null, index);
     }
 
-    @Override
-	public NodePointer createPath(JXPathContext context, Object value) {
+    public NodePointer createPath(JXPathContext context, Object value) {
         return parent.createChild(context, null, index, value);
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return getImmediateParentPointer().hashCode() + index;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (object == this) {
             return true;
         }
@@ -138,13 +125,11 @@ public class NullElementPointer extends CollectionPointer {
                 && index == other.index;
     }
 
-    @Override
-	public int getLength() {
+    public int getLength() {
         return 0;
     }
 
-    @Override
-	public String asPath() {
+    public String asPath() {
         StringBuffer buffer = new StringBuffer();
         NodePointer parent = getImmediateParentPointer();
         if (parent != null) {

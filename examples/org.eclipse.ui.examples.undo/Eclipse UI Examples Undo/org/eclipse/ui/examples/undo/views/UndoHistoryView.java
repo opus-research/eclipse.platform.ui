@@ -104,7 +104,8 @@ public class UndoHistoryView extends ViewPart implements
 	 * undo context.
 	 */
 
-	class ViewContentProvider implements IStructuredContentProvider, IOperationHistoryListener {
+	class ViewContentProvider implements IStructuredContentProvider,
+			IOperationHistoryListener {
 
 		@Override
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
@@ -409,7 +410,7 @@ public class UndoHistoryView extends ViewPart implements
 				StringBuffer buf = new StringBuffer(operation.getLabel());
 				buf.append("\n");
 				buf.append("Enabled=");	//$NON-NLS-1$
-				buf.append(Boolean.valueOf(operation.canUndo()).toString());
+				buf.append(new Boolean(operation.canUndo()).toString());
 				buf.append("\n");
 				buf.append(operation.getClass().toString());
 				showMessage(buf.toString());

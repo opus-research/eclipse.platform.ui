@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,22 +20,22 @@ import org.eclipse.core.runtime.ISafeRunnable;
  * Clients may provide their own implementation to change
  * how safe runnables are run from within JFace.
  * </p>
- *
+ * 
  * @see SafeRunnable#getRunner()
  * @see SafeRunnable#setRunner(ISafeRunnableRunner)
  * @see SafeRunnable#run(ISafeRunnable)
  * @since 3.1
  */
 public interface ISafeRunnableRunner {
-
+	
 	/**
 	 * Runs the runnable.  All <code>ISafeRunnableRunners</code> must catch any exception
-	 * thrown by the <code>ISafeRunnable</code> and pass the exception to
-	 * <code>ISafeRunnable.handleException()</code>.
+	 * thrown by the <code>ISafeRunnable</code> and pass the exception to 
+	 * <code>ISafeRunnable.handleException()</code>. 
 	 * @param code the code executed as a save runnable
 	 *
 	 * @see SafeRunnable#run(ISafeRunnable)
 	 */
 	public abstract void run(ISafeRunnable code);
-
+	
 }

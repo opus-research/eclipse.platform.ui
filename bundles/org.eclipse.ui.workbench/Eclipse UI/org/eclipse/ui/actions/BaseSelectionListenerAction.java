@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.Event;
 
 /**
  * The abstract superclass for actions that listen to selection change events.
- * This implementation tracks the current selection (see
- * <code>getStructuredSelection</code>) and provides a convenient place to
+ * This implementation tracks the current selection (see 
+ * <code>getStructuredSelection</code>) and provides a convenient place to 
  * monitor selection changes that could affect the availability of the action.
  * <p>
  * Subclasses must implement the following <code>IAction</code> method:
@@ -54,7 +54,7 @@ public abstract class BaseSelectionListenerAction extends Action implements
     private IStructuredSelection selection = new StructuredSelection();
 
     /**
-     * Running flag:  <code>true</code> iff the action is running.
+     * Running flag:  <code>true</code> iff the action is running.  
      */
     private boolean running = false;
 
@@ -67,7 +67,7 @@ public abstract class BaseSelectionListenerAction extends Action implements
     /**
      * Creates a new action with the given text.
      *
-     * @param text the string used as the text for the action,
+     * @param text the string used as the text for the action, 
      *   or <code>null</code> if there is no text
      */
     protected BaseSelectionListenerAction(String text) {
@@ -125,8 +125,8 @@ public abstract class BaseSelectionListenerAction extends Action implements
     }
 
     /**
-     * The <code>BaseSelectionListenerAction</code> implementation of this
-     * <code>ISelectionChangedListener</code> method calls
+     * The <code>BaseSelectionListenerAction</code> implementation of this 
+     * <code>ISelectionChangedListener</code> method calls 
      * <code>selectionChanged(IStructuredSelection)</code> assuming the selection is
      * a structured one. Subclasses should override the <code>updateSelection</code>
      * method to react to selection changes.
@@ -158,6 +158,9 @@ public abstract class BaseSelectionListenerAction extends Action implements
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.Action#runWithEvent(org.eclipse.swt.widgets.Event)
+     */
     @Override
 	public void runWithEvent(Event event) {
         // Set the running flag during the run so that selection changes are deferred.

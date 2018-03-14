@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.internal.ActionExpression;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class LegacyActionExpressionWrapper extends
@@ -49,7 +49,7 @@ public final class LegacyActionExpressionWrapper extends
 
 	/**
 	 * Constructs a new instance of {@link LegacyActionExpressionWrapper}.
-	 *
+	 * 
 	 * @param expression
 	 *            The expression to wrap; must not be <code>null</code>.
 	 * @param window

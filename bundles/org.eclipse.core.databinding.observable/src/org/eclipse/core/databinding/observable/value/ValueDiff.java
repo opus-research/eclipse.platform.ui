@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 194734
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -17,12 +16,10 @@ import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IDiff;
 
 /**
- * @param <T>
- *            the type of value being observed
  * @since 1.0
- *
+ * 
  */
-public abstract class ValueDiff<T> implements IDiff {
+public abstract class ValueDiff implements IDiff {
 	/**
 	 * Creates a value diff.
 	 */
@@ -32,17 +29,16 @@ public abstract class ValueDiff<T> implements IDiff {
 	/**
 	 * @return the old value
 	 */
-	public abstract T getOldValue();
+	public abstract Object getOldValue();
 
 	/**
 	 * @return the new value
 	 */
-	public abstract T getNewValue();
+	public abstract Object getNewValue();
 
-	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ValueDiff) {
-			ValueDiff<?> val = (ValueDiff<?>) obj;
+			ValueDiff val = (ValueDiff) obj;
 
 			return Diffs.equals(val.getNewValue(), getNewValue())
 					&& Diffs.equals(val.getOldValue(), getOldValue());
@@ -50,8 +46,7 @@ public abstract class ValueDiff<T> implements IDiff {
 		}
 		return false;
 	}
-
-	@Override
+		
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -65,7 +60,6 @@ public abstract class ValueDiff<T> implements IDiff {
 	/**
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer
@@ -75,6 +69,7 @@ public abstract class ValueDiff<T> implements IDiff {
 			.append("], newValue [") //$NON-NLS-1$
 			.append(getNewValue() != null ? getNewValue().toString() : "null") //$NON-NLS-1$
 			.append("]}"); //$NON-NLS-1$
+		
 		return buffer.toString();
 	}
 }

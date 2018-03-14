@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class CommonContentExtensionSite extends CommonExtensionSite implements
 		ICommonContentExtensionSite {
@@ -32,7 +32,7 @@ public class CommonContentExtensionSite extends CommonExtensionSite implements
 
 	/**
 	 * Create a config element for the initialization of Content Extensions.
-	 *
+	 * 
 	 * @param anExtensionId
 	 *            The unique identifier of the associated content extension or
 	 *            the top-level action provider. <b>May NOT be null.</b>
@@ -57,18 +57,28 @@ public class CommonContentExtensionSite extends CommonExtensionSite implements
 		contentService = aContentService;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getMemento()
+	 */
 	public IMemento getMemento() {
 		return memento;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getExtension()
+	 */
 	public INavigatorContentExtension getExtension() {
 		return extension;
 	}
 
-	@Override
-	public INavigatorContentService getService() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getService()
+	 */
+	public INavigatorContentService getService() { 
 		return contentService;
 	}
 

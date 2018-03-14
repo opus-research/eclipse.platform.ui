@@ -23,17 +23,14 @@ public class ActivitySupportTests extends DynamicTestCase {
 		super(testName);
 	}
 
-	@Override
 	protected String getExtensionId() {
 		return "newActivitySupport1.testNewActivitySupportAddition";
 	}
 
-	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_ACTIVITYSUPPORT;
 	}
 
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newActivitySupport1";
 	}
@@ -64,12 +61,10 @@ public class ActivitySupportTests extends DynamicTestCase {
 			// ensure that the images are the same before loading the plugin
 			ImageTests.assertEquals(baselineImage, customImage);
 		} finally {
-			if (baselineImage != null) {
+			if (baselineImage != null)
 				baselineImage.dispose();
-			}
-			if (customImage != null) {
+			if (customImage != null)
 				customImage.dispose();
-			}
 		}
 
 		getBundle();
@@ -88,12 +83,10 @@ public class ActivitySupportTests extends DynamicTestCase {
 			// ensure that the images are differnt after loading the plugin
 			ImageTests.assertNotEquals(baselineImage, customImage);
 		} finally {
-			if (baselineImage != null) {
+			if (baselineImage != null)
 				baselineImage.dispose();
-			}
-			if (customImage != null) {
+			if (customImage != null)
 				customImage.dispose();
-			}
 		}
 
 		removeBundle();
@@ -112,17 +105,15 @@ public class ActivitySupportTests extends DynamicTestCase {
 			// ensure that the images are the same after unloading the plugin
 			ImageTests.assertEquals(baselineImage, customImage);
 		} finally {
-			if (baselineImage != null) {
+			if (baselineImage != null)
 				baselineImage.dispose();
-			}
-			if (customImage != null) {
+			if (customImage != null)
 				customImage.dispose();
-			}
 		}
 
 	}
-
-
+	
+	
 	public void testCategoryImages() {
 		ICategory baselineCategory = getWorkbench().getActivitySupport()
 				.getActivityManager().getCategory("someBogusCategoryId");
@@ -149,12 +140,10 @@ public class ActivitySupportTests extends DynamicTestCase {
 			// ensure that the images are the same before loading the plugin
 			ImageTests.assertEquals(baselineImage, customImage);
 		} finally {
-			if (baselineImage != null) {
+			if (baselineImage != null)
 				baselineImage.dispose();
-			}
-			if (customImage != null) {
+			if (customImage != null)
 				customImage.dispose();
-			}
 		}
 
 		getBundle();
@@ -173,12 +162,10 @@ public class ActivitySupportTests extends DynamicTestCase {
 			// ensure that the images are differnt after loading the plugin
 			ImageTests.assertNotEquals(baselineImage, customImage);
 		} finally {
-			if (baselineImage != null) {
+			if (baselineImage != null)
 				baselineImage.dispose();
-			}
-			if (customImage != null) {
+			if (customImage != null)
 				customImage.dispose();
-			}
 		}
 
 		removeBundle();
@@ -197,12 +184,10 @@ public class ActivitySupportTests extends DynamicTestCase {
 			// ensure that the images are the same after unloading the plugin
 			ImageTests.assertEquals(baselineImage, customImage);
 		} finally {
-			if (baselineImage != null) {
+			if (baselineImage != null)
 				baselineImage.dispose();
-			}
-			if (customImage != null) {
+			if (customImage != null)
 				customImage.dispose();
-			}
 		}
 
 	}

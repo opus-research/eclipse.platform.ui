@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -40,8 +39,8 @@ public class ToolBarContributionRecord {
 
 	MToolBar toolbarModel;
 	MToolBarContribution toolbarContribution;
-	ArrayList<MToolBarElement> generatedElements = new ArrayList<>();
-	HashSet<MToolBarElement> sharedElements = new HashSet<>();
+	ArrayList<MToolBarElement> generatedElements = new ArrayList<MToolBarElement>();
+	HashSet<MToolBarElement> sharedElements = new HashSet<MToolBarElement>();
 	ToolBarManagerRenderer renderer;
 	boolean isVisible = true;
 	private IEclipseContext infoContext;
@@ -64,7 +63,7 @@ public class ToolBarContributionRecord {
 	public void updateVisibility(IEclipseContext context) {
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
-		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<>();
+		HashSet<ToolBarContributionRecord> recentlyUpdated = new HashSet<ToolBarContributionRecord>();
 		recentlyUpdated.add(this);
 		boolean changed = false;
 		for (MToolBarElement item : generatedElements) {
@@ -156,16 +155,13 @@ public class ToolBarContributionRecord {
 		}
 
 		for (MToolBarElement child : childrenToInspect) {
-			if (requiresVisibilityCheck(child)) {
+			if (child.getVisibleWhen() != null
+					|| child.getPersistedState().get(
+							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private boolean requiresVisibilityCheck(MToolBarElement toolBarElement) {
-		return toolBarElement.getVisibleWhen() != null
-				|| toolBarElement.getPersistedState().get(MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null;
 	}
 
 	public boolean mergeIntoModel() {
@@ -179,7 +175,7 @@ public class ToolBarContributionRecord {
 		if (toolbarContribution.getTransientData().get(FACTORY) != null) {
 			copyElements = mergeFactoryIntoModel();
 		} else {
-			copyElements = new ArrayList<>();
+			copyElements = new ArrayList<MToolBarElement>();
 			for (MToolBarElement item : toolbarContribution.getChildren()) {
 				MToolBarElement copy = (MToolBarElement) EcoreUtil
 						.copy((EObject) item);
@@ -189,7 +185,7 @@ public class ToolBarContributionRecord {
 		for (MToolBarElement copy : copyElements) {
 			// if a visibleWhen clause is defined, the item should not be
 			// visible until the clause has been evaluated and returned 'true'
-			copy.setVisible(!requiresVisibilityCheck(copy));
+			copy.setVisible(!anyVisibleWhen());
 			if (copy instanceof MToolBarSeparator) {
 				MToolBarSeparator shared = findExistingSeparator(copy
 						.getElementId());

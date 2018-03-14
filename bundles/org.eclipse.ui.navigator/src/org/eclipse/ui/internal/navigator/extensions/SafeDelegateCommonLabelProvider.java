@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  * 	   Anton Leherbauer, Wind River - bug 146788
  *     rob.stryker@jboss.com - bug 243824 [CommonNavigator] lacks table / tree-table support
- *
+ * 
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.extensions;
 
@@ -41,7 +41,7 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 	/**
 	 * @param aLabelProvider
 	 *            A non-null label provider.
-	 *
+	 * 
 	 */
 	public SafeDelegateCommonLabelProvider(ILabelProvider aLabelProvider) {
 		super();
@@ -52,26 +52,24 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 	 * <p>
 	 * No-op.
 	 * </p>
-	 *
+	 * 
 	 * @see org.eclipse.ui.navigator.ICommonLabelProvider#init(ICommonContentExtensionSite)
 	 */
-	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 	}
 
 	/**
 	 * <p>
 	 * If the delegate label provider implements <code>IDescriptionProvider</code>,
-	 * it is used to retrieve the status bar message.
+	 * it is used to retrieve the status bar message. 
 	 * </p>
 	 * <p>
 	 * Returns <b>null </b> otherwise, forcing the CommonNavigator to provide the default
 	 * message.
 	 * </p>
-	 *
+	 * 
 	 * @see org.eclipse.ui.navigator.ICommonLabelProvider#getDescription(java.lang.Object)
 	 */
-	@Override
 	public String getDescription(Object element) {
 		/* The following few lines were contributed as part of a patch. */
 		if (delegateLabelProvider instanceof IDescriptionProvider) {
@@ -84,35 +82,37 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 	/**
 	 * @param listener
 	 */
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 		delegateLabelProvider.addListener(listener);
 	}
 
 	/**
-	 *
+	 * 
 	 */
-	@Override
 	public void dispose() {
 		delegateLabelProvider.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object obj) {
 		return delegateLabelProvider.equals(obj);
 	}
 
-	@Override
 	public Image getImage(Object element) {
 		return delegateLabelProvider.getImage(element);
 	}
 
-	@Override
 	public String getText(Object element) {
 		return delegateLabelProvider.getText(element);
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
+	 */
 	public StyledString getStyledText(Object element) {
 		if (delegateLabelProvider instanceof IStyledLabelProvider) {
 			return ((IStyledLabelProvider)delegateLabelProvider).getStyledText(element);
@@ -121,9 +121,11 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 		if (text == null)
 			text= ""; //$NON-NLS-1$
 		return new StyledString(text);
-	}
+	}	
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+	 */
 	public Image getColumnImage(Object element, int columnIndex) {
 		if (delegateLabelProvider instanceof ITableLabelProvider) {
 			return ((ITableLabelProvider)delegateLabelProvider).getColumnImage(element, columnIndex);
@@ -131,20 +133,25 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 		return getImage(element);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+	 */
 	public String getColumnText(Object element, int columnIndex) {
 		if (delegateLabelProvider instanceof ITableLabelProvider) {
 			return ((ITableLabelProvider)delegateLabelProvider).getColumnText(element, columnIndex);
 		}
 		return getText(element);
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		return delegateLabelProvider.hashCode();
 	}
 
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return delegateLabelProvider.isLabelProperty(element, property);
 	}
@@ -152,27 +159,30 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 	/**
 	 * @param listener
 	 */
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 		delegateLabelProvider.removeListener(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return delegateLabelProvider.toString();
 	}
 
-	@Override
 	public void restoreState(IMemento aMemento) {
 
 	}
 
-	@Override
 	public void saveState(IMemento aMemento) {
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreePathLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel, org.eclipse.jface.viewers.TreePath)
+	 */
 	public void updateLabel(ViewerLabel label, TreePath elementPath) {
 		if (delegateLabelProvider instanceof ITreePathLabelProvider) {
 			ITreePathLabelProvider tplp = (ITreePathLabelProvider) delegateLabelProvider;
@@ -193,7 +203,9 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
 	public Color getForeground(Object element) {
 		if(delegateLabelProvider instanceof IColorProvider) {
 			return ((IColorProvider)delegateLabelProvider).getForeground(element);
@@ -201,7 +213,9 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+	 */
 	public Color getBackground(Object element) {
 		if(delegateLabelProvider instanceof IColorProvider) {
 			return ((IColorProvider)delegateLabelProvider).getBackground(element);
@@ -209,7 +223,9 @@ public class SafeDelegateCommonLabelProvider implements ICommonLabelProvider, IC
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+	 */
 	public Font getFont(Object element) {
 		if(delegateLabelProvider instanceof IFontProvider) {
 			return ((IFontProvider)delegateLabelProvider).getFont(element);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ package org.eclipse.ui.views.framelist;
  * @deprecated These messages are not API and should not be referenced
  * outside of this plug-in.
  */
-@Deprecated
 class FrameListMessages {
 
     private FrameListMessages() {
@@ -25,7 +24,7 @@ class FrameListMessages {
 
     /**
      * Returns the formatted message for the given key in
-     * the resource bundle.
+     * the resource bundle. 
      *
      * @param key the resource name
      * @param args the message arguments

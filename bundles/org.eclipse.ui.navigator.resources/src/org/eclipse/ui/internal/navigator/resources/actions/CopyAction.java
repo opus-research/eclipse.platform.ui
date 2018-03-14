@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.actions;
 
@@ -36,7 +35,7 @@ import org.eclipse.ui.part.ResourceTransfer;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @since 2.0
  */
 /*package*/class CopyAction extends SelectionListenerAction {
@@ -68,12 +67,12 @@ import org.eclipse.ui.part.ResourceTransfer;
      * @param clipboard a platform clipboard
      */
     public CopyAction(Shell shell, Clipboard clipboard) {
-        super(WorkbenchNavigatorMessages.CopyAction_Cop_);
+        super(WorkbenchNavigatorMessages.CopyAction_Cop_); 
         Assert.isNotNull(shell);
         Assert.isNotNull(clipboard);
         this.shell = shell;
         this.clipboard = clipboard;
-        setToolTipText(WorkbenchNavigatorMessages.CopyAction_Copy_selected_resource_s_);
+        setToolTipText(WorkbenchNavigatorMessages.CopyAction_Copy_selected_resource_s_); 
         setId(CopyAction.ID);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this, "CopyHelpId"); //$NON-NLS-1$
 				// TODO INavigatorHelpContextIds.COPY_ACTION);
@@ -85,7 +84,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * @param shell the shell for any dialogs
      * @param clipboard a platform clipboard
      * @param pasteAction a paste action
-     *
+     * 
      * @since 2.0
      */
     public CopyAction(Shell shell, Clipboard clipboard, PasteAction pasteAction) {
@@ -94,14 +93,15 @@ import org.eclipse.ui.part.ResourceTransfer;
     }
 
     /**
-     * The <code>CopyAction</code> implementation of this method defined
-     * on <code>IAction</code> copies the selected resources to the
+     * The <code>CopyAction</code> implementation of this method defined 
+     * on <code>IAction</code> copies the selected resources to the 
      * clipboard.
      */
     @Override
 	public void run() {
-		List<? extends IResource> selectedResources = getSelectedResources();
-		IResource[] resources = selectedResources.toArray(new IResource[selectedResources.size()]);
+        List<IResource> selectedResources = getSelectedResources();
+        IResource[] resources =selectedResources
+                .toArray(new IResource[selectedResources.size()]);
 
         // Get the file names and a string representation
         final int length = resources.length;
@@ -138,7 +138,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 
     /**
      * Set the clipboard contents. Prompt to retry if clipboard is busy.
-     *
+     * 
      * @param resources the resources to copy to the clipboard
      * @param fileNames file names of the resources to copy to the clipboard
      * @param names string representation of all names
@@ -148,7 +148,8 @@ import org.eclipse.ui.part.ResourceTransfer;
         try {
             // set the clipboard contents
             if (fileNames.length > 0) {
-				clipboard.setContents(new Object[] { resources, fileNames, names },
+                clipboard.setContents(new Object[] { resources, fileNames,
+                        names },
                         new Transfer[] { ResourceTransfer.getInstance(),
                                 FileTransfer.getInstance(),
                                 TextTransfer.getInstance() });
@@ -173,7 +174,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 
     /**
      * The <code>CopyAction</code> implementation of this
-     * <code>SelectionListenerAction</code> method enables this action if
+     * <code>SelectionListenerAction</code> method enables this action if 
      * one or more resources of compatible types are selected.
      */
     @Override
@@ -186,13 +187,14 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-		List<? extends IResource> selectedResources = getSelectedResources();
+        List<IResource> selectedResources = getSelectedResources();
         if (selectedResources.size() == 0) {
 			return false;
 		}
 
         boolean projSelected = selectionIsOfType(IResource.PROJECT);
-		boolean fileFoldersSelected = selectionIsOfType(IResource.FILE | IResource.FOLDER);
+        boolean fileFoldersSelected = selectionIsOfType(IResource.FILE
+                | IResource.FOLDER);
         if (!projSelected && !fileFoldersSelected) {
 			return false;
 		}
@@ -202,7 +204,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-        // must have a common parent
+        // must have a common parent	
         IContainer firstParent = selectedResources.get(0).getParent();
         if (firstParent == null) {
 			return false;
@@ -217,7 +219,9 @@ import org.eclipse.ui.part.ResourceTransfer;
 				return false;
 			}
         }
+
         return true;
     }
 
 }
+

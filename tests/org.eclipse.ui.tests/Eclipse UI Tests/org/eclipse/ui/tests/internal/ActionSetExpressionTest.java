@@ -29,17 +29,15 @@ public class ActionSetExpressionTest extends ActionExpressionTest {
     /**
      * Opens the action set.  Returns the menu manager containing it.
      */
-    @Override
-	protected MenuManager getActionMenuManager(ListView view) throws Throwable {
+    protected MenuManager getActionMenuManager(ListView view) throws Throwable {
         fPage.showActionSet("org.eclipse.ui.tests.internal.ListElementActions");
         WorkbenchWindow win = (WorkbenchWindow) fWindow;
         IContributionItem item = win.getMenuBarManager().find(
                 "org.eclipse.ui.tests.internal.ListElementMenu");
         while (item instanceof SubContributionItem) {
             item = ((SubContributionItem) item).getInnerItem();
-            if (item instanceof MenuManager) {
-				return (MenuManager) item;
-			}
+            if (item instanceof MenuManager)
+                return (MenuManager) item;
         }
         fail("Unable to find menu manager");
         return null;
@@ -48,8 +46,7 @@ public class ActionSetExpressionTest extends ActionExpressionTest {
     /**
      * Tests the enablement of an action.
      */
-    @Override
-	protected void testAction(MenuManager mgr, String action, boolean expected)
+    protected void testAction(MenuManager mgr, String action, boolean expected)
             throws Throwable {
         assertEquals(action, expected, ActionUtil.getActionWithLabel(mgr,
                 action).isEnabled());

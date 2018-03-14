@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.util.Util;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class BindingElement extends ModelElement {
 
@@ -55,7 +55,7 @@ public class BindingElement extends ModelElement {
 		setTrigger(b.getTriggerSequence());
 		setContext((ContextElement) model.getContextIdToElement().get(
 				b.getContextId()));
-		setUserDelta(Integer.valueOf(b.getType()));
+		setUserDelta(new Integer(b.getType()));
 		setModelObject(b);
 	}
 
@@ -91,7 +91,7 @@ public class BindingElement extends ModelElement {
 		setCommandInfo(cmd);
 		setTrigger(null);
 		setContext(null);
-		setUserDelta(Integer.valueOf(Binding.SYSTEM));
+		setUserDelta(new Integer(Binding.SYSTEM));
 
 		setModelObject(cmd);
 	}
@@ -207,7 +207,7 @@ public class BindingElement extends ModelElement {
 		setTrigger(binding.getTriggerSequence());
 		setContext((ContextElement) contextModel.getContextIdToElement().get(
 				binding.getContextId()));
-		setUserDelta(Integer.valueOf(binding.getType()));
+		setUserDelta(new Integer(binding.getType()));
 		setModelObject(binding);
 	}
 
@@ -218,7 +218,7 @@ public class BindingElement extends ModelElement {
 		setCommandInfo(parameterizedCommand);
 		setTrigger(null);
 		setContext(null);
-		setUserDelta(Integer.valueOf(Binding.SYSTEM));
+		setUserDelta(new Integer(Binding.SYSTEM));
 		setModelObject(parameterizedCommand);
 	}
 }

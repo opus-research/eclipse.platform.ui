@@ -18,8 +18,7 @@ public class WorldChangedAction extends TestBrowserAction {
         super(label, browser);
     }
 
-    @Override
-	public void run() {
+    public void run() {
         ((StructuredViewer) getBrowser().getViewer()).refresh();
     }
 }

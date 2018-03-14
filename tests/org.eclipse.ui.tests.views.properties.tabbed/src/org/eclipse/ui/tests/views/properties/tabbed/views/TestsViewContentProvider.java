@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -25,7 +25,7 @@ public class TestsViewContentProvider
     implements IStructuredContentProvider, ITreeContentProvider {
 
     /**
-     *
+     * 
      */
     private final TestsView view;
 
@@ -38,18 +38,15 @@ public class TestsViewContentProvider
 
     private TreeNode invisibleRoot;
 
-    @Override
-	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer v, Object oldInput, Object newInput) {
         //
     }
 
-    @Override
-	public void dispose() {
+    public void dispose() {
         //
     }
 
-    @Override
-	public Object[] getElements(Object parent) {
+    public Object[] getElements(Object parent) {
         if (parent.equals(this.view.getViewSite())) {
             if (invisibleRoot == null)
                 initialize();
@@ -58,24 +55,21 @@ public class TestsViewContentProvider
         return getChildren(parent);
     }
 
-    @Override
-	public Object getParent(Object child) {
+    public Object getParent(Object child) {
         if (child instanceof TreeNode) {
             return ((TreeNode) child).getParent();
         }
         return null;
     }
 
-    @Override
-	public Object[] getChildren(Object parent) {
+    public Object[] getChildren(Object parent) {
         if (parent instanceof TreeNode) {
             return ((TreeNode) parent).getChildren();
         }
         return new Object[0];
     }
 
-    @Override
-	public boolean hasChildren(Object parent) {
+    public boolean hasChildren(Object parent) {
         if (parent instanceof TreeNode)
             return ((TreeNode) parent).hasChildren();
         return false;

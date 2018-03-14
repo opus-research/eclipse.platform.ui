@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Alexander Kurtakov <akurtako@redhat.com> - Bug 459761
  *******************************************************************************/
 
 package org.eclipse.jface.bindings.keys;
 
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.eclipse.jface.bindings.Trigger;
@@ -43,10 +41,10 @@ import org.eclipse.jface.util.Util;
  * <code>KeyStroke</code> objects are immutable. Clients are not permitted to
  * extend this class.
  * </p>
- *
+ * 
  * @since 3.1
  */
-public final class KeyStroke extends Trigger {
+public final class KeyStroke extends Trigger implements Comparable {
 
 	/**
 	 * The delimiter between multiple keys in a single key strokes -- expressed
@@ -68,7 +66,7 @@ public final class KeyStroke extends Trigger {
 
 	/**
 	 * Creates an instance of <code>KeyStroke</code> given a natural key.
-	 *
+	 * 
 	 * @param naturalKey
 	 *            the natural key. The format of this integer is defined by
 	 *            whichever widget toolkit you are using; <code>NO_KEY</code>
@@ -84,7 +82,7 @@ public final class KeyStroke extends Trigger {
 	/**
 	 * Creates an instance of <code>KeyStroke</code> given a set of modifier keys
 	 * and a natural key.
-	 *
+	 * 
 	 * @param modifierKeys
 	 *            the modifier keys. The format of this integer is defined by
 	 *            whichever widget toolkit you are using; <code>NO_KEY</code>
@@ -104,7 +102,7 @@ public final class KeyStroke extends Trigger {
 	/**
 	 * Creates an instance of <code>KeyStroke</code> by parsing a given a formal
 	 * string representation.
-	 *
+	 * 
 	 * @param string
 	 *            the formal string representation to parse.
 	 * @return a key stroke. Guaranteed not to be <code>null</code>.
@@ -130,7 +128,7 @@ public final class KeyStroke extends Trigger {
 
 			if (i % 2 == 0) {
 				if (stringTokenizer.hasMoreTokens()) {
-					token = token.toUpperCase(Locale.ENGLISH);
+					token = token.toUpperCase();
 					final int modifierKey = lookup.formalModifierLookup(token);
 					if (modifierKey == NO_KEY) {
 						throw new ParseException(
@@ -144,7 +142,7 @@ public final class KeyStroke extends Trigger {
 					naturalKey = token.charAt(0);
 
 				} else {
-					token = token.toUpperCase(Locale.ENGLISH);
+					token = token.toUpperCase();
 					naturalKey = lookup.formalKeyLookup(token);
 				}
 			}
@@ -170,7 +168,7 @@ public final class KeyStroke extends Trigger {
 	/**
 	 * Constructs an instance of <code>KeyStroke</code> given a set of
 	 * modifier keys and a natural key.
-	 *
+	 * 
 	 * @param modifierKeys
 	 *            the modifier keys. The format of this integer is defined by
 	 *            whichever widget toolkit you are using; <code>NO_KEY</code>
@@ -186,6 +184,11 @@ public final class KeyStroke extends Trigger {
 		this.naturalKey = naturalKey;
 	}
 
+    /*
+     * (non-Javadoc)
+     * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public final int compareTo(final Object object) {
 		final KeyStroke keyStroke = (KeyStroke) object;
@@ -198,6 +201,11 @@ public final class KeyStroke extends Trigger {
 		return compareTo;
 	}
 
+    /*
+     * (non-Javadoc)
+     * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public final boolean equals(final Object object) {
 		if (!(object instanceof KeyStroke)) {
@@ -214,7 +222,7 @@ public final class KeyStroke extends Trigger {
 
 	/**
 	 * Formats this key stroke into the current default look.
-	 *
+	 * 
 	 * @return A string representation for this key stroke using the default
 	 *         look; never <code>null</code>.
 	 */
@@ -224,7 +232,7 @@ public final class KeyStroke extends Trigger {
 
 	/**
 	 * Returns the modifier keys for this key stroke.
-	 *
+	 * 
 	 * @return the bit mask of modifier keys; <code>NO_KEY</code> means that
 	 *         there is no modifier key.
 	 */
@@ -234,7 +242,7 @@ public final class KeyStroke extends Trigger {
 
 	/**
 	 * Returns the natural key for this key stroke.
-	 *
+	 * 
 	 * @return The natural key for this key stroke. This value is
 	 *         <code>NO_KEY</code> if the key stroke is incomplete (i.e., has
 	 *         no natural key).
@@ -243,6 +251,11 @@ public final class KeyStroke extends Trigger {
 		return naturalKey;
 	}
 
+    /*
+     * (non-Javadoc)
+     * 
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public final int hashCode() {
 		return modifierKeys << 4 + naturalKey;
@@ -251,7 +264,7 @@ public final class KeyStroke extends Trigger {
 	/**
 	 * Returns whether or not this key stroke is complete. Key strokes are
 	 * complete iff they have a natural key which is not <code>NO_KEY</code>.
-	 *
+	 * 
 	 * @return <code>true</code>, iff the key stroke is complete.
 	 */
 	public final boolean isComplete() {
@@ -260,7 +273,7 @@ public final class KeyStroke extends Trigger {
 
 	/**
 	 * Returns the formal string representation for this key stroke.
-	 *
+	 * 
 	 * @return The formal string representation for this key stroke. Guaranteed
 	 *         not to be <code>null</code>.
 	 * @see java.lang.Object#toString()

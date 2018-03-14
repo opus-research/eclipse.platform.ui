@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.decorators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
@@ -38,32 +39,19 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * applied.
 	 */
 
-	private static class LightweightRunnable implements ISafeRunnable {
+	private class LightweightRunnable implements ISafeRunnable {
+		private Object element;
 
-		static class RunnableData {
+		private DecorationBuilder decoration;
 
-			final DecorationBuilder builder;
-
-			final LightweightDecoratorDefinition decorator;
-
-			final Object element;
-
-			public RunnableData(Object object, DecorationBuilder builder, LightweightDecoratorDefinition definition) {
-				this.element = object;
-				this.builder = builder;
-				this.decorator = definition;
-			}
-
-			boolean isConsistent() {
-				return builder != null && decorator != null && element != null;
-			}
-		}
-
-		private volatile RunnableData data = new RunnableData(null, null, null);
+		private LightweightDecoratorDefinition decorator;
 
 		void setValues(Object object, DecorationBuilder builder,
 				LightweightDecoratorDefinition definition) {
-			data = new RunnableData(object, builder, definition);
+			element = object;
+			decoration = builder;
+			decorator = definition;
+
 		}
 
 		/*
@@ -73,17 +61,12 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		public void handleException(Throwable exception) {
 			IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
 					.getMessage(), exception);
-			LightweightDecoratorDefinition decorator = data.decorator;
 			String message;
 			if (decorator == null) {
 				message = WorkbenchMessages.DecoratorError;
 			} else {
-				String name = decorator.getName();
-				if (name == null) {
-					// decorator definition is not accessible anymore
-					name = decorator.getId();
-				}
-				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled, name);
+				message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled,
+						decorator.getName());
 			}
 			WorkbenchPlugin.log(message, status);
 			if (decorator != null) {
@@ -97,22 +80,19 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		 */
 		@Override
 		public void run() throws Exception {
-			// Copy to local variables, see
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=300358
-			RunnableData data = this.data;
-			if (data.isConsistent()) {
-				data.decorator.decorate(data.element, data.builder);
-			}
+			decorator.decorate(element, decoration);
 			clearReferences();
 		}
 
 		/**
 		 * Clear all of the references in the receiver.
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		void clearReferences() {
-			data = new RunnableData(null, null, null);
+			decorator = null;
+			element = null;// Clear the element
+			decoration = null;
 		}
 	}
 
@@ -131,7 +111,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the lightweight definitions for the receiver.
-	 *
+	 * 
 	 * @return LightweightDecoratorDefinition[]
 	 */
 	LightweightDecoratorDefinition[] getDefinitions() {
@@ -154,7 +134,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * For dynamic UI
-	 *
+	 * 
 	 * @param decorator
 	 *            the definition to add
 	 * @return whether the definition was added
@@ -179,7 +159,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the name of the types that a decorator is registered for.
-	 *
+	 * 
 	 * @param decorator
 	 * @return String[]
 	 */
@@ -189,7 +169,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * For dynamic-ui
-	 *
+	 * 
 	 * @param decorator
 	 *            the definition to remove
 	 * @return whether the definition was removed
@@ -217,7 +197,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the LightweightDecoratorDefinition with the supplied id
-	 *
+	 * 
 	 * @return LightweightDecoratorDefinition or <code>null</code> if it is
 	 *         not found
 	 * @param decoratorId
@@ -235,7 +215,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Return the index of the definition in the array.
-	 *
+	 * 
 	 * @param decoratorId
 	 *            the id
 	 * @return the index of the definition in the array or <code>-1</code>
@@ -252,7 +232,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Return the enabled lightweight decorator definitions.
-	 *
+	 * 
 	 * @return LightweightDecoratorDefinition[]
 	 */
 	LightweightDecoratorDefinition[] enabledDefinitions() {
@@ -270,7 +250,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Return whether there are enabled lightwieght decorators
-	 *
+	 * 
 	 * @return boolean
 	 */
 	boolean hasEnabledDefinitions() {
@@ -305,7 +285,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Get the LightweightDecoratorDefinition with the supplied id
-	 *
+	 * 
 	 * @return LightweightDecoratorDefinition or <code>null</code> if it is
 	 *         not found
 	 * @param decoratorId
@@ -350,7 +330,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Fill the decoration with all of the results of the decorators.
-	 *
+	 * 
 	 * @param element
 	 *            The source element
 	 * @param decoration
@@ -372,7 +352,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	/**
 	 * Decorate the element receiver in a SafeRunnable.
-	 *
+	 * 
 	 * @param element
 	 *            The Object to be decorated
 	 * @param decoration
@@ -387,10 +367,10 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		SafeRunner.run(runnable);
 	}
 
-
+	
 	/**
 	 * Method for use by test cases
-	 *
+	 * 
 	 * @param object
 	 *            the object to be decorated
 	 * @return the decoration result
@@ -402,6 +382,12 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
+	 *      org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		// Do nothing as this is handled by the DecoratorManager

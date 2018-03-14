@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ import org.eclipse.ui.internal.wizards.preferences.PreferencesImportWizard;
  * This allows the extensions to be made available for use by RCP applications
  * without exposing their concrete implementation classes.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public class ExtensionFactory implements IExecutableExtensionFactory,
@@ -76,7 +76,7 @@ public class ExtensionFactory implements IExecutableExtensionFactory,
 
 	/**
 	 * Factory ID for the new (and improved) keys preference page.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public static final String NEW_KEYS_PREFERENCE_PAGE = "newKeysPreferencePage"; //$NON-NLS-1$
@@ -113,7 +113,7 @@ public class ExtensionFactory implements IExecutableExtensionFactory,
 
 	/**
 	 * Factory ID for the show in contribution.
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	public static final String SHOW_IN_CONTRIBUTION = "showInContribution"; //$NON-NLS-1$
@@ -193,6 +193,12 @@ public class ExtensionFactory implements IExecutableExtensionFactory,
 				0, "Unknown id in data argument for " + getClass(), null)); //$NON-NLS-1$
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
+	 *      java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {

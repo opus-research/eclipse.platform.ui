@@ -23,27 +23,37 @@ import com.ibm.icu.text.NumberFormat;
 public class StringToFloatValidatorTest extends
 		StringToNumberValidatorTestHarness {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInRangeNumber()
+	 */
 	protected Number getInRangeNumber() {
 		return new Float(1);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInvalidString()
+	 */
 	protected String getInvalidString() {
 		return "1a";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getOutOfRangeNumber()
+	 */
 	protected Number getOutOfRangeNumber() {
 		return new Double(Double.MAX_VALUE);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupNumberFormat()
+	 */
 	protected NumberFormat setupNumberFormat() {
 		return NumberFormat.getInstance();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupValidator(com.ibm.icu.text.NumberFormat)
+	 */
 	protected IValidator setupValidator(NumberFormat numberFormat) {
 		StringToNumberConverter converter = StringToNumberConverter.toFloat(numberFormat, false);
 		return new StringToFloatValidator(converter);

@@ -45,7 +45,7 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 	/**
 	 * Asserts the use case of specifying null on construction for the detail
 	 * type of the detail list.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNull() throws Exception {
@@ -66,7 +66,7 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 
 	/**
 	 * Asserts that you can't change the type across multiple inner observables.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNotNull() throws Exception {
@@ -95,7 +95,6 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 		class OuterObservable extends WritableValue {
 			boolean disposed = false;
 
-			@Override
 			public synchronized void dispose() {
 				disposed = true;
 				super.dispose();
@@ -137,7 +136,6 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 		final IObservableList[] detailObservable = new IObservableList[1];
 
 		master.addValueChangeListener(new IValueChangeListener() {
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				detailObservable[0].dispose();
 			}
@@ -152,7 +150,6 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 	private static class WritableListFactory implements IObservableFactory {
 		Object type = Object.class;
 
-		@Override
 		public IObservable createObservable(Object target) {
 			return new WritableList(new ArrayList(), type);
 		}
@@ -169,30 +166,26 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 	static class Delegate extends AbstractObservableCollectionContractDelegate {
 		Object elementType = Object.class;
 
-		@Override
 		public IObservableCollection createObservableCollection(
 				final Realm realm, final int elementCount) {
 
-			IObservableValue master = new WritableValue(realm, Integer.valueOf(
+			IObservableValue master = new WritableValue(realm, new Integer(
 					elementCount), Integer.class);
 			IObservableFactory factory = new FactoryStub(realm, elementType);
 			return new DetailObservableListStub(factory, master, elementType);
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return elementType;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			final IObservableValue master = ((DetailObservableListStub) observable).master;
-			master.setValue(Integer.valueOf(((Integer) master.getValue())
+			master.setValue(new Integer(((Integer) master.getValue())
 					.intValue() + 1));
 		}
 	}
@@ -208,7 +201,6 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 
 		Object type = Object.class;
 
-		@Override
 		public IObservable createObservable(Object target) {
 			int elementCount = ((Integer) target).intValue();
 			final ArrayList wrappedList = new ArrayList();

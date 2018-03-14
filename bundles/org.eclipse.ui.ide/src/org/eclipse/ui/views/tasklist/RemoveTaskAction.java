@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ class RemoveTaskAction extends TaskAction {
 
     /**
      * Creates the action.
-     *
+     * 
      * @param tasklist the task list
      * @param id the id
      */
@@ -45,8 +45,7 @@ class RemoveTaskAction extends TaskAction {
     /**
      * Removes all the tasks in the current selection from the task list.
      */
-    @Override
-	public void run() {
+    public void run() {
         TaskList taskList = getTaskList();
         TableViewer viewer = taskList.getTableViewer();
         IStructuredSelection selection = (IStructuredSelection) viewer

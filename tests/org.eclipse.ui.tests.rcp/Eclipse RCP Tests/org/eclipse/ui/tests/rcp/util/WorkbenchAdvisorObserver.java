@@ -14,13 +14,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.tests.harness.util.RCPTestWorkbenchAdvisor;
-import org.junit.Assert;
 
 /**
  * This utility class is used to record the order in which the hooks are called.
@@ -35,9 +36,9 @@ import org.junit.Assert;
  */
 public class WorkbenchAdvisorObserver extends RCPTestWorkbenchAdvisor {
 
-	private List<String> operations = new LinkedList<>();
+    private List operations = new LinkedList();
 
-	private Iterator<String> iterator;
+    private Iterator iterator;
 
     public final static String INITIALIZE = "initialize"; //$NON-NLS-1$
 
@@ -77,7 +78,7 @@ public class WorkbenchAdvisorObserver extends RCPTestWorkbenchAdvisor {
 
     public void assertNextOperation(String expected) {
         Assert.assertTrue(iterator.hasNext());
-        Assert.assertEquals(expected, iterator.next());
+        Assert.assertEquals(expected, (String) iterator.next());
     }
 
     public void assertAllOperationsExamined() {
@@ -89,75 +90,63 @@ public class WorkbenchAdvisorObserver extends RCPTestWorkbenchAdvisor {
         operations.add(operation);
     }
 
-    @Override
-	public void initialize(IWorkbenchConfigurer configurer) {
+    public void initialize(IWorkbenchConfigurer configurer) {
         super.initialize(configurer);
         workbenchConfig = configurer;
         addOperation(INITIALIZE);
     }
 
-    @Override
-	public void preStartup() {
+    public void preStartup() {
         super.preStartup();
         addOperation(PRE_STARTUP);
     }
 
-    @Override
-	public void preWindowOpen(IWorkbenchWindowConfigurer configurer) {
+    public void preWindowOpen(IWorkbenchWindowConfigurer configurer) {
         super.preWindowOpen(configurer);
         addOperation(PRE_WINDOW_OPEN);
     }
 
-    @Override
-	public void fillActionBars(IWorkbenchWindow window,
+    public void fillActionBars(IWorkbenchWindow window,
             IActionBarConfigurer configurer, int flags) {
         super.fillActionBars(window, configurer, flags);
         addOperation(FILL_ACTION_BARS);
     }
 
-    @Override
-	public void postWindowRestore(IWorkbenchWindowConfigurer configurer)
+    public void postWindowRestore(IWorkbenchWindowConfigurer configurer)
             throws WorkbenchException {
         super.postWindowRestore(configurer);
         addOperation(POST_WINDOW_RESTORE);
     }
 
-    @Override
-	public void postWindowOpen(IWorkbenchWindowConfigurer configurer) {
+    public void postWindowOpen(IWorkbenchWindowConfigurer configurer) {
         super.postWindowOpen(configurer);
         addOperation(POST_WINDOW_OPEN);
     }
 
-    @Override
-	public void postStartup() {
+    public void postStartup() {
         super.postStartup();
         addOperation(POST_STARTUP);
     }
 
-    @Override
-	public boolean preWindowShellClose(IWorkbenchWindowConfigurer configurer) {
-        if (!super.preWindowShellClose(configurer)) {
-			return false;
-		}
+    public boolean preWindowShellClose(IWorkbenchWindowConfigurer configurer) {
+        if (!super.preWindowShellClose(configurer))
+            return false;
         addOperation(PRE_WINDOW_SHELL_CLOSE);
         return true;
     }
 
-    @Override
-	public boolean preShutdown() {
+    public boolean preShutdown() {
         boolean result = super.preShutdown();
         addOperation(PRE_SHUTDOWN);
         return result;
     }
 
-    @Override
-	public void postShutdown() {
+    public void postShutdown() {
         super.postShutdown();
         addOperation(POST_SHUTDOWN);
     }
 
-    @Override
-	public void eventLoopException(Throwable exception) {
+    public void eventLoopException(Throwable exception) {
         super.eventLoopException(exception);
         addOperation(EVENT_LOOP_EXCEPTION);
     }

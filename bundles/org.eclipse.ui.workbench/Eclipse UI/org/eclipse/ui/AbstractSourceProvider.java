@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * support. Subclasses need only call <code>fireSourceChanged</code> whenever
  * appropriate.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public abstract class AbstractSourceProvider implements ISourceProvider {
@@ -31,7 +31,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	/**
 	 * Whether source providers should print out debugging information to the
 	 * console when events arrive.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	protected static boolean DEBUG = Policy.DEBUG_SOURCES;
@@ -40,7 +40,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 * The listeners to this source provider. This value is never
 	 * <code>null</code>.
 	 */
-	private final ListenerList<ISourceProviderListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
+	private final ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
 
 
 	@Override
@@ -55,7 +55,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 
 	/**
 	 * Notifies all listeners that a single source has changed.
-	 *
+	 * 
 	 * @param sourcePriority
 	 *            The source priority that has changed.
 	 * @param sourceName
@@ -66,14 +66,15 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 */
 	protected final void fireSourceChanged(final int sourcePriority,
 			final String sourceName, final Object sourceValue) {
-		for (ISourceProviderListener listener : listeners) {
-			listener.sourceChanged(sourcePriority, sourceName, sourceValue);
+		for (Object listener : listeners.getListeners()) {
+			((ISourceProviderListener) listener).sourceChanged(sourcePriority, sourceName,
+					sourceValue);
 		}
 	}
 
 	/**
 	 * Notifies all listeners that multiple sources have changed.
-	 *
+	 * 
 	 * @param sourcePriority
 	 *            The source priority that has changed.
 	 * @param sourceValuesByName
@@ -85,8 +86,8 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	protected final void fireSourceChanged(final int sourcePriority,
 			final Map sourceValuesByName) {
 
-		for (ISourceProviderListener listener : listeners) {
-			listener.sourceChanged(sourcePriority, sourceValuesByName);
+		for (Object listener : listeners.getListeners()) {
+			((ISourceProviderListener) listener).sourceChanged(sourcePriority, sourceValuesByName);
 		}
 	}
 
@@ -94,7 +95,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 * Logs a debugging message in an appropriate manner. If the message is
 	 * <code>null</code> or the <code>DEBUG</code> is <code>false</code>,
 	 * then this method does nothing.
-	 *
+	 * 
 	 * @param message
 	 *            The debugging message to log; if <code>null</code>, then
 	 *            nothing is logged.
@@ -120,7 +121,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 * This method is called when the source provider is instantiated by
 	 * <code>org.eclipse.ui.services</code>. Clients may override this method
 	 * to perform initialization.
-	 *
+	 * 
 	 * @param locator
 	 *            The global service locator. It can be used to retrieve
 	 *            services like the IContextService

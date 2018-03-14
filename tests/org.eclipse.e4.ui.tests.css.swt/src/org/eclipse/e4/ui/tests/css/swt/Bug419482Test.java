@@ -7,33 +7,31 @@
  *
  * Contributors:
  *     Stefan Winkler <stefan@winklerweb.net> - initial contribution
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
-import static org.junit.Assert.assertEquals;
-
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
-import org.junit.Test;
 
 public class Bug419482Test extends CSSSWTTestCase {
 
 	private static final RGB RGB_BLUE = new RGB(0, 0, 255);
 	private static final RGB RGB_RED = new RGB(255, 0, 0);
 
+	private CSSEngine engine;
 	private ToolBar toolbar1;
 	private ToolBar toolbar2;
 	private ToolBar toolbar3;
 
-	@Test
-	public void testTwoLevelsWildcard() {
+	public void testTwoLevelsWildcard() throws Exception {
 		String cssString = "Shell > * > * { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -43,8 +41,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_BLUE, rgb);
 	}
 
-	@Test
-	public void testOneLevelWildcardOneSpecific() {
+	public void testOneLevelWildcardOneSpecific() throws Exception {
 		String cssString = "Shell > * > Label { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -54,8 +51,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_RED, rgb);
 	}
 
-	@Test
-	public void testDescendentsWildcard() {
+	public void testDescendentsWildcard() throws Exception {
 		String cssString = "Shell * { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -65,8 +61,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_BLUE, rgb);
 	}
 
-	@Test
-	public void testDescendentsSpecific() {
+	public void testDescendentsSpecific() throws Exception {
 		String cssString = "Shell Label { color: red; } \n"
 				+ "Label { color: blue; }";
 
@@ -77,9 +72,26 @@ public class Bug419482Test extends CSSSWTTestCase {
 	}
 
 
+	private Label createTestLabel(String styleSheet) {
+		Display display = Display.getDefault();
+		engine = createEngine(styleSheet, display);
 
+		// Create widgets
+		Shell shell = new Shell(display, SWT.SHELL_TRIM);
+		FillLayout layout = new FillLayout();
+		shell.setLayout(layout);
 
-	@Test
+		Composite composite = new Composite(shell, SWT.NONE);
+		composite.setLayout(new FillLayout());
+
+		Label labelToTest = new Label(composite, SWT.NONE);
+		labelToTest.setText("Some label text");
+
+		// Apply styles
+		engine.applyStyles(labelToTest, true);
+		return labelToTest;
+	}
+
 	public void testOriginalBugReport() {
 		String css = "Shell, Shell > *, Shell > * > * {\n" +
 				"    background-color: red;\n" +
@@ -88,6 +100,7 @@ public class Bug419482Test extends CSSSWTTestCase {
 				"    background-color: blue;\n" +
 				"}";
 
+		Display display = Display.getDefault();
 		engine = createEngine(css, display);
 
 		Shell shell = createShellWithToolbars(display);
@@ -100,12 +113,12 @@ public class Bug419482Test extends CSSSWTTestCase {
 		assertEquals(RGB_BLUE, toolbar3.getBackground().getRGB());
 	}
 
-	@Test
 	public void testOriginalBugReportDifferentOrder() {
 		String css = "ToolBar {\n" + "    background-color: blue;\n" + "}"
 				+ "Shell, Shell > *, Shell > * > * {\n"
 				+ "    background-color: red;\n" + "}\n";
 
+		Display display = Display.getDefault();
 		engine = createEngine(css, display);
 
 		// Create widgets
@@ -133,7 +146,5 @@ public class Bug419482Test extends CSSSWTTestCase {
 
 		toolbar3 = new ToolBar(composite2, SWT.BORDER);
 		return shell;
-
 	}
-
 }

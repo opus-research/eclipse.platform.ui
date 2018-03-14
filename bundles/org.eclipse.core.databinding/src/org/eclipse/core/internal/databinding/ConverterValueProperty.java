@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Ovidio Mallo and others.
+ * Copyright (c) 2010 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ public class ConverterValueProperty extends SimpleValueProperty {
 	/**
 	 * Creates a new value property which applies the given converter on the
 	 * source object in order to produce the property's value.
-	 *
+	 * 
 	 * @param converter
 	 *            The converter to apply to the source object.
 	 */
@@ -35,39 +35,33 @@ public class ConverterValueProperty extends SimpleValueProperty {
 		this.converter = converter;
 	}
 
-	@Override
 	public Object getValueType() {
 		// the property type is the converter's target type
 		return converter.getToType();
 	}
 
-	@Override
 	public Object getValue(Object source) {
 		// We do also pass null values to the converter.
 		return doGetValue(source);
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		// delegate to the IConverter
 		return converter.convert(source);
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		// setting a value is not supported
 		throw new UnsupportedOperationException(toString()
 				+ ": Setter not supported on a converted value!"); //$NON-NLS-1$
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		// no listener API
 		return null;
 	}
 
-	@Override
 	public String toString() {
 		return "IConverter#convert(source) <IConverter#getToType()>"; //$NON-NLS-1$
 	}

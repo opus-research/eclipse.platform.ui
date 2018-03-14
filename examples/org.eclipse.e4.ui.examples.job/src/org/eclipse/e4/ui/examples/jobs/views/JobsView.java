@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.Active;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -293,15 +292,17 @@ public class JobsView {
 		Job showJob = new Job("Show In Dialog") {//$NON-NLS-1$
 			@Override
             protected IStatus run(IProgressMonitor monitor) {
-				SubMonitor subMonitor = SubMonitor.convert(monitor, "Run in dialog", 100);//$NON-NLS-1$
+				monitor.beginTask("Run in dialog", 100);//$NON-NLS-1$
 
 				for (int i = 0; i < 100; i++) {
-					subMonitor.split(1); 
+					if (monitor.isCanceled())
+						return Status.CANCEL_STATUS;
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						return Status.CANCEL_STATUS;
 					}
+					monitor.worked(1);
 
 				}
 				return Status.OK_STATUS;
@@ -466,17 +467,19 @@ public class JobsView {
 	protected void doRun(long duration, IProgressMonitor monitor) {
 		final long sleep = 10;
 		int ticks = (int) (duration / sleep);
-		SubMonitor subMonitor = SubMonitor.convert(monitor,
+		monitor.beginTask(
 				"Spinning inside IProgressService.busyCursorWhile", ticks); //$NON-NLS-1$
-		subMonitor.setTaskName("Spinning inside IProgressService.busyCursorWhile"); //$NON-NLS-1$
+		monitor.setTaskName("Spinning inside IProgressService.busyCursorWhile"); //$NON-NLS-1$
 		for (int i = 0; i < ticks; i++) {
-			subMonitor.subTask("Processing tick #" + i); //$NON-NLS-1$
-			subMonitor.split(1);
+			monitor.subTask("Processing tick #" + i); //$NON-NLS-1$
+			if (monitor.isCanceled())
+				return;
 			try {
 				Thread.sleep(sleep);
 			} catch (InterruptedException e) {
 				// ignore
 			}
+			monitor.worked(1);
 		}
 	}
 

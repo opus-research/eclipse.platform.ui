@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,9 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.PlatformUI;
@@ -30,14 +32,14 @@ import org.eclipse.ui.part.MarkerTransfer;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @since 2.0
  */
 class PasteTaskAction extends TaskAction {
 
     /**
      * Creates a new action.
-     *
+     * 
      * @param tasklist the task list
      * @param id the id
      */
@@ -50,8 +52,7 @@ class PasteTaskAction extends TaskAction {
     /**
      * Implementation of method defined on <code>IAction</code>.
      */
-    @Override
-	public void run() {
+    public void run() {
         // Get the markers from the clipboard
         MarkerTransfer transfer = MarkerTransfer.getInstance();
         final IMarker[] markerData = (IMarker[]) getTaskList().getClipboard()
@@ -65,22 +66,24 @@ class PasteTaskAction extends TaskAction {
         final ArrayList newMarkerResources = new ArrayList();
 
         try {
-            getTaskList().getWorkspace().run(monitor -> {
-			    for (int i = 0; i < markerData.length; i++) {
-			        // Only paste tasks
-			        if (!markerData[i].getType().equals(IMarker.TASK)) {
-						continue;
-					}
-			        newMarkerResources.add(markerData[i].getResource());
-			        newMarkerAttributes.add(markerData[i].getAttributes());
-			    }
-			}, null);
+            getTaskList().getWorkspace().run(new IWorkspaceRunnable() {
+                public void run(IProgressMonitor monitor) throws CoreException {
+                    for (int i = 0; i < markerData.length; i++) {
+                        // Only paste tasks 
+                        if (!markerData[i].getType().equals(IMarker.TASK)) {
+							continue;
+						}
+                        newMarkerResources.add(markerData[i].getResource());
+                        newMarkerAttributes.add(markerData[i].getAttributes());
+                    }
+                }
+            }, null);
         } catch (CoreException e) {
-            ErrorDialog.openError(getShell(), TaskListMessages.PasteTask_errorMessage,
+            ErrorDialog.openError(getShell(), TaskListMessages.PasteTask_errorMessage, 
                     null, e.getStatus());
             return;
         }
-
+        
 		final Map [] attrs = (Map []) newMarkerAttributes.toArray(new Map [newMarkerAttributes.size()]);
 		final IResource [] resources = (IResource []) newMarkerResources.toArray(new IResource [newMarkerResources.size()]);
 		final CreateMarkersOperation op = new CreateMarkersOperation(IMarker.TASK, attrs,
@@ -94,11 +97,13 @@ class PasteTaskAction extends TaskAction {
         // Must be done outside the create marker operation above since notification for add is
         // sent after the operation is executed.
         if (op.getMarkers() != null) {
-            getShell().getDisplay().asyncExec(() -> {
-			    TaskList taskList = getTaskList();
-			    taskList.setSelection(new StructuredSelection(op.getMarkers()),
-			            true);
-			});
+            getShell().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    TaskList taskList = getTaskList();
+                    taskList.setSelection(new StructuredSelection(op.getMarkers()),
+                            true);
+                }
+            });
         }
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,11 +20,11 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class StyledTextTextProperty extends WidgetStringValueProperty {
 	/**
-	 *
+	 * 
 	 */
 	public StyledTextTextProperty() {
 		this(null);
@@ -59,22 +59,18 @@ public class StyledTextTextProperty extends WidgetStringValueProperty {
 		return new int[] { SWT.Modify };
 	}
 
-	@Override
 	String doGetStringValue(Object source) {
 		return ((StyledText) source).getText();
 	}
 
-	@Override
 	void doSetStringValue(Object source, String value) {
 		((StyledText) source).setText(value == null ? "" : value); //$NON-NLS-1$
 	}
 
-	@Override
 	public String toString() {
 		return "StyledText.text <String>"; //$NON-NLS-1$
 	}
 
-	@Override
 	protected ISWTObservableValue wrapObservable(IObservableValue observable,
 			Widget widget) {
 		return new SWTVetoableValueDecorator(widget, this, observable);

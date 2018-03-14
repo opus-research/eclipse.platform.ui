@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 118516, 255734
  *     Chris Audley - bug 273265
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -20,19 +19,19 @@ import org.eclipse.core.runtime.ListenerList;
 /**
  * Listener management implementation. Exposed to subclasses in form of
  * {@link AbstractObservable} and {@link ChangeSupport}.
- *
+ * 
  * @since 1.0
- *
+ * 
  */
 /* package */class ChangeManager {
 
-	ListenerList<IObservablesListener>[] listenerLists = null;
+	ListenerList[] listenerLists = null;
 	Object listenerTypes[] = null;
 	private final Realm realm;
 
 	/**
 	 * @param realm
-	 *
+	 * 
 	 */
 	/* package */ChangeManager(Realm realm) {
 		Assert.isNotNull(realm, "Realm cannot be null"); //$NON-NLS-1$
@@ -43,7 +42,6 @@ import org.eclipse.core.runtime.ListenerList;
 	 * @param listenerType
 	 * @param listener
 	 */
-	@SuppressWarnings("unchecked")
 	protected void addListener(Object listenerType,
 			IObservablesListener listener) {
 		int listenerTypeIndex = findListenerTypeIndex(listenerType);
@@ -57,11 +55,13 @@ import org.eclipse.core.runtime.ListenerList;
 				length = listenerTypes.length;
 				System.arraycopy(listenerTypes, 0,
 						listenerTypes = new Object[length + 1], 0, length);
-				System.arraycopy(listenerLists, 0,
-						listenerLists = new ListenerList[length + 1], 0, length);
+				System
+						.arraycopy(listenerLists, 0,
+								listenerLists = new ListenerList[length + 1],
+								0, length);
 			}
 			listenerTypes[length] = listenerType;
-			listenerLists[length] = new ListenerList<>();
+			listenerLists[length] = new ListenerList();
 			listenerTypeIndex = length;
 		}
 		boolean hadListeners = hasListeners();
@@ -113,26 +113,28 @@ import org.eclipse.core.runtime.ListenerList;
 		Object listenerType = event.getListenerType();
 		int listenerTypeIndex = findListenerTypeIndex(listenerType);
 		if (listenerTypeIndex != -1) {
-			for (IObservablesListener listener : listenerLists[listenerTypeIndex]) {
-				event.dispatch(listener);
+			Object[] listeners = listenerLists[listenerTypeIndex]
+					.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				event.dispatch((IObservablesListener) listeners[i]);
 			}
 		}
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected void firstListenerAdded() {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected void lastListenerRemoved() {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public void dispose() {
 		listenerLists = null;
@@ -146,7 +148,6 @@ import org.eclipse.core.runtime.ListenerList;
 		return realm;
 	}
 
-	@Override
 	protected Object clone() throws CloneNotSupportedException {
 		ChangeManager duplicate = (ChangeManager) super.clone();
 		duplicate.listenerLists = null;

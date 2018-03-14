@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -18,7 +18,7 @@ import org.eclipse.ui.views.properties.tabbed.AbstractTabDescriptor;
 
 /**
  * A tab descriptor for the dynamic tests view.
- *
+ * 
  * @author Anthony Hunter
  */
 public class DynamicTestsBlackTabDescriptor extends AbstractTabDescriptor {
@@ -31,36 +31,30 @@ public class DynamicTestsBlackTabDescriptor extends AbstractTabDescriptor {
 						new DynamicTestsTypeMapper()));
 	}
 
-	@Override
 	public String getAfterTab() {
 		return "ColorTab"; //$NON-NLS-1$
 	}
 
-	@Override
 	public String getCategory() {
 		return "default"; //$NON-NLS-1$
 	}
 
-	@Override
 	public String getId() {
 		return "BlackTab"; //$NON-NLS-1$
 	}
 
-	@Override
 	public Image getImage() {
 		if (image == null) {
 			image = Activator
-					.getImageDescriptor("icons/black_triangle.gif").createImage(); //$NON-NLS-1$
+					.getImageDescriptor("icons/black_triangle.gif").createImage(); //$NON-NLS-1$ 
 		}
 		return image;
 	}
 
-	@Override
 	public String getLabel() {
 		return "Black"; //$NON-NLS-1$
 	}
 
-	@Override
 	public boolean isIndented() {
 		return true;
 	}

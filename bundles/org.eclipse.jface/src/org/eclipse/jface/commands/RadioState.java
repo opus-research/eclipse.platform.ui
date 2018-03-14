@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ import org.eclipse.jface.menus.IMenuStateIds;
  * <p>
  * Clients may instantiate or extend this interface.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public class RadioState extends ToggleState {
@@ -66,7 +66,7 @@ public class RadioState extends ToggleState {
 			/**
 			 * Activates a member. This checks to see if there are any other
 			 * active members. If there are, they are deactivated.
-			 *
+			 * 
 			 * @param state
 			 *            The state that should become active; must not be
 			 *            <code>null</code>.
@@ -82,13 +82,13 @@ public class RadioState extends ToggleState {
 			 * Adds a member to this radio group. If the state being added is
 			 * active, then it replaces the currently active group member as
 			 * the active state.
-			 *
+			 * 
 			 * @param state
 			 *            The state to add; must not be <code>null</code>.
 			 */
 			private final void addMember(final RadioState state) {
 				if (members == null) {
-					members = new HashSet<>(5);
+					members = new HashSet<RadioState>(5);
 				}
 
 				members.add(state);
@@ -116,7 +116,7 @@ public class RadioState extends ToggleState {
 			/**
 			 * Removes a member from this radio group. If the state was the
 			 * active state, then there will be no active state.
-			 *
+			 * 
 			 * @param state
 			 *            The state to remove; must not be <code>null</code>.
 			 */
@@ -142,7 +142,7 @@ public class RadioState extends ToggleState {
 
 		/**
 		 * Activates a particular state within a given group.
-		 *
+		 * 
 		 * @param identifier
 		 *            The identifier of the group to which the state belongs;
 		 *            must not be <code>null</code>.
@@ -164,7 +164,7 @@ public class RadioState extends ToggleState {
 
 		/**
 		 * Registers a piece of state with the radio manager.
-		 *
+		 * 
 		 * @param identifier
 		 *            The identifier of the radio group; must not be
 		 *            <code>null</code>.
@@ -174,7 +174,7 @@ public class RadioState extends ToggleState {
 		private static final void registerState(final String identifier,
 				final RadioState state) {
 			if (radioStatesById == null) {
-				radioStatesById = new HashMap<>();
+				radioStatesById = new HashMap<String, RadioGroup>();
 			}
 
 			final Object currentValue = radioStatesById.get(identifier);
@@ -190,7 +190,7 @@ public class RadioState extends ToggleState {
 
 		/**
 		 * Unregisters a piece of state from the radio manager.
-		 *
+		 * 
 		 * @param identifier
 		 *            The identifier of the radio group; must not be
 		 *            <code>null</code>.
@@ -229,11 +229,11 @@ public class RadioState extends ToggleState {
 	/**
 	 * Sets the identifier of the radio group for this piece of state. If the
 	 * identifier is cleared, then the state is unregistered.
-	 *
+	 * 
 	 * @param identifier
 	 *            The identifier of the radio group for this state; may be
 	 *            <code>null</code> if the identifier is being cleared.
-	 *
+	 * 
 	 */
 	public final void setRadioGroupIdentifier(final String identifier) {
 		if (identifier == null) {
@@ -248,7 +248,7 @@ public class RadioState extends ToggleState {
 	/**
 	 * Sets the value for this object. This notifies the radio state manager of
 	 * the change.
-	 *
+	 * 
 	 * @param value
 	 *            The new value; should be a <code>Boolean</code>.
 	 */
