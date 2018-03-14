@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.ide.undo;
 
@@ -917,21 +918,17 @@ public class WorkspaceUndoUtil {
 						.bind(
 								UndoMessages.AbstractResourcesOperation_outOfSyncQuestion,
 								resource.getName()), MessageDialog.QUESTION,
-				new String[] { IDialogConstants.YES_LABEL,
+						0,
+						IDialogConstants.YES_LABEL,
 						IDialogConstants.YES_TO_ALL_LABEL,
 						IDialogConstants.NO_LABEL,
-						IDialogConstants.CANCEL_LABEL }, 0) {
+						IDialogConstants.CANCEL_LABEL) {
 			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
 			}
 		};
-		shell.getDisplay().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				dialog.open();
-			}
-		});
+		shell.getDisplay().syncExec(() -> dialog.open());
 		int result = dialog.getReturnCode();
 		if (result == 0) {
 			return IDialogConstants.YES_ID;
