@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,13 +17,18 @@ import org.eclipse.core.commands.HandlerEvent;
 /**
  * Abstract base class that provides the enabled state, where changing the state
  * fires the HandlerEvent.
- *
+ * 
  * @since 3.3
  */
 public abstract class AbstractEnabledHandler extends AbstractHandler {
 
 	private boolean enabled = true;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
 	@Override
 	public boolean isEnabled() {
 		return enabled;

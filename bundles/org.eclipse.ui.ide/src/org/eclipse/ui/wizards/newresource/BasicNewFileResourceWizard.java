@@ -53,7 +53,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
 	 * @since 3.4
 	 */
 	public static final String WIZARD_ID = "org.eclipse.ui.wizards.new.file"; //$NON-NLS-1$
-
+	
     private WizardNewFileCreationPage mainPage;
 
     /**
@@ -63,30 +63,38 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
         super();
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
         mainPage = new WizardNewFileCreationPage("newFilePage1", getSelection());//$NON-NLS-1$
         mainPage.setTitle(ResourceMessages.FileResource_pageTitle);
-        mainPage.setDescription(ResourceMessages.FileResource_description);
+        mainPage.setDescription(ResourceMessages.FileResource_description); 
         addPage(mainPage);
     }
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         super.init(workbench, currentSelection);
         setWindowTitle(ResourceMessages.FileResource_shellTitle);
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	protected void initializeDefaultPageImageDescriptor() {
+    /* (non-Javadoc)
+     * Method declared on BasicNewResourceWizard.
+     */
+    protected void initializeDefaultPageImageDescriptor() {
        ImageDescriptor desc = IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/newfile_wiz.png");//$NON-NLS-1$
 	   setDefaultPageImageDescriptor(desc);
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
         IFile file = mainPage.createNewFile();
         if (file == null) {
 			return false;
@@ -104,7 +112,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
                 }
             }
         } catch (PartInitException e) {
-            DialogUtil.openError(dw.getShell(), ResourceMessages.FileResource_errorMessage,
+            DialogUtil.openError(dw.getShell(), ResourceMessages.FileResource_errorMessage, 
                     e.getMessage(), e);
         }
 

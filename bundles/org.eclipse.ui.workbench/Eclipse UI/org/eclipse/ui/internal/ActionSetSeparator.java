@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,6 +34,10 @@ public class ActionSetSeparator extends ContributionItem implements
         actionSetId = newActionSetId;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     * Fills the given menu with a SWT separator MenuItem.
+     */
     @Override
 	public void fill(Menu menu, int index) {
         if (index >= 0) {
@@ -43,6 +47,10 @@ public class ActionSetSeparator extends ContributionItem implements
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     * Fills the given tool bar with a SWT separator ToolItem.
+     */
     @Override
 	public void fill(ToolBar toolbar, int index) {
         if (index >= 0) {
@@ -60,8 +68,8 @@ public class ActionSetSeparator extends ContributionItem implements
         return actionSetId;
     }
 
-    /**
-     * The <code>Separator</code> implementation of this <code>IContributionItem</code>
+    /** 
+     * The <code>Separator</code> implementation of this <code>IContributionItem</code> 
      * method returns <code>true</code>
      */
     @Override

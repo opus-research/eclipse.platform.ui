@@ -86,7 +86,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 	@PostConstruct
 	void postConstruct() {
 		childHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				if (UIEvents.isADD(event)) {
 					for (Object element : UIEvents.asIterable(event,
@@ -127,7 +126,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 				childHandler);
 
 		activeChildHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				Object element = event
 						.getProperty(UIEvents.EventTags.NEW_VALUE);
@@ -154,7 +152,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 				activeChildHandler);
 
 		toBeRenderedHandler = new EventHandler() {
-			@Override
 			public void handleEvent(Event event) {
 				MUIElement element = (MUIElement) event
 						.getProperty(UIEvents.EventTags.ELEMENT);
@@ -210,7 +207,13 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		this.createContributions = createContributions;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#createGui(org.eclipse
+	 * .e4.ui.model.application.MUIElement, java.lang.Object)
+	 */
 	public Object createGui(MUIElement element, Object parentWidget,
 			IEclipseContext parentContext) {
 		if (!element.isToBeRendered()) {
@@ -341,7 +344,13 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		return widget;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#createGui(org.eclipse
+	 * .e4.ui.model.application.MUIElement)
+	 */
 	public Object createGui(MUIElement element) {
 		MUIElement placeholder = element.getCurSharedRef();
 		if (placeholder != null) {
@@ -356,7 +365,6 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		return createGui(element, parent.getWidget(), getParentContext(element));
 	}
 
-	@Override
 	public void removeGui(MUIElement element) {
 		if (element instanceof MElementContainer<?>) {
 			for (Object child : ((MElementContainer<?>) element).getChildren()) {
@@ -426,16 +434,32 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#run(org.eclipse.e4.ui
+	 * .model.application.MApplicationElement)
+	 */
 	public Object run(MApplicationElement uiRoot, IEclipseContext appContext) {
 		return 0;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.IPresentationEngine#stop()
+	 */
 	public void stop() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.IPresentationEngine#focusGui(org.eclipse.
+	 * e4.ui.model.application.ui.MUIElement)
+	 */
 	public void focusGui(MUIElement element) {
 		Object implementation = element instanceof MContribution ? ((MContribution) element)
 				.getObject() : null;

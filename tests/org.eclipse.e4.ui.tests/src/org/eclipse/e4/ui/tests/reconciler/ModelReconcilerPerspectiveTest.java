@@ -11,8 +11,6 @@
 
 package org.eclipse.e4.ui.tests.reconciler;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -22,12 +20,10 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerPerspectiveTest extends
 		ModelReconcilerTest {
 
-	@Test
 	public void testPerspective_Windows_Add() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -76,11 +72,10 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		assertEquals(perspective, perspectiveStack.getChildren().get(0));
 		assertEquals(1, perspective.getWindows().size());
 
-		nestedWindow = perspective.getWindows().get(0);
+		nestedWindow = (MWindow) perspective.getWindows().get(0);
 		assertEquals("nested", nestedWindow.getElementId());
 	}
 
-	@Test
 	public void testPerspective_Windows_Remove() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -135,7 +130,6 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		assertEquals(0, perspective.getWindows().size());
 	}
 
-	@Test
 	public void testPerspective_Windows_ChangeWindowAttribute() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);

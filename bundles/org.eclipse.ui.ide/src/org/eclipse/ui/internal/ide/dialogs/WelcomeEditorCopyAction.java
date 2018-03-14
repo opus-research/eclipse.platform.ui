@@ -25,8 +25,7 @@ public class WelcomeEditorCopyAction extends Action {
         setText(IDEWorkbenchMessages.WelcomeEditor_copy_text);
     }
 
-    @Override
-	public void run() {
+    public void run() {
         editorPart.getCurrentText().copy();
     }
 }

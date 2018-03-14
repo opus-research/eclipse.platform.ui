@@ -30,42 +30,38 @@ public class BadIndexDecorator implements ILightweightLabelDecorator {
      private Set listeners = new HashSet();
 
     private ImageDescriptor descriptor;
-
+   
 
     /*
      * @see IBaseLabelProvider#addListener(ILabelProviderListener)
      */
-    @Override
-	public void addListener(ILabelProviderListener listener) {
+    public void addListener(ILabelProviderListener listener) {
         listeners.add(listener);
     }
 
     /*
      * @see IBaseLabelProvider#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         listeners = new HashSet();
     }
 
     /*
      * @see IBaseLabelProvider#isLabelProperty(Object, String)
      */
-    @Override
-	public boolean isLabelProperty(Object element, String property) {
+    public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
     /*
      * @see IBaseLabelProvider#removeListener(ILabelProviderListener)
      */
-    @Override
-	public void removeListener(ILabelProviderListener listener) {
+    public void removeListener(ILabelProviderListener listener) {
         listeners.remove(listener);
     }
 
     /**
-     * Refresh the listeners to update the decorators for
+     * Refresh the listeners to update the decorators for 
      * element.
      */
 
@@ -101,8 +97,7 @@ public class BadIndexDecorator implements ILightweightLabelDecorator {
     /**
      * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object, org.eclipse.jface.viewers.IDecoration)
      */
-    @Override
-	public void decorate(Object element, IDecoration decoration) {
+    public void decorate(Object element, IDecoration decoration) {
         decoration.addOverlay(getOverlay(element), 17);
     }
 

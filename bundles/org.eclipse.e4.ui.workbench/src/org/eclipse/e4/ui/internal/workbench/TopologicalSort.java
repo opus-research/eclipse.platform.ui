@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Manumitting Technologies Inc and others.
+ * Copyright (c) 2014 Manumitting Technologies Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Brian de Alwis (MTI) - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -28,7 +27,7 @@ import java.util.Map;
  * objects have the same identifier. This is required for sorting Eclipse Extension Registry
  * extensions by their plug-in dependencies, as a plug-in may contribute multiple sets of
  * extensions.
- *
+ * 
  * <p>
  * The implementation creates a dependency graph where the vertices represent the object identifiers
  * and the edges represent the required-relation between them. Subclasses must implement of
@@ -37,7 +36,7 @@ import java.util.Map;
  * <em>A</em> is a dependent of <em>B</em>), one may be easier to compute than the other in some
  * contexts and so this class combines the results.
  * </p>
- *
+ * 
  * <p>
  * Description of the algorithm:
  * </p>
@@ -58,7 +57,7 @@ import java.util.Map;
  * bundles within the cycle, since any dependencies to any single ndoe within the cycle effectively
  * extends to all.</li>
  * </ol>
- *
+ * 
  * @param <T>
  *            the type of objects being sorted
  * @param <ID>
@@ -66,16 +65,16 @@ import java.util.Map;
  *            ID
  */
 public abstract class TopologicalSort<T, ID> {
-	private final Map<ID, Collection<T>> mappedObjects = new HashMap<>();
+	private final Map<ID, Collection<T>> mappedObjects = new HashMap<ID, Collection<T>>();
 	// Captures the bundles that are listed as requirements for a particular bundle.
-	private final Map<ID, Collection<ID>> requires = new HashMap<>();
+	private final Map<ID, Collection<ID>> requires = new HashMap<ID, Collection<ID>>();
 	// Captures the bundles that list a particular bundle as a requirement
-	private final Map<ID, Collection<ID>> depends = new HashMap<>();
+	private final Map<ID, Collection<ID>> depends = new HashMap<ID, Collection<ID>>();
 
 	/**
 	 * Return the identifier for the given object. The implementation properly tracks where multiple
 	 * objects have the same identifier.
-	 *
+	 * 
 	 * @param object
 	 *            the object
 	 * @return the identifier
@@ -86,7 +85,7 @@ public abstract class TopologicalSort<T, ID> {
 	 * Return the list of IDs required by {@code id}. Implementors may choose to return {@code null}
 	 * or an empty collection if this information is more easily computed by
 	 * {@link #getDependencies(Object)}.
-	 *
+	 * 
 	 * @param id
 	 *            the id
 	 * @return the IDs required by {@code id}; may be {@code null}
@@ -97,7 +96,7 @@ public abstract class TopologicalSort<T, ID> {
 	 * Return the list of IDs depended upon by {@code id}. Implementors may choose to return
 	 * {@code null} or an empty collection if this information is more easily computed by
 	 * {@link #getRequirements(Object)}.
-	 *
+	 * 
 	 * @param id
 	 *            the id
 	 * @return the IDs depended upon by {@code id}; may be {@code null}
@@ -107,12 +106,12 @@ public abstract class TopologicalSort<T, ID> {
 	/**
 	 * Sort the provided extensions by the dependencies of their contributors. Note that sorting is
 	 * done in-place.
-	 *
+	 * 
 	 * @param objects
 	 *            the objects to be sorted
 	 * @return the objects in a topologically-sorted order
 	 */
-	public T[] sort(T[] objects) {
+	public T[] sort(T... objects) {
 		if (objects.length <= 1) {
 			return objects;
 		}
@@ -130,7 +129,7 @@ public abstract class TopologicalSort<T, ID> {
 		// In case of a cycle, one of the nodes involved in the cycle should have
 		// higher in-degree from some other non-cyclic node
 		int resultsIndex = 0;
-		List<ID> sortedByOutdegree = new ArrayList<>(requires.keySet());
+		List<ID> sortedByOutdegree = new ArrayList<ID>(requires.keySet());
 		Comparator<ID> outdegreeSorter = new Comparator<ID>() {
 			@Override
 			public int compare(ID o1, ID o2) {
@@ -151,7 +150,7 @@ public abstract class TopologicalSort<T, ID> {
 			if (!requires.get(sortedByOutdegree.get(0)).isEmpty()) {
 				Collections.sort(sortedByOutdegree, outdegreeSorter);
 			}
-			LinkedList<ID> cycleToBeDone = new LinkedList<>();
+			LinkedList<ID> cycleToBeDone = new LinkedList<ID>();
 			cycleToBeDone.add(sortedByOutdegree.remove(0));
 			while (!cycleToBeDone.isEmpty()) {
 				ID bundleId = cycleToBeDone.removeFirst();
@@ -179,13 +178,13 @@ public abstract class TopologicalSort<T, ID> {
 	/**
 	 * @param objects
 	 */
-	private void addAll(T[] objects) {
+	private void addAll(T... objects) {
 		// first build up the list of object ids actually being considered
 		for (T o : objects) {
 			ID id = getId(o);
 			Collection<T> exts = mappedObjects.get(id);
 			if (exts == null) {
-				mappedObjects.put(id, exts = new HashSet<>());
+				mappedObjects.put(id, exts = new HashSet<T>());
 			}
 			exts.add(o);
 		}

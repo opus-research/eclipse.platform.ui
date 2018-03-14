@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2009 EclipseSource and others. All rights reserved.
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution, 
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
@@ -22,8 +22,10 @@ import org.w3c.dom.stylesheets.StyleSheet;
 
 public final class ParserTestUtil {
 
-	private static final CSSErrorHandler ERROR_HANDLER = e -> {
-		throw new RuntimeException(e);
+	private static final CSSErrorHandler ERROR_HANDLER = new CSSErrorHandler() {
+		public void error(Exception e) {
+			throw new RuntimeException(e);
+		}
 	};
 
 	private ParserTestUtil() {

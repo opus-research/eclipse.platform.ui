@@ -28,36 +28,46 @@ public class PerspectiveWidgetFactory extends TestWidgetFactory {
 
     private String perspectiveId;
     private IWorkbenchWindow window;
-
+    
     public PerspectiveWidgetFactory(String initialPerspective) {
         perspectiveId = initialPerspective;
     }
-
-    @Override
-	public Point getMaxSize() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#getMaxSize()
+     */
+    public Point getMaxSize() {
         return new Point(1024, 768);
     }
 
-    @Override
-	public void init() throws WorkbenchException {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#init()
+     */
+    public void init() throws WorkbenchException {
     	// open the perspective in a new window
         window = PlatformUI.getWorkbench().openWorkbenchWindow(perspectiveId, UITestCase.getPageInput());
 		IWorkbenchPage page = window.getActivePage();
         Assert.assertNotNull(page);
     }
-
-    @Override
-	public String getName() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#getName()
+     */
+    public String getName() {
         return "Perspective " + perspectiveId;
     }
 
-    @Override
-	public Composite getControl() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#getControl()
+     */
+    public Composite getControl() {
         return window.getShell();
     }
 
-    @Override
-	public void done() throws CoreException, WorkbenchException {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.performance.layout.TestWidgetFactory#done()
+     */
+    public void done() throws CoreException, WorkbenchException {
     	window.close();
     	super.done();
     }

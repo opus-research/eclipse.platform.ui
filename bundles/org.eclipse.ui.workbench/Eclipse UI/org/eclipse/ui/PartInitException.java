@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.ui;
 import org.eclipse.core.runtime.IStatus;
 
 /**
- * A checked exception indicating a workbench part cannot be initialized
+ * A checked exception indicating a workbench part cannot be initialized 
  * correctly. The message text provides a further description of the problem.
  * <p>
  * This exception class is not intended to be subclassed by clients.
@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IStatus;
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class PartInitException extends WorkbenchException {
-
+    
     /**
      * Generated serial version UID for this class.
      * @since 3.1
@@ -30,7 +30,7 @@ public class PartInitException extends WorkbenchException {
 
     /**
      * Creates a new exception with the given message.
-     *
+     * 
      * @param message the message
      */
     public PartInitException(String message) {
@@ -39,7 +39,7 @@ public class PartInitException extends WorkbenchException {
 
     /**
      * Creates a new exception with the given message.
-     *
+     * 
      * @param message the message
      * @param nestedException a exception to be wrapped by this PartInitException
      */

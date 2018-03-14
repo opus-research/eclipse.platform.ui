@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 
 package org.eclipse.ui.internal.dialogs;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jface.dialogs.Dialog;
@@ -36,9 +37,9 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 /**
  * Base implementation for a simple working set dialog that doesn't contain
  * references to non-editable/non-visible working sets.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
@@ -58,7 +59,7 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 			// one can explain. There doesn't seem to
 			// be a good reason to exclude these sets so the clause has been
 			// removed.
-
+			
 			// if (set.isAggregateWorkingSet() || !set.isSelfUpdating())
 			// return false;
 
@@ -68,13 +69,14 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 			if (!set.isEditable())
 				return false;
 
-			Set<String> workingSetTypeIds = getSupportedWorkingSetIds();
+			Set workingSetTypeIds = getSupportedWorkingSetIds();
 			if (workingSetTypeIds == null)
 				return true;
-			for (String workingSetTypeId : workingSetTypeIds) {
-				if (workingSetTypeId.equals(set.getId())) {
+
+			for (Iterator i = workingSetTypeIds.iterator(); i.hasNext();) {
+				String workingSetTypeId = (String) i.next();
+				if (workingSetTypeId.equals(set.getId()))
 					return true;
-				}
 			}
 
 			return false;
@@ -87,7 +89,7 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
 	/**
 	 * Create a new instance of this class.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell to parent this dialog on
 	 * @param workingSetTypeIds
@@ -97,7 +99,8 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 	 * @param canEdit
 	 *            whether or not this dialog will display edit controls
 	 */
-	public SimpleWorkingSetSelectionDialog(Shell shell, String[] workingSetTypeIds, IWorkingSet[] selectedWorkingSets,
+	public SimpleWorkingSetSelectionDialog(Shell shell,
+			String[] workingSetTypeIds, IWorkingSet[] selectedWorkingSets,
 			boolean canEdit) {
 		super(shell, workingSetTypeIds, canEdit);
 		this.initialSelection = selectedWorkingSets;
@@ -178,12 +181,6 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		viewer.setInput(PlatformUI.getWorkbench().getWorkingSetManager()
 				.getWorkingSets());
 		super.availableWorkingSetsChanged();
-	}
-
-	@Override
-	protected void workingSetAdded(IWorkingSet addedSet) {
-		viewer.setChecked(addedSet, true);
-		updateButtonAvailability();
 	}
 
 	/**

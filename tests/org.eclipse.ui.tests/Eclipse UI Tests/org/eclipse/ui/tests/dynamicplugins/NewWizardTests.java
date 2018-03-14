@@ -21,14 +21,14 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 public class NewWizardTests extends DynamicTestCase {
 
 	private static final String WIZARD_ID = "org.eclipse.newNewWizard1.newNewWizard1";
-
+	
 	/**
-	 *
+	 * 
 	 */
 	public NewWizardTests(String testName) {
 		super(testName);
 	}
-
+	
 	public void testNewWizardProperties() {
 		IWizardRegistry registry = WorkbenchPlugin.getDefault().getNewWizardRegistry();
 		assertNull(registry.findWizard(WIZARD_ID));
@@ -46,7 +46,7 @@ public class NewWizardTests extends DynamicTestCase {
 			//no-op
 		}
 	}
-
+	
 	/**
 	 * @param wizard
 	 */
@@ -58,22 +58,30 @@ public class NewWizardTests extends DynamicTestCase {
 		assertNotNull(wizard.getImageDescriptor());
 	}
 
-	@Override
-	protected String getExtensionId() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
+	protected String getExtensionId() {		
 		return "newNewWizard1.testDynamicNewWizardAddition";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_NEW;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newNewWizard1";
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicWizard";
 	}

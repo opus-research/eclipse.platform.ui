@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class HandlerServiceImpl implements EHandlerService {
 	/**
 	 * The static context key under which a command 'trigger' from legacy code is stored during
 	 * calls to {@link #executeHandler(ParameterizedCommand, IEclipseContext)}
-	 *
+	 * 
 	 * @see IEclipseContext
 	 * @see HandlerServiceImpl#executeHandler(ParameterizedCommand, IEclipseContext)
 	 */
@@ -102,7 +102,7 @@ public class HandlerServiceImpl implements EHandlerService {
 
 	/**
 	 * Fill in a temporary static context for execution.
-	 *
+	 * 
 	 * @param command
 	 */
 	@SuppressWarnings("rawtypes")
@@ -123,7 +123,7 @@ public class HandlerServiceImpl implements EHandlerService {
 
 	/**
 	 * Convert the parameter's value according to it's type.
-	 *
+	 * 
 	 * @param command
 	 * @param parameterId
 	 * @param value

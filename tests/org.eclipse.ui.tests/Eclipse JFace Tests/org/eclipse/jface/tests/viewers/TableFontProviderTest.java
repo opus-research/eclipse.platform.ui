@@ -37,11 +37,11 @@ public class TableFontProviderTest extends StructuredViewerTest {
 	Font font1;
 
 	Font font2;
-
+	
 
 	/**
 	 * Create a new instance of the receiver
-	 *
+	 * 
 	 * @param name
 	 */
 	public TableFontProviderTest(String name) {
@@ -53,7 +53,7 @@ public class TableFontProviderTest extends StructuredViewerTest {
 	 */
 	public void testFontProvider() {
 		TableViewer viewer = (TableViewer) fViewer;
-
+		
 		FontViewLabelProvider provider = new FontViewLabelProvider();
 		viewer.setLabelProvider(provider);
 
@@ -63,7 +63,7 @@ public class TableFontProviderTest extends StructuredViewerTest {
 
 		compareFontDatas(viewer.getTable().getItem(0).getFont(0), font1);//$NON-NLS-1$
 		compareFontDatas(viewer.getTable().getItem(0).getFont(1), font1);//$NON-NLS-1$
-
+		
 
 		provider.fExtended = false;
 
@@ -71,7 +71,7 @@ public class TableFontProviderTest extends StructuredViewerTest {
 
 	/**
 	 * Test that the fonts are being set.
-	 *
+	 *  
 	 */
 	public void testTableItemsFontProvider() {
 		TableViewer viewer = (TableViewer) fViewer;
@@ -89,24 +89,32 @@ public class TableFontProviderTest extends StructuredViewerTest {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#setUp()
+	 */
 	public void setUp() {
 		super.setUp();
 		font1 = JFaceResources.getFont(JFaceResources.BANNER_FONT);
 		font2 = JFaceResources.getFont(JFaceResources.HEADER_FONT);
-
+		
 	}
 
 	/**
 	 * Run as a stand alone test
-	 *
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		junit.textui.TestRunner.run(TableFontProviderTest.class);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#createViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	protected StructuredViewer createViewer(Composite parent) {
 		TableViewer viewer = new TableViewer(parent);
 		viewer.setContentProvider(new TestModelContentProvider());
@@ -132,7 +140,6 @@ public class TableFontProviderTest extends StructuredViewerTest {
 		return viewer;
 	}
 
-	@Override
 	protected int getItemCount() {
 		TestElement first = fRootElement.getFirstChild();
 		TableItem ti = (TableItem) fViewer.testFindItem(first);
@@ -140,34 +147,37 @@ public class TableFontProviderTest extends StructuredViewerTest {
 		return table.getItemCount();
 	}
 
-	@Override
 	protected String getItemText(int at) {
 		Table table = (Table) fViewer.getControl();
 		return table.getItem(at).getText();
 	}
-
+	
 	private void compareFontDatas(Font font1, Font font2){
-
+		
 		FontData[] font1Data = font1.getFontData();
 		FontData[] font2Data = font2.getFontData();
-
+		
 		assertTrue("Mismatched sizes",font1Data.length == font2Data.length);
 		for (int a = 0; a < font2Data.length; a++) {
 			assertTrue("Mismatched fontData",font1Data[a].equals(font2Data[a]));
 		}
-
-
+		
+		
 	}
 
 	class TableFontViewLabelProvider extends TableTestLabelProvider implements
 			ITableFontProvider {
 
-		@Override
 		public Image getColumnImage(Object obj, int index) {
 			return null;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITableFontProvider#getFont(java.lang.Object,
+		 *      int)
+		 */
 		public Font getFont(Object element, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
@@ -185,7 +195,11 @@ public class TableFontProviderTest extends StructuredViewerTest {
 	 */
 	class FontViewLabelProvider extends TableTestLabelProvider implements
 			IFontProvider {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+		 */
 		public Font getFont(Object element) {
 			return font1;
 		}

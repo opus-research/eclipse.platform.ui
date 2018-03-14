@@ -29,7 +29,6 @@ import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
  * This is the action group for the open actions.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class OpenActionGroup extends ResourceNavigatorActionGroup {
 
     private OpenFileAction openFileAction;
@@ -42,20 +41,18 @@ public class OpenActionGroup extends ResourceNavigatorActionGroup {
 
 	/**
 	 * Creates a new action group for open actions.
-	 *
+	 * 
 	 * @param navigator the resource navigator
 	 */
     public OpenActionGroup(IResourceNavigator navigator) {
         super(navigator);
     }
 
-    @Override
-	protected void makeActions() {
+    protected void makeActions() {
         openFileAction = new OpenFileAction(navigator.getSite().getPage());
     }
 
-    @Override
-	public void fillContextMenu(IMenuManager menu) {
+    public void fillContextMenu(IMenuManager menu) {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
 
@@ -79,7 +76,7 @@ public class OpenActionGroup extends ResourceNavigatorActionGroup {
 
     /**
      * Adds the OpenWith submenu to the context menu.
-     *
+     * 
      * @param menu the context menu
      * @param selection the current selection
      */
@@ -103,7 +100,7 @@ public class OpenActionGroup extends ResourceNavigatorActionGroup {
 
     /**
      * Adds the Open in New Window action to the context menu.
-     *
+     * 
      * @param menu the context menu
      * @param selection the current selection
      */
@@ -129,8 +126,7 @@ public class OpenActionGroup extends ResourceNavigatorActionGroup {
     /**
      * Runs the default action (open file).
      */
-    @Override
-	public void runDefaultAction(IStructuredSelection selection) {
+    public void runDefaultAction(IStructuredSelection selection) {
         Object element = selection.getFirstElement();
         if (element instanceof IFile) {
             openFileAction.selectionChanged(selection);

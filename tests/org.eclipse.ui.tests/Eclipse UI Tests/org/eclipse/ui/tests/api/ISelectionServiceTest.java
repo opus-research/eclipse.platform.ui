@@ -40,8 +40,7 @@ public class ISelectionServiceTest extends UITestCase implements
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -90,9 +89,9 @@ public class ISelectionServiceTest extends UITestCase implements
      * Tests getActivePage.
      */
     public void XXXtestGetSelection() throws Throwable {
-        // From Javadoc: "Returns the current selection in the active part.
-        // If the selection in the active part is <em>undefined</em> (the
-        // active part has no selection provider) the result will be
+        // From Javadoc: "Returns the current selection in the active part.  
+        // If the selection in the active part is <em>undefined</em> (the 
+        // active part has no selection provider) the result will be 
         // <code>null</code>"
         Object actualSel, sel1 = "Selection 1", sel2 = "Selection 2";
 
@@ -114,7 +113,7 @@ public class ISelectionServiceTest extends UITestCase implements
         fPage.hideView(view);
         assertNull("getSelection", fPage.getSelection());
     }
-
+    
     /**
      * Tests getting a selection service local to the part site
      */
@@ -128,9 +127,9 @@ public class ISelectionServiceTest extends UITestCase implements
 				.showView(SelectionProviderView.ID);
 
 		ISelectionService service = fWindow.getSelectionService();
-		ISelectionService windowService = fWindow
+		ISelectionService windowService = (ISelectionService) fWindow
 				.getService(ISelectionService.class);
-		ISelectionService slaveService = view2.getSite()
+		ISelectionService slaveService = (ISelectionService) view2.getSite()
 				.getService(ISelectionService.class);
 
 		assertTrue(service != slaveService);
@@ -189,7 +188,7 @@ public class ISelectionServiceTest extends UITestCase implements
     }
 
     /**
-     * Test event firing when activated.
+     * Test event firing when activated.  
      */
     public void testSelectionEventWhenActivated() throws Throwable {
         // From Javadoc: "Adds the given selection listener.
@@ -232,9 +231,8 @@ public class ISelectionServiceTest extends UITestCase implements
     private Object unwrapSelection(ISelection sel) {
         if (sel instanceof IStructuredSelection) {
             IStructuredSelection struct = (IStructuredSelection) sel;
-            if (struct.size() == 1) {
-				return struct.getFirstElement();
-			}
+            if (struct.size() == 1)
+                return struct.getFirstElement();
         }
         return null;
     }
@@ -251,8 +249,7 @@ public class ISelectionServiceTest extends UITestCase implements
     /*
      * @see ISelectionListener#selectionChanged(IWorkbenchPart, ISelection)
      */
-    @Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
         eventReceived = true;
         eventPart = part;
         eventSelection = selection;

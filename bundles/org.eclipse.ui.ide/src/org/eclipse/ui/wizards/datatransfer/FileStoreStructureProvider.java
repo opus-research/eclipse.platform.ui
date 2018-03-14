@@ -24,9 +24,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  * FileStoreStructureProvider is the structure provider for {@link IFileStore}
  * based file structures.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class FileStoreStructureProvider implements IImportStructureProvider {
 
@@ -35,7 +35,11 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 	 */
 	public final static FileStoreStructureProvider INSTANCE = new FileStoreStructureProvider();
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getChildren(java.lang.Object)
+	 */
 	public List getChildren(Object element) {
 		try {
 			return Arrays.asList(((IFileStore) element).childStores(EFS.NONE,
@@ -48,7 +52,7 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 
 	/**
 	 * Log the exception.
-	 *
+	 * 
 	 * @param exception
 	 */
 	private void logException(CoreException exception) {
@@ -56,7 +60,11 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getContents(java.lang.Object)
+	 */
 	public InputStream getContents(Object element) {
 		try {
 			return ((IFileStore) element).openInputStream(EFS.NONE,
@@ -67,17 +75,29 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getFullPath(java.lang.Object)
+	 */
 	public String getFullPath(Object element) {
 		return ((IFileStore) element).toURI().getSchemeSpecificPart();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getLabel(java.lang.Object)
+	 */
 	public String getLabel(Object element) {
 		return ((IFileStore) element).getName();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#isFolder(java.lang.Object)
+	 */
 	public boolean isFolder(Object element) {
 		return ((IFileStore) element).fetchInfo().isDirectory();
 	}

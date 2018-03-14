@@ -40,7 +40,7 @@ import org.eclipse.ui.internal.wizards.datatransfer.WizardArchiveFileResourceExp
  * dialog.open();
  * </pre>
  * During the call to <code>open</code>, the wizard dialog is presented to the
- * user. When the user hits Finish, the user-selected workspace resources
+ * user. When the user hits Finish, the user-selected workspace resources 
  * are exported to the user-specified zip file, the dialog closes, and the call
  * to <code>open</code> returns.
  * </p>
@@ -64,15 +64,19 @@ public class ZipFileExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
         mainPage = new WizardArchiveFileResourceExportPage1(selection);
         addPage(mainPage);
     }
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.selection = currentSelection;
         List selectedResources = IDE.computeSelectedResources(currentSelection);
         if (!selectedResources.isEmpty()) {
@@ -84,8 +88,10 @@ public class ZipFileExportWizard extends Wizard implements IExportWizard {
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
         return mainPage.finish();
     }
 }

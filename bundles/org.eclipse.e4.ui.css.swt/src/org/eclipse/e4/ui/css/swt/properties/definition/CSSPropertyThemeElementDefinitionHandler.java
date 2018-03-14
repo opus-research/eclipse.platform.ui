@@ -57,7 +57,7 @@ public class CSSPropertyThemeElementDefinitionHandler implements ICSSPropertyHan
 		} else if (LABEL_PROP.equals(property)) {
 			definition.setName(getLabel(value));
 		} else if (DESCRIPTION_PROP.equals(property)) {
-			definition.setDescription(getLabel(value));
+			definition.setDescription(value.getCssText());
 		}
 
 		return true;

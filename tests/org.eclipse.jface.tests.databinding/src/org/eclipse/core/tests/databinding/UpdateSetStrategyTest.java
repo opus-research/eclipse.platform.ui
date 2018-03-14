@@ -65,7 +65,6 @@ public class UpdateSetStrategyTest extends AbstractDefaultRealmTestCase {
 	}
 
 	class UpdateSetStrategyStub extends UpdateSetStrategy {
-		@Override
 		protected void fillDefaults(IObservableSet source,
 				IObservableSet destination) {
 			super.fillDefaults(source, destination);

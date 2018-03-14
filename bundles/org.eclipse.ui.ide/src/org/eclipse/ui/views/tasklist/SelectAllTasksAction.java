@@ -31,8 +31,7 @@ class SelectAllTasksAction extends TaskAction {
     /**
      * Selects all resources in the view.
      */
-    @Override
-	public void run() {
+    public void run() {
         getTaskList().cancelEditing();
         TableViewer viewer = getTaskList().getTableViewer();
         viewer.getTable().selectAll();

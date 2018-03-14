@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -91,6 +91,13 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#createPart
+	 * ()
+	 */
 	@Override
 	public IWorkbenchPart createPart() throws PartInitException {
 		try {
@@ -118,6 +125,13 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		return new ErrorViewPart(status);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#initialize
+	 * (org.eclipse.ui.IWorkbenchPart)
+	 */
 	@Override
 	public void initialize(IWorkbenchPart part) throws PartInitException {
 		ViewSite viewSite = new ViewSite(getModel(), part, this, descriptor == null ? null

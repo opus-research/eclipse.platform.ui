@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,37 +24,41 @@ import org.eclipse.swt.widgets.Control;
  * The AnimationItem is the class that manages the animation for the progress.
  */
 public abstract class AnimationItem {
-
+	
 	private AnimationManager animationManager;
 
     interface IAnimationContainer {
         /**
-         * The animation has started.
+         * The animation has started. 
          */
         public abstract void animationStart();
 
         /**
-         * The animation has ended.
+         * The animation has ended. 
          */
         public abstract void animationDone();
     }
 
     //Create a containter that does nothing by default
     IAnimationContainer animationContainer = new IAnimationContainer() {
-        @Override
-		public void animationDone() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationDone()
+         */
+        public void animationDone() {
             //Do nothing by default
         }
 
-        @Override
-		public void animationStart() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationStart()
+         */
+        public void animationStart() {
             //Do nothing by default
         }
     };
 
     /**
      * Create a new instance of the receiver.
-     *
+     * 
      * @param workbenchWindow
      *            the window being created
      */
@@ -64,7 +68,7 @@ public abstract class AnimationItem {
 
     /**
      * Create the canvas that will display the image.
-     *
+     * 
      * @param parent
      */
     public void createControl(Composite parent) {
@@ -72,24 +76,35 @@ public abstract class AnimationItem {
         Control animationItem = createAnimationItem(parent);
 
         animationItem.addMouseListener(new MouseListener() {
-            @Override
-			public void mouseDoubleClick(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+             */
+            public void mouseDoubleClick(MouseEvent arg0) {
                 ProgressManagerUtil.openProgressView();
             }
 
-            @Override
-			public void mouseDown(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+             */
+            public void mouseDown(MouseEvent arg0) {
                 //Do nothing
             }
 
-            @Override
-			public void mouseUp(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
+             */
+            public void mouseUp(MouseEvent arg0) {
                 //Do nothing
             }
         });
         animationItem.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent e) {
+            public void widgetDisposed(DisposeEvent e) {
                 animationManager.removeItem(AnimationItem.this);
             }
         });
@@ -105,7 +120,7 @@ public abstract class AnimationItem {
 
     /**
      * Paint the image in the canvas.
-     *
+     * 
      * @param event
      *            The PaintEvent that generated this call.
      * @param image
@@ -119,7 +134,7 @@ public abstract class AnimationItem {
 
     /**
      * Get the SWT control for the receiver.
-     *
+     * 
      * @return Control
      */
     public abstract Control getControl();
@@ -140,7 +155,7 @@ public abstract class AnimationItem {
 
     /**
      * Get the preferred width of the receiver.
-     *
+     * 
      * @return int
      */
     public int getPreferredWidth() {

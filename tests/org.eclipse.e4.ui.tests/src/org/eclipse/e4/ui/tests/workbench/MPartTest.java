@@ -11,11 +11,7 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -30,30 +26,36 @@ import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class MPartTest {
+public class MPartTest extends TestCase {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
-	@Before
-	public void setUp() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
-	@Test
 	public void testSetName() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
@@ -79,7 +81,6 @@ public class MPartTest {
 		assertEquals("Another Name", item.getText());
 	}
 
-	@Test
 	public void testCTabItem_GetImage() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
@@ -121,17 +122,14 @@ public class MPartTest {
 		assertEquals(expected, item.getText());
 	}
 
-	@Test
 	public void testDeclaredNameNull() {
 		testDeclaredName(null, "");
 	}
 
-	@Test
 	public void testDeclaredNameEmpty() {
 		testDeclaredName("", "");
 	}
 
-	@Test
 	public void testDeclaredNameDefined() {
 		testDeclaredName("partName", "partName");
 	}
@@ -157,17 +155,14 @@ public class MPartTest {
 		assertEquals(expectedToolTip, item.getToolTipText());
 	}
 
-	@Test
 	public void testDeclaredTooltipNull() {
 		testDeclaredTooltip(null, null);
 	}
 
-	@Test
 	public void testDeclaredTooltipEmptyString() {
 		testDeclaredTooltip("", null);
 	}
 
-	@Test
 	public void testDeclaredTooltipDefined() {
 		testDeclaredTooltip("partToolTip", "partToolTip");
 	}
@@ -197,22 +192,18 @@ public class MPartTest {
 		assertEquals(expectedToolTip, item.getToolTipText());
 	}
 
-	@Test
 	public void testMPart_setTooltipNull() {
 		testMPart_setTooltip(null, null);
 	}
 
-	@Test
 	public void testMPart_setTooltipEmptyString() {
 		testMPart_setTooltip("", null);
 	}
 
-	@Test
 	public void testMPart_setTooltipDefined() {
 		testMPart_setTooltip("partToolTip", "partToolTip");
 	}
 
-	@Test
 	public void testMPart_getContext() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
@@ -236,7 +227,6 @@ public class MPartTest {
 		assertNull(part.getContext());
 	}
 
-	@Test
 	public void testMPartBug369866() {
 		final MWindow window = createWindowWithOneView("Part");
 

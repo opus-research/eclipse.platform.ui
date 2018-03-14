@@ -20,12 +20,11 @@ import org.eclipse.swt.dnd.TransferData;
  * dropAccept does not contain the drop data. The selection may be used for
  * validation purposes so that the drop can be aborted if appropriate. This
  * class is not intended to be subclassed.
- *
+ * 
  * @since 2.1
  * @noextend This class is not intended to be subclassed by clients.
  * @deprecated as of 3.5, use {@link org.eclipse.jface.util.LocalSelectionTransfer} instead
  */
-@Deprecated
 public class LocalSelectionTransfer extends
 		org.eclipse.jface.util.LocalSelectionTransfer {
 
@@ -49,39 +48,59 @@ public class LocalSelectionTransfer extends
 
 	/**
 	 * Returns the singleton.
-	 *
+	 * 
 	 * @return the singleton
 	 */
 	public static LocalSelectionTransfer getInstance() {
 		return INSTANCE;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.util.LocalSelectionTransfer#getSelection()
+	 */
 	public ISelection getSelection() {
 		return jfaceTransfer.getSelection();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.util.LocalSelectionTransfer#getSelectionSetTime()
+	 */
 	public long getSelectionSetTime() {
 		return jfaceTransfer.getSelectionSetTime();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.util.LocalSelectionTransfer#setSelection(org.eclipse.jface.viewers.ISelection)
+	 */
 	public void setSelection(ISelection s) {
 		jfaceTransfer.setSelection(s);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.util.LocalSelectionTransfer#setSelectionSetTime(long)
+	 */
 	public void setSelectionSetTime(long time) {
 		jfaceTransfer.setSelectionSetTime(time);
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.util.LocalSelectionTransfer#javaToNative(java.lang.Object, org.eclipse.swt.dnd.TransferData)
+	 */
 	public void javaToNative(Object object, TransferData transferData) {
 		jfaceTransfer.javaToNative(object, transferData);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.util.LocalSelectionTransfer#nativeToJava(org.eclipse.swt.dnd.TransferData)
+	 */
 	public Object nativeToJava(TransferData transferData) {
 		return jfaceTransfer.nativeToJava(transferData);
 	}

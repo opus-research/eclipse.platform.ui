@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Konstantin Komissarchik - Fix for  Bug 316997
+ *     Konstantin Komissarchik - Fix for  Bug 316997 
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -41,7 +41,7 @@ public class TextSegment extends ParagraphSegment {
 
 	private boolean wrapAllowed = true;
 
-	protected Vector<AreaRectangle> areaRectangles = new Vector<>();
+	protected Vector areaRectangles = new Vector();
 
 	private TextFragment[] textFragments;
 
@@ -106,13 +106,13 @@ public class TextSegment extends ParagraphSegment {
 	public TextSegment(String text, String fontId, String colorId) {
 		this(text, fontId, colorId, true);
 	}
-
+	
 	public TextSegment(String text, String fontId, String colorId, boolean wrapAllowed) {
 		this.text = cleanup(text);
 		this.fontId = fontId;
 		this.colorId = colorId;
 		this.wrapAllowed = wrapAllowed;
-	}
+	}	
 
 	private String cleanup(String text) {
 		StringBuffer buf = new StringBuffer();
@@ -161,16 +161,15 @@ public class TextSegment extends ParagraphSegment {
 		textFragments = null;
 	}
 
-	@Override
 	public boolean contains(int x, int y) {
 		for (int i = 0; i < areaRectangles.size(); i++) {
-			AreaRectangle ar = areaRectangles.get(i);
+			AreaRectangle ar = (AreaRectangle) areaRectangles.get(i);
 			if (ar.contains(x, y))
 				return true;
 			if (i<areaRectangles.size()-1) {
 				// test the gap
 				Rectangle top = ar.rect;
-				Rectangle bot = areaRectangles.get(i+1).rect;
+				Rectangle bot = ((AreaRectangle)areaRectangles.get(i+1)).rect;
 				if (y >= top.y+top.height && y < bot.y) {
 					// in the gap
 					int left = Math.max(top.x, bot.x);
@@ -184,16 +183,15 @@ public class TextSegment extends ParagraphSegment {
 		return false;
 	}
 
-	@Override
 	public boolean intersects(Rectangle rect) {
 		for (int i = 0; i < areaRectangles.size(); i++) {
-			AreaRectangle ar = areaRectangles.get(i);
+			AreaRectangle ar = (AreaRectangle) areaRectangles.get(i);
 			if (ar.intersects(rect))
 				return true;
 			if (i<areaRectangles.size()-1) {
 				// test the gap
 				Rectangle top = ar.rect;
-				Rectangle bot = areaRectangles.get(i+1).rect;
+				Rectangle bot = ((AreaRectangle)areaRectangles.get(i+1)).rect;
 				if (top.y+top.height < bot.y) {
 					int y = top.y+top.height;
 					int height = bot.y-y;
@@ -211,19 +209,18 @@ public class TextSegment extends ParagraphSegment {
 	public Rectangle getBounds() {
 		if (areaRectangles.size() == 0)
 			return new Rectangle(0, 0, 0, 0);
-
-		AreaRectangle ar0 = areaRectangles.get(0);
+		
+		AreaRectangle ar0 = (AreaRectangle) areaRectangles.get(0);
 		Rectangle bounds = Geometry.copy(ar0.rect);
 		for (int i = 1; i < areaRectangles.size(); i++) {
-			AreaRectangle ar = areaRectangles.get(i);
+			AreaRectangle ar = (AreaRectangle) areaRectangles.get(i);
 			bounds.add(ar.rect);
 		}
 		return bounds;
 	}
 
-	@Override
 	public boolean advanceLocator(GC gc, int wHint, Locator locator,
-			Hashtable<String, Object> objectTable, boolean computeHeightOnly) {
+			Hashtable objectTable, boolean computeHeightOnly) {
 		Font oldFont = null;
 		if (fontId != null) {
 			oldFont = gc.getFont();
@@ -269,7 +266,7 @@ public class TextSegment extends ParagraphSegment {
 		for (int i = 0; i < textFragments.length; i++) {
 			TextFragment textFragment = textFragments[i];
 			int currentExtent = locator.x + lineExtent.x;
-
+			
 			if (isSelectable())
 				currentExtent += 1;
 
@@ -308,6 +305,17 @@ public class TextSegment extends ParagraphSegment {
 		return newLine;
 	}
 
+	/**
+	 * @param gc
+	 * @param width
+	 * @param locator
+	 * @param selected
+	 * @param selData
+	 * @param color
+	 * @param fm
+	 * @param lineHeight
+	 * @param descent
+	 */
 	private void layoutWithoutWrapping(GC gc, int width, Locator locator,
 			boolean selected, FontMetrics fm, int lineHeight, int descent) {
 		Point extent = gc.textExtent(text);
@@ -347,7 +355,7 @@ public class TextSegment extends ParagraphSegment {
 		if (areaRectangles == null)
 			return;
 		for (int i = 0; i < areaRectangles.size(); i++) {
-			AreaRectangle areaRectangle = areaRectangles.get(i);
+			AreaRectangle areaRectangle = (AreaRectangle) areaRectangles.get(i);
 			Rectangle br = areaRectangle.rect;
 			int bx = br.x;
 			int by = br.y;
@@ -366,14 +374,13 @@ public class TextSegment extends ParagraphSegment {
 		}
 	}
 
-	@Override
-	public void paint(GC gc, boolean hover, Hashtable<String, Object> resourceTable,
+	public void paint(GC gc, boolean hover, Hashtable resourceTable,
 			boolean selected, SelectionData selData, Rectangle repaintRegion) {
 		this.paint(gc, hover, resourceTable, selected, false, selData,
 				repaintRegion);
 	}
 
-	protected void paint(GC gc, boolean hover, Hashtable<String, Object> resourceTable,
+	protected void paint(GC gc, boolean hover, Hashtable resourceTable,
 			boolean selected, boolean rollover, SelectionData selData,
 			Rectangle repaintRegion) {
 		Font oldFont = null;
@@ -401,7 +408,7 @@ public class TextSegment extends ParagraphSegment {
 
 		// paint area rectangles of the segment
 		for (int i = 0; i < areaRectangles.size(); i++) {
-			AreaRectangle areaRectangle = areaRectangles.get(i);
+			AreaRectangle areaRectangle = (AreaRectangle) areaRectangles.get(i);
 			Rectangle rect = areaRectangle.rect;
 			String text = areaRectangle.getText();
 			Point extent = gc.textExtent(text);
@@ -437,8 +444,7 @@ public class TextSegment extends ParagraphSegment {
 		}
 	}
 
-	@Override
-	public void computeSelection(GC gc, Hashtable<String, Object> resourceTable, SelectionData selData) {
+	public void computeSelection(GC gc, Hashtable resourceTable, SelectionData selData) {
 		Font oldFont = null;
 
 		if (fontId != null) {
@@ -449,7 +455,7 @@ public class TextSegment extends ParagraphSegment {
 		}
 
 		for (int i = 0; i < areaRectangles.size(); i++) {
-			AreaRectangle areaRectangle = areaRectangles.get(i);
+			AreaRectangle areaRectangle = (AreaRectangle) areaRectangles.get(i);
 			Rectangle rect = areaRectangle.rect;
 			String text = areaRectangle.getText();
 			Point extent = gc.textExtent(text);
@@ -561,6 +567,15 @@ public class TextSegment extends ParagraphSegment {
 		}
 	}
 
+	/**
+	 * @param gc
+	 * @param s
+	 * @param x
+	 * @param y
+	 * @param lineY
+	 * @param hover
+	 * @param rolloverMode
+	 */
 	private void paintStringSegment(GC gc, String s, int swidth, int x, int y,
 			int lineY, boolean hover, boolean rolloverMode,
 			Rectangle repaintRegion) {
@@ -583,7 +598,7 @@ public class TextSegment extends ParagraphSegment {
 			drawUnderline(gc, swidth, clipX, clipLineY, hover, rolloverMode);
 		}
 	}
-
+	
 	protected void drawText(GC gc, String s, int clipX, int clipY) {
 		gc.drawText(s, clipX, clipY, true);
 	}
@@ -602,9 +617,16 @@ public class TextSegment extends ParagraphSegment {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#layout(org.eclipse.swt.graphics.GC,
+	 *      int, org.eclipse.ui.internal.forms.widgets.Locator,
+	 *      java.util.Hashtable, boolean,
+	 *      org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
 	public void layout(GC gc, int width, Locator locator,
-			Hashtable<String, Object> resourceTable, boolean selected) {
+			Hashtable resourceTable, boolean selected) {
 		Font oldFont = null;
 
 		areaRectangles.clear();
@@ -650,7 +672,7 @@ public class TextSegment extends ParagraphSegment {
 							lineExtent.y);
 					locator.resetCaret();
 					if (isSelectable())
-						locator.x += 1;
+						locator.x += 1;					
 					locator.y += locator.rowHeight;
 					locator.rowCounter++;
 					locator.rowHeight = 0;
@@ -667,7 +689,7 @@ public class TextSegment extends ParagraphSegment {
 			int lastWidth = lineExtent.x;
 			if (isSelectable())
 				lastWidth += 1;
-			Rectangle br = new Rectangle(isSelectable()?locator.x - 1:locator.x, ly,
+			Rectangle br = new Rectangle(isSelectable()?locator.x - 1:locator.x, ly, 
 					isSelectable()?lineExtent.x + 1:lineExtent.x,
 					lineHeight - descent + 3);
 			//int lineY = ly + lineHeight - descent + 1;
@@ -683,7 +705,7 @@ public class TextSegment extends ParagraphSegment {
 	private void computeTextFragments(GC gc) {
 		if (textFragments != null)
 			return;
-		ArrayList<TextFragment> list = new ArrayList<>();
+		ArrayList list = new ArrayList();
 		BreakIterator wb = BreakIterator.getLineInstance();
 		wb.setText(getText());
 		int cursor = 0;
@@ -695,11 +717,10 @@ public class TextSegment extends ParagraphSegment {
 			list.add(new TextFragment((short) loc, (short) extent.x));
 			cursor = loc;
 		}
-		textFragments = list.toArray(new TextFragment[list
+		textFragments = (TextFragment[]) list.toArray(new TextFragment[list
 				.size()]);
 	}
-
-	@Override
+	
 	public void clearCache(String fontId) {
 		if (fontId==null && (this.fontId==null||this.fontId.equals(FormTextModel.BOLD_FONT_ID)))
 			textFragments = null;

@@ -22,7 +22,7 @@ import org.eclipse.ui.tests.internal.ForcedException;
  * This is a broken pulldown delegate that throws exceptions if you try to get
  * the menu. The purpose of this is simply sanity. Eclipse should be able to
  * start in the face of code broken like this.
- *
+ * 
  * @since 3.0
  */
 public final class BrokenWorkbenchWindowPulldownDelegate implements
@@ -41,8 +41,7 @@ public final class BrokenWorkbenchWindowPulldownDelegate implements
     /**
      * @see org.eclipse.ui.IWorkbenchWindowPulldownDelegate2#getMenu(org.eclipse.swt.widgets.Menu)
      */
-    @Override
-	public Menu getMenu(Menu parent) {
+    public Menu getMenu(Menu parent) {
         if (throwMenu) {
             throwMenu = false;
             throw new ForcedException(
@@ -55,8 +54,7 @@ public final class BrokenWorkbenchWindowPulldownDelegate implements
     /**
      * @see org.eclipse.ui.IWorkbenchWindowPulldownDelegate#getMenu(org.eclipse.swt.widgets.Control)
      */
-    @Override
-	public Menu getMenu(Control parent) {
+    public Menu getMenu(Control parent) {
         if (throwControl) {
             throwControl = false;
             throw new ForcedException(
@@ -69,30 +67,25 @@ public final class BrokenWorkbenchWindowPulldownDelegate implements
     /**
      * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
      */
-    @Override
-	public void dispose() {
-        if (menuControl != null) {
-			menuControl.dispose();
-		}
+    public void dispose() {
+        if (menuControl != null)
+            menuControl.dispose();
 
-        if (menuMenu != null) {
-			menuMenu.dispose();
-		}
+        if (menuMenu != null)
+            menuMenu.dispose();
     }
 
     /**
      * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
      */
-    @Override
-	public void init(IWorkbenchWindow window) {
+    public void init(IWorkbenchWindow window) {
         // Do nothing.
     }
 
     /**
      * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
      */
-    @Override
-	public void run(IAction action) {
+    public void run(IAction action) {
         // Do nothing.
     }
 
@@ -100,8 +93,7 @@ public final class BrokenWorkbenchWindowPulldownDelegate implements
      * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
      *      org.eclipse.jface.viewers.ISelection)
      */
-    @Override
-	public void selectionChanged(IAction action, ISelection selection) {
+    public void selectionChanged(IAction action, ISelection selection) {
         // Do nothing.
     }
 

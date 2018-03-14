@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Philipp Bumann <bumannp@gmail.com> - Bug 477602
  *******************************************************************************/
 package org.eclipse.e4.ui.progress.internal;
 
@@ -66,12 +65,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	// ProgressBar flags
 	private int flags;
-
+	
 	private FinishedJobs finishedJobs;
 
 	/**
 	 * Create an instance of the receiver in the supplied region.
-	 *
+	 * 
 	 * @param region
 	 *            The ProgressRegion that contains the receiver.
 	 * @param flags
@@ -86,7 +85,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		progressRegion = region;
 		mouseListener = new MouseAdapter() {
-			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				doAction();
 			}
@@ -116,12 +114,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 						removeTopElement(ji);
 					}
 
-					// To fix a bug (335543) introduced in 3.6.1.
-					// doAction() should return if progress region button was
-					// selected to open a job result action or command.
-					if (execute(ji, job)) {
-						return;
-					}
+					execute(ji, job);
 				}
 			}
 		}
@@ -133,16 +126,14 @@ public class ProgressAnimationItem extends AnimationItem implements
 	/**
 	 * @param ji
 	 * @param job
-	 * @return <code>true</code> if Action or Command is executed
 	 */
-	private boolean execute(JobInfo ji, Job job) {
+	private void execute(JobInfo ji, Job job) {
 
 		Object prop = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		if (prop instanceof IAction && ((IAction) prop).isEnabled()) {
 			IAction action = (IAction) prop;
 			action.run();
 			removeTopElement(ji);
-			return true;
 		}
 
 		prop = job.getProperty(IProgressConstants.COMMAND_PROPERTY);
@@ -150,16 +141,14 @@ public class ProgressAnimationItem extends AnimationItem implements
 			ParameterizedCommand command = (ParameterizedCommand) prop;
 			getEHandlerService().executeHandler(command);
 			removeTopElement(ji);
-			return true;
 		}
-		return false;
 	}
 
 	/**
 	 * @param ji
 	 */
 	private void removeTopElement(JobInfo ji) {
-		JobTreeElement topElement = ji.getParent();
+		JobTreeElement topElement = (JobTreeElement) ji.getParent();
 		if (topElement == null) {
 			topElement = ji;
 		}
@@ -234,22 +223,25 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolButton.setToolTipText(tt);
     	toolbar.setVisible(true);
 		toolbar.getParent().layout(); // must layout
-
+		
     	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-        	@Override
-			public void getName(AccessibleEvent e) {
+        	public void getName(AccessibleEvent e) {
         		e.result = tt;
         	}
         });
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createAnimationItem(Composite parent) {
 
 		if (okImage == null) {
 			Display display = parent.getDisplay();
 			ImageTools imageTools = ImageTools.getInstance();
-
+			
 			noneImage = imageTools.getImage("progress/progress_none.png", display); //$NON-NLS-1$
 			okImage = imageTools.getImage("progress/progress_ok.png", display); //$NON-NLS-1$
 			errorImage = imageTools.getImage("progress/progress_error.png", display); //$NON-NLS-1$
@@ -257,7 +249,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		top = new Composite(parent, SWT.NULL);
 		top.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				finishedJobs.removeListener(
 						ProgressAnimationItem.this);
@@ -302,7 +293,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		toolButton = new ToolItem(toolbar, SWT.NONE);
 		toolButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				doAction();
 			}
@@ -324,12 +314,20 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return (flags & SWT.HORIZONTAL) != 0;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
+	 */
 	public Control getControl() {
 		return top;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
+	 */
 	void animationDone() {
 		super.animationDone();
 		animationRunning = false;
@@ -347,7 +345,11 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return animationRunning;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
+	 */
 	void animationStart() {
 		super.animationStart();
 		animationRunning = true;
@@ -358,32 +360,28 @@ public class ProgressAnimationItem extends AnimationItem implements
 		refresh();
 	}
 
-	@Override
 	public void removed(JobTreeElement info) {
 		final Display display = Display.getDefault();
 		display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				refresh();
 			}
 		});
 	}
 
-	@Override
 	public void finished(final JobTreeElement jte) {
 		final Display display = Display.getDefault();
 		display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				refresh();
 			}
 		});
 	}
-
+	
 	protected StatusReporter getStatusReporter() {
 	    return Services.getInstance().getStatusReporter();
     }
-
+	
 	protected EHandlerService getEHandlerService() {
 		return Services.getInstance().getEHandlerService();
 	}
