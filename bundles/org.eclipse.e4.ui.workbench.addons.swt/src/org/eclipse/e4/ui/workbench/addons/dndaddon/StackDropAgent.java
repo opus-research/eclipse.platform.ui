@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Christian Hempe - feedback visibility
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
@@ -145,6 +144,11 @@ public class StackDropAgent extends DropAgent {
 		return -1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		dndManager.clearOverlay();
@@ -162,6 +166,11 @@ public class StackDropAgent extends DropAgent {
 		super.dragLeave(dragElement, info);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		if (!tabArea.contains(info.cursorPos) || dropStack == null || !dropStack.isToBeRendered())
@@ -184,18 +193,18 @@ public class StackDropAgent extends DropAgent {
 		} else {
 			if (dropIndex < dropCTF.getItemCount()) {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex).getBounds();
+				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
 				dndManager.frameRect(itemBounds);
 			} else if (dropCTF.getItemCount() > 0) {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex - 1).getBounds();
 				itemBounds.x = itemBounds.x + itemBounds.width;
+				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
-				if ((itemBounds.x + itemBounds.width) > (tabArea.x + tabArea.width)) {
-					itemBounds.width = tabArea.x + tabArea.width - itemBounds.x;
-				}
 				dndManager.frameRect(itemBounds);
 			} else {
 				Rectangle fr = new Rectangle(tabArea.x, tabArea.y, tabArea.width, tabArea.height);
+				fr.width = 2;
 				dndManager.frameRect(fr);
 			}
 
