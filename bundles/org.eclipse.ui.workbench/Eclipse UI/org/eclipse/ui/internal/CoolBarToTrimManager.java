@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237, 472654, 483842
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601, 445538
  ******************************************************************************/
 
@@ -47,7 +47,6 @@ import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.internal.provisional.action.ICoolBarManager2;
 import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
@@ -555,7 +554,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				// TODO: Hack to work around Bug 370961
 				ToolBar tb = manager.getControl();
 				if (tb != null && !tb.isDisposed()) {
-					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+					tb.requestLayout();
 				}
 			}
 		}
@@ -589,7 +588,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				// TODO: Hack to work around Bug 370961
 				ToolBar tb = manager.getControl();
 				if (tb != null && !tb.isDisposed()) {
-					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+					tb.requestLayout();
 				}
 			}
 		}
