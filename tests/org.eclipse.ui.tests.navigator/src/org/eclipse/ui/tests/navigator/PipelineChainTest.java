@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Fair Isaac Corporation.
+ * Copyright (c) 2009, 2013 Fair Isaac Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,24 +7,23 @@
  *
  * Contributors:
  *     Fair Isaac Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
  ******************************************************************************/
 
 package org.eclipse.ui.tests.navigator;
 
-import static org.junit.Assert.assertEquals;
+import org.eclipse.swt.widgets.TreeItem;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.swt.widgets.TreeItem;
+
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.extension.TestPipelineProvider;
-import org.junit.Test;
 
 /**
  * @since 3.3
@@ -70,14 +69,12 @@ public class PipelineChainTest extends NavigatorTestBase {
 		_contentService.getActivationService().activateExtensions(EXTENSIONS, true);
 	}
 
-	@Test
 	public void testPipelinedChildren() throws Exception
 	{
 		_initContent();
 		_testPipelinedChildren();
 	}
 
-	@Test
 	public void testPipelinedChildrenWithLabel() throws Exception
 	{
 		_initContentWithLabel();
@@ -104,7 +101,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 	}
 
 	/** Verifies that interceptAdd is called in the right sequence */
-	@Test
 	public void testInterceptAdd() throws CoreException
 	{
 		_initContent();
@@ -112,7 +108,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 	}
 
 	/** Verifies that interceptAdd is called in the right sequence */
-	@Test
 	public void testInterceptAddWithLabel() throws CoreException
 	{
 		_initContentWithLabel();
@@ -137,7 +132,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 
 	/** Verifies that interceptRemove is called in the right sequence */
 	// Bug 285529 Incorrect pipeline logic for interceptXXX methods
-	@Test
 	public void testInterceptRemove() throws CoreException
 	{
 		_initContent();
@@ -146,7 +140,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 
 	/** Verifies that interceptRemove is called in the right sequence */
 	// Bug 285529 Incorrect pipeline logic for interceptXXX methods
-	@Test
 	public void testInterceptRemoveWithLabel() throws CoreException
 	{
 		_initContentWithLabel();
@@ -175,7 +168,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 
 	/** Verifies that interceptRefresh or interceptUpdate is called in the right sequence */
 	// Bug 285529 Incorrect pipeline logic for interceptXXX methods
-	@Test
 	public void testInterceptRefreshOnChildTypeChange() throws CoreException
 	{
 		_initContent();
@@ -184,7 +176,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 
 	/** Verifies that interceptRefresh or interceptUpdate is called in the right sequence */
 	// Bug 285529 Incorrect pipeline logic for interceptXXX methods
-	@Test
 	public void testInterceptRefreshOnChildTypeChangeWithLabel() throws CoreException
 	{
 		_initContentWithLabel();
@@ -213,7 +204,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 
 
 	// Bug 285529 Incorrect pipeline logic for interceptXXX methods
-	@Test
 	public void testInterceptUpdate() throws CoreException
 	{
 		_initContent();
@@ -221,7 +211,6 @@ public class PipelineChainTest extends NavigatorTestBase {
 	}
 
 	// Bug 285529 Incorrect pipeline logic for interceptXXX methods
-	@Test
 	public void testInterceptUpdateWithLabel() throws CoreException
 	{
 		_initContentWithLabel();
