@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -1010,7 +1010,12 @@ public final class IDE {
 		}
 
 		IUnknownEditorStrategy strategy = getUnknowEditorStrategy();
-		IEditorDescriptor editorDesc = strategy.getEditorDescriptor(name, editorReg);
+		IEditorDescriptor editorDesc;
+		try {
+			editorDesc = strategy.getEditorDescriptor(name, editorReg);
+		} catch (CoreException e) {
+			throw new PartInitException(IDEWorkbenchMessages.IDE_noFileEditorFound, e);
+		}
 
 		// if no valid editor found, bail out
 		if (editorDesc == null) {
