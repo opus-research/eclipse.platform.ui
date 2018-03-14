@@ -12,6 +12,7 @@
 
 package org.eclipse.ui.internal;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.core.commands.Category;
@@ -83,11 +84,13 @@ public class CommandToModelProcessor {
 			try {
 				final MCategory categoryModel = categories.get(cmd.getCategory().getId());
 
-				MCommand command = CommandProcessingAddon.createCommand(cmd, modelService, categoryModel);
+				MCommand command = CommandProcessingAddon.createCommand(cmd, modelService,
+						categoryModel);
 
 				application.getCommands().add(command);
 				commands.put(command.getElementId(), command);
 			} catch (NotDefinedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -115,6 +118,26 @@ public class CommandToModelProcessor {
 				// issue
 				e.printStackTrace();
 			}
+		}
+	}
+
+	void setCommandFireEvents(CommandManager manager, boolean b) {
+		try {
+			Field f = CommandManager.class.getDeclaredField("shouldCommandFireEvents"); //$NON-NLS-1$
+			f.setAccessible(true);
+			f.set(manager, Boolean.valueOf(b));
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
