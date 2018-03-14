@@ -50,7 +50,7 @@ public class UIEventPublisher extends EContentAdapter {
 			return;
 
 		// Format the EMF event as an E4 UIEvent
-		Map<String, Object> argMap = new HashMap<>();
+		Map<String, Object> argMap = new HashMap<String, Object>();
 
 		String topic = formatData(notification, argMap);
 

@@ -33,7 +33,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 final class BundleFinder implements BundleTrackerCustomizer<List<Bundle>> {
 
 	/** Map of bundle symbolic name to the corresponding bundles (hint: different versions). */
-	private final ConcurrentMap<String, List<Bundle>> trackedBundles = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, List<Bundle>> trackedBundles = new ConcurrentHashMap<String, List<Bundle>>();
 
 	/**
 	 * Resolves the latest bundle with the given bundle symbolic name.
@@ -49,7 +49,7 @@ final class BundleFinder implements BundleTrackerCustomizer<List<Bundle>> {
 		if (bundlesWithSameSymName == null)
 			return null;
 
-		List<Bundle> snapshot = new ArrayList<>(bundlesWithSameSymName);
+		List<Bundle> snapshot = new ArrayList<Bundle>(bundlesWithSameSymName);
 
 		switch (snapshot.size()) {
 		case 0:
@@ -71,7 +71,7 @@ final class BundleFinder implements BundleTrackerCustomizer<List<Bundle>> {
 
 		List<Bundle> bundlesWithSameSymName = trackedBundles.get(bundleSymName);
 		if (bundlesWithSameSymName == null) {
-			bundlesWithSameSymName = new CopyOnWriteArrayList<>();
+			bundlesWithSameSymName = new CopyOnWriteArrayList<Bundle>();
 
 			if (trackedBundles.putIfAbsent(bundleSymName, bundlesWithSameSymName) != null) {
 				// some other thread has won the race, so we use his List object

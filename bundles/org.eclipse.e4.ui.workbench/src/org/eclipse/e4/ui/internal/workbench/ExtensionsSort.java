@@ -110,7 +110,7 @@ public class ExtensionsSort extends TopologicalSort<IExtension, Bundle> {
 			return Collections.emptySet();
 		}
 
-		Set<Bundle> required = new HashSet<>();
+		Set<Bundle> required = new HashSet<Bundle>();
 		addDependents(required, providerWiring);
 		return Collections.unmodifiableSet(required);
 	}

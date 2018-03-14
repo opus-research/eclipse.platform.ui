@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 468380
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -39,7 +40,7 @@ public final class UIPlugin extends AbstractUIPlugin {
     /**
      * Returns the image registry for this plugin.
      *
-     * Where are the images?  The images (typically gifs) are found in the
+     * Where are the images?  The images (typically png files) are found in the
      * same plugins directory.
      *
      * @see ImageRegistry
@@ -48,7 +49,8 @@ public final class UIPlugin extends AbstractUIPlugin {
      * the class WorkbenchGraphicResources provides convenience access to the graphics resources
      * and fast field access for some of the commonly used graphical images.
      */
-    protected ImageRegistry createImageRegistry() {
+    @Override
+	protected ImageRegistry createImageRegistry() {
         /* Just to be sure that we don't access this
          * plug-ins image registry.
          */
@@ -56,7 +58,8 @@ public final class UIPlugin extends AbstractUIPlugin {
         return null;
     }
 
-    public ImageRegistry getImageRegistry() {
+    @Override
+	public ImageRegistry getImageRegistry() {
         /* Just to be sure that we don't access this
          * plug-ins image registry.
          */
@@ -75,20 +78,20 @@ public final class UIPlugin extends AbstractUIPlugin {
     }
 
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-     */
-    public void start(BundleContext context) throws Exception {
+    @Override
+	public void start(BundleContext context) throws Exception {
         super.start(context);
 
         // set a callback allowing the workbench plugin to obtain
         // and save the UI plugin's preference store
         PrefUtil.setUICallback(new PrefUtil.ICallback() {
-            public IPreferenceStore getPreferenceStore() {
+            @Override
+			public IPreferenceStore getPreferenceStore() {
                 return UIPlugin.this.getPreferenceStore();
             }
 
-            public void savePreferences() {
+            @Override
+			public void savePreferences() {
                 UIPlugin.this.savePluginPreferences();
             }
         });
