@@ -515,13 +515,22 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	public static final int APPLICATION__DIALOGS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 15;
 
 	/**
+	 * The feature id for the '<em><b>Wizards</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int APPLICATION__WIZARDS = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 16;
+
+	/**
 	 * The number of structural features of the '<em>Application</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 16;
+	public static final int APPLICATION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 17;
 
 	/**
 	 * The operation id for the '<em>Update Localization</em>' operation.
@@ -856,7 +865,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 
 	/**
 	 * Creates, registers, and initializes the <b>Package</b> for this model, and for any others upon which it depends.
-	 *
+	 * 
 	 * <p>This method is used to initialize {@link ApplicationPackageImpl#eINSTANCE} when that field is accessed.
 	 * Clients should not invoke it directly. Instead, they should simply access that field to obtain the package.
 	 * <!-- begin-user-doc -->
@@ -903,7 +912,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		// Mark meta-data to indicate it can't be changed
 		theApplicationPackage.freeze();
 
-
+  
 		// Update the registry and return the package
 		EPackage.Registry.INSTANCE.put(ApplicationPackageImpl.eNS_URI, theApplicationPackage);
 		return theApplicationPackage;
@@ -1013,6 +1022,20 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 */
 	public EReference getApplication_Dialogs() {
 		return (EReference)applicationEClass.getEStructuralFeatures().get(3);
+	}
+
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link org.eclipse.e4.ui.model.application.MApplication#getWizards <em>Wizards</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Wizards</em>'.
+	 * @see org.eclipse.e4.ui.model.application.MApplication#getWizards()
+	 * @see #getApplication()
+	 * @generated
+	 */
+	public EReference getApplication_Wizards() {
+		return (EReference)applicationEClass.getEStructuralFeatures().get(4);
 	}
 
 
@@ -1241,6 +1264,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		createEReference(applicationEClass, APPLICATION__ADDONS);
 		createEReference(applicationEClass, APPLICATION__CATEGORIES);
 		createEReference(applicationEClass, APPLICATION__DIALOGS);
+		createEReference(applicationEClass, APPLICATION__WIZARDS);
 
 		applicationElementEClass = createEClass(APPLICATION_ELEMENT);
 		createEAttribute(applicationElementEClass, APPLICATION_ELEMENT__ELEMENT_ID);
@@ -1338,6 +1362,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		initEReference(getApplication_Addons(), this.getAddon(), null, "addons", null, 0, -1, MApplication.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEReference(getApplication_Categories(), theCommandsPackage.getCategory(), null, "categories", null, 0, -1, MApplication.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEReference(getApplication_Dialogs(), theBasicPackage.getDialog(), null, "dialogs", null, 0, -1, MApplication.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEReference(getApplication_Wizards(), theBasicPackage.getWizardDialog(), null, "wizards", null, 0, -1, MApplication.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(applicationElementEClass, MApplicationElement.class, "ApplicationElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getApplicationElement_ElementId(), ecorePackage.getEString(), "elementId", null, 0, 1, MApplicationElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
@@ -1443,6 +1468,14 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EReference APPLICATION__DIALOGS = eINSTANCE.getApplication_Dialogs();
+
+		/**
+		 * The meta object literal for the '<em><b>Wizards</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EReference APPLICATION__WIZARDS = eINSTANCE.getApplication_Wizards();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.impl.ApplicationElementImpl <em>Element</em>}' class.
