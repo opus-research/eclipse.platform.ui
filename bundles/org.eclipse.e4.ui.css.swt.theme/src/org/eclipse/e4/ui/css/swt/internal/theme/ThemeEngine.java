@@ -213,9 +213,8 @@ public class ThemeEngine implements IThemeEngine {
 			}
 		}
 
-		// register a default resolver for platform uri's
-		registerResourceLocator(new OSGiResourceLocator(""));
-		// register a default resolver for file uri's
+		//Resolve to install dir
+		registerResourceLocator(new OSGiResourceLocator("platform:/plugin/org.eclipse.platform/css/"));
 		registerResourceLocator(new FileResourcesLocatorImpl());
 		// FIXME: perhaps ResourcesLocatorManager shouldn't have a default?
 		// registerResourceLocator(new HttpResourcesLocatorImpl());
