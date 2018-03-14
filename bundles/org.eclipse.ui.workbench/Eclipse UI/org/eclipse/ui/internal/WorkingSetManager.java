@@ -109,8 +109,7 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 						new InputStreamReader(input, "utf-8")); //$NON-NLS-1$
 
 				IMemento memento = XMLMemento.createReadRoot(reader);
-				restoreWorkingSetState(memento);
-				restoreMruList(memento);
+				restoreState(memento);
 				reader.close();
 			} catch (IOException e) {
 				handleInternalError(
@@ -124,6 +123,12 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 						WorkbenchMessages.ProblemRestoringWorkingSetState_message);
 			}
 		}
+	}
+
+	private void restoreState(IMemento memento) {
+		restoreWorkingSetState(memento);
+		restoreMruList(memento);
+		restoreDefaultWorkingSet(memento);
 	}
 
 	/**
