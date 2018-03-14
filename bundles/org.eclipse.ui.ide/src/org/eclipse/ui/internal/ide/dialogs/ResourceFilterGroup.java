@@ -1459,7 +1459,7 @@ class FilterTypeUtil {
 				return new Integer(1);
 		}
 		if (property.equals(INHERITABLE))
-			return Boolean.valueOf(
+			return new Boolean(
 					(filter.getType() & IResourceFilterDescription.INHERITABLE) != 0);
 
 		if (property.equals(ARGUMENTS))
@@ -2052,7 +2052,7 @@ class FilterEditDialog extends TrayDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.INHERITABLE,
-						Boolean.valueOf(inherited.getSelection()));
+						new Boolean(inherited.getSelection()));
 			}
 		});
 		inherited.setSelection((((Boolean) FilterTypeUtil.getValue(filter,
