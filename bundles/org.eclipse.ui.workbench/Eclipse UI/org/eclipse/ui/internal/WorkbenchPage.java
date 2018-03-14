@@ -127,7 +127,6 @@ import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISaveablesSource;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IShowEditorInput;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
@@ -194,12 +193,14 @@ public class WorkbenchPage implements IWorkbenchPage {
 		public void partActivated(MPart part) {
 			// update the workbench window's current selection with the active
 			// part's selection
-			SelectionService service = (SelectionService) getWorkbenchWindow()
+			SelectionService windowSelectionService = (SelectionService) getWorkbenchWindow()
 					.getSelectionService();
-			service.updateSelection(getWorkbenchPart(part));
+			windowSelectionService.updateSelection(getWorkbenchPart(part));
 
 			updateActivations(part);
 			firePartActivated(part);
+
+			selectionService.notifyListeners(getWorkbenchPart(part));
 		}
 
 		@Override
@@ -840,6 +841,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	private EPartService partService;
 
+	private SelectionService selectionService;
+
 	private MApplication application;
 
 	private MWindow window;
@@ -1015,7 +1018,7 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public void addSelectionListener(ISelectionListener listener) {
 		selectionListeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addSelectionListener(listener);
+		selectionService.addSelectionListener(listener);
     }
 
     @Override
@@ -1026,13 +1029,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 			targetedSelectionListeners.put(partId, listeners);
 		}
 		listeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addSelectionListener(partId, listener);
+		selectionService.addSelectionListener(partId, listener);
     }
 
     @Override
 	public void addPostSelectionListener(ISelectionListener listener) {
 		postSelectionListeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addPostSelectionListener(listener);
+		selectionService.addPostSelectionListener(listener);
     }
 
     @Override
@@ -1044,7 +1047,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			targetedPostSelectionListeners.put(partId, listeners);
 		}
 		listeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addPostSelectionListener(partId, listener);
+		selectionService.addPostSelectionListener(partId, listener);
     }
     
     /**
@@ -1810,7 +1813,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 			broker.unsubscribe(childrenHandler);
 			partEvents.clear();
 
-			ISelectionService selectionService = getWorkbenchWindow().getSelectionService();
 			for (ISelectionListener listener : selectionListeners) {
 				selectionService.removeSelectionListener(listener);
 			}
@@ -2485,12 +2487,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public ISelection getSelection() {
-		return getWorkbenchWindow().getSelectionService().getSelection();
+		return selectionService.getSelection();
     }
 
     @Override
 	public ISelection getSelection(String partId) {
-		return getWorkbenchWindow().getSelectionService().getSelection(partId);
+		return selectionService.getSelection(partId);
     }
 
 	/**
@@ -2674,6 +2676,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		this.broker = broker;
 		this.window = window;
 		this.partService = partService;
+		selectionService = ContextInjectionFactory.make(SelectionService.class, window.getContext());
 
 		partService.addPartListener(e4PartListener);
 
@@ -3333,7 +3336,7 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public void removeSelectionListener(ISelectionListener listener) {
 		selectionListeners.remove(listener);
-		getWorkbenchWindow().getSelectionService().removeSelectionListener(listener);
+		selectionService.removeSelectionListener(listener);
     }
 
     @Override
@@ -3343,13 +3346,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 		if (listeners != null) {
 			listeners.remove(listener);
 		}
-		getWorkbenchWindow().getSelectionService().removeSelectionListener(partId, listener);
+		selectionService.removeSelectionListener(partId, listener);
     }
 
     @Override
 	public void removePostSelectionListener(ISelectionListener listener) {
 		postSelectionListeners.remove(listener);
-		getWorkbenchWindow().getSelectionService().removePostSelectionListener(listener);
+		selectionService.removePostSelectionListener(listener);
     }
 
     @Override
@@ -3359,7 +3362,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		if (listeners != null) {
 			listeners.remove(listener);
 		}
-		getWorkbenchWindow().getSelectionService().removePostSelectionListener(partId, listener);
+		selectionService.removePostSelectionListener(partId, listener);
     }
 
 
