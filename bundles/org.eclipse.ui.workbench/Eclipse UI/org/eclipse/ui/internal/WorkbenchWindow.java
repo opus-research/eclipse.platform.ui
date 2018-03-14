@@ -1539,33 +1539,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 * Assumes that busy cursor is active.
 	 */
 	private boolean busyClose(boolean remove) {
-		/*
-		 * Warning: Intricate flow of control and re-entrant invocations of this
-		 * method:
-		 *
-		 * - busyClose(true) is called from WorkbenchWindow#close() when the
-		 * user closes a workbench window.
-		 *
-		 * - busyClose(false) is called from Workbench#close(int, boolean). This
-		 * happens on File > Exit/Restart, [Mac] Quit Eclipse, AND ... tadaa ...
-		 * from busyClose(true) when the user closes the last window => [Case A]
-		 *
-		 * Additional complication: busyClose(true) can also be called again
-		 * when someone runs an event loop during the shutdown sequence. In that
-		 * case, the nested busyClose(true) should be dropped (bug 381555) =>
-		 * [Case B]
-		 */
-		if (closing) {
-			// [Case A] Window is already closing.
+		if (closing)
 			return false;
-		}
-		if (updateDisabled && remove) {
-			// [Case B] User closed this window, which triggered
-			// "workbench.close()", during which the user tried to close this
-			// window again.
-			return false;
-		}
-
 		// Whether the window was actually closed or not
 		boolean windowClosed = false;
 
@@ -2680,6 +2655,34 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	}
 
 	/**
+     * Tell the workbench window a visible state for the fastview bar. This is
+     * only applicable if the window configurer also wishes the fast view bar to
+     * be visible.
+     *
+     * @param visible
+     *            <code>true</code> or <code>false</code>
+     * @since 3.2
+     * @deprecated discontinued support for fast views
+     */
+    @Deprecated
+    public void setFastViewBarVisible(boolean visible) {
+        // not supported anymore
+    }
+
+     /**
+	 * Returns the visible state for the fastview bar of the workbench window.
+	 *
+	 * @return <code>false</code>
+	 * @since 3.2
+	 * @deprecated discontinued support for fast views
+	 */
+    @Deprecated
+    public boolean getFastViewBarVisible() {
+        // not supported anymore
+        return false;
+    }
+
+	/**
 	 * @param visible
 	 *            whether the perspective bar should be shown. This is only
 	 *            applicable if the window configurer also wishes either the
@@ -2707,6 +2710,15 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public boolean getStatusLineVisible() {
 		return statusLineVisible;
 	}
+
+    /**
+     * @return <code>false</code>
+     * @deprecated discontinued support for fast views
+     */
+    @Deprecated
+    public boolean getShowFastViewBars() {
+        return false;
+    }
 
 	protected boolean showTopSeperator() {
 		return false;
