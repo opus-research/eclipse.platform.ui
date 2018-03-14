@@ -1616,14 +1616,12 @@ getPreferenceStore(),
 	protected boolean resetFont(FontDefinition definition, boolean force) {
 		if (force || !isDefault(definition)) {
             FontData[] newFD;
-			if (definition.isOverridden()) {
-				newFD = definition.getValue();
-			} else if (!force && definition.getDefaultsTo() != null) {
+			if (!force && definition.getDefaultsTo() != null)
                 newFD = getFontAncestorValue(definition);
-			} else {
+            else
 				newFD = PreferenceConverter.getDefaultFontDataArray(getPreferenceStore(),
 						createPreferenceKey(definition));
-			}
+
             if (newFD != null) {
 				setFontPreferenceValue(definition, newFD, true);
 				refreshElement(definition);
@@ -1718,7 +1716,7 @@ getPreferenceStore(),
         return null;
     }
 
-	private CascadingThemeExt getCascadingTheme() {
+    private ITheme getCascadingTheme() {
 		if (cascadingTheme == null) {
 			cascadingTheme = new CascadingThemeExt(currentTheme, colorRegistry, fontRegistry);
 		}
@@ -2210,12 +2208,12 @@ getPreferenceStore(),
 	}
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
-		if (definition instanceof ColorDefinition) {
-			RGB value = ((ColorDefinition) definition).getValue();
-			return value != null && value != EMPTY_COLOR_VALUE
-					&& colorRegistry.get(definition.getId()) != null;
+		if (definition instanceof FontDefinition) {
+			return fontRegistry.get(definition.getId()) != null;
 		}
-		return true;
+		RGB value = ((ColorDefinition) definition).getValue();
+		return value != null && value != EMPTY_COLOR_VALUE
+				&& colorRegistry.get(definition.getId()) != null;
 	}
 
 	private String fomatDescription(ThemeElementDefinition definition) {
@@ -2241,7 +2239,7 @@ getPreferenceStore(),
 		
 		Object newValue = definition instanceof ColorDefinition ? 
 			((ColorDefinition) definition).getValue(): ((FontDefinition) definition).getValue();
-		getCascadingTheme().fire(new PropertyChangeEvent(this, definition.getId(), null, newValue));
+		cascadingTheme.fire(new PropertyChangeEvent(this, definition.getId(), null, newValue));
 	}
 
 	private static class CascadingThemeExt extends CascadingTheme {
