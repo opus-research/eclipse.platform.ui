@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -195,14 +195,12 @@ public class ExpandableComposite extends Canvas {
 	 *             turned into static and hidden in the future versions. Do not
 	 *             use them and do not change its value.
 	 */
-	@Deprecated
 	protected int VGAP = 3;
 	/**
 	 * @deprecated this variable was left as protected by mistake. It will be
 	 *             turned into static and hidden in the future versions. Do not
 	 *             use it and do not change its value.
 	 */
-	@Deprecated
 	protected int GAP = 4;
 
 	static final int IGAP = 4;
@@ -254,7 +252,6 @@ public class ExpandableComposite extends Canvas {
 			}
 		}
 
-		@Override
 		protected void layout(Composite parent, boolean changed) {
 			initCache(changed);
 
@@ -394,7 +391,6 @@ public class ExpandableComposite extends Canvas {
 			}
 		}
 
-		@Override
 		protected Point computeSize(Composite parent, int wHint, int hHint,
 				boolean changed) {
 			initCache(changed);
@@ -514,12 +510,16 @@ public class ExpandableComposite extends Canvas {
 			return result;
 		}
 
-		@Override
 		public int computeMinimumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.ui.forms.parts.ILayoutExtension#computeMinimumWidth(org.eclipse.swt.widgets.Composite,
+		 *      boolean)
+		 */
 		public int computeMaximumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 		}
@@ -557,7 +557,6 @@ public class ExpandableComposite extends Canvas {
 		super.setLayout(new ExpandableLayout());
 		if (hasTitleBar()) {
 			this.addPaintListener(new PaintListener() {
-				@Override
 				public void paintControl(PaintEvent e) {
 					onPaint(e);
 				}
@@ -574,13 +573,11 @@ public class ExpandableComposite extends Canvas {
 		if (toggle != null) {
 			toggle.setExpanded(expanded);
 			toggle.addHyperlinkListener(new HyperlinkAdapter() {
-				@Override
 				public void linkActivated(HyperlinkEvent e) {
 					toggleState();
 				}
 			});
 			toggle.addPaintListener(new PaintListener() {
-				@Override
 				public void paintControl(PaintEvent e) {
 					if (textLabel instanceof Label && !isFixedStyle())
 						textLabel.setForeground(toggle.hover ? toggle
@@ -589,7 +586,6 @@ public class ExpandableComposite extends Canvas {
 				}
 			});
 			toggle.addKeyListener(new KeyAdapter() {
-				@Override
 				public void keyPressed(KeyEvent e) {
 					if (e.keyCode == SWT.ARROW_UP) {
 						verticalMove(false);
@@ -603,14 +599,12 @@ public class ExpandableComposite extends Canvas {
 			if ((getExpansionStyle()&FOCUS_TITLE)==0) {
 				toggle.paintFocus=false;
 				toggle.addFocusListener(new FocusListener() {
-					@Override
 					public void focusGained(FocusEvent e) {
 						if (textLabel != null) {
 						    textLabel.redraw();
 						}
 					}
 
-					@Override
 					public void focusLost(FocusEvent e) {
 						if (textLabel != null) {
 						    textLabel.redraw();
@@ -622,7 +616,6 @@ public class ExpandableComposite extends Canvas {
 		if ((expansionStyle & FOCUS_TITLE) != 0) {
 			Hyperlink link = new Hyperlink(this, SWT.WRAP);
 			link.addHyperlinkListener(new HyperlinkAdapter() {
-				@Override
 				public void linkActivated(HyperlinkEvent e) {
 					programmaticToggleState();
 				}
@@ -633,7 +626,6 @@ public class ExpandableComposite extends Canvas {
 			if (!isFixedStyle()) {
 				label.setCursor(FormsResources.getHandCursor());
 				Listener listener = new Listener() {
-					@Override
 					public void handleEvent(Event e) {
 						switch (e.type) {
 						case SWT.MouseDown:
@@ -679,7 +671,6 @@ public class ExpandableComposite extends Canvas {
 		if (textLabel != null) {
 			textLabel.setMenu(getMenu());
 			textLabel.addTraverseListener(new TraverseListener() {
-				@Override
 				public void keyTraversed(TraverseEvent e) {
 					if (e.detail == SWT.TRAVERSE_MNEMONIC) {
 						// steal the mnemonic
@@ -698,7 +689,9 @@ public class ExpandableComposite extends Canvas {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#forceFocus()
+	 */
 	public boolean forceFocus() {
 		return false;
 	}
@@ -710,7 +703,6 @@ public class ExpandableComposite extends Canvas {
 	 *            the menu from the parent to attach to this control.
 	 */
 
-	@Override
 	public void setMenu(Menu menu) {
 		if (textLabel != null)
 			textLabel.setMenu(menu);
@@ -721,14 +713,12 @@ public class ExpandableComposite extends Canvas {
 	 * Prevents assignment of the layout manager - expandable composite uses its
 	 * own layout.
 	 */
-	@Override
 	public final void setLayout(Layout layout) {
 	}
 
 	/**
 	 * Sets the background of all the custom controls in the expandable.
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if ((getExpansionStyle() & TITLE_BAR) == 0) {
@@ -742,7 +732,6 @@ public class ExpandableComposite extends Canvas {
 	/**
 	 * Sets the foreground of all the custom controls in the expandable.
 	 */
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		if (textLabel != null)
@@ -777,7 +766,6 @@ public class ExpandableComposite extends Canvas {
 	/**
 	 * Sets the fonts of all the custom controls in the expandable.
 	 */
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (textLabel != null)
@@ -786,7 +774,12 @@ public class ExpandableComposite extends Canvas {
 			toggle.setFont(font);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
+	 */
+
 	public void setEnabled(boolean enabled) {
 		if (textLabel != null)
 			textLabel.setEnabled(enabled);
@@ -836,7 +829,6 @@ public class ExpandableComposite extends Canvas {
 		layout();
 	}
 
-	@Override
 	public void setToolTipText(String string) {
 		super.setToolTipText(string);
 		// Also set on label, otherwise it's just on the background without text.
@@ -965,7 +957,6 @@ public class ExpandableComposite extends Canvas {
 	 *
 	 * @see org.eclipse.swt.widgets.Composite#computeSize
 	 */
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
 		Point size;

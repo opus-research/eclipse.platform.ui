@@ -13,7 +13,6 @@ package org.eclipse.ui.views.framelist;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -187,11 +186,14 @@ public class TreeFrame extends Frame {
      */
     private void saveElements(Object[] elements, IMemento memento) {
         for (int i = 0; i < elements.length; i++) {
-			IPersistableElement persistable = Adapters.adapt(elements[i], IPersistableElement.class);
-			if (persistable != null) {
-				IMemento elementMem = memento.createChild(TAG_ELEMENT);
-				elementMem.putString(TAG_FACTORY_ID, persistable.getFactoryId());
-				persistable.saveState(elementMem);
+            if (elements[i] instanceof IAdaptable) {
+                IPersistableElement persistable = ((IAdaptable) elements[i]).getAdapter(IPersistableElement.class);
+                if (persistable != null) {
+                    IMemento elementMem = memento.createChild(TAG_ELEMENT);
+                    elementMem.putString(TAG_FACTORY_ID, persistable
+                            .getFactoryId());
+                    persistable.saveState(elementMem);
+                }
             }
         }
     }
@@ -202,7 +204,11 @@ public class TreeFrame extends Frame {
      * @param memento memento to persist the frame state in.
      */
     public void saveState(IMemento memento) {
-		IPersistableElement persistable = Adapters.adapt(input, IPersistableElement.class);
+        if (!(input instanceof IAdaptable)) {
+			return;
+		}
+
+        IPersistableElement persistable = ((IAdaptable) input).getAdapter(IPersistableElement.class);
         if (persistable != null) {
             IMemento frameMemento = memento.createChild(TAG_FRAME_INPUT);
 

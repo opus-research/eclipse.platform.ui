@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -88,7 +88,12 @@ public class ProgressRegion {
         gc.dispose();
 
         region = new Composite(parent, SWT.NONE) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int,
+			 *      boolean)
+			 */
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				Point size = super.computeSize(wHint, hHint, changed);
 				if (isHorizontal(side))
@@ -128,8 +133,10 @@ public class ProgressRegion {
         animationItem.createControl(region);
 
         animationItem.setAnimationContainer(new AnimationItem.IAnimationContainer() {
-            @Override
-			public void animationDone() {
+            /* (non-Javadoc)
+             * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationDone()
+             */
+            public void animationDone() {
                 //Add an extra refresh to the viewer in case
                 //of stale input if the controls are not disposed
                 if (viewer.getControl().isDisposed()) {
@@ -138,8 +145,10 @@ public class ProgressRegion {
                 viewer.refresh();
             }
 
-            @Override
-			public void animationStart() {
+            /* (non-Javadoc)
+             * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationStart()
+             */
+            public void animationStart() {
                 // Nothing by default here.
 
             }
@@ -155,8 +164,12 @@ public class ProgressRegion {
         animationItem.getControl().setLayoutData(gd);
 
         viewerControl.addMouseListener(new MouseAdapter() {
-            @Override
-			public void mouseDoubleClick(MouseEvent e) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseAdapter#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+             */
+            public void mouseDoubleClick(MouseEvent e) {
                 processDoubleClick();
             }
         });
@@ -169,8 +182,7 @@ public class ProgressRegion {
         viewer.setLabelProvider(new ProgressViewerLabelProvider(viewerControl));
         viewer.setComparator(ProgressManagerUtil.getProgressViewerComparator());
         viewer.addFilter(new ViewerFilter() {
-            @Override
-			public boolean select(Viewer viewer, Object parentElement, Object element) {
+            public boolean select(Viewer viewer, Object parentElement, Object element) {
                 if (element instanceof JobInfo) {
                     JobInfo info= (JobInfo)element;
                     if (info.isBlocked() || info.getJob().getState() == Job.WAITING) {
@@ -209,6 +221,9 @@ public class ProgressRegion {
         ProgressManagerUtil.openProgressView();
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.IWindowTrim#dock(int)
+	 */
 	public void dock(int dropSide) {
 		int oldSide = side;
 		side = dropSide;
@@ -258,6 +273,9 @@ public class ProgressRegion {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.IWindowTrim#getId()
+	 */
 	public String getId() {
 		return "org.eclipse.ui.internal.progress.ProgressRegion"; //$NON-NLS-1$
 	}
@@ -266,18 +284,32 @@ public class ProgressRegion {
 		return ProgressMessages.TrimCommon_Progress_TrimName;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.IWindowTrim#getValidSides()
+	 */
 	public int getValidSides() {
 		return SWT.BOTTOM | SWT.TOP | SWT.LEFT | SWT.RIGHT ;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.IWindowTrim#isCloseable()
+	 */
 	public boolean isCloseable() {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.IWindowTrim#handleClose()
+	 */
 	public void handleClose() {
 		// nothing to do...
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IWindowTrim#getWidthHint()
+	 */
 	public int getWidthHint() {
 		return fWidthHint;
 	}
@@ -290,6 +322,11 @@ public class ProgressRegion {
 		fWidthHint = w;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IWindowTrim#getHeightHint()
+	 */
 	public int getHeightHint() {
 		return fHeightHint;
 	}
@@ -302,6 +339,9 @@ public class ProgressRegion {
 		fHeightHint = h;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWindowTrim#isResizeable()
+	 */
 	public boolean isResizeable() {
 		return false;
 	}

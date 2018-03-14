@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
@@ -44,7 +43,7 @@ final class ViewIntroAdapterSite implements IIntroSite {
 
     @Override
 	public <T> T getAdapter(Class<T> adapter) {
-		return Adapters.adapt(viewSite, adapter);
+        return viewSite.getAdapter(adapter);
     }
 
     @Override

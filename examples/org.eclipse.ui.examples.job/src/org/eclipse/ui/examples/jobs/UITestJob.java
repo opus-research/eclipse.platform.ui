@@ -28,7 +28,6 @@ public class UITestJob extends UIJob {
 		if (lock)
 			setRule(ResourcesPlugin.getWorkspace().getRoot());
 	}
-	@Override
 	public IStatus runInUIThread(IProgressMonitor monitor) {
 		if (failure)
 			throw new RuntimeException();

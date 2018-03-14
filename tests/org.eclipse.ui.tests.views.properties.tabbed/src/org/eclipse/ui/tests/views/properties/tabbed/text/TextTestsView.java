@@ -38,7 +38,6 @@ public class TextTestsView extends ViewPart implements
 
 	private TextViewer viewer;
 
-	@Override
 	public void createPartControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		FormLayout layout = new FormLayout();
@@ -68,7 +67,6 @@ public class TextTestsView extends ViewPart implements
 		getSite().setSelectionProvider(viewer);
 	}
 
-	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IPropertySheetPage.class) {
 			if (tabbedPropertySheetPage == null) {
@@ -79,7 +77,6 @@ public class TextTestsView extends ViewPart implements
 		return super.getAdapter(adapter);
 	}
 
-	@Override
 	public String getContributorId() {
 		return "org.eclipse.ui.tests.views.properties.tabbed.text"; //$NON-NLS-1$
 	}
@@ -92,7 +89,6 @@ public class TextTestsView extends ViewPart implements
 		return viewer;
 	}
 
-	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

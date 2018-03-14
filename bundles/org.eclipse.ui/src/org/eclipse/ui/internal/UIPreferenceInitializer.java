@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
@@ -40,7 +40,6 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	@Override
 	public void initializeDefaultPreferences() {
 
 
@@ -177,8 +176,15 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 		rootNode
 				.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
-
-					@Override
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #added(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
 					public void added(NodeChangeEvent event) {
 						if (!event.getChild().name().equals(uiName)) {
 							return;
@@ -189,7 +195,15 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 					}
 
-					@Override
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #removed(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
 					public void removed(NodeChangeEvent event) {
 						// Nothing to do here
 

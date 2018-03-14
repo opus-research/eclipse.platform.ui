@@ -46,6 +46,9 @@ public class TrimDragPreferenceDialog extends Dialog {
 		super(parentShell);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -92,6 +95,9 @@ public class TrimDragPreferenceDialog extends Dialog {
 		return composite;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	@Override
 	protected void okPressed() {
 		// Update the 'threshold' pref

@@ -58,6 +58,9 @@ public class BasicNewFolderResourceWizard extends BasicNewResourceWizard {
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public void addPages() {
         super.addPages();
@@ -65,6 +68,9 @@ public class BasicNewFolderResourceWizard extends BasicNewResourceWizard {
         addPage(mainPage);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         super.init(workbench, currentSelection);
@@ -72,6 +78,9 @@ public class BasicNewFolderResourceWizard extends BasicNewResourceWizard {
         setNeedsProgressMonitor(true);
     }
 
+    /* (non-Javadoc)
+     * Method declared on BasicNewResourceWizard.
+     */
     @Override
 	protected void initializeDefaultPageImageDescriptor() {
       ImageDescriptor desc = IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/newfolder_wiz.png");//$NON-NLS-1$
@@ -79,6 +88,9 @@ public class BasicNewFolderResourceWizard extends BasicNewResourceWizard {
 
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public boolean performFinish() {
         IFolder folder = mainPage.createNewFolder();

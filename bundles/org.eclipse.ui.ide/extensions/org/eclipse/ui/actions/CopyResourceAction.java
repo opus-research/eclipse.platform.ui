@@ -113,7 +113,12 @@ public class CopyResourceAction extends SelectionListenerAction implements
 	CopyResourceAction(final Shell shell, String name) {
         super(name);
         Assert.isNotNull(shell);
-        shellProvider = () -> shell;
+        shellProvider = new IShellProvider(){
+        	@Override
+			public Shell getShell(){
+        		return shell;
+        	}
+        };
         initAction();
     }
 
@@ -225,6 +230,9 @@ public class CopyResourceAction extends SelectionListenerAction implements
         return null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void run() {
         try {

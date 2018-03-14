@@ -79,6 +79,11 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 		return PROVIDED_SOURCE_NAMES;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.AbstractSourceProvider#initialize(org.eclipse.ui.services.IServiceLocator)
+	 */
 	@Override
 	public void initialize(IServiceLocator locator) {
 		contextService = locator

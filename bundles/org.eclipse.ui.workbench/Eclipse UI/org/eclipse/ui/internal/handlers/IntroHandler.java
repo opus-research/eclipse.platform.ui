@@ -37,6 +37,13 @@ public class IntroHandler extends AbstractHandler {
 		introDescriptor = workbench.getIntroDescriptor();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) {
 
@@ -51,6 +58,11 @@ public class IntroHandler extends AbstractHandler {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
 	@Override
 	public boolean isEnabled() {
 

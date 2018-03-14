@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
  *     Denis Zygann <d.zygann@web.de> - Bug 330453
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -74,9 +73,9 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 	private String defaultPerspectiveId;
 
-	private ArrayList<IPerspectiveDescriptor> perspToDelete = new ArrayList<>();
+	private ArrayList<IPerspectiveDescriptor> perspToDelete = new ArrayList<IPerspectiveDescriptor>();
 
-	private ArrayList<IPerspectiveDescriptor> perspToRevert = new ArrayList<>();
+	private ArrayList<IPerspectiveDescriptor> perspToRevert = new ArrayList<IPerspectiveDescriptor>();
 
 	private Table perspectivesTable;
 
@@ -247,7 +246,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		// Populate the perspectivesTable
 		IPerspectiveDescriptor[] persps = perspectiveRegistry.getPerspectives();
-		perspectives = new ArrayList<>(persps.length);
+		perspectives = new ArrayList<IPerspectiveDescriptor>(persps.length);
 		for (int i = 0; i < persps.length; i++) {
 			perspectives.add(i, persps[i]);
 		}
