@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 
 package org.eclipse.ui.internal.preferences;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -50,29 +50,28 @@ public class WorkingSetSettingsTransfer extends WorkbenchSettingsTransfer {
 	 */
 	@Override
 	public IStatus transferSettings(IPath newWorkspaceRoot) {
-		IPath dataLocation = getNewWorkbenchStateLocation(newWorkspaceRoot);
-
-		if (dataLocation == null)
-			return noWorkingSettingsStatus();
-
-		dataLocation = dataLocation
+		IPath newDataLocation = getDataLocation(newWorkspaceRoot);
+		createDirectoryHierarchy(newDataLocation);
+		IPath workingSetState = newDataLocation
 				.append(WorkingSetManager.WORKING_SET_STATE_FILENAME);
+		return saveWorkingSetState(workingSetState.toOSString());
+	}
 
-		File stateFile = new File(dataLocation.toOSString());
-
+	private IStatus saveWorkingSetState(String targetFileLocation) {
 		try {
 			IWorkingSetManager manager = PlatformUI.getWorkbench()
 					.getWorkingSetManager();
-			if (manager instanceof AbstractWorkingSetManager)
-				((AbstractWorkingSetManager) manager).saveState(stateFile);
-			else
+			if (manager instanceof AbstractWorkingSetManager) {
+				File targetFile = new File(targetFileLocation);
+				((AbstractWorkingSetManager) manager).saveState(targetFile);
+			} else {
 				return new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
 						WorkbenchMessages.WorkingSets_CannotSave);
+			}
 		} catch (IOException e) {
 			new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
 					WorkbenchMessages.ProblemSavingWorkingSetState_message, e);
 		}
 		return Status.OK_STATUS;
-
 	}
 }
