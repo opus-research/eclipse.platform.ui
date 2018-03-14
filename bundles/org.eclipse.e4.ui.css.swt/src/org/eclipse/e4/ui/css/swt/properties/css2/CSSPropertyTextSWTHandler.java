@@ -14,7 +14,6 @@ import org.eclipse.e4.ui.css.core.dom.properties.css2.AbstractCSSPropertyTextHan
 import org.eclipse.e4.ui.css.core.dom.properties.css2.ICSSPropertyTextHandler;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
-import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
 import org.eclipse.e4.ui.css.swt.helpers.SWTElementHelpers;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -68,12 +67,13 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 			if (widget instanceof CTabItem) {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {
-					CSSSWTColorHelper.setSelectionForeground(folder, newColor);
+					folder.setSelectionForeground(newColor);
 				} else {
-					CSSSWTColorHelper.setForeground(folder, newColor);
+					folder.setForeground(newColor);
 				}
-			} else if (widget instanceof Control) {
-				CSSSWTColorHelper.setForeground((Control) widget, newColor);
+			}
+			else if (widget instanceof Control) {
+				((Control) widget).setForeground(newColor);
 			}
 		}
 	}

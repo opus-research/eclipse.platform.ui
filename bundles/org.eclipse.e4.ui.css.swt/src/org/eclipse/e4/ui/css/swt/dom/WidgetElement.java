@@ -96,29 +96,9 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 	}
 
 	/**
-	 * Convenience method for requesting the CSS engine to re-apply styles to a
-	 * widget.
-	 *
-	 * @param widget
-	 *            widget to be restyled
-	 * @param applyStylesToChildNodes
-	 *            if true, apply styles to the child nodes
-	 */
-	public static void applyStyles(Widget widget,
-			boolean applyStylesToChildNodes) {
-		CSSEngine engine = getEngine(widget);
-		if (engine != null) {
-			engine.applyStyles(widget, applyStylesToChildNodes);
-		}
-	}
-
-	/**
 	 * Convenience method for setting the CSS engine responsible for a display.
-	 *
-	 * @param widget
-	 *            SWT display which is styled by an engine
-	 * @param engine
-	 *            Engine to be associated with the display
+	 * @param widget SWT display which is styled by an engine
+	 * @param engine Engine to be associated with the display
 	 */
 	public static void setEngine(Display display, CSSEngine engine) {
 		display.setData(CSSSWTConstants.CSS_ENGINE_KEY, engine);
@@ -154,7 +134,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		// for inner classes, the hyphen is used, e.g., for Outer$Inner,
 		// the selector is Outer-Inner {background-color:red;}
 		Widget widget = getWidget();
-		Class<?> clazz = widget.getClass();
+		Class clazz = widget.getClass();
 		return ClassUtils.getSimpleName(clazz);
 	}
 
@@ -172,7 +152,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		// @namespace eclipse org.eclipse.swt.widgets.Label
 		// ex : eclipse|Label {background-color:red;}
 		Widget widget = getWidget();
-		Class<?> clazz = widget.getClass();
+		Class clazz = widget.getClass();
 		return ClassUtils.getPackageName(clazz);
 	}
 
@@ -314,10 +294,5 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 	}
 
 	public void reset() {
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + ": " + getWidget();
 	}
 }
