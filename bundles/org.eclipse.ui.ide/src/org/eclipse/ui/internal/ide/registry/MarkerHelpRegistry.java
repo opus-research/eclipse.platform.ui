@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,9 +70,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 
 	private class QueryComparator implements Comparator {
-		/*
-		 * (non-Javadoc) Method declared on Object.
-		 */
 		@Override
 		public boolean equals(Object o) {
 			if (!(o instanceof QueryComparator)) {
@@ -81,9 +78,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 			return true;
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on Comparator.
-		 */
 		@Override
 		public int compare(Object o1, Object o2) {
 			// more attribues come first
@@ -103,9 +97,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IMarkerHelpRegistry.
-	 */
 	@Override
 	public String getHelp(IMarker marker) {
 		if (sortedHelpQueries == null) {
@@ -139,9 +130,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IMarkerHelpRegistry.
-	 */
 	@Override
 	public boolean hasResolutions(IMarker marker) {
 		// Detect a match
@@ -222,9 +210,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IMarkerHelpRegistry#getResolutions(org.eclipse.core.resources.IMarker)
-	 */
 	@Override
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		// Collect all matches
