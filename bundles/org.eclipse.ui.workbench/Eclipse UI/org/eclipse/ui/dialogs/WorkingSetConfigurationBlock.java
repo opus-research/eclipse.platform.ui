@@ -8,9 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - bug 201661
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 483425
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
+import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,7 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -45,8 +46,6 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.dialogs.SimpleWorkingSetSelectionDialog;
-
-import com.ibm.icu.text.Collator;
 
 /**
  * Instances of this class provide a reusable composite with controls that allow
@@ -115,6 +114,19 @@ public class WorkingSetConfigurationBlock {
 	/**
 	 * Create a new instance of this working set block using default labels.
 	 *
+	 * @param settings
+	 *            to store/load the selection history
+	 * @param workingSetIds
+	 *            working set ids from which the user can choose
+	 * @since 3.108
+	 */
+	public WorkingSetConfigurationBlock(IDialogSettings settings, String... workingSetIds) {
+		this(workingSetIds, settings, null, null, null);
+	}
+
+	/**
+	 * Create a new instance of this working set block using default labels.
+	 *
 	 * @param workingSetIds
 	 *            working set ids from which the user can choose
 	 * @param settings
@@ -123,6 +135,28 @@ public class WorkingSetConfigurationBlock {
 	public WorkingSetConfigurationBlock(String[] workingSetIds,
 			IDialogSettings settings) {
 		this(workingSetIds, settings, null, null, null);
+	}
+
+	/**
+	 * Create a new instance of this working set block using custom labels.
+	 *
+	 * @param settings
+	 *            to store/load the selection history
+	 * @param addButtonLabel
+	 *            the label to use for the checkable enablement button. May be
+	 *            <code>null</code> to use the default value.
+	 * @param comboLabel
+	 *            the label to use for the recent working set combo. May be
+	 *            <code>null</code> to use the default value.
+	 * @param selectLabel
+	 *            the label to use for the select button. May be
+	 *            <code>null</code> to use the default value.
+	 * @param workingSetIds
+	 *            working set ids from which the user can choose
+	 * @since 3.108
+	 */
+	public WorkingSetConfigurationBlock(IDialogSettings settings, String addButtonLabel, String comboLabel, String selectLabel, String... workingSetIds) {
+		this(workingSetIds, settings, addButtonLabel, comboLabel, selectLabel);
 	}
 
 	/**
@@ -186,7 +220,7 @@ public class WorkingSetConfigurationBlock {
 	 * @param workingSets
 	 *            the working sets
 	 */
-	public void setWorkingSets(IWorkingSet[] workingSets) {
+	public void setWorkingSets(IWorkingSet... workingSets) {
 		selectedWorkingSets = filterWorkingSets(Arrays.asList(workingSets));
 		if (workingSetCombo != null)
 			updateSelectedWorkingSets();
@@ -441,8 +475,7 @@ public class WorkingSetConfigurationBlock {
 		settings.put(WORKINGSET_SELECTION_HISTORY, history);
 	}
 
-	private ArrayList loadSelectionHistory(IDialogSettings settings,
-			String[] workingSetIds) {
+	private ArrayList loadSelectionHistory(IDialogSettings settings, String... workingSetIds) {
 		String[] strings = settings.getArray(WORKINGSET_SELECTION_HISTORY);
 		if (strings == null || strings.length == 0)
 			return new ArrayList();
