@@ -16,7 +16,6 @@ package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -165,14 +164,12 @@ public class ModelAssembler {
 				continue;
 			}
 
-			for (Iterator<MApplicationElement> it = elements.iterator(); it.hasNext();) {
-				MApplicationElement el = it.next();
+			for (MApplicationElement el : elements) {
 				EObject o = (EObject) el;
 
 				E4XMIResource r = (E4XMIResource) o.eResource();
 
 				if (checkExist && applicationResource.getIDToEObjectMap().containsKey(r.getID(o))) {
-					it.remove();
 					continue;
 				}
 

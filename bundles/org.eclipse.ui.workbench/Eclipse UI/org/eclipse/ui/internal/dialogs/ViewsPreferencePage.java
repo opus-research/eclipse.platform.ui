@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -41,7 +42,6 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -139,7 +139,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 				} else {
 					themeComboDecorator.hide();
 				}
-				engine.setTheme(selection, false);
 				try {
 					((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
 							.setSelection(selection);
@@ -223,12 +222,12 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	/** @return the currently selected theme or null if there are no themes */
 	private ITheme getSelectedTheme() {
-		return (ITheme) ((IStructuredSelection) themeIdCombo.getSelection()).getFirstElement();
+		return (ITheme) (themeIdCombo.getStructuredSelection().getFirstElement());
 	}
 
 	@Override
 	public void init(IWorkbench workbench) {
-		MApplication application = (MApplication) workbench.getService(MApplication.class);
+		MApplication application = workbench.getService(MApplication.class);
 		IEclipseContext context = application.getContext();
 		defaultTheme = (String) context.get(E4Application.THEME_ID);
 		engine = context.get(IThemeEngine.class);
@@ -463,8 +462,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private ColorsAndFontsTheme getSelectedColorsAndFontsTheme() {
-		return (ColorsAndFontsTheme) ((IStructuredSelection) colorsAndFontsThemeCombo
-				.getSelection()).getFirstElement();
+		return (ColorsAndFontsTheme) colorsAndFontsThemeCombo.getStructuredSelection().getFirstElement();
 	}
 
 	private ColorsAndFontsTheme getCurrentColorsAndFontsTheme() {
