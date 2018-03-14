@@ -48,7 +48,8 @@ public class BusyShowWhileDialog extends IconAndMessageDialog {
 				try {
 					ProgressManager.getInstance().busyCursorWhile(new IRunnableWithProgress() {
 						@Override
-						public void run(IProgressMonitor monitor) {
+						public void run(IProgressMonitor monitor) throws InvocationTargetException,
+								InterruptedException {
 							long time = System.currentTimeMillis();
 							long delay = PlatformUI.getWorkbench().getProgressService().getLongOperationTime();
 							long end = time + delay + delay;
