@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
  * Tests UpdatableTreeContentProvider and DirtyIndicationLabelProvider. Creates
  * a tree containing three randomly-generated sets of integers, and one node
  * that contains the union of the other sets.
- *
+ * 
  * @since 1.0
  */
 public class LabelProviderTest2 {
@@ -60,6 +60,11 @@ public class LabelProviderTest2 {
 	private Button renameButton;
 
 	private SelectionListener buttonSelectionListener = new SelectionAdapter() {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		 */
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Button pressed = (Button) e.widget;
@@ -78,7 +83,7 @@ public class LabelProviderTest2 {
 	private IObservableValue selectedRenamable;
 
 	/**
-	 *
+	 * 
 	 */
 	public LabelProviderTest2() {
 
@@ -99,6 +104,12 @@ public class LabelProviderTest2 {
 					}
 				};
 
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.databinding.viewers.ViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
+				 *      java.lang.Object)
+				 */
 				@Override
 				public void updateLabel(ViewerLabel label, Object element) {
 					if (element instanceof RenamableItem) {
@@ -190,7 +201,7 @@ public class LabelProviderTest2 {
 				Shell s = test.getShell();
 				s.pack();
 				s.setVisible(true);
-
+				
 				while (!s.isDisposed()) {
 					if (!display.readAndDispatch())
 						display.sleep();

@@ -33,7 +33,11 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();

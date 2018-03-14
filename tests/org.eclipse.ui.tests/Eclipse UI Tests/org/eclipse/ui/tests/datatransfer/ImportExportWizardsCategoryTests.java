@@ -206,7 +206,9 @@ public class ImportExportWizardsCategoryTests extends UITestCase {
 				category == null);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		importRoot = null;

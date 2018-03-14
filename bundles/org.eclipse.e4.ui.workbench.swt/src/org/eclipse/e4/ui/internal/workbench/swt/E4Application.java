@@ -10,7 +10,7 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 366364
  *     Terry Parker <tparker@google.com> - Bug 416673
  ******************************************************************************/
 
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import org.eclipse.core.databinding.observable.Realm;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -232,7 +233,8 @@ public class E4Application implements IApplication {
 		ContextInjectionFactory.setDefault(appContext);
 
 		// Get the factory to create DI instances with
-		IContributionFactory factory = appContext.get(IContributionFactory.class);
+		IContributionFactory factory = (IContributionFactory) appContext
+				.get(IContributionFactory.class.getName());
 
 		// Install the life-cycle manager for this session if there's one
 		// defined
@@ -264,13 +266,15 @@ public class E4Application implements IApplication {
 
 		// for compatibility layer: set the application in the OSGi service
 		// context (see Workbench#getInstance())
-		if (!E4Workbench.getServiceContext().containsKey(MApplication.class)) {
+		if (!E4Workbench.getServiceContext().containsKey(
+				MApplication.class.getName())) {
 			// first one wins.
-			E4Workbench.getServiceContext().set(MApplication.class, appModel);
+			E4Workbench.getServiceContext().set(MApplication.class.getName(),
+					appModel);
 		}
 
 		// Set the app's context after adding itself
-		appContext.set(MApplication.class, appModel);
+		appContext.set(MApplication.class.getName(), appModel);
 
 		// adds basic services to the contexts
 		initializeServices(appModel);
@@ -365,13 +369,9 @@ public class E4Application implements IApplication {
 			if (brandingBundle != null)
 				appModelPath = brandingBundle.getSymbolicName() + "/"
 						+ E4Application.APPLICATION_MODEL_PATH_DEFAULT;
-			else {
-				Logger logger = new WorkbenchLogger(PLUGIN_ID);
-				logger.error(
-						new Exception(), // log a stack trace for debugging
-						"applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
-			}
 		}
+		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
+				+ " argument missing"); //$NON-NLS-1$
 
 		URI initialWorkbenchDefinitionInstance;
 
@@ -545,7 +545,7 @@ public class E4Application implements IApplication {
 		Locale transformedLocale = ResourceBundleHelper.toLocale(
 				defaultLocaleString, Locale.ENGLISH);
 
-		appContext.set(TranslationService.LOCALE, transformedLocale);
+		appContext.set(TranslationService.LOCALE, transformedLocale.toString());
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);

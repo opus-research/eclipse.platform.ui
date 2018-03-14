@@ -93,7 +93,6 @@ public class ControlDecorationTests extends AbstractFieldAssistTestCase {
 	@Override
 	protected AbstractFieldAssistWindow createFieldAssistWindow() {
 		return new TextFieldAssistWindow() {
-				@Override
 				protected void createExtraControls(Composite parent) {
 					anotherControl = new Text(parent, SWT.DEFAULT);
 				}

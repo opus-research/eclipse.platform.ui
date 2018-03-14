@@ -28,14 +28,18 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 public class WorkbenchStatusDialogManagerImplTest extends TestCase {
 
 	WorkbenchStatusDialogManagerImpl mgr;
-	@Override
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		mgr = new WorkbenchStatusDialogManagerImpl(0xFFFFFF, null);
 		mgr.setProperty(IStatusDialogConstants.ANIMATION, Boolean.FALSE);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		if(mgr != null && mgr.getShell() != null){
