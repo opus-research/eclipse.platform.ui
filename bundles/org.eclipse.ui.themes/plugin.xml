@@ -99,12 +99,6 @@
       <themeid
             refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
    </stylesheet>
-   <theme
-         basestylesheeturi="css/e4_gtk_pure.css"
-         id="org.eclipse.e4.ui.css.theme.puregtk"
-         label="%theme.puregtk"
-         os="linux">
-   </theme>
 
    </extension>
 
