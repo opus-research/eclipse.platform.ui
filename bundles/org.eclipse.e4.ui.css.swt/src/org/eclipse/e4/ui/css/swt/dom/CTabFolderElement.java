@@ -8,7 +8,6 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 401439
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
@@ -16,7 +15,6 @@ import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -73,22 +71,11 @@ public class CTabFolderElement extends CompositeElement {
 		int childCount = 0;
 		if (widget instanceof Composite) {
 			childCount = ((Composite) widget).getChildren().length;
+
 			if (widget instanceof CTabFolder) {
 				// if it's a CTabFolder, include the child items in the count
-				for (CTabItem tabItem : ((CTabFolder) widget).getItems()) {
-					if (tabItem.isDisposed()) {
-						// widget (CTabFolder) is internaly marked as inDispose
-						// It has disposed the CTabItem, but has not taken it out of the items array.
-						// Do not return disposed items to the css engine
-						// TODO: When as to why CTabFolderElement is even getting called is solved, we can remove this guard.
-						System.err.println("CTabItem was disposed");
-						break;
-					} else {
-						childCount++;
-					}
-				}
+				childCount += ((CTabFolder) widget).getItemCount();
 			}
-
 		}
 		return childCount;
 	}
