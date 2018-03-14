@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards 
- *     to toolbar always displays icon and text
+ *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards to toolbar always displays icon and text
+ *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
+ *     Marco Descher <marco@descher.at> - Bug 397677
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -22,6 +23,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -157,11 +159,13 @@ public class HandledContributionItem extends ContributionItem {
 				orphanedToolItems.clear();
 			}
 
-			Runnable[] array = new Runnable[windowRunnables.size()];
-			windowRunnables.toArray(array);
-			for (Runnable r : array) {
-				runner.setRunnable(r);
-				SafeRunner.run(runner);
+			if (windowRunnables.size() > 0) {
+				Runnable[] array = new Runnable[windowRunnables.size()];
+				windowRunnables.toArray(array);
+				for (Runnable r : array) {
+					runner.setRunnable(r);
+					SafeRunner.run(runner);
+				}
 			}
 
 			// repeat until the list goes empty
@@ -277,6 +281,11 @@ public class HandledContributionItem extends ContributionItem {
 		model = item;
 		setId(model.getElementId());
 		generateCommand();
+		if (model.getCommand() == null) {
+			if (logger != null) {
+				logger.error("Element " + model.getElementId() + " invalid, no command defined."); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
 		updateVisible();
 	}
 
@@ -294,6 +303,12 @@ public class HandledContributionItem extends ContributionItem {
 			ParameterizedCommand parmCmd = commandService.createCommand(cmdId,
 					parameters);
 			Activator.trace(Policy.DEBUG_MENUS, "command: " + parmCmd, null); //$NON-NLS-1$
+			if (parmCmd == null) {
+				Activator.log(IStatus.ERROR,
+						"Unable to generate parameterized command for " + model //$NON-NLS-1$
+								+ " with " + parameters); //$NON-NLS-1$
+				return;
+			}
 
 			model.setWbCommand(parmCmd);
 
@@ -439,7 +454,7 @@ public class HandledContributionItem extends ContributionItem {
 			staticContext.set(WW_SUPPORT, context.get(WW_SUPPORT));
 
 			IContextFunction func = (IContextFunction) obj;
-			obj = func.compute(staticContext);
+			obj = func.compute(staticContext, null);
 			if (obj != null) {
 				model.getTransientData().put(DISPOSABLE_CHECK, obj);
 			}
@@ -556,7 +571,7 @@ public class HandledContributionItem extends ContributionItem {
 			parmCmd = model.getWbCommand();
 		}
 
-		if (text == null) {
+		if (parmCmd != null && text == null) {
 			try {
 				text = parmCmd.getName();
 			} catch (NotDefinedException e) {
@@ -656,6 +671,10 @@ public class HandledContributionItem extends ContributionItem {
 
 	private void handleWidgetDispose(Event event) {
 		if (event.widget == widget) {
+			if (unreferenceRunnable != null) {
+				unreferenceRunnable.run();
+				unreferenceRunnable = null;
+			}
 			unhookCheckListener();
 			toolItemUpdater.removeItem(this);
 			if (infoContext != null) {
@@ -768,7 +787,7 @@ public class HandledContributionItem extends ContributionItem {
 			obj = ((MRenderedMenu) mmenu).getContributionManager();
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
-				obj = ((IContextFunction) obj).compute(lclContext);
+				obj = ((IContextFunction) obj).compute(lclContext, null);
 				((MRenderedMenu) mmenu).setContributionManager(obj);
 			}
 			if (obj instanceof IMenuCreator) {
@@ -885,5 +904,12 @@ public class HandledContributionItem extends ContributionItem {
 
 	public Widget getWidget() {
 		return widget;
+	}
+
+	/**
+	 * @return the model
+	 */
+	public MHandledItem getModel() {
+		return model;
 	}
 }

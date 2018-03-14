@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -160,7 +160,7 @@ public class MultiPageEditorSite implements IEditorSite, INestable {
 
 		context.set(IContextService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext ctxt) {
+			public Object compute(IEclipseContext ctxt, String contextKey) {
 				if (contextService == null) {
 					contextService = new NestableContextService(ctxt.getParent().get(
 							IContextService.class), new ActivePartExpression(multiPageEditor));

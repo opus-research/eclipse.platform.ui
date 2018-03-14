@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,8 +55,7 @@ public class CleanupAddon {
 	private EventHandler childrenHandler = new EventHandler() {
 		public void handleEvent(Event event) {
 			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-			String eventType = (String) event.getProperty(UIEvents.EventTags.TYPE);
-			if (UIEvents.EventTypes.REMOVE.equals(eventType)) {
+			if (UIEvents.isREMOVE(event)) {
 				final MElementContainer<?> container = (MElementContainer<?>) changedObj;
 				MUIElement containerParent = container.getParent();
 

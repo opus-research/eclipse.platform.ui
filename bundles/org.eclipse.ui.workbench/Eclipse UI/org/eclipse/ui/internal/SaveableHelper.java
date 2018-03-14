@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -109,7 +110,8 @@ public class SaveableHelper {
 					choice = ((ISaveablePart2)saveable).promptToSaveOnClose();
 				}
 				if (choice == USER_RESPONSE || choice == ISaveablePart2.DEFAULT) {
-					String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion, part.getTitle()); 
+					String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion,
+							LegacyActionTools.escapeMnemonics(part.getTitle()));
 					// Show a dialog.
 					String[] buttons = new String[] {
 							IDialogConstants.YES_LABEL,

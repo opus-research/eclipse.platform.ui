@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -204,9 +204,6 @@ public class ActionSet {
 
 	protected void addContribution(String idContrib, ArrayList<MMenuContribution> contributions,
 			IConfigurationElement element, boolean isMenu, String parentId) {
-		if (isEditorAction(element)) {
-			return;
-		}
 		MMenuContribution menuContribution = MenuFactoryImpl.eINSTANCE.createMenuContribution();
 		menuContribution.setVisibleWhen(createVisibleWhen());
 		menuContribution.getTags().add(ContributionsAnalyzer.MC_MENU);
@@ -310,10 +307,9 @@ public class ActionSet {
 			ArrayList<MTrimContribution> trimContributions, IConfigurationElement element,
 			String parentId) {
 		String tpath = MenuHelper.getToolBarPath(element);
-		if (tpath == null || isEditorAction(element)) {
+		if (tpath == null) {
 			return;
 		}
-
 		if (tpath.endsWith("/")) { //$NON-NLS-1$
 			tpath += IWorkbenchActionConstants.MB_ADDITIONS;
 		}
@@ -323,7 +319,6 @@ public class ActionSet {
 		if (action == null) {
 			return;
 		}
-
 		action.getTransientData().put("Name", MenuHelper.getLabel(element)); //$NON-NLS-1$
 		action.getTransientData().put("ActionSet", id); //$NON-NLS-1$
 
@@ -373,14 +368,9 @@ public class ActionSet {
 
 		toolBarContribution.setPositionInParent(positionInParent);
 		toolBarContribution.setVisibleWhen(createVisibleWhen());
+
 		toolBarContribution.getChildren().add(action);
-
 		contributions.add(toolBarContribution);
-	}
-
-	private boolean isEditorAction(IConfigurationElement element) {
-		return IWorkbenchRegistryConstants.EXTENSION_EDITOR_ACTIONS.equals(element
-				.getDeclaringExtension().getExtensionPointUniqueIdentifier());
 	}
 
 	private void addTrimContribution(String idContrib,

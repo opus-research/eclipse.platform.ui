@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Marc R. Hoffmann <hoffmann@mountainminds.com> - Bug 284265 [JFace] 
  *                  DialogSettings.save() silently ignores IOException
+ *     Ruediger Herrmann <ruediger.herrmann@gmx.de> - bug 92518
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
@@ -120,14 +121,41 @@ public class DialogSettings implements IDialogSettings {
         return section;
     }
 
-    /* (non-Javadoc)
+	/* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public void addSection(IDialogSettings section) {
         sections.put(section.getName(), section);
     }
 
-    /* (non-Javadoc)
+    /**
+	 * Remove a section in the receiver. If the given section does not exist,
+	 * nothing is done.
+	 * 
+	 * @param section
+	 *            the section to be removed. Must not be <code>null</code>.
+	 * @since 3.9
+	 */
+	public void removeSection(IDialogSettings section) {
+		if (sections.get(section.getName()) == section) {
+			sections.remove(section.getName());
+		}
+	}
+
+    /**
+	 * Remove a section by name in the receiver. If the given section does not
+	 * exist, nothing is done.
+	 * 
+	 * @param sectionName
+	 *            the name of the section to be removed.  Must not be <code>null</code>.
+     * @return The dialog section removed, or <code>null</code> if it wasn't there.
+	 * @since 3.9
+	 */
+	public IDialogSettings removeSection(String sectionName) {
+		return (IDialogSettings) sections.remove(sectionName);
+	}
+
+	/* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
     public String get(String key) {
@@ -591,4 +619,5 @@ public class DialogSettings implements IDialogSettings {
     		return null;
     	}
     }
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,10 @@ import org.osgi.service.event.Event;
  * When the UI model changes org.eclipse.e4.ui.internal.workbench.swt.GenTopic should be run as an
  * Eclipse application and the console results should be pasted into this file replacing the code
  * below the "Place Generated Code Here" comment
+ * 
+ * @noextend This class is not intended to be subclassed by clients.
+ * @noinstantiate This class is not intended to be instantiated by clients.
+ * @since 1.0
  */
 public class UIEvents {
 
@@ -65,21 +69,29 @@ public class UIEvents {
 		 */
 		public static final String SET = "SET"; //$NON-NLS-1$
 		/**
-		 * Add event: value added is {@link EventTags#NEW_VALUE}
+		 * Add event: value added is {@link EventTags#NEW_VALUE}.
+		 * 
+		 * @see UIEvents#isADD(Event)
 		 */
 		public static final String ADD = "ADD"; //$NON-NLS-1$
 		/**
 		 * Add many items: values added are {@link EventTags#NEW_VALUE}
+		 * 
+		 * @see UIEvents#isADD(Event)
 		 */
 		public static final String ADD_MANY = "ADD_MANY";//$NON-NLS-1$
 		/**
 		 * Remove event: value removed is {@link EventTags#OLD_VALUE}
+		 * 
+		 * @see UIEvents#isREMOVE(Event)
 		 */
 		public static final String REMOVE = "REMOVE"; //$NON-NLS-1$
 		/**
 		 * Remove many event: the values removed are the {@link EventTags#OLD_VALUE} (a collection).
 		 * The former positions of the removed values are provided as an integer array in
 		 * {@link EventTags#POSITION}.
+		 * 
+		 * @see UIEvents#isREMOVE(Event)
 		 */
 		public static final String REMOVE_MANY = "REMOVE_MANY"; //$NON-NLS-1$
 		/**
@@ -94,6 +106,8 @@ public class UIEvents {
 	 *            An OSGI event representing a UIEvent
 	 * @return true if it is an add event (i.e., {@link EventTypes#ADD} or
 	 *         {@link EventTypes#ADD_MANY}), or false otherwise.
+	 * @see UIEvents.EventTags#NEW_VALUE
+	 * @see #asIterable(Event, String)
 	 */
 	public static boolean isADD(Event event) {
 		Object type = event.getProperty(UIEvents.EventTags.TYPE);
@@ -105,6 +119,8 @@ public class UIEvents {
 	 *            An OSGI event representing a UIEvent
 	 * @return true if it is a remove event (i.e., {@link EventTypes#REMOVE} or
 	 *         {@link EventTypes#REMOVE_MANY}), or false otherwise.
+	 * @see UIEvents.EventTags#OLD_VALUE
+	 * @see #asIterable(Event, String)
 	 */
 	public static boolean isREMOVE(Event event) {
 		Object type = event.getProperty(UIEvents.EventTags.TYPE);
@@ -239,6 +255,10 @@ public class UIEvents {
 		 * Sent when a perspective is opened
 		 */
 		public static final String PERSPECTIVE_OPENED = TOPIC + TOPIC_SEP + "perspOpened"; //$NON-NLS-1$
+		/**
+		 * Sent when application startup is complete
+		 */
+		public static final String APP_STARTUP_COMPLETE = TOPIC + TOPIC_SEP + "appStartupComplete"; //$NON-NLS-1$
 	}
 
 	/**
