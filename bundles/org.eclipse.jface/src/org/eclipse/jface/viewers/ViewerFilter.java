@@ -27,12 +27,8 @@ import java.util.ArrayList;
  * @see StructuredViewer
  */
 
+
 public abstract class ViewerFilter<E,I> {
-    /**
-     * Creates a new viewer filter.
-     */
-    protected ViewerFilter() {
-    }
 
     /**
      * Filters the given elements for the given viewer.
@@ -50,17 +46,18 @@ public abstract class ViewerFilter<E,I> {
      */
     public E[] filter(Viewer<I> viewer, Object parent, E[] elements) {
         int size = elements.length;
-        ArrayList<E> out = new ArrayList<E>(size);
+		ArrayList<E> out = new ArrayList<>(size);
         E element = null;
         for (int i = 0; i < size; ++i) {
             element = elements[i];
             if (select(viewer, parent, element)) {
 				out.add(element);
 			}
+		}
         @SuppressWarnings("unchecked")
 		E[] result = (E[]) out.toArray();
 			return result;
-		}
+
 
     }
 
@@ -111,6 +108,5 @@ public abstract class ViewerFilter<E,I> {
      * @return <code>true</code> if element is included in the
      *   filtered set, and <code>false</code> if excluded
      */
-    public abstract boolean select(Viewer<I> viewer, Object parentElement,
-            E element);
+	public abstract boolean select(Viewer<I> viewer, Object parentElement, E element);
 }

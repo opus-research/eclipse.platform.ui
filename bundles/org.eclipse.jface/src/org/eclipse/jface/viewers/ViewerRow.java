@@ -209,7 +209,7 @@ public abstract class ViewerRow<E> implements Cloneable {
 		if (column >= 0){
 			@SuppressWarnings("unchecked")
 			ViewerRow<E> viewerRow = (ViewerRow<E>) clone();
-			return new ViewerCell<E>(viewerRow, column, getElement());
+			return new ViewerCell<>(viewerRow, column, getElement());
 		}
 		return null;
 	}

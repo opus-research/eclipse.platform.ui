@@ -58,7 +58,7 @@ public class TableLayout extends Layout {
 	 * The list of column layout data (element type:
 	 * <code>ColumnLayoutData</code>).
 	 */
-	private List<ColumnLayoutData> columns = new ArrayList<ColumnLayoutData>();
+	private List<ColumnLayoutData> columns = new ArrayList<>();
 
 	/**
 	 * Indicates whether <code>layout</code> has yet to be called.

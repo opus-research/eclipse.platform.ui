@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414057 - Added support to Generics
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414057
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -102,7 +103,7 @@ public class StructuredSelection<E> implements IStructuredSelection<E> {
 	 * element comparer. If an element comparer is provided, it will be used to
 	 * determine equality between structured selection objects provided that
 	 * they both are based on the same (identical) comparer. See bug
-	 * 
+	 *
 	 * @param elements
 	 *            list of selected elements
 	 * @param comparer

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
  *                                                 fix for 159597, refactoring (bug 153993),
  *                                                 widget-independency (bug 154329), fix for 187826, 191468
  *     Peter Centgraf - bug 251575
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430873, 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Widget;
  * Users setting up an editable table with more than 1 column <b>have</b> to
  * pass the SWT.FULL_SELECTION style bit
  * </p>
- * 
+ *
  * @param <E>
  *            Type of an single element of the model
  * @param <I>
@@ -137,8 +137,8 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 
 	@Override
 	protected ColumnViewerEditor<E,I> createViewerEditor() {
-		return new TableViewerEditor<E,I>(this, null,
-				new ColumnViewerEditorActivationStrategy<E,I>(this),
+		return new TableViewerEditor<>(this, null,
+				new ColumnViewerEditorActivationStrategy<>(this),
 				ColumnViewerEditor.DEFAULT);
 	}
 
@@ -170,7 +170,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	@Override
 	protected ViewerRow<E> getViewerRowFromItem(Widget item) {
 		if (cachedRow == null) {
-			cachedRow = new TableViewerRow<E>((TableItem) item);
+			cachedRow = new TableViewerRow<>((TableItem) item);
 		} else {
 			cachedRow.setItem((TableItem) item);
 		}
@@ -422,7 +422,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 		if (elements.length == 1) {
 			elementToBeRemoved = elements[0];
 		} else {
-			elementsToBeRemoved = new CustomHashtable<E,E>(getComparer());
+			elementsToBeRemoved = new CustomHashtable<>(getComparer());
 			for (int i = 0; i < elements.length; i++) {
 				E element = elements[i];
 				elementsToBeRemoved.put(element, element);

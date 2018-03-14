@@ -11,9 +11,6 @@
 
 package org.eclipse.jface.tests.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -30,19 +27,18 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public class Bug200337TableViewerTest extends ViewerTestCase {
 
-	TableViewer<String,List<String>> tableViewer;
-
 	/**
 	 * @param name
 	 */
 	public Bug200337TableViewerTest(String name) {
 		super(name);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected StructuredViewer createViewer(Composite parent) {
-		tableViewer = new TableViewer<String,List<String>>(parent, SWT.FULL_SELECTION);
-		tableViewer.setContentProvider(new ArrayContentProvider<String>(String.class));
+		final TableViewer tableViewer = new TableViewer(parent, SWT.FULL_SELECTION);
+		tableViewer.setContentProvider(new ArrayContentProvider());
 		tableViewer.setCellEditors(new CellEditor[] { new TextCellEditor(
 				tableViewer.getTable()) });
 		tableViewer.setColumnProperties(new String[] { "0" });
@@ -76,21 +72,19 @@ public class Bug200337TableViewerTest extends ViewerTestCase {
 
 	@Override
 	protected void setInput() {
-
-		ArrayList<String> ar = new ArrayList<String>(100);
-		for( int i = 0; i < 100; i++ ) {
-			ar.add(i, i + "");
+		String[] ar = new String[100];
+		for( int i = 0; i < ar.length; i++ ) {
+			ar[i] = i + "";
 		}
-
 		getTableViewer().setInput(ar);
 	}
 
-	private TableViewer<String,List<String>> getTableViewer() {
-		return tableViewer;
+	private TableViewer getTableViewer() {
+		return (TableViewer) fViewer;
 	}
 
 	public void testBug200337() {
-		getTableViewer().editElement((String)getTableViewer().getElementAt(0), 0);
-		getTableViewer().editElement((String)getTableViewer().getElementAt(90), 0);
+		getTableViewer().editElement(getTableViewer().getElementAt(0), 0);
+		getTableViewer().editElement(getTableViewer().getElementAt(90), 0);
 	}
 }

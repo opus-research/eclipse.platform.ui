@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@
  *     Matthew Hall, bug 221988
  *     Julien Desgats, bug 203950
  *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -62,6 +63,7 @@ import org.eclipse.swt.widgets.Widget;
  * interfaces <code>ITreeContentProvider</code> or (as of 3.2, to support
  * multiple equal elements) <code>ITreePathContentProvider</code>.
  * </p>
+ *
  * @param <E> Type of an single element of the model
  * @param <I> Type of the input
  *
@@ -308,7 +310,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	private E[] filter(Object parentElementOrTreePath, E[] elements) {
 		ViewerFilter<E,I>[] filters = getFilters();
 		if (filters != null) {
-			ArrayList<E> filtered = new ArrayList<E>(elements.length);
+			ArrayList<E> filtered = new ArrayList<>(elements.length);
 			for (int i = 0; i < elements.length; i++) {
 				boolean add = true;
 				for (int j = 0; j < filters.length; j++) {
@@ -959,7 +961,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 
 			// If the control is virtual, we cannot use the cached cell object. See bug 188663.
 			if (isVirtual) {
-				cellToUpdate = new ViewerCell<E>(cellToUpdate.getViewerRow(), cellToUpdate.getColumnIndex(), element);
+				cellToUpdate = new ViewerCell<>(cellToUpdate.getViewerRow(), cellToUpdate.getColumnIndex(), element);
 			}
 
 			columnViewer.refresh(cellToUpdate);
@@ -1211,9 +1213,9 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	 * @see #setExpandedElements
 	 */
 	public E[] getExpandedElements() {
-		ArrayList<Item> items = new ArrayList<Item>();
+		ArrayList<Item> items = new ArrayList<>();
 		internalCollectExpandedItems(items, getControl());
-		ArrayList<E> result = new ArrayList<E>(items.size());
+		ArrayList<E> result = new ArrayList<>(items.size());
 		for (Iterator<Item> it = items.iterator(); it.hasNext();) {
 			Item item = it.next();
 			@SuppressWarnings("unchecked")
@@ -1391,7 +1393,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 						if (path == null) {
 							@SuppressWarnings("unchecked")
 							E[] segments = (E[]) new Object[] { parent };
-							path = new TreePath<E>(segments);
+							path = new TreePath<>(segments);
 						}
 					}
 					E[] result = tpcp.getChildren(path);
@@ -1466,7 +1468,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	@Override
 	protected List<E> getSelectionFromWidget() {
 		Widget[] items = getSelection(getControl());
-		ArrayList<E> list = new ArrayList<E>(items.length);
+		ArrayList<E> list = new ArrayList<>(items.length);
 		for (int i = 0; i < items.length; i++) {
 			Widget item = items[i];
 			@SuppressWarnings("unchecked")
@@ -1519,7 +1521,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 		if (event.item.getData() != null) {
 			@SuppressWarnings("unchecked")
 			E element = (E) event.item.getData();
-			fireTreeCollapsed(new TreeExpansionEvent<E,I>(this, element));
+			fireTreeCollapsed(new TreeExpansionEvent<>(this, element));
 		}
 	}
 
@@ -1534,7 +1536,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 		if (event.item.getData() != null) {
 			@SuppressWarnings("unchecked")
 			E element = (E) event.item.getData();
-			fireTreeExpanded(new TreeExpansionEvent<E,I>(this, element));
+			fireTreeExpanded(new TreeExpansionEvent<>(this, element));
 		}
 	}
 
@@ -1685,7 +1687,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 					if (expand && pw instanceof Item) {
 						// expand parent items top-down
 						Item item = (Item) pw;
-						LinkedList<Item> toExpandList = new LinkedList<Item>();
+						LinkedList<Item> toExpandList = new LinkedList<>();
 						while (item != null && !getExpanded(item)) {
 							toExpandList.addFirst(item);
 							item = getParentItem(item);
@@ -2043,7 +2045,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	 */
 	protected void internalRemove(E parent, E[] elements) {
 
-		CustomHashtable<E,E> toRemove = new CustomHashtable<E,E>(getComparer());
+		CustomHashtable<E,E> toRemove = new CustomHashtable<>(getComparer());
 		for (int i = 0; i < elements.length; i++) {
 			toRemove.put(elements[i], elements[i]);
 		}
@@ -2188,7 +2190,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 				if (path == null) {
 					@SuppressWarnings("unchecked")
 					E[] elements = (E[]) new Object[] { element };
-					path = new TreePath<E>(elements);
+					path = new TreePath<>(elements);
 				}
 			}
 			boolean hasChildren = tpcp.hasChildren(path);
@@ -2540,7 +2542,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 				return treePath.hashCode(comparer);
 			}
 		};
-		CustomHashtable<TreePath<E>,TreePath<E>> expandedTreePaths = new CustomHashtable<TreePath<E>,TreePath<E>>(
+		CustomHashtable<TreePath<E>,TreePath<E>> expandedTreePaths = new CustomHashtable<>(
 				treePaths.length * 2 + 1, treePathComparer);
 		for (int i = 0; i < treePaths.length; ++i) {
 			TreePath<E> treePath = treePaths[i];
@@ -2558,7 +2560,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 		@SuppressWarnings("unchecked")
 		E[] emptyElements = (E[]) new Object[0];
 		internalSetExpandedTreePaths(expandedTreePaths, getControl(),
-				new TreePath<E>(emptyElements));
+				new TreePath<>(emptyElements));
 	}
 
 	/**
@@ -2604,7 +2606,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 			return;
 		}
 		int size = v.size();
-		List<Item> newSelection = new ArrayList<Item>(size);
+		List<Item> newSelection = new ArrayList<>(size);
 		for (int i = 0; i < size; ++i) {
 			Object elementOrTreePath = v.get(i);
 			// Use internalExpand since item may not yet be created. See
@@ -2988,7 +2990,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	 * @since 2.0
 	 */
 	public E[] getVisibleExpandedElements() {
-		ArrayList<E> v = new ArrayList<E>();
+		ArrayList<E> v = new ArrayList<>();
 		internalCollectVisibleExpanded(v, getControl());
 		@SuppressWarnings("unchecked")
 		E[] elements = (E[]) v.toArray();
@@ -3020,7 +3022,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	 * @since 3.2
 	 */
 	protected TreePath<E> getTreePathFromItem(Item item) {
-		LinkedList<E> segments = new LinkedList<E>();
+		LinkedList<E> segments = new LinkedList<>();
 		while (item != null) {
 			@SuppressWarnings("unchecked")
 			E segment = (E) item.getData();
@@ -3030,7 +3032,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 		}
 		@SuppressWarnings("unchecked")
 		E[] elements = (E[]) segments.toArray();
-		return new TreePath<E>(elements);
+		return new TreePath<>(elements);
 	}
 
 	/**
@@ -3053,7 +3055,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 			return TreeSelection.EMPTY;
 		}
 		Widget[] items = getSelection(getControl());
-		ArrayList<TreePath<E>> list = new ArrayList<TreePath<E>>(items.length);
+		ArrayList<TreePath<E>> list = new ArrayList<>(items.length);
 		for (int i = 0; i < items.length; i++) {
 			Widget item = items[i];
 			if (item.getData() != null) {
@@ -3112,9 +3114,9 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	 * @since 3.2
 	 */
 	public TreePath<E>[] getExpandedTreePaths() {
-		ArrayList<Item> items = new ArrayList<Item>();
+		ArrayList<Item> items = new ArrayList<>();
 		internalCollectExpandedItems(items, getControl());
-		ArrayList<TreePath<E>> result = new ArrayList<TreePath<E>>(items.size());
+		ArrayList<TreePath<E>> result = new ArrayList<>(items.size());
 		for (Iterator<Item> it = items.iterator(); it.hasNext();) {
 			Item item = it.next();
 			TreePath<E> treePath = getTreePathFromItem(item);
@@ -3123,7 +3125,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 			}
 		}
 		@SuppressWarnings({ "unchecked", "cast" })
-		TreePath<E>[] treePaths = (TreePath<E>[]) result.toArray(new TreePath[items.size()]);
+		TreePath<E>[] treePaths = result.toArray(new TreePath[items.size()]);
 		return treePaths;
 	}
 

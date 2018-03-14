@@ -24,10 +24,10 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * The ViewerCell is the JFace representation of a cell entry in a ViewerRow.
- * 
+ *
  * @param <E>
  *            Type of an element of the model
- * 
+ *
  * @since 3.3
  *
  */

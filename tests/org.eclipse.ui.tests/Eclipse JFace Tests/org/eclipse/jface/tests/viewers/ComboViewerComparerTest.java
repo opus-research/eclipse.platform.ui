@@ -32,7 +32,7 @@ public class ComboViewerComparerTest extends TestCase {
 
 	private Shell shell;
 
-	private StructuredViewer<TestElement,TestElement[]> viewer;
+	private StructuredViewer viewer;
 
 	private static final class TestElement {
 
@@ -48,8 +48,7 @@ public class ComboViewerComparerTest extends TestCase {
 	}
 
 	public void testSetSelection() {
-		viewer.setContentProvider(new ArrayContentProvider<TestElement>(
-				TestElement.class));
+		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.setComparer(new IElementComparer() {
 			@Override
 			public boolean equals(final Object element1, final Object element2) {
@@ -114,8 +113,8 @@ public class ComboViewerComparerTest extends TestCase {
 		}
 	}
 
-	protected StructuredViewer<TestElement,TestElement[]> createViewer(final Shell parent) {
-		return new ComboViewer<TestElement,TestElement[]>(parent, SWT.NONE);
+	protected StructuredViewer createViewer(final Shell parent) {
+		return new ComboViewer(parent, SWT.NONE);
 	}
 
 	private void processEvents() {
