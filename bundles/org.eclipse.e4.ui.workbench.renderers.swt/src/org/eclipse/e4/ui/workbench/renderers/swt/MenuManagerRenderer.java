@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
@@ -14,8 +14,6 @@
  *     Patrick Naish <patrick.naish@microfocus.com> - Bug 435274
  *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 378849
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 378849
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -35,10 +33,8 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
@@ -60,7 +56,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -109,6 +104,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	@Inject
 	IEventBroker eventBroker;
+
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
@@ -216,7 +212,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					manager.setVisible(menuModel.isVisible());
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
-						manager.getParent().update(false);
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -228,7 +223,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					item.setVisible(itemModel.isVisible());
 					if (item.getParent() != null) {
 						item.getParent().markDirty();
-						item.getParent().update(false);
 					}
 				}
 			}
@@ -295,21 +289,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	}
 
-	@SuppressWarnings("unchecked")
-	@Inject
-	@Optional
-	private void subscribeTopicChildAdded(@UIEventTopic(ElementContainer.TOPIC_CHILDREN) Event event) {
-		// Ensure that this event is for a MMenuItem
-		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu)) {
-			return;
-		}
-		MMenu menuModel = (MMenu) event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (UIEvents.isADD(event)) {
-			Object obj = menuModel;
-			processContents((MElementContainer<MUIElement>) obj);
-		}
-	}
-
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
@@ -342,6 +321,13 @@ MenuManagerEventHelper.getInstance()
 		context.remove(MenuManagerRenderer.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
+	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
@@ -431,14 +417,14 @@ MenuManagerEventHelper.getInstance()
 				.toArray(new ContributionRecord[vals.size()])) {
 			if (record.menuModel == menuModel) {
 				record.dispose();
-				for (MMenuElement copy : record.getGeneratedElements()) {
+				for (MMenuElement copy : record.generatedElements) {
 					cleanUpCopy(record, copy);
 				}
-				for (MMenuElement copy : record.getSharedElements()) {
+				for (MMenuElement copy : record.sharedElements) {
 					cleanUpCopy(record, copy);
 				}
-				record.getGeneratedElements().clear();
-				record.getSharedElements().clear();
+				record.generatedElements.clear();
+				record.sharedElements.clear();
 				disposedRecords.add(record);
 			}
 		}
@@ -607,6 +593,13 @@ MenuManagerEventHelper.getInstance()
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
+	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// I can either simply stop processing, or we can walk the model
@@ -916,7 +909,7 @@ MenuManagerEventHelper.getInstance()
 
 	/**
 	 * Search the records for testing. Look, but don't touch!
-	 *
+	 * 
 	 * @return the array of active ContributionRecords.
 	 */
 	public ContributionRecord[] getContributionRecords() {
@@ -1116,7 +1109,7 @@ MenuManagerEventHelper.getInstance()
 	/**
 	 * Clean dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 *
+	 * 
 	 * @param menuManager
 	 * @param menuModel
 	 * @param dump

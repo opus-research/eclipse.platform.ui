@@ -23,7 +23,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests Bug 42024
- *
+ * 
  * @since 3.0
  */
 public class Bug42024Test extends UITestCase {
@@ -36,7 +36,7 @@ public class Bug42024Test extends UITestCase {
 
     /**
      * Constructor for Bug42024Test.
-     *
+     * 
      * @param name
      *            The name of the test
      */
@@ -47,8 +47,7 @@ public class Bug42024Test extends UITestCase {
     /*
      * @see TestCase#setUp()
      */
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
 
         // Create a window with a KeySequenceText
@@ -62,8 +61,7 @@ public class Bug42024Test extends UITestCase {
         shell.open();
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         super.doTearDown();
 
         // Close and destroy the window
@@ -79,7 +77,7 @@ public class Bug42024Test extends UITestCase {
      * Tests that the limiting facility on KeySequenceText allows an arbitrary
      * number of key strokes, when the the limit is set to "infinite". In this
      * case, we will use a six stroke sequence.
-     *
+     * 
      * @throws ParseException
      *             If the test sequence cannot be parsed.
      */
@@ -96,7 +94,7 @@ public class Bug42024Test extends UITestCase {
      * Tests that inserting a key sequence of matching length causes no change,
      * but inserted a key sequence of one greater does cause a change --
      * specifically truncation.
-     *
+     * 
      * @throws ParseException
      *             If the test sequences cannot be parsed.
      */

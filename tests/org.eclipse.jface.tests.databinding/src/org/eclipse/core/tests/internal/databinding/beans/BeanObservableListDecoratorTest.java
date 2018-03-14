@@ -27,7 +27,7 @@ import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.internal.databinding.beans.BeanObservableListDecorator;
 import org.eclipse.jface.databinding.conformance.MutableObservableListContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -39,15 +39,14 @@ public class BeanObservableListDecoratorTest extends TestCase {
 	private IObservableList observableList;
 	private BeanObservableListDecorator decorator;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-
+		
 		bean = new Bean();
 		propertyDescriptor = new PropertyDescriptor(
 				"list", Bean.class,"getList","setList");
 		observableList = BeansObservables.observeList(
-				DisplayRealm.getRealm(Display.getDefault()), bean, "list");
+				SWTObservables.getRealm(Display.getDefault()), bean, "list");
 		decorator = new BeanObservableListDecorator(observableList, propertyDescriptor);
 	}
 
@@ -71,7 +70,6 @@ public class BeanObservableListDecoratorTest extends TestCase {
 	}
 
 	static class Delegate extends AbstractObservableCollectionContractDelegate {
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			final WritableList delegate = new WritableList(realm);
@@ -82,12 +80,10 @@ public class BeanObservableListDecoratorTest extends TestCase {
 
 		private int counter;
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return Integer.toString(counter++);
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableList list = (IObservableList) observable;
 			list.add(createElement(list));

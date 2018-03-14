@@ -28,7 +28,7 @@ class RemoveBookmarkAction extends BookmarkAction {
 
     /**
      * Create a new instance of this class.
-     *
+     * 
      * @param view the view
      */
     public RemoveBookmarkAction(BookmarkNavigator view) {
@@ -42,8 +42,7 @@ class RemoveBookmarkAction extends BookmarkAction {
     /**
      * Delete the marker selection.
      */
-    @Override
-	public void run() {
+    public void run() {
         final IStructuredSelection sel = getStructuredSelection();
         if (sel.isEmpty()) {
 			return;
@@ -56,8 +55,7 @@ class RemoveBookmarkAction extends BookmarkAction {
    				WorkspaceUndoUtil.getUIInfoAdapter(getView().getShell()));
     }
 
-    @Override
-	public void selectionChanged(IStructuredSelection sel) {
+    public void selectionChanged(IStructuredSelection sel) {
         setEnabled(!sel.isEmpty());
     }
 }

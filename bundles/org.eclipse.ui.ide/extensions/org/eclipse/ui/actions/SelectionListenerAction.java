@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
  *******************************************************************************/
 
 package org.eclipse.ui.actions;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -55,7 +54,12 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * </ul>
  * </p>
  */
-public abstract class SelectionListenerAction extends BaseSelectionListenerAction {
+public abstract class SelectionListenerAction extends
+		BaseSelectionListenerAction {
+	/**
+	 * Empty list that is immutable.
+	 */
+	private static final List EMPTY_LIST = Arrays.asList(new Object[0]);
 
 	/**
 	 * Indicates whether the selection has changes since <code>resources</code>
@@ -68,18 +72,18 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 	 * <code>IResource</code>); meaningful only when
 	 * <code>selectionDirty == false</code>.
 	 */
-	private List<IResource> resources;
+	private List resources;
 
 	/**
 	 * The list of non-resource elements in the current selection (element type:
 	 * <code>Object</code>); meaningful only when
 	 * <code>selectionDirty == false</code>.
 	 */
-	private List<Object> nonResources;
+	private List nonResources;
 
 	/**
 	 * Creates a new action with the given text.
-	 *
+	 * 
 	 * @param text
 	 *            the string used as the text for the action, or
 	 *            <code>null</code> if there is no text
@@ -93,7 +97,6 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 	 * <code>BaseSelectionListenerAction</code> method clears the cached
 	 * resources and non-resources.
 	 */
-	@Override
 	protected void clearCache() {
 		selectionDirty = true;
 		// clear out the lists in case computeResources does not get called
@@ -110,21 +113,23 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 		resources = null;
 		nonResources = null;
 
-		for (Iterator<?> e = getStructuredSelection().iterator(); e.hasNext();) {
+		for (Iterator e = getStructuredSelection().iterator(); e.hasNext();) {
 			Object next = e.next();
 			if (next instanceof IResource) {
 				if (resources == null) {
 					// assume selection contains mostly resources most times
-					resources = new ArrayList<>(getStructuredSelection().size());
+					resources = new ArrayList(getStructuredSelection().size());
 				}
-				resources.add((IResource) next);
+				resources.add(next);
 				continue;
 			} else if (next instanceof IAdaptable) {
-				IResource resource = ((IAdaptable) next).getAdapter(IResource.class);
+				Object resource = ((IAdaptable) next)
+						.getAdapter(IResource.class);
 				if (resource != null) {
 					if (resources == null) {
 						// assume selection contains mostly resources most times
-						resources = new ArrayList<>(getStructuredSelection().size());
+						resources = new ArrayList(getStructuredSelection()
+								.size());
 					}
 					resources.add(resource);
 					continue;
@@ -132,34 +137,50 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			} else {
 
 				boolean resourcesFoundForThisSelection = false;
+
 				IAdapterManager adapterManager = Platform.getAdapterManager();
-				ResourceMapping mapping = adapterManager.getAdapter(next, ResourceMapping.class);
+				ResourceMapping mapping = (ResourceMapping) adapterManager
+						.getAdapter(next, ResourceMapping.class);
 
 				if (mapping != null) {
+
 					ResourceTraversal[] traversals = null;
 					try {
 						traversals = mapping.getTraversals(
 								ResourceMappingContext.LOCAL_CONTEXT,
 								new NullProgressMonitor());
 					} catch (CoreException exception) {
-						IDEWorkbenchPlugin.log(exception.getLocalizedMessage(), exception.getStatus());
+						IDEWorkbenchPlugin.log(exception.getLocalizedMessage(),
+								exception.getStatus());
 					}
 
 					if (traversals != null) {
+
 						for (int i = 0; i < traversals.length; i++) {
-							IResource[] traversalResources = traversals[i].getResources();
+
+							IResource[] traversalResources = traversals[i]
+									.getResources();
+
 							if (traversalResources != null) {
+
 								resourcesFoundForThisSelection = true;
+
 								if (resources == null) {
-									resources = new ArrayList<>(getStructuredSelection().size());
+									resources = new ArrayList(
+											getStructuredSelection().size());
 								}
+
 								for (int j = 0; j < traversalResources.length; j++) {
 									resources.add(traversalResources[j]);
-								}
-							}
-						}
-					}
-				}
+								}// for
+
+							}// if
+
+						}// for
+
+					}// if
+
+				}// if
 
 				if (resourcesFoundForThisSelection) {
 					continue;
@@ -168,7 +189,7 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 
 			if (nonResources == null) {
 				// assume selection contains mostly resources most times
-				nonResources = new ArrayList<>(1);
+				nonResources = new ArrayList(1);
 			}
 			nonResources.add(next);
 		}
@@ -177,10 +198,10 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 	/**
 	 * Returns the elements in the current selection that are not
 	 * <code>IResource</code>s.
-	 *
+	 * 
 	 * @return list of elements (element type: <code>Object</code>)
 	 */
-	protected List<?> getSelectedNonResources() {
+	protected List getSelectedNonResources() {
 		// recompute if selection has changed.
 		if (selectionDirty) {
 			computeResources();
@@ -188,19 +209,19 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 		}
 
 		if (nonResources == null) {
-			return Collections.emptyList();
+			return EMPTY_LIST;
 		}
-
+		
 		return nonResources;
 	}
 
 	/**
 	 * Returns the elements in the current selection that are
 	 * <code>IResource</code>s.
-	 *
+	 * 
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
-	protected List<? extends IResource> getSelectedResources() {
+	protected List getSelectedResources() {
 		// recompute if selection has changed.
 		if (selectionDirty) {
 			computeResources();
@@ -208,7 +229,7 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 		}
 
 		if (resources == null) {
-			return Collections.emptyList();
+			return EMPTY_LIST;
 		}
 		return resources;
 	}
@@ -216,7 +237,7 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 	/**
 	 * Returns whether the type of the given resource is among those in the
 	 * given resource type mask.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource
 	 * @param resourceMask
@@ -234,7 +255,7 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 	/**
 	 * Returns whether the current selection consists entirely of resources
 	 * whose types are among those in the given resource type mask.
-	 *
+	 * 
 	 * @param resourceMask
 	 *            a bitwise OR of resource types: <code>IResource</code>.{<code>FILE</code>,
 	 *            <code>FOLDER</code>, <code>PROJECT</code>,
@@ -250,7 +271,8 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			return false;
 		}
 
-		for (IResource next : getSelectedResources()) {
+		for (Iterator e = getSelectedResources().iterator(); e.hasNext();) {
+			IResource next = (IResource) e.next();
 			if (!resourceIsType(next, resourceMask)) {
 				return false;
 			}

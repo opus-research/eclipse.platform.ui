@@ -35,13 +35,13 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * dialog.open();
  * </pre>
  * During the call to <code>open</code>, the wizard dialog is presented to the
- * user. When the user hits Finish, the user-selected workspace preferences
+ * user. When the user hits Finish, the user-selected workspace preferences 
  * are exported to the user-specified location in the local file system,
  * the dialog closes, and the call to <code>open</code> returns.
  * </p>
- *
+ * 
  * @since 3.1
- *
+ * 
  */
 public class PreferencesExportWizard extends Wizard implements IExportWizard {
 
@@ -60,6 +60,9 @@ public class PreferencesExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public void addPages() {
         super.addPages();
@@ -67,6 +70,9 @@ public class PreferencesExportWizard extends Wizard implements IExportWizard {
         addPage(mainPage);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(PreferencesMessages.PreferencesExportWizard_export);
@@ -75,10 +81,13 @@ public class PreferencesExportWizard extends Wizard implements IExportWizard {
         setNeedsProgressMonitor(true);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public boolean performFinish() {
         return mainPage.finish();
     }
-
-
+    
+    
 }

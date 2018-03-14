@@ -14,7 +14,7 @@ package org.eclipse.core.databinding.conversion;
 
 /**
  * Abstract base class for converters.
- *
+ * 
  * @since 1.0
  *
  */
@@ -32,12 +32,10 @@ public abstract class Converter implements IConverter {
 		this.toType = toType;
 	}
 
-	@Override
 	public Object getFromType() {
 		return fromType;
 	}
 
-	@Override
 	public Object getToType() {
 		return toType;
 	}

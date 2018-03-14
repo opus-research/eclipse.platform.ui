@@ -25,12 +25,12 @@ import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.internal.navigator.Policy;
 
 /**
- *
+ * 
  * Provides an implementation of TreeViewerSorter that uses the given parent to determine the
  * correct sort order based on the defined
  * <b>org.eclipse.ui.navigator.navigatorContent/navigatorContent/commonSorter</b> elements
  * available in the set of <i>visible</i> content extensions.
- *
+ * 
  * <p>
  * The CommonViewerSorter must be assigned a {@link INavigatorContentService} to drive its sorting
  * algorithm. Without a valid content service, the sorter will return the default ordering.
@@ -38,15 +38,15 @@ import org.eclipse.ui.internal.navigator.Policy;
  * <p>
  * A CommonViewerSorter may not be attached to more than one CommonViewer.
  * </p>
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public final class CommonViewerSorter extends TreePathViewerSorter {
-
+	
 	private static final int LEFT_UNDERSTANDS = 1;
-	private static final int RIGHT_UNDERSTANDS = 2;
-	private static final int BOTH_UNDERSTAND = LEFT_UNDERSTANDS | RIGHT_UNDERSTANDS;
+	private static final int RIGHT_UNDERSTANDS = 2; 
+	private static final int BOTH_UNDERSTAND = LEFT_UNDERSTANDS | RIGHT_UNDERSTANDS; 
 
 	private NavigatorContentService contentService;
 
@@ -54,7 +54,7 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
 
 	/**
 	 * Create a sorter service attached to the given content service.
-	 *
+	 * 
 	 * @param aContentService
 	 *            The content service used by the viewer that will use this sorter service.
 	 * @since 3.3
@@ -64,7 +64,11 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
 		sorterService = contentService.getSorterService();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ViewerSorter#category(java.lang.Object)
+	 */
 	public int category(Object element) {
 		if (contentService == null)
 			return 0;
@@ -77,21 +81,20 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
 		NavigatorPlugin.logError(0, NLS.bind(CommonNavigatorMessages.CommonViewerSorter_NoContentExtensionForObject,
 				object != null ? object.toString() : "<null>", parent != null ? parent.toString() : "<null>"), null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-
-	@Override
+	
 	public int compare(Viewer viewer, TreePath parentPath, Object e1, Object e2) {
 		if (contentService == null)
 			return -1;
 		INavigatorContentDescriptor sourceOfLvalue = getSource(e1);
 		INavigatorContentDescriptor sourceOfRvalue = getSource(e2);
-
+		
 		Object parent;
 		if (parentPath == null) {
 			parent = viewer.getInput();
 		} else {
 			parent = parentPath.getLastSegment();
 		}
-
+		
 		if (sourceOfLvalue == null) {
 			logMissingExtension(parent, e1);
 			return -1;
@@ -132,11 +135,11 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
 				break;
 			}
 		}
-
+		
 		if (sorter != null) {
 			return sorter.compare(viewer, e1, e2);
 		}
-
+ 
 		int categoryDelta = category(e1) - category(e2);
 		if (categoryDelta == 0) {
 			return super.compare(viewer, e1, e2);
@@ -144,8 +147,10 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
 		return categoryDelta;
 	}
 
-    @Override
-	public boolean isSorterProperty(Object element, String property) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ViewerComparator#isSorterProperty(java.lang.Object, java.lang.String)
+     */
+    public boolean isSorterProperty(Object element, String property) {
     	// Have to get the parent path from the content provider
     	NavigatorContentServiceContentProvider cp = (NavigatorContentServiceContentProvider) contentService.createCommonContentProvider();
     	TreePath[] parentPaths = cp.getParents(element);
@@ -156,8 +161,10 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
     	return false;
     }
 
-    @Override
-	public boolean isSorterProperty(TreePath parentPath, Object element, String property) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.TreePathViewerSorter#isSorterProperty(org.eclipse.jface.viewers.TreePath, java.lang.Object, java.lang.String)
+     */
+    public boolean isSorterProperty(TreePath parentPath, Object element, String property) {
 		INavigatorContentDescriptor contentDesc = getSource(element);
 		if (parentPath.getSegmentCount() == 0)
 			return false;
@@ -167,7 +174,7 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
         return false;
     }
 
-
+    
 	private INavigatorContentDescriptor getSource(Object o) {
 		// Fast path - just an optimization for the common case
 		INavigatorContentDescriptor ncd = contentService.getSourceOfContribution(o);
@@ -188,6 +195,6 @@ public final class CommonViewerSorter extends TreePathViewerSorter {
 			System.out.println("sort: NULL object: " + o); //$NON-NLS-1$
 		return null;
 	}
-
+	
 
 }

@@ -27,9 +27,9 @@ import org.eclipse.ui.internal.ide.model.WorkbenchFile;
 
 /**
  * Lightweight decorator for more specific file icons.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class ContentTypeDecorator implements ILightweightLabelDecorator {
 
@@ -37,14 +37,13 @@ public class ContentTypeDecorator implements ILightweightLabelDecorator {
 
 	private boolean fHasEditorAssociationOverrides;
 
-	@Override
 	public void decorate(Object element, IDecoration decoration) {
 		if (!(element instanceof IFile))
 			return;
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench.isClosing())
 			return;
-
+		
 		IFile file = (IFile) element;
 		ImageDescriptor image = null;
 
@@ -84,20 +83,16 @@ public class ContentTypeDecorator implements ILightweightLabelDecorator {
 			decoration.addOverlay(image);
 	}
 
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
-	@Override
 	public void dispose() {
 	}
 
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
 

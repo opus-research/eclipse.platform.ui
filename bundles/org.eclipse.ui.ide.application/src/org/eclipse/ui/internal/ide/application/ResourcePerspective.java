@@ -22,7 +22,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 /**
  */
 public class ResourcePerspective implements IPerspectiveFactory {
-
+	
     /**
      * Constructs a new Default layout engine.
      */
@@ -44,8 +44,7 @@ public class ResourcePerspective implements IPerspectiveFactory {
      *
      * @param layout the factory used to add views to the perspective
      */
-    @Override
-	public void createInitialLayout(IPageLayout layout) {
+    public void createInitialLayout(IPageLayout layout) {
         defineActions(layout);
         defineLayout(layout);
     }
@@ -98,8 +97,8 @@ public class ResourcePerspective implements IPerspectiveFactory {
 		IFolderLayout bottomRight = layout.createFolder(
                 "bottomRight", IPageLayout.BOTTOM, (float) 0.66,//$NON-NLS-1$
                 editorArea);
-
+		
 		bottomRight.addView(IPageLayout.ID_TASK_LIST);
-
+		
     }
 }

@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 446965
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.handlers;
@@ -26,13 +25,15 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * <li>It has a valid editor input</li>
  * <li>The editor input adapts to an IResource</li>
  * </ol>
- *
  * @since 3.9.100
  */
 public class EditorInputPropertyTester extends PropertyTester {
 
-	@Override
-	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
+	 */
+	public boolean test(Object receiver, String property, Object[] args,
+			Object expectedValue) {
 		if (!(receiver instanceof IEditorPart)) {
 			return false;
 		}
@@ -41,12 +42,15 @@ public class EditorInputPropertyTester extends PropertyTester {
 		if (input instanceof IFileEditorInput) {
 			return true;
 		}
+		
 		if (input == null) {
 			IDEWorkbenchPlugin
 					.log("IEditorPart (" + editor.getClass() + ") passed in without IEditorInput set.", new NullPointerException()); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
+		
 		Object obj = input.getAdapter(IResource.class);
-		return obj != null;
+		return obj!=null;
 	}
+
 }

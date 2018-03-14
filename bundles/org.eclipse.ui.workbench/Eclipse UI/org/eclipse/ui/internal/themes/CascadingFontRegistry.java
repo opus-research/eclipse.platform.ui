@@ -39,13 +39,13 @@ public class CascadingFontRegistry extends FontRegistry {
 			if (!hasOverrideFor(event.getProperty()))
             fireMappingChanged(event.getProperty(), event.getOldValue(), event
                     .getNewValue());
-
+			
         }
     };
 
     /**
      * Create a new instance of this class.
-     *
+     * 
      * @param parent the parent registry
      */
     public CascadingFontRegistry(FontRegistry parent) {
@@ -54,6 +54,9 @@ public class CascadingFontRegistry extends FontRegistry {
         parent.addListener(listener);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.FontRegistry#get(java.lang.String)
+     */
     @Override
 	public Font get(String symbolicName) {
         if (super.hasValueFor(symbolicName)) {
@@ -62,6 +65,9 @@ public class CascadingFontRegistry extends FontRegistry {
         return parent.get(symbolicName);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.FontRegistry#getKeySet()
+     */
     @Override
 	public Set getKeySet() {
         Set keyUnion = new HashSet(super.getKeySet());
@@ -77,15 +83,18 @@ public class CascadingFontRegistry extends FontRegistry {
         return parent.getFontData(symbolicName);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ColorRegistry#hasValueFor(java.lang.String)
+     */
     @Override
 	public boolean hasValueFor(String colorKey) {
         return super.hasValueFor(colorKey) || parent.hasValueFor(colorKey);
     }
 
     /**
-     * Returns whether this cascading registry has an override for the provided
+     * Returns whether this cascading registry has an override for the provided 
      * color key.
-     *
+     * 
      * @param fontKey the provided color key
      * @return hether this cascading registry has an override
      */

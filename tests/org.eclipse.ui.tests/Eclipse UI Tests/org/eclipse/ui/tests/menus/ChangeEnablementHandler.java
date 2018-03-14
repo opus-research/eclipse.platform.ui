@@ -26,14 +26,18 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ChangeEnablementHandler extends AbstractHandler {
 	private static final String CONTEXT_ID = "org.eclipse.ui.menus.contexts.test2";
 
 	private IContextManagerListener fContextManagerListener;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -46,7 +50,7 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	private void init(IServiceLocator serviceLocator) {
 		if (fContextManagerListener == null) {
-			IContextService service = serviceLocator
+			IContextService service = (IContextService) serviceLocator
 					.getService(IContextService.class);
 			service.addContextManagerListener(getContextListener());
 		}
@@ -58,7 +62,6 @@ public class ChangeEnablementHandler extends AbstractHandler {
 	private IContextManagerListener getContextListener() {
 		if (fContextManagerListener == null) {
 			fContextManagerListener = new IContextManagerListener() {
-				@Override
 				public void contextManagerChanged(
 						ContextManagerEvent contextManagerEvent) {
 					if (contextManagerEvent.isActiveContextsChanged()) {
@@ -73,7 +76,11 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	boolean fEnabled = true;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
 	public boolean isEnabled() {
 		return fEnabled;
 	}
@@ -85,10 +92,14 @@ public class ChangeEnablementHandler extends AbstractHandler {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
+	 */
 	public void dispose() {
 		if (fContextManagerListener != null) {
-			IContextService service = PlatformUI
+			IContextService service = (IContextService) PlatformUI
 					.getWorkbench().getService(IContextService.class);
 			service.removeContextManagerListener(fContextManagerListener);
 			fContextManagerListener = null;

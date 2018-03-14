@@ -32,7 +32,6 @@ public class ProgressMonitorDialogTest extends TestCase {
 		ProgressMonitorDialog pmd = new ProgressMonitorDialog(null);
 		pmd.open();
 		pmd.run(fork, cancelable, new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				// nothing to do, just need this to happen to test bug 299731
 			}
@@ -40,9 +39,8 @@ public class ProgressMonitorDialogTest extends TestCase {
 
 		// process asynchronous runnables, the error will happen here when we
 		// try to do some with a widget that has already been disposed
-		while (Display.getDefault().readAndDispatch()) {
+		while (Display.getDefault().readAndDispatch())
 			;
-		}
 	}
 
 	public void testRunTrueTrue() throws Exception {

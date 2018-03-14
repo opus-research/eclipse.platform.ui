@@ -16,23 +16,21 @@ import org.eclipse.swt.widgets.List;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ListSingleSelectionIndexProperty extends
 		SingleSelectionIndexProperty {
 	/**
-	 *
+	 * 
 	 */
 	public ListSingleSelectionIndexProperty() {
 		super(new int[] { SWT.Selection, SWT.DefaultSelection });
 	}
 
-	@Override
 	int doGetIntValue(Object source) {
 		return ((List) source).getSelectionIndex();
 	}
 
-	@Override
 	void doSetIntValue(Object source, int value) {
 		if (value == -1)
 			((List) source).deselectAll();
@@ -40,7 +38,6 @@ public class ListSingleSelectionIndexProperty extends
 			((List) source).setSelection(value);
 	}
 
-	@Override
 	public String toString() {
 		return "List.selectionIndex <int>"; //$NON-NLS-1$
 	}

@@ -39,7 +39,7 @@ public class Bug410426Test extends UITestCase {
 
     public void testToolbarContributionFromFactoryVisibility() throws Exception {
         IWorkbenchWindow window = openTestWindow();
-        IMenuService menus = window.getService(IMenuService.class);
+        IMenuService menus = (IMenuService) window.getService(IMenuService.class);
         ToolBarManager manager = new ToolBarManager();
 
         try {
@@ -89,16 +89,14 @@ public class Bug410426Test extends UITestCase {
 
     public void testNoClassCastExceptionForMenuManagerToolbarContribution() throws Exception {
         IWorkbenchWindow window = openTestWindow();
-        IMenuService menus = window.getService(IMenuService.class);
+        IMenuService menus = (IMenuService) window.getService(IMenuService.class);
         ToolBarManager manager = new ToolBarManager();
 
         //Add a log listener to detect the corrected ClassCastException in bug 410426.
         final List<ClassCastException> cces = new ArrayList<ClassCastException>();
-		ExtendedLogReaderService log = window
-				.getService(ExtendedLogReaderService.class);
+        ExtendedLogReaderService log = (ExtendedLogReaderService) window.getService(ExtendedLogReaderService.class);
         LogListener logListener = new SynchronousLogListener() {
-            @Override
-			public void logged(LogEntry entry) {
+            public void logged(LogEntry entry) {
                 if (entry.getLevel() == LogService.LOG_ERROR && entry.getException() instanceof ClassCastException
                         && entry.getException().getMessage().contains("MenuManager cannot be cast to org.eclipse.jface.action.ContributionItem")) { //$NON-NLS-N$
                     cces.add((ClassCastException) entry.getException());
@@ -106,8 +104,7 @@ public class Bug410426Test extends UITestCase {
             }
         };
         LogFilter logFilter = new LogFilter() {
-            @Override
-			public boolean isLoggable(Bundle bundle, String loggerName, int logLevel) {
+            public boolean isLoggable(Bundle bundle, String loggerName, int logLevel) {
                 return logLevel == LogService.LOG_ERROR && loggerName == null && "org.eclipse.equinox.event".equals(bundle.getSymbolicName()); //$NON-NLS-N$
             }
         };
