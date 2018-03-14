@@ -23,8 +23,9 @@ package org.eclipse.jface.viewers;
  * This interface should be implemented by classes that wish to
  * act as cell modifiers.
  * </p>
+ * @param <E> Type of an single element of the model
  */
-public interface ICellModifier {
+public interface ICellModifier<E> {
     /**
      * Checks whether the given property of the given element can be
      * modified.
@@ -34,7 +35,7 @@ public interface ICellModifier {
      * @return <code>true</code> if the property can be modified,
      *   and <code>false</code> if it is not modifiable
      */
-    public boolean canModify(Object element, String property);
+    public boolean canModify(E element, String property);
 
     /**
      * Returns the value for the given property of the given element.
@@ -44,7 +45,7 @@ public interface ICellModifier {
      * @param property the property
      * @return the property value
      */
-    public Object getValue(Object element, String property);
+    public Object getValue(E element, String property);
 
     /**
      * Modifies the value for the given property of the given element.

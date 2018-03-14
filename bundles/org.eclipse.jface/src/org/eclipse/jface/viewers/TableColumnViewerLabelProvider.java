@@ -16,6 +16,11 @@ package org.eclipse.jface.viewers;
 /**
  * TableColumnViewerLabelProvider is the mapping from the table based providers
  * to the ViewerLabelProvider.
+ * 
+ * @param <E>
+ *            Type of an element of the model
+ * @param <I>
+ *            Type of the input
  *
  * @since 3.3
  * @see ITableLabelProvider
@@ -23,7 +28,7 @@ package org.eclipse.jface.viewers;
  * @see ITableFontProvider
  *
  */
-class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
+class TableColumnViewerLabelProvider<E> extends WrappedViewerLabelProvider<E> {
 
 	private ITableLabelProvider tableLabelProvider;
 
@@ -40,7 +45,7 @@ class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 	 * @see ITableColorProvider
 	 * @see ITableFontProvider
 	 */
-	public TableColumnViewerLabelProvider(IBaseLabelProvider labelProvider) {
+	public TableColumnViewerLabelProvider(IBaseLabelProvider<E> labelProvider) {
 		super(labelProvider);
 
 		if (labelProvider instanceof ITableLabelProvider)
@@ -54,9 +59,9 @@ class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 	}
 
 	@Override
-	public void update(ViewerCell cell) {
+	public void update(ViewerCell<E> cell) {
 
-		Object element = cell.getElement();
+		E element = cell.getElement();
 		int index = cell.getColumnIndex();
 
 		if (tableLabelProvider == null) {
