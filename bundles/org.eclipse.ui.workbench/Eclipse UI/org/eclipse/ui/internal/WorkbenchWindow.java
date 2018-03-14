@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -526,8 +527,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					Object object = dirtyPart.getObject();
 					if (object instanceof CompatibilityPart) {
 						IWorkbenchPart part = ((CompatibilityPart) object).getPart();
-						if (part instanceof ISaveablePart) {
-							if (!((ISaveablePart) part).isSaveOnCloseNeeded())
+						ISaveablePart saveable = SaveableHelper.getSaveable(part);
+						if (saveable != null) {
+							if (!saveable.isSaveOnCloseNeeded())
 								return Save.NO;
 							return SaveableHelper.savePart((ISaveablePart) part, part,
 									WorkbenchWindow.this, true) ? Save.NO : Save.CANCEL;
