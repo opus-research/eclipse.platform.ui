@@ -814,7 +814,6 @@ public class ESelectionServiceTest extends UITest {
 		// part one tracks down part three. this could just as easily be
 		// fronted by the mediator.addSelectionListener(*)
 		partContextC.runAndTrack(new RunAndTrack() {
-			@Override
 			public boolean changed(IEclipseContext context) {
 				ESelectionService s = (ESelectionService) partContextA
 						.get(ESelectionService.class.getName());
@@ -886,7 +885,6 @@ public class ESelectionServiceTest extends UITest {
 				.get(ESelectionService.class.getName());
 		selectionService.addSelectionListener(partC.getElementId(),
 				new ISelectionListener() {
-					@Override
 					public void selectionChanged(MPart part, Object selection) {
 						partOneImpl.setOtherSelection(selection);
 					}
@@ -1126,7 +1124,6 @@ public class ESelectionServiceTest extends UITest {
 			count = 0;
 		}
 
-		@Override
 		public void selectionChanged(MPart part, Object selection) {
 			this.part = part;
 			this.selection = selection;
@@ -1157,7 +1154,6 @@ public class ESelectionServiceTest extends UITest {
 			success = false;
 		}
 
-		@Override
 		public void selectionChanged(MPart part, Object selection) {
 			if (count > 0) {
 				success = false;
