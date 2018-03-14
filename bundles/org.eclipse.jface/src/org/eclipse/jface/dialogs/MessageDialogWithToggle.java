@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -390,8 +390,7 @@ public class MessageDialogWithToggle extends MessageDialog {
     /**
      * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
      */
-    @Override
-	protected void buttonPressed(int buttonId) {
+    protected void buttonPressed(int buttonId) {
         super.buttonPressed(buttonId);
 
         if (buttonId != IDialogConstants.CANCEL_ID && toggleState
@@ -414,8 +413,7 @@ public class MessageDialogWithToggle extends MessageDialog {
     /**
      * @see Dialog#createButtonBar(Composite)
      */
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         final String[] buttonLabels = getButtonLabels();
         final Button[] buttons = new Button[buttonLabels.length];
         final int defaultButtonIndex = getDefaultButtonIndex();
@@ -443,8 +441,7 @@ public class MessageDialogWithToggle extends MessageDialog {
     /**
      * @see Dialog#createDialogArea(Composite)
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         Composite dialogAreaComposite = (Composite) super
                 .createDialogArea(parent);
         setToggleButton(createToggleButton(dialogAreaComposite));
@@ -470,8 +467,7 @@ public class MessageDialogWithToggle extends MessageDialog {
 
         button.addSelectionListener(new SelectionAdapter() {
 
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 toggleState = button.getSelection();
             }
 

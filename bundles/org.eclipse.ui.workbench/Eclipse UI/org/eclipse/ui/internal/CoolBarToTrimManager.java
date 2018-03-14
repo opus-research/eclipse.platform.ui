@@ -57,7 +57,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	private static final String TOOLBAR_SEPARATOR = "toolbarSeparator"; //$NON-NLS-1$
 	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String OBJECT = "coolbar.object"; //$NON-NLS-1$
-	private static final String PREV_CHILD_VISIBLE = "prevChildVisible"; //$NON-NLS-1$
 	private MTrimBar topTrim;
 	private List<MTrimElement> workbenchTrimElements;
 	private IRendererFactory rendererFactory;
@@ -85,8 +84,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		if (topTrim == null) {
 			topTrim = modelService.getTrim(window, SideValue.TOP);
 			topTrim.setElementId(MAIN_TOOLBAR_ID);
+			topTrim.setToBeRendered(false);
 		}
-		topTrim.setToBeRendered(false);
+		// trimBar.setToBeRendered(false);
 
 		renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(
 				MenuFactoryImpl.eINSTANCE.createToolBar(), null);
@@ -166,9 +166,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			separator.setToBeRendered(false);
 			separator.setElementId(item.getId());
 
-			List<MToolBar> toolbars = modelService.findElements(window, item.getId(),
-					MToolBar.class, null);
-			MToolBar toolBar = toolbars.isEmpty() ? null : toolbars.get(0);
+			MToolBar toolBar = (MToolBar) modelService.find(item.getId(), window);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
 				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
@@ -265,12 +263,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	 * @see org.eclipse.jface.action.IContributionManager#find(java.lang.String)
 	 */
 	public IContributionItem find(String id) {
-		List<MToolBar> toolbars = modelService.findElements(window, id, MToolBar.class, null);
-		if (toolbars.isEmpty()) {
+		MTrimElement el = (MTrimElement) modelService.find(id, window);
+		if (el == null || !(el instanceof MToolBar))
 			return null;
-		}
 
-		final MToolBar model = toolbars.get(0);
+		final MToolBar model = (MToolBar) el;
 		if (model.getTransientData().get(OBJECT) != null) {
 			return (IContributionItem) model.getTransientData().get(OBJECT);
 		}
@@ -710,11 +707,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			if (item == null) {
 				continue;
 			}
-			MToolBarElement toolBarElem = renderer.getToolElement(item);
-			if (toolBarElem != null) {
-				if (container.isVisible()) {
-					setChildVisible(toolBarElem, item, manager);
-				}
+			if (renderer.getToolElement(item) != null) {
 				continue;
 			}
 			if (item instanceof IToolBarContributionItem) {
@@ -744,36 +737,5 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				renderer.linkModelToContribution(toolItem, item);
 			}
 		}
-	}
-
-	private void setChildVisible(MToolBarElement modelItem, IContributionItem item,
-			IContributionManager manager) {
-		Boolean currentChildVisible = isChildVisible(item, manager);
-		Boolean prevChildVisible = (Boolean) modelItem.getTransientData().get(PREV_CHILD_VISIBLE);
-
-		if (currentChildVisible != null) {
-			if (prevChildVisible == null) {
-				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
-				modelItem.setVisible(currentChildVisible);
-			}
-		} else if (prevChildVisible != null) {
-			modelItem.setVisible(prevChildVisible);
-			modelItem.getTransientData().remove(PREV_CHILD_VISIBLE);
-		}
-	}
-
-	private Boolean isChildVisible(IContributionItem item, IContributionManager manager) {
-		Boolean v;
-		IContributionManagerOverrides overrides = manager.getOverrides();
-		if (overrides == null) {
-			v = null;
-		} else {
-			v = overrides.getVisible(item);
-		}
-
-		if (v != null) {
-			return v.booleanValue();
-		}
-		return null;
 	}
 }
