@@ -12,9 +12,7 @@ package org.eclipse.ui.tests.progress;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Vector;
-
-import junit.framework.TestCase;
+import java.util.List;
 
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
@@ -31,6 +29,8 @@ import org.eclipse.ui.internal.progress.ProgressAnimationItem;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressRegion;
 import org.eclipse.ui.progress.IProgressConstants;
+
+import junit.framework.TestCase;
 
 public class ProgressAnimationItemTest extends TestCase {
 	private Shell shell;
@@ -126,7 +126,7 @@ public class ProgressAnimationItemTest extends TestCase {
 	private static int getAccessibleListenersSize(Accessible accessible) throws Exception {
 		Field f = Accessible.class.getDeclaredField("accessibleListeners");
 		f.setAccessible(true);
-		Vector accessibleListeners = (Vector) f.get(accessible);
+		List accessibleListeners = (List) f.get(accessible);
 		return accessibleListeners == null ? 0 : accessibleListeners.size();
 	}
 
