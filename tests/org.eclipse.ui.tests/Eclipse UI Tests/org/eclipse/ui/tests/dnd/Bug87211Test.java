@@ -30,7 +30,6 @@ public class Bug87211Test extends TestCase {
 
 	private IWorkbenchWindow fWindow;
 
-	@Override
 	protected void setUp() throws Exception {
 		fWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		fPage = (WorkbenchPage) fWindow.getActivePage();

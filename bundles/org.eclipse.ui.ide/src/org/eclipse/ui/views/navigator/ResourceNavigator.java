@@ -108,7 +108,6 @@ import org.eclipse.ui.views.framelist.TreeFrame;
  * Implements the Resource Navigator view.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         IResourceNavigator {
 
@@ -160,8 +159,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * @deprecated No longer used but preserved to avoid an api change.
      */
-    @Deprecated
-	public static final String NAVIGATOR_VIEW_HELP_ID = INavigatorHelpContextIds.RESOURCE_VIEW;
+    public static final String NAVIGATOR_VIEW_HELP_ID = INavigatorHelpContextIds.RESOURCE_VIEW;
 
     /**
      * True iff we've already scheduled an asynchronous call to linkToEditor
@@ -188,36 +186,30 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     private static final String TAG_CURRENT_FRAME = "currentFrame"; //$NON-NLS-1$
 
     private IPartListener partListener = new IPartListener() {
-        @Override
-		public void partActivated(IWorkbenchPart part) {
+        public void partActivated(IWorkbenchPart part) {
             if (part instanceof IEditorPart) {
 				editorActivated((IEditorPart) part);
 			}
         }
 
-        @Override
-		public void partBroughtToTop(IWorkbenchPart part) {
+        public void partBroughtToTop(IWorkbenchPart part) {
             if (part instanceof IEditorPart) {
 				editorActivated((IEditorPart) part);
 			}
         }
 
-        @Override
-		public void partClosed(IWorkbenchPart part) {
+        public void partClosed(IWorkbenchPart part) {
         }
 
-        @Override
-		public void partDeactivated(IWorkbenchPart part) {
+        public void partDeactivated(IWorkbenchPart part) {
         }
 
-        @Override
-		public void partOpened(IWorkbenchPart part) {
+        public void partOpened(IWorkbenchPart part) {
         }
     };
 
     private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             String property = event.getProperty();
             Object newValue = event.getNewValue();
             Object oldValue = event.getOldValue();
@@ -305,8 +297,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         TreeViewer viewer = createViewer(parent);
         this.viewer = viewer;
 
@@ -370,8 +361,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-            @Override
-			public void menuAboutToShow(IMenuManager manager) {
+            public void menuAboutToShow(IMenuManager manager) {
                 ResourceNavigator.this.fillContextMenu(manager);
             }
         });
@@ -457,20 +447,17 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      */
     protected void initListeners(final TreeViewer viewer) {
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(SelectionChangedEvent event) {
                 handleSelectionChanged(event);
             }
         });
         viewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(DoubleClickEvent event) {
                 handleDoubleClick(event);
             }
         });
         
 		openAndLinkWithEditorHelper = new OpenAndLinkWithEditorHelper(viewer) {
-			@Override
 			protected void activate(ISelection selection) {
 				Object selectedElement = getSingleElement(selection);
 				if (selectedElement instanceof IFile) {
@@ -484,14 +471,12 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 				
 			}
 
-			@Override
 			protected void linkToEditor(ISelection selection) {
 		        if (!linkScheduled) {
 					// Ensure that if another selection change arrives while we're waiting for the *syncExec,
 					// we only do this work once.
 					linkScheduled = true;
 					getSite().getShell().getDisplay().asyncExec(new Runnable() {
-						@Override
 						public void run() {
 							// There's no telling what might have changed since the syncExec was scheduled.
 							// Check to make sure that the widgets haven't been disposed.
@@ -511,7 +496,6 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 				}
 			}
 
-			@Override
 			protected void open(ISelection selection, boolean activate) {
 				handleOpen(selection);
 			}
@@ -520,13 +504,11 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         
 
         viewer.getControl().addKeyListener(new KeyListener() {
-            @Override
-			public void keyPressed(KeyEvent event) {
+            public void keyPressed(KeyEvent event) {
                 handleKeyPressed(event);
             }
 
-            @Override
-			public void keyReleased(KeyEvent event) {
+            public void keyReleased(KeyEvent event) {
                 handleKeyReleased(event);
             }
         });
@@ -537,8 +519,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         getSite().getPage().removePartListener(partListener);
 
         IWorkingSetManager workingSetManager = getPlugin().getWorkbench()
@@ -600,8 +581,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @see IResourceNavigatorPart
      * @since 2.0
      */
-    @Override
-	public FrameList getFrameList() {
+    public FrameList getFrameList() {
         return frameList;
     }
 
@@ -646,8 +626,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @return the pattern filter
      * @since 2.0
      */
-    @Override
-	public ResourcePatternFilter getPatternFilter() {
+    public ResourcePatternFilter getPatternFilter() {
         return this.patternFilter;
     }
 
@@ -657,8 +636,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @return the working set
      * @since 2.0
      */
-    @Override
-	public IWorkingSet getWorkingSet() {
+    public IWorkingSet getWorkingSet() {
         return workingSetFilter.getWorkingSet();
     }
 
@@ -678,9 +656,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 * @since 2.0
 	 * @deprecated as of 3.3, use {@link ResourceNavigator#getComparator()}
 	 */
-    @Deprecated
-	@Override
-	public ResourceSorter getSorter() {
+    public ResourceSorter getSorter() {
         ViewerSorter sorter = getTreeViewer().getSorter();
         if (sorter instanceof ResourceSorter) {
         	return (ResourceSorter) sorter;
@@ -697,8 +673,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @since 3.3
      */
 
-    @Override
-	public ResourceComparator getComparator(){
+    public ResourceComparator getComparator(){
     	ViewerComparator comparator = getTreeViewer().getComparator();
     	if (comparator instanceof ResourceComparator) {
     		return (ResourceComparator) comparator;
@@ -709,8 +684,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * Returns the resource viewer which shows the resource hierarchy.
      * @since 2.0
      */
-    @Override
-	public TreeViewer getViewer() {
+    public TreeViewer getViewer() {
         return viewer;
     }
 
@@ -730,8 +704,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @return the shell
      * @deprecated use getViewSite().getShell()
      */
-    @Deprecated
-	public Shell getShell() {
+    public Shell getShell() {
         return getViewSite().getShell();
     }
 
@@ -800,8 +773,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 * @since 2.0
 	 * @deprecated As of 3.5, replaced by {@link #handleOpen(ISelection)}
 	 */
-    @Deprecated
-	protected void handleOpen(OpenEvent event) {
+    protected void handleOpen(OpenEvent event) {
         handleOpen(event.getSelection());
 	}
 
@@ -882,8 +854,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /* (non-Javadoc)
      * Method declared on IViewPart.
      */
-    @Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+    public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -905,8 +876,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         adapter.setFeedbackEnabled(false);
         viewer.addDropSupport(ops | DND.DROP_DEFAULT, transfers, adapter);
         dragDetectListener = new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 dragDetected = true;
             }
         };
@@ -930,8 +900,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * 
      * @deprecated as of 3.3, use {@link ResourceNavigator#initResourceComparator()} instead
      */
-    @Deprecated
-	protected void initResourceSorter() {
+    protected void initResourceSorter() {
         int sortType = ResourceSorter.NAME;
         try {
             int sortInt = 0;
@@ -1014,8 +983,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 *         if not
 	 * @since 2.0 (this was protected in 2.0, but was made public in 2.1)
 	 */
-    @Override
-	public boolean isLinkingEnabled() {
+    public boolean isLinkingEnabled() {
         return linkingEnabled;
     }
 
@@ -1025,8 +993,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 * @since 2.0
 	 * @deprecated As of 3.5, replaced by {@link #linkToEditor(ISelection)}
 	 */
-    @Deprecated
-	protected void linkToEditor(IStructuredSelection selection) {
+    protected void linkToEditor(IStructuredSelection selection) {
     	linkToEditor((ISelection)selection);
 	}
 
@@ -1182,8 +1149,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * @see ViewPart#saveState
      */
-    @Override
-	public void saveState(IMemento memento) {
+    public void saveState(IMemento memento) {
         TreeViewer viewer = getTreeViewer();
         if (viewer == null) {
             if (this.memento != null) {
@@ -1264,8 +1230,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * Selects and reveals the specified elements.
      */
-    @Override
-	public void selectReveal(ISelection selection) {
+    public void selectReveal(ISelection selection) {
         StructuredSelection ssel = convertSelection(selection);
         if (!ssel.isEmpty()) {
             getViewer().getControl().setRedraw(false);
@@ -1278,8 +1243,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * Saves the filters defined as strings in <code>patterns</code>
      * in the preference store.
      */
-    @Override
-	public void setFiltersPreference(String[] patterns) {
+    public void setFiltersPreference(String[] patterns) {
 
         StringBuffer sb = new StringBuffer();
 
@@ -1306,8 +1270,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * @see IWorkbenchPart#setFocus()
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         getTreeViewer().getTree().setFocus();
     }
 
@@ -1321,8 +1284,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @param decorator a label decorator or <code>null</code> for no decorations.
      * @deprecated use the decorators extension point instead; see IWorkbench.getDecoratorManager()
      */
-    @Deprecated
-	public void setLabelDecorator(ILabelDecorator decorator) {
+    public void setLabelDecorator(ILabelDecorator decorator) {
         // do nothing
     }
 
@@ -1330,8 +1292,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @see IResourceNavigator#setLinkingEnabled(boolean)
      * @since 2.1
      */
-    @Override
-	public void setLinkingEnabled(boolean enabled) {
+    public void setLinkingEnabled(boolean enabled) {
         this.linkingEnabled = enabled;
 
         // remember the last setting in the dialog settings
@@ -1355,9 +1316,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @since 2.0
      * @deprecated as of 3.3, use {@link ResourceNavigator#setComparator(ResourceComparator)}
      */
-    @Deprecated
-	@Override
-	public void setSorter(ResourceSorter sorter) {
+    public void setSorter(ResourceSorter sorter) {
         TreeViewer viewer = getTreeViewer();
         ViewerSorter viewerSorter = viewer.getSorter();
 
@@ -1380,8 +1339,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @param comparator the resource comparator
      * @since 3.3
      */
-    @Override
-	public void setComparator(ResourceComparator comparator){
+    public void setComparator(ResourceComparator comparator){
         TreeViewer viewer = getTreeViewer();
         ViewerComparator viewerComparator = viewer.getComparator();
 
@@ -1402,8 +1360,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @see org.eclipse.ui.views.navigator.IResourceNavigatorPart#setWorkingSet(IWorkingSet)
      * @since 2.0
      */
-    @Override
-	public void setWorkingSet(IWorkingSet workingSet) {
+    public void setWorkingSet(IWorkingSet workingSet) {
         TreeViewer treeViewer = getTreeViewer();
         Object[] expanded = treeViewer.getExpandedElements();
         ISelection selection = treeViewer.getSelection();
@@ -1524,8 +1481,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /*
      * @see IWorkbenchPart#getAdapter(Class)
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IShowInSource.class) {
             return getShowInSource();
         }
@@ -1540,8 +1496,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      */
     protected IShowInSource getShowInSource() {
         return new IShowInSource() {
-            @Override
-			public ShowInContext getShowInContext() {
+            public ShowInContext getShowInContext() {
                 return new ShowInContext(getViewer().getInput(), getViewer()
                         .getSelection());
             }
@@ -1553,8 +1508,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      */
     protected IShowInTarget getShowInTarget() {
         return new IShowInTarget() {
-            @Override
-			public boolean show(ShowInContext context) {
+            public boolean show(ShowInContext context) {
                 ArrayList toSelect = new ArrayList();
                 ISelection sel = context.getSelection();
                 if (sel instanceof IStructuredSelection) {

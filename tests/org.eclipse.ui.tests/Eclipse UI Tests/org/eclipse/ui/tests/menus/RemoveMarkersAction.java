@@ -35,8 +35,7 @@ public class RemoveMarkersAction implements IWorkbenchWindowActionDelegate {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         // TODO Auto-generated method stub
 
     }
@@ -44,16 +43,14 @@ public class RemoveMarkersAction implements IWorkbenchWindowActionDelegate {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
      */
-    @Override
-	public void init(IWorkbenchWindow window) {
+    public void init(IWorkbenchWindow window) {
         this.window = window;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
      */
-    @Override
-	public void run(IAction action) {
+    public void run(IAction action) {
         try {
 	        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 	        
@@ -91,8 +88,7 @@ public class RemoveMarkersAction implements IWorkbenchWindowActionDelegate {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
      */
-    @Override
-	public void selectionChanged(IAction action, ISelection selection) {
+    public void selectionChanged(IAction action, ISelection selection) {
         // TODO Auto-generated method stub
 
     }

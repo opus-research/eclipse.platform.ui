@@ -41,7 +41,6 @@ public class IAggregateWorkingSetTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		IWorkingSetManager workingSetManager = fWorkbench
@@ -60,7 +59,6 @@ public class IAggregateWorkingSetTest extends UITestCase {
 
 		workingSetManager.addWorkingSet(fWorkingSet);
 	}
-	@Override
 	protected void doTearDown() throws Exception {
 		IWorkingSetManager workingSetManager = fWorkbench.getWorkingSetManager();
 		workingSetManager.removeWorkingSet(fWorkingSet);

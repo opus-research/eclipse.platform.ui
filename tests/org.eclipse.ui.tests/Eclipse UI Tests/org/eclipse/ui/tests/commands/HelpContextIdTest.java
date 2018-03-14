@@ -67,7 +67,6 @@ public final class HelpContextIdTest extends UITestCase {
 
 		// Retract the handler help context id by creating a handler conflict.
 		handlerService.activateHandler(COMMAND_ID, new AbstractHandler() {
-			@Override
 			public final Object execute(final ExecutionEvent event) {
 				return null;
 			}

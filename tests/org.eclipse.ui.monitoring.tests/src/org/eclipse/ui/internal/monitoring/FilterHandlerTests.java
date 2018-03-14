@@ -6,58 +6,61 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *	   Steve Foreman (Google) - initial API and implementation
- *	   Marcus Eng (Google)
- *	   Sergey Prigogin (Google)
+ *     Steve Foreman (Google) - initial API and implementation
+ *     Marcus Eng (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 
 import junit.framework.TestCase;
 
 import org.eclipse.ui.monitoring.StackSample;
+import org.eclipse.ui.monitoring.UiFreezeEvent;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 
 /**
  * Tests for {@link FilterHandler} class.
  */
 public class FilterHandlerTests extends TestCase {
 	private static final String FILTER_TRACES =
-			"org.eclipse.ui.internal.monitoring.FilterHandlerTests.createFilteredStackSamples";
+			"org.eclipse.ui.internal.monitoring.FilterHandlerTests.createFilteredUiFreezeEvent";
 	private static final long THREAD_ID = Thread.currentThread().getId();
 
-	private StackSample[] createStackSamples() {
+	private UiFreezeEvent createUiFreezeEvent() {
 		ThreadMXBean jvmThreadManager = ManagementFactory.getThreadMXBean();
 		ThreadInfo thread =
 				jvmThreadManager.getThreadInfo(Thread.currentThread().getId(), Integer.MAX_VALUE);
-		return new StackSample[] { new StackSample(0, new ThreadInfo[] { thread }) };
+		StackSample[] samples = { new StackSample(0, new ThreadInfo[] { thread }) };
+		return new UiFreezeEvent(0, 0, samples, 1, false);
 	}
 
 	/**
-	 * Creates stack samples that should not be filtered.
+	 * Creates a {@link UiFreezeEvent} with a stack trace that is not filtered.
 	 */
-	private StackSample[] createUnfilteredStackSamples() {
-		return createStackSamples();
+	private UiFreezeEvent createUnfilteredUiFreezeEvent() {
+		return createUiFreezeEvent();
 	}
 
 	/**
-	 * Creates stack samples that should be filtered.
+	 * Creates a {@link UiFreezeEvent} with a stack trace that should be filtered.
 	 */
-	private StackSample[] createFilteredStackSamples() {
-		return createStackSamples();
+	private UiFreezeEvent createFilteredUiFreezeEvent() {
+		return createUiFreezeEvent();
 	}
 
 	public void testUnfilteredEventLogging() {
 		FilterHandler filterHandler = new FilterHandler(FILTER_TRACES);
-		StackSample[] samples = createUnfilteredStackSamples();
-		assertTrue(filterHandler.shouldLogEvent(samples, samples.length, THREAD_ID));
+		UiFreezeEvent unfilteredEvent = createUnfilteredUiFreezeEvent();
+
+		assertTrue(filterHandler.shouldLogEvent(unfilteredEvent, THREAD_ID));
 	}
 
 	public void testFilteredEventLogging() {
 		FilterHandler filterHandler = new FilterHandler(FILTER_TRACES);
-		StackSample[] samples = createFilteredStackSamples();
-		assertFalse(filterHandler.shouldLogEvent(samples, samples.length, THREAD_ID));
+		UiFreezeEvent filteredEvent = createFilteredUiFreezeEvent();
+
+		assertFalse(filterHandler.shouldLogEvent(filteredEvent, THREAD_ID));
 	}
 }
