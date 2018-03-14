@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440136
  *******************************************************************************/
 package org.eclipse.ui.tests.performance;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.eclipse.ui.tests.performance.presentations.PresentationPerformanceTestSuite;
 
 /**
  * Test all areas of the UI API.
@@ -32,6 +33,7 @@ public class UIPerformanceTestSuite extends FilteredTestSuite {
     public UIPerformanceTestSuite() {
     	super();
         addTest(new ActivitiesPerformanceSuite());
+        addTest(new PresentationPerformanceTestSuite());
         addTest(new WorkbenchPerformanceSuite());
         addTest(new ViewPerformanceSuite());
         addTest(new EditorPerformanceSuite());
