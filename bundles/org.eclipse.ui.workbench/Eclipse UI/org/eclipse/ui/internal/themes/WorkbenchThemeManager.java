@@ -78,13 +78,32 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * 
 	 * @return singleton instance
 	 */
-	public static synchronized WorkbenchThemeManager getInstance() {
+	public static WorkbenchThemeManager getInstance() {
 		if (instance == null) {
-			instance = new WorkbenchThemeManager();
+			if (PlatformUI.getWorkbench().getDisplay() != null) {
+				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						getInternalInstance();
+					}
+				});
+			}
 		}
 		return instance;
 	}
 
+	/**
+	 * Initialize the singleton theme manager. Must be called in the UI thread.
+	 * 
+	 * @return the theme manager.
+	 */
+	private static synchronized WorkbenchThemeManager getInternalInstance() {
+		if (instance == null) {
+			instance = new WorkbenchThemeManager();
+			instance.getCurrentTheme(); // initialize the current theme
+		}
+		return instance;
+	}
 
 	private ITheme currentTheme;
 
@@ -115,11 +134,6 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private EventHandler themeRegistryModifiedHandler = new ThemeRegistryModifiedHandler();
 
-	private boolean initialized = false;
-
-	private WorkbenchThemeManager() {
-	}
-
 	/*
 	 * Initialize the WorkbenchThemeManager.
 	 * Determine the default theme according to the following rules:
@@ -128,13 +142,7 @@ public class WorkbenchThemeManager extends EventManager implements
 	 *   3) Otherwise, use our default
 	 * Call dispose when we close.
 	 */
-	private void init() {
-		synchronized (this) {
-			if (initialized) {
-				return;
-			}
-			initialized = true;
-		}
+	private WorkbenchThemeManager() {
 		defaultThemeColorRegistry = new ColorRegistry(PlatformUI.getWorkbench()
 				.getDisplay());
 
@@ -179,7 +187,6 @@ public class WorkbenchThemeManager extends EventManager implements
 			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, themeChangedHandler);
 			eventBroker.subscribe(Events.THEME_REGISTRY_MODIFIED, themeRegistryModifiedHandler);
 		}
-		getCurrentTheme(); // initialize the current theme
 	}
 
 	/*
@@ -270,7 +277,6 @@ public class WorkbenchThemeManager extends EventManager implements
 	 */
 	@Override
 	public ITheme getCurrentTheme() {
-		init();
 		if (currentTheme == null) {
 			String themeId = PrefUtil.getAPIPreferenceStore().getString(
 					IWorkbenchPreferenceConstants.CURRENT_THEME_ID);
@@ -301,7 +307,6 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * @return the default color registry
 	 */
 	public ColorRegistry getDefaultThemeColorRegistry() {
-		init();
 		return defaultThemeColorRegistry;
 	}
 
@@ -311,7 +316,6 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * @return the default font registry
 	 */
 	public FontRegistry getDefaultThemeFontRegistry() {
-		init();
 		return defaultThemeFontRegistry;
 	}
 
@@ -331,7 +335,6 @@ public class WorkbenchThemeManager extends EventManager implements
 	 */
 	@Override
 	public ITheme getTheme(String id) {
-		init();
 		if (id.equals(IThemeManager.DEFAULT_THEME)) {
 			return getTheme((IThemeDescriptor) null);
 		}
@@ -370,7 +373,6 @@ public class WorkbenchThemeManager extends EventManager implements
 	 */
 	@Override
 	public void setCurrentTheme(String id) {
-		init();
 		ITheme oldTheme = currentTheme;
 		if (WorkbenchThemeManager.getInstance().doSetCurrentTheme(id)) {
 			firePropertyChange(CHANGE_CURRENT_THEME, oldTheme,
@@ -614,7 +616,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		protected void sendThemeDefinitionChangedEvent() {
 			MApplication application = (MApplication) getContext()
 					.get(MApplication.class.getName());
-			getInstance().eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
+			getInternalInstance().eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
 					application);
 		}
 
