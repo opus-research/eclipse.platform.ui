@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Dinko Ivanov - bug 164365
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 448143
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 470397
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -29,16 +30,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * Editor Activation on DoubleClick instead of single.
- *
- * @author Tom Schindl <tom.schindl@bestsolution.at>
+ * Demonstrates how to activate the editor in in a table on double click instead of a single click.
  *
  */
 public class Snippet021CellEditorsOnDoubleClick {
@@ -96,37 +93,25 @@ public class Snippet021CellEditorsOnDoubleClick {
 		final TableViewer v = new TableViewer(table);
 		final MyEditingSupport editingSupport = new MyEditingSupport(v);
 
-		table.addListener(SWT.MouseDown, new Listener() {
+		table.addListener(SWT.MouseDown, event -> editingSupport.setEnabled(false));
 
-			@Override
-			public void handleEvent(Event event) {
-				editingSupport.setEnabled(false);
+		table.addListener(SWT.MouseDoubleClick, event -> {
+			editingSupport.setEnabled(true);
+			TableItem[] selection = table.getSelection();
+
+			if (selection.length != 1) {
+				return;
 			}
 
-		});
+			TableItem item = table.getSelection()[0];
 
-		table.addListener(SWT.MouseDoubleClick, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				editingSupport.setEnabled(true);
-				TableItem[] selection = table.getSelection();
-
-				if (selection.length != 1) {
-					return;
-				}
-
-				TableItem item = table.getSelection()[0];
-
-				for (int i = 0; i < table.getColumnCount(); i++) {
-					if (item.getBounds(i).contains(event.x, event.y)) {
-						v.editElement(v.getStructuredSelection().getFirstElement(), i);
-						editingSupport.setEnabled(false);
-						break;
-					}
+			for (int i = 0; i < table.getColumnCount(); i++) {
+				if (item.getBounds(i).contains(event.x, event.y)) {
+					v.editElement(v.getStructuredSelection().getFirstElement(), i);
+					editingSupport.setEnabled(false);
+					break;
 				}
 			}
-
 		});
 
 		TableViewerColumn viewerColumn = new TableViewerColumn(v, SWT.NONE);
@@ -141,7 +126,7 @@ public class Snippet021CellEditorsOnDoubleClick {
 	}
 
 	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+		List<MyModel> elements = new ArrayList<>();
 
 		for (int i = 0; i < 10; i++) {
 			elements.add(new MyModel(i));
@@ -149,9 +134,6 @@ public class Snippet021CellEditorsOnDoubleClick {
 		return elements;
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		Display display = new Display();
 		Shell shell = new Shell(display);
