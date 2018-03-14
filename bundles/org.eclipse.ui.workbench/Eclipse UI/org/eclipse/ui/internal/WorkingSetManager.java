@@ -52,12 +52,22 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 		super(context);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSetManager
+	 */
 	@Override
 	public void addRecentWorkingSet(IWorkingSet workingSet) {
 		internalAddRecentWorkingSet(workingSet);
 		saveState();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSetManager
+	 */
 	@Override
 	public void addWorkingSet(IWorkingSet workingSet) {
 		super.addWorkingSet(workingSet);
@@ -79,6 +89,11 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 		return path.toFile();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSetManager
+	 */
 	@Override
 	public void removeWorkingSet(IWorkingSet workingSet) {
 		if (internalRemoveWorkingSet(workingSet)) {
