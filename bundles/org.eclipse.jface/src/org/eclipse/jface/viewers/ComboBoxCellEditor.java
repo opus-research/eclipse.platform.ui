@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,9 +129,7 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 		populateComboBoxItems();
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on CellEditor.
-	 */
+	@Override
 	protected Control createControl(Composite parent) {
 
 		comboBox = new CCombo(parent, getStyle());
@@ -141,22 +139,26 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 
 		comboBox.addKeyListener(new KeyAdapter() {
 			// hook key pressed - see PR 14201
+			@Override
 			public void keyPressed(KeyEvent e) {
 				keyReleaseOccured(e);
 			}
 		});
 
 		comboBox.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 				applyEditorValueAndDeactivate();
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				selection = comboBox.getSelectionIndex();
 			}
 		});
 
 		comboBox.addTraverseListener(new TraverseListener() {
+			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_ESCAPE
 						|| e.detail == SWT.TRAVERSE_RETURN) {
@@ -166,6 +168,7 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 		});
 
 		comboBox.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent e) {
 				ComboBoxCellEditor.this.focusLost();
 			}
@@ -181,13 +184,12 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 	 * @return the zero-based index of the current selection wrapped as an
 	 *         <code>Integer</code>
 	 */
+	@Override
 	protected Object doGetValue() {
 		return new Integer(selection);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on CellEditor.
-	 */
+	@Override
 	protected void doSetFocus() {
 		comboBox.setFocus();
 	}
@@ -200,6 +202,7 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 	 * to make sure the arrow button and some text is visible. The list of
 	 * CCombo will be wide enough to show its longest item.
 	 */
+	@Override
 	public LayoutData getLayoutData() {
 		LayoutData layoutData = super.getLayoutData();
 		if ((comboBox == null) || comboBox.isDisposed()) {
@@ -223,6 +226,7 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 	 *            the zero-based index of the selection wrapped as an
 	 *            <code>Integer</code>
 	 */
+	@Override
 	protected void doSetValue(Object value) {
 		Assert.isTrue(comboBox != null && (value instanceof Integer));
 		selection = ((Integer) value).intValue();
@@ -274,22 +278,14 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 		deactivate();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.CellEditor#focusLost()
-	 */
+	@Override
 	protected void focusLost() {
 		if (isActivated()) {
 			applyEditorValueAndDeactivate();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.CellEditor#keyReleaseOccured(org.eclipse.swt.events.KeyEvent)
-	 */
+	@Override
 	protected void keyReleaseOccured(KeyEvent keyEvent) {
 		if (keyEvent.character == '\u001b') { // Escape character
 			fireCancelEditor();

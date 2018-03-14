@@ -70,12 +70,15 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case BasicPackageImpl.PART: return (EObject)createPart();
+			case BasicPackageImpl.COMPOSITE_PART: return (EObject)createCompositePart();
 			case BasicPackageImpl.INPUT_PART: return (EObject)createInputPart();
 			case BasicPackageImpl.PART_STACK: return (EObject)createPartStack();
 			case BasicPackageImpl.PART_SASH_CONTAINER: return (EObject)createPartSashContainer();
 			case BasicPackageImpl.WINDOW: return (EObject)createWindow();
 			case BasicPackageImpl.TRIMMED_WINDOW: return (EObject)createTrimmedWindow();
 			case BasicPackageImpl.TRIM_BAR: return (EObject)createTrimBar();
+			case BasicPackageImpl.DIALOG: return (EObject)createDialog();
+			case BasicPackageImpl.WIZARD_DIALOG: return (EObject)createWizardDialog();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -89,6 +92,16 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	public MPart createPart() {
 		PartImpl part = new PartImpl();
 		return part;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public MCompositePart createCompositePart() {
+		CompositePartImpl compositePart = new CompositePartImpl();
+		return compositePart;
 	}
 
 	/**
@@ -149,6 +162,26 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	public MTrimBar createTrimBar() {
 		TrimBarImpl trimBar = new TrimBarImpl();
 		return trimBar;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public MDialog createDialog() {
+		DialogImpl dialog = new DialogImpl();
+		return dialog;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public MWizardDialog createWizardDialog() {
+		WizardDialogImpl wizardDialog = new WizardDialogImpl();
+		return wizardDialog;
 	}
 
 	/**

@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.ui.IAggregateWorkingSet;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IWorkbench;
@@ -87,6 +88,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 */
 	private String workingSetLabel;
 
+	@Override
 	public void createPartControl(Composite aParent) {
 		super.createPartControl(aParent);
 		
@@ -100,6 +102,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * 
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
+	@Override
 	public void updateTitle() {
 		super.updateTitle();
 		Object input = getCommonViewer().getInput();
@@ -110,6 +113,11 @@ public final class ProjectExplorer extends CommonNavigator {
 		}
 
 		if (!(input instanceof IResource)) {
+			String label = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(input);
+			if (label != null) {
+				setContentDescription(label);
+				return;
+			}
 			if (input instanceof IAdaptable) {
 				IWorkbenchAdapter wbadapter = (IWorkbenchAdapter) ((IAdaptable) input)
 						.getAdapter(IWorkbenchAdapter.class);
@@ -134,6 +142,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @return the tooltip
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
+	@Override
 	public String getFrameToolTipText(Object element) {
 		String result;
 		if (!(element instanceof IResource)) {
@@ -199,6 +208,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
+	@Override
 	public void setRootMode(int mode) {
 		rootMode = mode;
 	}
@@ -208,6 +218,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
+	@Override
 	public int getRootMode() {
 		return rootMode;
 	}
@@ -217,6 +228,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
+	@Override
 	public void setWorkingSetLabel(String label) {
 		workingSetLabel = label;
 	}
@@ -226,6 +238,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @noreference This method is not intended to be referenced by clients.
 	 * @since 3.4
 	 */
+	@Override
 	public String getWorkingSetLabel() {
 		return workingSetLabel;
 	}
@@ -234,6 +247,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @see org.eclipse.ui.navigator.CommonNavigator#handleDoubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
 	 * @since 4.3
 	 */
+	@Override
 	protected void handleDoubleClick(DoubleClickEvent anEvent) {
 		ICommandService commandService = (ICommandService) getViewSite().getService(ICommandService.class);
 		Command openProjectCommand = commandService.getCommand(IWorkbenchCommandConstants.PROJECT_OPEN_PROJECT);

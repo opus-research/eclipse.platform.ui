@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -49,6 +48,7 @@ public class MenuRenderer extends SWTPartRenderer {
 		application = context.get(MApplication.class);
 	}
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
 			return null;
@@ -62,6 +62,7 @@ public class MenuRenderer extends SWTPartRenderer {
 			if (container instanceof MWindow) {
 				newMenu = new Menu((Decorations) parent, SWT.BAR);
 				newMenu.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						cleanUp(menuModel);
 					}
