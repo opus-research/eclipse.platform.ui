@@ -11,12 +11,12 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
+import org.junit.Assert;
 
 /**
  * This view is used to test the creation and restoration of 
