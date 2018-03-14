@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ class MarkerUpdateJob extends Job {
 
 	CachedMarkerBuilder builder;
 	private boolean clean;
-	private long lastUpdateTime = -1;
+	private long lastUpdateTime=-1;
 
 	/**
 	 * @param builder
@@ -45,9 +45,16 @@ class MarkerUpdateJob extends Job {
 		this.builder = builder;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @seeorg.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
+	 * IProgressMonitor)
+	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		monitor.beginTask(MarkerMessages.MarkerView_searching_for_markers, IProgressMonitor.UNKNOWN);
+		monitor.beginTask(MarkerMessages.MarkerView_searching_for_markers,
+				IProgressMonitor.UNKNOWN);
 		buildMarkers(monitor);
 		return Status.OK_STATUS;
 	}
@@ -66,7 +73,7 @@ class MarkerUpdateJob extends Job {
 		// builder.getUpdateScheduler().indicateStatus(
 		// MarkerMessages.MarkerView_searching_for_markers, false);
 
-		Collection<MarkerEntry> markerEntries = new LinkedList<>();
+		Collection markerEntries = new LinkedList();
 		//this is not incremental clean every time
 		clean = !clean(markerEntries, monitor);
 		if (monitor.isCanceled()) {
@@ -82,7 +89,8 @@ class MarkerUpdateJob extends Job {
 		if (monitor.isCanceled()) {
 			return;
 		}
-		builder.getUpdateScheduler().scheduleUIUpdate(MarkerUpdateScheduler.SHORT_DELAY);
+		builder.getUpdateScheduler().scheduleUIUpdate(
+				MarkerUpdateScheduler.SHORT_DELAY);
 		if (monitor.isCanceled()) {
 			return;
 		}
@@ -101,7 +109,7 @@ class MarkerUpdateJob extends Job {
 	 * Collect the markers starting clean, all over again.
 	 * @param markerEntries
 	 */
-	boolean clean(Collection<MarkerEntry> markerEntries, IProgressMonitor monitor) {
+	boolean clean(Collection markerEntries, IProgressMonitor monitor) {
 		MarkerContentGenerator generator = builder.getGenerator();
 		if (monitor.isCanceled() || generator == null) {
 			return false;
@@ -117,7 +125,8 @@ class MarkerUpdateJob extends Job {
 	 * @param markerEntries
 	 *            the collection of new MarkerEntry(s)
 	 */
-	boolean processMarkerEntries(Collection<MarkerEntry> markerEntries, IProgressMonitor monitor) {
+	boolean processMarkerEntries(Collection markerEntries,
+			IProgressMonitor monitor) {
 		Markers markers = builder.getMarkers();
 		if (monitor.isCanceled()) {
 			return false;
@@ -125,15 +134,26 @@ class MarkerUpdateJob extends Job {
 		return markers.updateWithNewMarkers(markerEntries, true, monitor);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
+	 */
 	@Override
 	public boolean shouldRun() {
 		if (!PlatformUI.isWorkbenchRunning()) {
 			return false;
 		}
 		// Do not run if the change came in before there is a viewer
-		return (IDEWorkbenchPlugin.getDefault().getBundle().getState() == Bundle.ACTIVE) && builder.isActive();
+		return (IDEWorkbenchPlugin.getDefault().getBundle().getState() == Bundle.ACTIVE)
+				&& builder.isActive();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
+	 */
 	@Override
 	public boolean belongsTo(Object family) {
 		if (family.equals(builder.CACHE_UPDATE_FAMILY)) {
@@ -180,9 +200,17 @@ class SortingJob extends MarkerUpdateJob {
 		this.builder = builder;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.ui.internal.views.markers.MarkerUpdateJob#run(org.eclipse
+	 * .core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		monitor.beginTask(MarkerMessages.MarkerView_19, IProgressMonitor.UNKNOWN);
+		monitor.beginTask(MarkerMessages.MarkerView_19,
+				IProgressMonitor.UNKNOWN);
 		builder.getUpdateScheduler().cancelQueuedUIUpdates();
 		// builder.getUpdateScheduler().indicateStatus(
 		// MarkerMessages.MarkerView_19, false);
