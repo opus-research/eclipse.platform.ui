@@ -8,6 +8,8 @@
  * Contributors:
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 430848
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 431635
  *******************************************************************************/
 
 /*******************************************************************************
@@ -322,8 +324,11 @@ FormHeading {
 }
 
 Section {
-    background-color: #4F5355;
-    color: #AEBED0;
+       background-color: #4F5355;
+       color: #AEBED0;
+       background-color-titlebar: #4F5355;
+       background-color-gradient-titlebar: #4F5355;
+       border-color-titlebar: #4F5355;
 }
 
 Form > LayoutComposite > LayoutComposite > * {
@@ -413,8 +418,12 @@ FlyoutControlComposite, FlyoutControlComposite ToolBar, FlyoutControlComposite C
  * which does not look very nice.
  */
 Label#org-eclipse-ui-splash-progressText {
-	background-color: #f7f7f7;
+	background-color: inherit; /* transparent */
 	color: #9c9696; /* see property startupForegroundColor in the product */
+}
+
+Label#org-eclipse-ui-buildid-text {
+	background-color: inherit; /* transparent */
 }
 
 ProgressIndicator#org-eclipse-ui-splash-progressIndicator {

@@ -10,6 +10,10 @@
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
  *     Steven Spungin <steven@spungin.tv> - Bug 437747
+ *     Alan Staves <alan.staves@microfocus.com> - Bug 435274
+ *     Patrick Naish <patrick.naish@microfocus.com> - Bug 435274
+ *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 378849
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 378849
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -62,6 +66,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.internal.MenuManagerEventHelper;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -392,6 +397,11 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void cleanUp(MMenu menuModel) {
+		for (MMenuElement childElement : menuModel.getChildren()) {
+			if (childElement instanceof MMenu) {
+				cleanUp((MMenu) childElement);
+			}
+		}
 		Collection<ContributionRecord> vals = modelContributionToRecord
 				.values();
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
@@ -845,6 +855,10 @@ MenuManagerEventHelper.getInstance()
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
+		for (MMenuElement element : model.getChildren()) {
+			IContributionItem ici = getContribution(element);
+			clearModelToContribution(element, ici);
+		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
 	}
@@ -917,6 +931,12 @@ MenuManagerEventHelper.getInstance()
 		IContributionItem[] items = menuManager.getItems();
 		for (int src = 0, dest = 0; src < items.length; src++, dest++) {
 			IContributionItem item = items[src];
+
+			if (item instanceof SubContributionItem) {
+				// get the wrapped contribution item
+				item = ((SubContributionItem) item).getInnerItem();
+			}
+
 			if (item instanceof MenuManager) {
 				MenuManager childManager = (MenuManager) item;
 				MMenu childModel = getMenuModel(childManager);
@@ -924,6 +944,8 @@ MenuManagerEventHelper.getInstance()
 					MMenu legacyModel = OpaqueElementUtil.createOpaqueMenu();
 					legacyModel.setElementId(childManager.getId());
 					legacyModel.setVisible(childManager.isVisible());
+					legacyModel.setLabel(childManager.getMenuText());
+
 					linkModelToManager(legacyModel, childManager);
 					OpaqueElementUtil.setOpaqueItem(legacyModel, childManager);
 					if (modelChildren.size() > dest) {
@@ -954,6 +976,10 @@ MenuManagerEventHelper.getInstance()
 														.getElementId()));
 							}
 						}
+					}
+
+					if (childModel.getChildren().size() != childManager.getSize()) {
+						reconcileManagerToModel(childManager, childModel);
 					}
 				}
 			} else if (item.isSeparator() || item.isGroupMarker()) {
