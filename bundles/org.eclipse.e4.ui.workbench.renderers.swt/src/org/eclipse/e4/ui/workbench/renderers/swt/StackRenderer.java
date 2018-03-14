@@ -764,7 +764,6 @@ public class StackRenderer extends LazyStackRenderer {
 			ToolBar newViewTB = null;
 			if (needsTB && part != null && part.getObject() != null) {
 				part.getToolbar().setVisible(true);
-				part.getToolbar().getTags().add(IPresentationEngine.NO_CLOSE);
 				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
 						ctf.getTopRight(), part.getContext());
 				// We can get calls during shutdown in which case the
