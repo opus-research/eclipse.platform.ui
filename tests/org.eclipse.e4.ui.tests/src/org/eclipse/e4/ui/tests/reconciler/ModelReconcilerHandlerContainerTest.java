@@ -11,8 +11,6 @@
 
 package org.eclipse.e4.ui.tests.reconciler;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
@@ -20,12 +18,10 @@ import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerHandlerContainerTest extends
 		ModelReconcilerTest {
 
-	@Test
 	public void testHandlerContainer_Handlers_Add_UnboundHandler() {
 		MApplication application = createApplication();
 
@@ -53,7 +49,6 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 		assertEquals(null, handler.getCommand());
 	}
 
-	@Test
 	public void testHandlerContainer_Handlers_Add_BoundHandler() {
 		MApplication application = createApplication();
 
@@ -86,7 +81,6 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 		assertEquals(command, handler.getCommand());
 	}
 
-	@Test
 	public void testHandlerContainer_Handlers_Remove_UnboundHandler() {
 		MApplication application = createApplication();
 
@@ -116,7 +110,6 @@ public abstract class ModelReconcilerHandlerContainerTest extends
 		assertEquals(0, application.getHandlers().size());
 	}
 
-	@Test
 	public void testHandlerContainer_Handlers_Remove_BoundHandler() {
 		MApplication application = createApplication();
 
