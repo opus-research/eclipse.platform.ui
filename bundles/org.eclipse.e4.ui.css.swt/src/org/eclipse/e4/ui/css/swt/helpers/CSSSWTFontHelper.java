@@ -506,14 +506,20 @@ public class CSSSWTFontHelper {
 		}
 	}
 
+	/** Helper function to avoid setting fonts unnecessarily */
 	public static void setFont(Control control, Font font) {
-		storeDefaultFont(control);
-		control.setFont(font);
+		if (!equals(control.getFont(), font)) {
+			storeDefaultFont(control);
+			control.setFont(font);
+		}
 	}
 
+	/** Helper function to avoid setting fonts unnecessarily */
 	public static void setFont(CTabItem item, Font font) {
-		storeDefaultFont(item);
-		item.setFont(font);
+		if (!equals(item.getFont(), font)) {
+			storeDefaultFont(item);
+			item.setFont(font);
+		}
 	}
 
 	/**
