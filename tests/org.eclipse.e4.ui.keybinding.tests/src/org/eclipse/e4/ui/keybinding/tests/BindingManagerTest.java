@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,8 +46,8 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  * The listener code is tested throughout the various tests. There is no
  * individual test method for the listener code.
  * </p>
- * 
- * @see org.eclipse.ui.tests.keys.BindingInteractionsTest
+ *
+ * @see BindingInteractionsTest
  * @since 3.1
  */
 public final class BindingManagerTest extends UITestCase {
@@ -72,7 +72,7 @@ public final class BindingManagerTest extends UITestCase {
 
 	/**
 	 * Constructor for <code>BindingInteractionsTest</code>.
-	 * 
+	 *
 	 * @param name
 	 *            The name of the test
 	 */
@@ -84,6 +84,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * Creates a new context manager and a binding manager for use in the test
 	 * cases.
 	 */
+	@Override
 	protected final void doSetUp() {
 		commandManager = new CommandManager();
 		contextManager = new ContextManager();
@@ -93,6 +94,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Releases the context manager and binding manager for garbage collection.
 	 */
+	@Override
 	protected final void doTearDown() {
 		bindingManager = null;
 		contextManager = null;
@@ -114,7 +116,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Tests that it is not possible to add a null binding. Tests that adding a
 	 * binding forces a recomputation.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -149,7 +151,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * Tests that <code>getActiveBindingsDisregardingContext()</code> never
 	 * returns <code>null</code>. The rest of the functionality is tested in
 	 * <code>BindingInteractionsTest</code>.
-	 * 
+	 *
 	 * @see BindingInteractionsTest
 	 */
 	public final void testGetActiveBindingsDisregardingContext() {
@@ -165,7 +167,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * Tests that <code>getActiveBindingsDisregardingContextFlat()</code>
 	 * never returns <code>null</code>. The rest of the functionality is
 	 * tested in <code>BindingInteractionsTest</code>.
-	 * 
+	 *
 	 * @see BindingInteractionsTest
 	 */
 	public final void testGetActiveBindingsDisregardingContextFlat() {
@@ -180,7 +182,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Tests whether the method works with a null argument. Tests that it works
 	 * in a simple case.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -221,7 +223,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Tests that the active scheme starts off <code>null</code>. The rest of
 	 * the active scheme testing happens in <code>testSetActiveScheme()</code>.
-	 * 
+	 *
 	 * @see BindingManagerTest#testSetActiveScheme()
 	 */
 	public final void testGetActiveScheme() {
@@ -303,7 +305,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * bindings and a partial match binding. In the second scenario, there are
 	 * two partial match bindings. In the third scenario, we are checking that
 	 * all bindings match an empty trigger sequence.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 * @throws ParseException
@@ -387,7 +389,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * binding. In the second scenario, there are two partial match bindings. In
 	 * the third scenario, we are checking that nothing matches an empty
 	 * sequence.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 * @throws ParseException
@@ -479,7 +481,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * binding. In the second scenario, there are two partial match bindings. In
 	 * the third scenario, we are checking that all bindings match an empty
 	 * trigger sequence.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 * @throws ParseException
@@ -548,7 +550,7 @@ public final class BindingManagerTest extends UITestCase {
 	 * binding. In the second scenario, there are two partial match bindings. In
 	 * the third scenario, we are checking that nothing matches an empty
 	 * sequence.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 * @throws ParseException
@@ -613,7 +615,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Tests that you can remove binding, and that it will change the active
 	 * bindings as well.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -699,7 +701,7 @@ public final class BindingManagerTest extends UITestCase {
 	}
 
 	public void testGetCurrentConflicts() throws NotDefinedException, ParseException {
-		
+
 		final Context context = contextManager.getContext("na");
 		context.define("name", "description", null);
 		final Scheme scheme = bindingManager.getScheme("na");
@@ -730,23 +732,23 @@ public final class BindingManagerTest extends UITestCase {
 
 		Map activeBindingsDisregardingContext = bindingManager.getActiveBindingsDisregardingContext();// force a recompute
 		assertNotNull(activeBindingsDisregardingContext);
-		
+
 		Map currentConflicts = bindingManager.getCurrentConflicts();
 		assertEquals(1, currentConflicts.size()); // we have only one conflict
-		
+
 		Collection conflictsCollection = bindingManager.getConflictsFor(noConflict);
 		assertNull(conflictsCollection); // no conflict for this keybinding
-		
+
 		conflictsCollection = bindingManager.getConflictsFor(conflict);
 		assertNotNull(conflictsCollection); // this has one conflict with 2 commands
 		assertEquals(2, conflictsCollection.size());
 
 	}
-	
+
 	/**
 	 * Verifies that you can set the bindings to null. Verifies that setting the
 	 * bindings clears the cache.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If this test doesn't properly define a scheme.
 	 */
@@ -784,7 +786,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Verifies that it cannot be set to <code>null</code>. Verifies that it
 	 * clears the cache.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If this test doesn't properly define a scheme.
 	 */
@@ -827,7 +829,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Verifies that it cannot be set to <code>null</code>. Verifies that it
 	 * clears the cache.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If this test doesn't properly define a scheme.
 	 */
@@ -870,7 +872,7 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Tests whether the method works with a null argument. Tests that it works
 	 * in a simple case.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the scheme we try to activate is not defined.
 	 */
@@ -903,18 +905,22 @@ public final class BindingManagerTest extends UITestCase {
 		Command cmd = commandManager.getCommand(commandId);
 		IParameter[] parms = new IParameter[1];
 		parms[0] = new IParameter() {
+			@Override
 			public String getId() {
 				return "viewId";
 			}
 
+			@Override
 			public String getName() {
 				return "View Id";
 			}
 
+			@Override
 			public IParameterValues getValues() throws ParameterValuesException {
 				return null;
 			}
 
+			@Override
 			public boolean isOptional() {
 				return false;
 			}
@@ -947,10 +953,10 @@ public final class BindingManagerTest extends UITestCase {
 		final TriggerSequence[] bindings = bindingManager
 				.getActiveBindingsFor(binding.getParameterizedCommand());
 		assertEquals(2, bindings.length);
-		
+
 		final TriggerSequence bestBinding = bindingManager.getBestActiveBindingFor(outline);
 		assertEquals(binding.getTriggerSequence(), bestBinding);
-		
+
 		final TriggerSequence bestBinding2 = bindingManager.getBestActiveBindingFor(console);
 		assertEquals(b3.getTriggerSequence(), bestBinding2);
 	}
