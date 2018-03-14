@@ -17,7 +17,6 @@ package org.eclipse.core.databinding;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.eclipse.core.databinding.conversion.Converter;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.IValidator;
@@ -585,15 +584,4 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		}
 	}
 
-	/**
-	 * Create an {@link UpdateValueStrategy} with a converter
-	 *
-	 * @param converter
-	 *            the converter
-	 * @return the update value strategy
-	 * @since 1.6
-	 */
-	public static UpdateValueStrategy create(Converter converter) {
-		return new UpdateValueStrategy().setConverter(converter);
-	}
 }
