@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
@@ -169,6 +170,10 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	@Optional
 	private EContextService contextService;
+
+	@Inject
+	@Optional
+	private ContextManager contextManager;
 
 	private PartActivationHistory partActivationHistory;
 
@@ -591,25 +596,11 @@ public class PartServiceImpl implements EPartService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.modeling.EPartService#activate(org.eclipse.e4.ui.model.application
-	 * .MPart)
-	 */
 	@Override
 	public void activate(MPart part) {
 		activate(part, true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.modeling.EPartService#activate(org.eclipse.e4.ui.model.application
-	 * .MPart,boolean)
-	 */
 	@Override
 	public void activate(MPart part, boolean requiresFocus) {
 		activate(part, requiresFocus, true);
@@ -655,6 +646,9 @@ public class PartServiceImpl implements EPartService {
 		if (contextService != null) {
 			contextService.deferUpdates(true);
 		}
+		if (contextManager != null) {
+			contextManager.deferUpdates(true);
+		}
 
 		MPart lastActivePart = activePart;
 		activePart = part;
@@ -686,6 +680,9 @@ public class PartServiceImpl implements EPartService {
 		} finally {
 			if (contextService != null) {
 				contextService.deferUpdates(false);
+			}
+			if (contextManager != null) {
+				contextManager.deferUpdates(false);
 			}
 		}
 	}
@@ -737,11 +734,6 @@ public class PartServiceImpl implements EPartService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.modeling.EPartService#getActivePart()
-	 */
 	@Override
 	public MPart getActivePart() {
 		return activePart;
@@ -1127,7 +1119,8 @@ public class PartServiceImpl implements EPartService {
 			return addedPart;
 		case VISIBLE:
 			MPart activePart = getActivePart();
-			if (activePart == null || getParent(activePart) == getParent(addedPart)) {
+			if (activePart == null
+					|| (activePart != addedPart && getParent(activePart) == getParent(addedPart))) {
 				delegateBringToTop(addedPart);
 				activate(addedPart);
 			} else {
@@ -1289,11 +1282,6 @@ public class PartServiceImpl implements EPartService {
 		return context != null && context.getParent().getActiveChild() == context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.modeling.EPartService#getDirtyParts()
-	 */
 	@Override
 	public Collection<MPart> getDirtyParts() {
 		List<MPart> dirtyParts = new ArrayList<MPart>();
@@ -1305,13 +1293,6 @@ public class PartServiceImpl implements EPartService {
 		return dirtyParts;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.modeling.EPartService#save(org.eclipse.e4.ui.model.application.
-	 * MSaveablePart, boolean)
-	 */
 	@Override
 	public boolean savePart(MPart part, boolean confirm) {
 		if (!part.isDirty()) {
