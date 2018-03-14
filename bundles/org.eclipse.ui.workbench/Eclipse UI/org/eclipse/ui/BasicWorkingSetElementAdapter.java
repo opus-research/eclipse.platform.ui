@@ -176,23 +176,12 @@ public final class BasicWorkingSetElementAdapter implements
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSetElementAdapter#dispose()
-	 */
 	@Override
 	public void dispose() {
 		if (packageTracker != null)
 			packageTracker.close();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
-	 *      java.lang.String, java.lang.Object)
-	 */
 	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
