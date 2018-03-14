@@ -2498,13 +2498,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			List<MPart> parts = modelService.findElements(window, null, MPart.class, null, scope);
+			List<MPlaceholder> placeholders = modelService.findElements(window, null,
+					MPlaceholder.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				for (MPart part : parts) {
-					if (reference.getModel().getElementId().equals(part.getElementId())
-							&& (isStickyView(reference.getModel().getElementId()) || partService
-									.isPartOrPlaceholderInPerspective(part.getElementId(), perspective))) {
+				for (MPlaceholder placeholder : placeholders) {
+					if (reference.getModel() == placeholder.getRef()
+							&& placeholder.isToBeRendered()) {
 						// only rendered placeholders are valid view references
 						visibleReferences.add(reference);
 					}
@@ -2513,24 +2513,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return visibleReferences.toArray(new IViewReference[visibleReferences.size()]);
 		}
 		return new IViewReference[0];
-	}
-
-    /**
-	 * Check if the elementId belongs to a sticky view.
-	 *
-	 * @param elementId
-	 *            id of the part
-	 * @return <code>true</code> in case it is a sticky view and
-	 *         <code>false</code> otherwise
-	 */
-	private boolean isStickyView(String elementId) {
-		IStickyViewDescriptor[] stickyViews = PlatformUI.getWorkbench().getViewRegistry().getStickyViews();
-		for (IStickyViewDescriptor stickyViewDescriptor : stickyViews) {
-			if (stickyViewDescriptor.getId().equals(elementId)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -2840,8 +2822,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private void addActionSet(MPerspective perspective, MPerspective temporary) {
 		List<String> tags = perspective.getTags();
 		List<String> extendedTags = temporary.getTags();
+		String excludedTags = perspective.getPersistedState().get(
+				ModeledPageLayout.HIDDEN_ITEMS_KEY);
 		for (String extendedTag : extendedTags) {
-			if (!tags.contains(extendedTag)) {
+			if (!tags.contains(extendedTag) && excludedTags != null
+					&& !excludedTags.contains(extendedTag + ",")) { //$NON-NLS-1$
 				tags.add(extendedTag);
 			}
 		}
@@ -3472,9 +3457,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 		updateActionSets(getPerspective(persp), getPerspective(dummyPerspective));
 		modelToPerspectiveMapping.remove(dummyPerspective);
 
-		// partly fixing toolbar refresh issue, see bug 383569 comment 10
-		legacyWindow.updateActionSets();
-
 		// migrate the tags
 		List<String> tags = persp.getTags();
 		tags.clear();
@@ -4065,12 +4047,6 @@ public class WorkbenchPage implements IWorkbenchPage {
              
              IActionSetDescriptor desc = reg.findActionSet(actionSetID);
              if (desc != null) {
-				IActionSetDescriptor[] offActionSets = persp.getAlwaysOffActionSets();
-				for (IActionSetDescriptor off : offActionSets) {
-					if (off.getId().equals(desc.getId())) {
-						return;
-					}
-				}
                  persp.addActionSet(desc);
                  legacyWindow.updateActionSets();
                  legacyWindow.firePerspectiveChanged(this, getPerspective(),
