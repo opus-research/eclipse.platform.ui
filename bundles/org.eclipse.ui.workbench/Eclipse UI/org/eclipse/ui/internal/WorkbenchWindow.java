@@ -52,7 +52,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.URIHelper;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -71,6 +70,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.model.internal.Position;
@@ -706,7 +706,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, windowWidgetHandler);
 
 			boolean newWindow = setupPerspectiveStack(windowContext);
-			partService.setPage(page);
 			page.setPerspective(perspective);
 			firePageActivated();
 
@@ -715,6 +714,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			} else {
 				page.updatePerspectiveActionSets();
 			}
+			partService.setPage(page);
 			updateActionSets();
 
 			IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
@@ -1188,10 +1188,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				menu.getChildren().add(separator);
 				manager.remove(item);
 			} else {
-				MMenuItem menuItem = OpaqueElementUtil.createOpaqueMenuItem();
+				MOpaqueMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createOpaqueMenuItem();
 				menuItem.setElementId(item.getId());
 				menuItem.setVisible(item.isVisible());
-				OpaqueElementUtil.setOpaqueItem(menuItem, item);
 				menu.getChildren().add(menuItem);
 				renderer.linkModelToContribution(menuItem, item);
 			}
@@ -2198,7 +2197,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		try {
 			getShell().setLayoutDeferred(true);
-			eventBroker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+
+			if (toolBarManagerRenderer != null) {
+				toolBarManagerRenderer.updateEnablement();
+			}
 			getCoolBarManager2().update(false);
 		} finally {
 			getShell().setLayoutDeferred(false);

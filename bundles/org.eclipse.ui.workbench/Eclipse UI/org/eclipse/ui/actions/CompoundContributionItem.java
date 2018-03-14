@@ -83,12 +83,6 @@ public abstract class CompoundContributionItem extends ContributionItem {
     protected abstract IContributionItem[] getContributionItems();
     
     private IContributionItem[] getContributionItemsToFill() {
-		disposeOldItems();
-		oldItems = getContributionItems();
-		return oldItems;
-	}
-
-	private void disposeOldItems() {
         if (oldItems != null) {
             for (int i = 0; i < oldItems.length; i++) {
                 IContributionItem oldItem = oldItems[i];
@@ -96,6 +90,8 @@ public abstract class CompoundContributionItem extends ContributionItem {
             }
             oldItems = null;
         }
+        oldItems = getContributionItems();
+        return oldItems;
     }
     
     /* (non-Javadoc)
@@ -127,15 +123,4 @@ public abstract class CompoundContributionItem extends ContributionItem {
         }
         super.setParent(parent);
     }
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
-	@Override
-	public void dispose() {
-		disposeOldItems();
-		super.dispose();
-	}
 }

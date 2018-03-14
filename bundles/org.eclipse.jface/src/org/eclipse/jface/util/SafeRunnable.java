@@ -55,7 +55,6 @@ public abstract class SafeRunnable implements ISafeRunnable {
 	 * 
 	 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
 	 */
-	@Override
 	public void handleException(Throwable e) {
 		// Workaround to avoid interactive error dialogs during
 		// automated testing
@@ -125,7 +124,6 @@ public abstract class SafeRunnable implements ISafeRunnable {
 	 */
 	private static ISafeRunnableRunner createDefaultRunner() {
 		return new ISafeRunnableRunner() {
-			@Override
 			public void run(ISafeRunnable code) {
 				try {
 					code.run();
