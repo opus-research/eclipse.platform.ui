@@ -331,6 +331,15 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 			}
 			return;
 		}
+		if (wasHidden) {
+			IViewPart[] stack = getSite().getPage().getViewStack(this);
+			for (IViewPart vPart : stack) {
+				if (vPart == part) {
+					// don't react on activation of parts from same stack, see bug 485154.
+					return;
+				}
+			}
+		}
 
 		IContributedContentsView view = Adapters.adapt(part, IContributedContentsView.class);
         IWorkbenchPart source = null;
