@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278, 472654
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 388476
  *******************************************************************************/
 

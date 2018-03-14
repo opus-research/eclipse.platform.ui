@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Nikolay Botev - bug 240651
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 459964
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 

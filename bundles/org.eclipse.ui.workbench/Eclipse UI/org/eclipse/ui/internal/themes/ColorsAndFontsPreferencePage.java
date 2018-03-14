@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 436247
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;

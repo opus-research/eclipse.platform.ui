@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267, 441282, 445609, 441280
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430616, 441267, 441282, 445609, 441280, 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 

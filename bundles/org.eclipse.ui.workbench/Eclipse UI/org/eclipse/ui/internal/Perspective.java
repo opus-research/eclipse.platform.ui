@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Markus Alexander Kuppe, Versant GmbH - bug 215797
  *     Sascha Zak - bug 282874
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440136
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 440136, 472654
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 404348, 421178, 456727
  *******************************************************************************/
 

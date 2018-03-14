@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
  *     Denis Zygann <d.zygann@web.de> - Bug 330453
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;

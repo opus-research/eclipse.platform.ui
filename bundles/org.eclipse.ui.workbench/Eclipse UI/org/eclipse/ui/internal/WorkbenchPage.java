@@ -9,8 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431340, 431348, 426535, 433234, 431868, 472654
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799, 466230
  *******************************************************************************/

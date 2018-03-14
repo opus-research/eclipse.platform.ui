@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla  - bug 77710
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430603
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430603, 472654
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 455527
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;

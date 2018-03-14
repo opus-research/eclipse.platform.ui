@@ -7,10 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Benjamin Muskalla -	Bug 29633 [EditorMgmt] "Open" menu should
- *     						have Open With-->Other
- *     Helena Halperin - Bug 298747 [EditorMgmt] Bidi Incorrect file type direction in mirrored "Editor Selection" dialog
+ *     Benjamin Muskalla -Bug 29633
+ *     Helena Halperin - Bug 298747
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 378485, 460555, 463262
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
