@@ -374,7 +374,7 @@ public class ModeledPageLayout implements IPageLayout {
 		// perspModel.setFixed(isFixed);
 	}
 
-	public static int plRelToSwt(int rel) {
+	private static int plRelToSwt(int rel) {
 		switch (rel) {
 		case IPageLayout.BOTTOM:
 			return SWT.BOTTOM;
