@@ -97,6 +97,11 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		filterText.getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.swt.accessibility.AccessibleListener#getName(org.eclipse.swt.accessibility.AccessibleEvent)
+					 */
 					@Override
 					public void getName(AccessibleEvent e) {
 						String filterTextString = filterText.getText();
@@ -109,6 +114,11 @@ public class CommonFiltersTab extends CustomizationTab {
 				});
 
 		filterText.addFocusListener(new FocusAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
+			 */
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (initialFilterTextValue.equals(filterText.getText().trim())) {
@@ -118,6 +128,11 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addMouseListener(new MouseAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.MouseAdapter#mouseUp(org.eclipse.swt.events.MouseEvent)
+			 */
 			@Override
 			public void mouseUp(MouseEvent e) {
 				super.mouseUp(e);
@@ -128,6 +143,11 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addKeyListener(new KeyAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
+			 */
 			@Override
 			public void keyPressed(KeyEvent e) {
 				// on a CR we want to transfer focus to the list
@@ -181,6 +201,11 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addModifyListener(new ModifyListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+			 */
 			@Override
 			public void modifyText(ModifyEvent e) {
 				textChanged();
@@ -223,6 +248,12 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		private StringMatcher matcher = null;
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
@@ -257,9 +288,15 @@ public class CommonFiltersTab extends CustomizationTab {
  
 	private class CommonFilterSorter extends ViewerSorter {
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ViewerSorter#sort(org.eclipse.jface.viewers.Viewer, java.lang.Object[])
+		 */
 		@Override
 		public void sort(Viewer viewer, Object[] elements) {
 			Arrays.sort(elements, new Comparator() {
+				/* (non-Javadoc)
+				 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+				 */
 				@Override
 				public int compare(Object o1, Object o2) { 
 					ICommonFilterDescriptor lvalue = (ICommonFilterDescriptor) o1;
