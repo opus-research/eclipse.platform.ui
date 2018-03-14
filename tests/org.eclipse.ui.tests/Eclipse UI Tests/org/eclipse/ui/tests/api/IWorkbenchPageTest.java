@@ -70,10 +70,7 @@ import org.eclipse.ui.tests.harness.util.FileUtil;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IWorkbenchPageTest extends UITestCase {
 
 	private IWorkbenchPage fActivePage;
@@ -158,12 +155,12 @@ public class IWorkbenchPageTest extends UITestCase {
 
 	@Override
 	protected void doTearDown() throws Exception {
-		Platform.removeLogListener(openAndHideListener);
+		super.doTearDown();
 		if (proj != null) {
 			FileUtil.deleteProject(proj);
 			proj = null;
 		}
-		super.doTearDown();
+		Platform.removeLogListener(openAndHideListener);
 	}
 
 	/**
@@ -1047,7 +1044,6 @@ public class IWorkbenchPageTest extends UITestCase {
 	 */
 	public void testFindViewReference() throws Throwable {
 		fWin.getWorkbench().showPerspective(ViewPerspective.ID, fWin);
-		processEvents();
 		assertNull(fActivePage.findView(MockViewPart.ID4));
 		assertNull(fActivePage.findView(MockViewPart.ID2));
 		assertNotNull(fActivePage.findView(MockViewPart.ID));
@@ -1061,7 +1057,6 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertNotNull(fActivePage.findView(MockViewPart.ID2));
 
 		fWin.getWorkbench().showPerspective(SessionPerspective.ID, fWin);
-		processEvents();
 		assertNull(fActivePage.findView(MockViewPart.ID4));
 		assertNull(fActivePage.findView(MockViewPart.ID2));
 		assertNotNull(fActivePage.findView(SessionView.VIEW_ID));
@@ -1084,7 +1079,6 @@ public class IWorkbenchPageTest extends UITestCase {
 	 */
 	public void testFindViewReferenceAfterShowViewCommand() throws Throwable {
 		fWin.getWorkbench().showPerspective(ViewPerspective.ID, fWin);
-		processEvents();
 		assertNull(fActivePage.findView(MockViewPart.ID4));
 		assertNull(fActivePage.findView(MockViewPart.ID2));
 		assertNotNull(fActivePage.findView(MockViewPart.ID));
@@ -1098,7 +1092,6 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertNotNull(fActivePage.findViewReference(MockViewPart.ID2));
 
 		fWin.getWorkbench().showPerspective(SessionPerspective.ID, fWin);
-		processEvents();
 		assertNull(fActivePage.findView(MockViewPart.ID2));
 		assertNull(fActivePage.findView(MockViewPart.ID4));
 		assertNotNull(fActivePage.findView(SessionView.VIEW_ID));
@@ -1122,7 +1115,6 @@ public class IWorkbenchPageTest extends UITestCase {
 	public void testFindHistoryViewReferenceAfterShowViewCommand() throws Throwable {
 		String historyView = "org.eclipse.team.ui.GenericHistoryView";
 		fWin.getWorkbench().showPerspective(ViewPerspective.ID, fWin);
-		processEvents();
 		assertNull(fActivePage.findView(MockViewPart.ID4));
 		assertNull(fActivePage.findView(MockViewPart.ID2));
 		assertNotNull(fActivePage.findView(MockViewPart.ID));
@@ -1137,7 +1129,6 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertNotNull(fActivePage.findViewReference(historyView));
 
 		fWin.getWorkbench().showPerspective(SessionPerspective.ID, fWin);
-		processEvents();
 		assertNull(fActivePage.findView(MockViewPart.ID2));
 		assertNull(fActivePage.findView(MockViewPart.ID4));
 		assertNull(fActivePage.findView(historyView));
@@ -1160,8 +1151,9 @@ public class IWorkbenchPageTest extends UITestCase {
 		Command command = createCommand(IWorkbenchCommandConstants.VIEWS_SHOW_VIEW);
 		ExecutionEvent event = createEvent(command, parameters);
 		command.executeWithChecks(event);
-		processEvents();
-		waitForJobs(1000, 5000);
+		while (fWorkbench.getDisplay().readAndDispatch()) {
+			// process events, who knows what is flying after command execution
+		}
 	}
 
 	private ExecutionEvent createEvent(Command command, Map<String, String> parameters) {
@@ -1180,7 +1172,6 @@ public class IWorkbenchPageTest extends UITestCase {
 	public void testFindSecondaryViewReference() throws Throwable {
 		fActivePage.getWorkbenchWindow().getWorkbench().showPerspective(
 				SessionPerspective.ID, fActivePage.getWorkbenchWindow());
-		processEvents();
 		assertNull(fActivePage.findViewReference(MockViewPart.IDMULT, "1"));
 
 		fActivePage.showView(MockViewPart.IDMULT, "1", IWorkbenchPage.VIEW_ACTIVATE);

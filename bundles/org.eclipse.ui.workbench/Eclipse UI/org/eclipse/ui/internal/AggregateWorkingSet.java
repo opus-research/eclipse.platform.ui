@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -289,7 +290,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 
 	@Override
 	public int hashCode() {
-		int hashCode = getName().hashCode() & java.util.Arrays.hashCode(getComponentsInternal());
+		int hashCode = getName().hashCode() & getComponentsInternal().hashCode();
 		return hashCode;
 	}
 
@@ -316,10 +317,4 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		return new IAdaptable[0];
 	}
-
-	@Override
-	public String toString() {
-		return "AWS [name=" + getName() + ", components=" + Arrays.toString(components) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
 }
