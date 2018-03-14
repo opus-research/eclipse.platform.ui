@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.ExecutionException;
@@ -71,6 +72,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -269,7 +271,8 @@ import org.osgi.util.tracker.ServiceTracker;
  * rewritten to use the new workbench advisor API.
  * </p>
  */
-public final class Workbench extends EventManager implements IWorkbench {
+public final class Workbench extends EventManager implements IWorkbench,
+		org.eclipse.e4.ui.workbench.IWorkbench {
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
 
@@ -451,6 +454,9 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 	private Job autoSaveJob;
 
+	private String id;
+	private ServiceRegistration<?> osgiRegistration;
+
 	/**
 	 * Creates a new workbench.
 	 * 
@@ -465,6 +471,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app,
 			IEclipseContext appContext) {
 		super();
+		this.id = createId();
 		StartupThreading.setWorkbench(this);
 		if (instance != null && instance.isRunning()) {
 			throw new IllegalStateException(WorkbenchMessages.Workbench_CreatingWorkbenchTwice);
@@ -522,6 +529,11 @@ public final class Workbench extends EventManager implements IWorkbench {
 		serviceLocator.registerService(IWorkbenchLocationService.class,
 				new WorkbenchLocationService(IServiceScopes.WORKBENCH_SCOPE, this, null, null,
 						null, null, 0));
+		Hashtable<String, Object> properties = new Hashtable<String, Object>();
+		properties.put("id", getId()); //$NON-NLS-1$
+
+		osgiRegistration = Activator.getDefault().getContext()
+				.registerService(IWorkbench.class.getName(), this, properties);
 
 	}
 
@@ -1300,7 +1312,12 @@ public final class Workbench extends EventManager implements IWorkbench {
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
 	public boolean close() {
-		return close(PlatformUI.RETURN_OK, false);
+		boolean close = close(PlatformUI.RETURN_OK, false);
+		if (close && osgiRegistration != null) {
+			osgiRegistration.unregister();
+			osgiRegistration = null;
+		}
+		return close;
 	}
 
 	/**
@@ -3656,5 +3673,13 @@ UIEvents.Context.TOPIC_CONTEXT,
 			UIStats.end(UIStats.RESTORE_WORKBENCH, this, "MRUList"); //$NON-NLS-1$
 		}
 		return result;
+	}
+
+	public final String getId() {
+		return id;
+	}
+
+	protected String createId() {
+		return UUID.randomUUID().toString();
 	}
 }
