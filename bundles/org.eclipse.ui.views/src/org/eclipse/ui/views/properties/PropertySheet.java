@@ -12,7 +12,6 @@
  *     Craig Foote (Footeware.ca) - https://bugs.eclipse.org/325743
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 417447
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 477848 - code cleanup
  *******************************************************************************/
 package org.eclipse.ui.views.properties;
 
@@ -122,7 +121,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	/**
 	 * Set of workbench parts, which should not be used as a source for PropertySheet
 	 */
-	private HashSet<String> ignoredViews;
+	private HashSet ignoredViews;
 
     /**
      * Creates a property sheet view.
@@ -355,9 +354,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	 * @since 3.2
 	 */
 	@Override
-	protected <T> T getViewAdapter(Class<T> key) {
+	protected Object getViewAdapter(Class key) {
 		if (ISaveablePart.class.equals(key)) {
-			return key.cast(getSaveablePart());
+			return getSaveablePart();
 		}
 		return super.getViewAdapter(key);
 	}
@@ -422,9 +421,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		updateContentDescription();
 	}
 
-	private HashSet<String> getIgnoredViews() {
+	private HashSet getIgnoredViews() {
 		if (ignoredViews == null) {
-			ignoredViews = new HashSet<>();
+			ignoredViews = new HashSet();
 	        IExtensionRegistry registry = RegistryFactory.getRegistry();
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {
