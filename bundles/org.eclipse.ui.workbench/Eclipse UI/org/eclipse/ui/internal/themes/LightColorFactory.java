@@ -144,6 +144,11 @@ public class LightColorFactory implements IColorFactory,
 		return ColorUtil.blend(white, base, 40);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.themes.IColorFactory#createColor()
+	 */
 	@Override
 	public RGB createColor() {
 		//should have base, otherwise error in the xml

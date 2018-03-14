@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208332, 274450
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -31,46 +30,43 @@ import org.eclipse.core.databinding.observable.Realm;
  * listeners may be invoked from any thread.
  * </p>
  *
- * @param <E>
- *            the type of elements in this collection
- *
  * @since 1.0
  *
  */
-public abstract class ObservableSet<E> extends AbstractObservable implements
-		IObservableSet<E> {
+public abstract class ObservableSet extends AbstractObservable implements
+		IObservableSet {
 
-	protected Set<E> wrappedSet;
+	protected Set wrappedSet;
 
 	private boolean stale = false;
 
 	protected Object elementType;
 
-	protected ObservableSet(Set<E> wrappedSet, Object elementType) {
+	protected ObservableSet(Set wrappedSet, Object elementType) {
 		this(Realm.getDefault(), wrappedSet, elementType);
 	}
 
-	protected ObservableSet(Realm realm, Set<E> wrappedSet, Object elementType) {
+	protected ObservableSet(Realm realm, Set wrappedSet, Object elementType) {
 		super(realm);
 		this.wrappedSet = wrappedSet;
 		this.elementType = elementType;
 	}
 
 	@Override
-	public synchronized void addSetChangeListener(ISetChangeListener<? super E> listener) {
+	public synchronized void addSetChangeListener(ISetChangeListener listener) {
 		addListener(SetChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeSetChangeListener(ISetChangeListener<? super E> listener) {
+	public synchronized void removeSetChangeListener(ISetChangeListener listener) {
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
-	protected void fireSetChange(SetDiff<? extends E> diff) {
+	protected void fireSetChange(SetDiff diff) {
 		// fire general change event first
 		super.fireChange();
 
-		fireEvent(new SetChangeEvent<>(this, diff));
+		fireEvent(new SetChangeEvent(this, diff));
 	}
 
 	@Override
@@ -80,7 +76,7 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 	}
 
 	@Override
-	public boolean containsAll(Collection<?> c) {
+	public boolean containsAll(Collection c) {
 		getterCalled();
 		return wrappedSet.containsAll(c);
 	}
@@ -104,10 +100,10 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 	}
 
 	@Override
-	public Iterator<E> iterator() {
+	public Iterator iterator() {
 		getterCalled();
-		final Iterator<E> wrappedIterator = wrappedSet.iterator();
-		return new Iterator<E>() {
+		final Iterator wrappedIterator = wrappedSet.iterator();
+		return new Iterator() {
 
 			@Override
 			public void remove() {
@@ -121,7 +117,7 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 			}
 
 			@Override
-			public E next() {
+			public Object next() {
 				ObservableTracker.getterCalled(ObservableSet.this);
 				return wrappedIterator.next();
 			}
@@ -141,7 +137,7 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 	}
 
 	@Override
-	public <T> T[] toArray(T[] a) {
+	public Object[] toArray(Object[] a) {
 		getterCalled();
 		return wrappedSet.toArray(a);
 	}
@@ -157,12 +153,12 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 	}
 
 	@Override
-	public boolean add(E o) {
+	public boolean add(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends E> c) {
+	public boolean addAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -172,12 +168,12 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> c) {
+	public boolean removeAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> c) {
+	public boolean retainAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -214,7 +210,7 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 	 * @param wrappedSet
 	 *            The wrappedSet to set.
 	 */
-	protected void setWrappedSet(Set<E> wrappedSet) {
+	protected void setWrappedSet(Set wrappedSet) {
 		this.wrappedSet = wrappedSet;
 	}
 
