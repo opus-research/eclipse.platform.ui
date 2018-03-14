@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -19,10 +23,12 @@ import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
+import org.junit.Test;
 
 public abstract class ModelReconcilerBindingContainerTest extends
 		ModelReconcilerTest {
 
+	@Test
 	public void testBindingContainer_Add() {
 		MApplication application = createApplication();
 
@@ -48,6 +54,7 @@ public abstract class ModelReconcilerBindingContainerTest extends
 		assertEquals(1, application.getBindingTables().size());
 	}
 
+	@Test
 	public void testBindingContainer_Remove() {
 		MApplication application = createApplication();
 
@@ -112,14 +119,17 @@ public abstract class ModelReconcilerBindingContainerTest extends
 		assertEquals(0, keyBinding.getParameters().size());
 	}
 
+	@Test
 	public void testBindingContainer_Add_KeyBinding_Null() throws Exception {
 		testBindingContainer_Add_KeyBinding(null);
 	}
 
+	@Test
 	public void testBindingContainer_Add_KeyBinding_Empty() throws Exception {
 		testBindingContainer_Add_KeyBinding("");
 	}
 
+	@Test
 	public void testBindingContainer_Add_KeyBinding_String() throws Exception {
 		testBindingContainer_Add_KeyBinding("Ctrl+S");
 	}
@@ -163,14 +173,17 @@ public abstract class ModelReconcilerBindingContainerTest extends
 		assertEquals(0, bindingTable.getBindings().size());
 	}
 
+	@Test
 	public void testBindingContainer_Remove_KeyBinding_Null() throws Exception {
 		testBindingContainer_Remove_KeyBinding(null);
 	}
 
+	@Test
 	public void testBindingContainer_Remove_KeyBinding_Empty() throws Exception {
 		testBindingContainer_Remove_KeyBinding("");
 	}
 
+	@Test
 	public void testBindingContainer_Remove_KeyBinding_String()
 			throws Exception {
 		testBindingContainer_Remove_KeyBinding("Ctrl+S");
@@ -217,16 +230,19 @@ public abstract class ModelReconcilerBindingContainerTest extends
 		assertEquals(keySequence, keyBinding.getKeySequence());
 	}
 
+	@Test
 	public void testBindingContainer_Add_BoundKeyBinding_Null()
 			throws Exception {
 		testBindingContainer_Add_BoundKeyBinding(null);
 	}
 
+	@Test
 	public void testBindingContainer_Add_BoundKeyBinding_Empty()
 			throws Exception {
 		testBindingContainer_Add_BoundKeyBinding("");
 	}
 
+	@Test
 	public void testBindingContainer_Add_BoundKeyBinding_String()
 			throws Exception {
 		testBindingContainer_Add_BoundKeyBinding("Ctrl+S");
@@ -276,16 +292,19 @@ public abstract class ModelReconcilerBindingContainerTest extends
 		assertEquals(0, bindingTable.getBindings().size());
 	}
 
+	@Test
 	public void testBindingContainer_Remove_BoundKeyBinding_Null()
 			throws Exception {
 		testBindingContainer_Remove_BoundKeyBinding(null);
 	}
 
+	@Test
 	public void testBindingContainer_Remove_BoundKeyBinding_Empty()
 			throws Exception {
 		testBindingContainer_Remove_BoundKeyBinding("");
 	}
 
+	@Test
 	public void testBindingContainer_Remove_BoundKeyBinding_String()
 			throws Exception {
 		testBindingContainer_Remove_BoundKeyBinding("Ctrl+S");

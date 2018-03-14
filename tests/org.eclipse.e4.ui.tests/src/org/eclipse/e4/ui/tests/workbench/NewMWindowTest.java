@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -36,11 +42,14 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /*
  *
  */
-public class NewMWindowTest extends TestCase {
+public class NewMWindowTest {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
@@ -49,8 +58,8 @@ public class NewMWindowTest extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
@@ -61,14 +70,15 @@ public class NewMWindowTest extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
+	@Test
 	public void testCreateWindow() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
@@ -80,6 +90,7 @@ public class NewMWindowTest extends TestCase {
 		assertEquals(topWidget, appContext.get(IServiceConstants.ACTIVE_SHELL));
 	}
 
+	@Test
 	public void testCreateView() {
 		final MWindow window = createWindowWithOneView();
 		wb = new E4Workbench(window, appContext);
@@ -103,6 +114,7 @@ public class NewMWindowTest extends TestCase {
 		assertTrue(viewPart[0] instanceof Tree);
 	}
 
+	@Test
 	public void testContextChildren() {
 		final MWindow window = createWindowWithOneView();
 		wb = new E4Workbench(window, appContext);
@@ -144,6 +156,7 @@ public class NewMWindowTest extends TestCase {
 		assertEquals(window, contextPart.getParent().getParent().getParent());
 	}
 
+	@Test
 	public void testCreateMenu() {
 		final MWindow window = createWindowWithOneViewAndMenu();
 		wb = new E4Workbench(window, appContext);
