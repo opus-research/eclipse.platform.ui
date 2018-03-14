@@ -7,7 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 400714, 441267
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445724
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -76,7 +77,6 @@ import org.eclipse.ui.internal.wizards.ImportWizardRegistry;
 import org.eclipse.ui.internal.wizards.NewWizardRegistry;
 import org.eclipse.ui.operations.IWorkbenchOperationSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.presentations.AbstractPresentationFactory;
 import org.eclipse.ui.testing.TestableObject;
 import org.eclipse.ui.views.IViewRegistry;
 import org.eclipse.ui.wizards.IWizardRegistry;
@@ -455,7 +455,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @return the workbench action set registry
      */
     public ActionSetRegistry getActionSetRegistry() {
-		return (ActionSetRegistry) e4Context.get(ActionSetRegistry.class.getName());
+		return e4Context.get(ActionSetRegistry.class);
     }
 
     /**
@@ -475,7 +475,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      */
 
     public IEditorRegistry getEditorRegistry() {
-		return (IEditorRegistry) e4Context.get(IEditorRegistry.class.getName());
+		return e4Context.get(IEditorRegistry.class);
     }
 
     /**
@@ -527,82 +527,11 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Returns the presentation factory with the given id, or <code>null</code> if not found.
-     * @param targetID The id of the presentation factory to use.
-     * @return AbstractPresentationFactory or <code>null</code>
-     * if not factory matches that id.
-     */
-    public AbstractPresentationFactory getPresentationFactory(String targetID) {
-        Object o = createExtension(
-                IWorkbenchRegistryConstants.PL_PRESENTATION_FACTORIES,
-                "factory", targetID); //$NON-NLS-1$
-        if (o instanceof AbstractPresentationFactory) {
-            return (AbstractPresentationFactory) o;
-        }
-        WorkbenchPlugin
-                .log("Error creating presentation factory: " + targetID + " -- class is not an AbstractPresentationFactory"); //$NON-NLS-1$ //$NON-NLS-2$
-        return null;
-    }
-
-    /**
-     * Looks up the configuration element with the given id on the given extension point
-     * and instantiates the class specified by the class attributes.
-     * 
-     * @param extensionPointId the extension point id (simple id)
-     * @param elementName the name of the configuration element, or <code>null</code>
-     *   to match any element
-     * @param targetID the target id
-     * @return the instantiated extension object, or <code>null</code> if not found
-     */
-    private Object createExtension(String extensionPointId, String elementName,
-            String targetID) {
-        IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
-                .getExtensionPoint(PI_WORKBENCH, extensionPointId);
-        if (extensionPoint == null) {
-            WorkbenchPlugin
-                    .log("Unable to find extension. Extension point: " + extensionPointId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
-            return null;
-        }
-
-        // Loop through the config elements.
-        IConfigurationElement targetElement = null;
-        IConfigurationElement[] elements = extensionPoint
-                .getConfigurationElements();
-        for (int j = 0; j < elements.length; j++) {
-            IConfigurationElement element = elements[j];
-            if (elementName == null || elementName.equals(element.getName())) {
-                String strID = element.getAttribute("id"); //$NON-NLS-1$
-                if (targetID.equals(strID)) {
-                    targetElement = element;
-                    break;
-                }
-            }
-        }
-        if (targetElement == null) {
-            // log it since we cannot safely display a dialog.
-            WorkbenchPlugin.log("Unable to find extension: " + targetID //$NON-NLS-1$
-                    + " in extension point: " + extensionPointId); //$NON-NLS-1$ 
-            return null;
-        }
-
-        // Create the extension.
-        try {
-            return createExtension(targetElement, "class"); //$NON-NLS-1$
-        } catch (CoreException e) {
-            // log it since we cannot safely display a dialog.
-            WorkbenchPlugin.log("Unable to create extension: " + targetID //$NON-NLS-1$
-                    + " in extension point: " + extensionPointId //$NON-NLS-1$
-                    + ", status: ", e.getStatus()); //$NON-NLS-1$
-        }
-        return null;
-    }
-
-    /**
      * Return the perspective registry.
      * @return IPerspectiveRegistry. The registry for the receiver.
      */
     public IPerspectiveRegistry getPerspectiveRegistry() {
-		return (IPerspectiveRegistry) e4Context.get(IPerspectiveRegistry.class.getName());
+		return e4Context.get(IPerspectiveRegistry.class);
     }
 
     /**
@@ -612,7 +541,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 2.0
      */
     public IWorkingSetManager getWorkingSetManager() {
-		return (IWorkingSetManager) e4Context.get(IWorkingSetManager.class.getName());
+		return e4Context.get(IWorkingSetManager.class);
     }
 
     /**
@@ -622,7 +551,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 2.0
      */
     public WorkingSetRegistry getWorkingSetRegistry() {
-		return (WorkingSetRegistry) e4Context.get(WorkingSetRegistry.class.getName());
+		return e4Context.get(WorkingSetRegistry.class);
     }
 
     /**
@@ -632,7 +561,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.0
      */
     public IIntroRegistry getIntroRegistry() {
-		return (IIntroRegistry) e4Context.get(IIntroRegistry.class.getName());
+		return e4Context.get(IIntroRegistry.class);
     }
     
     /**
@@ -658,7 +587,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * the receiver.
      */
     public PreferenceManager getPreferenceManager() {
-		return (PreferenceManager) e4Context.get(PreferenceManager.class.getName());
+		return e4Context.get(PreferenceManager.class);
     }
 
     /**
@@ -673,7 +602,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     	if(e4Context == null) {
     		return sharedImages;
     	}
-		return (ISharedImages) e4Context.get(ISharedImages.class.getName());
+		return e4Context.get(ISharedImages.class);
     }
 
     /**
@@ -682,7 +611,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @return the theme registry
      */
     public IThemeRegistry getThemeRegistry() {
-		return (IThemeRegistry) e4Context.get(IThemeRegistry.class.getName());
+		return e4Context.get(IThemeRegistry.class);
     }
 
     /**
@@ -691,7 +620,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * receiver.
      */
     public IViewRegistry getViewRegistry() {
-		return (IViewRegistry) e4Context.get(IViewRegistry.class.getName());
+		return e4Context.get(IViewRegistry.class);
     }
 
     /**
@@ -852,13 +781,9 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * for the receiver.
      */
     public DecoratorManager getDecoratorManager() {
-		return (DecoratorManager) e4Context.get(IDecoratorManager.class.getName());
+		return (DecoratorManager) e4Context.get(IDecoratorManager.class);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-     */
     @Override
 	public void start(BundleContext context) throws Exception {
     	context.addBundleListener(getBundleListener());
@@ -1154,9 +1079,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         return productInfo;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-     */
     @Override
 	public void stop(BundleContext context) throws Exception {
     	if (bundleListener!=null) {
@@ -1181,7 +1103,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.1
      */
     public IWizardRegistry getNewWizardRegistry() {
-		return (IWizardRegistry) e4Context.get(NewWizardRegistry.class.getName());
+		return e4Context.get(NewWizardRegistry.class);
     }
     
     /**
@@ -1191,7 +1113,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.1
      */
     public IWizardRegistry getImportWizardRegistry() {
-		return (IWizardRegistry) e4Context.get(ImportWizardRegistry.class.getName());
+		return e4Context.get(ImportWizardRegistry.class);
     }
     
     /**
@@ -1201,7 +1123,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.1
      */
     public IWizardRegistry getExportWizardRegistry() {
-		return (IWizardRegistry) e4Context.get(ExportWizardRegistry.class.getName());
+		return e4Context.get(ExportWizardRegistry.class);
     }
     
     /**

@@ -51,11 +51,7 @@ public class MenuTestCase extends UITestCase {
 	protected IWorkbenchWindow window;
 	protected IContextActivation activeContext;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
@@ -72,11 +68,7 @@ public class MenuTestCase extends UITestCase {
 		menuService = window.getService(IMenuService.class);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		if (activeContext != null) {
 			contextService.deactivateContext(activeContext);

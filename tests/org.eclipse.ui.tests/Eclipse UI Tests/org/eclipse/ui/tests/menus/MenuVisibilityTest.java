@@ -73,11 +73,7 @@ public class MenuVisibilityTest extends UITestCase {
 	public void testBasicContribution() throws Exception {
 
 		IAction a = new Action() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.action.Action#run()
-			 */
+			@Override
 			public void run() {
 				System.out.println("Hello action");
 			}
@@ -89,12 +85,7 @@ public class MenuVisibilityTest extends UITestCase {
 				new String[] { ISources.ACTIVE_CONTEXT_NAME });
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
-			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
-			 */
+			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(item, activeContextExpr);
@@ -134,11 +125,7 @@ public class MenuVisibilityTest extends UITestCase {
 
 	public void testExtensionContributionExpression() throws Exception {
 		IAction a = new Action() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.action.Action#run()
-			 */
+			@Override
 			public void run() {
 				System.out.println("Hello action");
 			}
@@ -171,12 +158,7 @@ public class MenuVisibilityTest extends UITestCase {
 		assertNotNull("Failed to find expression", activeContextExpr[0]);
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
-			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
-			 */
+			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(aci, activeContextExpr[0]);
@@ -209,11 +191,13 @@ public class MenuVisibilityTest extends UITestCase {
 	}
 
 	private static class TestEnabled extends AbstractEnabledHandler {
+		@Override
 		public Object execute(ExecutionEvent event) {
 			System.out.println("go");
 			return null;
 		}
 
+		@Override
 		public void setEnabled(boolean isEnabled) {
 			super.setEnabled(isEnabled);
 		}
@@ -229,6 +213,7 @@ public class MenuVisibilityTest extends UITestCase {
 
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
+			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(item, null);
@@ -268,11 +253,7 @@ public class MenuVisibilityTest extends UITestCase {
 		manager.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
@@ -288,11 +269,7 @@ public class MenuVisibilityTest extends UITestCase {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		if (activeContext != null) {
 			contextService.deactivateContext(activeContext);
