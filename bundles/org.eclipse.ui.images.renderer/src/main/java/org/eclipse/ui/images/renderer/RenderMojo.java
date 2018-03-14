@@ -1,5 +1,5 @@
 /*******************************************************************************
- * (c) Copyright 2015 l33t labs LLC and others.
+ * (c) Copyright 2013 l33t labs LLC and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,9 +17,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,8 +48,6 @@ import org.w3c.dom.svg.SVGDocument;
 import com.jhlabs.image.ContrastFilter;
 import com.jhlabs.image.GrayscaleFilter;
 import com.jhlabs.image.HSBAdjustFilter;
-import com.jhlabs.image.PointFilter;
-import com.jhlabs.image.TransferFilter;
 
 /**
  * <p>Mojo which renders SVG icons into PNG format.</p>
@@ -67,6 +65,44 @@ public class RenderMojo extends AbstractMojo {
 
     /** Used to specify the number of render threads when rasterizing icons. */
     public static final String RENDERTHREADS = "eclipse.svg.renderthreads";
+
+    /**
+     * <p>IconEntry is used to define an icon to rasterize,
+     * where to put it and the dimensions to render it at.</p>
+     */
+    class IconEntry {
+
+        /** The name of the icon minus extension */
+        String nameBase;
+
+        /** The input path of the source svg files. */
+        File inputPath;
+
+        /**
+         * The path rasterized versions of this icon should be written into.
+         */
+        File outputPath;
+
+        /** The path to a disabled version of the icon (gets desaturated). */
+        private File disabledPath;
+
+        /**
+         * Creates an IconEntry used for record keeping when
+         * rendering a set of SVG icons.
+         *
+         * @param nameBase the name of the icon file, minus any extension
+         * @param inputPath the SVG file that is rendered
+         * @param outputPath the path to the rendered icon data
+         * @param disabledPath the part to the disabled version of the output icon
+         */
+        public IconEntry(String nameBase, File inputPath, File outputPath,
+                File disabledPath) {
+            this.nameBase = nameBase;
+            this.inputPath = inputPath;
+            this.outputPath = outputPath;
+            this.disabledPath = disabledPath;
+        }
+    }
 
     /** A list of directories with svg sources to rasterize. */
     private List<IconEntry> icons;
@@ -88,7 +124,7 @@ public class RenderMojo extends AbstractMojo {
             .synchronizedList(new ArrayList<IconEntry>(5));
 
     /** The amount of scaling to apply to rasterized images. */
-    private double outputScale;
+    private int outputScale;
 
     /** Used for creating desaturated icons */
     private GrayscaleFilter grayFilter;
@@ -111,6 +147,24 @@ public class RenderMojo extends AbstractMojo {
      */
     public int getFailedIcons() {
         return failedIcons.size();
+    }
+
+    /**
+     * <p>Creates an IconEntry during the icon gather operation.</p>
+     *
+     * @param input the source of the icon file (SVG document)
+     * @param outputPath the path of the rasterized version to generate
+     * @param disabledPath the path of the disabled (desaturated) icon, if one is required
+     *
+     * @return an IconEntry describing the rendering operation
+     */
+    public IconEntry createIcon(File input, File outputPath, File disabledPath) {
+        String name = input.getName();
+        String[] split = name.split("\\.(?=[^\\.]+$)");
+
+        IconEntry def = new IconEntry(split[0], input, outputPath, disabledPath);
+
+        return def;
     }
 
     /**
@@ -164,8 +218,8 @@ public class RenderMojo extends AbstractMojo {
         int nativeWidth = Integer.parseInt(nativeWidthStr);
         int nativeHeight = Integer.parseInt(nativeHeightStr);
 
-        int outputWidth = (int) (nativeWidth * outputScale);
-        int outputHeight = (int) (nativeHeight * outputScale);
+        int outputWidth = nativeWidth * outputScale;
+        int outputHeight = nativeHeight * outputScale;
 
         // Guesstimate the PNG size in memory, BAOS will enlarge if necessary.
         int outputInitSize = nativeWidth * nativeHeight * 4 + 1024;
@@ -254,12 +308,7 @@ public class RenderMojo extends AbstractMojo {
      */
     private void writeIcon(IconEntry icon, int width, int height, BufferedImage sourceImage) {
         try {
-            String outputName = icon.nameBase;
-            if (outputScale != 1) {
-                outputName += "@" + outputScale + "x";
-            }
-            outputName += ".png";
-            ImageIO.write(sourceImage, "PNG", new File(icon.outputPath, outputName));
+            ImageIO.write(sourceImage, "PNG", new File(icon.outputPath, icon.nameBase + ".png"));
 
             if (icon.disabledPath != null) {
                 BufferedImage desaturated16 = desaturator.filter(
@@ -267,11 +316,11 @@ public class RenderMojo extends AbstractMojo {
 
                 BufferedImage deconstrast = decontrast.filter(desaturated16, null);
 
-                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, outputName));
+                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, icon.nameBase + ".png"));
             }
         } catch (Exception e1) {
             log.error("Failed to resize rendered icon to output size: "  +
-                               icon.nameBase, e1);
+                               icon.nameBase + " - " + e1.getMessage());
             failedIcons.add(icon);
         }
     }
@@ -451,12 +500,83 @@ public class RenderMojo extends AbstractMojo {
     }
 
     /**
+     * <p>Search the root resources directory for svg icons and add them to our
+     * collection for rasterization later.</p>
+     *
+     * @param outputName
+     * @param iconDir
+     * @param outputBase
+     * @param outputDir2
+     */
+    public void gatherIcons(String outputName, File rootDir, File iconDir,
+            File outputBase) {
+
+        File[] listFiles = iconDir.listFiles();
+
+        for (File child : listFiles) {
+            if (child.isDirectory()) {
+                gatherIcons(outputName, rootDir, child, outputBase);
+                continue;
+            }
+
+            if (!child.getName().endsWith("svg")) {
+                return;
+            }
+
+            // Compute a relative path for the output dir
+            URI rootUri = rootDir.toURI();
+            URI iconUri = iconDir.toURI();
+
+            String relativePath = rootUri.relativize(iconUri).getPath();
+            File outputDir = new File(outputBase, relativePath);
+            File disabledOutputDir = null;
+
+            File parentFile = child.getParentFile();
+
+            /* Determine if/where to put a disabled version of the icon
+               Eclipse traditionally uses a prefix of d for disabled, e for
+               enabled in the folder name */
+            if (parentFile != null) {
+                String parentDirName = parentFile.getName();
+                if (parentDirName.startsWith("e")) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("d");
+                    builder.append(parentDirName.substring(1, parentDirName.length()));
+
+                    // Disabled variant folder name
+                    String disabledVariant = builder.toString();
+
+                    // The parent's parent, to create the disabled directory in
+                    File setParent = parentFile.getParentFile();
+
+                    // The source directory's disabled folder
+                    File disabledSource = new File(setParent, disabledVariant);
+
+                    // Compute a relative path, so we can create the output folder
+                    String path = rootUri.relativize(
+                              disabledSource.toURI()).getPath();
+
+                    // Create the output folder, so a disabled icon is generated
+                    disabledOutputDir = new File(outputBase, path);
+                    if(!disabledOutputDir.exists()) {
+                        disabledOutputDir.mkdirs();
+                    }
+                }
+            }
+
+            IconEntry icon = createIcon(child, outputDir, disabledOutputDir);
+
+            icons.add(icon);
+        }
+    }
+
+    /**
      * <p>Initializes rasterizer defaults</p>
      *
      * @param threads the number of threads to render with
      * @param scale multiplier to use with icon output dimensions
      */
-    private void init(int threads, double scale) {
+    private void init(int threads, int scale) {
         this.threads = threads;
         this.outputScale = Math.max(1, scale);
         icons = new ArrayList<IconEntry>();
@@ -469,19 +589,8 @@ public class RenderMojo extends AbstractMojo {
         desaturator.setSFactor(0.0f);
 
         decontrast = new ContrastFilter();
-        decontrast.setBrightness(2.9f);
-        decontrast.setContrast(0.2f);
-        initFilter(decontrast);
-    }
-
-    /**
-     * Work around the fact that {@link com.jhlabs.image.TransferFilter#initialize()}
-     * is not thread-safe.
-     * @param filter the filter
-     */
-    private void initFilter(TransferFilter filter) {
-		filter.filter(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-				new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
+             decontrast.setBrightness(2.9f);
+             decontrast.setContrast(0.2f);
     }
 
     /**
@@ -505,13 +614,10 @@ public class RenderMojo extends AbstractMojo {
 
         // if high res is enabled, the icons output size will be scaled by iconScale
         // Defaults to 1, meaning native size
-        double iconScale = 1;
+        int iconScale = 1;
         String iconScaleStr = System.getProperty(ECLIPSE_SVG_SCALE);
-        if (iconScaleStr != null) {
-            iconScale = Double.parseDouble(iconScaleStr);
-            if (iconScale != 1 && iconScale != 1.5 && iconScale != 2) {
-                log.warn("Unusual scale factor: " + iconScaleStr + " (@" + iconScale + "x)");
-            }
+        if(iconScaleStr != null) {
+            iconScale = Integer.parseInt(iconScaleStr);
         }
 
         // Track the time it takes to render the entire set
@@ -522,7 +628,7 @@ public class RenderMojo extends AbstractMojo {
 
         String workingDirectory = System.getProperty("user.dir");
 
-        File outputDir = new File(workingDirectory + (iconScale == 1 ? "/eclipse-png/" : "/eclipse-png-highdpi/"));
+        File outputDir = new File(workingDirectory+"/eclipse-png/");
         File iconDirectoryRoot = new File("eclipse-svg/");
 
         // Search each subdir in the root dir for svg icons
@@ -534,12 +640,9 @@ public class RenderMojo extends AbstractMojo {
             String dirName = file.getName();
 
             // Where to place the rendered icon
-            File outputBase = new File(outputDir, (iconScale == 1 ? dirName : dirName + ".highdpi"));
-            if (iconScale != 1) {
-                createFragmentFiles(outputBase, dirName);
-            }
+            File outputBase = new File(outputDir, dirName);
 
-            IconGatherer.gatherIcons(icons, "svg", file, file, outputBase, true);
+            gatherIcons(dirName, file, file, outputBase);
         }
 
         log.info("Working directory: " + outputDir.getAbsolutePath());
@@ -561,49 +664,6 @@ public class RenderMojo extends AbstractMojo {
 
         log.info("Rasterization operations completed, Took: "
                 + (System.currentTimeMillis() - totalStartTime) + " ms.");
-    }
-
-    private void createFragmentFiles(File outputBase, String dirName) {
-        createFile(new File(outputBase, "build.properties"), "bin.includes = META-INF/,icons/,.\n");
-        createFile(new File(outputBase, ".project"), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
-                "<projectDescription>\n" + 
-                "    <name>" + dirName + ".highdpi</name>\n" + 
-                "    <comment></comment>\n" + 
-                "    <projects>\n" + 
-                "    </projects>\n" + 
-                "    <buildSpec>\n" + 
-                "        <buildCommand>\n" + 
-                "            <name>org.eclipse.pde.ManifestBuilder</name>\n" + 
-                "            <arguments>\n" + 
-                "            </arguments>\n" + 
-                "        </buildCommand>\n" + 
-                "        <buildCommand>\n" + 
-                "            <name>org.eclipse.pde.SchemaBuilder</name>\n" + 
-                "            <arguments>\n" + 
-                "            </arguments>\n" + 
-                "        </buildCommand>\n" + 
-                "    </buildSpec>\n" + 
-                "    <natures>\n" + 
-                "        <nature>org.eclipse.pde.PluginNature</nature>\n" + 
-                "    </natures>\n" + 
-                "</projectDescription>\n");
-        createFile(new File(outputBase, "META-INF/MANIFEST.MF"), "Manifest-Version: 1.0\n" + 
-                "Bundle-ManifestVersion: 2\n" + 
-                "Bundle-Name: " + dirName + ".highdpi\n" + 
-                "Bundle-SymbolicName: " + dirName + ".highdpi\n" + 
-                "Bundle-Version: 0.1.0.qualifier\n" + 
-                "Fragment-Host: " + dirName + "\n");
-    }
-
-    private void createFile(File file, String contents) {
-        try {
-            file.getParentFile().mkdirs();
-            FileWriter writer = new FileWriter(file);
-            writer.write(contents);
-            writer.close();
-        } catch (IOException e) {
-            log.error(e);
-        }
     }
 
 }

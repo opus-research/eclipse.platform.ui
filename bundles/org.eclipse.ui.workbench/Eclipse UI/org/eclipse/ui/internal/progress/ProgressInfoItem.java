@@ -248,6 +248,11 @@ public class ProgressInfoItem extends Composite {
 			}
 		});
 		actionBar.addListener(SWT.Traverse, new Listener() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
 			@Override
 			public void handleEvent(Event event) {
 				if (indexListener == null) {
@@ -275,6 +280,11 @@ public class ProgressInfoItem extends Composite {
 		progressLabel.setLayoutData(progressData);
 
 		mouseListener = new MouseAdapter() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+			 */
 			@Override
 			public void mouseDown(MouseEvent e) {
 				if (indexListener != null) {
@@ -768,6 +778,11 @@ public class ProgressInfoItem extends Composite {
 			link.setLayoutData(linkData);
 
 			link.addSelectionListener(new SelectionAdapter() {
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					executeTrigger();
@@ -775,6 +790,11 @@ public class ProgressInfoItem extends Composite {
 			});
 
 			link.addListener(SWT.Resize, new Listener() {
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+				 */
 				@Override
 				public void handleEvent(Event event) {
 
@@ -1033,6 +1053,9 @@ public class ProgressInfoItem extends Composite {
 			refresh();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Widget#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();
