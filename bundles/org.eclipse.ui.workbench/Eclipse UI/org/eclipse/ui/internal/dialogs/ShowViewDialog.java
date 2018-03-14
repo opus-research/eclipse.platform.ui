@@ -57,11 +57,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
+import org.eclipse.ui.help.IWorkbenchHelpSystem;
+import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 
-/**
- * Based on org.eclipse.ui.internal.dialogs.ShowViewDialog.
- */
 public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 		IDoubleClickListener {
 
@@ -137,8 +136,8 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(WorkbenchMessages.ShowView_shellTitle);
-		// PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
-		// IWorkbenchHelpContextIds.SHOW_VIEW_DIALOG);
+		IWorkbenchHelpSystem iWorkbenchHelpSystem = context.get(IWorkbenchHelpSystem.class);
+		iWorkbenchHelpSystem.setHelp(shell, IWorkbenchHelpContextIds.SHOW_VIEW_DIALOG);
 	}
 
 	@Override
