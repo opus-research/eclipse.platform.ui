@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
@@ -588,7 +587,8 @@ public class MinMaxAddon {
 
 	void restore(MUIElement element) {
 		if (isEmptyPerspectiveStack(element)) {
-			restoreEmptyPerspectiveStack(element);
+			element.setVisible(true);
+			element.getTags().remove(MINIMIZED_BY_ZOOM);
 			return;
 		}
 
@@ -613,20 +613,6 @@ public class MinMaxAddon {
 			List<MUIElement> elementsLeftToRestore = getElementsToRestore(maxElement);
 			if (elementsLeftToRestore.size() == 0) {
 				maxElement.getTags().remove(IPresentationEngine.MAXIMIZED);
-			}
-		}
-	}
-
-	private void restoreEmptyPerspectiveStack(MUIElement element) {
-		element.setVisible(true);
-		element.getTags().remove(MINIMIZED_BY_ZOOM);
-
-		MUIElement selectedElem = getWindowFor(element).getSelectedElement();
-		if (selectedElem instanceof MPartSashContainer) {
-			for (MUIElement elem : ((MPartSashContainer) selectedElem).getChildren()) {
-				if (elem.getTags().contains(MAXIMIZED)) {
-					elem.getTags().remove(MAXIMIZED);
-				}
 			}
 		}
 	}
