@@ -93,6 +93,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -615,6 +616,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
+						MApplication appModel = e4Workbench.getContext().get(MApplication.class);
+						setSearchContribution(appModel, false);
 						e4app.saveModel();
 					}
 					e4Workbench.close();
@@ -623,6 +626,17 @@ public final class Workbench extends EventManager implements IWorkbench {
 			}
 		});
 		return returnCode[0];
+	}
+
+	static void setSearchContribution(MApplication app, boolean enabled) {
+		for (MTrimContribution contribution : app.getTrimContributions()) {
+			if ("org.eclipse.ui.ide.application.trimcontribution.QuickAccess".contains(contribution //$NON-NLS-1$
+					.getElementId())) {
+				// allows us to handle the case where someone opens a workspace
+				// with Luna and then with Kepler
+				contribution.setToBeRendered(enabled);
+			}
+		}
 	}
 
 	private static ServiceTracker instanceAppContext;
@@ -1238,6 +1252,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 	private static void cleanUpCopy(MApplication appCopy, IEclipseContext context) {
 		// clean up all trim bars that come from trim bar contributions
 		// the trim elements that need to be removed are stored in the trimBar.
+		setSearchContribution(appCopy, false);
 		EModelService modelService = context.get(EModelService.class);
 		List<MWindow> windows = modelService.findElements(appCopy, null, MWindow.class, null);
 		for (MWindow window : windows) {
