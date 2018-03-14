@@ -19,6 +19,7 @@ import org.eclipse.e4.ui.tests.application.Bug320857Test;
 import org.eclipse.e4.ui.tests.application.ModelElementTest;
 import org.eclipse.e4.ui.tests.application.ModelRobustnessTest;
 import org.eclipse.e4.ui.tests.application.ResourceHandlerTest;
+import org.eclipse.e4.ui.tests.application.ResourceHandlerXPathTest;
 import org.eclipse.e4.ui.tests.application.StartupTestSuite;
 import org.eclipse.e4.ui.tests.application.UIEventTypesTest;
 import org.eclipse.e4.ui.tests.reconciler.ModelReconcilerTestSuite;
@@ -75,6 +76,7 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(Bug308317Test.class);
 		addTestSuite(ModelRobustnessTest.class);
 		addTestSuite(ResourceHandlerTest.class);
+		addTestSuite(ResourceHandlerXPathTest.class);
 		addTestSuite(PartFocusTest.class);
 		addTestSuite(ModelElementTest.class);
 		addTestSuite(StackRendererTest.class);
