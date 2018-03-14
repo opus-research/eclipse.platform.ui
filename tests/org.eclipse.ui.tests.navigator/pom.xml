@@ -21,53 +21,19 @@
   <version>3.4.300-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
   
-  <properties>
-    <skipTests>false</skipTests>
-   	<testSuiteNavigatorTests>**/org/eclipse/ui/tests/navigator/NavigatorTestSuite.java</testSuiteNavigatorTests>
-  </properties>
-  
    <build>
     <plugins>
       <plugin>
-  			<groupId>org.eclipse.tycho</groupId>
-  			<artifactId>tycho-surefire-plugin</artifactId>
-  			<version>${tycho.version}</version>
-				<configuration>
-					<includes>
-						<include>${testSuiteNavigatorTests}</include>
-					</includes>
-					<useUIHarness>true</useUIHarness>
-					<useUIThread>true</useUIThread>
-		  			<dependencies>
-		  				<dependency>
-		  					<type>eclipse-plugin</type>
-		  					<artifactId>org.eclipse.equinox.event</artifactId>
-		  					<version>0.0.0</version>
-		  				</dependency>
-		  				<dependency>
-		  					<type>eclipse-plugin</type>
-		  					<artifactId>org.eclipse.osgi.compatibility.state</artifactId>
-		  					<version>0.0.0</version>
-		  				</dependency>
-						<dependency>
-							<type>eclipse-plugin</type>
-							<artifactId>org.eclipse.jdt.ui</artifactId>
-							<version>0.0.0</version>
-						</dependency>
-		  			</dependencies>
-				</configuration>
-  		</plugin>
-		<plugin>
-        	<groupId>org.eclipse.tycho</groupId>
-        	<artifactId>tycho-compiler-plugin</artifactId>
-        	<version>${tycho.version}</version>
-        	<configuration>
-          		<compilerArgs>
-            		<arg>-warn:-raw,unchecked</arg>
-          		</compilerArgs>
-        	</configuration>
-      	</plugin>
-      </plugins>
-	</build>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <compilerArgs>
+            <arg>-warn:-raw,unchecked</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+ </build>
 
 </project>
