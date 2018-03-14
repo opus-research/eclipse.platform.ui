@@ -48,8 +48,7 @@ public final class UIPlugin extends AbstractUIPlugin {
      * the class WorkbenchGraphicResources provides convenience access to the graphics resources
      * and fast field access for some of the commonly used graphical images.
      */
-    @Override
-	protected ImageRegistry createImageRegistry() {
+    protected ImageRegistry createImageRegistry() {
         /* Just to be sure that we don't access this
          * plug-ins image registry.
          */
@@ -57,8 +56,7 @@ public final class UIPlugin extends AbstractUIPlugin {
         return null;
     }
 
-    @Override
-	public ImageRegistry getImageRegistry() {
+    public ImageRegistry getImageRegistry() {
         /* Just to be sure that we don't access this
          * plug-ins image registry.
          */
@@ -77,20 +75,20 @@ public final class UIPlugin extends AbstractUIPlugin {
     }
 
 
-    @Override
-	public void start(BundleContext context) throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+     */
+    public void start(BundleContext context) throws Exception {
         super.start(context);
 
         // set a callback allowing the workbench plugin to obtain
         // and save the UI plugin's preference store
         PrefUtil.setUICallback(new PrefUtil.ICallback() {
-            @Override
-			public IPreferenceStore getPreferenceStore() {
+            public IPreferenceStore getPreferenceStore() {
                 return UIPlugin.this.getPreferenceStore();
             }
 
-            @Override
-			public void savePreferences() {
+            public void savePreferences() {
                 UIPlugin.this.savePluginPreferences();
             }
         });

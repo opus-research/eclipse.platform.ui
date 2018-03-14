@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel (Lars.Vogel@vogella.com) - Bug 416082,  472654
+ *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
  ******************************************************************************/
