@@ -2759,7 +2759,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// 3.3 end
 
 		// Populate the action bars with the action sets' data
-		for (ActionSet actionSet : actionSets) {
+		for (Iterator<ActionSet> i = actionSets.iterator(); i.hasNext();) {
+			ActionSet actionSet = i.next();
 			ActionSetDescriptor descriptor = actionSet.descriptor;
 			PluginActionSet pluginActionSet = buildMenusAndToolbarsFor(
 					customizeActionBars, descriptor);
