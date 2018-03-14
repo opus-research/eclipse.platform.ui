@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardContainer2;
 import org.eclipse.swt.SWT;
@@ -50,6 +51,7 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.internal.registry.WizardsRegistryReader;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.wizards.IWizardCategory;
@@ -132,6 +134,14 @@ class NewWizardNewPage implements ISelectionChangedListener {
         } else {
             needShowAll = !allActivityEnabled(wizardCategories);
         }
+
+		IWizard wizard = mainPage.getWizard();
+		if (wizard instanceof NewWizard) {
+			if (WizardsRegistryReader.FULL_EXAMPLES_WIZARD_CATEGORY.equals(((NewWizard) wizard)
+					.getCategoryId())) {
+				filter.setFilterPrimaryWizards(true);
+			}
+		}
     }
 
     /**
@@ -342,7 +352,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
              * 
              * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
              */
-            public void doubleClick(DoubleClickEvent event) {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
             	    IStructuredSelection s = (IStructuredSelection) event
 						.getSelection();
 				selectionChanged(new SelectionChangedEvent(event.getViewer(), s));
@@ -388,7 +399,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
                 // and the current 'no show all'
                 private Object[] delta = new Object[0];
 
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     boolean showAll = showAllCheck.getSelection();
 
                     if (showAll) {
@@ -468,7 +480,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
             /* (non-Javadoc)
              * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
              */
-            public void widgetDisposed(DisposeEvent e) {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
                 for (Iterator i = imageTable.values().iterator(); i.hasNext();) {
                     ((Image) i.next()).dispose();
                 }
@@ -542,7 +555,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
      * 
      * @param selectionEvent ISelection
      */
-    public void selectionChanged(SelectionChangedEvent selectionEvent) {
+    @Override
+	public void selectionChanged(SelectionChangedEvent selectionEvent) {
         page.setErrorMessage(null);
         page.setMessage(null);
 
@@ -593,7 +607,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
         //work around for 62039
         final StructuredSelection selection = new StructuredSelection(selected);
         filteredTree.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
             	filteredTree.getViewer().setSelection(selection, true);
             }
         });
@@ -725,7 +740,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
                     .get(selectedObject);
         } else {
             selectedNode = new WorkbenchWizardNode(page, selectedObject) {
-                public IWorkbenchWizard createWizard() throws CoreException {
+                @Override
+				public IWorkbenchWizard createWizard() throws CoreException {
                     return wizardElement.createWizard();
                 }
             };
