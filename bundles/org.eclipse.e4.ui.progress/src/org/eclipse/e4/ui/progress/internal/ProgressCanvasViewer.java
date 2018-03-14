@@ -43,7 +43,7 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
 
     Object[] displayedItems = new Object[0];
 
-    private final static List<Object> EMPTY_LIST = new ArrayList<>();
+    private final static List<Object> EMPTY_LIST = new ArrayList<Object>();
 
     /**
      * Font metrics to use for determining pixel sizes.
@@ -87,62 +87,51 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
      * tab traversal order.  Defeating it here is more self-contained then
      * setting the tab list on the shell or other parent composite.
      */
-    @Override
-	protected void hookControl(Control control) {
+    protected void hookControl(Control control) {
         control.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
+            public void widgetDisposed(DisposeEvent event) {
                 handleDispose(event);
             }
         });
     }
 
-    @Override
-	protected Widget doFindInputItem(Object element) {
+    protected Widget doFindInputItem(Object element) {
         return null; // No widgets associated with items
     }
 
-    @Override
-	protected Widget doFindItem(Object element) {
+    protected Widget doFindItem(Object element) {
         return null; // No widgets associated with items
     }
 
-    @Override
-	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
+    protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
         canvas.redraw();
     }
 
-    @Override
-	protected List<Object> getSelectionFromWidget() {
+    protected List<Object> getSelectionFromWidget() {
         //No selection on a Canvas
         return EMPTY_LIST;
     }
 
-    @Override
-	protected void internalRefresh(Object element) {
+    protected void internalRefresh(Object element) {
         displayedItems = getSortedChildren(getRoot());
         canvas.redraw();
     }
 
-    @Override
-	public void reveal(Object element) {
+    public void reveal(Object element) {
         //Nothing to do here as we do not scroll
     }
 
-    @Override
-	protected void setSelectionToWidget(@SuppressWarnings("rawtypes") List l, boolean reveal) {
+    protected void setSelectionToWidget(@SuppressWarnings("rawtypes") List l, boolean reveal) {
         //Do nothing as there is no selection
     }
 
-    @Override
-	public Control getControl() {
+    public Control getControl() {
         return canvas;
     }
 
     private void initializeListeners() {
         canvas.addPaintListener(new PaintListener() {
-            @Override
-			public void paintControl(PaintEvent event) {
+            public void paintControl(PaintEvent event) {
 
                 GC gc = event.gc;
                 Transform transform = null;
@@ -188,8 +177,7 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
         });
     }
 
-    @Override
-	public void setLabelProvider(IBaseLabelProvider labelProvider) {
+    public void setLabelProvider(IBaseLabelProvider labelProvider) {
         Assert.isTrue(labelProvider instanceof ILabelProvider);
         super.setLabelProvider(labelProvider);
     }
@@ -221,13 +209,11 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
         return new Point(fontWidth, fontHeight);
     }
 
-	@Override
 	public void add(Object[] elements) {
 		refresh(true);
 
 	}
 
-	@Override
 	public void remove(Object[] elements) {
 		refresh(true);
 

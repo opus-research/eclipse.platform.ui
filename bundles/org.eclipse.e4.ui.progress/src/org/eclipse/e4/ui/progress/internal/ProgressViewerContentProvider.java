@@ -65,23 +65,19 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 	private KeptJobsListener getKeptJobListener() {
 		keptJobListener = new KeptJobsListener() {
 
-			@Override
 			public void finished(JobTreeElement jte) {
 				final JobTreeElement element = jte;
 				Job updateJob = new UIJob("Refresh finished") {//$NON-NLS-1$
-					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						refresh(new Object[] { element });
 						return Status.OK_STATUS;
 					}
 
-					@Override
 					public boolean shouldSchedule() {
 						return !progressViewer.getControl().isDisposed();
 					}
 
 
-					@Override
 					public boolean shouldRun() {
 						return !progressViewer.getControl().isDisposed();
 					}
@@ -91,11 +87,9 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 			}
 
-			@Override
 			public void removed(JobTreeElement jte) {
 				final JobTreeElement element = jte;
 				Job updateJob = new UIJob("Remove finished") {//$NON-NLS-1$
-					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						if (element == null) {
 							refresh();
@@ -115,12 +109,10 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 		return keptJobListener;
 	}
 
-	@Override
 	public void refresh() {
 		progressViewer.refresh(true);
 	}
 
-	@Override
 	public void refresh(Object[] elements) {
 		Object[] refreshes = getRoots(elements, true);
 		for (int i = 0; i < refreshes.length; i++) {
@@ -128,7 +120,6 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 		}
 	}
 
-	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements = super.getElements(inputElement);
 
@@ -140,7 +131,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 		if (kept.size() == 0)
 			return elements;
 
-		Set<Object> all = new HashSet<>();
+		Set<Object> all = new HashSet<Object>();
 
 		for (int i = 0; i < elements.length; i++) {
 			Object element = elements[i];
@@ -173,7 +164,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 		if (elements.length == 0) {
 			return elements;
 		}
-		HashSet<Object> roots = new HashSet<>();
+		HashSet<Object> roots = new HashSet<Object>();
 		for (int i = 0; i < elements.length; i++) {
 			JobTreeElement element = (JobTreeElement) elements[i];
 			if (element.isJobInfo()) {
@@ -192,19 +183,16 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 		return roots.toArray();
 	}
 
-	@Override
 	public void add(Object[] elements) {
 		progressViewer.add(elements);
 
 	}
 
-	@Override
 	public void remove(Object[] elements) {
 		progressViewer.remove(elements);
 
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 		if (keptJobListener != null) {

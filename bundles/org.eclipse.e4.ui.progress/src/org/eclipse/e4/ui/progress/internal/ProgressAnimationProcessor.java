@@ -61,20 +61,17 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     }
 
-    @Override
-	public void addItem(AnimationItem item) {
+    public void addItem(AnimationItem item) {
         Assert.isTrue(item instanceof ProgressAnimationItem);
         items.add(item);
     }
 
-    @Override
-	public void removeItem(AnimationItem item) {
+    public void removeItem(AnimationItem item) {
         Assert.isTrue(item instanceof ProgressAnimationItem);
         items.remove(item);
     }
 
-    @Override
-	public boolean hasItems() {
+    public boolean hasItems() {
         return items.size() > 0;
     }
 
@@ -83,8 +80,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     }
 
-    @Override
-	public void animationStarted() {
+    public void animationStarted() {
         AnimationItem[] animationItems = getAnimationItems();
         for (int i = 0; i < animationItems.length; i++) {
             animationItems[i].animationStart();
@@ -92,8 +88,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     }
 
-    @Override
-	public int getPreferredWidth() {
+    public int getPreferredWidth() {
         return 30;
     }
 
@@ -109,8 +104,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
         return animationItems;
     }
 
-    @Override
-	public void animationFinished() {
+    public void animationFinished() {
         AnimationItem[] animationItems = getAnimationItems();
         for (int i = 0; i < animationItems.length; i++) {
             animationItems[i].animationDone();
@@ -118,8 +112,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     }
 
-    @Override
-	public boolean isProcessorJob(Job job) {
+    public boolean isProcessorJob(Job job) {
         // We have no jobs
         return false;
     }

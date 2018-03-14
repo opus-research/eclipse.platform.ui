@@ -52,19 +52,16 @@ public abstract class ProgressContentProvider implements
     	canShowDebug = debug;
     }
 
-    @Override
-	public Object[] getElements(Object inputElement) {
+    public Object[] getElements(Object inputElement) {
 
         return progressManager.getRootElements(debug());
     }
 
-    @Override
-	public void dispose() {
+    public void dispose() {
         progressViewUpdater.removeCollector(this);
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         //No change when input changes
     }
 

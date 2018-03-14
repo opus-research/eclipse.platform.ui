@@ -87,7 +87,7 @@ public class ProgressInfoItem extends Composite {
 
 	ToolItem actionButton;
 
-	List<Link> taskEntries = new ArrayList<>(0);
+	List<Link> taskEntries = new ArrayList<Link>(0);
 
 	private ProgressBar progressBar;
 
@@ -221,14 +221,12 @@ public class ProgressInfoItem extends Composite {
 		actionButton
 				.setToolTipText(ProgressMessages.NewProgressView_CancelJobToolTip);
 		actionButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				actionButton.setEnabled(false);
 				cancelOrRemove();
 			}
 		});
 		actionBar.addListener(SWT.Traverse, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				if (indexListener == null) {
 					return;
@@ -255,7 +253,6 @@ public class ProgressInfoItem extends Composite {
 		progressLabel.setLayoutData(progressData);
 
 		mouseListener = new MouseAdapter() {
-			@Override
 			public void mouseDown(MouseEvent e) {
 				if (indexListener != null) {
 					indexListener.select();
@@ -748,14 +745,12 @@ public class ProgressInfoItem extends Composite {
 			link.setLayoutData(linkData);
 
 			link.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					executeTrigger();
 				}
 			});
 
 			link.addListener(SWT.Resize, new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 
 					Object text = link.getData(TEXT_KEY);
@@ -987,7 +982,6 @@ public class ProgressInfoItem extends Composite {
 			refresh();
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 		if(resourceManager != null)

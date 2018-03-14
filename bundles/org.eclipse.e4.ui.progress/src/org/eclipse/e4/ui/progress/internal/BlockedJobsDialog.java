@@ -84,12 +84,10 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 	 */
 	private class BlockedUIElement extends JobTreeElement {
 
-		@Override
 		Object[] getChildren() {
 			return ProgressManagerUtil.EMPTY_OBJECT_ARRAY;
 		}
 
-		@Override
 		String getDisplayString() {
 			if (blockedTaskName == null || blockedTaskName.length() == 0) {
 				return ProgressMessages.BlockedJobsDialog_UserInterfaceTreeElement;
@@ -97,32 +95,26 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 			return blockedTaskName;
 		}
 
-		@Override
 		public Image getDisplayImage() {
 			return JFaceResources.getImage(ProgressManager.WAITING_JOB_KEY);
 		}
 
-		@Override
 		boolean hasChildren() {
 			return false;
 		}
 
-		@Override
 		boolean isActive() {
 			return true;
 		}
 
-		@Override
 		boolean isJobInfo() {
 			return false;
 		}
 
-		@Override
 		public void cancel() {
 			blockingMonitor.setCanceled(true);
 		}
 
-		@Override
 		public boolean isCancellable() {
 			return true;
 		}
@@ -174,7 +166,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 			// create the job that will open the dialog after a delay.
 			Job dialogJob = new UIJob(
 					ProgressMessages.EventLoopProgressMonitor_OpenDialogJobName) {
-				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					if (singleton == null) {
 						return Status.CANCEL_STATUS;
@@ -251,7 +242,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 	 *
 	 * @return parent The parent Composite.
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		setMessage(message);
 		createMessageArea(parent);
@@ -270,7 +260,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 		viewer = new DetailedProgressViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.BORDER, progressService, finishedJobs);
 		viewer.setComparator(new ViewerComparator() {
-			@Override
 			@SuppressWarnings("unchecked")
             public int compare(Viewer testViewer, Object e1, Object e2) {
 				return ((Comparable<Object>) e1).compareTo(e2);
@@ -297,7 +286,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 		return new ProgressViewerContentProvider(viewer, finishedJobs,
 		        progressViewUpdater, progressManager, true, false) {
 
-			@Override
 			public Object[] getElements(Object inputElement) {
 				Object[] elements = super.getElements(inputElement);
 				Object[] result = new Object[elements.length + 1];
@@ -335,7 +323,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 		}
 	}
 
-	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(ProgressMessages.BlockedJobsDialog_BlockedTitle);
@@ -360,7 +347,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 		messageLabel.setText(message);
 	}
 
-	@Override
 	protected Image getImage() {
 		return getInfoImage();
 	}
@@ -390,7 +376,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 		return close();
 	}
 
-	@Override
 	public boolean close() {
 		// Clear the singleton first
 		singleton = null;
@@ -398,7 +383,6 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 		return super.close();
 	}
 
-	@Override
 	protected Control createButtonBar(Composite parent) {
 		// Do nothing here as we want no buttons
 		return parent;

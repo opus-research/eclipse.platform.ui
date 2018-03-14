@@ -633,10 +633,6 @@ public class RenameResourceAction extends WorkspaceAction {
 		this.modelProviderIds = modelProviderIds;
 	}
 
-	/*
-	 * Overridden to create and execute an undoable operation that performs the
-	 * rename.
-	 */
 	@Override
 	protected IRunnableWithProgress createOperation(final IStatus[] errorStatus) {
 		return new IRunnableWithProgress() {

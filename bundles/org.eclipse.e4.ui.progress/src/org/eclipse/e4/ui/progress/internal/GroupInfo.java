@@ -25,7 +25,7 @@ import org.eclipse.osgi.util.NLS;
 
 class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
-	private List<JobInfo> infos = new ArrayList<>();
+	private List<JobInfo> infos = new ArrayList<JobInfo>();
 
 	private Object lock = new Object();
 
@@ -46,7 +46,6 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 	    this.finishedJobs = finishedJobs;
     }
 
-	@Override
 	boolean hasChildren() {
 		synchronized (lock) {
 			return !infos.isEmpty();
@@ -54,14 +53,12 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
 	}
 
-	@Override
 	Object[] getChildren() {
 		synchronized (lock) {
 			return infos.toArray();
 		}
 	}
 
-	@Override
 	String getDisplayString() {
 		if (total < 0) {
 			return taskName;
@@ -83,12 +80,10 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 		return (int) (currentWork * 100 / total);
 	}
 
-	@Override
 	boolean isJobInfo() {
 		return false;
 	}
 
-	@Override
 	public void beginTask(String name, int totalWork) {
 		if (name == null)
 			name = ProgressMessages.SubTaskInfo_UndefinedTaskName;
@@ -102,7 +97,6 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
 	}
 
-	@Override
 	public void done() {
 		synchronized (lock) {
 			isActive = false;
@@ -131,7 +125,6 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 			progressManager.removeGroup(this);
 	}
 
-	@Override
 	public void internalWorked(double work) {
 		synchronized (lock) {
 			currentWork += work;
@@ -139,18 +132,15 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
 	}
 
-	@Override
 	public boolean isCanceled() {
 		// Just a group so no cancel state
 		return false;
 	}
 
-	@Override
 	public void setCanceled(boolean value) {
 		cancel();
 	}
 
-	@Override
 	public void setTaskName(String name) {
 		synchronized (this) {
 			isActive = true;
@@ -162,12 +152,10 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
 	}
 
-	@Override
 	public void subTask(String name) {
 		// Not interesting for this monitor
 	}
 
-	@Override
 	public void worked(int work) {
 		internalWorked(work);
 	}
@@ -197,12 +185,10 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 		}
 	}
 
-	@Override
 	boolean isActive() {
 		return isActive;
 	}
 
-	@Override
 	public void cancel() {
 		Object[] jobInfos = getChildren();
 		for (int i = 0; i < jobInfos.length; i++) {
@@ -212,7 +198,6 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 		updateInProgressManager();
 	}
 
-	@Override
 	public boolean isCancellable() {
 		return true;
 	}

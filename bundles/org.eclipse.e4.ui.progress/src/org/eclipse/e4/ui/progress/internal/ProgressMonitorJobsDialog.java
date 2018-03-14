@@ -86,8 +86,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         this.finishedJobs = finishedJobs;
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         Composite top = (Composite) super.createDialogArea(parent);
         createExtendedDialogArea(parent);
         return top;
@@ -134,8 +133,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
             viewer = new DetailedProgressViewer(viewerComposite, SWT.MULTI
                     | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, progressService, finishedJobs);
             viewer.setComparator(new ViewerComparator() {
-                @Override
-				@SuppressWarnings("unchecked")
+                @SuppressWarnings("unchecked")
                 public int compare(Viewer testViewer, Object e1, Object e2) {
                     return ((Comparable<Object>) e1).compareTo(e2);
                 }
@@ -157,8 +155,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         }
     }
 
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         super.createButtonsForButtonBar(parent);
         createDetailsButton(parent);
     }
@@ -187,8 +184,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
                 ProgressMessages.ProgressMonitorJobsDialog_DetailsTitle,
                 false);
         detailsButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 handleDetailsButtonSelect();
             }
         });
@@ -196,8 +192,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         detailsButton.setEnabled(enableDetailsButton);
     }
 
-    @Override
-	protected Control createButtonBar(Composite parent) {
+    protected Control createButtonBar(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         // create a layout with spacing and margins appropriate for the font
         // size.
@@ -223,16 +218,14 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         return composite;
     }
 
-    @Override
-	protected void clearCursors() {
+    protected void clearCursors() {
         if (detailsButton != null && !detailsButton.isDisposed()) {
             detailsButton.setCursor(null);
         }
         super.clearCursors();
     }
 
-    @Override
-	protected void updateForSetBlocked(IStatus reason) {
+    protected void updateForSetBlocked(IStatus reason) {
     	if(alreadyClosed)
     		return;
 
@@ -243,8 +236,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 		}
     }
 
-    @Override
-	public void run(boolean fork, boolean cancelable,
+    public void run(boolean fork, boolean cancelable,
             IRunnableWithProgress runnable) throws InvocationTargetException,
             InterruptedException {
         //if it is run in the UI Thread don't do anything.
@@ -287,8 +279,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
             IProgressMonitor superMonitor = ProgressMonitorJobsDialog.super
                     .getProgressMonitor();
 
-            @Override
-			public void beginTask(String name, int totalWork) {
+            public void beginTask(String name, int totalWork) {
                 superMonitor.beginTask(name, totalWork);
                 checkTicking();
             }
@@ -314,8 +305,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 					return;
 				}
             	getUISynchronize().syncExec(new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
 						//Reset the watch if it is not safe to open
 						 if (!ProgressManagerUtil.safeToOpen(ProgressMonitorJobsDialog.this,null)){
 							  watchTicks();
@@ -329,51 +319,43 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
                 });
             }
 
-            @Override
-			public void done() {
+            public void done() {
                 superMonitor.done();
                 checkTicking();
             }
 
-            @Override
-			public void internalWorked(double work) {
+            public void internalWorked(double work) {
                 superMonitor.internalWorked(work);
                 checkTicking();
             }
 
-            @Override
-			public boolean isCanceled() {
+            public boolean isCanceled() {
                 return superMonitor.isCanceled();
             }
 
-            @Override
-			public void setCanceled(boolean value) {
+            public void setCanceled(boolean value) {
                 superMonitor.setCanceled(value);
 
             }
 
-            @Override
-			public void setTaskName(String name) {
+            public void setTaskName(String name) {
                 superMonitor.setTaskName(name);
                 checkTicking();
 
             }
 
-            @Override
-			public void subTask(String name) {
+            public void subTask(String name) {
                 superMonitor.subTask(name);
                 checkTicking();
             }
 
-            @Override
-			public void worked(int work) {
+            public void worked(int work) {
                 superMonitor.worked(work);
                 checkTicking();
 
             }
 
-            @Override
-			public void clearBlocked() {
+            public void clearBlocked() {
                 //We want to open on blocking too
                 if (superMonitor instanceof IProgressMonitorWithBlocking) {
 					((IProgressMonitorWithBlocking) superMonitor)
@@ -382,8 +364,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
 
             }
 
-            @Override
-			public void setBlocked(IStatus reason) {
+            public void setBlocked(IStatus reason) {
                 openDialog();
                 if (superMonitor instanceof IProgressMonitorWithBlocking) {
 					((IProgressMonitorWithBlocking) superMonitor)
@@ -395,16 +376,14 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         };
     }
 
-    @Override
-	public IProgressMonitor getProgressMonitor() {
+    public IProgressMonitor getProgressMonitor() {
         if (wrapperedMonitor == null) {
 			createWrapperedMonitor();
 		}
         return wrapperedMonitor;
     }
 
-    @Override
-	public boolean close() {
+    public boolean close() {
         alreadyClosed = true;//As this sometimes delayed cache if it was already closed
         boolean result = super.close();
         if (!result) {//If it fails reset the flag
@@ -413,8 +392,7 @@ public class ProgressMonitorJobsDialog extends ProgressMonitorDialog {
         return result;
     }
 
-    @Override
-	protected boolean isResizable() {
+    protected boolean isResizable() {
     	return true;
     }
 

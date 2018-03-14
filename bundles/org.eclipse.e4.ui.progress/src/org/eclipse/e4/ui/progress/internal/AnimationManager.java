@@ -66,8 +66,7 @@ public class AnimationManager {
 
         animationUpdateJob = new UIJob(ProgressMessages.AnimationManager_AnimationStart) {
 
-            @Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+            public IStatus runInUIThread(IProgressMonitor monitor) {
 
                 if (animated) {
 					animationProcessor.animationStarted();
@@ -134,13 +133,11 @@ public class AnimationManager {
         return new IJobProgressManagerListener() {
             Set<Job> jobs = Collections.synchronizedSet(new HashSet<Job>());
 
-            @Override
-			public void addJob(JobInfo info) {
+            public void addJob(JobInfo info) {
                 incrementJobCount(info);
             }
 
-            @Override
-			public void refreshJobInfo(JobInfo info) {
+            public void refreshJobInfo(JobInfo info) {
                 int state = info.getJob().getState();
                 if (state == Job.RUNNING) {
 					addJob(info);
@@ -149,8 +146,7 @@ public class AnimationManager {
 				}
             }
 
-            @Override
-			public void refreshAll() {
+            public void refreshAll() {
                 jobs.clear();
                 setAnimated(false);
                 JobInfo[] currentInfos = progressManager.getJobInfos(showsDebug());
@@ -159,13 +155,11 @@ public class AnimationManager {
                 }
             }
 
-            @Override
-			public void removeJob(JobInfo info) {
+            public void removeJob(JobInfo info) {
                 decrementJobCount(info.getJob());
             }
 
-            @Override
-			public boolean showsDebug() {
+            public boolean showsDebug() {
                 return false;
             }
 
@@ -200,18 +194,15 @@ public class AnimationManager {
                         || animationProcessor.isProcessorJob(job);
             }
 
-            @Override
-			public void addGroup(GroupInfo info) {
+            public void addGroup(GroupInfo info) {
                 //Don't care about groups
             }
 
-            @Override
-			public void removeGroup(GroupInfo group) {
+            public void removeGroup(GroupInfo group) {
                 //Don't care about groups
             }
 
-            @Override
-			public void refreshGroup(GroupInfo info) {
+            public void refreshGroup(GroupInfo info) {
                 //Don't care about groups
             }
         };

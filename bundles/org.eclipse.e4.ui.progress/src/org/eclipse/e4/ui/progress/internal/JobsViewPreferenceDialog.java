@@ -43,13 +43,11 @@ public class JobsViewPreferenceDialog extends ViewSettingsDialog {
 		this.preferenceStore = preferenceStore;
 	}
 
-	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(ProgressMessages.JobsViewPreferenceDialog_Title);
 	}
 
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite top = (Composite) super.createDialogArea(parent);
 
@@ -72,14 +70,12 @@ public class JobsViewPreferenceDialog extends ViewSettingsDialog {
 		return top;
 	}
 
-	@Override
 	protected void okPressed() {
 		runInBackground.store();
 		showSystemJob.store();
 		super.okPressed();
 	}
 
-	@Override
 	protected void performDefaults() {
 		runInBackground.loadDefault();
 		showSystemJob.loadDefault();

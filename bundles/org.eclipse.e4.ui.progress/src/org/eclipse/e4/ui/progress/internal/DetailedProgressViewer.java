@@ -86,7 +86,6 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 			private boolean settingFocus = false;
 
-			@Override
 			public void focusGained(FocusEvent e) {
 				if (!settingFocus) {
 					// Prevent new focus events as a result this update
@@ -99,13 +98,11 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		});
 
 		control.addControlListener(new ControlListener() {
-			@Override
 			public void controlMoved(ControlEvent e) {
 				updateVisibleItems();
 
 			}
 
-			@Override
 			public void controlResized(ControlEvent e) {
 				updateVisibleItems();
 			}
@@ -137,12 +134,11 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	}
 
-	@Override
 	public void add(Object[] elements) {
 		ViewerComparator sorter = getComparator();
 
 		// Use a Set in case we are getting something added that exists
-		Set<Object> newItems = new HashSet<>(elements.length);
+		Set<Object> newItems = new HashSet<Object>(elements.length);
 
 		Control[] existingChildren = control.getChildren();
 		for (int i = 0; i < existingChildren.length; i++) {
@@ -200,19 +196,16 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 				info, progressService, finishedJobs);
 
 		item.setIndexListener(new ProgressInfoItem.IndexListener() {
-			@Override
 			public void selectNext() {
 				DetailedProgressViewer.this.selectNext(item);
 
 			}
 
-			@Override
 			public void selectPrevious() {
 				DetailedProgressViewer.this.selectPrevious(item);
 
 			}
 
-			@Override
 			public void select() {
 
 				Control[] children = control.getChildren();
@@ -281,12 +274,10 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 	}
 
-	@Override
 	protected Widget doFindInputItem(Object element) {
 		return null;
 	}
 
-	@Override
 	protected Widget doFindItem(Object element) {
 		Control[] existingChildren = control.getChildren();
 		for (int i = 0; i < existingChildren.length; i++) {
@@ -301,7 +292,6 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		return null;
 	}
 
-	@Override
 	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
 		if (usingElementMap()) {
 			unmapElement(item);
@@ -310,24 +300,20 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		add(new Object[] { element });
 	}
 
-	@Override
 	public Control getControl() {
 		return scrolled;
 	}
 
-	@Override
 	protected List<Object> getSelectionFromWidget() {
-		return new ArrayList<>(0);
+		return new ArrayList<Object>(0);
 	}
 
-	@Override
 	protected void inputChanged(Object input, Object oldInput) {
 		super.inputChanged(input, oldInput);
 		refreshAll();
 		updateForShowingProgress();
 	}
 
-	@Override
 	protected void internalRefresh(Object element) {
 		if (element == null) {
 			return;
@@ -352,7 +338,6 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		scrolled.setMinSize(size);
 	}
 
-	@Override
 	public void remove(Object[] elements) {
 
 		for (int i = 0; i < elements.length; i++) {
@@ -388,12 +373,10 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		updateForShowingProgress();
 	}
 
-	@Override
 	public void reveal(Object element) {
 
 	}
 
-	@Override
 	protected void setSelectionToWidget(@SuppressWarnings("rawtypes") List l, boolean reveal) {
 
 	}

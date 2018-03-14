@@ -51,8 +51,7 @@ public class WorkbenchDialogBlockedHandler implements IDialogBlockedHandler {
 
     int nestingDepth = 0;
 
-    @Override
-	public void clearBlocked() {
+    public void clearBlocked() {
         if (nestingDepth == 0) {
 			return;
 		}
@@ -67,8 +66,7 @@ public class WorkbenchDialogBlockedHandler implements IDialogBlockedHandler {
 
     }
 
-    @Override
-	public void showBlocked(Shell parentShell,
+    public void showBlocked(Shell parentShell,
             IProgressMonitor blockingMonitor, IStatus blockingStatus,
             String blockedName) {
 
@@ -86,8 +84,7 @@ public class WorkbenchDialogBlockedHandler implements IDialogBlockedHandler {
 
     }
 
-    @Override
-	public void showBlocked(IProgressMonitor blocking, IStatus blockingStatus,
+    public void showBlocked(IProgressMonitor blocking, IStatus blockingStatus,
             String blockedName) {
         showBlocked(null, blocking, blockingStatus, blockedName);
     }

@@ -42,17 +42,14 @@ public class ErrorInfo extends JobTreeElement {
 		timestamp = System.currentTimeMillis();
 	}
 
-	@Override
 	boolean hasChildren() {
 		return false;
 	}
 
-	@Override
 	Object[] getChildren() {
 		return ProgressManagerUtil.EMPTY_OBJECT_ARRAY;
 	}
 
-	@Override
 	String getDisplayString() {
 		return NLS.bind(ProgressMessages.JobInfo_Error, (new Object[] {
 				job.getName(),
@@ -68,7 +65,6 @@ public class ErrorInfo extends JobTreeElement {
 		return JFaceResources.getImage(ProgressManager.ERROR_JOB_KEY);
 	}
 
-	@Override
 	boolean isJobInfo() {
 		return false;
 	}
@@ -82,7 +78,6 @@ public class ErrorInfo extends JobTreeElement {
 		return errorStatus;
 	}
 
-	@Override
 	boolean isActive() {
 		return true;
 	}
@@ -105,7 +100,6 @@ public class ErrorInfo extends JobTreeElement {
 		return timestamp;
 	}
 
-	@Override
 	public int compareTo(Object arg0) {
 		if (arg0 instanceof ErrorInfo) {
 			// Order ErrorInfo by time received

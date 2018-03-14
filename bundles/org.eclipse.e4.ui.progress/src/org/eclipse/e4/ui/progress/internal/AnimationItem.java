@@ -41,13 +41,11 @@ public abstract class AnimationItem {
 
     //Create a containter that does nothing by default
     IAnimationContainer animationContainer = new IAnimationContainer() {
-        @Override
-		public void animationDone() {
+        public void animationDone() {
             //Do nothing by default
         }
 
-        @Override
-		public void animationStart() {
+        public void animationStart() {
             //Do nothing by default
         }
     };
@@ -72,24 +70,20 @@ public abstract class AnimationItem {
         Control animationItem = createAnimationItem(parent);
 
         animationItem.addMouseListener(new MouseListener() {
-            @Override
-			public void mouseDoubleClick(MouseEvent arg0) {
+            public void mouseDoubleClick(MouseEvent arg0) {
                 ProgressManagerUtil.openProgressView();
             }
 
-            @Override
-			public void mouseDown(MouseEvent arg0) {
+            public void mouseDown(MouseEvent arg0) {
                 //Do nothing
             }
 
-            @Override
-			public void mouseUp(MouseEvent arg0) {
+            public void mouseUp(MouseEvent arg0) {
                 //Do nothing
             }
         });
         animationItem.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent e) {
+            public void widgetDisposed(DisposeEvent e) {
                 animationManager.removeItem(AnimationItem.this);
             }
         });
