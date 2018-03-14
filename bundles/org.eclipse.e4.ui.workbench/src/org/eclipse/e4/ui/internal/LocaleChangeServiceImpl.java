@@ -28,16 +28,15 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.osgi.service.log.LogService;
 
 /**
  * Default implementation of {@link ILocaleChangeService} that changes the {@link Locale} in the
  * specified {@link IEclipseContext} and additionally fires an event on the event bus.
- *
+ * 
  * @author Dirk Fauth
- *
+ * 
  */
 @SuppressWarnings("restriction")
 public class LocaleChangeServiceImpl implements ILocaleChangeService {
@@ -51,7 +50,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 
 	/**
 	 * Create a new {@link LocaleChangeServiceImpl} for the given {@link IEclipseContext}.
-	 *
+	 * 
 	 * @param application
 	 *            The application to retrieve the context from.
 	 */
@@ -101,7 +100,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 	/**
 	 * Will iterate over the given list of {@link MUIElement}s and inform them about the Locale
 	 * change if necessary.
-	 *
+	 * 
 	 * @param children
 	 *            The list of {@link MUIElement}s that should be checked for Locale updates.
 	 */
@@ -112,14 +111,9 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 				updateLocalization(((MElementContainer) element).getChildren());
 			}
 
-			if (element instanceof MWindow) {
-				MWindow window = (MWindow) element;
-				MMenu mainMenu = window.getMainMenu();
-				if (mainMenu != null) {
-					mainMenu.updateLocalization();
-					updateLocalization(mainMenu.getChildren());
-				}
-				updateLocalization(window.getSharedElements());
+			if (element instanceof MWindow && ((MWindow) element).getMainMenu() != null) {
+				((MWindow) element).getMainMenu().updateLocalization();
+				updateLocalization(((MWindow) element).getMainMenu().getChildren());
 			}
 
 			if (element instanceof MTrimmedWindow) {
