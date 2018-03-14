@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,19 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.ui.tests.rcp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -36,103 +30,97 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.eclipse.ui.tests.harness.util.RCPTestWorkbenchAdvisor;
 import org.eclipse.ui.tests.rcp.util.WorkbenchAdvisorObserver;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
-public class WorkbenchConfigurerTest {
+public class WorkbenchConfigurerTest extends TestCase {
 
+    public WorkbenchConfigurerTest(String name) {
+        super(name);
+    }
 
     private Display display = null;
 
-	@Before
-	public void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
 
         assertNull(display);
         display = PlatformUI.createDisplay();
         assertNotNull(display);
     }
 
-	@After
-	public void tearDown() {
+    protected void tearDown() throws Exception {
         assertNotNull(display);
         display.dispose();
         assertTrue(display.isDisposed());
 
+        super.tearDown();
     }
 
-	@Ignore
-	@Test
-	public void testDefaults() {
-		WorkbenchAdvisorObserver wa = new WorkbenchAdvisorObserver(1) {
+    public void testDefaults() {
+        WorkbenchAdvisorObserver wa = new WorkbenchAdvisorObserver(1) {
 
-			private IWorkbenchConfigurer configurer;
+            private IWorkbenchConfigurer configurer;
 
-			public void initialize(IWorkbenchConfigurer c) {
-				super.initialize(c);
-				configurer = c;
+            public void initialize(IWorkbenchConfigurer c) {
+                super.initialize(c);
+                configurer = c;
 
-				assertNotNull(c.getWorkbench());
-				assertFalse(c.getSaveAndRestore());
-				assertNotNull(c.getWorkbenchWindowManager());
-			}
+                assertNotNull(c.getWorkbench());
+                assertFalse(c.getSaveAndRestore());
+                assertNotNull(c.getWorkbenchWindowManager());
+            }
 
-			public void postShutdown() {
-				super.postShutdown();
+            public void postShutdown() {
+                super.postShutdown();
 
-				// *** This should be checked on all of the advisor callbacks
-				// but assume that if its still set in the last one, then it
-				// must have been set for all of them.
-				assertFalse(configurer.emergencyClosing());
-			}
-		};
+                // *** This should be checked on all of the advisor callbacks
+                //     but assume that if its still set in the last one, then it
+                //     must have been set for all of them.
+                assertFalse(configurer.emergencyClosing());
+            }
+        };
 
-		int code = PlatformUI.createAndRunWorkbench(display, wa);
-		assertEquals(PlatformUI.RETURN_OK, code);
-	}
+        int code = PlatformUI.createAndRunWorkbench(display, wa);
+        assertEquals(PlatformUI.RETURN_OK, code);
+    }
 
-	@Ignore
-	@Test
-	public void testEmergencyClose() {
-		WorkbenchAdvisorObserver wa = new WorkbenchAdvisorObserver(2) {
+    public void testEmergencyClose() {
+        WorkbenchAdvisorObserver wa = new WorkbenchAdvisorObserver(2) {
 
-			private IWorkbenchConfigurer configurer;
+            private IWorkbenchConfigurer configurer;
 
-			public void initialize(IWorkbenchConfigurer c) {
-				super.initialize(c);
-				configurer = c;
+            public void initialize(IWorkbenchConfigurer c) {
+                super.initialize(c);
+                configurer = c;
 
-				assertNotNull(c.getWorkbench());
-				assertFalse(c.getSaveAndRestore());
-				assertNotNull(c.getWorkbenchWindowManager());
-			}
+                assertNotNull(c.getWorkbench());
+                assertFalse(c.getSaveAndRestore());
+                assertNotNull(c.getWorkbenchWindowManager());
+            }
 
-			// emergencyClose as soon as possible
-			public void eventLoopIdle(Display disp) {
-				super.eventLoopIdle(disp);
-				configurer.emergencyClose();
-			}
+            // emergencyClose as soon as possible
+            public void eventLoopIdle(Display disp) {
+                super.eventLoopIdle(disp);
+                configurer.emergencyClose();
+            }
 
-			public void postShutdown() {
-				super.postShutdown();
+            public void postShutdown() {
+                super.postShutdown();
 
-				// *** This should be checked on all of the advisor callbacks
-				// but assume that if its still set in the last one, then it
-				// must have been set for all of them.
-				assertTrue(configurer.emergencyClosing());
-			}
-		};
+                // *** This should be checked on all of the advisor callbacks
+                //     but assume that if its still set in the last one, then it
+                //     must have been set for all of them.
+                assertTrue(configurer.emergencyClosing());
+            }
+        };
 
-		int code = PlatformUI.createAndRunWorkbench(display, wa);
-		assertEquals(PlatformUI.RETURN_EMERGENCY_CLOSE, code);
-	}
+        int code = PlatformUI.createAndRunWorkbench(display, wa);
+        assertEquals(PlatformUI.RETURN_EMERGENCY_CLOSE, code);
+    }
     
 
 	// tests to ensure that all WorkbenchAdvisor API is called from the UI thread.
-	@Test
 	public void testThreading() {
-		final ArrayList<Exception> results = new ArrayList<Exception>();
+		final ArrayList results = new ArrayList();
 		
 		WorkbenchAdvisor advisor = new RCPTestWorkbenchAdvisor(1) {
 
@@ -282,8 +270,8 @@ public class WorkbenchConfigurerTest {
 		if (!results.isEmpty()) {
 			StringBuffer buffer = new StringBuffer("Advisor methods called from non-UI threads:\n");
 			int count=0;
-			for (Iterator<Exception> i = results.iterator(); i.hasNext();) {
-				Exception e = i.next();
+			for (Iterator i = results.iterator(); i.hasNext();) {
+				Exception e = (Exception) i.next();
 				StackTraceElement [] stack = e.getStackTrace();
 				buffer.append("Failure ").append(++count).append('\n');
 				for (int j = 1; j < Math.min(stack.length, 10); j++) {

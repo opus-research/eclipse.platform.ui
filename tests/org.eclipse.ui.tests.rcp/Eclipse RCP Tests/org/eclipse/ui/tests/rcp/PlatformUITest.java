@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,34 +7,44 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.ui.tests.rcp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Assert;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.tests.harness.util.RCPTestWorkbenchAdvisor;
 import org.eclipse.ui.tests.rcp.util.WorkbenchAdvisorObserver;
-import org.junit.Ignore;
-import org.junit.Test;
 
-public class PlatformUITest {
+public class PlatformUITest extends TestCase {
+	public static TestSuite suite() {
+		TestSuite suite = new TestSuite("org.eclipse.ui.tests.rcp.PlatformUITest");
+		suite.addTest(new PlatformUITest("testEarlyGetWorkbench"));
+		suite.addTest(new PlatformUITest("testCreateDisplay"));
+		suite.addTest(new PlatformUITest("testCreateAndRunWorkbench"));
+		suite.addTest(new PlatformUITest("testCreateAndRunWorkbenchWithExceptionOnStartup"));
+		return suite;
+	}
 
-
-    /** Make sure workbench is not returned before it is running. */
-	@Test(expected = IllegalStateException.class)
-	public void testEarlyGetWorkbench() {
-        assertFalse(PlatformUI.isWorkbenchRunning());
-		PlatformUI.getWorkbench();
+    public PlatformUITest(String testName) {
+        super(testName);
     }
 
-	@Test
-	public void testCreateDisplay() {
+    /** Make sure workbench is not returned before it is running. */
+    public void testEarlyGetWorkbench() {
+        assertFalse(PlatformUI.isWorkbenchRunning());
+        try {
+            PlatformUI.getWorkbench();
+            fail("Exception should have been thrown."); //$NON-NLS-1$
+        } catch (IllegalStateException e) {
+            // do nothing
+        }
+    }
+
+    public void testCreateDisplay() {
         Display disp = PlatformUI.createDisplay();
         assertNotNull(disp);
         assertFalse(disp.isDisposed());
@@ -42,8 +52,7 @@ public class PlatformUITest {
         assertTrue(disp.isDisposed());
     }
 
-	@Test
-	public void testCreateAndRunWorkbench() {
+    public void testCreateAndRunWorkbench() {
         final Display display = PlatformUI.createDisplay();
         assertNotNull(display);
 
@@ -89,23 +98,21 @@ public class PlatformUITest {
      * and PlatformUI.isWorkbenchRunning() returns false. 
      * Regression test for bug 82286.
      */
-	@Ignore
-	@Test
-	public void testCreateAndRunWorkbenchWithExceptionOnStartup() {
-		final Display display = PlatformUI.createDisplay();
-		assertNotNull(display);
+    public void testCreateAndRunWorkbenchWithExceptionOnStartup() {
+        final Display display = PlatformUI.createDisplay();
+        assertNotNull(display);
 
-		WorkbenchAdvisorObserver wa = new WorkbenchAdvisorObserver(1) {
-			public void preStartup() {
-				throw new IllegalArgumentException("Thrown deliberately by PlatformUITest");
-			}
-		};
+        WorkbenchAdvisorObserver wa = new WorkbenchAdvisorObserver(1) {
+            public void preStartup() {
+                throw new IllegalArgumentException("Thrown deliberately by PlatformUITest");
+            }
+        };
 
-		int code = PlatformUI.createAndRunWorkbench(display, wa);
-		assertEquals(PlatformUI.RETURN_UNSTARTABLE, code);
-		assertFalse(PlatformUI.isWorkbenchRunning());
-		display.dispose();
-		assertTrue(display.isDisposed());
+        int code = PlatformUI.createAndRunWorkbench(display, wa);
+        assertEquals(PlatformUI.RETURN_UNSTARTABLE, code);
+        assertFalse(PlatformUI.isWorkbenchRunning());
+        display.dispose();
+        assertTrue(display.isDisposed());
 	}
 }
 
@@ -123,7 +130,7 @@ class CheckForWorkbench extends WorkbenchAdvisorObserver {
         if (checkComplete)
             return;
 
-		assertNotNull(PlatformUI.getWorkbench());
+        Assert.assertNotNull(PlatformUI.getWorkbench());
         checkComplete = true;
     }
 }
