@@ -10,7 +10,6 @@
  *     Markus Alexander Kuppe (Versant Corp.) - https://bugs.eclipse.org/248103
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 272564
  *     Craig Foote (Footeware.ca) - https://bugs.eclipse.org/325743
- *     Jeroen Daanen (j.daanen@beinformed.nl) - https://bugs.eclipse.org/434102
  *******************************************************************************/
 package org.eclipse.ui.views.properties;
 
@@ -301,16 +300,19 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
         if(isImportant(part)) {
         	currentPart = part;
-		}
-
-		// When the view is first opened, pass the selection to the page
-		if (currentSelection == null && bootstrapSelection != null) {
-			currentSelection = bootstrapSelection;
-			bootstrapSelection = null;
-		}
-
-		updateSelectionInPage();
-	}
+        	// reset the selection (to allow selectionChanged() accept part change for empty selections)
+        	currentSelection = null;
+        }
+        
+        // When the view is first opened, pass the selection to the page
+        if (bootstrapSelection != null) {
+            IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
+            if (page != null) {
+				page.selectionChanged(part, bootstrapSelection);
+			}
+            bootstrapSelection = null;
+        }
+    }
 
     @Override
 	public void selectionChanged(IWorkbenchPart part, ISelection sel) {
@@ -318,8 +320,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		if (sel == null || !isImportant(part) || sel.equals(currentSelection)) {
 			return;
 		}
-
-		currentSelection = sel;
 		
 		// we ignore selection if we are hidden OR selection is coming from another source as the last one
 		if(part == null || !part.equals(currentPart)){
@@ -327,10 +327,8 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		}
         
         currentPart = part;
-		updateSelectionInPage();
-	}
-
-	private void updateSelectionInPage() {
+        currentSelection = sel;
+        
         // pass the selection to the page
         IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
         if (page != null) {
