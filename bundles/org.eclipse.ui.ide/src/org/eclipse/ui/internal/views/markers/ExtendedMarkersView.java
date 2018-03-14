@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -140,8 +140,6 @@ public class ExtendedMarkersView extends ViewPart {
 	private static final String TAG_EXPANDED = "expanded"; //$NON-NLS-1$
 
 	private static final String TAG_CATEGORY = "category"; //$NON-NLS-1$
-
-	private static final String TAG_PART_NAME = "partName"; //$NON-NLS-1$
 
 	private static final String TAG_COLUMN_WIDTHS = "columnWidths"; //$NON-NLS-1$
 
@@ -1044,11 +1042,6 @@ public class ExtendedMarkersView extends ViewPart {
 		if (service != null)
 			builder.setProgressService((IWorkbenchSiteProgressService) service);
 		this.memento = memento;
-
-		if (memento == null || memento.getString(TAG_PART_NAME) == null)
-			return;
-
-		setPartName(memento.getString(TAG_PART_NAME));
 	}
 
 	/**
@@ -1219,7 +1212,6 @@ public class ExtendedMarkersView extends ViewPart {
 	@Override
 	public void saveState(IMemento memento) {
 		super.saveState(memento);
-		memento.putString(TAG_PART_NAME, getPartName());
 		if (generator != null) {
 			memento.putString(TAG_GENERATOR, builder.getGenerator().getId());
 		}
