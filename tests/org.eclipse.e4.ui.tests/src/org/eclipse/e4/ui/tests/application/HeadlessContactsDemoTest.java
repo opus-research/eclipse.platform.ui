@@ -31,9 +31,8 @@ public class HeadlessContactsDemoTest extends HeadlessApplicationTest {
 		return (MPart) findElement("ContactsView");
 	}
 
-	@Override
 	protected IPresentationEngine createPresentationEngine(
-			String renderingEngineURI) {
+			String renderingEngineURI) throws Exception {
 		HeadlessContextPresentationEngine engine = (HeadlessContextPresentationEngine) super
 				.createPresentationEngine(renderingEngineURI);
 		engine.setCreateContributions(false);
