@@ -212,7 +212,7 @@ public class RenderMojo extends AbstractMojo {
 
                 BufferedImage deconstrast = decontrast.filter(desaturated16, null);
 
-                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, icon.nameBase + ".png"));
+                ImageIO.write(deconstrast, "PNG", new File(icon.disabledPath, icon.nameBase));
             }
         } catch (Exception e1) {
             log.error("Failed to render disabled icon: "  +

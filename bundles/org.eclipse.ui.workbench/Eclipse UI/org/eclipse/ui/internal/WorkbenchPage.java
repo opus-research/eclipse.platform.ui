@@ -1437,7 +1437,7 @@ public class WorkbenchPage implements IWorkbenchPage {
         }
 
 		// notify the model manager before the close
-		List<IWorkbenchPart> partsToClose = new ArrayList<>();
+		List<IEditorPart> partsToClose = new ArrayList<IEditorPart>();
 		for (IEditorReference ref : editorRefs) {
 			IEditorPart refPart = ref.getEditor(false);
 			if (refPart != null) {
