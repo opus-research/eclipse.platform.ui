@@ -15,7 +15,6 @@
 
 package org.eclipse.ui.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -40,7 +39,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -75,14 +73,11 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
-import org.eclipse.e4.ui.workbench.addons.minmax.TrimStack;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IPageChangeProvider;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -109,7 +104,6 @@ import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -154,7 +148,6 @@ import org.eclipse.ui.Saveable;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.contexts.IContextService;
-import org.eclipse.ui.dialogs.EditorSelectionDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
@@ -167,7 +160,6 @@ import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.misc.ExternalEditor;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
-import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.internal.registry.ActionSetRegistry;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
@@ -177,7 +169,6 @@ import org.eclipse.ui.internal.registry.UIExtensionTracker;
 import org.eclipse.ui.internal.registry.ViewDescriptor;
 import org.eclipse.ui.internal.tweaklets.TabBehaviour;
 import org.eclipse.ui.internal.tweaklets.Tweaklets;
-import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchPartLabelProvider;
@@ -591,10 +582,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private IWorkingSet[] workingSets = new IWorkingSet[0];
 	private String aggregateWorkingSetId;
 
-	// determines if a prompt is shown when opening large files
-	private long maxFileSize = 0;
-	private boolean checkDocumentSize;
-
 	/**
 	 * Manages editor contributions and action set part associations.
 	 */
@@ -900,10 +887,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		final MToolControl minimizedStack = (MToolControl) changedObj;
 
-		if (!(minimizedStack.getObject() instanceof TrimStack))
+		// Note: The non-API type TrimStack is not imported to avoid
+		// https://bugs.eclipse.org/435521
+		if (!(minimizedStack.getObject() instanceof org.eclipse.e4.ui.workbench.addons.minmax.TrimStack))
 			return;
 
-		TrimStack ts = (TrimStack) minimizedStack.getObject();
+		org.eclipse.e4.ui.workbench.addons.minmax.TrimStack ts = (org.eclipse.e4.ui.workbench.addons.minmax.TrimStack) minimizedStack
+				.getObject();
 		if (!(ts.getMinimizedElement() instanceof MPartStack))
 			return;
 
@@ -924,12 +914,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		if (UIEvents.isADD(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
-					TrimStack.MINIMIZED_AND_SHOWING)) {
+					org.eclipse.e4.ui.workbench.addons.minmax.TrimStack.MINIMIZED_AND_SHOWING)) {
 				firePartVisible(thePart);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
-					TrimStack.MINIMIZED_AND_SHOWING)) {
+					org.eclipse.e4.ui.workbench.addons.minmax.TrimStack.MINIMIZED_AND_SHOWING)) {
 				firePartHidden(thePart);
 			}
 		}
@@ -2636,13 +2626,6 @@ public class WorkbenchPage implements IWorkbenchPage {
         this.input = input;
         actionSets = new ActionSetManager(w);
 		initActionSetListener();
-		initMaxFileSize();
-	}
-
-	private void initMaxFileSize() {
-		IPreferenceStore preferenceStore = PrefUtil.getInternalPreferenceStore();
-		maxFileSize = preferenceStore.getLong(IPreferenceConstants.LARGE_DOC_SIZE_FOR_EDITORS);
-		checkDocumentSize = maxFileSize != 0;
 	}
 
 	@PostConstruct
@@ -3138,16 +3121,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return null;
 		}
 
-		IEditorDescriptor desc = getWorkbenchWindow().getWorkbench()
+		EditorDescriptor descriptor = (EditorDescriptor) getWorkbenchWindow().getWorkbench()
 				.getEditorRegistry().findEditor(editorId);
-		if (desc != null && !desc.isOpenExternal() && isLargeDocument(input)) {
-			desc = getAlternateEditor();
-			if (desc == null) {
-				// the user pressed cancel in the editor selection dialog
-				return null;
-			}
-		}
-		if (desc == null) {
+		if (descriptor == null) {
 			throw new PartInitException(NLS.bind(
 					WorkbenchMessages.EditorManager_unknownEditorIDMessage, editorId));
 		}
@@ -3168,9 +3144,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 				activate(editor);
 			}
 
-			recordEditor(input, desc);
+			recordEditor(input, descriptor);
 			return editor;
-		} else if (desc.isInternal()) {
+		} else if (descriptor.isInternal()) {
 			// look for an editor to reuse
 			EditorReference reusableEditorRef = (EditorReference) ((TabBehaviour) Tweaklets
 					.get(TabBehaviour.KEY)).findReusableEditor(this);
@@ -3179,7 +3155,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 				if (editorId.equals(reusableEditorRef.getId())
 						&& reusableEditor instanceof IReusableEditor) {
 					// reusable editors that share the same id are okay
-					recordEditor(input, desc);
+					recordEditor(input, descriptor);
 					reuseEditor((IReusableEditor) reusableEditor, input);
 
 					MPart editor = reusableEditorRef.getModel();
@@ -3195,8 +3171,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 				// new one will be opened
 				closeEditor(reusableEditorRef, false);
 			}
-		} else if (desc.isOpenExternal()) {
-			openExternalEditor((EditorDescriptor) desc, input);
+		} else if (descriptor.isOpenExternal()) {
+			openExternalEditor(descriptor, input);
 			// no editor parts for external editors, return null
 			return null;
 		}
@@ -3222,48 +3198,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_EDITOR_OPEN);
 		}
 
-		recordEditor(input, desc);
+		recordEditor(input, descriptor);
 		return compatibilityEditor.getEditor();
     }
 
 	private void recordEditor(IEditorInput input, IEditorDescriptor descriptor) {
 		EditorHistory history = ((Workbench) legacyWindow.getWorkbench()).getEditorHistory();
 		history.add(input, descriptor);
-	}
-
-	private static IEditorDescriptor getAlternateEditor() {
-		Shell shell = ProgressManagerUtil.getDefaultParent();
-		EditorSelectionDialog dialog = new EditorSelectionDialog(shell) {
-			@Override
-			protected IDialogSettings getDialogSettings() {
-				IDialogSettings result = new DialogSettings("EditorSelectionDialog"); //$NON-NLS-1$
-				result.put(EditorSelectionDialog.STORE_ID_INTERNAL_EXTERNAL, true);
-				return result;
-			}
-		};
-		dialog.setMessage(WorkbenchMessages.EditorManager_largeDocumentWarning);
-
-		if (dialog.open() == Window.OK)
-			return dialog.getSelectedEditor();
-		return null;
-	}
-
-	boolean isLargeDocument(IEditorInput editorInput) {
-
-		if (!checkDocumentSize)
-			return false;
-
-		if (!(editorInput instanceof IPathEditorInput))
-			return false; // we know nothing about it
-
-		try {
-			IPath path = ((IPathEditorInput) editorInput).getPath();
-			File file = new File(path.toOSString());
-			return file.length() > maxFileSize;
-		} catch (Exception e) {
-			// ignore exceptions
-			return false;
-		}
 	}
 
     /**

@@ -56,10 +56,9 @@ import org.eclipse.ui.internal.registry.EditorRegistry;
  * internal and external editors.
  * 
  * @since 3.3
- * @noextend This class is not intended to be subclassed by clients.
  */
 
-public class EditorSelectionDialog extends Dialog {
+public final class EditorSelectionDialog extends Dialog {
 	private EditorDescriptor selectedEditor;
 
 	private EditorDescriptor hiddenSelectedEditor;
@@ -76,13 +75,7 @@ public class EditorSelectionDialog extends Dialog {
 
 	private Button okButton;
 
-	/**
-	 * For internal use only.
-	 * 
-	 * @noreference This field is not intended to be referenced by clients.
-	 * @since 3.7
-	 */
-	protected static final String STORE_ID_INTERNAL_EXTERNAL = "EditorSelectionDialog.STORE_ID_INTERNAL_EXTERNAL";//$NON-NLS-1$
+	private static final String STORE_ID_INTERNAL_EXTERNAL = "EditorSelectionDialog.STORE_ID_INTERNAL_EXTERNAL";//$NON-NLS-1$
 
 	private String message = WorkbenchMessages.EditorSelection_chooseAnEditor;
 
@@ -173,13 +166,10 @@ public class EditorSelectionDialog extends Dialog {
 		((GridLayout) contents.getLayout()).numColumns = 2;
 
 		// begin the layout
-		Label textLabel = new Label(contents, SWT.WRAP);
-
+		Label textLabel = new Label(contents, SWT.NONE);
 		textLabel.setText(message);
 		GridData data = new GridData();
 		data.horizontalSpan = 2;
-		data.horizontalAlignment = SWT.FILL;
-		data.widthHint = TABLE_WIDTH;
 		textLabel.setLayoutData(data);
 		textLabel.setFont(font);
 
