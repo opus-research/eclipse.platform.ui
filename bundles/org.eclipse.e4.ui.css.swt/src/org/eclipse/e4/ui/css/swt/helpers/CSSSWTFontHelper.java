@@ -283,8 +283,7 @@ public class CSSSWTFontHelper {
 
 	public static String getFontFamily(FontData fontData) {
 		if (fontData != null) {
-			String family = fontData.getName();
-			return CSS2FontHelper.getFontFamily(family);
+			return fontData.getName();
 		}
 		return null;
 	}
