@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Oakland Software Incorporated and others.
+ * Copyright (c) 2010, 2013 Oakland Software Incorporated and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,20 +7,17 @@
  *
  * Contributors:
  *     Oakland Software Incorporated - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.jface.viewers.StructuredSelection;
+
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.extension.TestLinkHelper;
-import org.junit.Test;
 
 public class LinkHelperTest extends NavigatorTestBase {
 
@@ -32,7 +29,6 @@ public class LinkHelperTest extends NavigatorTestBase {
 	}
 
 
-	@Test
 	public void testLinkHelperSelectionChange() throws Exception {
 
 		System.out.println("SelectionChange start");
@@ -69,7 +65,6 @@ public class LinkHelperTest extends NavigatorTestBase {
 			DisplayHelper.sleep(100000000);
 	}
 
-	@Test
 	public void testLinkHelperEditorActivation() throws Exception {
 		System.out.println("EditorActivation start");
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -26,7 +20,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.tests.navigator.extension.TestContentProviderNoChildren;
 import org.eclipse.ui.tests.navigator.extension.TestContentProviderPipelined;
-import org.junit.Test;
 
 public class PipelineTest extends NavigatorTestBase {
 
@@ -34,7 +27,6 @@ public class PipelineTest extends NavigatorTestBase {
 		_navigatorInstanceId = TEST_VIEWER_PIPELINE;
 	}
 
-	@Test
 	public void testNavigatorResourceJava() throws Exception {
 
 		assertEquals(
@@ -69,7 +61,7 @@ public class PipelineTest extends NavigatorTestBase {
 		assertTrue(
 				"The root object should be an IJavaProject, which is IAdaptable.", rootItems[0].getData() instanceof IAdaptable); //$NON-NLS-1$
 
-		IProject adaptedProject = ((IAdaptable) rootItems[_projectInd]
+		IProject adaptedProject = (IProject) ((IAdaptable) rootItems[_projectInd]
 				.getData()).getAdapter(IProject.class);
 		assertEquals(_project, adaptedProject);
 
@@ -107,7 +99,6 @@ public class PipelineTest extends NavigatorTestBase {
 	}
 
 	// Make sure problems in bad extension points are reported well
-	@Test
 	public void testInterceptAddThrow() throws Exception {
 		_contentService.bindExtensions(new String[] {
 				COMMON_NAVIGATOR_RESOURCE_EXT, TEST_CONTENT_RESOURCE_OVERRIDE},
@@ -131,8 +122,7 @@ public class PipelineTest extends NavigatorTestBase {
 	}
 
 	// Bug 299661 hasChildren() does not handle overrides correctly
-
-	private void testHasNoChildrenOverride(boolean hasChildren) throws Exception {
+	public void testHasNoChildrenOverride(boolean hasChildren) throws Exception {
 		TestContentProviderNoChildren._hasChildrenTrue = hasChildren;
 		_contentService.bindExtensions(new String[] {
 				COMMON_NAVIGATOR_RESOURCE_EXT, TEST_CONTENT_NO_CHILDREN},
@@ -153,12 +143,10 @@ public class PipelineTest extends NavigatorTestBase {
 		assertEquals(0, rootItems[0].getItems().length);
 	}
 
-	@Test
 	public void testHasNoChildrenOverrideHasChildren() throws Exception {
 		testHasNoChildrenOverride(true);
 	}
 
-	@Test
 	public void testHasNoChildrenOverride() throws Exception {
 		testHasNoChildrenOverride(false);
 	}

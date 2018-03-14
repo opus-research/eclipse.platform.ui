@@ -92,15 +92,6 @@ Text {
     background-color: #515658;
     color: #cccccc;
 }
-
-
-SashForm > StyledText {
-	/*	Fix StyledText inside a SashForm */
-    background-color: #202020;
-    color: #cccccc;
-}
-
-
 Text[style~='SWT.DROP_DOWN'],
 TextSearchControl /* SWT-BUG: background color is hard-coded */,
 TextSearchControl > Label {
@@ -369,9 +360,6 @@ LayoutComposite > Table {
     color: #FFF;
 }
 
-HeapStatus {
-	background-color:#41464a;
-}
 Twistie {
     color: #E8E4DF;
 }

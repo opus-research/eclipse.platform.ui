@@ -334,7 +334,7 @@ public class ThemeEngine implements IThemeEngine {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
 		// TODO: Need to differentiate win32 versions
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
+		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
 		ArrayList<IConfigurationElement> matchingElements = new ArrayList<IConfigurationElement>();
 		for (IConfigurationElement element : elements) {
 			String elementOs = element.getAttribute("os");
@@ -523,8 +523,7 @@ public class ThemeEngine implements IThemeEngine {
 	}
 
 	private IEclipsePreferences getPreferences() {
-		return InstanceScope.INSTANCE.getNode(
-				FrameworkUtil.getBundle(
+		return new InstanceScope().getNode(FrameworkUtil.getBundle(
 				ThemeEngine.class).getSymbolicName());
 	}
 

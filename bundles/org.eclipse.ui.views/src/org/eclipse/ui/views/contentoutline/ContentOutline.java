@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 
 package org.eclipse.ui.views.contentoutline;
@@ -36,7 +35,7 @@ import org.eclipse.ui.part.PageBookView;
  * <p>
  * This standard view has id <code>"org.eclipse.ui.views.ContentOutline"</code>.
  * </p>
- * When a <b>content outline view</b> notices an editor being activated, it
+ * When a <b>content outline view</b> notices an editor being activated, it 
  * asks the editor whether it has a <b>content outline page</b> to include
  * in the outline view. This is done using <code>getAdapter</code>:
  * <pre>
@@ -47,13 +46,13 @@ import org.eclipse.ui.part.PageBookView;
  * }
  * </pre>
  * If the editor supports a content outline page, the editor instantiates
- * and configures the page, and returns it. This page is then added to the
- * content outline view (a pagebook which presents one page at a time) and
+ * and configures the page, and returns it. This page is then added to the 
+ * content outline view (a pagebook which presents one page at a time) and 
  * immediately made the current page (the content outline view need not be
  * visible). If the editor does not support a content outline page, the content
  * outline view shows a special default page which makes it clear to the user
  * that the content outline view is disengaged. A content outline page is free
- * to report selection events; the content outline view forwards these events
+ * to report selection events; the content outline view forwards these events 
  * along to interested parties. When the content outline view notices a
  * different editor being activated, it flips to the editor's corresponding
  * content outline page. When the content outline view notices an editor being
@@ -87,7 +86,7 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     /**
      * Message to show on the default page.
      */
-    private String defaultText =ContentOutlineMessages.ContentOutline_noOutline;
+    private String defaultText =ContentOutlineMessages.ContentOutline_noOutline; 
 
     /**
      * Creates a content outline view with no content outline pages.
@@ -124,8 +123,9 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     @Override
 	protected PageRec doCreatePage(IWorkbenchPart part) {
         // Try to get an outline page.
-		IContentOutlinePage page = ViewsPlugin.getAdapter(part, IContentOutlinePage.class, false);
-		if (page != null) {
+        Object obj = ViewsPlugin.getAdapter(part, IContentOutlinePage.class, false);
+        if (obj instanceof IContentOutlinePage) {
+            IContentOutlinePage page = (IContentOutlinePage) obj;
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);
 			}
@@ -144,14 +144,14 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     }
 
     @Override
-	public <T> T getAdapter(Class<T> key) {
+	public Object getAdapter(Class key) {
         if (key == IContributedContentsView.class) {
-			return key.cast(new IContributedContentsView() {
+			return new IContributedContentsView() {
                 @Override
 				public IWorkbenchPart getContributingPart() {
                     return getContributingEditor();
                 }
-			});
+            };
 		}
         return super.getAdapter(key);
     }
@@ -167,7 +167,7 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     }
 
     /**
-     * Returns the editor which contributed the current
+     * Returns the editor which contributed the current 
      * page to this view.
      *
      * @return the editor which contributed the current page
@@ -213,7 +213,7 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     /**
      * The <code>ContentOutline</code> implementation of this <code>PageBookView</code> method
      * extends the behavior of its parent to use the current page as a selection provider.
-     *
+     * 
      * @param pageRec the page record containing the page to show
      */
     @Override
@@ -221,7 +221,7 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
         IPageSite pageSite = getPageSite(pageRec.page);
         ISelectionProvider provider = pageSite.getSelectionProvider();
         if (provider == null && (pageRec.page instanceof IContentOutlinePage)) {
-			// This means that the page did not set a provider during its initialization
+			// This means that the page did not set a provider during its initialization 
             // so for backward compatibility we will set the page itself as the provider.
             pageSite.setSelectionProvider((IContentOutlinePage) pageRec.page);
 		}

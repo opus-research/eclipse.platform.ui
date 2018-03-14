@@ -8,7 +8,7 @@
  *     IBM Corporation - initial API and implementation
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 419482
  *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 459961
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 458291
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
@@ -23,40 +23,39 @@ import org.eclipse.e4.ui.css.swt.properties.preference.EclipsePreferencesHandler
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-// note to contributors: please ignore Eclipse default formatting and keep one class per line.
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	CSSSWTFontHelperTest.class,
-	CSSSWTColorHelperTest.class,
+	CSSSWTFontHelperTest.class, 
+	CSSSWTColorHelperTest.class, 
 	CSSResourcesHelpersTest.class,
-	SWTResourceRegistryKeyFactoryTest.class,
-	SWTResourcesRegistryTest.class,
+	SWTResourceRegistryKeyFactoryTest.class, 
+	SWTResourcesRegistryTest.class, 
 	FontDefinitionTest.class,
-	ColorDefinitionTest.class,
-	ThemesExtensionTest.class,
+	ColorDefinitionTest.class, 
+	ThemesExtensionTest.class, 
 	IEclipsePreferencesTest.class,
-	EclipsePreferencesHelperTest.class,
-	CSSSWTWidgetTest.class,
-	LabelTest.class,
+	EclipsePreferencesHelperTest.class, 
+	CSSSWTWidgetTest.class, 
+	LabelTest.class, 
 	CTabFolderTest.class,
-	CTabItemTest.class,
-	IdClassLabelColorTest.class,
-	ShellTest.class,
-	ButtonTest.class,
+	CTabItemTest.class, 
+	IdClassLabelColorTest.class, 
+	ShellTest.class, 
+	ButtonTest.class, 
 	GradientTest.class,
-	MarginTest.class,
-	InnerClassElementTest.class,
+	MarginTest.class, 
+	InnerClassElementTest.class, 
 	EclipsePreferencesHandlerTest.class,
-	PreferenceOverriddenByCssChangeListenerTest.class,
-	ButtonTextTransformTest.class,
+	PreferenceOverriddenByCssChangeListenerTest.class, 
+	ButtonTextTransformTest.class, 
 	LabelTextTransformTest.class,
-	TextTextTransformTest.class,
-	DescendentTest.class,
-	ThemeTest.class,
-	Bug459961Test.class,
-	Bug419482Test.class,
+	TextTextTransformTest.class, 
+	DescendentTest.class, 
+	ThemeTest.class, 
+	Bug419482Test.class, 
 	ShellActiveTest.class,
-	InheritTest.class })
+	InheritTest.class, 
+	InitialTest.class })
 public class CssSwtTestSuite {
 
 }
