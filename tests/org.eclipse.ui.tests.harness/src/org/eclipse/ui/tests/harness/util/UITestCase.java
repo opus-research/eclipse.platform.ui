@@ -411,14 +411,8 @@ public abstract class UITestCase extends TestCase {
 	 * @since 3.2
 	 */
 	private void waitOnShell(Shell shell) {
-
 		processEvents();
-//		long endTime = System.currentTimeMillis() + 5000;
-//
-//		while (shell.getDisplay().getActiveShell() != shell
-//				&& System.currentTimeMillis() < endTime) {
-//			processEvents();
-//		}
+		waitForJobs(100, 5000);
 	}
 
 	/**
