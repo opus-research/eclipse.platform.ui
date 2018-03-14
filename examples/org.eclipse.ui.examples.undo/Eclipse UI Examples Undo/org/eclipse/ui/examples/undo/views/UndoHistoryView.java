@@ -87,21 +87,25 @@ public class UndoHistoryView extends ViewPart implements
 	class ViewContentProvider implements IStructuredContentProvider,
 			IOperationHistoryListener {
 
+		@Override
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 			// we never change inputs, so we just use this as a place to add our
 			// listener.
 			history.addOperationHistoryListener(this);
 		}
 
+		@Override
 		public void dispose() {
 			history.removeOperationHistoryListener(this);
 		}
 
+		@Override
 		public Object[] getElements(Object input) {
 			// show the items in the operations history.
 			return history.getUndoHistory(fContext);
 		}
 
+		@Override
 		public void historyNotification(OperationHistoryEvent event) {
 			if (viewer.getTable().isDisposed())
 				return;
@@ -114,6 +118,7 @@ public class UndoHistoryView extends ViewPart implements
 				if (event.getOperation().hasContext(fContext)
 						&& display != null) {
 					display.syncExec(new Runnable() {
+						@Override
 						public void run() {
 							// refresh all labels in case any operation has
 							// changed dynamically
@@ -135,14 +140,17 @@ public class UndoHistoryView extends ViewPart implements
 	 */
 	class ViewLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
+		@Override
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
 		}
 
+		@Override
 		public Image getColumnImage(Object obj, int index) {
 			return getImage(obj);
 		}
 
+		@Override
 		public String getText(Object obj) {
 			if (!showDebug && obj instanceof IUndoableOperation)
 				return ((IUndoableOperation)obj).getLabel();
@@ -153,6 +161,7 @@ public class UndoHistoryView extends ViewPart implements
 	/*
 	 * Create a table viewer to show the list of operations.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
 				| SWT.V_SCROLL);
@@ -171,6 +180,7 @@ public class UndoHistoryView extends ViewPart implements
 	 */
 	private void addListeners() {
 		propertyChangeListener = new IPropertyChangeListener(){
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty() == PreferenceConstants.PREF_SHOWDEBUG) {
 					showDebug = UndoPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.PREF_SHOWDEBUG);
@@ -180,6 +190,7 @@ public class UndoHistoryView extends ViewPart implements
 		};
 		UndoPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(propertyChangeListener);
 		viewer.getControl().addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent event) {
 				removeListeners();
 			}
@@ -219,7 +230,7 @@ public class UndoHistoryView extends ViewPart implements
 	private IUndoContext selectContext() {
 		// This would be better implemented as a view filter, but for now, we 
 		// will use a dialog that collects the available undo contexts.
-		List input = new ArrayList();
+		List<IUndoContext> input = new ArrayList<IUndoContext>();
 		IUndoableOperation[] operations = history
 				.getUndoHistory(IOperationHistory.GLOBAL_UNDO_CONTEXT);
 		for (int i = 0; i < operations.length; i++) {
@@ -233,6 +244,7 @@ public class UndoHistoryView extends ViewPart implements
 		input.add(IOperationHistory.GLOBAL_UNDO_CONTEXT);
 
 		ILabelProvider labelProvider = new LabelProvider() {
+			@Override
 			public String getText(Object element) {
 				return ((IUndoContext) element).getLabel();
 			}
@@ -273,6 +285,7 @@ public class UndoHistoryView extends ViewPart implements
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				UndoHistoryView.this.fillContextMenu(manager);
 			}
@@ -316,6 +329,7 @@ public class UndoHistoryView extends ViewPart implements
 	 */
 	private void makeActions() {
 		filterAction = new Action() {
+			@Override
 			public void run() {
 				IUndoContext context = selectContext();
 				if (fContext != context && context != null) {
@@ -330,6 +344,7 @@ public class UndoHistoryView extends ViewPart implements
 						ISharedImages.IMG_OBJS_INFO_TSK));
 
 		selectiveUndoAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
@@ -352,6 +367,7 @@ public class UndoHistoryView extends ViewPart implements
 						ISharedImages.IMG_TOOL_UNDO));
 
 		refreshListAction = new Action() {
+			@Override
 			public void run() {
 				if (!viewer.getTable().isDisposed())
 					viewer.refresh(true);
@@ -361,6 +377,7 @@ public class UndoHistoryView extends ViewPart implements
 		refreshListAction.setToolTipText(UndoExampleMessages.UndoHistoryView_RefreshListToolTipText);
 
 		doubleClickAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				IUndoableOperation operation = (IUndoableOperation) ((IStructuredSelection) selection)
@@ -382,6 +399,7 @@ public class UndoHistoryView extends ViewPart implements
 	 */
 	private void hookDoubleClickAction() {
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(DoubleClickEvent event) {
 				doubleClickAction.run();
 			}
@@ -399,6 +417,7 @@ public class UndoHistoryView extends ViewPart implements
 	/*
 	 * The selection has changed.
 	 */
+	@Override
 	public void selectionChanged(SelectionChangedEvent event) {
 		ISelection selection = viewer.getSelection();
 		boolean enabled = !selection.isEmpty();
@@ -408,6 +427,7 @@ public class UndoHistoryView extends ViewPart implements
 	/*
 	 * Pass the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 

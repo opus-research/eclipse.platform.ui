@@ -146,6 +146,7 @@ public class BoxView extends ViewPart {
 	 * Create the canvas on which boxes are drawn and hook up all actions and
 	 * listeners.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		paintCanvas = new Canvas(parent, SWT.BORDER | SWT.V_SCROLL
 				| SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE);
@@ -170,6 +171,7 @@ public class BoxView extends ViewPart {
 	 */
 	private void addListeners() {
 		paintCanvas.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseDown(MouseEvent event) {
 				if (event.button != 1)
 					return;
@@ -193,6 +195,7 @@ public class BoxView extends ViewPart {
 				}
 			}
 
+			@Override
 			public void mouseUp(MouseEvent event) {
 				if (event.button != 1) {
 					resetDrag(true); // abort if right or middle mouse button
@@ -234,10 +237,12 @@ public class BoxView extends ViewPart {
 				paintCanvas.redraw();
 			}
 
+			@Override
 			public void mouseDoubleClick(MouseEvent event) {
 			}
 		});
 		paintCanvas.addMouseMoveListener(new MouseMoveListener() {
+			@Override
 			public void mouseMove(MouseEvent event) {
 				if (dragInProgress) {
 					clearRubberBandSelection();
@@ -255,6 +260,7 @@ public class BoxView extends ViewPart {
 			}
 		});
 		paintCanvas.addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent event) {
 				event.gc.setForeground(paintCanvas.getForeground());
 				boxes.draw(event.gc);
@@ -262,6 +268,7 @@ public class BoxView extends ViewPart {
 		});
 
 		paintCanvas.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent event) {
 				// dispose the gc
 				gc.dispose();
@@ -272,6 +279,7 @@ public class BoxView extends ViewPart {
 
 		// listen for a change in the undo limit
 		propertyChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty() == PreferenceConstants.PREF_UNDOLIMIT) {
 					int limit = UndoPlugin.getDefault().getPreferenceStore()
@@ -303,6 +311,7 @@ public class BoxView extends ViewPart {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				BoxView.this.fillContextMenu(manager);
 			}
@@ -353,6 +362,7 @@ public class BoxView extends ViewPart {
 	 */
 	private void makeActions() {
 		clearBoxesAction = new Action() {
+			@Override
 			public void run() {
 				try {
 					getOperationHistory().execute(
@@ -389,6 +399,7 @@ public class BoxView extends ViewPart {
 	/*
 	 * Set focus to the canvas.
 	 */
+	@Override
 	public void setFocus() {
 		paintCanvas.setFocus();
 	}

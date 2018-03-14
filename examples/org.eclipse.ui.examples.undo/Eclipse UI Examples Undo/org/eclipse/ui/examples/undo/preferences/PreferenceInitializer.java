@@ -12,7 +12,6 @@ package org.eclipse.ui.examples.undo.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-
 import org.eclipse.ui.examples.undo.UndoPlugin;
 
 /**
@@ -20,11 +19,7 @@ import org.eclipse.ui.examples.undo.UndoPlugin;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-	 */
+	@Override
 	public void initializeDefaultPreferences() {
 		IPreferenceStore store = UndoPlugin.getDefault()
 				.getPreferenceStore();
