@@ -622,6 +622,9 @@ public class ActionContributionItem extends ContributionItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Object.
+	 */
 	@Override
 	public int hashCode() {
 		return action.hashCode();
@@ -681,6 +684,9 @@ public class ActionContributionItem extends ContributionItem {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IContributionItem.
+	 */
 	@Override
 	public boolean isEnabled() {
 		return action != null && action.isEnabled();
@@ -1192,6 +1198,11 @@ public class ActionContributionItem extends ContributionItem {
 		return textValue;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
