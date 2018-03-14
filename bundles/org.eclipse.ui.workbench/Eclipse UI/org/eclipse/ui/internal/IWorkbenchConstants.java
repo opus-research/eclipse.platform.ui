@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -109,6 +109,8 @@ public interface IWorkbenchConstants {
     public static final String TAG_ITEM_WRAP_INDEX = "wrapIndex"; //$NON-NLS-1$
 
     public static final String TAG_TOOLBAR_LAYOUT = "toolbarLayout"; //$NON-NLS-1$
+
+	public static final String TAG_TOOLBAR_SEPARATOR = "toolbarSeparator"; //$NON-NLS-1$
 
     public static final String TAG_WIDTH = "width"; //$NON-NLS-1$
 
@@ -339,6 +341,10 @@ public interface IWorkbenchConstants {
     public static final String TAG_TRIM_AREA = "trimArea"; //$NON-NLS-1$
         
     public static final String TAG_TRIM_ITEM = "trimItem"; //$NON-NLS-1$
+
+	public static final String TRIM_PERSPECTIVE_SPACER = "PerspectiveSpacer"; //$NON-NLS-1$
+
+	public static final String ADDITIONS = "additions"; //$NON-NLS-1$
 
     //Fonts
     public static final String SMALL_FONT = "org.eclipse.ui.smallFont"; //$NON-NLS-1$
