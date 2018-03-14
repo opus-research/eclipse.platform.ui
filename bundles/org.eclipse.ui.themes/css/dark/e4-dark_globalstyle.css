@@ -425,5 +425,10 @@ Label#org-eclipse-ui-splash-progressText {
 }
 
 ProgressIndicator#org-eclipse-ui-splash-progressIndicator {
-	background-color: #e1e1e1;
+	background-color: #e8e8e8;
 }
+
+ProgressIndicator#org-eclipse-ui-splash-progressIndicator ProgressBar {
+	background-color: #e8e8e8; 
+}
+
