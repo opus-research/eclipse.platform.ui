@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Eric Rizzo - added API to set the list of recent workspaces.
  *     Jan-Ove Weichel <ovi.weichel@gmail.com> - Bug 463039
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -80,8 +79,6 @@ public class ChooseWorkspaceData {
 	private static final int PERS_ENCODING_VERSION_CONFIG_PREFS_NO_COMMAS = 3;
 
     private boolean showDialog = true;
-
-	private boolean openRecentWorkspacesComposite;
 
     private String initialDefault;
 
@@ -171,13 +168,6 @@ public class ChooseWorkspaceData {
         return showDialog;
     }
 
-	/**
-	 * Returns whether the RecentWorkspaces-Composite should be opened
-	 */
-	public boolean isOpenRecentWorkspacesComposite() {
-		return openRecentWorkspacesComposite;
-	}
-
     /**
      * Return an array of recent workspaces sorted with the most recently used at
      * the start.
@@ -202,13 +192,6 @@ public class ChooseWorkspaceData {
     public void toggleShowDialog() {
         showDialog = !showDialog;
     }
-
-	/**
-	 * Set if the RecentWorkspaces-Composite should be opened
-	 */
-	public void setOpenRecentWorkspacesComposite(boolean openRecentWorkspacesComposite) {
-		this.openRecentWorkspacesComposite = openRecentWorkspacesComposite;
-	}
 
     /**
      * Sets the list of recent workspaces.
@@ -264,10 +247,7 @@ public class ChooseWorkspaceData {
 		node.putInt(IDE.Preferences.RECENT_WORKSPACES_PROTOCOL,
 				PERS_ENCODING_VERSION_CONFIG_PREFS_NO_COMMAS);
 
-		// 6. store if the RecentWorkspaces-Composite should be opened
-		node.putBoolean(IDE.Preferences.OPEN_RECENT_WORKSPACES_COMPOSITE, openRecentWorkspacesComposite);
-
-		// 7. store the node
+		// 6. store the node
 		try {
 			node.flush();
 		} catch (BackingStoreException e) {
@@ -440,9 +420,6 @@ public class ChooseWorkspaceData {
 		String workspacePathPref = store
 				.getString(IDE.Preferences.RECENT_WORKSPACES);
 		recentWorkspaces = decodeStoredWorkspacePaths(protocol, max, workspacePathPref);
-
-		// 5. load open RecentWorkspaces-Composite
-		openRecentWorkspacesComposite = store.getBoolean(IDE.Preferences.OPEN_RECENT_WORKSPACES_COMPOSITE);
 
 		return true;
 	}
