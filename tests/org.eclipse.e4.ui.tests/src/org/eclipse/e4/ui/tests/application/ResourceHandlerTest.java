@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,6 +62,7 @@ public class ResourceHandlerTest extends HeadlessStartupTest {
 		localContext.set(E4Workbench.INSTANCE_LOCATION, getInstanceLocation());
 		localContext.set(E4Workbench.PERSIST_STATE, Boolean.TRUE);
 		localContext.set(E4Workbench.CLEAR_PERSISTED_STATE, Boolean.TRUE);
+		localContext.set(E4Workbench.DELTA_RESTORE, Boolean.TRUE);
 
 		localContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI, uri);
 

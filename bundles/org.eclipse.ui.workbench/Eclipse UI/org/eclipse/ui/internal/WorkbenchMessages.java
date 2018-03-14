@@ -952,6 +952,8 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
+	public static String WorkbenchLayoutSettings_Name;
+	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
@@ -974,7 +976,6 @@ public class WorkbenchMessages extends NLS {
 
 	// WorkingSetConfigurationBlock
 	public static String WorkingSetConfigurationBlock_SelectWorkingSet_button;
-	public static String WorkingSetConfigurationBlock_NewWorkingSet_button;
 	public static String WorkingSetConfigurationBlock_WorkingSetText_name;
 
 	public static String WorkingSetPropertyPage_ReadOnlyWorkingSet_description;

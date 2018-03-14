@@ -10,7 +10,6 @@
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 462056
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
  *     Alexander Baranov <achilles-86@mail.ru> - Bug 458460
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483842
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -214,7 +212,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 			// Put the control under the 'limbo' shell
 			if (changedElement.getWidget() instanceof Control) {
 				Control ctrl = (Control) changedElement.getWidget();
-				ctrl.requestLayout();
+
+				if (!(ctrl instanceof Shell)) {
+					ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
+				}
+
 				ctrl.setParent(getLimboShell());
 			}
 
@@ -297,7 +299,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 						final Control ctrl = (Control) w;
 						fixZOrder(added);
 						if (!ctrl.isDisposed()) {
-							ctrl.requestLayout();
+							ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
 						}
 					}
 				} else {
@@ -329,7 +331,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (removed.getWidget() instanceof Control) {
 					Control ctrl = (Control) removed.getWidget();
 					ctrl.setLayoutData(null);
-					ctrl.requestLayout();
+					ctrl.getParent().layout(new Control[] { ctrl }, SWT.CHANGED | SWT.DEFER);
 				}
 
 				// Ensure that the element about to be removed is not the
@@ -435,6 +437,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 					}
 					temp = temp.getParent();
 				}
+
 				composite.layout(true, true);
 			}
 		}
@@ -633,8 +636,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				Map<String, String> props = ctxt.getProperties();
-				for (Entry<String, String> entry : props.entrySet()) {
-					lclContext.set(entry.getKey(), entry.getValue());
+				for (String key : props.keySet()) {
+					lclContext.set(key, props.get(key));
 				}
 			}
 		}
@@ -1053,10 +1056,20 @@ public class PartRenderingEngine implements IPresentationEngine {
 					spinOnce = false; // loop until the app closes
 					theApp = (MApplication) uiRoot;
 					// long startTime = System.currentTimeMillis();
-					for (MWindow window : theApp.getChildren()) {
-						createGui(window);
+					MWindow selected = theApp.getSelectedElement();
+					if (selected == null) {
+						for (MWindow window : theApp.getChildren()) {
+							createGui(window);
+						}
+					} else {
+						// render the selected one first
+						createGui(selected);
+						for (MWindow window : theApp.getChildren()) {
+							if (selected != window) {
+								createGui(window);
+							}
+						}
 					}
-
 					// long endTime = System.currentTimeMillis();
 					// System.out.println("Render: " + (endTime - startTime));
 					// tell the app context we are starting so the splash is
