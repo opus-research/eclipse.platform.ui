@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -117,7 +117,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 			String attName = (String) event
 					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 				ici.update();
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				ici.update();
@@ -137,7 +138,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			MenuManager manager = getManager(model);
 			if ((manager == null))
 				return;
-			if (UIEvents.UILabel.LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 				manager.setMenuText(getText(model));
 				manager.update(IAction.TEXT);
 			}
@@ -623,6 +625,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	private void processMenu(MenuManager parentManager, MMenu menuModel) {
 		MenuManager menuManager = getManager(menuModel);
 		if (menuManager == null) {
+			menuModel.setRenderer(this);
 			String menuText = getText(menuModel);
 			ImageDescriptor desc = getImageDescriptor(menuModel);
 			menuManager = new MenuManager(menuText, desc,
@@ -688,6 +691,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		Object obj = itemModel.getContributionItem();
 		if (obj instanceof IContextFunction) {
 			final IEclipseContext lclContext = getContext(itemModel);
@@ -711,6 +715,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		Object obj = itemModel.getOpaqueItem();
 		if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
@@ -732,6 +737,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		AbstractGroupMarker marker = null;
 		if (itemModel.getTags().contains(GROUP_MARKER)
 				|| !itemModel.isVisible()) {
@@ -760,6 +766,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		DirectContributionItem ci = ContextInjectionFactory.make(
 				DirectContributionItem.class, lclContext);
@@ -779,6 +786,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		DynamicContributionContributionItem ci = new DynamicContributionContributionItem(
 				itemModel);
 		addToManager(menuManager, itemModel, ci);
@@ -795,6 +803,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		HandledContributionItem ci = ContextInjectionFactory.make(
 				HandledContributionItem.class, lclContext);
