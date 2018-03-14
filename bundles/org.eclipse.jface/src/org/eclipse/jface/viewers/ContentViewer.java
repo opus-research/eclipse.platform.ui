@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Steven Spungin <steven@spungin.tv> - Bug 401439
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475844, 475689
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475844
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.internal.InternalPolicy;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Control;
 
 /**
@@ -219,7 +220,12 @@ public abstract class ContentViewer extends Viewer {
      * @param control the control
      */
     protected void hookControl(Control control) {
-		control.addDisposeListener(this::handleDispose);
+        control.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent event) {
+                handleDispose(event);
+            }
+        });
     }
 
     /**

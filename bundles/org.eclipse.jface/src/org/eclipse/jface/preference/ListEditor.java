@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -261,13 +263,16 @@ public abstract class ListEditor extends FieldEditor {
             layout.marginWidth = 0;
             buttonBox.setLayout(layout);
             createButtons(buttonBox);
-            buttonBox.addDisposeListener(event -> {
-			    addButton = null;
-			    removeButton = null;
-			    upButton = null;
-			    downButton = null;
-			    buttonBox = null;
-			});
+            buttonBox.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    addButton = null;
+                    removeButton = null;
+                    upButton = null;
+                    downButton = null;
+                    buttonBox = null;
+                }
+            });
 
         } else {
             checkParent(buttonBox, parent);
@@ -289,7 +294,12 @@ public abstract class ListEditor extends FieldEditor {
                     | SWT.H_SCROLL);
             list.setFont(parent.getFont());
             list.addSelectionListener(getSelectionListener());
-            list.addDisposeListener(event -> list = null);
+            list.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    list = null;
+                }
+            });
         } else {
             checkParent(list, parent);
         }
