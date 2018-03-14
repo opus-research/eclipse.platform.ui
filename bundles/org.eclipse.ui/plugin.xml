@@ -395,6 +395,16 @@
             contextId="org.eclipse.ui.contexts.dialogAndWindow"
             sequence="M2+INSERT"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
+      <key
+            commandId="org.eclipse.ui.zoomIn"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            sequence="M1++"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
+       <key
+            commandId="org.eclipse.ui.zoomOut"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            sequence="M1+-"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
 
 	  <key
 	        commandId="org.eclipse.ui.edit.text.contentAssist.proposals"
@@ -1406,8 +1416,16 @@
             id="org.eclipse.ui.activeContextInfo"
             name="%activeContextInfo.name">
       </command>
+      <command
+      		categoryId="org.eclipse.ui.category.window"
+      		id="org.eclipse.ui.zoomIn"
+      		name="%command.zoomIn.name"/>
+      <command
+      		categoryId="org.eclipse.ui.category.window"
+      		id="org.eclipse.ui.zoomOut"
+      		name="%command.zoomOut.name"/>
    </extension>
-   
+
    <extension
          point="org.eclipse.ui.commandImages">
       <image
@@ -1490,8 +1508,16 @@
             commandId="org.eclipse.ui.help.helpSearch"
             icon="$nl$/icons/full/etool16/help_search.png">
       </image>
+      <image
+            commandId="org.eclipse.ui.zoomIn"
+            icon="$nl$/icons/full/etool16/zoomIn.gif">
+      </image>
+      <image
+            commandId="org.eclipse.ui.zoomOut"
+            icon="$nl$/icons/full/etool16/zoomOut.gif">
+      </image>
    </extension>
-   
+
    <extension
          point="org.eclipse.ui.views">
       <category

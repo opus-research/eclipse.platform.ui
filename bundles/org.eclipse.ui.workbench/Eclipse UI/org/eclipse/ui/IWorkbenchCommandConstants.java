@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009-2011 IBM Corporation and others.
+ * Copyright (c) 2009-2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Marc R. Hoffmann <hoffmann@mountainminds.com>
  *         - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - 469918 Zoom In/Out
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -610,5 +611,21 @@ public interface IWorkbenchCommandConstants {
 	 * @since 3.6
 	 */
 	public static final String PERSPECTIVES_SHOW_PERSPECTIVE_PARM_NEWWINDOW = "org.eclipse.ui.perspectives.showPerspective.newWindow"; //$NON-NLS-1$
+
+	// Zoom
+
+	/**
+	 * Id for command "Zoom In".
+	 *
+	 * @since 3.108
+	 */
+	public static final String ZOOM_IN = "org.eclipse.ui.zoomIn"; //$NON-NLS-1$
+
+	/**
+	 * Id for command "Zoom Out".
+	 *
+	 * @since 3.108
+	 */
+	public static final String ZOOM_OUT = "org.eclipse.ui.zoomOut"; //$NON-NLS-1$
 
 }
