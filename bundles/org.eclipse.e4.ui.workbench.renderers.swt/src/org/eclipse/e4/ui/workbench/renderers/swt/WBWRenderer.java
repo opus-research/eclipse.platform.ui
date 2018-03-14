@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -129,7 +130,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	private EventHandler shellUpdater;
 	private EventHandler visibilityHandler;
 	private EventHandler sizeHandler;
-	private EventHandler themeDefinitionChanged;
+	private ThemeDefinitionChangedHandler themeDefinitionChanged;
 
 	@Inject
 	private EModelService modelService;
@@ -324,6 +325,8 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(sizeHandler);
 		eventBroker.unsubscribe(themeDefinitionChanged);
+
+		themeDefinitionChanged.dispose();
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -345,16 +348,17 @@ public class WBWRenderer extends SWTPartRenderer {
 				.getShell();
 
 		final Shell wbwShell;
+
+		int styleOverride = getStyleOverride(wbwModel) | rtlStyle;
 		if (parentShell == null) {
-			wbwShell = new Shell(Display.getCurrent(), SWT.SHELL_TRIM
-					| rtlStyle);
+			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
+					: styleOverride;
+			wbwShell = new Shell(Display.getCurrent(), style);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
-		} else if (wbwModel.getTags().contains("dragHost")) { //$NON-NLS-1$
-			wbwShell = new Shell(parentShell, SWT.BORDER | rtlStyle);
-			wbwShell.setAlpha(110);
 		} else {
-			wbwShell = new Shell(parentShell, SWT.TITLE | SWT.RESIZE | SWT.MAX
-					| SWT.CLOSE | rtlStyle);
+			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
+			style = styleOverride == -1 ? style : styleOverride;
+			wbwShell = new Shell(parentShell, style);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
@@ -673,13 +677,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
-	 * (org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parent = element.getParent();
@@ -694,13 +691,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		return tpl.clientArea;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.PartFactory#postProcess(org.eclipse
-	 * .e4.ui.model.application.MPart)
-	 */
 	@Override
 	public void postProcess(MUIElement shellME) {
 		super.postProcess(shellME);
@@ -730,6 +720,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			shell.setMinimized(true);
 
 		shell.layout(true);
+		forceLayout(shell);
 		if (shellME.isVisible()) {
 			shell.open();
 		} else {
@@ -825,6 +816,8 @@ public class WBWRenderer extends SWTPartRenderer {
 	@SuppressWarnings("restriction")
 	protected static class ThemeDefinitionChangedHandler implements
 			EventHandler {
+		protected Set<Resource> unusedResources = new HashSet<Resource>();
+
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(IEventBroker.DATA);
 
@@ -832,7 +825,6 @@ public class WBWRenderer extends SWTPartRenderer {
 				return;
 			}
 
-			List<Object> unusedResources = new ArrayList<Object>();
 			Set<CSSEngine> engines = new HashSet<CSSEngine>();
 
 			// In theory we can have multiple engines since API allows it.
@@ -845,13 +837,14 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 
 			for (CSSEngine engine : engines) {
-				unusedResources.addAll(removeResources(engine
-						.getResourcesRegistry()));
+				for (Object resource : removeResources(engine
+						.getResourcesRegistry())) {
+					if (resource instanceof Resource
+							&& !((Resource) resource).isDisposed()) {
+						unusedResources.add((Resource) resource);
+					}
+				}
 				engine.reapply();
-			}
-
-			for (Object resource : unusedResources) {
-				disposeResource(resource);
 			}
 		}
 
@@ -869,11 +862,25 @@ public class WBWRenderer extends SWTPartRenderer {
 			return Collections.emptyList();
 		}
 
-		protected void disposeResource(Object resource) {
-			if (resource instanceof Resource
-					&& !((Resource) resource).isDisposed()) {
-				((Resource) resource).dispose();
+		public void dispose() {
+			for (Resource resource : unusedResources) {
+				if (!resource.isDisposed()) {
+					resource.dispose();
+				}
 			}
+			unusedResources.clear();
+		}
+	}
+
+	private void forceLayout(Shell shell) {
+		int i = 0;
+		while(shell.isLayoutDeferred()) {
+			shell.setLayoutDeferred(false);
+			i++;
+		}
+		while(i > 0) {
+			shell.setLayoutDeferred(true);
+			i--;
 		}
 	}
 }

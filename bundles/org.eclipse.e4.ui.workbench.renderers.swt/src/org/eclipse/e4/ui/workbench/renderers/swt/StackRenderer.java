@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -23,6 +24,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -41,8 +43,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -51,6 +51,8 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
+import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
@@ -99,7 +101,19 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.w3c.dom.css.CSSValue;
 
+/**
+ * SWT default renderer for a MPartStack model elements
+ *
+ * Style bits for the underlying CTabFolder can be set via the
+ * IPresentation.STYLE_OVERRIDE_KEY key
+ *
+ */
 public class StackRenderer extends LazyStackRenderer {
+	/**
+	 * 
+	 */
+	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
+
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
 	Map<MUIElement, Set<MPlaceholder>> renderedMap;
@@ -109,7 +123,7 @@ public class StackRenderer extends LazyStackRenderer {
 	private static final String STACK_SELECTED_PART = "stack_selected_part"; //$NON-NLS-1$
 
 	/**
-	 * Add this tag to prevent the next tab's activation from granting focus to
+	 * Add this tag to prevent the next tab's activation from granting focus toac
 	 * the part. This is used to keep the focus on the CTF when traversing the
 	 * tabs using the keyboard.
 	 */
@@ -261,13 +275,6 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#requiresFocus
-	 * (org.eclipse.e4.ui.model.application.ui.basic.MPart)
-	 */
 	@Override
 	protected boolean requiresFocus(MPart element) {
 		MUIElement inStack = element.getCurSharedRef() != null ? element
@@ -582,6 +589,8 @@ public class StackRenderer extends LazyStackRenderer {
 		if (!(element instanceof MPartStack) || !(parent instanceof Composite))
 			return null;
 
+		MPartStack pStack = (MPartStack) element;
+
 		Composite parentComposite = (Composite) parent;
 
 		// Ensure that all rendered PartStacks have an Id
@@ -591,8 +600,9 @@ public class StackRenderer extends LazyStackRenderer {
 			element.setElementId(generatedId);
 		}
 
-		// TBD: need to define attributes to handle this
-		final CTabFolder ctf = new CTabFolder(parentComposite, SWT.BORDER);
+		int styleOverride = getStyleOverride(pStack);
+		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
+		final CTabFolder ctf = new CTabFolder(parentComposite, style);
 		ctf.setMRUVisible(getInitialMRUValue(ctf));
 
 		// Adjust the minimum chars based on the location
@@ -700,7 +710,7 @@ public class StackRenderer extends LazyStackRenderer {
 			// Gather the parameters...old part, new part...
 			MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
 			MUIElement element = stack.getSelectedElement();
-			MPart curPart = (MPart) ctf.getTopRight().getData("thePart"); //$NON-NLS-1$
+			MPart curPart = (MPart) ctf.getTopRight().getData(THE_PART_KEY);
 			MPart part = null;
 			if (element != null) {
 				part = (MPart) ((element instanceof MPart) ? element
@@ -731,13 +741,13 @@ public class StackRenderer extends LazyStackRenderer {
 			// visible or not
 			RowData rd = (RowData) menuTB.getLayoutData();
 			if (needsMenu) {
-				menuTB.getItem(0).setData("thePart", part); //$NON-NLS-1$
+				menuTB.getItem(0).setData(THE_PART_KEY, part);
 				menuTB.moveBelow(null);
 				menuTB.pack();
 				rd.exclude = false;
 				menuTB.setVisible(true);
 			} else {
-				menuTB.getItem(0).setData("thePart", null); //$NON-NLS-1$
+				menuTB.getItem(0).setData(THE_PART_KEY, null);
 				rd.exclude = true;
 				menuTB.setVisible(false);
 			}
@@ -759,11 +769,11 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 
 			if (needsMenu || needsTB) {
-				ctf.getTopRight().setData("thePart", part); //$NON-NLS-1$
+				ctf.getTopRight().setData(THE_PART_KEY, part);
 				ctf.getTopRight().pack(true);
 				ctf.getTopRight().setVisible(true);
 			} else {
-				ctf.getTopRight().setData("thePart", null); //$NON-NLS-1$
+				ctf.getTopRight().setData(THE_PART_KEY, null);
 				ctf.getTopRight().setVisible(false);
 			}
 
@@ -1223,6 +1233,11 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		ignoreTabSelChanges = true;
+		// Ensure that the newly selected control is correctly sized
+		if (cti.getControl() instanceof Composite) {
+			Composite ctiComp = (Composite) cti.getControl();
+			ctiComp.layout(true, true);
+		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
 
@@ -1234,7 +1249,10 @@ public class StackRenderer extends LazyStackRenderer {
 	 * @param item
 	 */
 	protected void showMenu(ToolItem item) {
-		MPart part = (MPart) item.getData("thePart"); //$NON-NLS-1$
+		MPart part = (MPart) item.getData(THE_PART_KEY);
+		if (part == null) {
+			return;
+		}
 		Control ctrl = (Control) part.getWidget();
 		MMenu menuModel = getViewMenu(part);
 		if (menuModel == null || !menuModel.isToBeRendered())
@@ -1259,7 +1277,7 @@ public class StackRenderer extends LazyStackRenderer {
 		swtMenu.setLocation(displayAt);
 		swtMenu.setVisible(true);
 
-		Display display = Display.getCurrent();
+		Display display = swtMenu.getDisplay();
 		while (!swtMenu.isDisposed() && swtMenu.isVisible()) {
 			if (!display.readAndDispatch())
 				display.sleep();
@@ -1354,6 +1372,7 @@ public class StackRenderer extends LazyStackRenderer {
 							EPartService.class);
 					if (partService.savePart(part, true))
 						partService.hidePart(part);
+
 				}
 			});
 			closeableElements++;
@@ -1456,6 +1475,42 @@ public class StackRenderer extends LazyStackRenderer {
 
 		EPartService partService = getContextForParent(part).get(
 				EPartService.class);
+		// try using the ISaveHandler first... This gives better control of
+		// dialogs...
+		ISaveHandler saveHandler = getContextForParent(part).get(
+				ISaveHandler.class);
+		if (saveHandler != null) {
+			final List<MPart> toPrompt = new ArrayList<MPart>(others);
+			toPrompt.retainAll(partService.getDirtyParts());
+
+			final Save[] response;
+			if (toPrompt.size() > 1) {
+				response = saveHandler.promptToSave(toPrompt);
+			} else if (toPrompt.size() == 1) {
+				response = new Save[] { saveHandler.promptToSave(toPrompt
+						.get(0)) };
+			} else {
+				response = new Save[] {};
+			}
+			final List<MPart> toSave = new ArrayList<MPart>(toPrompt.size());
+			for (int i = 0; i < response.length; i++) {
+				final Save save = response[i];
+				final MPart mPart = toPrompt.get(i);
+				if (save == Save.CANCEL) {
+					return;
+				} else if (save == Save.YES) {
+					toSave.add(mPart);
+				}
+			}
+			saveHandler.saveParts(toSave, false);
+
+			for (MPart other : others) {
+				partService.hidePart(other);
+			}
+			return;
+		}
+
+		// No ISaveHandler, fall back to just using the part service...
 		for (MPart otherPart : others) {
 			if (partService.savePart(otherPart, true))
 				partService.hidePart(otherPart);
@@ -1491,15 +1546,10 @@ public class StackRenderer extends LazyStackRenderer {
 
 		for (MMenuElement menuElement : viewMenu.getChildren()) {
 			if (menuElement.isToBeRendered() && menuElement.isVisible()) {
-				if (menuElement instanceof MOpaqueMenuItem) {
-					IContributionItem item = (IContributionItem) ((MOpaqueMenuItem) menuElement)
-							.getOpaqueItem();
-					if (item != null && item.isVisible()) {
-						return true;
-					}
-				} else if (menuElement instanceof MOpaqueMenuSeparator) {
-					IContributionItem item = (IContributionItem) ((MOpaqueMenuSeparator) menuElement)
-							.getOpaqueItem();
+				if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)
+						|| OpaqueElementUtil.isOpaqueMenuSeparator(menuElement)) {
+					IContributionItem item = (IContributionItem) OpaqueElementUtil
+							.getOpaqueItem(menuElement);
 					if (item != null && item.isVisible()) {
 						return true;
 					}
@@ -1599,4 +1649,7 @@ public class StackRenderer extends LazyStackRenderer {
 			return newValue == null && tagName.equals(oldValue);
 		}
 	}
+
+
+
 }
