@@ -420,7 +420,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		}
 
-		createToolbarMenu(toolbarModel, renderedCtrl);
+		if (!toolbarModel.getTags().contains(IPresentationEngine.NO_CLOSE)) {
+			createToolbarMenu(toolbarModel, renderedCtrl);
+		}
 
 		return renderedCtrl;
 	}
