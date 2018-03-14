@@ -39,11 +39,11 @@ import org.eclipse.ui.tests.harness.util.EditorTestHelper;
 import org.eclipse.ui.tests.harness.util.FileUtil;
 import org.eclipse.ui.tests.navigator.extension.TestContentProvider;
 import org.eclipse.ui.tests.navigator.extension.TestContentProviderPipelined;
-import org.eclipse.ui.tests.navigator.extension.TestEmptyContentProvider;
-import org.eclipse.ui.tests.navigator.extension.TestSorterData;
-import org.eclipse.ui.tests.navigator.extension.TestDragAssistant;
-import org.eclipse.ui.tests.navigator.extension.TestLabelProvider;
 import org.eclipse.ui.tests.navigator.extension.TestContentProviderResource;
+import org.eclipse.ui.tests.navigator.extension.TestDragAssistant;
+import org.eclipse.ui.tests.navigator.extension.TestEmptyContentProvider;
+import org.eclipse.ui.tests.navigator.extension.TestLabelProvider;
+import org.eclipse.ui.tests.navigator.extension.TestSorterData;
 import org.eclipse.ui.tests.navigator.extension.TestSorterResource;
 import org.eclipse.ui.tests.navigator.m12.model.ResourceWrapper;
 import org.eclipse.ui.tests.navigator.util.TestWorkspace;
@@ -105,6 +105,9 @@ public class NavigatorTestBase extends TestCase {
 	public static final String TEST_CONTENT_SORTER_RESOURCE_SORTONLY_OVERRIDE = "org.eclipse.ui.tests.navigator.testContentSorterResource.sortOnly.override";
 	public static final String TEST_CONTENT_SORTER_RESOURCE_OVERRIDE = "org.eclipse.ui.tests.navigator.testContentSorterResource.override";
 	public static final String TEST_CONTENT_SORTER_RESOURCE_OVERRIDE_SORTER = "org.eclipse.ui.tests.navigator.testContentSorterResource.override.sorter";
+	public static final String TEST_CONTENT_SORTER_BASIC_A = "org.eclipse.ui.tests.navigator.testContentBasic.a";
+	public static final String TEST_CONTENT_SORTER_BASIC_B = "org.eclipse.ui.tests.navigator.testContentBasic.b";
+	public static final String TEST_CONTENT_SORTER_BASIC_SORTONLY_SORTER = "org.eclipse.ui.tests.navigator.testContentBasic.sortOnlySorter";
 
 	public static final String TEST_CONTENT_REDLABEL = "org.eclipse.ui.tests.navigator.testContentRedLabel";
 	public static final String TEST_CONTENT_MISSINGLABEL = "org.eclipse.ui.tests.navigator.testContentMissingLabel";
