@@ -10,11 +10,12 @@
  *     Andrew Gvozdev -  Bug 364039 - Add "Delete All Markers"
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864, 466927
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -795,6 +797,8 @@ public class ExtendedMarkersView extends ViewPart {
 	private IPartListener2 getPartListener() {
 		return new IPartListener2() {
 
+			private IResource[] lastShownResources;
+
 			@Override
 			public void partActivated(IWorkbenchPartReference partRef) {
 				// Do nothing by default
@@ -819,6 +823,7 @@ public class ExtendedMarkersView extends ViewPart {
 			public void partHidden(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
 					isViewVisible= false;
+					lastShownResources = generator.getSelectedResources();
 					Markers markers = getActiveViewerInputClone();
 					Integer[] counts = markers.getMarkerCounts();
 					setTitleToolTip(getStatusMessage(markers, counts));
@@ -838,30 +843,17 @@ public class ExtendedMarkersView extends ViewPart {
 			@Override
 			public void partVisible(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
-					isViewVisible = true;
-					boolean needUpdate = hasPendingChanges();
-					if (needUpdate) {
-						// trigger UI update, the data is changed meanwhile
-						builder.getUpdateScheduler().scheduleUIUpdate(MarkerUpdateScheduler.SHORT_DELAY);
+					isViewVisible= true;
+					IResource[] current = generator.getSelectedResources();
+					if (!Arrays.equals(lastShownResources, current)) {
+						// update entire view content, since the data is changed meanwhile
+						builder.scheduleUpdate();
 					} else {
 						// data is same as before, only clear tooltip
 						setTitleToolTip(null);
 					}
+					lastShownResources = null;
 				}
-			}
-
-			/**
-			 * @return true if the builder noticed that marker updates were made
-			 *         but UI is not updated yet
-			 */
-			private boolean hasPendingChanges() {
-				boolean[] changeFlags = builder.readChangeFlags();
-				for (boolean b : changeFlags) {
-					if (b) {
-						return true;
-					}
-				}
-				return false;
 			}
 		};
 	}
