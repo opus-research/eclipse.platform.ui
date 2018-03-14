@@ -13,11 +13,14 @@
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312, 491293
+ *     Wayne Beaton (The Eclipse Foundation) - Bug 162006
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -31,6 +34,11 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionDelta;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
+import org.eclipse.core.runtime.IRegistryChangeListener;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -108,8 +116,6 @@ public class SearchField {
 
 	private MWindow window;
 
-	private Map<String, QuickAccessProvider> providerMap = new HashMap<>();
-
 	private Map<String, QuickAccessElement> elementMap = new HashMap<>();
 
 	private Map<QuickAccessElement, ArrayList<String>> textMap = new HashMap<>();
@@ -126,6 +132,7 @@ public class SearchField {
 
 	private String selectedString = ""; //$NON-NLS-1$
 	private AccessibleAdapter accessibleListener;
+	private IRegistryChangeListener registryChangeListener;
 
 	@Inject
 	private IBindingService bindingService;
@@ -166,12 +173,46 @@ public class SearchField {
 				new EditorProvider(), new ViewProvider(application, window),
 				new PerspectiveProvider(), commandProvider, new ActionProvider(),
 				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
-		for (int i = 0; i < providers.length; i++) {
-			providerMap.put(providers[i].getId(), providers[i]);
-		}
-		restoreDialog();
 
-		quickAccessContents = new QuickAccessContents(providers) {
+		/*
+		 * Listen to changes in the registry. If an extension is removed that
+		 * contains something in our previousPicksList, then remove it from that
+		 * list.
+		 */
+		registryChangeListener = new IRegistryChangeListener() {
+			@Override
+			public void registryChanged(IRegistryChangeEvent event) {
+				for (IExtensionDelta delta : event.getExtensionDeltas()) {
+					if (delta.getKind() != IExtensionDelta.REMOVED) continue;
+					for (IConfigurationElement element : delta.getExtension().getConfigurationElements()) {
+						removeElementsNamed(getProviderId(element));
+					}
+				}
+			}
+
+			private String getProviderId(IConfigurationElement element) {
+				return element.getNamespaceIdentifier()
+						+ "." + element.getAttribute(ExtensionQuickAccessProvider.ATTRIBUTE_ID); //$NON-NLS-1$
+			}
+
+			private void removeElementsNamed(String id) {
+				Iterator<QuickAccessElement> iterator = previousPicksList.iterator();
+				while (iterator.hasNext()) {
+					QuickAccessProvider provider = iterator.next().getProvider();
+					if (provider instanceof ExtensionQuickAccessProvider) {
+						if (((ExtensionQuickAccessProvider) provider).getId() == id) {
+							iterator.remove();
+							for (QuickAccessElement element : provider.getElements()) {
+								elementMap.remove(element.getId());
+							}
+						}
+					}
+				}
+			}
+		};
+		Platform.getExtensionRegistry().addRegistryChangeListener(registryChangeListener, "org.eclipse.ui.workbench"); //$NON-NLS-1$
+
+		quickAccessContents = new QuickAccessContents(providers, window.getContext()) {
 			@Override
 			protected void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
 			}
@@ -219,6 +260,9 @@ public class SearchField {
 			}
 		};
 		quickAccessContents.hookFilterText(txtQuickAccess);
+
+		restoreDialog();
+
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
@@ -612,6 +656,19 @@ public class SearchField {
 
 			if (orderedElements != null && orderedProviders != null && textEntries != null
 					&& textArray != null) {
+
+				/*
+				 * Moved from the #(Composite) method. We only ever use this map
+				 * in this method and this private method is only called once,
+				 * so create the map only when it's required. Keeping this as a
+				 * field would require that we remove references to providers
+				 * when the bundle that defines the provider is deactivated.
+				 */
+				Map<String, QuickAccessProvider> providerMap = new HashMap<>();
+				for (QuickAccessProvider provider : quickAccessContents.getProviders()) {
+					providerMap.put(provider.getId(), provider);
+				}
+
 				int arrayIndex = 0;
 				for (int i = 0; i < orderedElements.length; i++) {
 					QuickAccessProvider quickAccessProvider = providerMap.get(orderedProviders[i]);
@@ -642,6 +699,7 @@ public class SearchField {
 
 	@PreDestroy
 	void dispose() {
+		Platform.getExtensionRegistry().removeRegistryChangeListener(registryChangeListener);
 		storeDialog();
 	}
 
