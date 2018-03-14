@@ -8,6 +8,7 @@
  *     IBM Corporation - initial API and implementation
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 419482
  *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 458291
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
@@ -30,8 +31,8 @@ import org.junit.runners.Suite;
 	CTabItemTest.class, IdClassLabelColorTest.class, ShellTest.class, ButtonTest.class, GradientTest.class,
 	MarginTest.class, InnerClassElementTest.class, EclipsePreferencesHandlerTest.class,
 	PreferenceOverriddenByCssChangeListenerTest.class, ButtonTextTransformTest.class, LabelTextTransformTest.class,
-		TextTextTransformTest.class, DescendentTest.class, ThemeTest.class, Bug419482Test.class, ShellActiveTest.class,
-		InheritTest.class })
+	TextTextTransformTest.class, DescendentTest.class, ThemeTest.class, Bug419482Test.class, ShellActiveTest.class,
+	InheritTest.class, InitialTest.class })
 public class CssSwtTestSuite {
 
 }

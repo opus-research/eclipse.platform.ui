@@ -12,6 +12,7 @@
  *     Red Hat Inc. (mistria) - Bug 413348: fix stream leak
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428715
  *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 458291
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
 
@@ -704,6 +705,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	public ICSSPropertyHandler applyCSSProperty(Object element,
 			String property,
 			CSSValue value, String pseudo) throws Exception {
+
+		if ("initial".equals(value.getCssText())) {
+			// 'initial' means: do not style
+			return null;
+		}
+
 		if (currentCSSPropertiesApplyed != null
 				&& currentCSSPropertiesApplyed.containsKey(property)) {
 			// CSS Property was already applied, ignore it.
