@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
@@ -98,42 +97,6 @@ public class PartServiceImpl implements EPartService {
 					}
 				}
 			}
-		}
-	};
-
-	private EventHandler minimizedPartHandler = new EventHandler() {
-		public void handleEvent(Event event) {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (!(element instanceof MPartStack)) {
-				return;
-			}
-
-			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
-			Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
-
-			boolean minimizedTagAdded = UIEvents.isADD(event)
-					&& IPresentationEngine.MINIMIZED.equals(newValue);
-			boolean minimizedTagRemoved = UIEvents.isREMOVE(event)
-					&& IPresentationEngine.MINIMIZED.equals(oldValue);
-
-			if (!(minimizedTagAdded || minimizedTagRemoved)) {
-				return;
-			}
-
-			MPart part = toPart(((MPartStack) element).getSelectedElement());
-			if (part != null && minimizedTagAdded) {
-				firePartHidden(part);
-			} else if (part != null) {
-				firePartVisible(part);
-			}
-		}
-
-		private MPart toPart(MStackElement stackElement) {
-			if (stackElement != null) {
-				return stackElement instanceof MPlaceholder ? (MPart) ((MPlaceholder) stackElement)
-						.getRef() : (MPart) stackElement;
-			}
-			return null;
 		}
 	};
 
@@ -207,7 +170,6 @@ public class PartServiceImpl implements EPartService {
 	@PostConstruct
 	void postConstruct() {
 		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT, selectedHandler);
-		eventBroker.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS, minimizedPartHandler);
 		constructed = true;
 		partActivationHistory = new PartActivationHistory(this, modelService);
 		if (activePart != null) {
@@ -219,7 +181,6 @@ public class PartServiceImpl implements EPartService {
 	void preDestroy() {
 		constructed = false;
 		eventBroker.unsubscribe(selectedHandler);
-		eventBroker.unsubscribe(minimizedPartHandler);
 		partActivationHistory.clear();
 	}
 
@@ -796,6 +757,29 @@ public class PartServiceImpl implements EPartService {
 	 * @see MPartDescriptor#isAllowMultiple()
 	 */
 	private MPart addPart(MPart providedPart, MPart localPart) {
+		// If this is a multi-instance view see if there's a placeholder
+		String partId = providedPart.getElementId();
+		int colonIndex = partId == null ? -1 : partId.indexOf(':');
+		if (colonIndex >= 0) {
+			String descId = providedPart.getElementId().substring(0, colonIndex);
+			descId += ":*"; //$NON-NLS-1$
+			List<MPlaceholder> phList = modelService.findElements(workbenchWindow, descId,
+					MPlaceholder.class, null);
+			if (phList.size() > 0) {
+				MUIElement phParent = phList.get(0).getParent();
+				if (phParent instanceof MPartStack) {
+					MPartStack theStack = (MPartStack) phParent;
+					adjustPlaceholder(providedPart);
+					MPlaceholder placeholder = providedPart.getCurSharedRef();
+					if (placeholder == null) {
+						theStack.getChildren().add(providedPart);
+					} else {
+						theStack.getChildren().add(placeholder);
+					}
+
+				}
+			}
+		}
 		MPartDescriptor descriptor = modelService.getPartDescriptor(providedPart.getElementId());
 		if (descriptor == null) {
 			// there is no part descriptor backing the provided part, just add it to the container
@@ -862,8 +846,7 @@ public class PartServiceImpl implements EPartService {
 					}
 				} else {
 					List<MElementContainer> containers = modelService.findElements(getContainer(),
-							null, MElementContainer.class, Collections.singletonList(category),
-							EModelService.PRESENTATION);
+							null, MElementContainer.class, Collections.singletonList(category));
 					if (containers.isEmpty()) {
 						// couldn't find any containers with the specified tag, just add it to the
 						// end
@@ -904,32 +887,6 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void addToLastContainer(String category, MPart part) {
-		// OK, we haven't found an explicit placeholder;
-		// If this is a multi-instance view see if there's a 'global' placeholder
-		String partId = part.getElementId();
-		int colonIndex = partId == null ? -1 : partId.indexOf(':');
-		if (colonIndex >= 0) {
-			String descId = part.getElementId().substring(0, colonIndex);
-			descId += ":*"; //$NON-NLS-1$
-			List<MPlaceholder> phList = modelService.findElements(workbenchWindow, descId,
-					MPlaceholder.class, null, EModelService.PRESENTATION);
-			if (phList.size() > 0) {
-				MUIElement phParent = phList.get(0).getParent();
-				if (phParent instanceof MPartStack) {
-					MPartStack theStack = (MPartStack) phParent;
-					int phIndex = theStack.getChildren().indexOf(phList.get(0));
-					adjustPlaceholder(part);
-					MPlaceholder placeholder = part.getCurSharedRef();
-					if (placeholder == null) {
-						theStack.getChildren().add(phIndex, part);
-					} else {
-						theStack.getChildren().add(phIndex, placeholder);
-					}
-					return;
-				}
-			}
-		}
-
 		MElementContainer<?> lastContainer = getLastContainer();
 		MPlaceholder placeholder = part.getCurSharedRef();
 		if (placeholder == null) {
