@@ -17,6 +17,7 @@ import org.eclipse.jface.fieldassist.TextControlCreator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -89,7 +90,12 @@ public class ImageAndMessageArea extends Composite {
 
 		messageField.getLayoutControl().setLayoutData(gd);
 
-		addPaintListener(this::onPaint);
+		addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				onPaint(e);
+			}
+		});
 
 		// sets the layout and size to account for the BORDER_MARGIN between
 		// the border drawn around the container and the decorated field.
