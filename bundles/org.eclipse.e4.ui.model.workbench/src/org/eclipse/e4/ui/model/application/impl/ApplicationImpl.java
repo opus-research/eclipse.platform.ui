@@ -33,7 +33,6 @@ import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
@@ -64,7 +63,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getContext <em>Context</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getVariables <em>Variables</em>}</li>
@@ -82,8 +80,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getAddons <em>Addons</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCategories <em>Categories</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getDialogs <em>Dialogs</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getWizards <em>Wizards</em>}</li>
  * </ul>
+ * </p>
  *
  * @generated
  */
@@ -257,16 +255,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * @ordered
 	 */
 	protected EList<MDialog> dialogs;
-
-	/**
-	 * The cached value of the '{@link #getWizards() <em>Wizards</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getWizards()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MWizardDialog> wizards;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -518,18 +506,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<MWizardDialog> getWizards() {
-		if (wizards == null) {
-			wizards = new EObjectContainmentEList<MWizardDialog>(MWizardDialog.class, this, ApplicationPackageImpl.APPLICATION__WIZARDS);
-		}
-		return wizards;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -557,8 +533,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return ((InternalEList<?>)getAddons()).basicRemove(otherEnd, msgs);
 			case ApplicationPackageImpl.APPLICATION__CATEGORIES:
 				return ((InternalEList<?>)getCategories()).basicRemove(otherEnd, msgs);
-			case ApplicationPackageImpl.APPLICATION__WIZARDS:
-				return ((InternalEList<?>)getWizards()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -604,8 +578,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return getCategories();
 			case ApplicationPackageImpl.APPLICATION__DIALOGS:
 				return getDialogs();
-			case ApplicationPackageImpl.APPLICATION__WIZARDS:
-				return getWizards();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -681,10 +653,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				getDialogs().clear();
 				getDialogs().addAll((Collection<? extends MDialog>)newValue);
 				return;
-			case ApplicationPackageImpl.APPLICATION__WIZARDS:
-				getWizards().clear();
-				getWizards().addAll((Collection<? extends MWizardDialog>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -745,9 +713,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 			case ApplicationPackageImpl.APPLICATION__DIALOGS:
 				getDialogs().clear();
 				return;
-			case ApplicationPackageImpl.APPLICATION__WIZARDS:
-				getWizards().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -792,8 +757,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return categories != null && !categories.isEmpty();
 			case ApplicationPackageImpl.APPLICATION__DIALOGS:
 				return dialogs != null && !dialogs.isEmpty();
-			case ApplicationPackageImpl.APPLICATION__WIZARDS:
-				return wizards != null && !wizards.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
