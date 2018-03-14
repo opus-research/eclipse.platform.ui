@@ -51,7 +51,8 @@ public class PropertyColumnLabelProvider extends ColumnLabelProvider {
 				.getPropertySource(object);
 		IPropertyDescriptor[] propertyDescriptors = propertySource
 				.getPropertyDescriptors();
-		for (IPropertyDescriptor propertyDescriptor : propertyDescriptors) {
+		for (int i = 0; i < propertyDescriptors.length; i++) {
+			IPropertyDescriptor propertyDescriptor = propertyDescriptors[i];
 			if (propertyID.equals(propertyDescriptor.getId())) {
 				return propertyDescriptor.getLabelProvider().getText(
 						propertySource.getPropertyValue(propertyID));
@@ -66,7 +67,8 @@ public class PropertyColumnLabelProvider extends ColumnLabelProvider {
 				.getPropertySource(object);
 		IPropertyDescriptor[] propertyDescriptors = propertySource
 				.getPropertyDescriptors();
-		for (IPropertyDescriptor propertyDescriptor : propertyDescriptors) {
+		for (int i = 0; i < propertyDescriptors.length; i++) {
+			IPropertyDescriptor propertyDescriptor = propertyDescriptors[i];
 			if (propertyID.equals(propertyDescriptor.getId())) {
 				return propertyDescriptor.getLabelProvider().getImage(
 						propertySource.getPropertyValue(propertyID));
