@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,11 +31,9 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 
-	@Test
 	public void testApplicationElement_Id_Changed() {
 		MApplication application = createApplication();
 
@@ -72,7 +63,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals("customName", window.getLabel());
 	}
 
-	@Test
 	public void testApplicationElement_Id_Changed2() {
 		MApplication application = createApplication();
 
@@ -112,7 +102,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * "customName".</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Name_NameChangeFromUser_UserWins() {
 		MApplication application = createApplication();
 
@@ -160,7 +149,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * renamed "customName" per user intervention.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Visibility_TrueFalseFromApplication_ApplicationWins() {
 		MApplication application = createApplication();
 
@@ -212,7 +200,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * should still occur.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Visibility_TrueFalseFromUser_UserWins() {
 		MApplication application = createApplication();
 
@@ -254,7 +241,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals("name2", part.getLabel());
 	}
 
-	@Test
 	public void testPart_Addition_PlacedAfterHiddenPart_UserWins() {
 		MApplication application = createApplication();
 
@@ -317,7 +303,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be three parts, A, B, and D.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Addition_PlacedAfterRemovedPart_UserWins() {
 		MApplication application = createApplication();
 
@@ -377,7 +362,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be only one part, part C.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_Addition_PlacedAfterRemovedPart_UserWins2() {
 		MApplication application = createApplication();
 
@@ -431,7 +415,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * places part A in it.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPartStack_Addition_ContainsExistingPart() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -486,7 +469,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * places part A in it.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPartStack_Addition_ContainsExistingPart2() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -625,12 +607,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(partA, stack2.getChildren().get(0));
 	}
 
-	@Test
 	public void testPartStack_AdditionInBack_ApplicationHasNewStackInFront_True() {
 		testPartStack_AdditionInBack_ApplicationHasNewStackInFront(true);
 	}
 
-	@Test
 	public void testPartStack_AdditionInBack_ApplicationHasNewStackInFront_False() {
 		testPartStack_AdditionInBack_ApplicationHasNewStackInFront(false);
 	}
@@ -728,12 +708,10 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(partC, stack3.getChildren().get(0));
 	}
 
-	@Test
 	public void testPartStack_AdditionInFront_ApplicationHasNewStackInBack_True() {
 		testPartStack_AdditionInFront_ApplicationHasNewStackInBack(true);
 	}
 
-	@Test
 	public void testPartStack_AdditionInFront_ApplicationHasNewStackInBack_False() {
 		testPartStack_AdditionInFront_ApplicationHasNewStackInBack(false);
 	}
@@ -751,7 +729,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * the second stack has C, B, and D, in that order from left to right.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testPart_MoveFromExistingStackToExistingStack_ToStackHasNewPart() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -820,7 +797,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(partD, stack2.getChildren().get(2));
 	}
 
-	@Test
 	public void testElementContainer_ActiveChild_New() {
 		MApplication application = createApplication();
 		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -856,7 +832,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 				application.getSelectedElement());
 	}
 
-	@Test
 	public void testElementContainer_ActiveChild_Removed() {
 		MApplication application = createApplication();
 		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -891,7 +866,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(window1, application.getChildren().get(0));
 	}
 
-	@Test
 	public void testElementContainer_ActiveChild_Removed2() {
 		MApplication application = createApplication();
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -953,7 +927,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertNull(partStack2.getSelectedElement());
 	}
 
-	@Test
 	public void testElementContainer_Children_Move_IdenticalToUserChange() {
 		MApplication application = createApplication();
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -1025,7 +998,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(part2, partStack2.getChildren().get(1));
 	}
 
-	@Test
 	public void testElementContainer_Children_Move_NewHasSameChildren() {
 		MApplication application = createApplication();
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -1105,7 +1077,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be only one window, window A.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testElementContainer_Children_AddMultipleThenRemove() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1153,7 +1124,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * application should not have an active window.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testElementContainer_Children_AddMultipleThenRemove2() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1200,7 +1170,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * <li>The merged outcome should be only one window, window A.</li>
 	 * </ol>
 	 */
-	@Test
 	public void testElementContainer_Children_AddMultipleThenRemove3() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1239,7 +1208,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(0, window.getChildren().size());
 	}
 
-	@Test
 	public void testMenu_MenuOrdering() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1315,7 +1283,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 	 * Tests that the addition of a part to a window and the alteration of the
 	 * window's main menu will be reconciled appropriately.
 	 */
-	@Test
 	public void testWindow_AddPartAndChangeMenu() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
@@ -1356,7 +1323,6 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertTrue(window.getChildren().get(0) instanceof MPart);
 	}
 
-	@Test
 	public void testBug338707() {
 		MApplication application = createApplication();
 
@@ -1464,52 +1430,42 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(newValue, addon.getPersistedState().get("key"));
 	}
 
-	@Test
 	public void testBug361851_NullNull() {
 		testBug361851(null, null);
 	}
 
-	@Test
 	public void testBug361851_NullEmpty() {
 		testBug361851(null, "");
 	}
 
-	@Test
 	public void testBug361851_NullString() {
 		testBug361851(null, "string");
 	}
 
-	@Test
 	public void testBug361851_EmptyNull() {
 		testBug361851("", null);
 	}
 
-	@Test
 	public void testBug361851_EmptyEmpty() {
 		testBug361851("", "");
 	}
 
-	@Test
 	public void testBug361851_EmptyString() {
 		testBug361851("", "string");
 	}
 
-	@Test
 	public void testBug361851_StringNull() {
 		testBug361851("string", null);
 	}
 
-	@Test
 	public void testBug361851_StringEmpty() {
 		testBug361851("string", "");
 	}
 
-	@Test
 	public void testBug361851_StringStringUnchanged() {
 		testBug361851("string", "string");
 	}
 
-	@Test
 	public void testBug361851_StringStringChanged() {
 		testBug361851("string", "string2");
 	}
@@ -1600,557 +1556,457 @@ public abstract class ModelReconcilerScenarioTest extends ModelReconcilerTest {
 		assertEquals(userWindowKeyBindingSequence, keyBinding2.getKeySequence());
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullNull_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, null, "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullEmpty_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", null,
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_NullString_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings(null, "Ctrl+S",
 				"Ctrl+S", "Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyNull_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", null, "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyEmpty_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_EmptyString_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("", "Ctrl+S", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, null,
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null, "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringNull_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", null,
 				"Ctrl+S", "Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", null,
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringEmpty_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "", "Ctrl+S",
 				"Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S", "",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S", "",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringUnchanged_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+S",
 				"Ctrl+S", "Ctrl+D");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_NullNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				null, null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_NullEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				null, "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_NullString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				null, "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_EmptyNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D", "",
 				null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_EmptyEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D", "",
 				"");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_EmptyString() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D", "",
 				"Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringNull() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", null);
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringEmpty() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", "");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringStringUnchanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", "Ctrl+S");
 	}
 
-	@Test
 	public void testApplication_Commands_MultiLevelKeyBindings_StringStringChanged_StringStringChanged() {
 		testApplication_Commands_MultiLevelKeyBindings("Ctrl+S", "Ctrl+D",
 				"Ctrl+S", "Ctrl+D");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
-
-import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
@@ -39,19 +37,16 @@ import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Display;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class StackRendererTest {
+public class StackRendererTest extends TestCase {
 	private IEclipseContext context;
 	private E4Workbench wb;
 	private MPart part;
 	private CTabItemStylingMethodsListener executedMethodsListener;
 	private MPartStack partStack;
 
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		context = E4Application.createDefaultContext();
 		context.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
@@ -87,16 +82,16 @@ public class StackRendererTest {
 			;
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		context.dispose();
 	}
 
-	@Test
-	public void testTabStateHandlerWhenOneOfSupportedTagChangeEvents() {
+	public void testTabStateHandlerWhenOneOfSupportedTagChangeEvents()
+			throws Exception {
 		// given
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(UIEvents.EventTags.ELEMENT, part);
@@ -115,8 +110,7 @@ public class StackRendererTest {
 						.getMethodExecutionCount("setClassnameAndId(.+)"));
 	}
 
-	@Test
-	public void testTabStateHandlerWhenSelectionChangedEvent() {
+	public void testTabStateHandlerWhenSelectionChangedEvent() throws Exception {
 		// given
 		MPlaceholder placeHolder = AdvancedFactoryImpl.eINSTANCE
 				.createPlaceholder();
@@ -150,7 +144,6 @@ public class StackRendererTest {
 			methods = new ArrayList<String>();
 		}
 
-		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
 				throws Throwable {
 			if (isTabItemForPart(args[0])) {

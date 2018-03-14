@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
@@ -25,11 +20,9 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.junit.Test;
 
 public class EModelServiceTest extends UITest {
 
-	@Test
 	public void testGetPerspectiveFor_RegularElement() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -59,7 +52,6 @@ public class EModelServiceTest extends UITest {
 		assertEquals(perspective, foundPerspective);
 	}
 
-	@Test
 	public void testGetPerspectiveFor_SharedElement() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -94,7 +86,6 @@ public class EModelServiceTest extends UITest {
 		assertEquals(perspective, foundPerspective);
 	}
 
-	@Test
 	public void testGetPerspectiveFor_SharedElement2() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -134,7 +125,6 @@ public class EModelServiceTest extends UITest {
 		assertEquals(perspective, foundPerspective);
 	}
 
-	@Test
 	public void testBringToTop01() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
@@ -157,7 +147,6 @@ public class EModelServiceTest extends UITest {
 		assertEquals(windowB, application.getSelectedElement());
 	}
 
-	@Test
 	public void testBringToTop02() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
@@ -184,7 +173,6 @@ public class EModelServiceTest extends UITest {
 		assertEquals(windowA, application.getSelectedElement());
 	}
 
-	@Test
 	public void testBringToTop_Bug334411() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -209,7 +197,6 @@ public class EModelServiceTest extends UITest {
 		assertTrue(detachedWindow.isToBeRendered());
 	}
 
-	@Test
 	public void testGetElementLocation_Bug331062_01() {
 		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
 				.createPerspective();
@@ -222,7 +209,6 @@ public class EModelServiceTest extends UITest {
 				modelService.getElementLocation(part));
 	}
 
-	@Test
 	public void testGetElementLocation_Bug331062_02() {
 		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
 				.createPerspective();

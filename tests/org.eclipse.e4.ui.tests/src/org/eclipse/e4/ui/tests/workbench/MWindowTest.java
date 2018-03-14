@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import junit.framework.TestCase;
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -47,14 +41,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  *
  */
-public class MWindowTest {
+public class MWindowTest extends TestCase {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
@@ -63,8 +54,8 @@ public class MWindowTest {
 	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
@@ -76,15 +67,14 @@ public class MWindowTest {
 	 *
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
-	@Test
 	public void testCreateWindow() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
@@ -105,7 +95,6 @@ public class MWindowTest {
 		assertEquals(topWidget, appContext.get(IServiceConstants.ACTIVE_SHELL));
 	}
 
-	@Test
 	public void testWindowVisibility() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
@@ -133,7 +122,6 @@ public class MWindowTest {
 		assertTrue(shell.getVisible() == true);
 	}
 
-	@Test
 	public void testWindowInvisibleCreate() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
@@ -156,7 +144,6 @@ public class MWindowTest {
 		assertTrue(shell.getVisible() == false);
 	}
 
-	@Test
 	public void testCreateView() {
 		final MWindow window = createWindowWithOneView();
 
@@ -182,7 +169,6 @@ public class MWindowTest {
 		assertTrue(viewPart[0] instanceof Tree);
 	}
 
-	@Test
 	public void testContextChildren() {
 		final MWindow window = createWindowWithOneView();
 
@@ -233,7 +219,6 @@ public class MWindowTest {
 		assertEquals(window, contextPart.getParent().getParent().getParent());
 	}
 
-	@Test
 	public void testCreateMenu() {
 		final MWindow window = createWindowWithOneViewAndMenu();
 
@@ -277,7 +262,6 @@ public class MWindowTest {
 		fileMenu.notifyListeners(SWT.Hide, null);
 	}
 
-	@Test
 	public void testWindow_Name() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("windowName");
@@ -379,7 +363,6 @@ public class MWindowTest {
 		assertEquals(300, bounds.y);
 	}
 
-	@Test
 	public void testWindow_Width() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -414,7 +397,6 @@ public class MWindowTest {
 		assertEquals(300, shell.getBounds().width);
 	}
 
-	@Test
 	public void testWindow_Height() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
