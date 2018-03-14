@@ -89,7 +89,7 @@ public class InternalErrorDialog extends MessageDialog {
         detailButtonID = index;
     }
 
-    /*
+    /* (non-Javadoc)
      * Method declared on Dialog.
      */
     @Override
