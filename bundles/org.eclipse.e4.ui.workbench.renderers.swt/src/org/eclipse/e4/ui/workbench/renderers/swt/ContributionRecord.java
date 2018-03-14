@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.OrExpression;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -32,7 +33,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.MenuManager;
@@ -187,6 +187,9 @@ public class ContributionRecord {
 			// implied to always be visible
 			return null;
 		}
+		if (coreExpressionA.equals(coreExpressionB)) {
+			return expressionA;
+		}
 
 		// combine the two expressions
 		OrExpression expression = new OrExpression();
@@ -225,8 +228,7 @@ public class ContributionRecord {
 					renderer.linkElementToContributionRecord(copy, this);
 					menuModel.getChildren().add(idx++, copy);
 				} else {
-					shared.setVisibleWhen(merge(
-							menuContribution.getVisibleWhen(),
+					shared.setVisibleWhen(merge(copy.getVisibleWhen(),
 							shared.getVisibleWhen()));
 					copy = shared;
 				}
@@ -248,8 +250,7 @@ public class ContributionRecord {
 				menuModel.getChildren().add(idx++, copy);
 			}
 			if (copy instanceof MMenu || copy instanceof MMenuSeparator) {
-				ArrayList<ContributionRecord> array = renderer.getList(copy);
-				array.add(this);
+				renderer.addRecord(copy, this);
 			}
 		}
 		return true;
@@ -265,8 +266,8 @@ public class ContributionRecord {
 		}
 		IEclipseContext staticContext = getStaticContext();
 		staticContext.remove(List.class);
-		factoryDispose = (Runnable) ((IContextFunction) obj)
-				.compute(staticContext);
+		factoryDispose = (Runnable) ((IContextFunction) obj).compute(
+				staticContext, null);
 		return staticContext.get(List.class);
 	}
 
@@ -315,8 +316,8 @@ public class ContributionRecord {
 			menuModel.getChildren().remove(copy);
 		}
 		for (MMenuElement shared : sharedElements) {
+			renderer.removeRecord(shared, this);
 			ArrayList<ContributionRecord> array = renderer.getList(shared);
-			array.remove(this);
 			if (array.isEmpty()) {
 				menuModel.getChildren().remove(shared);
 			}

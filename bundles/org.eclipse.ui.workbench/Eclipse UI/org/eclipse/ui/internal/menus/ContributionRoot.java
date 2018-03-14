@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,6 +51,7 @@ final class ContributionRoot implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.menus.IContributionRoot#addContributionItem(org.eclipse.jface.action.IContributionItem, org.eclipse.core.expressions.Expression, org.eclipse.core.expressions.Expression)
 	 */
+	@Override
 	public void addContributionItem(IContributionItem item,
 			Expression visibleWhen) {
 		if (item == null)
@@ -108,6 +109,7 @@ final class ContributionRoot implements
 	 *      org.eclipse.core.expressions.Expression,
 	 *      org.eclipse.core.expressions.Expression)
 	 */
+	@Override
 	public void registerVisibilityForChild(IContributionItem item,
 			Expression visibleWhen) {
 		if (item == null)

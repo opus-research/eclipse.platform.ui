@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,6 @@
 package org.eclipse.ui.operations;
 
 import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IAdvancedUndoableOperation2;
 import org.eclipse.core.commands.operations.IOperationHistory;
@@ -24,13 +18,16 @@ import org.eclipse.core.commands.operations.IOperationHistoryListener;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
-
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.LegacyActionTools;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -44,8 +41,6 @@ import org.eclipse.ui.internal.operations.TimeTriggeredProgressMonitorDialog;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.part.MultiPageEditorSite;
 import org.eclipse.ui.statushandlers.StatusManager;
-
-import org.eclipse.osgi.util.NLS;
 
 /**
  * <p>
@@ -79,24 +74,27 @@ import org.eclipse.osgi.util.NLS;
 public abstract class OperationHistoryActionHandler extends Action implements
 		ActionFactory.IWorkbenchAction, IAdaptable {
 
-	private static final int MAX_LABEL_LENGTH = 32;
+	private static final int MAX_LABEL_LENGTH = 33;
 
 	private class PartListener implements IPartListener {
 		/**
 		 * @see IPartListener#partActivated(IWorkbenchPart)
 		 */
+		@Override
 		public void partActivated(IWorkbenchPart part) {
 		}
 
 		/**
 		 * @see IPartListener#partBroughtToTop(IWorkbenchPart)
 		 */
+		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 		}
 
 		/**
 		 * @see IPartListener#partClosed(IWorkbenchPart)
 		 */
+		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (site != null && part.equals(site.getPart())) {
 				dispose();
@@ -112,18 +110,21 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		/**
 		 * @see IPartListener#partDeactivated(IWorkbenchPart)
 		 */
+		@Override
 		public void partDeactivated(IWorkbenchPart part) {
 		}
 
 		/**
 		 * @see IPartListener#partOpened(IWorkbenchPart)
 		 */
+		@Override
 		public void partOpened(IWorkbenchPart part) {
 		}
 
 	}
 
 	private class HistoryListener implements IOperationHistoryListener {
+		@Override
 		public void historyNotification(final OperationHistoryEvent event) {
 			IWorkbenchWindow workbenchWindow = getWorkbenchWindow();
 			if (workbenchWindow == null)
@@ -140,6 +141,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			case OperationHistoryEvent.REDONE:
 				if (event.getOperation().hasContext(undoContext)) {
 					display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							update();
 						}
@@ -149,6 +151,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			case OperationHistoryEvent.OPERATION_NOT_OK:
 				if (event.getOperation().hasContext(undoContext)) {
 					display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							if (pruning) {
 								IStatus status = event.getStatus();
@@ -174,6 +177,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			case OperationHistoryEvent.OPERATION_CHANGED:
 				if (event.getOperation() == getOperation()) {
 					display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							update();
 						}
@@ -222,6 +226,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 * 
 	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
 	 */
+	@Override
 	public void dispose() {
 
 		IOperationHistory history = getHistory();
@@ -295,6 +300,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 * 
 	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#run()
 	 */
+	@Override
 	public final void run() {
 		if (isInvalid()) {
 			return;
@@ -305,6 +311,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 				getWorkbenchWindow().getWorkbench().getProgressService()
 						.getLongOperationTime());
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor pm)
 					throws InvocationTargetException {
 				try {
@@ -349,6 +356,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IUndoContext.class)) {
 			return undoContext;
@@ -440,8 +448,8 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		if (enabled) {
 			tooltipText = NLS.bind(getTooltipString(), getOperation()
 					.getLabel());
-			text = NLS.bind(getCommandString(), shortenText(getOperation()
-					.getLabel()));
+			text = NLS.bind(getCommandString(),
+					LegacyActionTools.escapeMnemonics(shortenText(getOperation().getLabel()))) + '@';
 		} else {
 			tooltipText = NLS.bind(
 					WorkbenchMessages.Operations_undoRedoCommandDisabled,
@@ -467,10 +475,10 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		int length = message.length();
 		if (length > MAX_LABEL_LENGTH) {
 			StringBuffer result = new StringBuffer();
-			int mid = MAX_LABEL_LENGTH / 2;
-			result.append(message.substring(0, mid));
+			int end = MAX_LABEL_LENGTH / 2 - 1;
+			result.append(message.substring(0, end));
 			result.append("..."); //$NON-NLS-1$
-			result.append(message.substring(length - mid));
+			result.append(message.substring(length - end));
 			return result.toString();
 		}
 		return message;
