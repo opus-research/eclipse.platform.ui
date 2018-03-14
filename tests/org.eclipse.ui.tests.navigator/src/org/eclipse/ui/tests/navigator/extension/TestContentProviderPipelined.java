@@ -38,7 +38,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedChildren
 	 * (java.lang.Object, java.util.Set)
 	 */
-	@Override
 	public void getPipelinedChildren(Object aParent, Set theCurrentChildren) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
@@ -54,7 +53,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedElements
 	 * (java.lang.Object, java.util.Set)
 	 */
-	@Override
 	public void getPipelinedElements(Object anInput, Set theCurrentElements) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
@@ -64,7 +62,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProviderHasChildren#hasPipelinedChildren(java.lang.Object, boolean)
 	 */
-	@Override
 	public boolean hasPipelinedChildren(Object anInput, boolean currentHasChildren) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
@@ -78,7 +75,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedParent
 	 * (java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public Object getPipelinedParent(Object anObject, Object aSuggestedParent) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
@@ -92,7 +88,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptAdd(org
 	 * .eclipse.ui.navigator.PipelinedShapeModification)
 	 */
-	@Override
 	public PipelinedShapeModification interceptAdd(
 			PipelinedShapeModification anAddModification) {
 		if (_throw)
@@ -107,7 +102,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRefresh
 	 * (org.eclipse.ui.navigator.PipelinedViewerUpdate)
 	 */
-	@Override
 	public boolean interceptRefresh(
 			PipelinedViewerUpdate aRefreshSynchronization) {
 		if (_throw)
@@ -122,7 +116,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRemove
 	 * (org.eclipse.ui.navigator.PipelinedShapeModification)
 	 */
-	@Override
 	public PipelinedShapeModification interceptRemove(
 			PipelinedShapeModification aRemoveModification) {
 		if (_throw)
@@ -137,7 +130,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptUpdate
 	 * (org.eclipse.ui.navigator.PipelinedViewerUpdate)
 	 */
-	@Override
 	public boolean interceptUpdate(PipelinedViewerUpdate anUpdateSynchronization) {
 		if (_throw)
 			throw new RuntimeException("did not work out");
@@ -151,7 +143,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator
 	 * .ICommonContentExtensionSite)
 	 */
-	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 
 	}
@@ -163,7 +154,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento
 	 * )
 	 */
-	@Override
 	public void restoreState(IMemento aMemento) {
 
 	}
@@ -174,7 +164,6 @@ public class TestContentProviderPipelined extends ResourceExtensionContentProvid
 	 * @see
 	 * org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void saveState(IMemento aMemento) {
 
 	}

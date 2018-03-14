@@ -43,12 +43,10 @@ public class PerformanceTest extends NavigatorTestBase {
 		_initTestData = false;
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
@@ -56,7 +54,6 @@ public class PerformanceTest extends NavigatorTestBase {
 	protected void createProjects() throws Exception {
 		Job createJob = new Job("Create projects") {
 
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					for (int i = 0; i < _numProjects; i++) {
@@ -97,7 +94,6 @@ public class PerformanceTest extends NavigatorTestBase {
 	protected void deleteProjects() throws Exception {
 		Job deleteJob = new Job("Delete Projects") {
 
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					for (int i = 0; i < _numProjects; i++) {
@@ -127,7 +123,6 @@ public class PerformanceTest extends NavigatorTestBase {
 			throws Exception {
 		Job createJob = new Job("Create Files") {
 
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					for (int i = startNumber; i < _numFiles; i++) {
@@ -153,7 +148,6 @@ public class PerformanceTest extends NavigatorTestBase {
 	protected void touchFiles(final IProject p1) throws Exception {
 		Job touchJob = new Job("Touch Files") {
 
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					for (int i = 0; i < _numFiles; i++) {
@@ -224,7 +218,6 @@ public class PerformanceTest extends NavigatorTestBase {
 
 		Job touchJob = new Job("Touch Files") {
 
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					for (int i = 0; i < _numFiles; i++) {

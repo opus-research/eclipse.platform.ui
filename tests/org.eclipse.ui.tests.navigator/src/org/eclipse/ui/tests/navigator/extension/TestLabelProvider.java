@@ -56,7 +56,6 @@ public abstract class TestLabelProvider extends LabelProvider implements
 		boldFontData.setStyle(SWT.BOLD);
 	}
 
-	@Override
 	public void init(ICommonContentExtensionSite aSite) {
 		boldFont = new Font(Display.getDefault(), boldFontData);
 		initSubclass();
@@ -80,7 +79,6 @@ public abstract class TestLabelProvider extends LabelProvider implements
 		return backgroundColorName;
 	}
 
-	@Override
 	public Image getImage(Object element) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
@@ -90,7 +88,6 @@ public abstract class TestLabelProvider extends LabelProvider implements
 		return image;
 	}
 
-	@Override
 	public String getText(Object element) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
@@ -109,7 +106,6 @@ public abstract class TestLabelProvider extends LabelProvider implements
 		return element.toString();
 	}
 
-	@Override
 	public String getDescription(Object anElement) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
@@ -120,35 +116,30 @@ public abstract class TestLabelProvider extends LabelProvider implements
 		return null;
 	}
 
-	@Override
 	public void restoreState(IMemento aMemento) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 
 	}
 
-	@Override
 	public void saveState(IMemento aMemento) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 
 	}
 
-	@Override
 	public Color getForeground(Object element) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 		return toForegroundColor(getTestColor());
 	}
 
-	@Override
 	public Color getBackground(Object element) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
 		return getTestColor();
 	}
 
-	@Override
 	public Font getFont(Object element) {
 		if (_throw)
 			throw new RuntimeException("Throwing...");
@@ -161,7 +152,6 @@ public abstract class TestLabelProvider extends LabelProvider implements
 		return font;
 	}
 
-	@Override
 	public void dispose() {
 		if (_throw)
 			throw new RuntimeException("Throwing...");

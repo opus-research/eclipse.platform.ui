@@ -61,12 +61,10 @@ public class TestContentProvider implements ITreeContentProvider,
 		_diedOnSetInput = false;
 	}
 
-	@Override
 	public Object[] getElements(Object inputElement) {
 		return getChildren(inputElement);
 	}
 
-	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof TestExtensionTreeData) {
 			TestExtensionTreeData data = (TestExtensionTreeData) parentElement;
@@ -128,7 +126,6 @@ public class TestContentProvider implements ITreeContentProvider,
 
 	}
 
-	@Override
 	public Object getParent(Object element) {
 		if (element instanceof TestExtensionTreeData) {
 			TestExtensionTreeData data = (TestExtensionTreeData) element;
@@ -137,7 +134,6 @@ public class TestContentProvider implements ITreeContentProvider,
 		return null;
 	}
 
-	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof TestExtensionTreeData) {
 			TestExtensionTreeData data = (TestExtensionTreeData) element;
@@ -146,14 +142,12 @@ public class TestContentProvider implements ITreeContentProvider,
 		return false;
 	}
 
-	@Override
 	public void dispose() {
 		rootElements.clear();
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 
 	}
 
-	@Override
 	public void inputChanged(Viewer aViewer, Object oldInput, Object newInput) {
 		if (_dieOnSetInput)
 			_diedOnSetInput = true;
@@ -168,7 +162,6 @@ public class TestContentProvider implements ITreeContentProvider,
 	 * 
 	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
 	 */
-	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 
 		IResourceDelta delta = event.getDelta();
@@ -185,7 +178,6 @@ public class TestContentProvider implements ITreeContentProvider,
 	 * 
 	 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
 	 */
-	@Override
 	public boolean visit(IResourceDelta delta) throws CoreException {
 
 		IResource source = delta.getResource();
@@ -199,7 +191,6 @@ public class TestContentProvider implements ITreeContentProvider,
 				if ("model.properties".equals(file.getName())) {
 				updateModel(file);
 				new UIJob("Update Test Model in CommonViewer") {
-					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						if (viewer != null && !viewer.getControl().isDisposed())
 							viewer.refresh(file.getParent());
