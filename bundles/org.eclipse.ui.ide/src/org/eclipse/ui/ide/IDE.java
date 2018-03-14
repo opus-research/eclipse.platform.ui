@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2012 IBM Corporation and others.
+ * Copyright (c) 2003, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,9 +35,6 @@ import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
 import org.eclipse.core.resources.mapping.ModelProvider;
 import org.eclipse.core.resources.mapping.ModelStatus;
 import org.eclipse.core.resources.mapping.ResourceChangeValidator;
-import org.eclipse.core.resources.mapping.ResourceMapping;
-import org.eclipse.core.resources.mapping.ResourceMappingContext;
-import org.eclipse.core.resources.mapping.ResourceTraversal;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -64,15 +61,12 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IMarkerHelpRegistry;
-import org.eclipse.ui.ISaveableFilter;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.MultiPartInitException;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.Saveable;
 import org.eclipse.ui.internal.ide.EditorAssociationOverrideDescriptor;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
@@ -190,6 +184,7 @@ public final class IDE {
 	 * <p>
 	 * This interface is not intended to be implemented by clients.
 	 * </p>
+	 * @noimplement This interface is not intended to be implemented by clients.
 	 */
 	public interface Preferences {
 
@@ -252,123 +247,14 @@ public final class IDE {
 		 */
 		public static final String RECENT_WORKSPACES_PROTOCOL = "RECENT_WORKSPACES_PROTOCOL"; //$NON-NLS-1$
 
+		/**
+		 * Workspace name, will be displayed in the window title. This
+		 * preference must only be changed on the UI thread.
+		 * @since 3.10
+		 */
+		public static final String WORKSPACE_NAME = "WORKSPACE_NAME"; //$NON-NLS-1$
 	}
 
-	/**
-	 * A saveable filter that selects savables that contain resources that
-	 * are descendants of the roots of the filter.
-	 * @since 3.3
-	 *
-	 */
-	private static class SaveFilter implements ISaveableFilter {
-		private final IResource[] roots;
-
-		/**
-		 * Create the filter
-		 * @param roots the save roots
-		 */
-		public SaveFilter(IResource[] roots) {
-			this.roots = roots;
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISaveableFilter#select(org.eclipse.ui.Saveable, org.eclipse.ui.IWorkbenchPart[])
-		 */
-		public boolean select(Saveable saveable,
-				IWorkbenchPart[] containingParts) {
-			if (isDescendantOfRoots(saveable)) {
-				return true;
-			}
-			// For backwards compatibility, we need to check the parts
-			for (int i = 0; i < containingParts.length; i++) {
-				IWorkbenchPart workbenchPart = containingParts[i];
-				if (workbenchPart instanceof IEditorPart) {
-					IEditorPart editorPart = (IEditorPart) workbenchPart;
-					if (isEditingDescendantOf(editorPart)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-		
-		/**
-		 * Return whether the given saveable contains any resources that
-		 * are descendants of the root resources.
-		 * @param saveable the saveable
-		 * @return whether the given saveable contains any resources that
-		 * are descendants of the root resources
-		 */
-		private boolean isDescendantOfRoots(Saveable saveable) {
-			// First, try and adapt the saveable to a resource mapping.
-			ResourceMapping mapping = ResourceUtil.getResourceMapping(saveable);
-			if (mapping != null) {
-				try {
-					ResourceTraversal[] traversals = mapping.getTraversals(
-							ResourceMappingContext.LOCAL_CONTEXT, null);
-					for (int i = 0; i < traversals.length; i++) {
-						ResourceTraversal traversal = traversals[i];
-						IResource[] resources = traversal.getResources();
-						for (int j = 0; j < resources.length; j++) {
-							IResource resource = resources[j];
-							if (isDescendantOfRoots(resource)) {
-								return true;
-							}
-						}
-					}
-				} catch (CoreException e) {
-					IDEWorkbenchPlugin
-							.log(
-									NLS
-											.bind(
-													"An internal error occurred while determining the resources for {0}", saveable.getName()), e); //$NON-NLS-1$
-				}
-			} else {
-				// If there is no mapping, try to adapt to a resource or file directly
-				IFile file = ResourceUtil.getFile(saveable);
-				if (file != null) {
-					return isDescendantOfRoots(file);
-				}
-			}
-			return false;
-		}
-
-		/**
-		 * Return whether the given resource is either equal to or a descendant of
-		 * one of the given roots.
-		 * 
-		 * @param resource the resource to be tested
-		 * @return whether the given resource is either equal to or a descendant of
-		 *         one of the given roots
-		 */
-		private boolean isDescendantOfRoots(IResource resource) {
-			for (int l = 0; l < roots.length; l++) {
-				IResource root = roots[l];
-				if (root.getFullPath().isPrefixOf(resource.getFullPath())) {
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		/**
-		 * Return whether the given dirty editor part is editing resources that are
-		 * descendants of the given roots.
-		 * 
-		 * @param part the dirty editor part
-		 * @return whether the given dirty editor part is editing resources that are
-		 *         descendants of the given roots
-		 */
-		private boolean isEditingDescendantOf(IEditorPart part) {
-			IFile file = ResourceUtil.getFile(part.getEditorInput());
-			if (file != null) {
-				return isDescendantOfRoots(file);
-			}
-			return false;
-		}
-		
-	}
-	
 	/**
 	 * Block instantiation.
 	 */
@@ -1359,6 +1245,7 @@ public final class IDE {
 
 		final boolean[] result = new boolean[] { true };
 		SafeRunner.run(new SafeRunnable(IDEWorkbenchMessages.ErrorOnSaveAll) {
+			@Override
 			public void run() {
 				IWorkbenchWindow w = PlatformUI.getWorkbench()
 						.getActiveWorkbenchWindow();
@@ -1370,7 +1257,7 @@ public final class IDE {
 				}
 				if (w != null) {
 					result[0] = PlatformUI.getWorkbench().saveAll(w, w,
-							new SaveFilter(resourceRoots), confirm);
+							new ResourceSaveableFilter(resourceRoots), confirm);
 				}
 			}
 		});
@@ -1622,10 +1509,12 @@ public final class IDE {
 
 		final boolean[] result = new boolean[] { false };
 		Runnable runnable = new Runnable() {
+			@Override
 			public void run() {
 				ErrorDialog dialog = new ErrorDialog(shell, title,
 						dialogMessage, displayStatus, IStatus.ERROR
 								| IStatus.WARNING | IStatus.INFO) {
+					@Override
 					protected void createButtonsForButtonBar(Composite parent) {
 						createButton(parent, IDialogConstants.YES_ID,
 								IDialogConstants.YES_LABEL, false);
@@ -1634,11 +1523,7 @@ public final class IDE {
 						createDetailsButton(parent);
 					}
 
-					/*
-					 * (non-Javadoc)
-					 * 
-					 * @see org.eclipse.jface.dialogs.ErrorDialog#buttonPressed(int)
-					 */
+					@Override
 					protected void buttonPressed(int id) {
 						if (id == IDialogConstants.YES_ID) {
 							super.buttonPressed(IDialogConstants.OK_ID);
@@ -1647,6 +1532,7 @@ public final class IDE {
 						}
 						super.buttonPressed(id);
 					}
+					@Override
 					protected int getShellStyle() {
 						return super.getShellStyle() | SWT.SHEET;
 					}

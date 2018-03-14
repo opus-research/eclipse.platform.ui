@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
 import java.util.ArrayList;
@@ -116,6 +126,7 @@ class Overlay {
 
 		blue = new Color(baseShell.getDisplay(), 0, 0, 128);
 		overlayShell.addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent e) {
 				e.gc.setForeground(blue);
 				e.gc.setBackground(blue);

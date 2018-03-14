@@ -1,6 +1,6 @@
 /*******************************************************************************
 
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,13 +26,13 @@ public class WindowlessSessionTest extends UITestCase {
 		ts.addTest(new WindowlessSessionTest("testWindowlessWorkbench"));
 		return ts;
 	}
-	
+
 	public WindowlessSessionTest(String name) {
 		super(name);
 	}
 
 	public void testWindowlessWorkbench() throws Exception {
-		
+
 		// There should not be any windows in this app
 		assertTrue(fWorkbench.getWorkbenchWindowCount() == 0);
 

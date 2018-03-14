@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -24,7 +25,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -48,6 +48,7 @@ public class MenuRenderer extends SWTPartRenderer {
 		application = context.get(MApplication.class);
 	}
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
 			return null;
@@ -61,6 +62,7 @@ public class MenuRenderer extends SWTPartRenderer {
 			if (container instanceof MWindow) {
 				newMenu = new Menu((Decorations) parent, SWT.BAR);
 				newMenu.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						cleanUp(menuModel);
 					}
@@ -83,13 +85,6 @@ public class MenuRenderer extends SWTPartRenderer {
 		return newMenu;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
-	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
-	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		if (container.getChildren().size() == 0) {
@@ -198,14 +193,6 @@ public class MenuRenderer extends SWTPartRenderer {
 		item.setText(text);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#hideChild
-	 * (org.eclipse.e4.ui.model.application.MElementContainer,
-	 * org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void hideChild(MElementContainer<MUIElement> parentElement,
 			MUIElement child) {
@@ -218,13 +205,6 @@ public class MenuRenderer extends SWTPartRenderer {
 			widget.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.AbstractPartRenderer#getUIContainer
-	 * (org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		if (!(element instanceof MMenuElement))

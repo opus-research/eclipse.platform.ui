@@ -39,10 +39,8 @@ public class ViewActionBuilder extends PluginActionBuilder {
         contribute(bars.getMenuManager(), bars.getToolBarManager(), true);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginActionBuilder.
-     */
-    protected ActionDescriptor createActionDescriptor(
+    @Override
+	protected ActionDescriptor createActionDescriptor(
             org.eclipse.core.runtime.IConfigurationElement element) {
         return new ActionDescriptor(element, ActionDescriptor.T_VIEW,
                 targetPart);

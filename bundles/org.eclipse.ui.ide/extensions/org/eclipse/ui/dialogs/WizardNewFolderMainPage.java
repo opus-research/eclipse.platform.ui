@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Leon J. Breedt - Added multiple folder creation support (in WizardNewFolderMainPage)
- * 
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -173,6 +173,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			data.horizontalAlignment = GridData.BEGINNING;
 			advancedButton.setLayoutData(data);
 			advancedButton.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleAdvancedButtonSelect();
 				}
@@ -180,18 +181,22 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FOLDER,
 				new Listener() {
+					@Override
 					public void handleEvent(Event e) {
 						setPageComplete(validatePage());
 						firstLinkCheck = false;
 					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
+					@Override
 					public String getValue() {
 						return resourceGroup.getResource();
 					}
 
+					@Override
 					public void setValue(String string) {
 						resourceGroup.setResource(string);
 					}
+					@Override
 					public IResource getResource() {
 						IPath path = resourceGroup.getContainerFullPath();
 						if (path != null) {
@@ -255,6 +260,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/**
 	 * (non-Javadoc) Method declared on IDialogPage.
 	 */
+	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		// top level group
@@ -296,6 +302,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 * @deprecated As of 3.3, use {@link #createNewFolder()} which uses the
 	 *   undoable operation support.
 	 */
+	@Deprecated
 	protected void createFolder(IFolder folderHandle, IProgressMonitor monitor)
 			throws CoreException {
 		try {
@@ -453,6 +460,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			} 
 		}
 		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				AbstractOperation op;
 				op = new CreateFolderOperation(
@@ -468,6 +476,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 				} catch (final ExecutionException e) {
 					getContainer().getShell().getDisplay().syncExec(
 							new Runnable() {
+								@Override
 								public void run() {
 									if (e.getCause() instanceof CoreException) {
 										ErrorDialog
@@ -553,21 +562,21 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			advancedButton.setText(IDEWorkbenchMessages.showAdvanced);
 		} else {
 			Point oldCompositeSize = advancedComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			
+
 			ImageDescriptor folderDescriptor = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
 	                ISharedImages.IMG_OBJ_FOLDER);
 
 			ImageDescriptor[][] linkedResourceOverlayMap = new ImageDescriptor[4][1];
 			linkedResourceOverlayMap[1]= new ImageDescriptor[] {AbstractUIPlugin.imageDescriptorFromPlugin(
 					IDEWorkbenchPlugin.IDE_WORKBENCH,
-			"$nl$/icons/full/ovr16/link_ovr.gif")}; //$NON-NLS-1$
-			
+			"$nl$/icons/full/ovr16/link_ovr.png")}; //$NON-NLS-1$
+
 			CompositeImageDescriptor linkedFolderDescriptor = new OverlayIcon(folderDescriptor, linkedResourceOverlayMap, new Point(16, 16)); 
 
 			ImageDescriptor[][] virtualFolderOverlayMap = new ImageDescriptor[4][1];
 			virtualFolderOverlayMap[1]= new ImageDescriptor[] {AbstractUIPlugin.imageDescriptorFromPlugin(
 					IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/ovr16/virt_ovr.gif")}; //$NON-NLS-1$
+				"$nl$/icons/full/ovr16/virt_ovr.png")}; //$NON-NLS-1$
 
 			CompositeImageDescriptor virtualFolderDescriptor = new OverlayIcon(folderDescriptor, virtualFolderOverlayMap, new Point(16, 16)); 
 
@@ -607,6 +616,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			useLinkedResource.setLayoutData(data);
 
 			SelectionAdapter radioListener = new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleRadioSelect();
 				}
@@ -646,6 +656,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			data.horizontalIndent = indent;
 			filterButton.setLayoutData(data);
 			filterButton.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					handleEditFilterSelect();
 				}
@@ -680,6 +691,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	 * <code>Listener</code> method handles all events and enablements for
 	 * controls on this page. Subclasses may extend.
 	 */
+	@Override
 	public void handleEvent(Event ev) {
 		setPageComplete(validatePage());
 	}
@@ -715,6 +727,7 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 	/*
 	 * @see DialogPage.setVisible(boolean)
 	 */
+	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible) {
@@ -815,6 +828,8 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			return false;
 		if (resourceName.length() > 0) {
 			IPath newFolderPath = containerPath.append(resourceName);
+			if (newFolderPath.segmentCount() < 2)
+				return false;
 			IFolder newFolderHandle = createFolderHandle(newFolderPath);
 			IWorkspace workspace = newFolderHandle.getWorkspace();
 			return !workspace.validateFiltered(newFolderHandle).isOK();

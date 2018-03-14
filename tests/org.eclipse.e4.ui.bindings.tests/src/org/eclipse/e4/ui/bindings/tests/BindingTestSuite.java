@@ -1,17 +1,25 @@
+/*******************************************************************************
+ * Copyright (c) 2013, 2014 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
+ *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
 
-import junit.framework.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+	BindingLookupTest.class,
+	KeyDispatcherTest.class,
+	BindingTableTests.class,
+	BindingCreateTest.class })
 public class BindingTestSuite extends TestSuite {
-	public static Test suite() {
-		return new BindingTestSuite();
-	}
-	
-	public BindingTestSuite() {
-		addTestSuite(BindingLookupTest.class);
-		addTestSuite(KeyDispatcherTest.class);
-		addTestSuite(BindingTableTests.class);
-		addTestSuite(BindingCreateTest.class);
-	}
 }

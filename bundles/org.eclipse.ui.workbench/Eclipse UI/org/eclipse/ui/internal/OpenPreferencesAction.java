@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,9 +53,7 @@ public class OpenPreferencesAction extends Action implements ActionFactory.IWork
 				IWorkbenchHelpContextIds.OPEN_PREFERENCES_ACTION);
 	}
 
-	/* (non-Javadoc)
-	 * Method declared on Action.
-	 */
+	@Override
 	public void run() {
 		if (workbenchWindow == null) {
 			// action has been dispose
@@ -65,9 +63,7 @@ public class OpenPreferencesAction extends Action implements ActionFactory.IWork
 		dialog.open();
 	}
 
-	/* (non-Javadoc)
-	 * Method declared on ActionFactory.IWorkbenchAction.
-	 */
+	@Override
 	public void dispose() {
 		workbenchWindow = null;
 	}

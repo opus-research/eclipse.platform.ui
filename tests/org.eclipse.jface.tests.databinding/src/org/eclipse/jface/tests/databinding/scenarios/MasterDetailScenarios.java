@@ -22,6 +22,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.masterdetail.MasterDetailObservables;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -73,7 +74,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 		// be edited in a text widget. There is always a selected Lodging
 		// object.
 		ListViewer listViewer = new ListViewer(getComposite(), SWT.BORDER);
-		Realm realm = SWTObservables.getRealm(listViewer.getControl()
+		Realm realm = DisplayRealm.getRealm(listViewer.getControl()
 				.getDisplay());
 		listViewer.getList().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -158,6 +159,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 
 		ComputedValue selectionExistsObservable = new ComputedValue(
 				boolean.class) {
+			@Override
 			protected Object calculate() {
 				return new Boolean(selectedLodgingObservable.getValue() != null);
 			}
@@ -193,6 +195,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 
 		Button addButton = new Button(getComposite(), SWT.PUSH);
 		addButton.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Lodging selectedLodging = (Lodging) selectedLodgingObservable
 						.getValue();
@@ -218,6 +221,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 						.getText());
 			}
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -225,6 +229,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 
 		Button removeButton = new Button(getComposite(), SWT.PUSH);
 		removeButton.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Lodging selectedLodging = (Lodging) selectedLodgingObservable
 						.getValue();
@@ -238,6 +243,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 				assertNull(selectedLodgingObservable.getValue());
 			}
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -285,6 +291,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 				.value(Adventure.class, "name"));
 
 		ComputedValue categorySelectionExistsObservable = new ComputedValue() {
+			@Override
 			protected Object calculate() {
 				return new Boolean(
 						selectedCategoryObservable.getValue() != null);
@@ -299,6 +306,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 				.observeSingleSelection(adventureListViewer);
 
 		ComputedValue adventureSelectionExistsObservable = new ComputedValue() {
+			@Override
 			protected Object calculate() {
 				return new Boolean(
 						selectedAdventureObservable.getValue() != null);

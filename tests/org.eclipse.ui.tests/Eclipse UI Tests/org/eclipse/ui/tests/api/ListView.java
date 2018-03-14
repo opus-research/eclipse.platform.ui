@@ -56,7 +56,8 @@ public class ListView extends MockViewPart implements IMenuListener {
     /**
      * @see IWorkbenchPart#createPartControl(Composite)
      */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         callTrace.add("createPartControl");
 
         // Create viewer.
@@ -78,17 +79,19 @@ public class ListView extends MockViewPart implements IMenuListener {
     public void createPopupMenu() {
         // Create actions.
         addAction = new Action("Add Standard Items") {
-            public void run() {
+            @Override
+			public void run() {
                 addStandardItems();
             }
         };
         addAction.setId(ADD_ACTION_ID);
 
         // Create popup menu.
-        if (useStaticMenu())
-            createStaticPopupMenu();
-        else
-            createDynamicPopupMenu();
+        if (useStaticMenu()) {
+			createStaticPopupMenu();
+		} else {
+			createDynamicPopupMenu();
+		}
     }
 
     /**
@@ -121,10 +124,11 @@ public class ListView extends MockViewPart implements IMenuListener {
     }
 
     public void selectElement(ListElement el) {
-        if (el == null)
-            viewer.setSelection(new StructuredSelection());
-        else
-            viewer.setSelection(new StructuredSelection(el));
+        if (el == null) {
+			viewer.setSelection(new StructuredSelection());
+		} else {
+			viewer.setSelection(new StructuredSelection(el));
+		}
     }
 
     public MenuManager getMenuManager() {
@@ -134,7 +138,8 @@ public class ListView extends MockViewPart implements IMenuListener {
     /**
      * @see IMenuListener#menuAboutToShow(IMenuManager)
      */
-    public void menuAboutToShow(IMenuManager menuMgr) {
+    @Override
+	public void menuAboutToShow(IMenuManager menuMgr) {
         menuMgr.add(addAction);
         menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }

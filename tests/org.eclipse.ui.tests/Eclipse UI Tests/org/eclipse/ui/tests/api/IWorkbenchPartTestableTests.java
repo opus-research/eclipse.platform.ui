@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class IWorkbenchPartTestableTests extends UITestCase {
 
@@ -78,18 +78,18 @@ public class IWorkbenchPartTestableTests extends UITestCase {
 	 * @param encounteredControls
 	 */
 	private void testParts(Object[] parts, Set encounteredControls) {
-		for (int i = 0; i < parts.length; i++) {
+		for (Object part : parts) {
 			String title = null;
 			IWorkbenchPartTestable testable = null;
 			if (parts instanceof IWorkbenchPart[]) {
-				testable = (IWorkbenchPartTestable) ((IWorkbenchPart) parts[i])
+				testable = (IWorkbenchPartTestable) ((IWorkbenchPart) part)
 						.getSite().getAdapter(IWorkbenchPartTestable.class);
-				title = ((IWorkbenchPart) parts[i]).getTitle();
+				title = ((IWorkbenchPart) part).getTitle();
 			} else {
-				testable = (IWorkbenchPartTestable) ((IIntroPart) parts[i])
+				testable = (IWorkbenchPartTestable) ((IIntroPart) part)
 						.getIntroSite()
 						.getAdapter(IWorkbenchPartTestable.class);
-				title = ((IIntroPart) parts[i]).getTitle();
+				title = ((IIntroPart) part).getTitle();
 			}
 			assertNotNull(title + " has null testable", testable);
 			assertTrue(title + " has previously encountered control",
