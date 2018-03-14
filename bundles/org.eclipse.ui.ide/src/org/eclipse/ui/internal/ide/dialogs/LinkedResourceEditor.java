@@ -27,8 +27,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -43,9 +45,11 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
@@ -219,7 +223,12 @@ public class LinkedResourceEditor {
 
 		fTree = new TreeViewer(treeComposite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 
-		fTree.addSelectionChangedListener(event -> updateSelection());
+		fTree.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				updateSelection();
+			}
+		});
 
 		data = new GridData(GridData.FILL_BOTH);
 		data.heightHint = fTree.getTree().getItemHeight() * 10;
@@ -434,11 +443,18 @@ public class LinkedResourceEditor {
 																		 * >
 																		 */();
 			try {
-				fProject.accept(resource -> {
-if (resource.isLinked() && !resource.isVirtual())
-				resources.add(resource);
-return true;
-});
+				fProject.accept(new IResourceVisitor() {
+					/**
+					 * @throws CoreException
+					 */
+					@Override
+					public boolean visit(IResource resource)
+							throws CoreException {
+						if (resource.isLinked() && !resource.isVirtual())
+							resources.add(resource);
+						return true;
+					}
+				});
 			} catch (CoreException e) {
 			}
 			projectFiles = (IResource[]) resources.toArray(new IResource[0]);
@@ -547,28 +563,31 @@ return true;
 			final IResource[] selectedResources = getSelectedResource();
 			final ArrayList/*<IResource>*/ removedResources = new ArrayList();
 
-			IRunnableWithProgress op = monitor -> {
-				try {
-					monitor.beginTask(
-							IDEWorkbenchMessages.LinkedResourceEditor_removingMessage,
-							selectedResources.length);
-					for (int i = 0; i < selectedResources.length; i++) {
-						if (monitor.isCanceled())
-							break;
-						String fullPath = selectedResources[i]
-								.getFullPath().toPortableString();
-						try {
-							selectedResources[i].delete(true, new SubProgressMonitor(monitor, 1));
-							removedResources.add(selectedResources[i]);
-							fBrokenResources.remove(fullPath);
-							fFixedResources.remove(fullPath);
-							fAbsoluteResources.remove(fullPath);
-						} catch (CoreException e) {
-							e.printStackTrace();
+			IRunnableWithProgress op = new IRunnableWithProgress() {
+				@Override
+				public void run(IProgressMonitor monitor) {
+					try {
+						monitor.beginTask(
+								IDEWorkbenchMessages.LinkedResourceEditor_removingMessage,
+								selectedResources.length);
+						for (int i = 0; i < selectedResources.length; i++) {
+							if (monitor.isCanceled())
+								break;
+							String fullPath = selectedResources[i]
+									.getFullPath().toPortableString();
+							try {
+								selectedResources[i].delete(true, new SubProgressMonitor(monitor, 1));
+								removedResources.add(selectedResources[i]);
+								fBrokenResources.remove(fullPath);
+								fFixedResources.remove(fullPath);
+								fAbsoluteResources.remove(fullPath);
+							} catch (CoreException e) {
+								e.printStackTrace();
+							}
 						}
+					} finally {
+						monitor.done();
 					}
-				} finally {
-					monitor.done();
 				}
 			};
 			try {

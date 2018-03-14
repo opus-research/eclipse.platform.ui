@@ -40,6 +40,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -66,8 +67,14 @@ import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
  */
 public class WizardExternalProjectImportPage extends WizardPage {
 
-    private FileFilter projectFilter = pathName -> pathName.getName().equals(
-	        IProjectDescription.DESCRIPTION_FILE_NAME);
+    private FileFilter projectFilter = new FileFilter() {
+        //Only accept those files that are .project
+        @Override
+		public boolean accept(File pathName) {
+            return pathName.getName().equals(
+                    IProjectDescription.DESCRIPTION_FILE_NAME);
+        }
+    };
 
     //Keep track of the directory that we browsed to last time
     //the wizard was invoked.
@@ -82,7 +89,12 @@ public class WizardExternalProjectImportPage extends WizardPage {
 
     private IProjectDescription description;
 
-    private Listener locationModifyListener = e -> setPageComplete(validatePage());
+    private Listener locationModifyListener = new Listener() {
+        @Override
+		public void handleEvent(Event e) {
+            setPageComplete(validatePage());
+        }
+    };
 
     // constants
     private static final int SIZING_TEXT_FIELD_WIDTH = 250;
