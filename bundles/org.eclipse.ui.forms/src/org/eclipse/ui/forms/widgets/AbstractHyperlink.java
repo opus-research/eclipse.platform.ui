@@ -335,10 +335,6 @@ public abstract class AbstractHyperlink extends Canvas {
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
-	 */
 
 	public void setEnabled (boolean enabled) {
 		boolean needsRedraw = enabled != getEnabled();

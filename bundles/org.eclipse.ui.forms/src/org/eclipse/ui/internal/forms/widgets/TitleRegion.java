@@ -247,9 +247,6 @@ public class TitleRegion extends Canvas {
 		});
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Control#forceFocus()
-	 */
 	public boolean forceFocus() {
 		return false;
 	}

@@ -756,20 +756,10 @@ public class Form extends Composite {
 		head.addDropSupport(operations, transferTypes, listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
-	 */
 	public String getMessage() {
 		return head.getMessage();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
-	 */
 	public int getMessageType() {
 		return head.getMessageType();
 	}

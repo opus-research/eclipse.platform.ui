@@ -138,22 +138,12 @@ public final class DetailsPart implements IFormPart, IPartSelectionListener {
 		}
 		return null;
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IFormPart#dispose()
-	 */
 	public void dispose() {
 		for (Enumeration enm = pages.elements(); enm.hasMoreElements();) {
 			PageBag pageBag = (PageBag) enm.nextElement();
 			pageBag.dispose();
 		}
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IFormPart#initialize(org.eclipse.ui.forms.IManagedForm)
-	 */
 	public void initialize(IManagedForm form) {
 		this.managedForm = form;
 	}
@@ -194,20 +184,9 @@ public final class DetailsPart implements IFormPart, IPartSelectionListener {
 		if (page != null)
 			page.setFocus();
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IFormPart#setFormInput(java.lang.Object)
-	 */
 	public boolean setFormInput(Object input) {
 		return false;
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IPartSelectionListener#selectionChanged(org.eclipse.ui.forms.IFormPart,
-	 *      org.eclipse.jface.viewers.ISelection)
-	 */
 	public void selectionChanged(IFormPart part, ISelection selection) {
 		this.masterPart = part;
 		if (currentSelection != null) {

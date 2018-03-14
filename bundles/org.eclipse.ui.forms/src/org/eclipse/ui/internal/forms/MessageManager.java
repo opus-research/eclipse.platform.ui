@@ -93,56 +93,26 @@ public class MessageManager implements IMessageManager {
 			this.control = message.control;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IMessage#getKey()
-		 */
 		public Object getKey() {
 			return key;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
-		 */
 		public String getMessage() {
 			return message;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
-		 */
 		public int getMessageType() {
 			return type;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.forms.messages.IMessage#getControl()
-		 */
 		public Control getControl() {
 			return control;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.forms.messages.IMessage#getData()
-		 */
 		public Object getData() {
 			return data;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.forms.messages.IMessage#getPrefix()
-		 */
 		public String getPrefix() {
 			return prefix;
 		}
@@ -330,24 +300,12 @@ public class MessageManager implements IMessageManager {
 		this.form = form;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object,
-	 *      java.lang.String, int)
-	 */
 	public void addMessage(Object key, String messageText, Object data, int type) {
 		addMessage(null, key, messageText, data, type, messages);
 		if (isAutoUpdate())
 			updateForm();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object,
-	 *      java.lang.String, int, org.eclipse.swt.widgets.Control)
-	 */
 	public void addMessage(Object key, String messageText, Object data,
 			int type, Control control) {
 		ControlDecorator dec = (ControlDecorator) decorators.get(control);
@@ -361,11 +319,6 @@ public class MessageManager implements IMessageManager {
 			updateForm();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object)
-	 */
 	public void removeMessage(Object key) {
 		Message message = findMessage(key, messages);
 		if (message != null) {
@@ -375,11 +328,6 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessages()
-	 */
 	public void removeMessages() {
 		if (!messages.isEmpty()) {
 			messages.clear();
@@ -388,12 +336,6 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object,
-	 *      org.eclipse.swt.widgets.Control)
-	 */
 	public void removeMessage(Object key, Control control) {
 		ControlDecorator dec = (ControlDecorator) decorators.get(control);
 		if (dec == null)
@@ -403,11 +345,6 @@ public class MessageManager implements IMessageManager {
 				updateForm();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessages(org.eclipse.swt.widgets.Control)
-	 */
 	public void removeMessages(Control control) {
 		ControlDecorator dec = (ControlDecorator) decorators.get(control);
 		if (dec != null) {
@@ -418,11 +355,6 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#removeAllMessages()
-	 */
 	public void removeAllMessages() {
 		boolean needsUpdate = false;
 		for (Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
@@ -470,11 +402,6 @@ public class MessageManager implements IMessageManager {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#update()
-	 */
 	public void update() {
 		// Update decorations
 		for (Iterator iter = decorators.values().iterator(); iter.hasNext();) {
@@ -578,11 +505,6 @@ public class MessageManager implements IMessageManager {
 		return sw.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#createSummary(org.eclipse.ui.forms.IMessage[])
-	 */
 	public String createSummary(IMessage[] messages) {
 		return createDetails(messages);
 	}
@@ -595,20 +517,10 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#getMessagePrefixProvider()
-	 */
 	public IMessagePrefixProvider getMessagePrefixProvider() {
 		return prefixProvider;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#setMessagePrefixProvider(org.eclipse.ui.forms.IMessagePrefixProvider)
-	 */
 	public void setMessagePrefixProvider(IMessagePrefixProvider provider) {
 		this.prefixProvider = provider;
 		for (Iterator iter = decorators.values().iterator(); iter.hasNext();) {
@@ -617,20 +529,10 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#getDecorationPosition()
-	 */
 	public int getDecorationPosition() {
 		return decorationPosition;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#setDecorationPosition(int)
-	 */
 	public void setDecorationPosition(int position) {
 		this.decorationPosition = position;
 		for (Iterator iter = decorators.values().iterator(); iter.hasNext();) {
@@ -639,20 +541,10 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#isAutoUpdate()
-	 */
 	public boolean isAutoUpdate() {
 		return autoUpdate;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.IMessageManager#setAutoUpdate(boolean)
-	 */
 	public void setAutoUpdate(boolean autoUpdate) {
 		boolean needsCaching = this.autoUpdate && !autoUpdate;
 		boolean needsUpdate = !this.autoUpdate && autoUpdate;

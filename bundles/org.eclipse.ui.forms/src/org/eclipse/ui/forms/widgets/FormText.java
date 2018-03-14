@@ -1698,19 +1698,11 @@ public class FormText extends Canvas {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
-	 */
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		redraw();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.widgets.Control#setFocus()
-	 */
 	public boolean setFocus() {
 		mouseFocus = true;
 		FormUtil.setFocusScrollingEnabled(this, false);

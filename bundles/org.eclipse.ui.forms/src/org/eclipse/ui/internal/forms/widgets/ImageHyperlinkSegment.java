@@ -24,20 +24,10 @@ public class ImageHyperlinkSegment extends ImageSegment implements
 	public ImageHyperlinkSegment() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#setHref(java.lang.String)
-	 */
 	public void setHref(String href) {
 		this.href = href;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#getHref()
-	 */
 	public String getHref() {
 		return href;
 	}
@@ -58,29 +48,14 @@ public class ImageHyperlinkSegment extends ImageSegment implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#isWordWrapAllowed()
-	 */
 	public boolean isWordWrapAllowed() {
 		return !isNowrap();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#setWordWrapAllowed(boolean)
-	 */
 	public void setWordWrapAllowed(boolean value) {
 		setNowrap(!value);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.forms.widgets.IHyperlinkSegment#getText()
-	 */
 	public String getText() {
 		return text!=null?text:""; //$NON-NLS-1$
 	}

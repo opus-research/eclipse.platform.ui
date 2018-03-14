@@ -147,11 +147,6 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.editor.FormEditor#dispose()
-	 */
 	public void dispose() {
 		if (headerForm != null) {
 			headerForm.dispose();
@@ -160,11 +155,6 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		super.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.editor.FormEditor#isDirty()
-	 */
 	public boolean isDirty() {
 		if (headerForm != null && headerForm.isDirty()) {
 			return true;
@@ -172,11 +162,6 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		return super.isDirty();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.editor.FormEditor#commitPages(boolean)
-	 */
 	protected void commitPages(boolean onSave) {
 		if (headerForm != null && headerForm.isDirty())
 			headerForm.commit(onSave);

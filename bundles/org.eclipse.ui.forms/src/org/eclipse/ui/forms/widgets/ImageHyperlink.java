@@ -84,11 +84,6 @@ public class ImageHyperlink extends Hyperlink {
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.forms.widgets.AbstractHyperlink#paintHyperlink(org.eclipse.swt.events.PaintEvent)
-	 */
 	protected void paintHyperlink(GC gc) {
 		paintHyperlink(gc, getClientArea());
 	}
