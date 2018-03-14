@@ -24,7 +24,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.AboutToShow;
-import org.eclipse.e4.ui.di.lifecycle.PreShow;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
@@ -33,7 +32,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
-import org.eclipse.e4.ui.workbench.modeling.ELifecycleService;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.jface.action.IMenuListener2;
@@ -70,9 +68,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	@Inject
 	@Optional
 	private Logger logger;
-
-	@Inject
-	private ELifecycleService lifecycleService;
 
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
@@ -222,11 +217,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 				}
 			}
 		}
-
-		IEclipseContext dynamicMenuContext = EclipseContextFactory.create();
-		dynamicMenuContext.set(MMenu.class, menuModel);
-		lifecycleService.validate(PreShow.class, menuModel, dynamicMenuContext);
-		dynamicMenuContext.dispose();
 	}
 
 	private void cleanUp(final Menu menu, MMenu menuModel,
