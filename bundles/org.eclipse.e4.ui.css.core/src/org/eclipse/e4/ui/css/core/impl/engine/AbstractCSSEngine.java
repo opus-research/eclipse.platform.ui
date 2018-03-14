@@ -177,30 +177,20 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		int counter;
 		for (counter = 0; counter < length; counter++) {
 			CSSRule rule = rules.item(counter);
-			if (rule.getType() != CSSRule.IMPORT_RULE) {
+			if (rule.getType() !=  CSSRule.IMPORT_RULE) {
 				break;
 			}
-			// processing an import CSS
-			CSSImportRule importRule = (CSSImportRule) rule;
-			URL url = null;
-			if (importRule.getHref().startsWith("platform")) {
-				url = FileLocator.resolve(new URL(importRule.getHref()));
-				System.out.println(url);
-			} else {
-				Path p = new Path(source.getURI());
-				IPath trim = p.removeLastSegments(1);
+			Path p = new Path(source.getURI());
+			IPath trim = p.removeLastSegments(1);
 
-				url = FileLocator.resolve(new URL(trim.addTrailingSeparator()
-						.toString() + ((CSSImportRule) rule).getHref()));
-				File testFile = new File(url.getFile());
-				if (!testFile.exists()) {
-					// look in platform default
-					String path = getResourcesLocatorManager().resolve(
-							(importRule).getHref());
-					testFile = new File(new URL(path).getFile());
-					if (testFile.exists()) {
-						url = new URL(path);
-					}
+			URL url = FileLocator.resolve(new URL(trim.addTrailingSeparator().toString() + ((CSSImportRule) rule).getHref()));
+			File testFile = new File(url.getFile());
+			if (!testFile.exists()) {
+				//look in platform default
+				String path = getResourcesLocatorManager().resolve(((CSSImportRule) rule).getHref());
+				testFile = new File(new URL(path).getFile());
+				if (testFile.exists()) {
+					url = new URL(path);
 				}
 			}
 			InputStream stream = null;
@@ -223,12 +213,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			}
 		}
 
-		// add remaining non import rules
+		//add remaining non import rules
 		for (int i = counter; i < length; i++) {
 			masterList.add(rules.item(i));
 		}
 
-		// final stylesheet
+		//final stylesheet
 		CSSStyleSheetImpl s = new CSSStyleSheetImpl();
 		s.setRuleList(masterList);
 		if (!parseImport) {
@@ -391,26 +381,20 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 					}
 
 					if (styleWithPseudoInstance != null) {
-						CSSRule parentRule = styleWithPseudoInstance
-								.getParentRule();
+						CSSRule parentRule = styleWithPseudoInstance.getParentRule();
 						if (parentRule instanceof ExtendedCSSRule) {
-							applyConditionalPseudoStyle(
-									(ExtendedCSSRule) parentRule,
-									pseudoInstance, element,
-									styleWithPseudoInstance);
+							applyConditionalPseudoStyle((ExtendedCSSRule) parentRule, pseudoInstance, element, styleWithPseudoInstance);
 						} else {
-							// applyStyleDeclaration(element,
-							// styleWithPseudoInstance,
-							// pseudoInstance);
-							applyStyleDeclaration(elt, styleWithPseudoInstance,
-									pseudoInstance);
+							//							applyStyleDeclaration(element, styleWithPseudoInstance,
+							//									pseudoInstance);
+							applyStyleDeclaration(elt, styleWithPseudoInstance, pseudoInstance);
 						}
 					}
 				}
 			}
 
 			if (style != null) {
-				// applyStyleDeclaration(element, style, null);
+				//applyStyleDeclaration(element, style, null);
 				applyStyleDeclaration(elt, style, null);
 			}
 			try {
@@ -436,16 +420,13 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	}
 
-	private void applyConditionalPseudoStyle(ExtendedCSSRule parentRule,
-			String pseudoInstance, Object element,
-			CSSStyleDeclaration styleWithPseudoInstance) {
+	private void applyConditionalPseudoStyle(ExtendedCSSRule parentRule, String pseudoInstance, Object element, CSSStyleDeclaration styleWithPseudoInstance) {
 		SelectorList selectorList = parentRule.getSelectorList();
 		for (int j = 0; j < selectorList.getLength(); j++) {
 			Selector item = selectorList.item(j);
 			// search for conditional selectors
 			if (item instanceof ConditionalSelector) {
-				Condition condition = ((ConditionalSelector) item)
-						.getCondition();
+				Condition condition = ((ConditionalSelector) item).getCondition();
 				// we're only interested in attribute selector conditions
 				if (condition instanceof AttributeCondition) {
 					String value = ((AttributeCondition) condition).getValue();
@@ -469,8 +450,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	}
 
 	/**
-	 * Callback method called when styles applied of <code>nodes</code> children
-	 * of the <code>element</code>.
+	 * Callback method called when styles applied of <code>nodes</code>
+	 * children of the <code>element</code>.
 	 *
 	 * @param element
 	 * @param nodes
@@ -580,8 +561,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				CSSStylableElement stylableElement = (CSSStylableElement) elt;
 				String style = stylableElement.getCSSStyle();
 				if (style != null && style.length() > 0) {
-					parseAndApplyStyleDeclaration(
-							stylableElement.getNativeWidget(), style);
+					parseAndApplyStyleDeclaration(stylableElement
+							.getNativeWidget(), style);
 				}
 			}
 			if (applyStylesToChildNodes) {
@@ -681,7 +662,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	 */
 	@Override
 	public ICSSPropertyHandler applyCSSProperty(Object element,
-			String property, CSSValue value, String pseudo) throws Exception {
+			String property,
+			CSSValue value, String pseudo) throws Exception {
 		if (currentCSSPropertiesApplyed != null
 				&& currentCSSPropertiesApplyed.containsKey(property)) {
 			// CSS Property was already applied, ignore it.
@@ -698,7 +680,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			for (ICSSPropertyHandler handler : handlers) {
 				try {
 					boolean result = handler.applyCSSProperty(element,
-							property, value, pseudo, this);
+							property,
+							value, pseudo, this);
 					if (result) {
 						// Add CSS Property to flag that this CSS Property was
 						// applied.
@@ -835,8 +818,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				parent = parent.getSuperclass();
 				tmp = widgetsMap.get(parent.getName());
 			}
-			if (tmp != null && tmp instanceof IElementProvider) {
-				elt = ((IElementProvider) tmp).getElement(element, this);
+			if(tmp != null && tmp instanceof IElementProvider) {
+				elt = ((IElementProvider)tmp).getElement(element, this);
 			}
 		}
 		if (elt != null) {
@@ -844,13 +827,14 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				elementContext = new CSSElementContextImpl();
 				Object nativeWidget = getNativeWidget(element);
 				hookNativeWidget(nativeWidget);
-				getElementsContext().put(nativeWidget, elementContext);
+				getElementsContext().put(nativeWidget,
+						elementContext);
 			}
 			elementContext.setElementProvider(elementProvider);
 			elementContext.setElement(elt);
 			if (elt instanceof CSSStylableElement) {
 				// Initialize CSS stylable element
-				((CSSStylableElement) elt).initialize();
+				((CSSStylableElement)elt).initialize();
 			}
 
 		}
@@ -859,23 +843,22 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/**
 	 * Called when an element context is created for a native widget and
-	 * registered with this engine. Subclasses should override and install a
-	 * listener on the widget that will call
-	 * {@link #handleWidgetDisposed(Object)} when the widget is disposed.
+	 * registered with this engine. Subclasses should override and install
+	 * a listener on the widget that will call {@link #handleWidgetDisposed(Object)}
+	 * when the widget is disposed.
 	 * <p>
 	 * The default implementation of this method does nothing.
 	 * </p>
 	 *
-	 * @param widget
-	 *            the native widget to hook
+	 * @param widget the native widget to hook
 	 */
 	protected void hookNativeWidget(Object widget) {
 	}
 
 	/**
-	 * Called when a widget is disposed. Removes the element context from the
-	 * element contexts map and the widgets map. Overriding classes must call
-	 * the super implementation.
+	 * Called when a widget is disposed. Removes the element context
+	 * from the element contexts map and the widgets map. Overriding
+	 * classes must call the super implementation.
 	 */
 	protected void handleWidgetDisposed(Object widget) {
 		if (widgetsMap != null) {

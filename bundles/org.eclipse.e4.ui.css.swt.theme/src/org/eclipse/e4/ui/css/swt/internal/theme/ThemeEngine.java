@@ -214,14 +214,12 @@ public class ThemeEngine implements IThemeEngine {
 		}
 
 		//Resolve to install dir
-		registerResourceLocator(new OSGiResourceLocator(
-				"platform:/plugin/org.eclipse.ui.themes/css/"));
+		registerResourceLocator(new OSGiResourceLocator("platform:/plugin/org.eclipse.platform/css/"));
 		registerResourceLocator(new FileResourcesLocatorImpl());
 		// FIXME: perhaps ResourcesLocatorManager shouldn't have a default?
 		// registerResourceLocator(new HttpResourcesLocatorImpl());
 	}
 
-	@Override
 	public synchronized ITheme registerTheme(String id, String label,
 			String basestylesheetURI) throws IllegalArgumentException {
 		return  registerTheme(id, label, basestylesheetURI, "");
@@ -244,7 +242,6 @@ public class ThemeEngine implements IThemeEngine {
 		return theme;
 	}
 
-	@Override
 	public synchronized void registerStylesheet(String uri, String... themes) {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
@@ -261,7 +258,6 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
-	@Override
 	public synchronized void registerResourceLocator(IResourceLocator locator,
 			String... themes) {
 		if (themes.length == 0) {
@@ -354,7 +350,6 @@ public class ThemeEngine implements IThemeEngine {
 				.toArray(new IConfigurationElement[matchingElements.size()]);
 	}
 
-	@Override
 	public void setTheme(String themeId, boolean restore) {
 		String osVersion = System.getProperty("os.version");
 		if (osVersion != null) {
@@ -383,7 +378,6 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
-	@Override
 	public void setTheme(ITheme theme, boolean restore) {
 		setTheme(theme, restore, false);
 	}
@@ -499,12 +493,10 @@ public class ThemeEngine implements IThemeEngine {
 		return context.getService(eventAdminRef);
 	}
 
-	@Override
 	public synchronized List<ITheme> getThemes() {
 		return Collections.unmodifiableList(new ArrayList<ITheme>(themes));
 	}
 
-	@Override
 	public void applyStyles(Object widget, boolean applyStylesToChildNodes) {
 		for (CSSEngine engine : cssEngines) {
 			Object element = engine.getElement(widget);
@@ -545,7 +537,6 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
-	@Override
 	public void restore(String alternateTheme) {
 		String prefThemeId = getPreferenceThemeId();
 		boolean flag = true;
@@ -564,12 +555,10 @@ public class ThemeEngine implements IThemeEngine {
 		}
 	}
 
-	@Override
 	public ITheme getActiveTheme() {
 		return currentTheme;
 	}
 
-	@Override
 	public CSSStyleDeclaration getStyle(Object widget) {
 		for (CSSEngine engine : cssEngines) {
 			CSSElementContext context = engine.getCSSElementContext(widget);
@@ -608,13 +597,11 @@ public class ThemeEngine implements IThemeEngine {
 		modifiedStylesheets.remove(selection.getId());
 	}
 
-	@Override
 	public void addCSSEngine(CSSEngine cssEngine) {
 		cssEngines.add(cssEngine);
 		resetCurrentTheme();
 	}
 
-	@Override
 	public void removeCSSEngine(CSSEngine cssEngine) {
 		cssEngines.remove(cssEngine);
 	}
