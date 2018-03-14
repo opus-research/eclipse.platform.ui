@@ -41,7 +41,7 @@ public class ResourceFilterPage extends PropertyPage {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
 				IIDEHelpContextIds.RESOURCE_FILTER_PROPERTY_PAGE);
 
-		IResource resource = Adapters.adapt(getElement(), IResource.class);
+		IResource resource = Adapters.getAdapter(getElement(), IResource.class, true);
 		IContainer container = resource instanceof IContainer ? (IContainer) resource
 				: null;
 		groupWidget.setContainer(container);

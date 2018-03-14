@@ -113,7 +113,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	private IAdaptable[] getWorkingSetElements(IWorkingSet workingSet) {
 		IAdaptable[] children = workingSet.getElements();
 		for (int i = 0; i < children.length; i++) {
-			IResource resource = Adapters.adapt(children[i], IResource.class);
+			IResource resource = Adapters.getAdapter(children[i], IResource.class, true);
 			if (resource instanceof IProject)
 				children[i] = resource;
 		}

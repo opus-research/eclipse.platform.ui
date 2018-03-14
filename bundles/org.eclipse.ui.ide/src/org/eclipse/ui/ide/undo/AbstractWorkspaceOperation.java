@@ -724,7 +724,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *
 	 */
 	protected Shell getShell(IAdaptable uiInfo) {
-		Shell shell = Adapters.adapt(uiInfo, Shell.class);
+		Shell shell = Adapters.getAdapter(uiInfo, Shell.class, true);
 		if (shell != null) {
 			return shell;
 		}

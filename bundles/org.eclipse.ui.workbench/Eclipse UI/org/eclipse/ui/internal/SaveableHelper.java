@@ -497,7 +497,7 @@ public class SaveableHelper {
 	}
 
 	public static ISaveablePart getSaveable(Object o) {
-		return Adapters.adapt(o, ISaveablePart.class);
+		return Adapters.getAdapter(o, ISaveablePart.class, true);
 	}
 
 	public static boolean isSaveable(Object o) {
@@ -509,7 +509,7 @@ public class SaveableHelper {
 		if (saveable instanceof ISaveablePart2) {
 			return (ISaveablePart2) saveable;
 		}
-		return Adapters.adapt(o, ISaveablePart2.class);
+		return Adapters.getAdapter(o, ISaveablePart2.class, true);
 	}
 
 	public static boolean isSaveable2(Object o) {
