@@ -34,8 +34,7 @@ public class IPageServiceTest extends UITestCase implements IPageListener,
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
     }
@@ -46,7 +45,7 @@ public class IPageServiceTest extends UITestCase implements IPageListener,
 
 		MockViewPart view = (MockViewPart) page.showView(MockViewPart.ID);
 
-		IPageService slaveService = view.getSite().getService(
+		IPageService slaveService = (IPageService) view.getSite().getService(
 				IPageService.class);
 
 		assertTrue(fWindow != slaveService);
@@ -198,32 +197,28 @@ public class IPageServiceTest extends UITestCase implements IPageListener,
     /**
      * @see IPageListener#pageActivated(IWorkbenchPage)
      */
-    @Override
-	public void pageActivated(IWorkbenchPage page) {
+    public void pageActivated(IWorkbenchPage page) {
         pageEventReceived = true;
     }
 
     /**
      * @see IPageListener#pageClosed(IWorkbenchPage)
      */
-    @Override
-	public void pageClosed(IWorkbenchPage page) {
+    public void pageClosed(IWorkbenchPage page) {
         pageEventReceived = true;
     }
 
     /**
      * @see IPageListener#pageOpened(IWorkbenchPage)
      */
-    @Override
-	public void pageOpened(IWorkbenchPage page) {
+    public void pageOpened(IWorkbenchPage page) {
         pageEventReceived = true;
     }
 
     /**
      * @see IPerspectiveListener#perspectiveActivated(IWorkbenchPage, IPerspectiveDescriptor)
      */
-    @Override
-	public void perspectiveActivated(IWorkbenchPage page,
+    public void perspectiveActivated(IWorkbenchPage page,
             IPerspectiveDescriptor perspective) {
         perspEventReceived = true;
     }
@@ -231,8 +226,7 @@ public class IPageServiceTest extends UITestCase implements IPageListener,
     /**
      * @see IPerspectiveListener#perspectiveChanged(IWorkbenchPage, IPerspectiveDescriptor, String)
      */
-    @Override
-	public void perspectiveChanged(IWorkbenchPage page,
+    public void perspectiveChanged(IWorkbenchPage page,
             IPerspectiveDescriptor perspective, String changeId) {
         perspEventReceived = true;
     }

@@ -63,7 +63,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * The shell in which to show any dialogs.
 	 * @deprecated the shell provider should be used instead.
 	 */
-	@Deprecated
 	protected Shell shell;
 
 	/**
@@ -88,7 +87,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * 
 	 * @deprecated {@link #CopyProjectAction(IShellProvider)}
 	 */
-	@Deprecated
 	public CopyProjectAction(Shell shell) {
 		this(shell, COPY_TITLE);
 	}
@@ -115,12 +113,10 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * 
 	 * @deprecated {@link #CopyProjectAction(IShellProvider, String)}
 	 */
-	@Deprecated
 	CopyProjectAction(final Shell shell, String name) {
 		super(name);
 		Assert.isNotNull(shell);
 		shellProvider = new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return shell;
 			} };
@@ -199,7 +195,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * @deprecated As of 3.3, the undoable operation created by this action
 	 *             handles error dialogs.
 	 */
-	@Deprecated
 	protected String getErrorsTitle() {
 		return PROBLEMS_TITLE;
 	}
@@ -228,7 +223,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	boolean performCopy(final IProject project, final String projectName,
 			final URI newLocation) {
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				org.eclipse.ui.ide.undo.CopyProjectOperation op = new org.eclipse.ui.ide.undo.CopyProjectOperation(
 						project, projectName, newLocation, getText());
@@ -292,7 +286,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	/**
 	 * Implementation of method defined on <code>IAction</code>.
 	 */
-	@Override
 	public void run() {
 
 		errorStatus = null;
@@ -327,7 +320,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * <code>SelectionListenerAction</code> method enables this action only if
 	 * there is a single selection which is a project.
 	 */
-	@Override
 	protected boolean updateSelection(IStructuredSelection selection) {
 		if (!super.updateSelection(selection)) {
 			return false;

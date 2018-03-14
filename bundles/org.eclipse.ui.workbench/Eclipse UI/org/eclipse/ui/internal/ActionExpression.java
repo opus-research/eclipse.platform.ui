@@ -123,6 +123,9 @@ public class ActionExpression {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			Iterator iter = list.iterator();
@@ -174,6 +177,11 @@ public class ActionExpression {
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
+		 */
 		@Override
 		public String[] extractObjectClasses() {
 			Iterator iterator = list.iterator();
@@ -215,6 +223,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
@@ -228,6 +239,11 @@ public class ActionExpression {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
+		 */
 		@Override
 		public Collection valuesForExpression(String expressionType) {
 			Iterator iterator = list.iterator();
@@ -265,6 +281,9 @@ public class ActionExpression {
 			super(element);
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			return !super.isEnabledFor(object);
@@ -347,6 +366,11 @@ public class ActionExpression {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
+		 */
 		@Override
 		public String[] extractObjectClasses() {
 			extracted = true;
@@ -371,6 +395,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			if (object == null) {
@@ -402,6 +429,9 @@ public class ActionExpression {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
@@ -471,6 +501,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			if (object == null) {
@@ -512,6 +545,11 @@ public class ActionExpression {
 			return filter.testAttribute(object, name, value);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
+		 */
 		@Override
 		public Collection valuesForExpression(String expressionType) {
 			if (expressionType.equals(name)) {
@@ -551,6 +589,9 @@ public class ActionExpression {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			Iterator iter = list.iterator();
@@ -619,6 +660,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			Bundle bundle = Platform.getBundle(id);
@@ -690,6 +734,11 @@ public class ActionExpression {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
+		 */
 		@Override
 		public String[] extractObjectClasses() {
 			return child.extractObjectClasses();
@@ -711,17 +760,28 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			return child.isEnabledFor(object);
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
 			return child.isEnabledForExpression(object, expressionType);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
+		 */
 		@Override
 		public Collection valuesForExpression(String expressionType) {
 			return child.valuesForExpression(expressionType);
@@ -756,6 +816,9 @@ public class ActionExpression {
 			}
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		@Override
 		public boolean isEnabledFor(Object object) {
 			String str = System.getProperty(name);

@@ -45,28 +45,23 @@ public class StyledTextObservableValueModifyTest extends TestCase {
 
 		private StyledText text;
 
-		@Override
 		public void setUp() {
 			shell = new Shell();
 			text = new StyledText(shell, SWT.NONE);
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.text(SWT.Modify).observe(realm, text);
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return String.class;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			text.setFocus();
 
@@ -74,7 +69,6 @@ public class StyledTextObservableValueModifyTest extends TestCase {
 			text.setText((String) createValue(observableValue));
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			String value = (String) observable.getValue();
 			return value + "a";

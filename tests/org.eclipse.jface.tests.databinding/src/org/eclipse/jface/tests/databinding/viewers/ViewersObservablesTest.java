@@ -34,7 +34,6 @@ public class ViewersObservablesTest extends AbstractDefaultRealmTestCase {
 	TableViewer viewer;
 	Realm realm;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		realm = SWTObservables.getRealm(Display.getCurrent());
@@ -42,7 +41,6 @@ public class ViewersObservablesTest extends AbstractDefaultRealmTestCase {
 		viewer = new TableViewer(shell, SWT.NONE);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		Shell shell = viewer.getTable().getShell();
 		if (!shell.isDisposed())
