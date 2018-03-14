@@ -56,7 +56,6 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 	private Image image1;
 	private Image image2;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -71,14 +70,12 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 		RealmTester.setDefault(SWTObservables.getRealm(shell.getDisplay()));
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
 		RealmTester.setDefault(null);
 	}
 
-	@Override
 	protected Shell getShell() {
 		if (shell == null) {
 			shell = new Shell(SWT.V_SCROLL);

@@ -482,6 +482,11 @@ public class StickyViewTest extends UITestCase {
 		}
 	}
 
+    /*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
+	 */
     @Override
 	protected void doSetUp() throws Exception {
         window = openTestWindow();

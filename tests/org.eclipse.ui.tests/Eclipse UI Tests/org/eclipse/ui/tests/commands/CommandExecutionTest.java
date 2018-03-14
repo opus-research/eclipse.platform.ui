@@ -43,6 +43,11 @@ public class CommandExecutionTest extends UITestCase {
 		String key;
 		Object result;
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
 		@Override
 		public String toString() {
 			return "(" + key + ",\n\t" + result + ")";

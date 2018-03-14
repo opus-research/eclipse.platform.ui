@@ -25,7 +25,6 @@ public class ViewerElementWrapperTest extends TestCase {
 	private Object element;
 	private IElementComparer comparer;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		element = new ElementStub(0);
@@ -62,7 +61,6 @@ public class ViewerElementWrapperTest extends TestCase {
 			this.hash = hash;
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			if (obj == this)
 				return true;
@@ -74,19 +72,16 @@ public class ViewerElementWrapperTest extends TestCase {
 			return this.hash == that.hash;
 		}
 
-		@Override
 		public int hashCode() {
 			return hash;
 		}
 	}
 
 	static class IdentityElementComparer implements IElementComparer {
-		@Override
 		public boolean equals(Object a, Object b) {
 			return a == b;
 		}
 
-		@Override
 		public int hashCode(Object element) {
 			return System.identityHashCode(element);
 		}
