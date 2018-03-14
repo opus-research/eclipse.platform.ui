@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation; bug 153993
  *												   fix in bug 163317, 151295, 167323, 167858, 184346, 187826, 201905
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442747
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -34,17 +33,16 @@ import org.eclipse.swt.widgets.Widget;
  * (e.g., AbstractTreeViewer and AbstractTableViewer). Concrete subclasses of
  * {@link ColumnViewer} should implement a matching concrete subclass of {@link
  * ViewerColumn}.
- *
+ * 
  * <strong> This class is not intended to be subclassed outside of the JFace
  * viewers framework.</strong>
- *
+ * 
  * @since 3.3
  * 
  */
 public abstract class ColumnViewer extends StructuredViewer {
 	private CellEditor[] cellEditors;
 
-	@SuppressWarnings("deprecation")
 	private ICellModifier cellModifier;
 
 	private String[] columnProperties;
@@ -212,23 +210,21 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Sets up editing support for the given column based on the "old" cell
 	 * editor API.
-	 *
+	 * 
 	 * @param columnIndex
 	 * @param viewer
 	 */
-
-	@SuppressWarnings("deprecation")
 	private void setupEditingSupport(final int columnIndex, ViewerColumn viewer) {
 		if (getCellModifier() != null) {
 			viewer.setEditingSupport(new EditingSupport(this) {
 
 				@Override
 				public boolean canEdit(Object element) {
-					Object[] properties = getViewer().getColumnProperties();
+					Object[] properties = getColumnProperties();
 
 					if (columnIndex < properties.length) {
-						return getViewer().getCellModifier().canModify(element,
-								(String) getViewer().getColumnProperties()[columnIndex]);
+						return getCellModifier().canModify(element,
+								(String) getColumnProperties()[columnIndex]);
 					}
 
 					return false;
@@ -236,20 +232,20 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 				@Override
 				public CellEditor getCellEditor(Object element) {
-					CellEditor[] editors = getViewer().getCellEditors();
+					CellEditor[] editors = getCellEditors();
 					if (columnIndex < editors.length) {
-						return getViewer().getCellEditors()[columnIndex];
+						return getCellEditors()[columnIndex];
 					}
 					return null;
 				}
 
 				@Override
 				public Object getValue(Object element) {
-					Object[] properties = getViewer().getColumnProperties();
+					Object[] properties = getColumnProperties();
 
 					if (columnIndex < properties.length) {
-						return getViewer().getCellModifier().getValue(element,
-								(String) getViewer().getColumnProperties()[columnIndex]);
+						return getCellModifier().getValue(element,
+								(String) getColumnProperties()[columnIndex]);
 					}
 
 					return null;
@@ -257,11 +253,12 @@ public abstract class ColumnViewer extends StructuredViewer {
 
 				@Override
 				public void setValue(Object element, Object value) {
-					Object[] properties = getViewer().getColumnProperties();
+					Object[] properties = getColumnProperties();
 
 					if (columnIndex < properties.length) {
-						getViewer().getCellModifier().modify(getViewer().findItem(element),
-								(String) getViewer().getColumnProperties()[columnIndex], value);
+						getCellModifier().modify(findItem(element),
+								(String) getColumnProperties()[columnIndex],
+								value);
 					}
 				}
 
@@ -276,7 +273,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Creates a generic viewer column for the given column widget, based on the
 	 * given label provider.
-	 *
+	 * 
 	 * @param columnOwner
 	 * 		the column widget
 	 * @param labelProvider
@@ -467,7 +464,6 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
 	 * @see EditingSupport
 	 */
-	@SuppressWarnings("deprecation")
 	public ICellModifier getCellModifier() {
 		return cellModifier;
 	}
@@ -548,7 +544,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Sets the cell editors of this column viewer. If editing is not supported
 	 * by this viewer the call simply has no effect.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
@@ -563,10 +559,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
 	 * @see EditingSupport
-	 * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)}
-	 *             for a more flexible way of editing values in a column viewer.
 	 */
-	@Deprecated
 	public void setCellEditors(CellEditor[] editors) {
 		this.cellEditors = editors;
 	}
@@ -574,7 +567,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	/**
 	 * Sets the cell modifier for this column viewer. This method does nothing
 	 * if editing is not supported by this viewer.
-	 *
+	 * 
 	 * <p>
 	 * Since 3.3, an alternative API is available, see {@link
 	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
@@ -589,10 +582,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
 	 * @see EditingSupport
-	 * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)}
-	 *             for a more flexible way of editing values in a column viewer.
 	 */
-	@Deprecated
 	public void setCellModifier(ICellModifier modifier) {
 		this.cellModifier = modifier;
 	}
@@ -602,28 +592,22 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * correspond with the columns of the control. They are used to identify the
 	 * column in a cell modifier. If editing is not supported by this viewer the
 	 * call simply has no effect.
-	 *
-	 * <p>
-	 * Since 3.3, an alternative API is available, see
-	 * {@link ViewerColumn#setEditingSupport(EditingSupport)} for a more
-	 * flexible way of editing values in a column viewer.
-	 * </p>
-	 * <p>
-	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer}
-	 * with more than 1 column <b>have</b> to pass the SWT.FULL_SELECTION style
-	 * bit
-	 * </p>
 	 * 
+	 * <p>
+	 * Since 3.3, an alternative API is available, see {@link
+	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
+	 * of editing values in a column viewer.
+	 * </p>
+	 * <p>
+	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer} with more than 1 column <b>have</b>
+	 * to pass the SWT.FULL_SELECTION style bit
+	 * </p>
 	 * @param columnProperties
-	 *            the list of column properties
+	 * 		the list of column properties
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
 	 * @see EditingSupport
-	 * 
-	 * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)}
-	 *             for a more flexible way of editing values in a column viewer.
 	 */
-	@Deprecated
 	public void setColumnProperties(String[] columnProperties) {
 		this.columnProperties = columnProperties;
 	}
