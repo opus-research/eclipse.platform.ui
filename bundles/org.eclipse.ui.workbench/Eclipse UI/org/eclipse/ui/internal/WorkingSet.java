@@ -106,7 +106,7 @@ public class WorkingSet extends AbstractWorkingSet {
 
 	@Override
 	public String toString() {
-		return "WS [name=" + getName() + ", elements=" + elements + ", id=" + getId() + "]"; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+		return "WS [name=" + getName() + ", elements=" + getElementsArray() + ", id=" + getId() + "]"; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 	}
 
 	/**
