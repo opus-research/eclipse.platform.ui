@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 463027
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -141,7 +142,7 @@ public abstract class WorkbenchPart extends EventManager implements
      * Platform's adapter manager is consulted).
      */
     @Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 
         /**
          * This implementation of the method declared by <code>IAdaptable</code>
@@ -149,15 +150,16 @@ public abstract class WorkbenchPart extends EventManager implements
          * <code>Platform.getAdapterManager().getAdapter(this, adapter)</code>.
          */
 
-        return Platform.getAdapterManager().getAdapter(this, adapter);
-    }
+		return Platform.getAdapterManager().getAdapter(this, adapter);
+	}
 
-    /**
-     * Returns the configuration element for this part. The configuration element
-     * comes from the plug-in registry entry for the extension defining this part.
-     *
-     * @return the configuration element for this part
-     */
+	/**
+	 * Returns the configuration element for this part. The configuration
+	 * element comes from the plug-in registry entry for the extension defining
+	 * this part.
+	 *
+	 * @return the configuration element for this part
+	 */
     protected IConfigurationElement getConfigurationElement() {
         return configElement;
     }
