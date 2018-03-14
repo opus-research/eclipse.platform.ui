@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457097
  *******************************************************************************/
 package org.eclipse.ui.help;
 
@@ -71,7 +70,6 @@ public class WorkbenchHelp {
      * 
      * @since 3.0
      */
-	@Deprecated
     public static void displayHelp() {
     	PlatformUI.getWorkbench().getHelpSystem().displayHelp();
     }
@@ -94,7 +92,6 @@ public class WorkbenchHelp {
      * @param y verifical position
      * @since 3.0
      */
-	@Deprecated
     public static void displayContext(IContext context, int x, int y) {
     	PlatformUI.getWorkbench().getHelpSystem().displayContext(context, x, y);
     }
@@ -118,7 +115,6 @@ public class WorkbenchHelp {
      * </p>
      * @since 3.0
      */
-	@Deprecated
     public static void displayHelpResource(String href) {
     	PlatformUI.getWorkbench().getHelpSystem().displayHelpResource(href);
     }
@@ -133,7 +129,6 @@ public class WorkbenchHelp {
      *            not be <code>null</code>.
      * @return A help listener; never <code>null</code>.
      */
-	@Deprecated
     public static HelpListener createHelpListener(ICommand command) {
     	return WorkbenchHelpSystem.getInstance().createHelpListener(command);
     }
@@ -160,7 +155,6 @@ public class WorkbenchHelp {
      * @param context the context to display
      * @since 2.0
      */
-	@Deprecated
     public static void displayHelp(IContext context) {
     	PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
     }
@@ -244,7 +238,6 @@ public class WorkbenchHelp {
      * @return <code>true</code> if the context-sensitive help
      * window is currently being displayed, <code>false</code> otherwise
      */
-	@Deprecated
     public static boolean isContextHelpDisplayed() {
     	return PlatformUI.getWorkbench().getHelpSystem().isContextHelpDisplayed();
     }
@@ -408,7 +401,6 @@ public class WorkbenchHelp {
      * @param contextId the context id to use when F1 help is invoked
      * @since 2.0
      */
-	@Deprecated
     public static void setHelp(IAction action, final String contextId) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(action, contextId);
     }
@@ -420,7 +412,6 @@ public class WorkbenchHelp {
      * @param contextId the context id to use when F1 help is invoked
      * @since 2.0
      */
-	@Deprecated
     public static void setHelp(Control control, String contextId) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(control, contextId);    	
     }
@@ -432,7 +423,6 @@ public class WorkbenchHelp {
      * @param contextId the context id to use when F1 help is invoked
      * @since 2.0
      */
-	@Deprecated
     public static void setHelp(Menu menu, String contextId) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(menu, contextId);
     }
@@ -444,7 +434,6 @@ public class WorkbenchHelp {
      * @param contextId the context id to use when F1 help is invoked
      * @since 2.0
      */
-	@Deprecated
     public static void setHelp(MenuItem item, String contextId) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(item, contextId);
     }
