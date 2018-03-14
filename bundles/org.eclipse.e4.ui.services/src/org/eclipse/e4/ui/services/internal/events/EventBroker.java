@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Steven Spungin - Bug 441874
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 478889
  *******************************************************************************/
 package org.eclipse.e4.ui.services.internal.events;
 
@@ -104,9 +105,23 @@ public class EventBroker implements IEventBroker {
 	private Event constructEvent(String topic, Object data) {
 		Event event;
 		if (data instanceof Dictionary<?,?>) {
-			event = new Event(topic, (Dictionary<String,?>)data);
+			Dictionary<String, Object> d = (Dictionary<String, Object>) data;
+			if (d.get(EventConstants.EVENT_TOPIC) == null) {
+				d.put(EventConstants.EVENT_TOPIC, topic);
+			}
+			if (d.get(IEventBroker.DATA) == null) {
+				d.put(IEventBroker.DATA, data);
+			}
+			event = new Event(topic, d);
 		} else if (data instanceof Map<?,?>) {
-			event = new Event(topic, (Map<String,?>)data);
+			Map<String, Object> map = (Map<String, Object>)data;
+			if (!map.containsKey(EventConstants.EVENT_TOPIC)) {
+				map.put(EventConstants.EVENT_TOPIC, topic);
+			}
+			if (!map.containsKey(IEventBroker.DATA)) {
+				map.put(IEventBroker.DATA, data);
+			}
+			event = new Event(topic, map);
 		} else {
 			Dictionary<String, Object> d = new Hashtable<String, Object>(2);
 			d.put(EventConstants.EVENT_TOPIC, topic);
