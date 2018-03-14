@@ -54,6 +54,37 @@ import org.osgi.service.packageadmin.RequiredBundle;
  *
  */
 public class ModelAssembler {
+
+	/**
+	 * 
+	 */
+	private static final String E4ONLY = "e4only"; //$NON-NLS-1$
+	private static final String E4STEP = "e4step"; //$NON-NLS-1$
+	private static final String LEGACYSTEP = "legacystep"; //$NON-NLS-1$
+	private static final String LEGACYONLY = "legacyonly"; //$NON-NLS-1$
+
+	/**
+	 * 
+	 */
+	private static final String COMPATIBILITY = "compatibility"; //$NON-NLS-1$
+
+	/**
+	 * The application is running without the compatibility layer.
+	 */
+	public static final int PURE_E4 = 0;
+
+	/**
+	 * The application is running with the compat layer and fragments and processors that DO NOT
+	 * need to be compatible with the legacy workbench are processed now.
+	 */
+	public static final int LEGACY_E4STEP = 1;
+
+	/**
+	 * The application is running with the compat layer and fragments and processors that need to be
+	 * compatible with the legacy workbench are processed now.
+	 */
+	public static final int LEGACY_E3STEP = 2;
+
 	@Inject
 	private Logger logger;
 
@@ -66,9 +97,16 @@ public class ModelAssembler {
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
 	/**
-	 * Process the model
+	 * Process the model based on the step field which can be {@link #PURE_E4},
+	 * {@link #LEGACY_E4STEP} or {@link #LEGACY_E3STEP}.
+	 * 
+	 * @param step
+	 * @see #PURE_E4
+	 * @see #LEGACY_E4STEP
+	 * @see #LEGACY_E3STEP
 	 */
-	public void processModel() {
+	public void processModel(int step) {
+
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = topoSort(extPoint.getExtensions());
@@ -85,6 +123,9 @@ public class ModelAssembler {
 				if (!"processor".equals(ce.getName()) || !Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
+				if (!compatModeCheck(step, ce)) {
+					continue;
+				}
 				runProcessor(ce);
 			}
 		}
@@ -93,6 +134,9 @@ public class ModelAssembler {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if (!"fragment".equals(ce.getName())) { //$NON-NLS-1$
+					continue;
+				}
+				if (!compatModeCheck(step, ce)) {
 					continue;
 				}
 				IContributor contributor = ce.getContributor();
@@ -195,12 +239,82 @@ public class ModelAssembler {
 				if (!"processor".equals(ce.getName()) || Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					continue;
 				}
+				if (!compatModeCheck(step, ce)) {
+					continue;
+				}
 
 				runProcessor(ce);
 			}
 		}
 
 		resolveImports(imports, addedElements);
+	}
+
+	/**
+	 * Check if this configuration element must be run now based on the <code>step</code> parameter
+	 * which can be any of {@link #PURE_E4}, {@link #LEGACY_E4STEP} or {@link #LEGACY_E3STEP}.
+	 * 
+	 * @param step
+	 * @param ce
+	 * @return true if the element must be processed now.
+	 */
+	private boolean compatModeCheck(int step, IConfigurationElement ce) {
+
+		// Running in pure E4 mode ignore elements only meant to run on the compat layer.
+		if (step == PURE_E4) {
+			if (E4ONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			if (E4STEP.equals(ce.getAttribute(COMPATIBILITY))
+					|| ce.getAttribute(COMPATIBILITY) == null) {
+				return true;
+			}
+			if (LEGACYSTEP.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			if (LEGACYONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			return false;
+		}
+
+		// If this is the E4 step in the legacy workbench
+		if (step == LEGACY_E4STEP) {
+			if (E4ONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			if (E4STEP.equals(ce.getAttribute(COMPATIBILITY))
+					|| ce.getAttribute(COMPATIBILITY) == null) {
+				return true;
+			}
+			if (LEGACYSTEP.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			if (LEGACYONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			return false;
+		}
+
+		// If this is the E3 step in the legacy workbench
+		if (step == LEGACY_E3STEP) {
+			if (E4ONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return false;
+			}
+			if (E4STEP.equals(ce.getAttribute(COMPATIBILITY))
+					|| ce.getAttribute(COMPATIBILITY) == null) {
+				return false;
+			}
+			if (LEGACYSTEP.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			if (LEGACYONLY.equals(ce.getAttribute(COMPATIBILITY))) {
+				return true;
+			}
+			return false;
+		}
+
+		return false;
 	}
 
 	private void runProcessor(IConfigurationElement ce) {
