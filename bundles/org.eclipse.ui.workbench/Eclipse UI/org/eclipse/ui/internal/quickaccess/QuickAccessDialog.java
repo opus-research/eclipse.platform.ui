@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     René Brandstetter - Bug 433778
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 436101
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -328,7 +327,7 @@ public class QuickAccessDialog extends PopupDialog {
 
 	@Override
 	protected Point getDefaultSize() {
-		return new Point(600, 420);
+		return new Point(350, 420);
 	}
 
 	@Override
