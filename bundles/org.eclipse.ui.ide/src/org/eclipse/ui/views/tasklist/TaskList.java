@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -45,12 +46,14 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.IBasicPropertyConstants;
 import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
@@ -70,6 +73,8 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.HelpEvent;
+import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -337,7 +342,12 @@ public class TaskList extends ViewPart {
         }
     };
 
-    private ISelectionChangedListener focusSelectionChangedListener = event -> TaskList.this.focusSelectionChanged(event);
+    private ISelectionChangedListener focusSelectionChangedListener = new ISelectionChangedListener() {
+        @Override
+		public void selectionChanged(SelectionChangedEvent event) {
+            TaskList.this.focusSelectionChanged(event);
+        }
+    };
 
     private IResource[] focusResources;
 
@@ -600,8 +610,18 @@ public class TaskList extends ViewPart {
         //update the menu to indicate how task are currently sorted
         updateSortingState();
         viewer.setInput(getWorkspace().getRoot());
-        viewer.addSelectionChangedListener(event -> TaskList.this.selectionChanged(event));
-        viewer.addOpenListener(event -> gotoTaskAction.run());
+        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
+                TaskList.this.selectionChanged(event);
+            }
+        });
+        viewer.addOpenListener(new IOpenListener() {
+            @Override
+			public void open(OpenEvent event) {
+                gotoTaskAction.run();
+            }
+        });
         viewer.getControl().addKeyListener(new KeyAdapter() {
             @Override
 			public void keyPressed(KeyEvent e) {
@@ -661,7 +681,12 @@ public class TaskList extends ViewPart {
         // Configure the context menu to be lazily populated on each pop-up.
         MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(manager -> TaskList.this.fillContextMenu(manager));
+        menuMgr.addMenuListener(new IMenuListener() {
+            @Override
+			public void menuAboutToShow(IMenuManager manager) {
+                TaskList.this.fillContextMenu(manager);
+            }
+        });
         Menu menu = menuMgr.createContextMenu(table);
         table.setMenu(menu);
         // Be sure to register it so that other plug-ins can add actions.
@@ -690,22 +715,28 @@ public class TaskList extends ViewPart {
         memento = null;
 
         // Set help on the view itself
-        viewer.getControl().addHelpListener(e -> {
-		    String contextId = null;
-		    // See if there is a context registered for the current selection
-		    IMarker marker = (IMarker) ((IStructuredSelection) getSelection())
-		            .getFirstElement();
-		    if (marker != null) {
-		        contextId = IDE.getMarkerHelpRegistry().getHelp(marker);
-		    }
+        viewer.getControl().addHelpListener(new HelpListener() {
+            /*
+             * @see HelpListener#helpRequested(HelpEvent)
+             */
+            @Override
+			public void helpRequested(HelpEvent e) {
+                String contextId = null;
+                // See if there is a context registered for the current selection
+                IMarker marker = (IMarker) ((IStructuredSelection) getSelection())
+                        .getFirstElement();
+                if (marker != null) {
+                    contextId = IDE.getMarkerHelpRegistry().getHelp(marker);
+                }
 
-		    if (contextId == null) {
-				contextId = ITaskListHelpContextIds.TASK_LIST_VIEW;
-			}
+                if (contextId == null) {
+					contextId = ITaskListHelpContextIds.TASK_LIST_VIEW;
+				}
 
-		    getSite().getWorkbenchWindow().getWorkbench().getHelpSystem()
-					.displayHelp(contextId);
-		});
+                getSite().getWorkbenchWindow().getWorkbench().getHelpSystem()
+						.displayHelp(contextId);
+            }
+        });
 
         // Prime the status line and title.
         updateStatusMessage();
@@ -818,17 +849,20 @@ public class TaskList extends ViewPart {
     void filterChanged() {
 
         BusyIndicator.showWhile(viewer.getControl().getShell().getDisplay(),
-                () -> {
-				    // Filter has already been updated by dialog; just refresh.
-				    // Don't need to update labels for existing elements
-				    // since changes to filter settings don't affect them.
-				    viewer.getControl().setRedraw(false);
-				    viewer.refresh(false);
-				    viewer.getControl().setRedraw(true);
-				    // update after refresh since the content provider caches summary info
-				    updateStatusMessage();
-				    updateTitle();
-				});
+                new Runnable() {
+                    @Override
+					public void run() {
+                        // Filter has already been updated by dialog; just refresh.
+                        // Don't need to update labels for existing elements
+                        // since changes to filter settings don't affect them.
+                        viewer.getControl().setRedraw(false);
+                        viewer.refresh(false);
+                        viewer.getControl().setRedraw(true);
+                        // update after refresh since the content provider caches summary info
+                        updateStatusMessage();
+                        updateTitle();
+                    }
+                });
 
     }
 
@@ -839,10 +873,21 @@ public class TaskList extends ViewPart {
     @Override
 	public <T> T getAdapter(Class<T> adapterType) {
 		if (adapterType == IShowInSource.class) {
-			return adapterType.cast((IShowInSource) () -> new ShowInContext(null, getSelection()));
+			return adapterType.cast(new IShowInSource() {
+                @Override
+				public ShowInContext getShowInContext() {
+                    return new ShowInContext(null, getSelection());
+                }
+			});
         }
 		if (adapterType == IShowInTargetList.class) {
-			return adapterType.cast((IShowInTargetList) () -> new String[] { IPageLayout.ID_RES_NAV });
+			return adapterType.cast(new IShowInTargetList() {
+                @Override
+				public String[] getShowInTargetIds() {
+                    return new String[] { IPageLayout.ID_RES_NAV };
+                }
+
+			});
         }
 		return super.getAdapter(adapterType);
     }

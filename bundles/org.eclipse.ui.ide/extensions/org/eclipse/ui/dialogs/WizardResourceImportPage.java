@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
 import org.eclipse.jface.util.BidiUtils;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -230,7 +231,12 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
                 getFileProvider(), new WorkbenchLabelProvider(), SWT.NONE,
                 DialogUtil.inRegularFontMode(parent));
 
-        ICheckStateListener listener = event -> updateWidgetEnablements();
+        ICheckStateListener listener = new ICheckStateListener() {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+                updateWidgetEnablements();
+            }
+        };
 
         WorkbenchViewerComparator comparator = new WorkbenchViewerComparator();
         this.selectionGroup.setTreeComparator(comparator);
@@ -483,7 +489,12 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      */
     protected void updateSelections(final Map map) {
 
-        Runnable runnable = () -> selectionGroup.updateSelections(map);
+        Runnable runnable = new Runnable() {
+            @Override
+			public void run() {
+                selectionGroup.updateSelections(map);
+            }
+        };
 
         BusyIndicator.showWhile(getShell().getDisplay(), runnable);
     }
