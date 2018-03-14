@@ -13,7 +13,6 @@ package org.eclipse.ui.tests.themes;
 
 import java.util.Arrays;
 
-import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
@@ -85,9 +84,6 @@ public class WorkbenchThemeChangedHandlerTest extends TestCase {
 		verify(fontRegistry, never()).put(eq("fontDefinition2"), any(FontData[].class));
 		verify(colorRegistry, times(2)).put(eq("colorDefinition"), any(RGB.class));
 		verify(colorRegistry, times(1)).put(eq("colorDefinition"), eq(EMPTY_COLOR_VALUE));
-		
-		verify(handler, times(1)).repopulateThemeRegistries(eq(themeRegistry), eq(fontRegistry), 
-			eq(colorRegistry), any(ITheme.class), any(org.eclipse.ui.themes.ITheme.class));
 		
 		verify(handler, times(1)).sendThemeRegistryRestyledEvent();
 	}
@@ -194,9 +190,6 @@ public class WorkbenchThemeChangedHandlerTest extends TestCase {
 		verify(colorRegistry, times(2)).put(eq("colorDefinition2"), any(RGB.class));
 		verify(colorRegistry, times(1)).put(eq("colorDefinition2"), eq(EMPTY_COLOR_VALUE));
 		
-		verify(handler, times(1)).repopulateThemeRegistries(eq(themeRegistry), eq(fontRegistry), 
-			eq(colorRegistry), any(ITheme.class), any(org.eclipse.ui.themes.ITheme.class));
-		
 		verify(handler, times(1)).sendThemeRegistryRestyledEvent();
 	}
 	
@@ -228,22 +221,6 @@ public class WorkbenchThemeChangedHandlerTest extends TestCase {
 		
 		@Override
 		public void sendThemeRegistryRestyledEvent() {
-		}
-		
-		@Override
-		public ITheme getTheme(Event event) {
-			return null;
-		}
-		
-		@Override
-		public org.eclipse.ui.themes.ITheme getColorsAndFontsTheme() {
-			return null;
-		}
-		
-		@Override
-		public void repopulateThemeRegistries(ThemeRegistry themeRegistry,
-				FontRegistry fontRegistry, ColorRegistry colorRegistry,
-				ITheme theme, org.eclipse.ui.themes.ITheme colorsAndFontsTheme) {			
 		}
 	}
 }
