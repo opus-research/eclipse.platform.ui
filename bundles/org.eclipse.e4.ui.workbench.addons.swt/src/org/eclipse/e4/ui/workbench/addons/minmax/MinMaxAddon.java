@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 331690
+ *     Dirk Fauth (dirk.fauth@googlemail.com) - Bug 459285
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.minmax;
@@ -245,21 +246,24 @@ public class MinMaxAddon {
 				MUIElement removed = (MUIElement) removedElement;
 				String perspectiveId = removed.getElementId();
 				MWindow window = modelService.getTopLevelWindowFor(changedElement);
-				MTrimBar bar = modelService.getTrim((MTrimmedWindow) window, SideValue.TOP);
 
-				// gather up any minimized stacks for this perspective...
-				List<MToolControl> toRemove = new ArrayList<MToolControl>();
-				for (MUIElement child : bar.getChildren()) {
-					String trimElementId = child.getElementId();
-					if (child instanceof MToolControl && trimElementId.contains(perspectiveId)) {
-						toRemove.add((MToolControl) child);
+				if (window instanceof MTrimmedWindow) {
+					MTrimBar bar = modelService.getTrim((MTrimmedWindow) window, SideValue.TOP);
+
+					// gather up any minimized stacks for this perspective...
+					List<MToolControl> toRemove = new ArrayList<MToolControl>();
+					for (MUIElement child : bar.getChildren()) {
+						String trimElementId = child.getElementId();
+						if (child instanceof MToolControl && trimElementId.contains(perspectiveId)) {
+							toRemove.add((MToolControl) child);
+						}
 					}
-				}
 
-				// ...and remove them
-				for (MToolControl minStack : toRemove) {
-					minStack.setToBeRendered(false);
-					bar.getChildren().remove(minStack);
+					// ...and remove them
+					for (MToolControl minStack : toRemove) {
+						minStack.setToBeRendered(false);
+						bar.getChildren().remove(minStack);
+					}
 				}
 			}
 		}
@@ -267,7 +271,7 @@ public class MinMaxAddon {
 
 	/**
 	 * Handles changes of the perspective
-	 * 
+	 *
 	 * @param event
 	 */
 
