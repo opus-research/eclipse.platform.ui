@@ -37,8 +37,6 @@ public abstract class AbstractHandlerWithState extends AbstractHandler implement
 	 */
 	private Map<String, State> states;
 
-	private static final String[] EMPTY = new String[0];
-
 	/**
 	 * <p>
 	 * Adds a state to this handler. This will add this handler as a listener to
@@ -82,7 +80,7 @@ public abstract class AbstractHandlerWithState extends AbstractHandler implement
 	@Override
 	public final String[] getStateIds() {
 		if ((states == null) || (states.isEmpty())) {
-			return EMPTY;
+			return null;
 		}
 
 		final Set<String> stateIds = states.keySet();
@@ -109,14 +107,12 @@ public abstract class AbstractHandlerWithState extends AbstractHandler implement
 		if (stateId == null) {
 			throw new NullPointerException("Cannot remove a null state"); //$NON-NLS-1$
 		}
-		if (states == null) {
-			return;
-		}
+
 		final State state = states.get(stateId);
 		if (state != null) {
 			state.removeListener(this);
 			if (states != null) {
-				states.remove(stateId);
+				states.remove(state);
 				if (states.isEmpty()) {
 					states = null;
 				}
