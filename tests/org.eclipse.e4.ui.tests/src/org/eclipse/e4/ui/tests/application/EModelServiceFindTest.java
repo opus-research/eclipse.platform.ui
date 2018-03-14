@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 433228
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
@@ -14,10 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.commands.MBindingTable;
+import org.eclipse.e4.ui.model.application.commands.MCommandsFactory;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
+import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
@@ -25,7 +30,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -46,9 +50,12 @@ public class EModelServiceFindTest extends TestCase {
 
 	MApplication app = null;
 
+	private EModelService modelService;
+
 	@Override
 	protected void setUp() throws Exception {
 		applicationContext = E4Application.createDefaultContext();
+		modelService = new ModelServiceImpl(applicationContext);
 		super.setUp();
 	}
 
@@ -360,7 +367,7 @@ public class EModelServiceFindTest extends TestCase {
 		handler1.setElementId("handler1");
 		application.getHandlers().add(handler1);
 
-		MHandler handler2 = CommandsFactoryImpl.eINSTANCE.createHandler();
+		MHandler handler2 = MCommandsFactory.INSTANCE.createHandler();
 		handler2.setElementId("handler2");
 		application.getHandlers().add(handler2);
 
@@ -383,38 +390,64 @@ public class EModelServiceFindTest extends TestCase {
 		assertNull(foundHandler);
 	}
 
+	public void testFindMKeyBindings() {
+		MApplication application = createApplication();
+		EModelService modelService = (EModelService) application.getContext()
+				.get(EModelService.class.getName());
+		assertNotNull(modelService);
+
+		MBindingTable bindingTable = MCommandsFactory.INSTANCE
+				.createBindingTable();
+		MKeyBinding keyBinding = MCommandsFactory.INSTANCE.createKeyBinding();
+		bindingTable.getBindings().add(keyBinding);
+
+		application.getBindingTables().add(bindingTable);
+
+		List<MKeyBinding> elements = modelService.findElements(application,
+				MKeyBinding.class, EModelService.ANYWHERE, new Selector() {
+					@Override
+					public boolean select(MApplicationElement element) {
+						return (element instanceof MKeyBinding);
+					}
+				});
+
+		assertEquals(1, elements.size());
+		assertEquals(keyBinding, elements.get(0));
+	}
+
 	public void testBug314685() {
 		MApplication application = createApplication();
 		application.setContext(applicationContext);
 
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = modelService.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
-				.createPerspectiveStack();
+		MPerspectiveStack perspectiveStack = modelService
+				.createModelElement(MPerspectiveStack.class);
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspectiveA = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspectiveA = modelService
+				.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspectiveA);
 
-		MPerspective perspectiveB = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspectiveB = modelService
+				.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspectiveB);
 
-		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
+		MPartStack partStack = modelService
+				.createModelElement(MPartStack.class);
 		window.getSharedElements().add(partStack);
 
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part = modelService.createModelElement(MPart.class);
 		partStack.getChildren().add(part);
 
-		MPlaceholder placeholderA = AdvancedFactoryImpl.eINSTANCE
-				.createPlaceholder();
+		MPlaceholder placeholderA = modelService
+				.createModelElement(MPlaceholder.class);
 		placeholderA.setRef(partStack);
 		perspectiveA.getChildren().add(placeholderA);
 
-		MPlaceholder placeholderB = AdvancedFactoryImpl.eINSTANCE
-				.createPlaceholder();
+		MPlaceholder placeholderB = modelService
+				.createModelElement(MPlaceholder.class);
 		placeholderB.setRef(partStack);
 		perspectiveB.getChildren().add(placeholderB);
 

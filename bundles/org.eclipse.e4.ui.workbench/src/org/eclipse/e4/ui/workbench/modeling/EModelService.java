@@ -76,7 +76,7 @@ public interface EModelService {
 	public static final int IN_MAIN_MENU = 0x20;
 
 	/**
-	 * Returned Location if the element is in a menu or a tool bar of an MPart
+	 * Returned Location if the element is in an MPart
 	 * 
 	 * @since 1.1
 	 */
@@ -129,9 +129,9 @@ public interface EModelService {
 	/**
 	 * This is a convenience method that constructs a new Selector based on {@link ElementMatcher}
 	 * and forwards the call on to the base API
-	 * {@link EModelService#findElements(MApplicationElement, int, Selector)}.
+	 * {@link EModelService#findElements(MApplicationElement, Class, int, Selector)}.
 	 * 
-	 * @see EModelService#findElements(MApplicationElement, int, Selector)
+	 * @see EModelService#findElements(MApplicationElement, Class, int, Selector)
 	 */
 	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
 			List<String> tagsToMatch, int searchFlags);
