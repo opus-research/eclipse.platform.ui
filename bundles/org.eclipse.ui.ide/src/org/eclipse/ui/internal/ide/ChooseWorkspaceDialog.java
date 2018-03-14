@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 462707 - [WorkbenchLauncher] dialog not closed on ESC
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -38,9 +37,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
@@ -58,11 +55,6 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
     private boolean suppressAskAgain = false;
 
     private boolean centerOnMonitor = false;
-
-	private Shell parentShell;
-
-	private Listener keyListener;
-
     /**
      * Create a modal dialog on the arugment shell, using and updating the
      * argument data object.
@@ -80,28 +72,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         this.launchData = launchData;
         this.suppressAskAgain = suppressAskAgain;
         this.centerOnMonitor = centerOnMonitor;
-
-		// Bug 462707 - [WorkbenchLauncher] dialog not closed on ESC
-		this.parentShell = parentShell;
-		this.keyListener = new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				if (event.character == SWT.ESC) {
-					cancelPressed();
-				}
-			}
-		};
-		parentShell.getDisplay().addFilter(SWT.KeyDown, keyListener);
     }
-
-	/**
-	 * Remove key down filter and close
-	 */
-	@Override
-	public boolean close() {
-		parentShell.getDisplay().removeFilter(SWT.KeyDown, keyListener);
-		return super.close();
-	}
 
     /**
      * Show the dialog to the user (if needed). When this method finishes,
@@ -119,7 +90,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         if (force || launchData.getShowDialog()) {
             open();
 
-			// dialog is dismissed on ESC too
+            // 70576: make sure dialog gets dismissed on ESC too
             if (getReturnCode() == CANCEL) {
 				launchData.workspaceSelected(null);
 			}
