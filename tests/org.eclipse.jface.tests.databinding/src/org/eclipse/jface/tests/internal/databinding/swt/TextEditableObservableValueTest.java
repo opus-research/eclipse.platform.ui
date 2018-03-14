@@ -43,12 +43,6 @@ public class TextEditableObservableValueTest extends ObservableDelegateTest {
 		super(testName, new Delegate());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.conformance.databinding.ObservableDelegateTest#setUp()
-	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 

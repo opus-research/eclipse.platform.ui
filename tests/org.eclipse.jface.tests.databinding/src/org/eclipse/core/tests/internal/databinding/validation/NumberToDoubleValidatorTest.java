@@ -25,24 +25,15 @@ import com.ibm.icu.text.NumberFormat;
 public class NumberToDoubleValidatorTest extends
 		NumberToNumberValidatorTestHarness {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetOutOfRangeNumber()
-	 */
 	protected Number doGetOutOfRangeNumber() {
 		return new BigDecimal(Double.MAX_VALUE).add(new BigDecimal(Double.MAX_VALUE));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
-	 */
 	protected NumberToNumberValidator doGetToBoxedTypeValidator(Class fromType) {
 		NumberToDoubleConverter converter = new NumberToDoubleConverter(NumberFormat.getInstance(), fromType, false);
 		return new NumberToDoubleValidator(converter);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToPrimitiveValidator(java.lang.Class)
-	 */
 	protected NumberToNumberValidator doGetToPrimitiveValidator(Class fromType) {
 		NumberToDoubleConverter converter = new NumberToDoubleConverter(NumberFormat.getInstance(), fromType, true);
 		return new NumberToDoubleValidator(converter);
