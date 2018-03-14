@@ -142,9 +142,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	@Inject
 	private EModelService modelService;
 
-	@Inject
-	private Display display;
-
 	/**
 	 * Closes the provided detached window.
 	 *
@@ -364,16 +361,12 @@ public class WBWRenderer extends SWTPartRenderer {
 		if (parentShell == null) {
 			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
 					: styleOverride;
-			wbwShell = new Shell(display, style);
+			wbwShell = new Shell(Display.getCurrent(), style);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
 		} else {
 			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
 			style = styleOverride == -1 ? style : styleOverride;
-			if (wbwModel.getTags().contains(
-					IPresentationEngine.WINDOW_TOP_LEVEL))
-				wbwShell = new Shell(display, style);
-			else
-				wbwShell = new Shell(parentShell, style);
+			wbwShell = new Shell(parentShell, style);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
