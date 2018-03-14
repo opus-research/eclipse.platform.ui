@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 The Pampered Chef, Inc. and others.
+ * Copyright (c) 2006, 2014 The Pampered Chef, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     The Pampered Chef, Inc. - initial API and implementation
  *     Brad Reynolds - bug 116920
  *     Matthew Hall - bug 260329
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -20,7 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
@@ -28,6 +29,7 @@ import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.masterdetail.MasterDetailObservables;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -40,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Shows how to bind a Combo so that when update its items, the selection is
  * retained if at all possible.
- * 
+ *
  * @since 3.2
  */
 public class Snippet002UpdateComboRetainSelection {
@@ -51,14 +53,14 @@ public class Snippet002UpdateComboRetainSelection {
 			public void run() {
     			ViewModel viewModel = new ViewModel();
     			Shell shell = new View(viewModel).createShell();
-    			
+
     			// The SWT event loop
     			while (!shell.isDisposed()) {
     				if (!display.readAndDispatch()) {
     					display.sleep();
     				}
     			}
-    			
+
     			// Print the results
     			System.out.println(viewModel.getText());
     		}
@@ -162,13 +164,15 @@ public class Snippet002UpdateComboRetainSelection {
             System.out.println(viewModel.getText());
 
             DataBindingContext dbc = new DataBindingContext();
-            
-            IObservableList list = MasterDetailObservables.detailList(BeansObservables.observeValue(viewModel, "choices"),
+
+            IObservableList list = MasterDetailObservables.detailList(BeanProperties.value(viewModel.getClass(), "choices").observe(
+            		viewModel),
                     getListDetailFactory(),
                     String.class);
-            dbc.bindList(SWTObservables.observeItems(combo), list); 
-            dbc.bindValue(SWTObservables.observeText(combo), BeansObservables.observeValue(viewModel, "text"));
-            
+			dbc.bindList(WidgetProperties.items().observe(combo), list);
+			dbc.bindValue(WidgetProperties.text().observe(combo), BeanProperties.value(viewModel.getClass(), "text")
+					.observe(viewModel));
+
             // Open and return the Shell
             shell.pack();
             shell.open();

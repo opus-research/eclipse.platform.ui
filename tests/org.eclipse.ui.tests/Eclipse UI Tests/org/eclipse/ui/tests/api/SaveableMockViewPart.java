@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -45,13 +46,15 @@ public class SaveableMockViewPart extends MockViewPart implements
 
 	private boolean adapt;
 
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
         final Button dirtyToggle = new Button(parent, SWT.CHECK);
         dirtyToggle.setText("Dirty");
         dirtyToggle.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 setDirty(dirtyToggle.getSelection());
             }
         });
@@ -60,7 +63,8 @@ public class SaveableMockViewPart extends MockViewPart implements
         final Button adaptToggle = new Button(parent, SWT.CHECK);
         adaptToggle.setText("Adapt to resource");
         adaptToggle.addSelectionListener(new SelectionAdapter() {
-        	public void widgetSelected(SelectionEvent e) {
+        	@Override
+			public void widgetSelected(SelectionEvent e) {
         		setAdapt(adaptToggle.getSelection());
         	}
         });
@@ -68,7 +72,8 @@ public class SaveableMockViewPart extends MockViewPart implements
         final Button saveNeededToggle = new Button(parent, SWT.CHECK);
         saveNeededToggle.setText("Save on close");
         saveNeededToggle.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 setSaveNeeded(saveNeededToggle.getSelection());
             }
         });
@@ -77,7 +82,8 @@ public class SaveableMockViewPart extends MockViewPart implements
         final Button saveAsToggle = new Button(parent, SWT.CHECK);
         saveAsToggle.setText("Save as allowed");
         saveAsToggle.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 setSaveAsAllowed(saveAsToggle.getSelection());
             }
         });
@@ -94,6 +100,7 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
+	@Override
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave" );
 	}
@@ -101,6 +108,7 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
+	@Override
 	public void doSaveAs() {
 		callTrace.add("doSaveAs" );
 	}
@@ -108,6 +116,7 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
+	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty" );
 		return isDirty;
@@ -116,6 +125,7 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
+	@Override
 	public boolean isSaveAsAllowed() {
 		callTrace.add("isSaveAsAllowed" );
 		return saveAsAllowed ;
@@ -124,6 +134,7 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 */
+	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded" );
 		return saveNeeded;
@@ -145,6 +156,7 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablesSource#getActiveSaveables()
 	 */
+	@Override
 	public Saveable[] getActiveSaveables() {
 		// TODO Auto-generated method stub
 		return getSaveables();
@@ -153,15 +165,18 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablesSource#getSaveables()
 	 */
+	@Override
 	public Saveable[] getSaveables() {
 		Saveable[] result = new Saveable[1];
 		result[0] = new DefaultSaveable(this){
+			@Override
 			public Object getAdapter(Class c) {
 				final IFile[] someFile = {null};
 				try {
 					ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
 						
-						public boolean visit(IResource resource) throws CoreException {
+						@Override
+						public boolean visit(IResource resource) {
 							if (someFile[0] != null) {
 								return false;
 							}
