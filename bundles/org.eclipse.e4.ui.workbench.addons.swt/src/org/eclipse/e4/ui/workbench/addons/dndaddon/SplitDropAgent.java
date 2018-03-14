@@ -60,35 +60,30 @@ public class SplitDropAgent extends DropAgent {
 
 	@Override
 	public boolean canDrop(MUIElement dragElement, DnDInfo info) {
-		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack)) {
+		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack))
 			return false;
-		}
 
 		dropStack = null;
 
 		// Hack! allow splitting the 'empty' editor area stack
 		if (info.curElement instanceof MPartStack) {
 			MPartStack stack = (MPartStack) info.curElement;
-			if (dndManager.getModelService().isLastEditorStack(stack)) {
+			if (dndManager.getModelService().isLastEditorStack(stack))
 				dropStack = stack;
-			}
 		}
 
 		if (dropStack == null) {
 			if (!(info.curElement instanceof MStackElement)
-					&& !dndManager.getModelService().isLastEditorStack(info.curElement)) {
+					&& !dndManager.getModelService().isLastEditorStack(info.curElement))
 				return false;
-			}
 
 			// Detect placeholders
 			MUIElement parent = info.curElement.getParent();
-			if (info.curElement instanceof MPart && info.curElement.getCurSharedRef() != null) {
+			if (info.curElement instanceof MPart && info.curElement.getCurSharedRef() != null)
 				parent = info.curElement.getCurSharedRef().getParent();
-			}
 
-			if (!(parent instanceof MPartStack) || !(parent.getWidget() instanceof CTabFolder)) {
+			if (!(parent instanceof MPartStack) || !(parent.getWidget() instanceof CTabFolder))
 				return false;
-			}
 
 			dropStack = (MPartStack) parent;
 		}
@@ -98,17 +93,15 @@ public class SplitDropAgent extends DropAgent {
 			EModelService ms = dndManager.getModelService();
 			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
 			MWindow dropWin = ms.getTopLevelWindowFor(dropStack);
-			if (dragElementWin != dropWin) {
+			if (dragElementWin != dropWin)
 				return false;
-			}
 		}
 
 		// We can't split ourselves with if the element being dragged is the only element in the
 		// stack (we check for '2' because the dragAgent puts a Drag Placeholder in the stack)
 		MUIElement dragParent = dragElement.getParent();
-		if (dragParent == dropStack && dropStack.getChildren().size() == 2) {
+		if (dragParent == dropStack && dropStack.getChildren().size() == 2)
 			return false;
-		}
 
 		dropCTF = (CTabFolder) dropStack.getWidget();
 
@@ -133,9 +126,8 @@ public class SplitDropAgent extends DropAgent {
 		// Find the root of the dropStack's sash structure
 		outerRelTo = dropStack.getParent();
 		if (outerRelTo instanceof MPartSashContainer) {
-			while (outerRelTo != null && !(outerRelTo.getWidget() instanceof Composite)) {
+			while (outerRelTo != null && !(outerRelTo.getWidget() instanceof Composite))
 				outerRelTo = outerRelTo.getParent();
-			}
 		}
 
 		// If the stack is in an MArea or a Perspective then allow 'outer' docking
@@ -175,9 +167,8 @@ public class SplitDropAgent extends DropAgent {
 	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
-		if (dndManager.getFeedbackStyle() != DnDManager.SIMPLE) {
+		if (dndManager.getFeedbackStyle() != DnDManager.SIMPLE)
 			unDock(dragElement);
-		}
 		dndManager.clearOverlay();
 		clearFeedback();
 		curDockLocation = NOWHERE;
@@ -204,9 +195,8 @@ public class SplitDropAgent extends DropAgent {
 	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
-		if (!clientBounds.contains(info.cursorPos)) {
+		if (!clientBounds.contains(info.cursorPos))
 			return false;
-		}
 
 		boolean wasOnEdge = onEdge;
 		int dockLocation = getDockLocation(info);
@@ -215,13 +205,11 @@ public class SplitDropAgent extends DropAgent {
 			feedback.setFeedback(getEnclosed(), getModified());
 		}
 
-		if (dockLocation == curDockLocation && wasOnEdge == onEdge) {
+		if (dockLocation == curDockLocation && wasOnEdge == onEdge)
 			return true;
-		}
 
-		if (dropStack == dragElement && !onEdge) {
+		if (dropStack == dragElement && !onEdge)
 			return false;
-		}
 
 		curDockLocation = dockLocation;
 
@@ -244,9 +232,8 @@ public class SplitDropAgent extends DropAgent {
 	 * @return Whether this is a 'modified' drop.
 	 */
 	private boolean getModified() {
-		if (!onEdge) {
+		if (!onEdge)
 			return false;
-		}
 		return dndManager.isModified;
 	}
 
@@ -256,9 +243,8 @@ public class SplitDropAgent extends DropAgent {
 	 */
 	private boolean getEnclosed() {
 		if (onEdge) {
-			if (outerRelTo instanceof MPerspectiveStack) {
+			if (outerRelTo instanceof MPerspectiveStack)
 				return !getModified();
-			}
 			return getModified(); // 'Inner' drop
 		}
 
@@ -270,9 +256,8 @@ public class SplitDropAgent extends DropAgent {
 	 * @return
 	 */
 	private void showFeedback(int location) {
-		if (location == NOWHERE) {
+		if (location == NOWHERE)
 			return;
-		}
 
 		Rectangle feedbackBounds = null;
 
@@ -287,9 +272,8 @@ public class SplitDropAgent extends DropAgent {
 			feedbackBounds = bounds;
 		}
 
-		if (feedback != null) {
+		if (feedback != null)
 			feedback.dispose();
-		}
 		int side = 0;
 		if (location == EModelService.ABOVE) {
 			side = SWT.TOP;
@@ -311,9 +295,8 @@ public class SplitDropAgent extends DropAgent {
 	}
 
 	private void clearFeedback() {
-		if (feedback == null) {
+		if (feedback == null)
 			return;
-		}
 
 		feedback.dispose();
 		feedback = null;
@@ -347,9 +330,8 @@ public class SplitDropAgent extends DropAgent {
 		int minDx = Math.min(dx, dxr);
 		int minDy = Math.min(dy, dyr);
 
-		if (minDx < minDy) {
+		if (minDx < minDy)
 			return dx < dxr ? EModelService.LEFT_OF : EModelService.RIGHT_OF;
-		}
 
 		return dy < dyr ? EModelService.ABOVE : EModelService.BELOW;
 	}

@@ -49,39 +49,33 @@ public class StackDropAgent extends DropAgent {
 	@Override
 	public boolean canDrop(MUIElement dragElement, DnDInfo info) {
 		// We only except stack elements and whole stacks
-		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack)) {
+		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack))
 			return false;
-		}
 
 		// We have to be over a stack ourselves
-		if (!(info.curElement instanceof MPartStack)) {
+		if (!(info.curElement instanceof MPartStack))
 			return false;
-		}
 
 		MPartStack stack = (MPartStack) info.curElement;
 
-		if (stack.getTags().contains(IPresentationEngine.STANDALONE)) {
+		if (stack.getTags().contains(IPresentationEngine.STANDALONE))
 			return false;
-		}
 
 		// We only work for CTabFolders
-		if (!(stack.getWidget() instanceof CTabFolder)) {
+		if (!(stack.getWidget() instanceof CTabFolder))
 			return false;
-		}
 
 		// We can't drop stacks onto itself
-		if (stack == dragElement) {
+		if (stack == dragElement)
 			return false;
-		}
 
 		// You can only drag MParts from window to window 68
 		if (!(dragElement instanceof MPart)) {
 			EModelService ms = dndManager.getModelService();
 			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
 			MWindow dropWin = ms.getTopLevelWindowFor(stack);
-			if (dragElementWin != dropWin) {
+			if (dragElementWin != dropWin)
 				return false;
-			}
 		}
 
 		// only allow dropping into the the area
@@ -140,14 +134,12 @@ public class StackDropAgent extends DropAgent {
 	}
 
 	private int getDropIndex(DnDInfo info) {
-		if (itemRects == null) {
+		if (itemRects == null)
 			return -1;
-		}
 
 		for (Rectangle itemRect : itemRects) {
-			if (itemRect.contains(info.cursorPos)) {
+			if (itemRect.contains(info.cursorPos))
 				return itemRects.indexOf(itemRect);
-			}
 		}
 		return -1;
 	}
@@ -162,9 +154,8 @@ public class StackDropAgent extends DropAgent {
 		dndManager.clearOverlay();
 
 		if (dndManager.getFeedbackStyle() == DnDManager.HOSTED) {
-			if (dragElement.getParent() != null) {
+			if (dragElement.getParent() != null)
 				dndManager.hostElement(dragElement, 16, 10);
-			}
 		} else {
 			dndManager.setHostBounds(null);
 		}
@@ -182,21 +173,18 @@ public class StackDropAgent extends DropAgent {
 	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
-		if (!tabArea.contains(info.cursorPos) || dropStack == null || !dropStack.isToBeRendered()) {
+		if (!tabArea.contains(info.cursorPos) || dropStack == null || !dropStack.isToBeRendered())
 			return false;
-		}
 
 		int dropIndex = getDropIndex(info);
-		if (curDropIndex == dropIndex || dropIndex == -1) {
+		if (curDropIndex == dropIndex || dropIndex == -1)
 			return true;
-		}
 		curDropIndex = dropIndex;
 
 		dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_HAND));
 
-		if (dropStack.getChildren().indexOf(dragElement) == dropIndex) {
+		if (dropStack.getChildren().indexOf(dragElement) == dropIndex)
 			return true;
-		}
 
 		if (dndManager.getFeedbackStyle() == DnDManager.HOSTED) {
 			dock(dragElement, dropIndex);
@@ -243,9 +231,8 @@ public class StackDropAgent extends DropAgent {
 			for (CTabItem cti : dropCTF.getItems()) {
 				if (dragCtrl == cti.getControl()) {
 					int itemIndex = dropCTF.indexOf(cti);
-					if (dropIndex > 0 && itemIndex < dropIndex) {
+					if (dropIndex > 0 && itemIndex < dropIndex)
 						dropIndex--;
-					}
 				}
 			}
 		}
@@ -258,9 +245,8 @@ public class StackDropAgent extends DropAgent {
 			MUIElement itemModel = (MUIElement) item.getData(AbstractPartRenderer.OWNING_ME);
 
 			// if we're going before ourselves its a NO-OP
-			if (itemModel == dragElement) {
+			if (itemModel == dragElement)
 				return;
-			}
 
 			dropIndex = itemModel.getParent().getChildren().indexOf(itemModel);
 			// if the item is dropped at the last position, there is
@@ -271,15 +257,13 @@ public class StackDropAgent extends DropAgent {
 		}
 
 		if (dragElement instanceof MStackElement) {
-			if (dragElement.getParent() != null) {
+			if (dragElement.getParent() != null)
 				dragElement.getParent().getChildren().remove(dragElement);
-			}
 
-			if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size()) {
+			if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size())
 				dropStack.getChildren().add(dropIndex, (MStackElement) dragElement);
-			} else {
+			else
 				dropStack.getChildren().add((MStackElement) dragElement);
-			}
 
 			// (Re)active the element being dropped
 			dropStack.setSelectedElement((MStackElement) dragElement);
@@ -301,21 +285,19 @@ public class StackDropAgent extends DropAgent {
 				}
 
 				kids.remove(kid);
-				if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size()) {
+				if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size())
 					dropStack.getChildren().add(dropIndex, kid);
-				} else {
+				else
 					dropStack.getChildren().add(kid);
-				}
 			}
 
 			// Finally, move over the selected element
 			kids.remove(curSel);
 			dropIndex = dropIndex + selIndex;
-			if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size()) {
+			if (dropIndex >= 0 && dropIndex < dropStack.getChildren().size())
 				dropStack.getChildren().add(dropIndex, curSel);
-			} else {
+			else
 				dropStack.getChildren().add(curSel);
-			}
 
 			// (Re)active the element being dropped
 			dropStack.setSelectedElement(curSel);
