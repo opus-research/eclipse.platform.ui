@@ -135,11 +135,17 @@ public class ResourcePropertySource implements IPropertySource {
         this.element = res;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public Object getEditableValue() {
         return this;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public IPropertyDescriptor[] getPropertyDescriptors() {
         if (isPathVariable(element)) {
@@ -148,6 +154,9 @@ public class ResourcePropertySource implements IPropertySource {
 		return propertyDescriptors;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public Object getPropertyValue(Object name) {
         if (name.equals(IBasicPropertyConstants.P_TEXT)) {
@@ -213,6 +222,9 @@ public class ResourcePropertySource implements IPropertySource {
         return true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPropertySource.
+     */
     @Override
 	public boolean isPropertySet(Object property) {
         return false;

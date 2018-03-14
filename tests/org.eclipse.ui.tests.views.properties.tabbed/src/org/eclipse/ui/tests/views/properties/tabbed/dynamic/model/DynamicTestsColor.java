@@ -63,7 +63,6 @@ public class DynamicTestsColor {
 		this.color = aColor;
 	}
 
-	@Override
 	public String toString() {
 		return getColor();
 	}

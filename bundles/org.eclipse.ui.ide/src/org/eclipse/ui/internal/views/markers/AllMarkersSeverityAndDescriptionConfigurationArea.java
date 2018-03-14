@@ -34,6 +34,11 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 	boolean filterOnSeverity;
 	private Button enablementButton;
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.DescriptionConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void createContents(Composite parent) {
 
@@ -56,6 +61,11 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 		buttons.setLayoutData(buttonData);
 
 		enablementButton.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setFilterOnSeverity(enablementButton.getSelection());
@@ -64,6 +74,11 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionConfigurationArea#apply(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	@Override
 	public void apply(MarkerFieldFilter filter) {
 		super.apply(filter);
@@ -71,6 +86,11 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 				.setFilterOnSeverity(filterOnSeverity);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionConfigurationArea#initialize(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		super.initialize(filter);
