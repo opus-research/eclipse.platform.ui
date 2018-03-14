@@ -83,8 +83,7 @@ public class OpenWithMenu extends ContributionItem {
     private static final Comparator comparer = new Comparator() {
         private Collator collator = Collator.getInstance();
 
-        @Override
-		public int compare(Object arg0, Object arg1) {
+        public int compare(Object arg0, Object arg1) {
             String s1 = ((IEditorDescriptor) arg0).getLabel();
             String s2 = ((IEditorDescriptor) arg1).getLabel();
             return collator.compare(s1, s2);
@@ -99,8 +98,7 @@ public class OpenWithMenu extends ContributionItem {
      * @deprecated As there is no way to set the file with this constructor use a
      * different constructor.
      */
-    @Deprecated
-	public OpenWithMenu(IWorkbenchPage page) {
+    public OpenWithMenu(IWorkbenchPage page) {
         this(page, null);
     }
 
@@ -175,8 +173,7 @@ public class OpenWithMenu extends ContributionItem {
             menuItem.setImage(image);
         }
         Listener listener = new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Selection:
                     if (menuItem.getSelection()) {
@@ -203,8 +200,7 @@ public class OpenWithMenu extends ContributionItem {
         final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
         menuItem.setText(IDEWorkbenchMessages.OpenWithMenu_Other);
         Listener listener = new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Selection:
                    	EditorSelectionDialog dialog = new EditorSelectionDialog(
@@ -230,8 +226,7 @@ public class OpenWithMenu extends ContributionItem {
     /* (non-Javadoc)
      * Fills the menu with perspective items.
      */
-    @Override
-	public void fill(Menu menu, int index) {
+    public void fill(Menu menu, int index) {
 		final IFile file= getFileResource();
         if (file == null) {
             return;
@@ -315,8 +310,7 @@ public class OpenWithMenu extends ContributionItem {
     /* (non-Javadoc)
      * Returns whether this menu is dynamic.
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return true;
     }
 
@@ -365,8 +359,7 @@ public class OpenWithMenu extends ContributionItem {
         menuItem.setText(IDEWorkbenchMessages.DefaultEditorDescription_name);
 
         Listener listener = new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Selection:
                     if (menuItem.getSelection()) {

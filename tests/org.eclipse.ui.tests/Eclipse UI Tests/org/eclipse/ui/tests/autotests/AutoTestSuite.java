@@ -51,8 +51,7 @@ public class AutoTestSuite extends TestSuite {
     /* (non-Javadoc)
      * @see junit.framework.TestSuite#run(junit.framework.TestResult)
      */
-    @Override
-	public void run(TestResult result) {
+    public void run(TestResult result) {
         super.run(result);
 
         IPath statePath = Platform.getStateLocation(TestPlugin.getDefault().getBundle());

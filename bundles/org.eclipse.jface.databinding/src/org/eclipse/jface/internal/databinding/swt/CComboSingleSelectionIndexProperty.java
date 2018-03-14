@@ -26,12 +26,10 @@ public class CComboSingleSelectionIndexProperty extends SingleSelectionIndexProp
 		super(new int[] { SWT.Selection, SWT.DefaultSelection });
 	}
 
-	@Override
 	int doGetIntValue(Object source) {
 		return ((CCombo) source).getSelectionIndex();
 	}
 
-	@Override
 	void doSetIntValue(Object source, int value) {
 		if (value == -1)
 			((CCombo) source).deselectAll();
@@ -39,7 +37,6 @@ public class CComboSingleSelectionIndexProperty extends SingleSelectionIndexProp
 			((CCombo) source).select(value);
 	}
 
-	@Override
 	public String toString() {
 		return "CCombo.selectionIndex <int>"; //$NON-NLS-1$
 	}

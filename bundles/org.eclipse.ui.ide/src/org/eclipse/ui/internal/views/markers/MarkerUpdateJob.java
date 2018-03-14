@@ -51,7 +51,6 @@ class MarkerUpdateJob extends Job {
 	 * @seeorg.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
 	 * IProgressMonitor)
 	 */
-	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		monitor.beginTask(MarkerMessages.MarkerView_searching_for_markers,
 				IProgressMonitor.UNKNOWN);
@@ -139,7 +138,6 @@ class MarkerUpdateJob extends Job {
 	 * 
 	 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
 	 */
-	@Override
 	public boolean shouldRun() {
 		if (!PlatformUI.isWorkbenchRunning()) {
 			return false;
@@ -154,7 +152,6 @@ class MarkerUpdateJob extends Job {
 	 * 
 	 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 	 */
-	@Override
 	public boolean belongsTo(Object family) {
 		if (family.equals(builder.CACHE_UPDATE_FAMILY)) {
 			return true;
@@ -207,7 +204,6 @@ class SortingJob extends MarkerUpdateJob {
 	 * org.eclipse.ui.internal.views.markers.MarkerUpdateJob#run(org.eclipse
 	 * .core.runtime.IProgressMonitor)
 	 */
-	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		monitor.beginTask(MarkerMessages.MarkerView_19,
 				IProgressMonitor.UNKNOWN);

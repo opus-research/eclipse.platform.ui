@@ -38,7 +38,6 @@ public class RetargetActionWithDefault extends RetargetAction {
 	/* (non-Javadoc)
 	 * Method declared on RetargetAction.
 	 */
-	@Override
 	protected void setActionHandler(IAction newHandler) {
 		super.setActionHandler(newHandler);
 		// Only set the default handler after clearing the old handler above.

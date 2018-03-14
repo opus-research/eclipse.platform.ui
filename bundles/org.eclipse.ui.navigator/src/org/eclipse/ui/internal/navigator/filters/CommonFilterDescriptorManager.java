@@ -32,7 +32,7 @@ public class CommonFilterDescriptorManager {
 	private static final CommonFilterDescriptor[] NO_FILTER_DESCRIPTORS = new CommonFilterDescriptor[0];
 
 	// K(ID) V(CommonFilterDescriptor)
-	private final Map<String, CommonFilterDescriptor> filters = new HashMap<String, CommonFilterDescriptor>();
+	private final Map filters = new HashMap();
 
 	/**
 	 * 
@@ -73,7 +73,7 @@ public class CommonFilterDescriptorManager {
 	 */
 	public CommonFilterDescriptor[] findVisibleFilters(INavigatorContentService contentService, boolean forUI) {
 
-		List<CommonFilterDescriptor> visibleFilters = new ArrayList<CommonFilterDescriptor>();
+		List visibleFilters = new ArrayList();
 		CommonFilterDescriptor descriptor;
 		for (Iterator filtersItr = filters.entrySet().iterator(); filtersItr.hasNext();) {
 			descriptor = (CommonFilterDescriptor) ((Map.Entry)filtersItr.next()).getValue();
@@ -86,7 +86,7 @@ public class CommonFilterDescriptorManager {
 		if (visibleFilters.size() == 0) {
 			return NO_FILTER_DESCRIPTORS;
 		}
-		return visibleFilters
+		return (CommonFilterDescriptor[]) visibleFilters
 				.toArray(new CommonFilterDescriptor[visibleFilters.size()]);
 	}
 
@@ -95,7 +95,7 @@ public class CommonFilterDescriptorManager {
 	 * @return the CommonFilterDescriptor, if found
 	 */
 	public CommonFilterDescriptor getFilterById(String id) {
-		return filters.get(id);
+		return (CommonFilterDescriptor) filters.get(id);
 	}
 	
 	/**
@@ -114,7 +114,6 @@ public class CommonFilterDescriptorManager {
 		 * 
 		 * @see org.eclipse.ui.internal.navigator.extensions.NavigatorContentRegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
 		 */
-		@Override
 		protected boolean readElement(IConfigurationElement element) {
 			if (TAG_COMMON_FILTER.equals(element.getName())) {
 				addCommonFilter(new CommonFilterDescriptor(element));

@@ -54,7 +54,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		recreate(monitor, uiInfo);
@@ -68,7 +67,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		delete(monitor, uiInfo, false); // never delete content
@@ -82,7 +80,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
 	 *      int)
 	 */
-	@Override
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
 		boolean modified = false;
@@ -110,7 +107,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#getExecuteSchedulingRule()
 	 */
-	@Override
 	protected ISchedulingRule getExecuteSchedulingRule() {
 		return super.computeCreateSchedulingRule();
 	}
@@ -120,7 +116,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#getUndoSchedulingRule()
 	 */
-	@Override
 	protected ISchedulingRule getUndoSchedulingRule() {
 		return super.computeDeleteSchedulingRule();
 	}
@@ -132,7 +127,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeExecutionStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeExecutionStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeExecutionStatus(monitor);
 		if (status.isOK()) {
@@ -148,7 +142,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeUndoableStatus(monitor);
 		if (status.isOK()) {
@@ -164,7 +157,6 @@ abstract class AbstractCreateResourcesOperation extends
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeRedoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeRedoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeRedoableStatus(monitor);
 		if (status.isOK()) {

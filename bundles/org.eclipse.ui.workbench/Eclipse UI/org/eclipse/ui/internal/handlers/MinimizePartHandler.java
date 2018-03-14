@@ -39,7 +39,8 @@ public class MinimizePartHandler extends AbstractHandler {
 			if (page != null) {
 				IWorkbenchPartReference partRef = page.getActivePartReference();
 				if (partRef != null) {
-					page.setPartState(partRef, IWorkbenchPage.STATE_MINIMIZED);
+					page.setPartState(partRef,
+							IStackPresentationSite.STATE_MINIMIZED);
 				}
 			}
 		}
