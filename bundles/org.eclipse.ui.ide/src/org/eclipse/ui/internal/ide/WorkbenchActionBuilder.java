@@ -11,6 +11,7 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487570, 494289
+ *     Kaloyan Raev <kaloyan.r@zend.com> - Bug 322002
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -398,6 +399,18 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             // Add to the cool bar manager
             coolBar.add(actionBarConfigurer.createToolBarContributionItem(fileToolBar,
                     IWorkbenchActionConstants.TOOLBAR_FILE));
+        }
+
+        coolBar.add(new GroupMarker(IIDEActionConstants.GROUP_EDIT));
+        { // Edit group
+            IToolBarManager editToolBar = actionBarConfigurer.createToolBarManager();
+            editToolBar.add(new Separator(IWorkbenchActionConstants.EDIT_GROUP));
+            editToolBar.add(undoAction);
+            editToolBar.add(redoAction);
+
+            // Add to the cool bar manager
+            coolBar.add(actionBarConfigurer.createToolBarContributionItem(editToolBar,
+                    IWorkbenchActionConstants.TOOLBAR_EDIT));
         }
 
         coolBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
