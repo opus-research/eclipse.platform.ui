@@ -15,6 +15,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -160,7 +161,6 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveableFilter;
-import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.ISourceProvider;
@@ -1355,11 +1355,11 @@ public final class Workbench extends EventManager implements IWorkbench,
 			return true;
 		}
 
-		Set<ISaveablePart> dirtyParts = new HashSet<ISaveablePart>();
+		Set<IWorkbenchPart> dirtyParts = new HashSet<IWorkbenchPart>();
 		for (IWorkbenchWindow window : windows) {
 			WorkbenchPage page = (WorkbenchPage) window.getActivePage();
 			if (page != null) {
-				Collections.addAll(dirtyParts, page.getDirtyParts());
+				Collections.addAll(dirtyParts, page.getDirtyWorkbenchParts());
 			}
 		}
 
@@ -1367,7 +1367,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		if (activeWindow == null) {
 			activeWindow = windows[0];
 		}
-		return WorkbenchPage.saveAll(new ArrayList<ISaveablePart>(dirtyParts),
+		return WorkbenchPage.saveAll(new ArrayList<IWorkbenchPart>(dirtyParts),
 				confirm, closing, true, activeWindow, activeWindow);
 	}
 

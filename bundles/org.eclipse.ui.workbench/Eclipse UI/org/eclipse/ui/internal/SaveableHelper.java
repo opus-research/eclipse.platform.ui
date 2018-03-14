@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -45,6 +46,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.progress.IJobRunnable;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -499,6 +501,26 @@ public class SaveableHelper {
 		public DynamicFamily(Collection collection) {
 			super(collection);
 		}
+	}
+
+	public static ISaveablePart getSaveable(Object o) {
+		return (ISaveablePart) Util.getAdapter(o, ISaveablePart.class);
+	}
+
+	public static boolean isSaveable(Object o) {
+		return getSaveable(o) != null;
+	}
+
+	public static ISaveablePart2 getSaveable2(Object o) {
+		ISaveablePart saveable = getSaveable(o);
+		if (saveable instanceof ISaveablePart2) {
+			return (ISaveablePart2) saveable;
+		}
+		return (ISaveablePart2) Util.getAdapter(o, ISaveablePart2.class);
+	}
+
+	public static boolean isSaveable2(Object o) {
+		return getSaveable2(o) != null;
 	}
 
 }
