@@ -241,10 +241,6 @@ public class ModelServiceImpl implements EModelService {
 
 			// Check for Handlers
 			if (searchFlags == ANYWHERE) {
-
-				if (menu != null) {
-					findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
-				}
 				
 				for (MHandler child : window.getHandlers()) {
 					findElementsRecursive(child, clazz, matcher, elements, searchFlags);
@@ -272,7 +268,7 @@ public class ModelServiceImpl implements EModelService {
 		if (searchRoot instanceof MPart) {
 			MPart part = (MPart) searchRoot;
 
-			if (searchFlags != IN_MAIN_MENU) {
+			if ((searchFlags & IN_PART) != 0) {
 				for (MMenu menu : part.getMenus()) {
 					findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
 				}
@@ -283,7 +279,8 @@ public class ModelServiceImpl implements EModelService {
 				findElementsRecursive(toolBar, clazz, matcher, elements, searchFlags);
 			}
 
-			if (searchFlags != IN_TRIM) {
+			if ((searchFlags & PRESENTATION) != 0 || (searchFlags & IN_PART) != 0
+					|| (searchFlags & IN_ANY_PERSPECTIVE) != 0) {
 				for (MHandler child : part.getHandlers()) {
 					findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 				}
