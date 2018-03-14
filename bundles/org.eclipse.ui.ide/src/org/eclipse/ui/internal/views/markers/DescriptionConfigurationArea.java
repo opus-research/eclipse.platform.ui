@@ -45,6 +45,11 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
+	 */
 	@Override
 	public void apply(MarkerFieldFilter filter) {
 		DescriptionFieldFilter desc = (DescriptionFieldFilter) filter;
@@ -57,11 +62,21 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void createContents(Composite parent) {
 		createDescriptionGroup(parent);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
+	 */
 	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		DescriptionFieldFilter desc = (DescriptionFieldFilter) filter;
@@ -120,6 +135,9 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.FilterConfigurationArea#getTitle()
+	 */
 	@Override
 	public String getTitle() {
 		return MarkerMessages.propertiesDialog_description_text;

@@ -146,11 +146,19 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		setDialogSettings(section);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
 	@Override
 	public void addPages() {
 		super.addPages();
 
 		mainPage = new WizardNewProjectCreationPage("basicNewProjectPage") { //$NON-NLS-1$
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.ui.dialogs.WizardNewProjectCreationPage#createControl(org.eclipse.swt.widgets.Composite)
+			 */
 			@Override
 			public void createControl(Composite parent) {
 				super.createControl(parent);
@@ -297,6 +305,9 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		return newProject;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWorkbenchWizard.
+	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		super.init(workbench, currentSelection);
@@ -304,6 +315,9 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		setWindowTitle(ResourceMessages.NewProject_windowTitle);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on BasicNewResourceWizard.
+	 */
 	@Override
 	protected void initializeDefaultPageImageDescriptor() {
 		ImageDescriptor desc = IDEWorkbenchPlugin
@@ -311,6 +325,9 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		setDefaultPageImageDescriptor(desc);
 	}
 
+	/*
+	 * (non-Javadoc) Opens a new window with a particular perspective and input.
+	 */
 	private static void openInNewWindow(IPerspectiveDescriptor desc) {
 
 		// Open the page.
@@ -327,6 +344,9 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
 	@Override
 	public boolean performFinish() {
 		createNewProject();
@@ -345,6 +365,9 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc) Replaces the current perspective with the new one.
+	 */
 	private static void replaceCurrentPerspective(IPerspectiveDescriptor persp) {
 
 		// Get the active page.
