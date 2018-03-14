@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, Bug 426535
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -1246,6 +1246,23 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			break;
 		case VIEW_CREATE:
 			partService.showPart(part, PartState.CREATE);
+
+			// Report the visibility of the created part
+			MStackElement sElement = part;
+			if (part.getCurSharedRef() != null)
+				sElement = part.getCurSharedRef();
+			MUIElement parentElement = sElement.getParent();
+			if (parentElement instanceof MPartStack) {
+				MPartStack partStack = (MPartStack) parentElement;
+				if (partStack.getSelectedElement() == sElement
+						&& !partStack.getTags().contains(IPresentationEngine.MINIMIZED)) {
+					firePartVisible(part);
+				} else {
+					firePartHidden(part);
+				}
+			} else {
+				firePartVisible(part); // Stand-alone part
+			}
 			break;
 		}
 		return part;
@@ -3358,13 +3375,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		tags.clear();
 		tags.addAll(dummyPerspective.getTags());
 
-		// remove HIDDEN_BY_USER tags from toolbar
-		// need to reset all window / perspective relevant elements if
-		// HIDDEN_BY_USER
-		// get implemented by more renderer
+		// remove HIDDEN_EXPLICITLY tag from toolbar
 		List<MToolBar> toolBars = modelService.findElements(window, null, MToolBar.class, null);
 		for (MToolBar mToolBar : toolBars) {
-			mToolBar.getTags().remove("HIDDEN_BY_USER"); //$NON-NLS-1$
+			mToolBar.getTags().remove(IPresentationEngine.HIDDEN_EXPLICITLY);
 		}
 
 		partService.requestActivation();
