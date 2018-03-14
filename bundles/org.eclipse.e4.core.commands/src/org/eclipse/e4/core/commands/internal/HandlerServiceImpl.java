@@ -104,8 +104,8 @@ public class HandlerServiceImpl implements EHandlerService {
 	 * Fill in a temporary static context for execution.
 	 * 
 	 * @param command
-	 * @return a context not part of the normal hierarchy
 	 */
+	@SuppressWarnings("rawtypes")
 	private void addParms(ParameterizedCommand command, IEclipseContext staticContext) {
 		final Map parms = command.getParameterMap();
 		Iterator i = parms.entrySet().iterator();
@@ -158,6 +158,7 @@ public class HandlerServiceImpl implements EHandlerService {
 		context.set(handlerId, handler);
 	}
 
+	@Override
 	public boolean canExecute(ParameterizedCommand command) {
 		final IEclipseContext staticContext = EclipseContextFactory.create(TMP_STATIC_CONTEXT);
 		try {
