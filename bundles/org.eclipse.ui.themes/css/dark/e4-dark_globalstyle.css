@@ -323,10 +323,8 @@ FormHeading {
 }
 
 Section {
-	background-color: #4F5355;
-	color: #AEBED0;
-	background-color-titlebar: #6D5E5E;
-	border-color-titlebar: white;
+    background-color: #4F5355;
+    color: #AEBED0;
 }
 
 Form > LayoutComposite > LayoutComposite > * {
