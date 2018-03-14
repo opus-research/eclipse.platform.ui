@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,6 +45,9 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		super();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IContentProvider.
+	 */
 	@Override
 	public void dispose() {
 		if (viewer != null) {
@@ -63,6 +66,9 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		super.dispose();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IContentProvider.
+	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		super.inputChanged(viewer, oldInput, newInput);
@@ -94,6 +100,9 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IResourceChangeListener.
+	 */
 	@Override
 	public final void resourceChanged(final IResourceChangeEvent event) {
 
@@ -103,17 +112,17 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 
 	/**
 	 * Process the resource delta.
-	 *
+	 * 
 	 * @param delta
 	 */
-	protected void processDelta(IResourceDelta delta) {
+	protected void processDelta(IResourceDelta delta) {		
 
 		Control ctrl = viewer.getControl();
 		if (ctrl == null || ctrl.isDisposed()) {
 			return;
 		}
-
-
+		
+		
 		final Collection runnables = new ArrayList();
 		processDelta(delta, runnables);
 
@@ -125,14 +134,20 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		if (ctrl.getDisplay().getThread() == Thread.currentThread()) {
 			runUpdates(runnables);
 		} else {
-			ctrl.getDisplay().asyncExec(() -> {
-				//Abort if this happens after disposes
-				Control ctrl1 = viewer.getControl();
-				if (ctrl1 == null || ctrl1.isDisposed()) {
-					return;
+			ctrl.getDisplay().asyncExec(new Runnable(){
+				/* (non-Javadoc)
+				 * @see java.lang.Runnable#run()
+				 */
+				@Override
+				public void run() {
+					//Abort if this happens after disposes
+					Control ctrl = viewer.getControl();
+					if (ctrl == null || ctrl.isDisposed()) {
+						return;
+					}
+					
+					runUpdates(runnables);
 				}
-
-				runUpdates(runnables);
 			});
 		}
 
@@ -147,7 +162,7 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		while(runnableIterator.hasNext()){
 			((Runnable)runnableIterator.next()).run();
 		}
-
+		
 	}
 
 	/**
@@ -163,7 +178,7 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 
 		// Get the affected resource
 		final IResource resource = delta.getResource();
-
+	
 		// If any children have changed type, just do a full refresh of this
 		// parent,
 		// since a simple update on such children won't work,
@@ -266,33 +281,36 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		}
 		// heuristic test for items moving within same folder (i.e. renames)
 		final boolean hasRename = numMovedFrom > 0 && numMovedTo > 0;
-
-		Runnable addAndRemove = () -> {
-			if (viewer instanceof AbstractTreeViewer) {
-				AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
-				// Disable redraw until the operation is finished so we don't
-				// get a flash of both the new and old item (in the case of
-				// rename)
-				// Only do this if we're both adding and removing files (the
-				// rename case)
-				if (hasRename) {
-					treeViewer.getControl().setRedraw(false);
-				}
-				try {
-					if (addedObjects.length > 0) {
-						treeViewer.add(resource, addedObjects);
-					}
-					if (removedObjects.length > 0) {
-						treeViewer.remove(removedObjects);
-					}
-				}
-				finally {
+		
+		Runnable addAndRemove = new Runnable(){
+			@Override
+			public void run() {
+				if (viewer instanceof AbstractTreeViewer) {
+					AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
+					// Disable redraw until the operation is finished so we don't
+					// get a flash of both the new and old item (in the case of
+					// rename)
+					// Only do this if we're both adding and removing files (the
+					// rename case)
 					if (hasRename) {
-						treeViewer.getControl().setRedraw(true);
+						treeViewer.getControl().setRedraw(false);
 					}
+					try {
+						if (addedObjects.length > 0) {
+							treeViewer.add(resource, addedObjects);
+						}
+						if (removedObjects.length > 0) {
+							treeViewer.remove(removedObjects);
+						}
+					}
+					finally {
+						if (hasRename) {
+							treeViewer.getControl().setRedraw(true);
+						}
+					}
+				} else {
+					((StructuredViewer) viewer).refresh(resource);
 				}
-			} else {
-				((StructuredViewer) viewer).refresh(resource);
 			}
 		};
 		runnables.add(addAndRemove);
@@ -303,7 +321,12 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 	 * @return Runnable
 	 */
 	private Runnable getRefreshRunnable(final IResource resource) {
-		return () -> ((StructuredViewer) viewer).refresh(resource);
+		return new Runnable(){
+			@Override
+			public void run() {
+				((StructuredViewer) viewer).refresh(resource);
+			}
+		};
 	}
 
 		/**
@@ -312,6 +335,11 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		 * @return Runnable
 		 */
 		private Runnable getUpdateRunnable(final IResource resource) {
-			return () -> ((StructuredViewer) viewer).update(resource, null);
+			return new Runnable(){
+				@Override
+				public void run() {
+					((StructuredViewer) viewer).update(resource, null);
+				}
+			};
 		}
 }

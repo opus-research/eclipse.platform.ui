@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,19 +28,25 @@ import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
@@ -50,9 +56,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -76,7 +83,7 @@ public class WelcomeEditor extends EditorPart {
 
     private final static int VERT_SCROLL_INCREMENT = 20;
 
-    // width at which wrapping will stop and a horizontal scroll bar will be
+    // width at which wrapping will stop and a horizontal scroll bar will be 
     // introduced
     private final static int WRAP_MIN_WIDTH = 150;
 
@@ -132,37 +139,41 @@ public class WelcomeEditor extends EditorPart {
     }
 
     /**
-     * Finds the next text
+     * Finds the next text 
      */
     private StyledText nextText(StyledText text) {
         int index = 0;
         if (text == null) {
 			return (StyledText) texts.get(0);
+		} else {
+			index = texts.indexOf(text);
 		}
-		index = texts.indexOf(text);
 
         //If we are not at the end....
         if (index < texts.size() - 1) {
 			return (StyledText) texts.get(index + 1);
+		} else {
+			return (StyledText) texts.get(0);
 		}
-		return (StyledText) texts.get(0);
     }
 
     /**
-     * Finds the previous text
+     * Finds the previous text 
      */
     private StyledText previousText(StyledText text) {
         int index = 0;
         if (text == null) {
 			return (StyledText) texts.get(0);
+		} else {
+			index = texts.indexOf(text);
 		}
-		index = texts.indexOf(text);
 
         //If we are at the beginning....
         if (index == 0) {
 			return (StyledText) texts.get(texts.size() - 1);
+		} else {
+			return (StyledText) texts.get(index - 1);
 		}
-		return (StyledText) texts.get(index - 1);
     }
 
     /**
@@ -173,7 +184,7 @@ public class WelcomeEditor extends EditorPart {
     }
 
     /**
-     * Returns the copy action.
+     * Returns the copy action. 
      */
     protected WelcomeEditorCopyAction getCopyAction() {
         return copyAction;
@@ -277,122 +288,130 @@ public class WelcomeEditor extends EditorPart {
             }
         });
 
-        styledText.addMouseMoveListener(e -> {
-		    // Do not change cursor on drag events
-		    if (mouseDown) {
-		        if (!dragEvent) {
-		            StyledText text1 = (StyledText) e.widget;
-		            text1.setCursor(null);
-		        }
-		        dragEvent = true;
-		        return;
-		    }
-		    StyledText text2 = (StyledText) e.widget;
-		    WelcomeItem item = (WelcomeItem) e.widget.getData();
-		    int offset = -1;
-		    try {
-		        offset = text2.getOffsetAtLocation(new Point(e.x, e.y));
-		    } catch (IllegalArgumentException ex) {
-		        // location is not over a character
-		    }
-		    if (offset == -1) {
-				text2.setCursor(null);
-			} else if (item.isLinkAt(offset)) {
-				text2.setCursor(handCursor);
-			} else {
-				text2.setCursor(null);
-			}
-		});
+        styledText.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+			public void mouseMove(MouseEvent e) {
+                // Do not change cursor on drag events
+                if (mouseDown) {
+                    if (!dragEvent) {
+                        StyledText text = (StyledText) e.widget;
+                        text.setCursor(null);
+                    }
+                    dragEvent = true;
+                    return;
+                }
+                StyledText text = (StyledText) e.widget;
+                WelcomeItem item = (WelcomeItem) e.widget.getData();
+                int offset = -1;
+                try {
+                    offset = text.getOffsetAtLocation(new Point(e.x, e.y));
+                } catch (IllegalArgumentException ex) {
+                    // location is not over a character
+                }
+                if (offset == -1) {
+					text.setCursor(null);
+				} else if (item.isLinkAt(offset)) {
+					text.setCursor(handCursor);
+				} else {
+					text.setCursor(null);
+				}
+            }
+        });
 
-        styledText.addTraverseListener(e -> {
-		    StyledText text = (StyledText) e.widget;
+        styledText.addTraverseListener(new TraverseListener() {
+            @Override
+			public void keyTraversed(TraverseEvent e) {
+                StyledText text = (StyledText) e.widget;
 
-		    switch (e.detail) {
-		    case SWT.TRAVERSE_ESCAPE:
-		        e.doit = true;
-		        break;
-		    case SWT.TRAVERSE_TAB_NEXT:
-		        // Handle Ctrl-Tab
-		        if ((e.stateMask & SWT.CTRL) != 0) {
-		            if (e.widget == lastText) {
-						return;
-					}
-					e.doit = false;
-					nextTabAbortTraversal = true;
-					lastText.traverse(SWT.TRAVERSE_TAB_NEXT);
-					return;
-		        }
-		        if (nextTabAbortTraversal) {
-		            nextTabAbortTraversal = false;
-		            return;
-		        }
-		        // Find the next link in current widget, if applicable
-		        // Stop at top of widget
-		        StyleRange nextLink = findNextLink(text);
-		        if (nextLink == null) {
-		            // go to the next widget, focus at beginning
-		            StyledText nextText = nextText(text);
-		            nextText.setSelection(0);
-		            focusOn(nextText, 0);
-		        } else {
-		            // focusOn: allow none tab traversals to align
-		            focusOn(text, text.getSelection().x);
-		            text.setSelectionRange(nextLink.start, nextLink.length);
-		        }
-		        e.detail = SWT.TRAVERSE_NONE;
-		        e.doit = true;
-		        break;
-		    case SWT.TRAVERSE_TAB_PREVIOUS:
-		        // Handle Ctrl-Shift-Tab
-		        if ((e.stateMask & SWT.CTRL) != 0) {
-		            if (e.widget == firstText) {
-						return;
-					}
-					e.doit = false;
-					previousTabAbortTraversal = true;
-					firstText.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
-					return;
-		        }
-		        if (previousTabAbortTraversal) {
-		            previousTabAbortTraversal = false;
-		            return;
-		        }
-		        // Find the previous link in current widget, if applicable
-		        // Stop at top of widget also
-		        StyleRange previousLink = findPreviousLink(text);
-		        if (previousLink == null) {
-		            if (text.getSelection().x == 0) {
-		                // go to the previous widget, focus at end
-		                StyledText previousText = previousText(text);
-		                previousText.setSelection(previousText
-		                        .getCharCount());
-		                previousLink = findPreviousLink(previousText);
-		                if (previousLink == null) {
-							focusOn(previousText, 0);
+                switch (e.detail) {
+                case SWT.TRAVERSE_ESCAPE:
+                    e.doit = true;
+                    break;
+                case SWT.TRAVERSE_TAB_NEXT:
+                    // Handle Ctrl-Tab
+                    if ((e.stateMask & SWT.CTRL) != 0) {
+                        if (e.widget == lastText) {
+							return;
 						} else {
-		                    focusOn(previousText, previousText
-		                            .getSelection().x);
-		                    previousText
-		                            .setSelectionRange(previousLink.start,
-		                                    previousLink.length);
-		                }
-		            } else {
-		                // stay at top of this widget
-		                focusOn(text, 0);
-		            }
-		        } else {
-		            // focusOn: allow none tab traversals to align
-		            focusOn(text, text.getSelection().x);
-		            text.setSelectionRange(previousLink.start,
-		                    previousLink.length);
-		        }
-		        e.detail = SWT.TRAVERSE_NONE;
-		        e.doit = true;
-		        break;
-		    default:
-		        break;
-		    }
-		});
+                            e.doit = false;
+                            nextTabAbortTraversal = true;
+                            lastText.traverse(SWT.TRAVERSE_TAB_NEXT);
+                            return;
+                        }
+                    }
+                    if (nextTabAbortTraversal) {
+                        nextTabAbortTraversal = false;
+                        return;
+                    }
+                    // Find the next link in current widget, if applicable
+                    // Stop at top of widget
+                    StyleRange nextLink = findNextLink(text);
+                    if (nextLink == null) {
+                        // go to the next widget, focus at beginning
+                        StyledText nextText = nextText(text);
+                        nextText.setSelection(0);
+                        focusOn(nextText, 0);
+                    } else {
+                        // focusOn: allow none tab traversals to align
+                        focusOn(text, text.getSelection().x);
+                        text.setSelectionRange(nextLink.start, nextLink.length);
+                    }
+                    e.detail = SWT.TRAVERSE_NONE;
+                    e.doit = true;
+                    break;
+                case SWT.TRAVERSE_TAB_PREVIOUS:
+                    // Handle Ctrl-Shift-Tab
+                    if ((e.stateMask & SWT.CTRL) != 0) {
+                        if (e.widget == firstText) {
+							return;
+						} else {
+                            e.doit = false;
+                            previousTabAbortTraversal = true;
+                            firstText.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
+                            return;
+                        }
+                    }
+                    if (previousTabAbortTraversal) {
+                        previousTabAbortTraversal = false;
+                        return;
+                    }
+                    // Find the previous link in current widget, if applicable
+                    // Stop at top of widget also
+                    StyleRange previousLink = findPreviousLink(text);
+                    if (previousLink == null) {
+                        if (text.getSelection().x == 0) {
+                            // go to the previous widget, focus at end
+                            StyledText previousText = previousText(text);
+                            previousText.setSelection(previousText
+                                    .getCharCount());
+                            previousLink = findPreviousLink(previousText);
+                            if (previousLink == null) {
+								focusOn(previousText, 0);
+							} else {
+                                focusOn(previousText, previousText
+                                        .getSelection().x);
+                                previousText
+                                        .setSelectionRange(previousLink.start,
+                                                previousLink.length);
+                            }
+                        } else {
+                            // stay at top of this widget
+                            focusOn(text, 0);
+                        }
+                    } else {
+                        // focusOn: allow none tab traversals to align
+                        focusOn(text, text.getSelection().x);
+                        text.setSelectionRange(previousLink.start,
+                                previousLink.length);
+                    }
+                    e.detail = SWT.TRAVERSE_NONE;
+                    e.doit = true;
+                    break;
+                default:
+                    break;
+                }
+            }
+        });
 
         styledText.addKeyListener(new KeyListener() {
             @Override
@@ -422,7 +441,7 @@ public class WelcomeEditor extends EditorPart {
                     return;
                 }
 
-                // When page down is pressed, move the cursor to the next item in the
+                // When page down is pressed, move the cursor to the next item in the 
                 // welcome page.   Note that this operation wraps (pages to the top item
                 // when the last item is reached).
                 if (event.keyCode == SWT.PAGE_DOWN) {
@@ -430,7 +449,7 @@ public class WelcomeEditor extends EditorPart {
                     return;
                 }
 
-                // When page up is pressed, move the cursor to the previous item in the
+                // When page up is pressed, move the cursor to the previous item in the 
                 // welcome page.  Note that this operation wraps (pages to the bottom item
                 // when the first item is reached).
                 if (event.keyCode == SWT.PAGE_UP) {
@@ -466,7 +485,7 @@ public class WelcomeEditor extends EditorPart {
         styledText.addSelectionListener(new SelectionAdapter() {
             @Override
 			public void widgetSelected(SelectionEvent e) {
-                // enable/disable copy action
+                // enable/disable copy action			
                 StyledText text = (StyledText) e.widget;
 				copyAction.setEnabled(text.isTextSelected());
             }
@@ -606,30 +625,33 @@ public class WelcomeEditor extends EditorPart {
             final int adjust = HINDENT + bounds.width + layout.verticalSpacing
                     + (layout.marginWidth * 2);
             final int adjustFirst = HINDENT + (layout.marginWidth * 2);
-            infoArea.addListener(SWT.Resize, event -> {
-			    int w = scrolledComposite.getClientArea().width;
-			    // if the horizontal scroll bar exists, we want to wrap to the
-			    // minimum wrap width
-			    if (w < WRAP_MIN_WIDTH) {
-			        w = WRAP_MIN_WIDTH;
-			    }
-			    for (int i = 0; i < texts.size(); i++) {
-			        int extent;
-			        if (i == 0) {
-						extent = w - adjustFirst;
-					} else {
-						extent = w - adjust;
-					}
-			        StyledText text = (StyledText) texts.get(i);
-			        Point p1 = text.computeSize(extent, SWT.DEFAULT, false);
-			        ((GridData) text.getLayoutData()).widthHint = p1.x;
-			    }
-			    // reset the scrolled composite height since the height of the
-			    // styled text widgets have changed
-			    Point p2 = infoArea.computeSize(SWT.DEFAULT, SWT.DEFAULT,
-			            true);
-			    scrolledComposite.setMinHeight(p2.y);
-			});
+            infoArea.addListener(SWT.Resize, new Listener() {
+                @Override
+				public void handleEvent(Event event) {
+                    int w = scrolledComposite.getClientArea().width;
+                    // if the horizontal scroll bar exists, we want to wrap to the
+                    // minimum wrap width
+                    if (w < WRAP_MIN_WIDTH) {
+                        w = WRAP_MIN_WIDTH;
+                    }
+                    for (int i = 0; i < texts.size(); i++) {
+                        int extent;
+                        if (i == 0) {
+							extent = w - adjustFirst;
+						} else {
+							extent = w - adjust;
+						}
+                        StyledText text = (StyledText) texts.get(i);
+                        Point p = text.computeSize(extent, SWT.DEFAULT, false);
+                        ((GridData) text.getLayoutData()).widthHint = p.x;
+                    }
+                    // reset the scrolled composite height since the height of the 
+                    // styled text widgets have changed
+                    Point p = infoArea.computeSize(SWT.DEFAULT, SWT.DEFAULT,
+                            true);
+                    scrolledComposite.setMinHeight(p.y);
+                }
+            });
         }
 
         // Adjust the scrollbar increments
@@ -700,18 +722,21 @@ public class WelcomeEditor extends EditorPart {
         getSite().getWorkbenchWindow().getWorkbench().getHelpSystem().setHelp(
 				editorComposite, IIDEHelpContextIds.WELCOME_EDITOR);
 
-        this.colorListener = event -> {
-		    if (event.getProperty()
-		            .equals(JFacePreferences.HYPERLINK_COLOR)) {
-		        Color fg = JFaceColors.getHyperlinkText(editorComposite
-		                .getDisplay());
-		        Iterator links = hyperlinkRanges.iterator();
-		        while (links.hasNext()) {
-		            StyleRange range = (StyleRange) links.next();
-		            range.foreground = fg;
-		        }
-		    }
-		};
+        this.colorListener = new IPropertyChangeListener() {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
+                if (event.getProperty()
+                        .equals(JFacePreferences.HYPERLINK_COLOR)) {
+                    Color fg = JFaceColors.getHyperlinkText(editorComposite
+                            .getDisplay());
+                    Iterator links = hyperlinkRanges.iterator();
+                    while (links.hasNext()) {
+                        StyleRange range = (StyleRange) links.next();
+                        range.foreground = fg;
+                    }
+                }
+            }
+        };
 
         JFacePreferences.getPreferenceStore().addPropertyChangeListener(
                 this.colorListener);
@@ -769,13 +794,21 @@ public class WelcomeEditor extends EditorPart {
         messageLabel.setText(getBannerTitle());
         messageLabel.setFont(JFaceResources.getHeaderFont());
 
-        final IPropertyChangeListener fontListener = event -> {
-		    if (JFaceResources.HEADER_FONT.equals(event.getProperty())) {
-		        messageLabel.setFont(JFaceResources.getHeaderFont());
-		    }
-		};
+        final IPropertyChangeListener fontListener = new IPropertyChangeListener() {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
+                if (JFaceResources.HEADER_FONT.equals(event.getProperty())) {
+                    messageLabel.setFont(JFaceResources.getHeaderFont());
+                }
+            }
+        };
 
-        messageLabel.addDisposeListener(event -> JFaceResources.getFontRegistry().removeListener(fontListener));
+        messageLabel.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent event) {
+                JFaceResources.getFontRegistry().removeListener(fontListener);
+            }
+        });
 
         JFaceResources.getFontRegistry().addListener(fontListener);
 
@@ -795,7 +828,7 @@ public class WelcomeEditor extends EditorPart {
     }
 
     /**
-     * The <code>WorkbenchPart</code> implementation of this
+     * The <code>WorkbenchPart</code> implementation of this 
      * <code>IWorkbenchPart</code> method disposes the title image
      * loaded by <code>setInitializationData</code>. Subclasses may extend.
      */
@@ -839,7 +872,7 @@ public class WelcomeEditor extends EditorPart {
      */
     @Override
 	public void doSaveAs() {
-        // do nothing
+        // do nothing	
     }
 
     /**
@@ -935,7 +968,7 @@ public class WelcomeEditor extends EditorPart {
 
     /**
      * Read the contents of the welcome page
-     *
+     * 
      * @param is the <code>InputStream</code> to parse
      * @throws IOException if there is a problem parsing the stream.
      */
@@ -958,7 +991,7 @@ public class WelcomeEditor extends EditorPart {
                 .getWelcomePageURL();
 
         if (url == null) {
-			// should not happen
+			// should not happen 
             return;
 		}
 

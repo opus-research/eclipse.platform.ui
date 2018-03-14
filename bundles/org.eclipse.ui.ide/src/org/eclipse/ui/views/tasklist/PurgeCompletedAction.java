@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ class PurgeCompletedAction extends TaskAction {
 
     /**
      * Creates the action.
-     *
+     * 
      * @param tasklist the task list
      * @param id the id
      */
@@ -57,7 +57,7 @@ class PurgeCompletedAction extends TaskAction {
         } catch (CoreException e) {
             ErrorDialog.openError(
                     getShell(),
-                    TaskListMessages.PurgeCompleted_errorMessage, null, e.getStatus());
+                    TaskListMessages.PurgeCompleted_errorMessage, null, e.getStatus()); 
 
         	return;
         }
@@ -70,8 +70,8 @@ class PurgeCompletedAction extends TaskAction {
         }
         // Check if there is anything to do
         if (completed.size() == 0) {
-            MessageDialog.openInformation(getShell(), TaskListMessages.PurgeCompleted_title,
-                    TaskListMessages.PurgeCompleted_noneCompleted);
+            MessageDialog.openInformation(getShell(), TaskListMessages.PurgeCompleted_title, 
+                    TaskListMessages.PurgeCompleted_noneCompleted); 
             return;
         }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public interface IInPlaceEditor extends IEditorPart {
     /**
      * Informs the in-place editor that the system file it is
      * editing was moved or renamed by the application.
-     *
+     * 
      * @param input the new in-place editor input to use
      */
     public void sourceChanged(IInPlaceEditorInput input);

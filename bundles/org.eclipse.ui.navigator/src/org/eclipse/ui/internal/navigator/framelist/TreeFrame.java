@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.navigator.framelist;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -52,7 +51,7 @@ public class TreeFrame extends Frame {
     /**
      * Constructs a frame for the specified tree viewer.
      * The frame's input, name and tool tip text are not set.
-     *
+     * 
      * @param viewer the tree viewer
      */
     public TreeFrame(AbstractTreeViewer viewer) {
@@ -62,9 +61,9 @@ public class TreeFrame extends Frame {
     /**
      * Constructs a frame for the specified tree viewer.
      * The frame's input element is set to the specified input element.
-     * The frame's name and tool tip text are set to the text for the input
+     * The frame's name and tool tip text are set to the text for the input 
      * element, as provided by the viewer's label provider.
-     *
+     * 
      * @param viewer the tree viewer
      * @param input the input element
      */
@@ -82,7 +81,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Returns the expanded elements.
-     *
+     * 
      * @return the expanded elements
      */
     public Object[] getExpandedElements() {
@@ -91,7 +90,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Returns the input element.
-     *
+     * 
      * @return the input element
      */
     public Object getInput() {
@@ -100,7 +99,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Returns the selection.
-     *
+     * 
      * @return the selection
      */
     public ISelection getSelection() {
@@ -109,7 +108,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Returns the tree viewer.
-     *
+     * 
      * @return the tree viewer
      */
     public AbstractTreeViewer getViewer() {
@@ -118,7 +117,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Restore IPersistableElements from the specified memento.
-     *
+     * 
      * @param memento memento to restore elements from
      * @return list of restored elements. May be empty.
      */
@@ -141,7 +140,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Restore the frame from the specified memento.
-     *
+     * 
      * @param memento memento to restore frame from
      */
     public void restoreState(IMemento memento) {
@@ -182,28 +181,37 @@ public class TreeFrame extends Frame {
     /**
      * Save the specified elements to the given memento.
      * The elements have to be adaptable to IPersistableElement.
-     *
+     * 
      * @param elements elements to persist
      * @param memento memento to persist elements in
      */
     private void saveElements(Object[] elements, IMemento memento) {
         for (int i = 0; i < elements.length; i++) {
-			IPersistableElement persistable = Adapters.adapt(elements[i], IPersistableElement.class);
-			if (persistable != null) {
-				IMemento elementMem = memento.createChild(TAG_ELEMENT);
-				elementMem.putString(TAG_FACTORY_ID, persistable.getFactoryId());
-				persistable.saveState(elementMem);
+            if (elements[i] instanceof IAdaptable) {
+                IPersistableElement persistable = (IPersistableElement) ((IAdaptable) elements[i])
+                        .getAdapter(IPersistableElement.class);
+                if (persistable != null) {
+                    IMemento elementMem = memento.createChild(TAG_ELEMENT);
+                    elementMem.putString(TAG_FACTORY_ID, persistable
+                            .getFactoryId());
+                    persistable.saveState(elementMem);
+                }
             }
         }
     }
 
     /**
      * Save the frame state in the given memento.
-     *
+     * 
      * @param memento memento to persist the frame state in.
      */
     public void saveState(IMemento memento) {
-		IPersistableElement persistable = Adapters.adapt(input, IPersistableElement.class);
+        if (!(input instanceof IAdaptable)) {
+			return;
+		}
+
+        IPersistableElement persistable = (IPersistableElement) ((IAdaptable) input)
+                .getAdapter(IPersistableElement.class);
         if (persistable != null) {
             IMemento frameMemento = memento.createChild(TAG_FRAME_INPUT);
 
@@ -228,7 +236,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Sets the input element.
-     *
+     * 
      * @param input the input element
      */
     public void setInput(Object input) {
@@ -237,7 +245,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Sets the expanded elements.
-     *
+     * 
      * @param expandedElements the expanded elements
      */
     public void setExpandedElements(Object[] expandedElements) {
@@ -246,7 +254,7 @@ public class TreeFrame extends Frame {
 
     /**
      * Sets the selection.
-     *
+     * 
      * @param selection the selection
      */
     public void setSelection(ISelection selection) {

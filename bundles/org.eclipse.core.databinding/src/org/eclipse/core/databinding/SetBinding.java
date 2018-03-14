@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.Status;
 
 /**
  * @since 1.1
- *
+ * 
  */
 public class SetBinding extends Binding {
 
@@ -182,8 +182,8 @@ public class SetBinding extends Binding {
 					for (Iterator iterator = diff.getRemovals().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doRemove(
-								destination,
-								updateSetStrategy.convert(iterator.next()));
+								destination, updateSetStrategy.convert(iterator
+										.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -194,8 +194,8 @@ public class SetBinding extends Binding {
 					for (Iterator iterator = diff.getAdditions().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doAdd(
-								destination,
-								updateSetStrategy.convert(iterator.next()));
+								destination, updateSetStrategy.convert(iterator
+										.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -203,7 +203,7 @@ public class SetBinding extends Binding {
 						// occurred...
 					}
 				} finally {
-					setValidationStatus(multiStatus);
+					validationStatusObservable.setValue(multiStatus);
 
 					if (destination == getTarget()) {
 						updatingTarget = false;
@@ -215,19 +215,10 @@ public class SetBinding extends Binding {
 		});
 	}
 
-	private void setValidationStatus(final IStatus status) {
-		validationStatusObservable.getRealm().exec(new Runnable() {
-			@Override
-			public void run() {
-				validationStatusObservable.setValue(status);
-			}
-		});
-	}
-
 	/**
 	 * Merges the provided <code>newStatus</code> into the
 	 * <code>multiStatus</code>.
-	 *
+	 * 
 	 * @param multiStatus
 	 * @param newStatus
 	 */

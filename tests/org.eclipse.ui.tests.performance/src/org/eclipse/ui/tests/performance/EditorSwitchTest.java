@@ -27,7 +27,7 @@ public class EditorSwitchTest extends BasicPerformanceTest {
 
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param testName
 	 *            Test's name.
 	 */
@@ -40,7 +40,6 @@ public class EditorSwitchTest extends BasicPerformanceTest {
 	/**
 	 * Test editor opening performance. This test always fails.
 	 */
-	@Override
 	protected void runTest() throws CoreException {
 
 		// Open both files outside the loop so as not to include
@@ -56,7 +55,7 @@ public class EditorSwitchTest extends BasicPerformanceTest {
 		processEvents();
         EditorTestHelper.calmDown(500, 30000, 500);
         waitForBackgroundJobs();
-
+        
 		for (int j = 0; j < 100; j++) {
 
 			startMeasuring();
@@ -69,7 +68,7 @@ public class EditorSwitchTest extends BasicPerformanceTest {
 			stopMeasuring();
             EditorTestHelper.calmDown(500, 30000, 100);
 		}
-
+        
 		commitMeasurements();
 		assertPerformance();
 	}

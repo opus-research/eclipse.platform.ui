@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   IBM Corporation - initial API and implementation
+ *   IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font should be activated and used by other components.
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
@@ -43,7 +43,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * A composite widget which holds a list of elements for user selection. The
  * elements are sorted alphabetically. Optionally, the elements can be filtered
  * and duplicate entries can be hidden (folding).
- *
+ * 
  * @since 2.0
  */
 public class FilteredList extends Composite {
@@ -53,7 +53,7 @@ public class FilteredList extends Composite {
 	public interface FilterMatcher {
 		/**
 		 * Sets the filter.
-		 *
+		 * 
 		 * @param pattern
 		 *            the filter pattern.
 		 * @param ignoreCase
@@ -143,7 +143,7 @@ public class FilteredList extends Composite {
 
 		/**
 		 * Create a new instance of label.
-		 *
+		 * 
 		 * @param newString
 		 * @param image
 		 */
@@ -158,7 +158,7 @@ public class FilteredList extends Composite {
 
 		/**
 		 * Return whether or not the receiver is the same as label.
-		 *
+		 * 
 		 * @param label
 		 * @return boolean
 		 */
@@ -218,7 +218,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Constructs a new filtered list.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @param style
@@ -262,7 +262,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Sets the list of elements.
-	 *
+	 * 
 	 * @param elements
 	 *            the elements to be shown in the list.
 	 */
@@ -284,7 +284,6 @@ public class FilteredList extends Composite {
 			fLabels[i] = new Label(text, image);
 			imageSet.add(image);
 		}
-		fList.deselectAll();
 		fImages.clear();
 		fImages.addAll(imageSet);
 		fSorter.sort(fLabels, fElements);
@@ -295,7 +294,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Tests if the list (before folding and filtering) is empty.
-	 *
+	 * 
 	 * @return returns <code>true</code> if the list is empty,
 	 *         <code>false</code> otherwise.
 	 */
@@ -305,7 +304,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Sets the filter matcher.
-	 *
+	 * 
 	 * @param filterMatcher
 	 */
 	public void setFilterMatcher(FilterMatcher filterMatcher) {
@@ -315,7 +314,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Sets a custom comparator for sorting the list.
-	 *
+	 * 
 	 * @param comparator
 	 */
 	public void setComparator(Comparator comparator) {
@@ -325,7 +324,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Adds a selection listener to the list.
-	 *
+	 * 
 	 * @param listener
 	 *            the selection listener to be added.
 	 */
@@ -335,7 +334,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Removes a selection listener from the list.
-	 *
+	 * 
 	 * @param listener
 	 *            the selection listener to be removed.
 	 */
@@ -345,7 +344,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Sets the selection of the list. Empty or null array removes selection.
-	 *
+	 * 
 	 * @param selection
 	 *            an array of indices specifying the selection.
 	 */
@@ -368,7 +367,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Returns the selection of the list.
-	 *
+	 * 
 	 * @return returns an array of indices specifying the current selection.
 	 */
 	public int[] getSelectionIndices() {
@@ -378,7 +377,7 @@ public class FilteredList extends Composite {
 	/**
 	 * Returns the selection of the list. This is a convenience function for
 	 * <code>getSelectionIndices()</code>.
-	 *
+	 * 
 	 * @return returns the index of the selection, -1 for no selection.
 	 */
 	public int getSelectionIndex() {
@@ -387,7 +386,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Sets the selection of the list. Empty or null array removes selection.
-	 *
+	 * 
 	 * @param elements
 	 *            the array of elements to be selected.
 	 */
@@ -431,7 +430,7 @@ public class FilteredList extends Composite {
 	 * returned in the list are the same as the ones passed with
 	 * <code>setElements</code>. The array does not contain the rendered
 	 * strings.
-	 *
+	 * 
 	 * @return returns the array of selected elements.
 	 */
 	public Object[] getSelection() {
@@ -449,7 +448,7 @@ public class FilteredList extends Composite {
 	/**
 	 * Sets the filter pattern. Current only prefix filter patterns are
 	 * supported.
-	 *
+	 * 
 	 * @param filter
 	 *            the filter pattern.
 	 */
@@ -470,7 +469,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Returns the filter pattern.
-	 *
+	 * 
 	 * @return returns the filter pattern.
 	 */
 	public String getFilter() {
@@ -479,7 +478,7 @@ public class FilteredList extends Composite {
 
 	/**
 	 * Returns all elements which are folded together to one entry in the list.
-	 *
+	 * 
 	 * @param index
 	 *            the index selecting the entry in the list.
 	 * @return returns an array of elements folded together, <code>null</code>
@@ -555,12 +554,12 @@ public class FilteredList extends Composite {
 		 * Programmatic selections requested while this job was running.
 		 */
 		int[] indicesToSelect;
-
+		
 		private boolean readyForSelection = false;
 
 		/**
 		 * Create a new instance of a job used to update the table.
-		 *
+		 * 
 		 * @param table
 		 * @param count
 		 *            The number of items to update per running.
@@ -578,7 +577,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 				return Status.CANCEL_STATUS;
 			}
             int itemCount = fTable.getItemCount();
-
+                        
             // Remove excess items
             if (fCount < itemCount) {
                 fTable.setRedraw(false);
@@ -638,7 +637,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
         }
 		/**
 		 * Update the selection for the supplied indices.
-		 *
+		 * 
 		 * @param indices
 		 */
 		void updateSelection(final int[] indices) {
@@ -660,7 +659,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 
 		/**
 		 * Select the supplied indices and notify any listeners
-		 *
+		 * 
 		 * @param indices
 		 */
 		private void selectAndNotify(final int[] indices) {
@@ -676,7 +675,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 
 	/**
 	 * Returns whether or not duplicates are allowed.
-	 *
+	 * 
 	 * @return <code>true</code> indicates duplicates are allowed
 	 */
 	public boolean getAllowDuplicates() {
@@ -686,7 +685,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 	/**
 	 * Sets whether or not duplicates are allowed. If this value is set the
 	 * items should be set again for this value to take effect.
-	 *
+	 * 
 	 * @param allowDuplicates
 	 *            <code>true</code> indicates duplicates are allowed
 	 */
@@ -696,7 +695,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 
 	/**
 	 * Returns whether or not case should be ignored.
-	 *
+	 * 
 	 * @return <code>true</code> if case should be ignored
 	 */
 	public boolean getIgnoreCase() {
@@ -706,7 +705,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 	/**
 	 * Sets whether or not case should be ignored If this value is set the items
 	 * should be set again for this value to take effect.
-	 *
+	 * 
 	 * @param ignoreCase
 	 *            <code>true</code> if case should be ignored
 	 */
@@ -716,7 +715,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 
 	/**
 	 * Returns whether empty filter strings should filter everything or nothing.
-	 *
+	 * 
 	 * @return <code>true</code> for the empty string to match all items,
 	 *         <code>false</code> to match none
 	 */
@@ -728,7 +727,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 	 * Sets whether empty filter strings should filter everything or nothing. If
 	 * this value is set the items should be set again for this value to take
 	 * effect.
-	 *
+	 * 
 	 * @param matchEmptyString
 	 *            <code>true</code> for the empty string to match all items,
 	 *            <code>false</code> to match none
@@ -739,7 +738,7 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 
 	/**
 	 * Returns the label provider for the items.
-	 *
+	 * 
 	 * @return the label provider
 	 */
 	public ILabelProvider getLabelProvider() {
@@ -749,14 +748,14 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 	/**
 	 * Sets the label provider. If this value is set the items should be set
 	 * again for this value to take effect.
-	 *
+	 * 
 	 * @param labelProvider
 	 *            the label provider
 	 */
 	public void setLabelProvider(ILabelProvider labelProvider) {
 		this.fLabelProvider = labelProvider;
 	}
-
+	
 	/**
 	 * Returns the accessible object for the receiver.
 	 * If this is the first time this object is requested,
@@ -768,10 +767,10 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 	 *    <li>ERROR_WIDGET_DISPOSED - if the receiver has been disposed</li>
 	 *    <li>ERROR_THREAD_INVALID_ACCESS - if not called from the thread that created the receiver</li>
 	 * </ul>
-	 *
+	 * 
 	 * @see Accessible#addAccessibleListener
 	 * @see Accessible#addAccessibleControlListener
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	@Override

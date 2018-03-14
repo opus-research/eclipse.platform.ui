@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Tom Schindl and others.
+ * Copyright (c) 2010, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,20 +61,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
 public class ThemeEngine implements IThemeEngine {
-	private List<Theme> themes = new ArrayList<>();
-	private List<CSSEngine> cssEngines = new ArrayList<>();
+	private List<Theme> themes = new ArrayList<Theme>();
+	private List<CSSEngine> cssEngines = new ArrayList<CSSEngine>();
 
 	// kept for theme notifications only
 	private Display display;
 
 	private ITheme currentTheme;
 
-	private List<String> globalStyles = new ArrayList<>();
-	private List<IResourceLocator> globalSourceLocators = new ArrayList<>();
+	private List<String> globalStyles = new ArrayList<String>();
+	private List<IResourceLocator> globalSourceLocators = new ArrayList<IResourceLocator>();
 
-	private HashMap<String, List<String>> stylesheets = new HashMap<>();
-	private HashMap<String, List<String>> modifiedStylesheets = new HashMap<>();
-	private HashMap<String, List<IResourceLocator>> sourceLocators = new HashMap<>();
+	private HashMap<String, List<String>> stylesheets = new HashMap<String, List<String>>();
+	private HashMap<String, List<String>> modifiedStylesheets = new HashMap<String, List<String>>();
+	private HashMap<String, List<IResourceLocator>> sourceLocators = new HashMap<String, List<IResourceLocator>>();
 
 	private static final String THEMEID_KEY = "themeid";
 
@@ -160,7 +160,7 @@ public class ThemeEngine implements IThemeEngine {
 									String modifiedFileName = modifiedFile.getName();
 									if (modifiedFileName.contains(".css") && modifiedFileName.equals(originalCSSFile)) {  //$NON-NLS-1$
 										//								modifiedStylesheets
-										ArrayList<String> styleSheets = new ArrayList<>();
+										ArrayList<String> styleSheets = new ArrayList<String>();
 										styleSheets.add(modifiedFile.toURI().toString());
 										modifiedStylesheets.put(themeId, styleSheets);
 									}
@@ -273,7 +273,7 @@ public class ThemeEngine implements IThemeEngine {
 			for (String t : themes) {
 				List<IResourceLocator> list = sourceLocators.get(t);
 				if (list == null) {
-					list = new ArrayList<>();
+					list = new ArrayList<IResourceLocator>();
 					sourceLocators.put(t, list);
 				}
 				list.add(locator);
@@ -284,7 +284,7 @@ public class ThemeEngine implements IThemeEngine {
 	private void registerStyle(String id, String stylesheet) {
 		List<String> s = stylesheets.get(id);
 		if (s == null) {
-			s = new ArrayList<>();
+			s = new ArrayList<String>();
 			stylesheets.put(id, s);
 		}
 		s.add(stylesheet);
@@ -294,7 +294,7 @@ public class ThemeEngine implements IThemeEngine {
 		// check for any modifications first
 		List<String> m = modifiedStylesheets.get(id);
 		if (m != null) {
-			m = new ArrayList<>(m);
+			m = new ArrayList<String>(m);
 			m.addAll(globalStyles);
 			return m;
 		}
@@ -304,14 +304,14 @@ public class ThemeEngine implements IThemeEngine {
 			s = Collections.emptyList();
 		}
 
-		s = new ArrayList<>(s);
+		s = new ArrayList<String>(s);
 		s.addAll(globalStyles);
 		return s;
 
 	}
 
 	private List<IResourceLocator> getResourceLocators(String id) {
-		List<IResourceLocator> list = new ArrayList<>(
+		List<IResourceLocator> list = new ArrayList<IResourceLocator>(
 				globalSourceLocators);
 		List<IResourceLocator> s = sourceLocators.get(id);
 		if (s != null) {
@@ -334,8 +334,8 @@ public class ThemeEngine implements IThemeEngine {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
 		// TODO: Need to differentiate win32 versions
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
-		ArrayList<IConfigurationElement> matchingElements = new ArrayList<>();
+		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
+		ArrayList<IConfigurationElement> matchingElements = new ArrayList<IConfigurationElement>();
 		for (IConfigurationElement element : elements) {
 			String elementOs = element.getAttribute("os");
 			String elementWs = element.getAttribute("ws");
@@ -478,7 +478,7 @@ public class ThemeEngine implements IThemeEngine {
 		if (eventAdmin == null) {
 			return;
 		}
-		Map<String, Object> data = new HashMap<>();
+		Map<String, Object> data = new HashMap<String, Object>();
 		data.put(IThemeEngine.Events.THEME_ENGINE, this);
 		data.put(IThemeEngine.Events.THEME, currentTheme);
 		data.put(IThemeEngine.Events.DEVICE, display);
@@ -523,8 +523,7 @@ public class ThemeEngine implements IThemeEngine {
 	}
 
 	private IEclipsePreferences getPreferences() {
-		return InstanceScope.INSTANCE.getNode(
-				FrameworkUtil.getBundle(
+		return new InstanceScope().getNode(FrameworkUtil.getBundle(
 				ThemeEngine.class).getSymbolicName());
 	}
 
@@ -590,7 +589,7 @@ public class ThemeEngine implements IThemeEngine {
 
 	public List<String> getStylesheets(ITheme selection) {
 		List<String> ss  = stylesheets.get(selection.getId());
-		return ss == null ? new ArrayList<>() : ss;
+		return ss == null ? new ArrayList<String>() : ss;
 	}
 
 	public void themeModified(ITheme theme, List<String> paths) {
@@ -606,7 +605,7 @@ public class ThemeEngine implements IThemeEngine {
 
 	public List<String> getModifiedStylesheets(ITheme selection) {
 		List<String> ss  = modifiedStylesheets.get(selection.getId());
-		return ss == null ? new ArrayList<>() : ss;
+		return ss == null ? new ArrayList<String>() : ss;
 	}
 
 	public void resetModifiedStylesheets(ITheme selection) {

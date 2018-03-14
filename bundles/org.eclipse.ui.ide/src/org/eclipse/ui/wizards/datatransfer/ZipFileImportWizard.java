@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,14 +36,14 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * </p>
  * <p>
  * Example:
- *
+ * 
  * <pre>
  * IWizard wizard = new ZipFileImportWizard();
  * wizard.init(workbench, selection);
  * WizardDialog dialog = new WizardDialog(shell, wizard);
  * dialog.open();
  * </pre>
- *
+ * 
  * During the call to <code>open</code>, the wizard dialog is presented to
  * the user. When the user hits Finish, the user-selected zip file is imported
  * into the workspace, the dialog closes, and the call to <code>open</code>
@@ -73,6 +73,9 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 		setDialogSettings(section);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
 	@Override
 	public void addPages() {
 		super.addPages();
@@ -84,7 +87,7 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 	/**
 	 * Get the file import mask used by the receiver. By default use null so
 	 * that there is no mask.
-	 *
+	 * 
 	 * @return String[] or <code>null</code>
 	 * @since 3.4
 	 */
@@ -92,6 +95,9 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWorkbenchWizard.
+	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		this.workbench = workbench;
@@ -107,11 +113,17 @@ public class ZipFileImportWizard extends Wizard implements IImportWizard {
 		setNeedsProgressMonitor(true);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
 	@Override
 	public boolean performCancel() {
 		return mainPage.cancel();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
 	@Override
 	public boolean performFinish() {
 		return mainPage.finish();

@@ -24,11 +24,10 @@ public class UITestJob extends UIJob {
 		this.duration = duration;
 		this.failure = failure;
 		this.unknown = indeterminate;
-
+		
 		if (lock)
 			setRule(ResourcesPlugin.getWorkspace().getRoot());
 	}
-	@Override
 	public IStatus runInUIThread(IProgressMonitor monitor) {
 		if (failure)
 			throw new RuntimeException();

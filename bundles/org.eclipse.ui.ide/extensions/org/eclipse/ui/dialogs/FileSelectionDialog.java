@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   IBM Corporation - initial API and implementation
+ *   IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *      font should be activated and used by other components.
  *******************************************************************************/
@@ -16,6 +16,7 @@ package org.eclipse.ui.dialogs;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.SWT;
@@ -45,7 +46,7 @@ import org.eclipse.ui.model.WorkbenchViewerComparator;
  * <p>
  * Example:
  * <pre>
- *	FileSelectionDialog dialog =
+ *	FileSelectionDialog dialog = 
  *		new FileSelectionDialog(getShell(), rootElement, msg);
  *	dialog.setInitialSelections(selectedResources);
  *	dialog.open();
@@ -180,8 +181,13 @@ public class FileSelectionDialog extends SelectionDialog {
                 SIZING_SELECTION_WIDGET_HEIGHT); // widgets we need to hardcode the combined widget's
         // size, otherwise it will open too small
 
-        ICheckStateListener listener = event -> getOkButton().setEnabled(
-		        selectionGroup.getCheckedElementCount() > 0);
+        ICheckStateListener listener = new ICheckStateListener() {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+                getOkButton().setEnabled(
+                        selectionGroup.getCheckedElementCount() > 0);
+            }
+        };
 
         WorkbenchViewerComparator comparator = new WorkbenchViewerComparator();
         selectionGroup.setTreeComparator(comparator);
@@ -204,7 +210,7 @@ public class FileSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * Returns a content provider for <code>FileSystemElement</code>s that returns
+     * Returns a content provider for <code>FileSystemElement</code>s that returns 
      * only files as children.
      */
     private ITreeContentProvider getFileProvider() {
@@ -220,7 +226,7 @@ public class FileSelectionDialog extends SelectionDialog {
     }
 
     /**
-     * Returns a content provider for <code>FileSystemElement</code>s that returns
+     * Returns a content provider for <code>FileSystemElement</code>s that returns 
      * only folders as children.
      */
     private ITreeContentProvider getFolderProvider() {
@@ -239,7 +245,7 @@ public class FileSelectionDialog extends SelectionDialog {
      * Initializes this dialog's controls.
      */
     private void initializeDialog() {
-        // initialize page
+        // initialize page	
         if (getInitialElementSelections().isEmpty()) {
 			getOkButton().setEnabled(false);
 		} else {
@@ -253,7 +259,7 @@ public class FileSelectionDialog extends SelectionDialog {
 
     /**
      * The <code>FileSelectionDialog</code> implementation of this
-     * <code>Dialog</code> method builds a list of the selected files for later
+     * <code>Dialog</code> method builds a list of the selected files for later 
      * retrieval by the client and closes this dialog.
      */
     @Override

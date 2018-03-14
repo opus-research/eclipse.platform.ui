@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
  * dialog etc.). Clients that need access to the class should not do it
  * directly. Instead, they should do it through IManagedForm interface as much
  * as possible.
- *
+ * 
  * @since 3.0
  */
 public class ManagedForm implements IManagedForm {
@@ -48,12 +48,12 @@ public class ManagedForm implements IManagedForm {
 
 	private boolean initialized;
 
-	private Vector<IFormPart> parts = new Vector<>();
+	private Vector parts = new Vector();
 
 	/**
 	 * Creates a managed form in the provided parent. Form toolkit and widget
 	 * will be created and owned by this object.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent widget
 	 */
@@ -65,7 +65,7 @@ public class ManagedForm implements IManagedForm {
 
 	/**
 	 * Creates a managed form that will use the provided toolkit and
-	 *
+	 * 
 	 * @param toolkit
 	 * @param form
 	 */
@@ -74,33 +74,57 @@ public class ManagedForm implements IManagedForm {
 		this.toolkit = toolkit;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#addPart(org.eclipse.ui.forms.IFormPart)
+	 */
 	public void addPart(IFormPart part) {
 		parts.add(part);
 		part.initialize(this);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#removePart(org.eclipse.ui.forms.IFormPart)
+	 */
 	public void removePart(IFormPart part) {
 		parts.remove(part);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getParts()
+	 */
 	public IFormPart[] getParts() {
-		return parts.toArray(new IFormPart[parts.size()]);
+		return (IFormPart[]) parts.toArray(new IFormPart[parts.size()]);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getToolkit()
+	 */
 	public FormToolkit getToolkit() {
 		return toolkit;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getForm()
+	 */
 	public ScrolledForm getForm() {
 		return form;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#reflow(boolean)
+	 */
 	public void reflow(boolean changed) {
 		form.reflow(changed);
 	}
@@ -108,17 +132,16 @@ public class ManagedForm implements IManagedForm {
 	/**
 	 * A part can use this method to notify other parts that implement
 	 * IPartSelectionListener about selection changes.
-	 *
+	 * 
 	 * @param part
 	 *            the part that broadcasts the selection
 	 * @param selection
 	 *            the selection in the part
 	 * @see IPartSelectionListener
 	 */
-	@Override
 	public void fireSelectionChanged(IFormPart part, ISelection selection) {
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart cpart = parts.get(i);
+			IFormPart cpart = (IFormPart) parts.get(i);
 			if (part.equals(cpart))
 				continue;
 			if (cpart instanceof IPartSelectionListener) {
@@ -132,12 +155,11 @@ public class ManagedForm implements IManagedForm {
 	 * Initializes the form by looping through the managed parts and
 	 * initializing them. Has no effect if already called once.
 	 */
-	@Override
 	public void initialize() {
 		if (initialized)
 			return;
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart part = parts.get(i);
+			IFormPart part = (IFormPart) parts.get(i);
 			part.initialize(this);
 		}
 		initialized = true;
@@ -148,7 +170,7 @@ public class ManagedForm implements IManagedForm {
 	 */
 	public void dispose() {
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart part = parts.get(i);
+			IFormPart part = (IFormPart) parts.get(i);
 			part.dispose();
 		}
 		if (ownsToolkit) {
@@ -162,7 +184,6 @@ public class ManagedForm implements IManagedForm {
 	 * is not needed to wrap the call in <code>Display.syncExec</code> or
 	 * <code>asyncExec</code>.
 	 */
-	@Override
 	public void refresh() {
 		Thread t = Thread.currentThread();
 		Thread dt = toolkit.getColors().getDisplay().getThread();
@@ -170,7 +191,6 @@ public class ManagedForm implements IManagedForm {
 			doRefresh();
 		else {
 			toolkit.getColors().getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					doRefresh();
 				}
@@ -181,7 +201,7 @@ public class ManagedForm implements IManagedForm {
 	private void doRefresh() {
 		int nrefreshed = 0;
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart part = parts.get(i);
+			IFormPart part = (IFormPart) parts.get(i);
 			if (part.isStale()) {
 				part.refresh();
 				nrefreshed++;
@@ -191,22 +211,30 @@ public class ManagedForm implements IManagedForm {
 			form.reflow(true);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#commit(boolean)
+	 */
 	public void commit(boolean onSave) {
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart part = parts.get(i);
+			IFormPart part = (IFormPart) parts.get(i);
 			if (part.isDirty())
 				part.commit(onSave);
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#setInput(java.lang.Object)
+	 */
 	public boolean setInput(Object input) {
 		boolean pageResult = false;
 
 		this.input = input;
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart part = parts.get(i);
+			IFormPart part = (IFormPart) parts.get(i);
 			boolean result = part.setFormInput(input);
 			if (result)
 				pageResult = true;
@@ -214,7 +242,11 @@ public class ManagedForm implements IManagedForm {
 		return pageResult;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getInput()
+	 */
 	public Object getInput() {
 		return input;
 	}
@@ -224,50 +256,76 @@ public class ManagedForm implements IManagedForm {
 	 */
 	public void setFocus() {
 		if (parts.size() > 0) {
-			IFormPart part = parts.get(0);
+			IFormPart part = (IFormPart) parts.get(0);
 			part.setFocus();
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#isDirty()
+	 */
 	public boolean isDirty() {
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart part = parts.get(i);
+			IFormPart part = (IFormPart) parts.get(i);
 			if (part.isDirty())
 				return true;
 		}
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#isStale()
+	 */
 	public boolean isStale() {
 		for (int i = 0; i < parts.size(); i++) {
-			IFormPart part = parts.get(i);
+			IFormPart part = (IFormPart) parts.get(i);
 			if (part.isStale())
 				return true;
 		}
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#dirtyStateChanged()
+	 */
 	public void dirtyStateChanged() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#staleStateChanged()
+	 */
 	public void staleStateChanged() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#getContainer()
+	 */
 	public Object getContainer() {
 		return container;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IManagedForm#setContainer(java.lang.Object)
+	 */
 	public void setContainer(Object container) {
 		this.container = container;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.IManagedForm#getMessageManager()
+	 */
 	public IMessageManager getMessageManager() {
 		return form.getMessageManager();
 	}

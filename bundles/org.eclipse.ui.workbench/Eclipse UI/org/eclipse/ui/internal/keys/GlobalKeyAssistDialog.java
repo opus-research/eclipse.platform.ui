@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 IBM Corporation and others.
+ * Copyright (c) 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,8 +28,8 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  * Extends the key conflict popup dialog to provide a full list of global key
  * bindings for the workbench. If {@link #open()} is called while this dialog is
  * still open, the keys preference page is opened.
- *
- *
+ * 
+ * 
  */
 public class GlobalKeyAssistDialog extends KeyAssistDialog {
 
@@ -79,7 +79,7 @@ public class GlobalKeyAssistDialog extends KeyAssistDialog {
 	 * Determines what keybinding was used to open this dialog and returns an
 	 * info string using that binding. ex:
 	 * "Press 'Ctrl-Shift-L') to open the preference page";
-	 *
+	 * 
 	 * @return info text for this dialog
 	 */
 	private String getInfoText() {

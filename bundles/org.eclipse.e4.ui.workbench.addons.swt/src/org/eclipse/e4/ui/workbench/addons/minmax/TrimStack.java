@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars.Vogel@vogella.com - Bug 454712, 485851
- *     dirk.fauth@googlemail.com - Bug 446095
+ *     Lars.Vogel@vogella.com - Bug 454712
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
@@ -45,7 +44,6 @@ import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
-import org.eclipse.e4.ui.workbench.addons.minmax.TrimStackIdHelper.TrimStackIdPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.renderers.swt.TrimmedPartLayout;
@@ -216,7 +214,7 @@ public class TrimStack {
 	/**
 	 * This is the new way to handle UIEvents (as opposed to subscring and unsubscribing them with
 	 * the event broker.
-	 *
+	 * 
 	 * The method is described in detail at http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
 	 */
 	@SuppressWarnings("unchecked")
@@ -299,7 +297,7 @@ public class TrimStack {
 			showStack(false);
 		}
 	};
-
+	
 	// Close any open stacks before shutting down
 	private EventHandler shutdownHandler = new EventHandler() {
 		@Override
@@ -582,8 +580,6 @@ public class TrimStack {
 			MTrimBar bar = (MTrimBar) meParent;
 			if (bar.getSide() == SideValue.RIGHT || bar.getSide() == SideValue.LEFT)
 				orientation = SWT.VERTICAL;
-			// TrimStacks are draggable by default
-			 me.getTags().add(IPresentationEngine.DRAGGABLE);
 		}
 		trimStackTB = new ToolBar(parent, orientation | SWT.FLAT | SWT.WRAP);
 		trimStackTB.addDisposeListener(new DisposeListener() {
@@ -681,7 +677,7 @@ public class TrimStack {
 	 * layout tags on the {@link #minimizedElement}. The restore item will remove the minimized tag.
 	 * The close item is not available on the editor stack, but will ask the part service to hide
 	 * the part.
-	 *
+	 * 
 	 * @param selectedPart
 	 *            the part from the data of the selected tool item
 	 */
@@ -801,20 +797,10 @@ public class TrimStack {
 			result = modelService.find(stackId, window);
 		} else {
 			String toolControlId = toolControl.getElementId();
-			Map<TrimStackIdPart, String> parsedIds = TrimStackIdHelper.parseTrimStackId(toolControlId);
-
-			String stackId = parsedIds.get(TrimStackIdPart.ELEMENT_ID);
-			String perspId = parsedIds.get(TrimStackIdPart.PERSPECTIVE_ID);
-
-			MPerspective persp = null;
-			if (perspId != null) {
-				List<MPerspective> perspectives = modelService.findElements(ps.get(0), perspId, MPerspective.class,
-						null);
-				if (perspectives != null && !perspectives.isEmpty()) {
-					persp = perspectives.get(0);
-				}
-			}
-
+			int index = toolControlId.indexOf('(');
+			String stackId = toolControlId.substring(0, index);
+			String perspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
+			MPerspective persp = (MPerspective) modelService.find(perspId, ps.get(0));
 			if (persp != null) {
 				result = modelService.find(stackId, persp);
 			} else {
@@ -928,8 +914,9 @@ public class TrimStack {
 				return;
 			}
 		}
+
 		trimStackTB.pack();
-		trimStackTB.requestLayout();
+		trimStackTB.getShell().layout(new Control[] { trimStackTB }, SWT.DEFER);
 	}
 
 	void restoreStack() {
@@ -960,7 +947,7 @@ public class TrimStack {
 
 	/**
 	 * Sets whether this stack should be visible or hidden
-	 *
+	 * 
 	 * @param show
 	 *            whether the stack should be visible
 	 */
@@ -1056,12 +1043,8 @@ public class TrimStack {
 				// If we haven't found one then use the first
 				if (partToActivate == null) {
 					List<MPart> parts = modelService.findElements(area, null, MPart.class, null);
-					for (MPart part : parts) {
-						if (partService.isPartVisible(part)) {
-							partToActivate = part;
-							break;
-						}
-					}
+					if (parts.size() > 0)
+						partToActivate = parts.get(0);
 				}
 
 				if (partToActivate != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,13 +77,14 @@ public class Snippet029TreeViewerMultiListProperty {
 	protected void createContents() {
 		shell = new Shell();
 		shell.setSize(509, 375);
-		shell.setText("Snippet029TreeViewerMultiListProperty.java");
+		shell.setText("Snippet028DuplexingObservableValue.java");
 		final GridLayout gridLayout = new GridLayout();
 		gridLayout.makeColumnsEqualWidth = true;
 		gridLayout.numColumns = 4;
 		shell.setLayout(new FillLayout());
 
-		viewer = new TreeViewer(shell, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER);
+		viewer = new TreeViewer(shell, SWT.FULL_SELECTION | SWT.MULTI
+				| SWT.BORDER);
 
 		bindUI();
 	}
@@ -97,20 +98,26 @@ public class Snippet029TreeViewerMultiListProperty {
 			propertyChangeSupport.addPropertyChangeListener(listener);
 		}
 
-		public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-			propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+		public void addPropertyChangeListener(String propertyName,
+				PropertyChangeListener listener) {
+			propertyChangeSupport.addPropertyChangeListener(propertyName,
+					listener);
 		}
 
 		public void removePropertyChangeListener(PropertyChangeListener listener) {
 			propertyChangeSupport.removePropertyChangeListener(listener);
 		}
 
-		public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-			propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+		public void removePropertyChangeListener(String propertyName,
+				PropertyChangeListener listener) {
+			propertyChangeSupport.removePropertyChangeListener(propertyName,
+					listener);
 		}
 
-		protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-			propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+		protected void firePropertyChange(String propertyName, Object oldValue,
+				Object newValue) {
+			propertyChangeSupport.firePropertyChange(propertyName, oldValue,
+					newValue);
 		}
 	}
 

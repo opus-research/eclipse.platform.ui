@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids - bug 128526, bug 128529
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988, 457434, 472654
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 455527
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -22,9 +21,7 @@ import org.eclipse.e4.ui.model.LocalizationHelper;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogLabelKeys;
@@ -58,12 +55,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 
-public class ShowViewDialog extends Dialog implements ISelectionChangedListener, IDoubleClickListener {
+public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
+		IDoubleClickListener {
 
 	private static final String DIALOG_SETTING_SECTION_NAME = "ShowViewDialog"; //$NON-NLS-1$
 
@@ -84,7 +83,6 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	private Button okButton;
 
 	private MApplication application;
-
 	private MPartDescriptor[] viewDescs = new MPartDescriptor[0];
 
 	private Label descriptionHint;
@@ -95,8 +93,6 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 
 	private MWindow window;
 
-	private EPartService partService;
-
 	/**
 	 * Constructs a new ShowViewDialog.
 	 *
@@ -104,17 +100,15 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	 * @param application
 	 * @param window
 	 * @param modelService
-	 * @param partService
 	 * @param context
 	 *
 	 */
-	public ShowViewDialog(Shell shell, MApplication application, MWindow window, EModelService modelService,
-			EPartService partService, IEclipseContext context) {
+	public ShowViewDialog(Shell shell, MApplication application, MWindow window,
+			EModelService modelService, IEclipseContext context) {
 		super(shell);
 		this.application = application;
 		this.window = window;
 		this.modelService = modelService;
-		this.partService = partService;
 		this.context = context;
 	}
 
@@ -142,18 +136,18 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(WorkbenchMessages.ShowView_shellTitle);
-		EHelpService helpService = context.get(EHelpService.class);
-		if (helpService != null) {
-			helpService.setHelp(shell, IWorkbenchHelpContextIds.SHOW_VIEW_DIALOG);
-		}
+		// TODO change to context access once
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=445600
+		// is solved
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, IWorkbenchHelpContextIds.SHOW_VIEW_DIALOG);
 	}
 
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		okButton = createButton(parent, IDialogConstants.OK_ID, JFaceResources.getString(IDialogLabelKeys.OK_LABEL_KEY),
-				true);
-		createButton(parent, IDialogConstants.CANCEL_ID, JFaceResources.getString(IDialogLabelKeys.CANCEL_LABEL_KEY),
-				false);
+		okButton = createButton(parent, IDialogConstants.OK_ID,
+				JFaceResources.getString(IDialogLabelKeys.OK_LABEL_KEY), true);
+		createButton(parent, IDialogConstants.CANCEL_ID,
+				JFaceResources.getString(IDialogLabelKeys.CANCEL_LABEL_KEY), false);
 		updateButtons();
 	}
 
@@ -232,7 +226,8 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 			}
 		});
 
-		treeViewer.setLabelProvider(new ViewLabelProvider(context, modelService, partService, window,dimmedForeground));
+		treeViewer.setLabelProvider(new ViewLabelProvider(context, modelService, window,
+				dimmedForeground));
 		treeViewer.setContentProvider(new ViewContentProvider(application));
 		treeViewer.setComparator(new ViewComparator());
 		treeViewer.setInput(application);
@@ -411,7 +406,7 @@ public class ShowViewDialog extends Dialog implements ISelectionChangedListener,
 	 * Update the selection object.
 	 */
 	protected void updateSelection(SelectionChangedEvent event) {
-		ArrayList<MPartDescriptor> descs = new ArrayList<>();
+		ArrayList<MPartDescriptor> descs = new ArrayList<MPartDescriptor>();
 		IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 		for (Iterator<?> i = sel.iterator(); i.hasNext();) {
 			Object o = i.next();

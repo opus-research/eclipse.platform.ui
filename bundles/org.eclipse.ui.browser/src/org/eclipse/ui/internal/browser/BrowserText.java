@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -59,8 +59,7 @@ public class BrowserText {
             super(parent, style);
         }
 
-        @Override
-		public void reflow(boolean flushCache) {
+        public void reflow(boolean flushCache) {
             updateWidth(this);
             super.reflow(flushCache);
         }
@@ -74,7 +73,7 @@ public class BrowserText {
         scomp = new ReflowScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
         Composite client = new Composite(scomp, SWT.NULL);
         fillContent(client, bg);
-        scomp.setContent(client);
+        scomp.setContent(client);        
         scomp.setBackground(bg);
     }
 
@@ -93,11 +92,9 @@ public class BrowserText {
         link.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         link.setToolTipText(Messages.BrowserText_tooltip);
         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 BusyIndicator.showWhile(link.getDisplay(), new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         doOpenExternal();
                     }
                 });
@@ -118,8 +115,7 @@ public class BrowserText {
         button = new Button(parent, SWT.PUSH);
         updateButtonText();
         button.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 toggleException();
             }
         });

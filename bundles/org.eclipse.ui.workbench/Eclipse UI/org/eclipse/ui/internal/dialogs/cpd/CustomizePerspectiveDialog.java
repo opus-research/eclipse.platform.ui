@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422040, 431992, 472654
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 456729, 404348, 421178, 420956, 424638, 460503
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 431992
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 456729, 404348, 421178, 420956
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -66,7 +66,6 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -163,8 +162,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	static final int MIN_TOOLTIP_WIDTH = 160;
 
 	WorkbenchWindow window;
-
-	private WorkbenchPage windowPage;
+	WorkbenchPage wPage;
 
 	private Perspective perspective;
 
@@ -202,19 +200,15 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 	private DisplayItem views;
 
-	Map<String, ActionSet> idToActionSet = new HashMap<>();
+	Map<String, ActionSet> idToActionSet = new HashMap<String, ActionSet>();
 
-	private final List<ActionSet> actionSets = new ArrayList<>();
+	private final List<ActionSet> actionSets = new ArrayList<ActionSet>();
 
 	private IWorkbenchWindowConfigurer configurer;
 
 	private TabItem actionSetTab;
 
 	private CheckboxTableViewer actionSetAvailabilityTable;
-
-	private TreeViewer actionSetMenuViewer;
-
-	private TreeViewer actionSetToolbarViewer;
 
 	private CheckboxTreeViewer menuStructureViewer1;
 
@@ -282,7 +276,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		public DynamicContributionItem(IContributionItem item) {
 			super(WorkbenchMessages.HideItems_dynamicItemName, item);
-			preview = new ArrayList<>();
+			preview = new ArrayList<MenuItem>();
 		}
 
 		public void addCurrentItem(MenuItem item) {
@@ -396,7 +390,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		public Category(String label) {
 			treeManager.super(label == null ? null : DialogUtil
 					.removeAccel(removeShortcut(label)));
-			this.contributionItems = new ArrayList<>();
+			this.contributionItems = new ArrayList<ShortcutItem>();
 		}
 
 		public List<ShortcutItem> getContributionItems() {
@@ -473,7 +467,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		public ActionSet(ActionSetDescriptor descriptor, boolean active) {
 			this.descriptor = descriptor;
 			this.active = active;
-			this.contributionItems = new ArrayList<>();
+			this.contributionItems = new ArrayList<DisplayItem>();
 		}
 
 		public void addItem(DisplayItem item) {
@@ -527,7 +521,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		this.context = context;
 		perspective = persp;
 		window = (WorkbenchWindow) configurer.getWindow();
-		windowPage = (WorkbenchPage) window.getActivePage();
+		wPage = (WorkbenchPage) window.getActivePage();
 		menuMngrRenderer = context.get(MenuManagerRenderer.class);
 		toolbarMngrRenderer = context.get(ToolBarManagerRenderer.class);
 		resUtils = (ISWTResourceUtilities) context.get(IResourceUtilities.class);
@@ -800,6 +794,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		actionSetAvailabilityTable = actionSetsViewer;
 		actionSetsViewer.getTable().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
+		actionSetsViewer.setLabelProvider(new GrayOutUnavailableLabelProvider(null));
 		actionSetsViewer.setContentProvider(new ArrayContentProvider());
 		actionSetsViewer.setComparator(new WorkbenchViewerComparator());
 		actionSetsViewer.setCheckStateProvider(new ICheckStateProvider() {
@@ -872,7 +867,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		label.setText(WorkbenchMessages.ActionSetSelection_menubarActions);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		actionSetMenuViewer = new TreeViewer(menubarGroup);
+		final TreeViewer actionSetMenuViewer = new TreeViewer(menubarGroup);
 		actionSetMenuViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		actionSetMenuViewer.getControl().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -898,7 +893,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		label.setText(WorkbenchMessages.ActionSetSelection_toolbarActions);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		actionSetToolbarViewer = new TreeViewer(toolbarGroup);
+		final TreeViewer actionSetToolbarViewer = new TreeViewer(toolbarGroup);
 		actionSetToolbarViewer
 				.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		actionSetToolbarViewer.getControl().setLayoutData(
@@ -1061,10 +1056,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 								initSelectAS = (ActionSet) actionSetViewer
 										.getElementAt(0);
 							}
-							if (initSelectAS != null) {
-								setSelectionOn(actionSetViewer, initSelectAS);
-								actionSetViewer.reveal(initSelectAS);
-							}
+							setSelectionOn(actionSetViewer, initSelectAS);
+							actionSetViewer.reveal(initSelectAS);
 							if (initSelectCI != null) {
 								setSelectionOn(menuStructureViewer2,
 										initSelectCI);
@@ -1218,10 +1211,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 								initSelectAS = (ActionSet) actionSetViewer
 										.getElementAt(0);
 							}
-							if (initSelectAS != null) {
-								setSelectionOn(actionSetViewer, initSelectAS);
-								actionSetViewer.reveal(initSelectAS);
+							if (initSelectAS == null) {
+								return;
 							}
+							setSelectionOn(actionSetViewer, initSelectAS);
+							actionSetViewer.reveal(initSelectAS);
 							if (initSelectCI != null) {
 								setSelectionOn(toolbarStructureViewer2,
 										initSelectCI);
@@ -1342,14 +1336,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * @param selected
 	 */
 	private static void setSelectionOn(Viewer viewer, final Object selected) {
-		ISelection selection;
-		if (selected == null) {
-			selection = StructuredSelection.EMPTY;
-		} else {
-			selection = new StructuredSelection(selected);
-		}
-		boolean reveal = selection != StructuredSelection.EMPTY;
-		viewer.setSelection(selection, reveal);
+		viewer.setSelection(new StructuredSelection(selected), true);
 	}
 
 	/**
@@ -1434,10 +1421,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * On a change to availability, updates the appropriate widgets.
 	 */
 	private void actionSetAvailabilityChanged() {
-		actionSetAvailabilityTable.refresh();
-		actionSetMenuViewer.refresh();
-		actionSetToolbarViewer.refresh();
-
 		menuStructureViewer1.refresh();
 		menuStructureViewer2.refresh();
 		toolbarStructureViewer1.refresh();
@@ -1643,7 +1626,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Add actionSet MenuManagers to menu
 		MenuManager menuManager = customizeActionBars.menuManager;
 		IContributionItem[] items = menuManager.getItems();
-		for (IContributionItem item : items) {
+		for (int src = 0; src < items.length; src++) {
+			IContributionItem item = items[src];
 			if (item instanceof ActionSetContributionItem) {
 				ActionSetContributionItem asci = (ActionSetContributionItem) item;
 				menuManager.add(asci.getInnerItem());
@@ -1896,7 +1880,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	}
 
 	private void createMenuEntries(MMenu menu, DisplayItem parent) {
-		Map<IContributionItem, IContributionItem> findDynamics = new HashMap<>();
+		Map<IContributionItem, IContributionItem> findDynamics = new HashMap<IContributionItem, IContributionItem>();
 		DynamicContributionItem dynamicEntry = null;
 
 		if (menu.getParent() != null) {
@@ -1916,7 +1900,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				if (findDynamics.containsKey(null)) {
 					IContributionItem item = findDynamics.get(null);
 					dynamicEntry = new DynamicContributionItem(item);
-					dynamicEntry.setCheckState(getMenuItemIsVisible(dynamicEntry));
 					dynamicEntry.setActionSet(idToActionSet.get(getActionSetID(item)));
 					parent.addChild(dynamicEntry);
 				}
@@ -1942,9 +1925,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				contributionItem = menuMngrRenderer.getManager((MMenu) menuItem);
 			} else {
 				contributionItem = menuMngrRenderer.getContribution(menuItem);
-			}
-			if (contributionItem == null) {
-				return dynamicEntry;
 			}
 			if (dynamicEntry != null
 					&& contributionItem.equals(dynamicEntry.getIContributionItem())) {
@@ -2066,7 +2046,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 	private boolean isHiddenItem(DisplayItem item, String prefix) {
 		String itemId = prefix + getCommandID(item) + ","; //$NON-NLS-1$
-		return windowPage.getHiddenItems().contains(itemId);
+		return wPage.getHiddenItems().contains(itemId);
 	}
 
 	/**
@@ -2168,9 +2148,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			if (text == null) {
 				text = item.getToolTipText();
 			}
-			if (text == null) {
-				text = item.getText();
-			}
 			if (iconDescriptor == null) {
 				Image image = item.getImage();
 				if (image != null) {
@@ -2206,7 +2183,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		Map<String, Object> parameters = null;
 		List<MParameter> modelParms = item.getParameters();
 		if (modelParms != null && !modelParms.isEmpty()) {
-			parameters = new HashMap<>();
+			parameters = new HashMap<String, Object>();
 			for (MParameter mParm : modelParms) {
 				parameters.put(mParm.getName(), mParm.getValue());
 			}
@@ -2268,9 +2245,9 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 	private static ArrayList<String> getVisibleIDs(DisplayItem root) {
 		if (root == null) {
-			return new ArrayList<>();
+			return new ArrayList<String>();
 		}
-		ArrayList<String> ids = new ArrayList<>(root.getChildrenCount());
+		ArrayList<String> ids = new ArrayList<String>(root.getChildrenCount());
 		for (TreeItem treeItem : root.getChildren()) {
 			DisplayItem object = (DisplayItem) treeItem;
 			if (object instanceof ShortcutItem && object.getState()) {
@@ -2316,8 +2293,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	}
 
 	private boolean updateHiddenElements(List<ActionSet> items, String currentHidden, String prefix) {
-		List<String> changedAndVisible = new ArrayList<>();
-		List<String> changedAndInvisible = new ArrayList<>();
+		List<String> changedAndVisible = new ArrayList<String>();
+		List<String> changedAndInvisible = new ArrayList<String>();
 		for (ActionSet actionSet : items) {
 			if (!actionSet.wasChanged()) {
 				continue;
@@ -2332,8 +2309,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	}
 
 	private boolean updateHiddenElements(DisplayItem items, String currentHidden, String prefix) {
-		List<String> changedAndVisible = new ArrayList<>();
-		List<String> changedAndInvisible = new ArrayList<>();
+		List<String> changedAndVisible = new ArrayList<String>();
+		List<String> changedAndInvisible = new ArrayList<String>();
 		getChangedIds(items, changedAndInvisible, changedAndVisible);
 
 		return updateHiddenElements(currentHidden, prefix, changedAndVisible, changedAndInvisible);
@@ -2345,18 +2322,18 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Remove explicitly 'visible' elements from the current list
 		for (String id : changedAndVisible) {
 			String itemId = prefix + id;
-			if (currentHidden.contains(itemId + ",")) { //$NON-NLS-1$
+			if (currentHidden.contains(itemId)) {
 				hasChanges = true;
-				windowPage.removeHiddenItems(itemId);
+				wPage.removeHiddenItems(itemId);
 			}
 		}
 
 		// Add explicitly 'hidden' elements to the current list
 		for (String id : changedAndInvisible) {
 			String itemId = prefix + id;
-			if (!currentHidden.contains(itemId + ",")) { //$NON-NLS-1$
+			if (!currentHidden.contains(itemId)) {
 				hasChanges = true;
-				windowPage.addHiddenItems(itemId);
+				wPage.addHiddenItems(itemId);
 			}
 		}
 
@@ -2368,17 +2345,17 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		// Shortcuts
 		if (showShortcutTab()) {
-			windowPage.setNewShortcuts(getVisibleIDs(wizards), ModeledPageLayout.NEW_WIZARD_TAG);
-			windowPage.setNewShortcuts(getVisibleIDs(perspectives), ModeledPageLayout.PERSP_SHORTCUT_TAG);
-			windowPage.setNewShortcuts(getVisibleIDs(views), ModeledPageLayout.SHOW_VIEW_TAG);
+			wPage.setNewShortcuts(getVisibleIDs(wizards), ModeledPageLayout.NEW_WIZARD_TAG);
+			wPage.setNewShortcuts(getVisibleIDs(perspectives), ModeledPageLayout.PERSP_SHORTCUT_TAG);
+			wPage.setNewShortcuts(getVisibleIDs(views), ModeledPageLayout.SHOW_VIEW_TAG);
 		}
 
 		// Determine if anything has changed and, if so, update the menu & tb's
 		boolean requiresUpdate = false;
 
 		// Action Sets
-		ArrayList<ActionSetDescriptor> toAdd = new ArrayList<>();
-		ArrayList<ActionSetDescriptor> toRemove = new ArrayList<>();
+		ArrayList<ActionSetDescriptor> toAdd = new ArrayList<ActionSetDescriptor>();
+		ArrayList<ActionSetDescriptor> toRemove = new ArrayList<ActionSetDescriptor>();
 
 		for (ActionSet actionSet : actionSets) {
 			if (!actionSet.wasChanged()) {
@@ -2398,12 +2375,12 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		perspective.turnOnActionSets(toAdd.toArray(new IActionSetDescriptor[toAdd.size()]));
 		perspective.turnOffActionSets(toRemove.toArray(new IActionSetDescriptor[toRemove.size()]));
 
-		requiresUpdate |= updateHiddenElements(actionSets, windowPage.getHiddenItems(),
+		requiresUpdate |= updateHiddenElements(actionSets, wPage.getHiddenItems(),
 				ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX);
 		// Menu and Toolbar Items
-		requiresUpdate |= updateHiddenElements(menuItems, windowPage.getHiddenItems(),
+		requiresUpdate |= updateHiddenElements(menuItems, wPage.getHiddenItems(),
 				ModeledPageLayout.HIDDEN_MENU_PREFIX);
-		requiresUpdate |= updateHiddenElements(toolBarItems, windowPage.getHiddenItems(),
+		requiresUpdate |= updateHiddenElements(toolBarItems, wPage.getHiddenItems(),
 				ModeledPageLayout.HIDDEN_TOOLBAR_PREFIX);
 
 		if (requiresUpdate) {

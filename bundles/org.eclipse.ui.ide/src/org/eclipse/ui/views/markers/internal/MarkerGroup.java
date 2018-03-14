@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,20 +32,21 @@ import org.eclipse.ui.views.markers.MarkerItem;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class MarkerGroup {
 
 	/**
 	 * Create a new MarkerGroup from element.
-	 *
+	 * 
 	 * @param element
 	 * @return MarkerGroup
 	 */
 	public static MarkerGroup createMarkerGroup(IConfigurationElement element) {
-		if (element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID).equals(Util.TYPE_MARKER_GROUPING_ID)) {
+
+		if (element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID).equals(
+				Util.TYPE_MARKER_GROUPING_ID))
 			return new TypeMarkerGroup(element.getAttribute(MarkerSupportRegistry.LABEL));
-		}
 		return new MarkerGroup(element);
 	}
 
@@ -60,30 +61,41 @@ public class MarkerGroup {
 		/**
 		 * Create a mapping for an attribute with name attributeName and value
 		 * value to the supplied entry.
-		 *
+		 * 
 		 * @param entry
 		 * @param attributeName
 		 * @param value
 		 */
-		AttributeMapping(MarkerGroupingEntry entry, String attributeName, String value, AttributeMarkerGrouping grouping) {
+		AttributeMapping(MarkerGroupingEntry entry, String attributeName,
+				String value, AttributeMarkerGrouping grouping) {
 			super(entry);
 			attribute = attributeName;
 			attributeValue = value;
 			this.grouping = grouping;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.FieldMarkerGroup.EntryMapping#hasAttributes()
+		 */
 		@Override
 		public boolean hasAttributes() {
 			return true;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.FieldMarkerGroup.EntryMapping#testAttribute(org.eclipse.ui.views.markers.internal.ConcreteMarker)
+		 */
 		@Override
 		public MarkerGroupingEntry testAttribute(IMarker marker) {
 			Object value;
 
-			if (!marker.exists()) {
-				return null;// If the marker was deleted during the update drop it
-			}
+			if (!marker.exists())
+				return null;// If the marker was deleted during the update drop
+			// it
 
 			try {
 				value = marker.getAttribute(attribute);
@@ -104,7 +116,7 @@ public class MarkerGroup {
 
 		/**
 		 * Create an entry mapping for the receiver.
-		 *
+		 * 
 		 * @param entry
 		 */
 		EntryMapping(MarkerGroupingEntry entry) {
@@ -113,7 +125,7 @@ public class MarkerGroup {
 
 		/**
 		 * Return whether or not the receiver tests attributes.
-		 *
+		 * 
 		 * @return boolean
 		 */
 		public boolean hasAttributes() {
@@ -122,7 +134,7 @@ public class MarkerGroup {
 
 		/**
 		 * Test the attribute of the marker to find a grouping.
-		 *
+		 * 
 		 * @param marker
 		 * @return MarkerGroupingEntry or <code>null</code> if there is not
 		 *         entry.
@@ -142,101 +154,174 @@ public class MarkerGroup {
 			markerGroup = group;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#compare(java.lang.Object,
+		 *      java.lang.Object)
+		 */
 		@Override
 		public int compare(Object obj1, Object obj2) {
-			MarkerGroupingEntry entry1 = getMapping(((MarkerNode) obj1).getConcreteRepresentative());
-			MarkerGroupingEntry entry2 = getMapping(((MarkerNode) obj2).getConcreteRepresentative());
+
+			MarkerGroupingEntry entry1 = getMapping(((MarkerNode) obj1)
+					.getConcreteRepresentative());
+			MarkerGroupingEntry entry2 = getMapping(((MarkerNode) obj2)
+					.getConcreteRepresentative());
 			return entry2.getPriority() - entry1.getPriority();
+
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getColumnHeaderImage()
+		 */
 		@Override
 		public Image getColumnHeaderImage() {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getColumnHeaderText()
+		 */
 		@Override
 		public String getColumnHeaderText() {
 			return markerGroup.getTitle();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getDefaultDirection()
+		 */
 		@Override
 		public int getDefaultDirection() {
 			return TableComparator.ASCENDING;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getDescription()
+		 */
 		@Override
 		public String getDescription() {
 			return markerGroup.getTitle();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getDescriptionImage()
+		 */
 		@Override
 		public Image getDescriptionImage() {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getImage(java.lang.Object)
+		 */
 		@Override
 		public Image getImage(Object obj) {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getPreferredWidth()
+		 */
 		@Override
 		public int getPreferredWidth() {
 			return 75;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#getValue(java.lang.Object)
+		 */
 		@Override
 		public String getValue(Object obj) {
 			MarkerNode node = (MarkerNode) obj;
 
 			if (node.isConcrete()) {
-				MarkerGroupingEntry groupingEntry = markerGroup.getMapping((ConcreteMarker) node);
+				MarkerGroupingEntry groupingEntry = markerGroup
+						.getMapping((ConcreteMarker) node);
 				return groupingEntry.getLabel();
 			}
 			return node.getDescription();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#isShowing()
+		 */
 		@Override
 		public boolean isShowing() {
 			return this.showing;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.views.markers.internal.IField#setShowing(boolean)
+		 */
 		@Override
 		public void setShowing(boolean showing) {
 			this.showing = showing;
+
 		}
 
 	}
 
 	/**
 	 * GroupMarkerField is the MarkerField used for MarkerGroupungs
-	 *
+	 * 
 	 * @since 3.4
-	 *
+	 * 
 	 */
 	class GroupMarkerField extends MarkerField {
 
 		GroupMarkerField() {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.api.MarkerItem)
+		 */
 		@Override
 		public String getValue(MarkerItem item) {
+
 			return MarkerSupportInternalUtilities.getGroupValue(MarkerGroup.this, item);
+
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#compare(org.eclipse.ui.internal.provisional.views.markers.api.MarkerItem,
+		 *      org.eclipse.ui.internal.provisional.views.markers.api.MarkerItem)
+		 */
 		@Override
 		public int compare(MarkerItem item1, MarkerItem item2) {
 			// Elements with markers to the top are higher values
 			if (item1.getMarker() == null) {
-				if (item2.getMarker() == null) {
+				if (item2.getMarker() == null)
 					return 0;
-				}
 				return 1;
 			}
 
 			// Elements with markers to the top are higher values
-			if (item2.getMarker() == null) {
+			if (item2.getMarker() == null)
 				return -1;
-			}
 
 			try {
 				return (findGroupValue(item2.getMarker().getType(),
@@ -248,8 +333,14 @@ public class MarkerGroup {
 				Policy.handle(exception);
 				return 0;
 			}
+
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getName()
+		 */
 		@Override
 		public String getName() {
 			return MarkerGroup.this.getTitle();
@@ -264,7 +355,7 @@ public class MarkerGroup {
 
 	protected MarkerField markerField;
 
-	private Map<String, Collection<EntryMapping>> typesToMappings = new HashMap<>();
+	private Map typesToMappings = new HashMap();
 
 	private IConfigurationElement configurationElement;
 
@@ -272,14 +363,13 @@ public class MarkerGroup {
 
 	/**
 	 * Create a new instance of the receiver called name with id identifier.
-	 *
+	 * 
 	 * @param element
 	 */
 	protected MarkerGroup(IConfigurationElement element) {
 		configurationElement = element;
-		if (element != null) {
+		if (element != null) // Is this an internal one?
 			id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
-		}
 		createFields();
 		processEntries();
 	}
@@ -288,30 +378,33 @@ public class MarkerGroup {
 	 * Process the markerContentEntries for the reciever.
 	 */
 	private void processEntries() {
-		if(configurationElement == null) {
+		
+		if(configurationElement == null)
 			return;
-		}
-
+		
 		IConfigurationElement[] markerEntryElements = configurationElement
 				.getChildren(MarkerSupportRegistry.MARKER_GROUPING_ENTRY);
 
 		IConfigurationElement[] attributeGroupingElements = configurationElement
 				.getChildren(MarkerSupportRegistry.MARKER_ATTRIBUTE_GROUPING);
 
-		Map<String, MarkerGroupingEntry> idsToEntries = new HashMap<>();
+		Map idsToEntries = new HashMap();
 		for (int i = 0; i < markerEntryElements.length; i++) {
-			MarkerGroupingEntry entry = new MarkerGroupingEntry(markerEntryElements[i]);
+			MarkerGroupingEntry entry = new MarkerGroupingEntry(
+					markerEntryElements[i]);
 			entry.setGroup(this);
 			idsToEntries.put(entry.getId(), entry);
 		}
 
 		for (int i = 0; i < attributeGroupingElements.length; i++) {
-			AttributeMarkerGrouping attributeGrouping = new AttributeMarkerGrouping(attributeGroupingElements[i]);
+			AttributeMarkerGrouping attributeGrouping = new AttributeMarkerGrouping(
+					attributeGroupingElements[i]);
 
 			String defaultEntryId = attributeGrouping.getDefaultGroupingEntry();
 			if (defaultEntryId != null) {
 				if (idsToEntries.containsKey(defaultEntryId)) {
-					MarkerGroupingEntry entry = idsToEntries.get(defaultEntryId);
+					MarkerGroupingEntry entry = (MarkerGroupingEntry) idsToEntries
+							.get(defaultEntryId);
 					entry.setAsDefault(attributeGrouping.getMarkerType());
 				} else {
 					IDEWorkbenchPlugin.log(NLS.bind(
@@ -323,10 +416,12 @@ public class MarkerGroup {
 					.getChildren(MarkerSupportRegistry.ATTRIBUTE_MAPPING);
 
 			for (int mappingIndex = 0; mappingIndex < mappings.length; mappingIndex++) {
-				String entryId = mappings[mappingIndex].getAttribute(MarkerSupportRegistry.MARKER_GROUPING_ENTRY);
+				String entryId = mappings[mappingIndex]
+						.getAttribute(MarkerSupportRegistry.MARKER_GROUPING_ENTRY);
 
 				if (idsToEntries.containsKey(entryId)) {
-					MarkerGroupingEntry entry = idsToEntries.get(entryId);
+					MarkerGroupingEntry entry = (MarkerGroupingEntry) idsToEntries
+							.get(entryId);
 					entry.getMarkerGroup().mapAttribute(
 							attributeGrouping,
 							entry,
@@ -337,8 +432,10 @@ public class MarkerGroup {
 							"Reference to invaild markerGroupingEntry {0}", //$NON-NLS-1$
 							defaultEntryId));
 				}
+
 			}
 		}
+
 	}
 
 	/**
@@ -351,41 +448,48 @@ public class MarkerGroup {
 
 	/**
 	 * Add the entry for the markerType.
-	 *
+	 * 
 	 * @param markerType
 	 * @param entry
 	 */
 	private void addEntry(String markerType, EntryMapping entry) {
+
 		MarkerType[] allDerived = getMarkerTypes(markerType);
+
 		for (int i = 0; i < allDerived.length; i++) {
-			Collection<EntryMapping> entries = new HashSet<>();
+			Collection entries = new HashSet();
 			MarkerType type = allDerived[i];
 			if (typesToMappings.containsKey(type.getId())) {
-				entries = typesToMappings.get(markerType);
+				entries = (Collection) typesToMappings.get(markerType);
 			} else {
-				entries = new HashSet<>();
+				entries = new HashSet();
 			}
+
 			entries.add(entry);
 			typesToMappings.put(type.getId(), entries);
 		}
+
 	}
 
 	/**
 	 * Find the group value. If it cannot be found in an attribute mapping then
 	 * return null;
-	 *
+	 * 
 	 * @param concreteMarker
 	 * @return String or <code>null</code>
 	 */
 	private MarkerGroupingEntry findGroupValue(ConcreteMarker concreteMarker) {
+
 		String type = concreteMarker.getType();
 		IMarker marker = concreteMarker.getMarker();
+
 		return findGroupValue(type, marker);
+
 	}
 
 	/**
 	 * Find the group for the marker of the specified marker type.
-	 *
+	 * 
 	 * @param type
 	 * @param marker
 	 * @return MarkerGroupingEntry
@@ -393,9 +497,10 @@ public class MarkerGroup {
 	public MarkerGroupingEntry findGroupValue(String type, IMarker marker) {
 		if (typesToMappings.containsKey(type)) {
 			EntryMapping defaultMapping = null;
-			Iterator<EntryMapping> mappings = typesToMappings.get(type).iterator();
+			Iterator mappings = ((Collection) typesToMappings.get(type))
+					.iterator();
 			while (mappings.hasNext()) {
-				EntryMapping mapping = mappings.next();
+				EntryMapping mapping = (EntryMapping) mappings.next();
 				if (mapping.hasAttributes()) {
 					MarkerGroupingEntry entry = mapping.testAttribute(marker);
 					if (entry != null) {
@@ -409,13 +514,15 @@ public class MarkerGroup {
 			if (defaultMapping != null) {
 				return defaultMapping.groupingEntry;
 			}
+
 		}
+
 		return undefinedEntry;
 	}
 
 	/**
 	 * Return the field for the receiver.
-	 *
+	 * 
 	 * @return {@link IField}
 	 */
 	public IField getField() {
@@ -424,7 +531,7 @@ public class MarkerGroup {
 
 	/**
 	 * Return the id of the receiver.
-	 *
+	 * 
 	 * @return String
 	 */
 	public String getId() {
@@ -433,11 +540,12 @@ public class MarkerGroup {
 
 	/**
 	 * Get the attribute mapping for the marker
-	 *
+	 * 
 	 * @param marker
 	 * @return MarkerGroupingEntry
 	 */
 	private MarkerGroupingEntry getMapping(ConcreteMarker marker) {
+
 		if (marker.getGroup() == null) {
 			marker.setGroup(findGroupValue(marker));
 		}
@@ -446,7 +554,7 @@ public class MarkerGroup {
 
 	/**
 	 * Return the markerField for the receiver.
-	 *
+	 * 
 	 * @return MarkerField
 	 */
 	public MarkerField getMarkerField() {
@@ -455,13 +563,13 @@ public class MarkerGroup {
 
 	/**
 	 * Return the marker types that match and are subtypes of markerType.
-	 *
+	 * 
 	 * @param markerType
 	 * @return MarkerType[]
 	 */
 	private MarkerType[] getMarkerTypes(String markerType) {
 		MarkerTypesModel model = MarkerTypesModel.getInstance();
-		Collection<MarkerType> types = new HashSet<>();
+		Collection types = new HashSet();
 
 		MarkerType type = model.getType(markerType);
 		if (type != null) {
@@ -483,7 +591,7 @@ public class MarkerGroup {
 
 	/**
 	 * Return the title for the receiver.
-	 *
+	 * 
 	 * @return String
 	 */
 	public String getTitle() {
@@ -492,7 +600,7 @@ public class MarkerGroup {
 
 	/**
 	 * Add an attributeMapping for the markerType.
-	 *
+	 * 
 	 * @param attributeGrouping
 	 * @param entry
 	 * @param attributeValue
@@ -503,21 +611,22 @@ public class MarkerGroup {
 				attributeGrouping.getAttribute(), attributeValue,
 				attributeGrouping));
 		attributeGrouping.addGroup(this);
+
 	}
 
 	/**
 	 * Remove the entry from all of the entries in the receiver.
-	 *
+	 * 
 	 * @param entry
 	 */
 	public void remove(MarkerGroupingEntry entry) {
-		Iterator<Collection<EntryMapping>> entries = typesToMappings.values().iterator();
-		Collection<EntryMapping> removeCollection = new ArrayList<>();
+		Iterator entries = typesToMappings.values().iterator();
+		Collection removeCollection = new ArrayList();
 		while (entries.hasNext()) {
-			Collection<EntryMapping> mappings = entries.next();
-			Iterator<EntryMapping> mappingsIterator = mappings.iterator();
+			Collection mappings = (Collection) entries.next();
+			Iterator mappingsIterator = mappings.iterator();
 			while (mappingsIterator.hasNext()) {
-				EntryMapping next = mappingsIterator.next();
+				EntryMapping next = (EntryMapping) mappingsIterator.next();
 				if (next.groupingEntry.equals(entry)) {
 					removeCollection.add(next);
 				}
@@ -526,48 +635,55 @@ public class MarkerGroup {
 			mappings.removeAll(removeCollection);
 			removeCollection.clear();
 		}
+
 	}
 
 	/**
 	 * Set entry and the default entry for the supplied markerType.
-	 *
+	 * 
 	 * @param markerType
 	 * @param entry
 	 */
 
 	public void setAsDefault(String markerType, MarkerGroupingEntry entry) {
 		addEntry(markerType, new EntryMapping(entry));
+
 	}
 
 	/**
 	 * Unmap the attributeMarkerGrouping from the receiver.
-	 *
+	 * 
 	 * @param attributeMarkerGrouping
 	 */
 	public void unmap(AttributeMarkerGrouping attributeMarkerGrouping) {
 		String type = attributeMarkerGrouping.getMarkerType();
-		Collection<EntryMapping> removed = new ArrayList<>();
-		Collection<EntryMapping> entries = typesToMappings.get(type);
-		Iterator<EntryMapping> mappings = entries.iterator();
+		Collection removed = new ArrayList();
+		Collection entries = (Collection) typesToMappings.get(type);
+		Iterator mappings = entries.iterator();
 		while (mappings.hasNext()) {
-			EntryMapping mapping = mappings.next();
+			Object mapping = mappings.next();
 			if (mapping instanceof AttributeMapping
 					&& (((AttributeMapping) mapping).grouping == attributeMarkerGrouping)) {
 				removed.add(mapping);
 			}
 		}
 		entries.removeAll(removed);
-		if (entries.size() == 0) {
+		if (entries.size() == 0)
 			typesToMappings.remove(type);
-		}
-	}
 
+	}
 	/**
-	 * Returns the comparator that can be used for
+	 * Returns the comparator that can be used for 
 	 * sorting the MarkerGroupingEntry(s) in the group.
 	 * @return Comparator
 	 */
-	public Comparator<MarkerGroupingEntry> getEntriesComparator() {
-		return (o1, o2) -> -(o1.getPriority() - o2.getPriority());
+	public Comparator getEntriesComparator(){
+		return new Comparator() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return -(((MarkerGroupingEntry) o1).getPriority()
+						- ((MarkerGroupingEntry) o2).getPriority());
+			}
+		};
 	}
 }

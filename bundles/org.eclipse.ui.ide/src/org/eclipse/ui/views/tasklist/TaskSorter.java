@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,6 +67,9 @@ class TaskSorter extends ViewerComparator {
         resetState();
     }
 
+    /* (non-Javadoc)
+     * Method declared on ViewerSorter.
+     */
     /**
      * Compares two markers, sorting first by the main column of this sorter,
      * then by subsequent columns, depending on the column sort order.
@@ -137,6 +140,9 @@ class TaskSorter extends ViewerComparator {
                 directions.length);
     }
 
+    /* (non-Javadoc)
+     * Method declared on ViewerSorter.
+     */
     /**
      * Compares two markers, based only on the value of the specified column.
      */
@@ -244,7 +250,7 @@ class TaskSorter extends ViewerComparator {
 
     /**
      * Compares the line number and location of the two markers.
-     * If line number is specified for both, this sorts first by line number (numerically),
+     * If line number is specified for both, this sorts first by line number (numerically), 
      * then by start offset (numerically), then by location (textually).
      * If line number is not specified for either, this sorts by location.
      * Otherwise, if only one has a line number, this sorts by the combined text for line number and location.

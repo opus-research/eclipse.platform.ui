@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
 	 * @since 3.4
 	 */
 	public static final String WIZARD_ID = "org.eclipse.ui.wizards.new.file"; //$NON-NLS-1$
-
+	
     private WizardNewFileCreationPage mainPage;
 
     /**
@@ -63,15 +63,21 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public void addPages() {
         super.addPages();
         mainPage = new WizardNewFileCreationPage("newFilePage1", getSelection());//$NON-NLS-1$
         mainPage.setTitle(ResourceMessages.FileResource_pageTitle);
-        mainPage.setDescription(ResourceMessages.FileResource_description);
+        mainPage.setDescription(ResourceMessages.FileResource_description); 
         addPage(mainPage);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         super.init(workbench, currentSelection);
@@ -79,12 +85,18 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
         setNeedsProgressMonitor(true);
     }
 
+    /* (non-Javadoc)
+     * Method declared on BasicNewResourceWizard.
+     */
     @Override
 	protected void initializeDefaultPageImageDescriptor() {
        ImageDescriptor desc = IDEWorkbenchPlugin.getIDEImageDescriptor("wizban/newfile_wiz.png");//$NON-NLS-1$
 	   setDefaultPageImageDescriptor(desc);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public boolean performFinish() {
         IFile file = mainPage.createNewFile();
@@ -104,7 +116,7 @@ public class BasicNewFileResourceWizard extends BasicNewResourceWizard {
                 }
             }
         } catch (PartInitException e) {
-            DialogUtil.openError(dw.getShell(), ResourceMessages.FileResource_errorMessage,
+            DialogUtil.openError(dw.getShell(), ResourceMessages.FileResource_errorMessage, 
                     e.getMessage(), e);
         }
 

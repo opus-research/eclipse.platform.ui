@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 433450
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -24,6 +23,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -32,6 +32,7 @@ import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -59,7 +60,6 @@ public class ModeledPageLayout implements IPageLayout {
 	public static final String PERSP_SHORTCUT_TAG = "persp.perspSC:"; //$NON-NLS-1$
 	public static final String SHOW_IN_PART_TAG = "persp.showIn:"; //$NON-NLS-1$
 	public static final String SHOW_VIEW_TAG = "persp.viewSC:"; //$NON-NLS-1$
-	public static final String EDITOR_STACK_TAG = "EditorStack"; //$NON-NLS-1$
 	public static final String HIDDEN_MENU_PREFIX = "persp.hideMenuSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_TOOLBAR_PREFIX = "persp.hideToolbarSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_ACTIONSET_PREFIX = "persp.hideActionSetSC:"; //$NON-NLS-1$
@@ -69,7 +69,7 @@ public class ModeledPageLayout implements IPageLayout {
 		if (model == null) {
 			return Collections.emptyList();
 		}
-		ArrayList<String> result = new ArrayList<>();
+		ArrayList<String> result = new ArrayList<String>();
 		for (String tag : model.getTags()) {
 			if (tag.startsWith(tagPrefix)) {
 				result.add(tag.substring(tagPrefix.length()));
@@ -94,8 +94,6 @@ public class ModeledPageLayout implements IPageLayout {
 	boolean createReferences;
 
 	private IViewRegistry viewRegistry;
-
-	private ModeledPageLayoutUtils layoutUtils;
 
 	private class ViewActivator implements IIdentifierListener {
 		private MUIElement element;
@@ -133,7 +131,6 @@ public class ModeledPageLayout implements IPageLayout {
 		// Create the editor area stack
 		this.perspModel = perspModel;
 		this.descriptor = descriptor;
-		this.layoutUtils = new ModeledPageLayoutUtils(modelService);
 
 		this.createReferences = createReferences;
 
@@ -151,8 +148,10 @@ public class ModeledPageLayout implements IPageLayout {
 			// sharedArea.setLabel("Editor Area"); //$NON-NLS-1$
 
 			editorStack = modelService.createModelElement(MPartStack.class);
+			// temporary HACK for bug 303982
+			editorStack.getTags().add("newtablook"); //$NON-NLS-1$
 			editorStack.getTags().add("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
-			editorStack.getTags().add(EDITOR_STACK_TAG);
+			editorStack.getTags().add("EditorStack"); //$NON-NLS-1$
 			editorStack.setElementId("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
 			sharedArea.getChildren().add(editorStack);
 			sharedArea.setElementId(getEditorArea());
@@ -368,6 +367,21 @@ public class ModeledPageLayout implements IPageLayout {
 		// perspModel.setFixed(isFixed);
 	}
 
+	private static int plRelToSwt(int rel) {
+		switch (rel) {
+		case IPageLayout.BOTTOM:
+			return SWT.BOTTOM;
+		case IPageLayout.LEFT:
+			return SWT.LEFT;
+		case IPageLayout.RIGHT:
+			return SWT.RIGHT;
+		case IPageLayout.TOP:
+			return SWT.TOP;
+		default:
+			return 0;
+		}
+	}
+
 	public static MStackElement createViewModel(MApplication application, String id,
 			boolean visible,
 			WorkbenchPage page, EPartService partService, boolean createReferences) {
@@ -397,6 +411,15 @@ public class ModeledPageLayout implements IPageLayout {
 		return null;
 	}
 
+	private MPartStack createStack(String id, boolean visible) {
+		MPartStack newStack = modelService.createModelElement(MPartStack.class);
+		// temporary HACK for bug 303982
+		newStack.getTags().add("newtablook"); //$NON-NLS-1$
+		newStack.setElementId(id);
+		newStack.setToBeRendered(visible);
+		return newStack;
+	}
+
 	private MUIElement insertView(String viewId, int relationship, float ratio,
 			String refId, boolean visible, boolean withStack) {
 
@@ -416,7 +439,7 @@ public class ModeledPageLayout implements IPageLayout {
 				stack.getChildren().add(viewModel);
 				retVal = stack;
 			} else {
-				layoutUtils.insert(viewModel, findRefModel(refId), layoutUtils.plRelToSwt(relationship), ratio);
+				insert(viewModel, findRefModel(refId), plRelToSwt(relationship), ratio);
 			}
 
 		}
@@ -460,7 +483,7 @@ public class ModeledPageLayout implements IPageLayout {
 	 * containers underneath the current perspective. If this element's parent
 	 * is the perspective itself, the element will be returned. The perspective
 	 * will only be returned if the perspective itself has no children.
-	 *
+	 * 
 	 * @return the parent of the final element in the recursion chain of
 	 *         children, or the element itself if its parent is the perspective,
 	 *         or the perspective if the perspective itself has no children
@@ -478,8 +501,8 @@ public class ModeledPageLayout implements IPageLayout {
 		MUIElement refModel = findElement(perspModel, refId);
 		if (refModel == null) {
 			WorkbenchPlugin.log(NLS.bind(WorkbenchMessages.PageLayout_missingRefPart, refId));
-			MPartStack stack = layoutUtils.createStack(stackId, visible);
-			layoutUtils.insert(stack, getLastElement(), layoutUtils.plRelToSwt(relationship), ratio);
+			MPartStack stack = createStack(stackId, visible);
+			insert(stack, getLastElement(), plRelToSwt(relationship), ratio);
 			return stack;
 		}
 		// If the 'refModel' is -not- a stack then find one
@@ -496,13 +519,13 @@ public class ModeledPageLayout implements IPageLayout {
 		// return null;
 		// }
 
-		MPartStack stack = layoutUtils.createStack(stackId, visible);
+		MPartStack stack = createStack(stackId, visible);
 		MElementContainer<?> parent = refModel.getParent();
 		if (parent instanceof MPartStack) {
 			// we don't want to put a stack in a stack
 			refModel = parent;
 		}
-		layoutUtils.insert(stack, refModel, layoutUtils.plRelToSwt(relationship), ratio);
+		insert(stack, refModel, plRelToSwt(relationship), ratio);
 
 		return stack;
 	}
@@ -536,6 +559,69 @@ public class ModeledPageLayout implements IPageLayout {
 
 		// Move the child under the new parent
 		newParent.getChildren().add(relTo);
+	}
+
+	private void insert(MUIElement toInsert, MUIElement relTo,
+			int swtSide, int ratio) {
+		if (toInsert == null || relTo == null)
+			return;
+
+		MElementContainer<MUIElement> relParent = relTo.getParent();
+		if (relParent != null) {
+			List<MUIElement> children = relParent.getChildren();
+			int index = children.indexOf(relTo);
+			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
+			psc.setContainerData(relTo.getContainerData());
+			relParent.getChildren().add(index + 1, psc);
+
+			switch (swtSide) {
+			case SWT.LEFT:
+				psc.getChildren().add((MPartSashContainerElement) toInsert);
+				psc.getChildren().add((MPartSashContainerElement) relTo);
+				toInsert.setContainerData("" + ratio); //$NON-NLS-1$
+				relTo.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
+				psc.setHorizontal(true);
+				break;
+			case SWT.RIGHT:
+				psc.getChildren().add((MPartSashContainerElement) relTo);
+				psc.getChildren().add((MPartSashContainerElement) toInsert);
+				relTo.setContainerData("" + ratio); //$NON-NLS-1$
+				toInsert.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
+				psc.setHorizontal(true);
+				break;
+			case SWT.TOP:
+				psc.getChildren().add((MPartSashContainerElement) toInsert);
+				psc.getChildren().add((MPartSashContainerElement) relTo);
+				toInsert.setContainerData("" + ratio); //$NON-NLS-1$
+				relTo.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
+				psc.setHorizontal(false);
+				break;
+			case SWT.BOTTOM:
+				psc.getChildren().add((MPartSashContainerElement) relTo);
+				psc.getChildren().add((MPartSashContainerElement) toInsert);
+				relTo.setContainerData("" + ratio); //$NON-NLS-1$
+				toInsert.setContainerData("" + (10000 - ratio)); //$NON-NLS-1$
+				psc.setHorizontal(false);
+				break;
+			}
+
+			if (relTo.isToBeRendered() || toInsert.isToBeRendered()) {
+				// one of the items to be inserted should be rendered, render
+				// all parent elements as well
+				resetToBeRenderedFlag(psc, true);
+			} else {
+				// no child elements need to be rendered, the parent part sash
+				// container does not need to be rendered either then
+				psc.setToBeRendered(false);
+			}
+			return;
+		}
+	}
+
+	private void insert(MUIElement toInsert, MUIElement relTo,
+			int swtSide, float ratio) {
+		int pct = (int) (ratio * 10000);
+		insert(toInsert, relTo, swtSide, pct);
 	}
 
 	MUIElement findElement(MUIElement toSearch, String id) {
@@ -597,33 +683,32 @@ public class ModeledPageLayout implements IPageLayout {
 			E4Util.unsupported("stackView: failed to find " + refId + " for " + id); //$NON-NLS-1$//$NON-NLS-2$
 			return;
 		}
-
-		// Hide views that are filtered by capabilities
-		boolean isFiltered = isViewFiltered(id);
-		boolean toBeRendered = visible && !isFiltered;
-
-		MStackElement viewModel = createViewModel(application, id, toBeRendered, page, partService,
+		MStackElement viewModel = createViewModel(application, id, visible, page, partService,
 				createReferences);
 		if (viewModel != null) {
 			MPartStack stack = (MPartStack) refModel;
 			boolean wasEmpty = stack.getChildren().isEmpty();
 			stack.getChildren().add(viewModel);
-			if (wasEmpty && toBeRendered) {
+			if (wasEmpty && visible) {
 				// the stack didn't originally have any children, set this as
 				// the selected element
 				stack.setSelectedElement(viewModel);
 			}
 
-			if (viewModel.isToBeRendered()) {
+			if (visible || viewModel.isToBeRendered()) {
 				// ensure that the parent is being rendered, it may have been a
 				// placeholder folder so its flag may actually be false
-				layoutUtils.resetToBeRenderedFlag(viewModel, true);
-			}
-
-			if (isFiltered) {
-				addViewActivator(viewModel);
+				resetToBeRenderedFlag(viewModel, true);
 			}
 		}
 	}
 
+	private static void resetToBeRenderedFlag(MUIElement element, boolean toBeRendered) {
+		MUIElement parent = element.getParent();
+		while (parent != null && !(parent instanceof MPerspective)) {
+			parent.setToBeRendered(toBeRendered);
+			parent = parent.getParent();
+		}
+		element.setToBeRendered(toBeRendered);
+	}
 }

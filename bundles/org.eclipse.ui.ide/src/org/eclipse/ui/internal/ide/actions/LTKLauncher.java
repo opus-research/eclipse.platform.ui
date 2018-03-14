@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 
 /**
  * Launch the LTK aware resource operations ... but sneaky!
- *
+ * 
  * @since 3.4
  */
 public class LTKLauncher {
@@ -37,10 +37,10 @@ public class LTKLauncher {
 
 	/**
 	 * Open the LTK delete resources wizard if available.
-	 *
+	 * 
 	 * @param structuredSelection
 	 *            The action current selection.
-	 *
+	 * 
 	 * @return <code>true</code> if we can launch the wizard
 	 */
 	public static boolean openDeleteWizard(
@@ -50,10 +50,10 @@ public class LTKLauncher {
 
 	/**
 	 * Open the LTK move resources wizard if available.
-	 *
+	 * 
 	 * @param structuredSelection
 	 *            The action current selection.
-	 *
+	 * 
 	 * @return <code>true</code> if we can launch the wizard
 	 */
 	public static boolean openMoveWizard(
@@ -63,10 +63,10 @@ public class LTKLauncher {
 
 	/**
 	 * Open the LTK rename resource wizard if available.
-	 *
+	 * 
 	 * @param structuredSelection
 	 *            The action current selection.
-	 *
+	 * 
 	 * @return <code>true</code> if we can launch the wizard
 	 */
 	public static boolean openRenameWizard(

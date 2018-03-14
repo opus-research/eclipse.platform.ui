@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -42,7 +41,7 @@ import org.eclipse.ui.model.PerspectiveLabelProvider;
 /**
  * The SavePerspectiveDialog can be used to get the name of a new
  * perspective or the descriptor of an old perspective.  The results
- * are returned by <code>getNewPerspName</code> and
+ * are returned by <code>getNewPerspName</code> and 
  * <code>getOldPersp</code>.
  */
 public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
@@ -84,7 +83,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell
-                .setText(WorkbenchMessages.SavePerspective_shellTitle);
+                .setText(WorkbenchMessages.SavePerspective_shellTitle); 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.SAVE_PERSPECTIVE_DIALOG);
     }
@@ -105,7 +104,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
     }
 
     /**
-     * Creates and returns the contents of the upper part
+     * Creates and returns the contents of the upper part 
      * of this dialog (above the button bar).
      *
      * @param parent the parent composite to contain the dialog area
@@ -192,7 +191,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
 
     /**
      * Returns the target name.
-     *
+     * 
      * @return the target name
      */
     public IPerspectiveDescriptor getPersp() {
@@ -201,7 +200,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
 
     /**
      * Returns the target name.
-     *
+     * 
      * @return the target name
      */
     public String getPerspName() {
@@ -245,12 +244,12 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
         persp = perspReg.findPerspectiveWithLabel(perspName);
         if (persp != null) {
             // Confirm ok to overwrite
-            String message = NLS.bind(WorkbenchMessages.SavePerspective_overwriteQuestion,perspName );
+            String message = NLS.bind(WorkbenchMessages.SavePerspective_overwriteQuestion,perspName ); 
             String[] buttons = new String[] { IDialogConstants.YES_LABEL,
                     IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL };
 			MessageDialog d = new MessageDialog(this.getShell(),
 					WorkbenchMessages.SavePerspective_overwriteTitle, null,
-					message, MessageDialog.QUESTION, 0, buttons) {
+					message, MessageDialog.QUESTION, buttons, 0) {
 				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;

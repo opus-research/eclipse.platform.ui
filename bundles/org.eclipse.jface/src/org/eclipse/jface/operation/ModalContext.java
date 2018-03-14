@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sergey Prigogin (Google) - [464838] ModalContext.run method should call done() on the progress monitor passed to the constructor
  *******************************************************************************/
 package org.eclipse.jface.operation;
 
@@ -36,8 +35,9 @@ import org.eclipse.swt.widgets.Display;
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class ModalContext {
+
 	/**
-	 * Indicates whether ModalContext is in debug mode; <code>false</code> by
+	 * Indicated whether ModalContext is in debug mode; <code>false</code> by
 	 * default.
 	 */
 	private static boolean debug = false;
@@ -70,7 +70,7 @@ public class ModalContext {
 		private Throwable throwable;
 
 		/**
-		 * The progress monitor used for progress and cancellation.
+		 * The progress monitor used for progress and cancelation.
 		 */
 		private IProgressMonitor progressMonitor;
 
@@ -86,19 +86,19 @@ public class ModalContext {
 
 		/**
 		 * The thread that forked this modal context thread.
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		private Thread callingThread;
 
 		/**
 		 * Creates a new modal context.
-		 *
+		 * 
 		 * @param operation
 		 *            the runnable to run
 		 * @param monitor
 		 *            the progress monitor to use to display progress and
-		 *            receive requests for cancellation
+		 *            receive requests for cancelation
 		 * @param display
 		 *            the display to be used to read and dispatch events
 		 */
@@ -118,35 +118,42 @@ public class ModalContext {
 				if (runnable != null) {
 					runnable.run(progressMonitor);
 				}
-			} catch (InvocationTargetException | InterruptedException | RuntimeException e) {
+			} catch (InvocationTargetException e) {
+				throwable = e;
+			} catch (InterruptedException e) {
+				throwable = e;
+			} catch (RuntimeException e) {
 				throwable = e;
 			} catch (ThreadDeath e) {
 				// Make sure to propagate ThreadDeath, or threads will never
-				// fully terminate.
+				// fully terminate
 				throw e;
 			} catch (Error e) {
 				throwable = e;
 			} finally {
-				progressMonitor.done();
-				// Notify the operation of change of thread of control.
+				// notify the operation of change of thread of control
 				if (runnable instanceof IThreadListener) {
-					Throwable exception = invokeThreadListener(((IThreadListener) runnable), callingThread);
-
-					// Forward it if we don't already have one
-					if (exception != null && throwable == null)
+					Throwable exception = 
+						invokeThreadListener(((IThreadListener) runnable), callingThread);
+					
+					//Forward it if we don't already have one
+					if(exception != null && throwable == null)
 						throwable = exception;
 				}
 
 				// Make sure that all events in the asynchronous event queue
 				// are dispatched.
-				display.syncExec(() -> {
-					// Do nothing.
+				display.syncExec(new Runnable() {
+					@Override
+					public void run() {
+						// do nothing
+					}
 				});
 
-				// Stop event dispatching.
+				// Stop event dispatching
 				continueEventDispatching = false;
 
-				// Force the event loop to return from sleep() so that
+				// Force the event loop to return from sleep () so that
 				// it stops event dispatching.
 				display.asyncExec(null);
 			}
@@ -168,8 +175,8 @@ public class ModalContext {
 						exceptionCount = 0;
 					}
 					// ThreadDeath is a normal error when the thread is dying.
-					// We must propagate it in order for it to properly
-					// terminate.
+					// We must
+					// propagate it in order for it to properly terminate.
 					catch (ThreadDeath e) {
 						throw (e);
 					}
@@ -191,8 +198,14 @@ public class ModalContext {
 								throw new RuntimeException(t);
 							}
 						}
-						Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE,
-								"Unhandled event loop exception during blocked modal context.", t)); //$NON-NLS-1$
+						Policy
+								.getLog()
+								.log(
+										new Status(
+												IStatus.ERROR,
+												Policy.JFACE,
+												"Unhandled event loop exception during blocked modal context.",//$NON-NLS-1$
+												t));
 					}
 				}
 			} else {
@@ -208,7 +221,7 @@ public class ModalContext {
 	/**
 	 * Returns whether the first progress monitor is the same as, or a wrapper
 	 * around, the second progress monitor.
-	 *
+	 * 
 	 * @param monitor1
 	 *            the first progress monitor
 	 * @param monitor2
@@ -217,13 +230,15 @@ public class ModalContext {
 	 *         around, the second
 	 * @see ProgressMonitorWrapper
 	 */
-	public static boolean canProgressMonitorBeUsed(IProgressMonitor monitor1, IProgressMonitor monitor2) {
+	public static boolean canProgressMonitorBeUsed(IProgressMonitor monitor1,
+			IProgressMonitor monitor2) {
 		if (monitor1 == monitor2) {
 			return true;
 		}
 
 		while (monitor1 instanceof ProgressMonitorWrapper) {
-			monitor1 = ((ProgressMonitorWrapper) monitor1).getWrappedProgressMonitor();
+			monitor1 = ((ProgressMonitorWrapper) monitor1)
+					.getWrappedProgressMonitor();
 			if (monitor1 == monitor2) {
 				return true;
 			}
@@ -240,21 +255,22 @@ public class ModalContext {
 	 * </p>
 	 * <p>
 	 * Convenience for:
-	 *
+	 * 
 	 * <pre>
 	 * if (monitor.isCanceled())
 	 * 	throw new InterruptedException();
 	 * </pre>
-	 *
+	 * 
 	 * </p>
-	 *
+	 * 
 	 * @param monitor
 	 *            the progress monitor
 	 * @exception InterruptedException
-	 *                if canceling the operation has been requested
+	 *                if cancelling the operation has been requested
 	 * @see IProgressMonitor#isCanceled()
 	 */
-	public static void checkCanceled(IProgressMonitor monitor) throws InterruptedException {
+	public static void checkCanceled(IProgressMonitor monitor)
+			throws InterruptedException {
 		if (monitor.isCanceled()) {
 			throw new InterruptedException();
 		}
@@ -279,7 +295,7 @@ public class ModalContext {
 	 * <code>ModalContext.run</code> method is called within the dynamic scope
 	 * of another call to <code>ModalContext.run</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return the modal nesting level, or <code>0</code> if this method is
 	 *         called outside the dynamic scope of any invocation of
 	 *         <code>ModalContext.run</code>
@@ -290,7 +306,7 @@ public class ModalContext {
 
 	/**
 	 * Returns whether the given thread is running a modal context.
-	 *
+	 * 
 	 * @param thread
 	 *            The thread to be checked
 	 * @return <code>true</code> if the given thread is running a modal
@@ -311,13 +327,13 @@ public class ModalContext {
 	 * If the supplied operation implements <code>IThreadListener</code>, it
 	 * will be notified of any thread changes required to execute the operation.
 	 * Specifically, the operation will be notified of the thread that will call
-	 * its <code>run</code> method before it is called, and will be notified of
-	 * the change of control back to the thread calling this method when the
+	 * its <code>run</code> method before it is called, and will be notified
+	 * of the change of control back to the thread calling this method when the
 	 * operation completes. These thread change notifications give the operation
 	 * an opportunity to transfer any thread-local state to the execution thread
 	 * before control is transferred to the new thread.
 	 * </p>
-	 *
+	 * 
 	 * @param operation
 	 *            the runnable to run
 	 * @param fork
@@ -325,20 +341,20 @@ public class ModalContext {
 	 *            thread, and <code>false</code> if in the same thread
 	 * @param monitor
 	 *            the progress monitor to use to display progress and receive
-	 *            requests for cancellation
+	 *            requests for cancelation
 	 * @param display
 	 *            the display to be used to read and dispatch events
 	 * @exception InvocationTargetException
 	 *                if the run method must propagate a checked exception, it
 	 *                should wrap it inside an
-	 *                <code>InvocationTargetException</code>; runtime exceptions
-	 *                and errors are automatically wrapped in an
+	 *                <code>InvocationTargetException</code>; runtime
+	 *                exceptions and errors are automatically wrapped in an
 	 *                <code>InvocationTargetException</code> by this method
 	 * @exception InterruptedException
 	 *                if the operation detects a request to cancel, using
-	 *                <code>IProgressMonitor.isCanceled()</code>, it should exit
-	 *                by throwing <code>InterruptedException</code>; this method
-	 *                propagates the exception
+	 *                <code>IProgressMonitor.isCanceled()</code>, it should
+	 *                exit by throwing <code>InterruptedException</code>;
+	 *                this method propagates the exception
 	 */
 	public static void run(IRunnableWithProgress operation, boolean fork,
 			IProgressMonitor monitor, Display display)
@@ -347,7 +363,9 @@ public class ModalContext {
 
 		modalLevel++;
 		try {
-			monitor.setCanceled(false);
+			if (monitor != null) {
+				monitor.setCanceled(false);
+			}
 			// Is the runnable supposed to be execute in the same thread.
 			if (!fork || !runInSeparateThread) {
 				runInCurrentThread(operation, monitor);
@@ -363,12 +381,13 @@ public class ModalContext {
 					if (operation instanceof IThreadListener) {
 						listenerException = invokeThreadListener((IThreadListener) operation, t);
 					}
-
-					if (listenerException == null) {
+					
+					if(listenerException == null){
 						t.start();
 						t.block();
-					} else {
-						if (t.throwable == null)
+					}
+					else {
+						if(t.throwable == null)
 							t.throwable = listenerException;
 					}
 					Throwable throwable = t.throwable;
@@ -376,14 +395,16 @@ public class ModalContext {
 						if (debug
 								&& !(throwable instanceof InterruptedException)
 								&& !(throwable instanceof OperationCanceledException)) {
-							System.err.println("Exception in modal context operation:"); //$NON-NLS-1$
+							System.err
+									.println("Exception in modal context operation:"); //$NON-NLS-1$
 							throwable.printStackTrace();
 							System.err.println("Called from:"); //$NON-NLS-1$
 							// Don't create the InvocationTargetException on the
 							// throwable,
 							// otherwise it will print its stack trace (from the
 							// other thread).
-							new InvocationTargetException(null).printStackTrace();
+							new InvocationTargetException(null)
+									.printStackTrace();
 						}
 						if (throwable instanceof InvocationTargetException) {
 							throw (InvocationTargetException) throwable;
@@ -393,7 +414,8 @@ public class ModalContext {
 							// See 1GAN3L5: ITPUI:WIN2000 - ModalContext
 							// converts OperationCancelException into
 							// InvocationTargetException
-							throw new InterruptedException(throwable.getMessage());
+							throw new InterruptedException(throwable
+									.getMessage());
 						} else {
 							throw new InvocationTargetException(throwable);
 						}
@@ -408,19 +430,22 @@ public class ModalContext {
 	/**
 	 * Invoke the ThreadListener if there are any errors or RuntimeExceptions
 	 * return them.
-	 *
+	 * 
 	 * @param listener
 	 * @param switchingThread
 	 *            the {@link Thread} being switched to
 	 */
-	static Throwable invokeThreadListener(IThreadListener listener, Thread switchingThread) {
+	static Throwable invokeThreadListener(IThreadListener listener,
+			Thread switchingThread) {
 		try {
 			listener.threadChange(switchingThread);
 		} catch (ThreadDeath e) {
 			// Make sure to propagate ThreadDeath, or threads will never
 			// fully terminate
 			throw e;
-		} catch (RuntimeException | Error e) {
+		} catch (Error e) {
+			return e;
+		}catch (RuntimeException e) {
 			return e;
 		}
 		return null;
@@ -430,28 +455,33 @@ public class ModalContext {
 	 * Run a runnable. Convert all thrown exceptions to either
 	 * InterruptedException or InvocationTargetException
 	 */
-	private static void runInCurrentThread(IRunnableWithProgress runnable, IProgressMonitor progressMonitor)
-			throws InterruptedException, InvocationTargetException {
+	private static void runInCurrentThread(IRunnableWithProgress runnable,
+			IProgressMonitor progressMonitor) throws InterruptedException,
+			InvocationTargetException {
 		try {
 			if (runnable != null) {
 				runnable.run(progressMonitor);
 			}
-		} catch (InvocationTargetException | InterruptedException e) {
+		} catch (InvocationTargetException e) {
+			throw e;
+		} catch (InterruptedException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
 			throw new InterruptedException();
 		} catch (ThreadDeath e) {
 			// Make sure to propagate ThreadDeath, or threads will never fully
-			// terminate.
+			// terminate
 			throw e;
-		} catch (RuntimeException | Error e) {
+		} catch (RuntimeException e) {
+			throw new InvocationTargetException(e);
+		} catch (Error e) {
 			throw new InvocationTargetException(e);
 		}
 	}
 
 	/**
 	 * Sets whether ModalContext is running in debug mode.
-	 *
+	 * 
 	 * @param debugMode
 	 *            <code>true</code> for debug mode, and <code>false</code>
 	 *            for normal mode (the default)
@@ -465,7 +495,7 @@ public class ModalContext {
 	 * <code>Display.readAndDispatch()</code>) while running operations. By
 	 * default, ModalContext will process events while running operations. Use
 	 * this method to disallow event processing temporarily.
-	 *
+	 * 
 	 * @param allowReadAndDispatch
 	 *            <code>true</code> (the default) if events may be processed
 	 *            while running an operation, <code>false</code> if
@@ -474,7 +504,7 @@ public class ModalContext {
 	 * @since 3.2
 	 */
 	public static void setAllowReadAndDispatch(boolean allowReadAndDispatch) {
-		// Use a separate thread if and only if it is OK to spin the event loop.
+		// use a separate thread if and only if it is OK to spin the event loop
 		runInSeparateThread = allowReadAndDispatch;
 	}
 }

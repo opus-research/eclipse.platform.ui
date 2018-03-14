@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -63,8 +63,6 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
     private boolean createLeadupStructure = true;
 
     private boolean createContainerDirectories = true;
-
-	private boolean resolveLinks = false;
 
     /**
      *  Create an instance of this class.  Use this constructor if you wish to
@@ -173,7 +171,7 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
             throws InterruptedException {
         for (int i = 0; i < children.length; i++) {
             IResource child = children[i];
-			if (!child.isAccessible() || (!resolveLinks && child.isLinked())) {
+            if (!child.isAccessible()) {
 				continue;
 			}
 
@@ -271,7 +269,7 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 
         while (resources.hasNext()) {
             IResource currentResource = (IResource) resources.next();
-			if (!currentResource.isAccessible() || (!resolveLinks && currentResource.isLinked())) {
+            if (!currentResource.isAccessible()) {
 				continue;
 			}
 
@@ -436,15 +434,4 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 			overwriteState = OVERWRITE_ALL;
 		}
     }
-
-	/**
-	 * Set this boolean indicating whether linked resources should be resolved
-	 * and exported (as opposed to simply ignored)
-	 *
-	 * @param value
-	 *            boolean
-	 */
-	public void setResolveLinks(boolean value) {
-		resolveLinks = value;
-	}
 }

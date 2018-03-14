@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ package org.eclipse.ui.internal.views.markers;
  */
 public class MockMarkerEntry extends MarkerEntry{
 	/**
-	 *
+	 * 
 	 */
 	public String name;
 	/**
@@ -25,6 +25,9 @@ public class MockMarkerEntry extends MarkerEntry{
 		super(null);
 		this.name=name;
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub

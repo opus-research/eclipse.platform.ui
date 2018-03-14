@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,11 +31,11 @@ public class WorkbenchFile extends WorkbenchResource {
 	 * to cache the result of doing a proper content type lookup. This will be
 	 * set by the ContentTypeDecorator (if enabled) and used instead of the
 	 * "guessed" content type in {@link #getBaseImage(IResource)}.
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	public static QualifiedName IMAGE_CACHE_KEY = new QualifiedName(WorkbenchPlugin.PI_WORKBENCH, "WorkbenchFileImage"); //$NON-NLS-1$
-
+	
 	/**
      *	Answer the appropriate base image to use for the passed resource, optionally
      *	considering the passed open status as well iff appropriate for the type of

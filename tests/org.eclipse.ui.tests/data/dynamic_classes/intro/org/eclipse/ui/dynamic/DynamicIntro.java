@@ -19,21 +19,27 @@ import org.eclipse.ui.part.IntroPart;
 public class DynamicIntro extends IntroPart {
 
 	/**
-	 *
+	 * 
 	 */
 	public DynamicIntro() {
 		super();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.intro.IIntroPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.intro.IIntroPart#setFocus()
+	 */
 	public void setFocus() {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.intro.IIntroPart#standbyStateChanged(boolean)
+	 */
 	public void standbyStateChanged(boolean standby) {
 	}
 }

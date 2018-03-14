@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,20 +15,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.window.Window;
+import com.ibm.icu.text.Collator;
+
 import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -45,12 +35,26 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import org.eclipse.core.resources.IMarker;
+
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.TrayDialog;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
+
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.IWorkingSetSelectionDialog;
 import org.eclipse.ui.internal.views.tasklist.TaskListMessages;
-
-import com.ibm.icu.text.Collator;
 
 class FiltersDialog extends TrayDialog {
     /**
@@ -208,7 +212,7 @@ class FiltersDialog extends TrayDialog {
 
         /**
          * Creates the working set filter selection widgets.
-         *
+         * 
          * @param parent the parent composite of the working set widgets
          */
         WorkingSetGroup(Composite parent) {
@@ -230,7 +234,7 @@ class FiltersDialog extends TrayDialog {
 
 		/**
 		 * Returns whether or not a working set filter should be used
-		 *
+		 * 
 		 * @return true=a working set filter should be used false=a working set filter should not be
 		 *         used
 		 */
@@ -241,7 +245,7 @@ class FiltersDialog extends TrayDialog {
         /**
          * Returns the selected working set filter or null if none
          * is selected.
-         *
+         * 
          * @return the selected working set filter or null if none
          * 	is selected.
          */
@@ -251,7 +255,7 @@ class FiltersDialog extends TrayDialog {
 
         /**
          * Sets the working set filter selection.
-         *
+         * 
          * @param selected true=a working set filter should be used
          * 	false=no working set filter should be used
          */
@@ -292,7 +296,7 @@ class FiltersDialog extends TrayDialog {
 
         /**
          * Sets the specified working set.
-         *
+         * 
          * @param workingSet the working set
          */
         void setWorkingSet(IWorkingSet workingSet) {
@@ -342,11 +346,16 @@ class FiltersDialog extends TrayDialog {
         }
     };
 
-    private ICheckStateListener checkStateListener = event -> FiltersDialog.this.checkStateChanged(event);
+    private ICheckStateListener checkStateListener = new ICheckStateListener() {
+        @Override
+		public void checkStateChanged(CheckStateChangedEvent event) {
+            FiltersDialog.this.checkStateChanged(event);
+        }
+    };
 
     /**
      * Creates a new filters dialog.
-     *
+     * 
      * @param parentShell the parent shell
      */
     public FiltersDialog(Shell parentShell) {
@@ -354,6 +363,9 @@ class FiltersDialog extends TrayDialog {
         initTypes();
     }
 
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
     @Override
 	protected void buttonPressed(int buttonId) {
         if (RESET_ID == buttonId) {
@@ -367,7 +379,7 @@ class FiltersDialog extends TrayDialog {
 
     /**
      * Check state change.
-     *
+     * 
      * @param event the event
      */
     public void checkStateChanged(CheckStateChangedEvent event) {
@@ -380,6 +392,9 @@ class FiltersDialog extends TrayDialog {
         updateEnabledState();
     }
 
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -416,7 +431,7 @@ class FiltersDialog extends TrayDialog {
 
         Button reset = new Button(composite, SWT.PUSH);
         reset.setText(TaskListMessages.TaskList_resetText);
-		reset.setData(Integer.valueOf(RESET_ID));
+        reset.setData(new Integer(RESET_ID));
 
         reset.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -467,6 +482,9 @@ class FiltersDialog extends TrayDialog {
         return combo;
     }
 
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -484,7 +502,7 @@ class FiltersDialog extends TrayDialog {
 
     /**
      * Creates a separator line above the OK/Cancel buttons bar
-     *
+     * 
      * @param parent the parent composite
      */
     void createSeparatorLine(Composite parent) {
@@ -946,7 +964,7 @@ class FiltersDialog extends TrayDialog {
 
 	/**
 	 * Handles selection on a check box or combo box.
-	 *
+	 * 
 	 * @param e the selection event
 	 */
     void widgetSelected(SelectionEvent e) {

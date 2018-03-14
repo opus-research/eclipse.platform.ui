@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063,398865,398866,403081,403083
- *     Bruce Skingle <Bruce.Skingle@immutify.com> - Bug 442570
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866,
+ *         Bug403081, Bug 403083
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -68,6 +69,8 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	@Optional
 	private Logger logger;
 
+	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
+
 	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
@@ -78,13 +81,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		final Menu menu = menuManager.getMenu();
 
 		if (menuModel != null && menuManager != null) {
-			cleanUp(menuModel, menuManager);
-			if (menuManager.getRemoveAllWhenShown()) {
-				// This needs to be done or else menu items get added multiple
-				// times to MenuModel which results in incorrect behavior and
-				// memory leak - bug 486474
-				menuModel.getChildren().removeAll(menuModel.getChildren());
-			}
+			cleanUp(menu, menuModel, menuManager);
 		}
 		if (menuModel instanceof MPopupMenu) {
 			showPopup(menu, (MPopupMenu) menuModel, menuManager);
@@ -151,7 +148,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 				IEclipseContext dynamicMenuContext = EclipseContextFactory
 						.create();
-				ArrayList<MMenuElement> mel = new ArrayList<>();
+				ArrayList<MMenuElement> mel = new ArrayList<MMenuElement>();
 				dynamicMenuContext.set(List.class, mel);
 				IEclipseContext parentContext = modelService
 						.getContainingContext(currentMenuElement);
@@ -165,6 +162,19 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 					}
 					continue;
 				}
+
+				// remove existing entries for this dynamic contribution item if
+				// there are any
+				Map<String, Object> storageMap = currentMenuElement
+						.getTransientData();
+				@SuppressWarnings("unchecked")
+				ArrayList<MMenuElement> dump = (ArrayList<MMenuElement>) storageMap
+						.get(DYNAMIC_ELEMENT_STORAGE_KEY);
+				if (dump != null && dump.size() > 0)
+					renderer.removeDynamicMenuContributions(menuManager,
+							menuModel, dump);
+
+				storageMap.remove(DYNAMIC_ELEMENT_STORAGE_KEY);
 
 				if (mel.size() > 0) {
 
@@ -191,21 +201,23 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 						menuModel.getChildren().add(position++, menuElement);
 						renderer.modelProcessSwitch(menuManager, menuElement);
 					}
-					currentMenuElement.getTransientData().put(DYNAMIC_ELEMENT_STORAGE_KEY, mel);
+					storageMap.put(DYNAMIC_ELEMENT_STORAGE_KEY, mel);
 				}
 			}
 		}
 	}
 
-	/**
-	 * Remove all of the items created by any dynamic contributions on the
-	 * menuModel.
-	 *
-	 * @param menuModel
-	 * @param menuManager
-	 */
-	private void cleanUp(MMenu menuModel, MenuManager menuManager) {
-		renderer.removeDynamicMenuContributions(menuManager, menuModel);
+	private void cleanUp(final Menu menu, MMenu menuModel,
+			MenuManager menuManager) {
+		trace("cleanUp", menu, null); //$NON-NLS-1$
+		if (pendingCleanup.isEmpty()) {
+			return;
+		}
+		Runnable cleanUp = pendingCleanup.remove(menu);
+		if (cleanUp != null) {
+			trace("cleanUp.run()", menu, null); //$NON-NLS-1$
+			cleanUp.run();
+		}
 	}
 
 	private void showPopup(final Menu menu, final MPopupMenu menuModel,

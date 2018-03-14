@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Benjamin Muskalla - bug 105041
  *     Remy Chi Jian Suen - bug 144102
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.navigator;
@@ -21,35 +19,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.commands.ActionHandler;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.Util;
-import org.eclipse.jface.viewers.DecoratingLabelProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ILabelDecorator;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.OpenEvent;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.FileTransfer;
@@ -58,9 +29,45 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.commands.ActionHandler;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.util.Util;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.OpenEvent;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerSorter;
+
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
@@ -134,7 +141,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 * event we're effectively not using a working set.
 	 */
     private boolean emptyWorkingSet = false;
-
+    
     /**
 	 * Settings constant for section name (value <code>ResourceNavigator</code>).
 	 */
@@ -160,7 +167,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * True iff we've already scheduled an asynchronous call to linkToEditor
      */
     private boolean linkScheduled = false;
-
+    
     // Persistance tags.
     private static final String TAG_SORTER = "sorter"; //$NON-NLS-1$
 
@@ -208,44 +215,47 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         }
     };
 
-    private IPropertyChangeListener propertyChangeListener = event -> {
-	    String property = event.getProperty();
-	    Object newValue = event.getNewValue();
-	    Object oldValue = event.getOldValue();
-
-	    if (IWorkingSetManager.CHANGE_WORKING_SET_REMOVE.equals(property)
-	            && oldValue == workingSet) {
-	        setWorkingSet(null);
-	    } else if (IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE
-	            .equals(property)
-	            && newValue == workingSet) {
-	        updateTitle();
-	    } else if (IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE
-	            .equals(property)
-	            && newValue == workingSet) {
-			if (workingSet.isAggregateWorkingSet() && workingSet.isEmpty()) {
-				// act as if the working set has been made null
-				if (!emptyWorkingSet) {
-					emptyWorkingSet = true;
-					workingSetFilter.setWorkingSet(null);
+    private IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+        @Override
+		public void propertyChange(PropertyChangeEvent event) {
+            String property = event.getProperty();
+            Object newValue = event.getNewValue();
+            Object oldValue = event.getOldValue();
+           
+            if (IWorkingSetManager.CHANGE_WORKING_SET_REMOVE.equals(property)
+                    && oldValue == workingSet) {
+                setWorkingSet(null);
+            } else if (IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE
+                    .equals(property)
+                    && newValue == workingSet) {
+                updateTitle();
+            } else if (IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE
+                    .equals(property)
+                    && newValue == workingSet) {
+				if (workingSet.isAggregateWorkingSet() && workingSet.isEmpty()) {
+					// act as if the working set has been made null
+					if (!emptyWorkingSet) {
+						emptyWorkingSet = true;
+						workingSetFilter.setWorkingSet(null);
+					}
+				} else {
+					// we've gone from empty to non-empty on our set.
+					// Restore it.
+					if (emptyWorkingSet) {
+					    emptyWorkingSet = false;
+						workingSetFilter.setWorkingSet(workingSet);
+					}
 				}
-			} else {
-				// we've gone from empty to non-empty on our set.
-				// Restore it.
-				if (emptyWorkingSet) {
-				    emptyWorkingSet = false;
-					workingSetFilter.setWorkingSet(workingSet);
-				}
-			}
-			getViewer().refresh();
-	    }
-	};
+				getViewer().refresh();
+            }
+        }
+    };
 
 	private CollapseAllHandler collapseAllHandler;
-
+	
 	/**
 	 * Helper to open and activate editors.
-	 *
+	 * 
 	 * @since 3.5
 	 */
 	private OpenAndLinkWithEditorHelper openAndLinkWithEditorHelper;
@@ -270,12 +280,20 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * where the elements are resources.
      */
     private StructuredSelection convertSelection(ISelection selection) {
-		ArrayList<IResource> list = new ArrayList<>();
+        ArrayList list = new ArrayList();
         if (selection instanceof IStructuredSelection) {
             IStructuredSelection ssel = (IStructuredSelection) selection;
-			for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
+            for (Iterator i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
-				IResource resource = Adapters.adapt(o, IResource.class);
+                IResource resource = null;
+                if (o instanceof IResource) {
+                    resource = (IResource) o;
+                } else {
+                    if (o instanceof IAdaptable) {
+                        resource = (IResource) ((IAdaptable) o)
+                                .getAdapter(IResource.class);
+                    }
+                }
                 if (resource != null) {
                     list.add(resource);
                 }
@@ -284,6 +302,9 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         return new StructuredSelection(list);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void createPartControl(Composite parent) {
         TreeViewer viewer = createViewer(parent);
@@ -333,7 +354,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Returns the help context id to use for this view.
-     *
+     * 
      * @since 2.0
      */
     protected String getHelpContextId() {
@@ -342,13 +363,18 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Initializes and registers the context menu.
-     *
+     * 
      * @since 2.0
      */
     protected void initContextMenu() {
         MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(manager -> ResourceNavigator.this.fillContextMenu(manager));
+        menuMgr.addMenuListener(new IMenuListener() {
+            @Override
+			public void menuAboutToShow(IMenuManager manager) {
+                ResourceNavigator.this.fillContextMenu(manager);
+            }
+        });
         TreeViewer viewer = getTreeViewer();
         Menu menu = menuMgr.createContextMenu(viewer.getTree());
         viewer.getTree().setMenu(menu);
@@ -357,7 +383,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Creates the viewer.
-     *
+     * 
      * @param parent the parent composite
      * @since 2.0
      */
@@ -375,7 +401,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Sets the content provider for the viewer.
-     *
+     * 
      * @param viewer the viewer
      * @since 2.0
      */
@@ -385,7 +411,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Sets the label provider for the viewer.
-     *
+     * 
      * @param viewer the viewer
      * @since 2.0
      */
@@ -397,7 +423,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Adds the filters to the viewer.
-     *
+     * 
      * @param viewer the viewer
      * @since 2.0
      */
@@ -425,14 +451,24 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Adds the listeners to the viewer.
-     *
+     * 
      * @param viewer the viewer
      * @since 2.0
      */
     protected void initListeners(final TreeViewer viewer) {
-        viewer.addSelectionChangedListener(event -> handleSelectionChanged(event));
-        viewer.addDoubleClickListener(event -> handleDoubleClick(event));
-
+        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
+                handleSelectionChanged(event);
+            }
+        });
+        viewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
+                handleDoubleClick(event);
+            }
+        });
+        
 		openAndLinkWithEditorHelper = new OpenAndLinkWithEditorHelper(viewer) {
 			@Override
 			protected void activate(ISelection selection) {
@@ -445,7 +481,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 						page.activate(editor);
 					}
 				}
-
+				
 			}
 
 			@Override
@@ -454,19 +490,22 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 					// Ensure that if another selection change arrives while we're waiting for the *syncExec,
 					// we only do this work once.
 					linkScheduled = true;
-					getSite().getShell().getDisplay().asyncExec(() -> {
-						// There's no telling what might have changed since the syncExec was scheduled.
-						// Check to make sure that the widgets haven't been disposed.
-						linkScheduled = false;
+					getSite().getShell().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							// There's no telling what might have changed since the syncExec was scheduled.
+							// Check to make sure that the widgets haven't been disposed.
+							linkScheduled = false;
 
-						if (viewer == null || viewer.getControl() == null || viewer.getControl().isDisposed()) {
-							return;
-						}
+							if (viewer == null || viewer.getControl() == null || viewer.getControl().isDisposed()) {
+								return;
+							}
 
-						if (dragDetected == false) {
-							// only synchronize with editor when the selection is not the result
-							// of a drag. Fixes bug 22274.
-							ResourceNavigator.this.linkToEditor(viewer.getSelection());
+							if (dragDetected == false) {
+								// only synchronize with editor when the selection is not the result
+								// of a drag. Fixes bug 22274.
+								ResourceNavigator.this.linkToEditor(viewer.getSelection());
+							}
 						}
 					});
 				}
@@ -478,7 +517,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 			}
 
 		};
-
+        
 
         viewer.getControl().addKeyListener(new KeyListener() {
             @Override
@@ -491,10 +530,13 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                 handleKeyReleased(event);
             }
         });
-
+        
         openAndLinkWithEditorHelper.setLinkWithEditor(linkingEnabled);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void dispose() {
         getSite().getPage().removePartListener(partListener);
@@ -506,7 +548,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         if (collapseAllHandler != null) {
 			collapseAllHandler.dispose();
 		}
-
+        
         if (getActionGroup() != null) {
             getActionGroup().dispose();
         }
@@ -515,14 +557,14 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                 && control.isDisposed() == false) {
             control.removeListener(SWT.DragDetect, dragDetectListener);
         }
-
+        
         super.dispose();
     }
 
     /**
      * An editor has been activated.  Sets the selection in this navigator
      * to be the editor's input, if linking is enabled.
-     *
+     * 
      * @param editor the active editor
      * @since 2.0
      */
@@ -569,26 +611,34 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * If the resource is a container, it uses that.
      * If the resource is a file, it uses its parent folder.
      * If a resource could not be obtained, it uses the workspace root.
-     *
+     * 
      * @since 2.0
      */
-	protected IAdaptable getInitialInput() {
-		IResource resource = Adapters.adapt(getSite().getPage().getInput(), IResource.class);
-		if (resource != null) {
-			switch (resource.getType()) {
-			case IResource.FILE:
-				return resource.getParent();
-			case IResource.FOLDER:
-			case IResource.PROJECT:
-			case IResource.ROOT:
-				return resource;
-			default:
-				// Unknown resource type. Fall through.
-				break;
-			}
-		}
-		return ResourcesPlugin.getWorkspace().getRoot();
-	}
+    protected IAdaptable getInitialInput() {
+        IAdaptable input = getSite().getPage().getInput();
+        if (input != null) {
+            IResource resource = null;
+            if (input instanceof IResource) {
+                resource = (IResource) input;
+            } else {
+                resource = (IResource) input.getAdapter(IResource.class);
+            }
+            if (resource != null) {
+                switch (resource.getType()) {
+                case IResource.FILE:
+                    return resource.getParent();
+                case IResource.FOLDER:
+                case IResource.PROJECT:
+                case IResource.ROOT:
+                    return resource;
+                default:
+                    // Unknown resource type.  Fall through.
+                    break;
+                }
+            }
+        }
+        return ResourcesPlugin.getWorkspace().getRoot();
+    }
 
     /**
      * Returns the pattern filter for this view.
@@ -624,7 +674,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	 * Return the sorter. If a comparator was set using
 	 * {@link #setComparator(ResourceComparator)}, this method will return
 	 * <code>null</code>.
-	 *
+	 * 
 	 * @since 2.0
 	 * @deprecated as of 3.3, use {@link ResourceNavigator#getComparator()}
 	 */
@@ -642,7 +692,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * Returns the comparator.  If a sorter was set using
 	 * {@link #setSorter(ResourceSorter)}, this method will return
 	 * <code>null</code>.
-     *
+     * 
      * @return the <code>ResourceComparator</code>
      * @since 3.3
      */
@@ -676,7 +726,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * Returns the shell to use for opening dialogs.
      * Used in this class, and in the actions.
-     *
+     * 
      * @return the shell
      * @deprecated use getViewSite().getShell()
      */
@@ -734,7 +784,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 			}
             return path.makeRelative().toString();
         }
-
+        
         String text = ((ILabelProvider) getTreeViewer().getLabelProvider())
         	.getText(element);
         if(text == null) {
@@ -745,7 +795,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
 	/**
 	 * Handles an open event from the viewer. Opens an editor on the selected file.
-	 *
+	 * 
 	 * @param event the open event
 	 * @since 2.0
 	 * @deprecated As of 3.5, replaced by {@link #handleOpen(ISelection)}
@@ -757,7 +807,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
 	/**
 	 * Handles an open event from the viewer. Opens an editor on the selected file.
-	 *
+	 * 
 	 * @param selection the selection
 	 * @since 3.5
 	 */
@@ -770,7 +820,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * Handles a double-click event from the viewer.
      * Expands or collapses a folder when double-clicked.
-     *
+     * 
      * @param event the double-click event
      * @since 2.0
      */
@@ -797,7 +847,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * Handles a selection changed event from the viewer.
      * Updates the status line and the action bars, and links to editor (if option enabled).
-     *
+     * 
      * @param event the selection event
      * @since 2.0
      */
@@ -812,7 +862,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
      * Handles a key press event from the viewer.
      * Delegates to the action group.
-     *
+     * 
      * @param event the key event
      * @since 2.0
      */
@@ -822,13 +872,16 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Handles a key release in the viewer.  Does nothing by default.
-     *
+     * 
      * @param event the key event
      * @since 2.0
      */
     protected void handleKeyReleased(KeyEvent event) {
     }
 
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
     @Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
@@ -837,7 +890,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Adds drag and drop support to the navigator.
-     *
+     * 
      * @since 2.0
      */
     protected void initDragAndDrop() {
@@ -851,13 +904,18 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         NavigatorDropAdapter adapter = new NavigatorDropAdapter(viewer);
         adapter.setFeedbackEnabled(false);
         viewer.addDropSupport(ops | DND.DROP_DEFAULT, transfers, adapter);
-        dragDetectListener = event -> dragDetected = true;
+        dragDetectListener = new Listener() {
+            @Override
+			public void handleEvent(Event event) {
+                dragDetected = true;
+            }
+        };
         viewer.getControl().addListener(SWT.DragDetect, dragDetectListener);
     }
 
     /**
      * Creates the frame source and frame list, and connects them.
-     *
+     * 
      * @since 2.0
      */
     protected FrameList createFrameList() {
@@ -869,7 +927,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Initializes the sorter.
-     *
+     * 
      * @deprecated as of 3.3, use {@link ResourceNavigator#initResourceComparator()} instead
      */
     @Deprecated
@@ -880,7 +938,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -893,7 +951,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         }
         setSorter(new ResourceSorter(sortType));
     }
-
+    
     /**
      * Initializes the comparator.
 	 * @since 3.3
@@ -905,7 +963,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -926,7 +984,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         String workingSetName = settings.get(STORE_WORKING_SET);
 
         IWorkingSet workingSet = null;
-
+        
         if (workingSetName != null && workingSetName.equals("") == false) { //$NON-NLS-1$
 			IWorkingSetManager workingSetManager = getPlugin().getWorkbench()
 					.getWorkingSetManager();
@@ -951,7 +1009,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     /**
 	 * Returns whether the navigator selection automatically tracks the active
 	 * editor.
-	 *
+	 * 
 	 * @return <code>true</code> if linking is enabled, <code>false</code>
 	 *         if not
 	 * @since 2.0 (this was protected in 2.0, but was made public in 2.1)
@@ -963,7 +1021,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
 	/**
 	 * Brings the corresponding editor to top if the selected resource is open.
-	 *
+	 * 
 	 * @since 2.0
 	 * @deprecated As of 3.5, replaced by {@link #linkToEditor(ISelection)}
 	 */
@@ -974,14 +1032,14 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
 	/**
 	 * Brings the corresponding editor to top if the selected resource is open.
-	 *
+	 * 
 	 * @since 3.5
 	 */
 	protected void linkToEditor(ISelection selection) {
 
     	if (this != this.getSite().getPage().getActivePart())
     		return;
-
+    	
         Object obj = getSingleElement(selection);
 		if (obj instanceof IFile) {
             IFile file = (IFile) obj;
@@ -1000,7 +1058,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     protected void makeActions() {
     	MainActionGroup group = new MainActionGroup(this);
         setActionGroup(group);
-
+        
         IHandlerService service = getSite().getService(IHandlerService.class);
 		service.activateHandler(IWorkbenchCommandConstants.NAVIGATE_TOGGLE_LINK_WITH_EDITOR,
     			new ActionHandler(group.toggleLinkingAction));
@@ -1292,7 +1350,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Sets the resource sorter.
-     *
+     * 
      * @param sorter the resource sorter
      * @since 2.0
      * @deprecated as of 3.3, use {@link ResourceNavigator#setComparator(ResourceComparator)}
@@ -1315,10 +1373,10 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         // update the sort actions' checked state
         updateActionBars((IStructuredSelection) viewer.getSelection());
     }
-
+    
     /**
      * Sets the resource comparator
-     *
+     * 
      * @param comparator the resource comparator
      * @since 3.3
      */
@@ -1349,9 +1407,9 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         TreeViewer treeViewer = getTreeViewer();
         Object[] expanded = treeViewer.getExpandedElements();
         ISelection selection = treeViewer.getSelection();
-
+        
         boolean refreshNeeded = internalSetWorkingSet(workingSet);
-
+        
         workingSetFilter.setWorkingSet(emptyWorkingSet ? null : workingSet);
         if (workingSet != null) {
             settings.put(STORE_WORKING_SET, workingSet.getName());
@@ -1372,7 +1430,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
 	/**
 	 * Set the internal working set fields specific to the navigator.
-	 *
+	 * 
 	 * @param workingSet
 	 *            the new working set
 	 * @since 3.2
@@ -1387,7 +1445,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Updates the action bar actions.
-     *
+     * 
      * @param selection the current selection
      * @since 2.0
      */
@@ -1413,7 +1471,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * Updates the title text and title tool tip.
      * Called whenever the input of the viewer changes.
      * Called whenever the input of the viewer changes.
-     *
+     * 
      * @since 2.0
      */
     public void updateTitle() {
@@ -1447,7 +1505,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Returns the action group.
-     *
+     * 
      * @return the action group
      */
     protected ResourceNavigatorActionGroup getActionGroup() {
@@ -1456,20 +1514,23 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 
     /**
      * Sets the action group.
-     *
+     * 
      * @param actionGroup the action group
      */
     protected void setActionGroup(ResourceNavigatorActionGroup actionGroup) {
         this.actionGroup = actionGroup;
     }
 
+    /*
+     * @see IWorkbenchPart#getAdapter(Class)
+     */
     @Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
         if (adapter == IShowInSource.class) {
-			return adapter.cast(getShowInSource());
+            return getShowInSource();
         }
         if (adapter == IShowInTarget.class) {
-			return adapter.cast(getShowInTarget());
+            return getShowInTarget();
         }
         return null;
     }
@@ -1478,54 +1539,74 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * Returns the <code>IShowInSource</code> for this view.
      */
     protected IShowInSource getShowInSource() {
-        return () -> new ShowInContext(getViewer().getInput(), getViewer()
-		        .getSelection());
+        return new IShowInSource() {
+            @Override
+			public ShowInContext getShowInContext() {
+                return new ShowInContext(getViewer().getInput(), getViewer()
+                        .getSelection());
+            }
+        };
     }
 
     /**
      * Returns the <code>IShowInTarget</code> for this view.
      */
     protected IShowInTarget getShowInTarget() {
-        return context -> {
-			ArrayList<IResource> toSelect = new ArrayList<>();
-		    ISelection sel = context.getSelection();
-		    if (sel instanceof IStructuredSelection) {
-		        IStructuredSelection ssel = (IStructuredSelection) sel;
-				for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
-		            Object o1 = i.next();
-
-					IResource resource = Adapters.adapt(o1, IResource.class);
-					if (resource != null) {
-						toSelect.add(resource);
-					}
-
-					IMarker marker = Adapters.adapt(o1, IMarker.class);
-					if (marker != null) {
-						IResource r2 = marker.getResource();
-						if (r2.getType() != IResource.ROOT) {
-							toSelect.add(r2);
-						}
-		            }
-		        }
-		    }
-			if (toSelect.isEmpty()) {
-				Object input = context.getInput();
-				IResource resource = Adapters.adapt(input, IResource.class);
-				if (resource != null) {
-					toSelect.add(resource);
-				}
-			}
-		    if (!toSelect.isEmpty()) {
-		        selectReveal(new StructuredSelection(toSelect));
-		        return true;
-		    }
-		    return false;
-		};
+        return new IShowInTarget() {
+            @Override
+			public boolean show(ShowInContext context) {
+                ArrayList toSelect = new ArrayList();
+                ISelection sel = context.getSelection();
+                if (sel instanceof IStructuredSelection) {
+                    IStructuredSelection ssel = (IStructuredSelection) sel;
+                    for (Iterator i = ssel.iterator(); i.hasNext();) {
+                        Object o = i.next();
+                        if (o instanceof IResource) {
+                            toSelect.add(o);
+                        } else if (o instanceof IMarker) {
+                            IResource r = ((IMarker) o).getResource();
+                            if (r.getType() != IResource.ROOT) {
+                                toSelect.add(r);
+                            }
+                        } else if (o instanceof IAdaptable) {
+                            IAdaptable adaptable = (IAdaptable) o;
+                            o = adaptable.getAdapter(IResource.class);
+                            if (o instanceof IResource) {
+                                toSelect.add(o);
+                            } else {
+                                o = adaptable.getAdapter(IMarker.class);
+                                if (o instanceof IMarker) {
+                                    IResource r = ((IMarker) o).getResource();
+                                    if (r.getType() != IResource.ROOT) {
+                                        toSelect.add(r);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (toSelect.isEmpty()) {
+                    Object input = context.getInput();
+                    if (input instanceof IAdaptable) {
+                        IAdaptable adaptable = (IAdaptable) input;
+                        Object o = adaptable.getAdapter(IResource.class);
+                        if (o instanceof IResource) {
+                            toSelect.add(o);
+                        }
+                    }
+                }
+                if (!toSelect.isEmpty()) {
+                    selectReveal(new StructuredSelection(toSelect));
+                    return true;
+                }
+                return false;
+            }
+        };
     }
-
+    
 	/**
 	 * Returns the selected element if the selection consists of a single element only.
-	 *
+	 * 
 	 * @param s the selection
 	 * @return the selected first element or null
 	 * @since 3.5

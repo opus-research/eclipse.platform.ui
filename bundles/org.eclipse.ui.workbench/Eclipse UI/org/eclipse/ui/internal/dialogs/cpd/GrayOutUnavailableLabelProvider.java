@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 420956
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 420956 - Fix perspective customization on 4.x
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -21,7 +20,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.ActionSet;
 import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.DisplayItem;
 
@@ -39,9 +37,9 @@ class GrayOutUnavailableLabelProvider extends TreeManager.TreeItemLabelProvider 
 	private Set<Image> toDispose;
 
 	public GrayOutUnavailableLabelProvider(ViewerFilter filter) {
-		this.display = PlatformUI.getWorkbench().getDisplay();
+		this.display = Display.getDefault();
 		this.filter = filter;
-		toDispose = new HashSet<>();
+		toDispose = new HashSet<Image>();
 	}
 
 	@Override
@@ -53,12 +51,12 @@ class GrayOutUnavailableLabelProvider extends TreeManager.TreeItemLabelProvider 
 	public Color getForeground(Object element) {
 		if (element instanceof DisplayItem) {
 			if (!CustomizePerspectiveDialog.isEffectivelyAvailable((DisplayItem) element, filter)) {
-				return display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
+				return display.getSystemColor(SWT.COLOR_GRAY);
 			}
 		}
 		if (element instanceof ActionSet) {
 			if (!((ActionSet) element).isActive()) {
-				return display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
+				return display.getSystemColor(SWT.COLOR_GRAY);
 			}
 		}
 		return null;

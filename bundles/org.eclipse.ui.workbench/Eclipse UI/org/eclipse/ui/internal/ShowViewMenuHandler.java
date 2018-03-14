@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -47,9 +46,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * <p>
  * Replacement for: ShowViewMenuAction
  * </p>
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 
@@ -138,6 +137,7 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 
 	@Override
 	protected Expression getEnabledWhenExpression() {
+		// TODO Auto-generated method stub
 		if (enabledWhen == null) {
 			enabledWhen = new Expression() {
 				@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,18 +19,18 @@ import org.eclipse.swt.widgets.Control;
 /**
  * Compatibility layer for the old-style drag-and-drop. Adapts an old-style
  * IPartDropListener into an IDragTarget.
- *
+ * 
  */
 public class CompatibilityDragTarget {
 
-    // Define width of part's "hot" border
+    // Define width of part's "hot" border	
     private final static int MARGIN = 30;
 
     /**
      * Returns the relative position of the given point (in display coordinates)
-     * with respect to the given control. Returns one of SWT.LEFT, SWT.RIGHT, SWT.CENTER, SWT.TOP,
-     * or SWT.BOTTOM if the point is on the control or SWT.DEFAULT if the point is not on the control.
-     *
+     * with respect to the given control. Returns one of SWT.LEFT, SWT.RIGHT, SWT.CENTER, SWT.TOP, 
+     * or SWT.BOTTOM if the point is on the control or SWT.DEFAULT if the point is not on the control. 
+     * 
      * @param control control to perform hit detection on
      * @param toTest point to test, in display coordinates
      * @return

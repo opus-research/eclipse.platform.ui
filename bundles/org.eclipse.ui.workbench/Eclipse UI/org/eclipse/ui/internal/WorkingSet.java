@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tomasz Zarna <tomasz.zarna@tasktop.com> - Bug 37183
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import org.eclipse.core.runtime.Adapters;
+
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -33,18 +32,18 @@ import org.eclipse.ui.internal.util.Util;
  * A working set holds a number of IAdaptable elements. A working set is
  * intended to group elements for presentation to the user or for operations on
  * a set of elements.
- *
+ * 
  * @see org.eclipse.ui.IWorkingSet
  * @since 2.0
  */
 public class WorkingSet extends AbstractWorkingSet {
 	private static final String DEFAULT_ID = "org.eclipse.ui.resourceWorkingSetPage"; //$NON-NLS-1$
-
+	
 	private String editPageId;
 
 	/**
 	 * Creates a new working set.
-	 *
+	 * 
 	 * @param name
 	 *            the name of the new working set. Should not have leading or
 	 *            trailing whitespace.
@@ -61,7 +60,7 @@ public class WorkingSet extends AbstractWorkingSet {
 
 	/**
 	 * Creates a new working set from a memento.
-	 *
+	 * 
 	 * @param name
 	 *            the name of the new working set. Should not have leading or
 	 *            trailing whitespace.
@@ -83,7 +82,7 @@ public class WorkingSet extends AbstractWorkingSet {
 
 	/**
 	 * Tests the receiver and the object for equality
-	 *
+	 * 
 	 * @param object
 	 *            object to compare the receiver to
 	 * @return true=the object equals the receiver, the name is the same. false
@@ -102,11 +101,6 @@ public class WorkingSet extends AbstractWorkingSet {
 					&& Util.equals(workingSet.getId(), getId());
 		}
 		return false;
-	}
-
-	@Override
-	public String toString() {
-		return "WS [name=" + getName() + ", elements=" + getElementsArray() + ", id=" + getId() + "]"; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 	}
 
 	/**
@@ -134,7 +128,7 @@ public class WorkingSet extends AbstractWorkingSet {
 
 	/**
 	 * Returns the hash code.
-	 *
+	 * 
 	 * @return the hash code.
 	 */
 	@Override
@@ -198,7 +192,7 @@ public class WorkingSet extends AbstractWorkingSet {
 	 * Implements IPersistableElement. Persist the working set name and working
 	 * set contents. The contents has to be either IPersistableElements or
 	 * provide adapters for it to be persistent.
-	 *
+	 * 
 	 * @see org.eclipse.ui.IPersistableElement#saveState(IMemento)
 	 */
 	@Override
@@ -215,7 +209,8 @@ public class WorkingSet extends AbstractWorkingSet {
 			Iterator iterator = elements.iterator();
 			while (iterator.hasNext()) {
 				IAdaptable adaptable = (IAdaptable) iterator.next();
-				final IPersistableElement persistable = Adapters.adapt(adaptable, IPersistableElement.class);
+				final IPersistableElement persistable = (IPersistableElement) Util
+						.getAdapter(adaptable, IPersistableElement.class);
 				if (persistable != null) {
 					final IMemento itemMemento = memento
 							.createChild(IWorkbenchConstants.TAG_ITEM);
@@ -238,9 +233,9 @@ public class WorkingSet extends AbstractWorkingSet {
 
 	@Override
 	public void setElements(IAdaptable[] newElements) {
-		AbstractWorkingSet oldWorkingSet = clone();
 		internalSetElements(newElements);
-		fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, oldWorkingSet);
+		fireWorkingSetChanged(
+				IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
 	}
 
 	@Override
@@ -266,7 +261,7 @@ public class WorkingSet extends AbstractWorkingSet {
 
 	/**
 	 * Return the working set descriptor for this working set.
-	 *
+	 * 
 	 * @param defaultId
 	 *            the default working set type ID to use if this set has no
 	 *            defined type
@@ -285,13 +280,13 @@ public class WorkingSet extends AbstractWorkingSet {
 
 		return registry.getWorkingSetDescriptor(id);
 	}
-
+	
 	@Override
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		IWorkingSetManager manager = getManager();
 		if (manager instanceof WorkingSetManager) {
 			WorkingSetDescriptor descriptor = getDescriptor(null);
-			if (descriptor == null || !descriptor.isElementAdapterClassLoaded())
+			if (descriptor == null || !descriptor.isElementAdapterClassLoaded()) 
 				return objects;
 			return ((WorkingSetManager) manager).getElementAdapter(
 						descriptor).adaptElements(this, objects);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,9 +32,9 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * ScopeArea is the filter configuration area that handles the scope of the
  * filter.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 class ScopeArea extends GroupFilterConfigurationArea {
 
@@ -49,13 +49,13 @@ class ScopeArea extends GroupFilterConfigurationArea {
 
 		/**
 		 * Creates the working set filter selection widgets.
-		 *
+		 * 
 		 * @param parent
 		 *            the parent composite of the working set widgets
 		 */
 		WorkingSetArea(Composite parent) {
-
-
+			
+			
 			// radio button has to be part of main radio button group
 			button = createRadioButton(parent,
 					MarkerMessages.filtersDialog_noWorkingSet,
@@ -74,16 +74,21 @@ class ScopeArea extends GroupFilterConfigurationArea {
 			// composite.setLayout(layout);
 			selectButton = new Button(parent, SWT.PUSH);
 			selectButton.setText(MarkerMessages.filtersDialog_workingSetSelect);
-
+			
 			initializeFontMetrics(parent);
 			GridData layoutData = new GridData();
 			layoutData.horizontalIndent = 20;
 			int widthHint = Dialog.convertHorizontalDLUsToPixels(getFontMetrics(),IDialogConstants.BUTTON_WIDTH);
 			Point minSize = selectButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 			layoutData.widthHint = Math.max(widthHint, minSize.x);
-
+			
 			selectButton.setLayoutData(layoutData);
 			selectButton.addSelectionListener(new SelectionAdapter() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 
@@ -110,14 +115,14 @@ class ScopeArea extends GroupFilterConfigurationArea {
 
 				}
 			});
-
-
+			
+			
 
 		}
 
 		/**
 		 * Returns wether or not a working set filter should be used
-		 *
+		 * 
 		 * @return true=a working set filter should be used false=a working set
 		 *         filter should not be used
 		 */
@@ -127,7 +132,7 @@ class ScopeArea extends GroupFilterConfigurationArea {
 
 		/**
 		 * Returns the selected working set filter or null if none is selected.
-		 *
+		 * 
 		 * @return the selected working set filter or null if none is selected.
 		 */
 		IWorkingSet getWorkingSet() {
@@ -136,7 +141,7 @@ class ScopeArea extends GroupFilterConfigurationArea {
 
 		/**
 		 * Sets the working set filter selection.
-		 *
+		 * 
 		 * @param selected
 		 *            true=a working set filter should be used false=no working
 		 *            set filter should be used
@@ -159,7 +164,7 @@ class ScopeArea extends GroupFilterConfigurationArea {
 
 		/**
 		 * Sets the specified working set.
-		 *
+		 * 
 		 * @param workingSet
 		 *            the working set
 		 */
@@ -191,13 +196,23 @@ class ScopeArea extends GroupFilterConfigurationArea {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#applyToGroup(org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilterGroup)
+	 */
 	@Override
 	public void applyToGroup(MarkerFieldFilterGroup group) {
 		group.setScope(scope);
 		group.setWorkingSet(workingSetArea.getWorkingSet());
-
+		
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void createContents(Composite parent) {
 
@@ -221,7 +236,7 @@ class ScopeArea extends GroupFilterConfigurationArea {
 
 	/**
 	 * Creates a radio button with the given parent and text.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @param text
@@ -235,6 +250,11 @@ class ScopeArea extends GroupFilterConfigurationArea {
 		button.setSelection(value == scope);
 		button.addSelectionListener(new SelectionAdapter() {
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				scope = value;
@@ -250,11 +270,21 @@ class ScopeArea extends GroupFilterConfigurationArea {
 	private void setScope(int value){
 		scope = value;
 	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#getTitle()
+	 */
 	@Override
 	public String getTitle() {
 		return MarkerMessages.filtersDialog_scopeTitle;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.FilterConfigurationArea#initializeFromGroup(org.eclipse.ui.internal.provisional.views.markers.MarkerFieldFilterGroup)
+	 */
 	@Override
 	public void initializeFromGroup(MarkerFieldFilterGroup group) {
 		buttons[scope].setSelection(false);
@@ -263,12 +293,22 @@ class ScopeArea extends GroupFilterConfigurationArea {
 		workingSetArea.setWorkingSet(group.getWorkingSet());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
+	 */
 	@Override
 	public void apply(MarkerFieldFilter filter) {
 		// Do nothing as this is a group level setting
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
+	 */
 	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		// Do nothing as this is a group level setting

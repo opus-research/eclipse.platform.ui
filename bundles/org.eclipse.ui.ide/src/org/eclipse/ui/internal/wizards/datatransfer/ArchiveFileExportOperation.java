@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  *	Operation for exporting a resource and its children to a new .zip or
  *  .tar.gz file.
- *
+ *  
  *  @since 3.1
  */
 public class ArchiveFileExportOperation implements IRunnableWithProgress {
@@ -50,9 +50,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     private List errorTable = new ArrayList(1); //IStatus
 
     private boolean useCompression = true;
-
-	private boolean resolveLinks = false;
-
+    
     private boolean useTarFormat = false;
 
     private boolean createLeadupStructure = true;
@@ -164,7 +162,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
             throws InterruptedException {
         exportResource(exportResource, 1);
     }
-
+    
     /**
      * Creates and returns the string that should be used as the name of the entry in the archive.
      * @param exportResource the resource to export
@@ -187,7 +185,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void exportResource(IResource exportResource, int leadupDepth)
             throws InterruptedException {
-		if (!exportResource.isAccessible() || (!resolveLinks && exportResource.isLinked())) {
+        if (!exportResource.isAccessible()) {
 			return;
 		}
 
@@ -214,7 +212,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
                 // this should never happen because an #isAccessible check is done before #members is invoked
                 addError(NLS.bind(DataTransferMessages.DataTransfer_errorExporting, exportResource.getFullPath()), e);
             }
-
+            
             if (children.length == 0) { // create an entry for empty containers, see bug 278402
             	String destinationName = createDestinationName(leadupDepth, exportResource);
                 try {
@@ -270,9 +268,9 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void initialize() throws IOException {
     	if(useTarFormat) {
-    		exporter = new TarFileExporter(destinationFilename, useCompression, resolveLinks);
+    		exporter = new TarFileExporter(destinationFilename, useCompression);
     	} else {
-        	exporter = new ZipFileExporter(destinationFilename, useCompression, resolveLinks);
+        	exporter = new ZipFileExporter(destinationFilename, useCompression);
     	}
     }
 
@@ -363,25 +361,14 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     public void setUseCompression(boolean value) {
         useCompression = value;
     }
-
+    
     /**
      * Set this boolean indicating whether the file should be output
      * in tar.gz format rather than .zip format.
-     *
+     * 
      * @param value boolean
      */
     public void setUseTarFormat(boolean value) {
     	useTarFormat = value;
     }
-
-	/**
-	 * Set this boolean indicating whether linked resources should be resolved
-	 * and exported (as opposed to simply ignored)
-	 *
-	 * @param value
-	 *            boolean
-	 */
-	public void setIncludeLinkedResources(boolean value) {
-		resolveLinks = value;
-	}
 }

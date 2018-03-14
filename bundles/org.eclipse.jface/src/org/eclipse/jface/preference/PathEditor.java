@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,20 +29,20 @@ public class PathEditor extends ListEditor {
     private String lastPath;
 
     /**
-     * The special label text for directory chooser,
+     * The special label text for directory chooser, 
      * or <code>null</code> if none.
      */
     private String dirChooserLabelText;
 
     /**
-     * Creates a new path field editor
+     * Creates a new path field editor 
      */
     protected PathEditor() {
     }
 
     /**
      * Creates a path field editor.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param dirChooserLabelText the label text displayed for the directory chooser
@@ -93,7 +93,7 @@ public class PathEditor extends ListEditor {
 	protected String[] parseString(String stringList) {
         StringTokenizer st = new StringTokenizer(stringList, File.pathSeparator
                 + "\n\r");//$NON-NLS-1$
-        ArrayList<Object> v = new ArrayList<>();
+        ArrayList<Object> v = new ArrayList<Object>();
         while (st.hasMoreElements()) {
             v.add(st.nextElement());
         }

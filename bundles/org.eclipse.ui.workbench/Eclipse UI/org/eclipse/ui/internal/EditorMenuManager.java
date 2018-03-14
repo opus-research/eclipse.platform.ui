@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.ui.actions.RetargetAction;
 
 /**
  * An <code>EditorMenuManager</code> is used to sort the contributions
- * made by an editor so that they always appear after the action sets.
+ * made by an editor so that they always appear after the action sets.  
  */
 public class EditorMenuManager extends SubMenuManager {
     private ArrayList wrappers;
@@ -71,7 +71,7 @@ public class EditorMenuManager extends SubMenuManager {
                         item);
 			} else {
 				// no acclerator if the item is disabled
-				return Integer.valueOf(0);
+                return new Integer(0);
 			}
         }
 
@@ -85,7 +85,7 @@ public class EditorMenuManager extends SubMenuManager {
 		public String getText(IContributionItem item) {
             return getParentMenuManager().getOverrides().getText(item);
         }
-
+        
         @Override
 		public Boolean getVisible(IContributionItem item) {
         	return getParentMenuManager().getOverrides().getVisible(item);
@@ -147,7 +147,7 @@ public class EditorMenuManager extends SubMenuManager {
     public void setVisible(boolean visible, boolean forceVisibility) {
         if (visible) {
             if (forceVisibility) {
-                // Make the items visible
+                // Make the items visible 
                 if (!enabledAllowed) {
 					setEnabledAllowed(true);
 				}

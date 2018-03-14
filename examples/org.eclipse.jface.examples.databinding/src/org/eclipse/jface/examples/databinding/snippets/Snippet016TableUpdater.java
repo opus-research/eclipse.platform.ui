@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,13 +48,13 @@ public class Snippet016TableUpdater {
 	}
 
 	static class Stuff {
-		private WritableValue counter = new WritableValue(Integer.valueOf(1), Integer.class);
+		private WritableValue counter = new WritableValue(new Integer(1), Integer.class);
 
 		public Stuff(final Display display) {
 			display.timerExec(1000, new Runnable() {
 				@Override
 				public void run() {
-					counter.setValue(Integer.valueOf(1 + ((Integer) counter
+					counter.setValue(new Integer(1 + ((Integer) counter
 							.getValue()).intValue()));
 					display.timerExec(1000, this);
 				}

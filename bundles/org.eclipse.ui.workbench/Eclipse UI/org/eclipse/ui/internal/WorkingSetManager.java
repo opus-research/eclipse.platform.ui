@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -35,7 +34,7 @@ import org.osgi.framework.BundleListener;
  * A working set manager stores working sets and provides property change
  * notification when a working set is added or removed. Working sets are
  * persisted whenever one is added or removed.
- *
+ * 
  * @see IWorkingSetManager
  * @since 2.0
  */
@@ -68,7 +67,7 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	/**
 	 * Returns the file used as the persistence store, or <code>null</code> if
 	 * there is no available file.
-	 *
+	 * 
 	 * @return the file used as the persistence store, or <code>null</code>
 	 */
 	private File getWorkingSetStateFile() {
@@ -99,7 +98,7 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 
 				FileInputStream input = new FileInputStream(stateFile);
 				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(input, StandardCharsets.UTF_8));
+						new InputStreamReader(input, "utf-8")); //$NON-NLS-1$
 
 				IMemento memento = XMLMemento.createReadRoot(reader);
 				restoreWorkingSetState(memento);
@@ -154,7 +153,7 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	 * Persists all working sets and fires a property change event for the
 	 * changed working set. Should only be called by
 	 * org.eclipse.ui.internal.WorkingSet.
-	 *
+	 * 
 	 * @param changedWorkingSet
 	 *            the working set that has changed
 	 * @param propertyChangeId

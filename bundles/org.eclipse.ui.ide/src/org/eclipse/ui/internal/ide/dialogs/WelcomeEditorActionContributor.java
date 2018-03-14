@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,13 +17,13 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorActionBarContributor;
 
 /**
- * Manages the installation and deinstallation of global actions for
+ * Manages the installation and deinstallation of global actions for 
  * the welcome editor.
  */
 public class WelcomeEditorActionContributor extends EditorActionBarContributor {
     /**
-     * The <code>WelcomeEditorActionContributor</code> implementation of this
-     * <code>IEditorActionBarContributor</code> method installs the global
+     * The <code>WelcomeEditorActionContributor</code> implementation of this 
+     * <code>IEditorActionBarContributor</code> method installs the global 
      * action handler for the given editor.
      */
     @Override

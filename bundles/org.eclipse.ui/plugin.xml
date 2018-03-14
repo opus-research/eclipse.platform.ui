@@ -967,13 +967,7 @@
             defaultHandler="org.eclipse.ui.internal.handlers.QuitHandler"
             description="%command.exit.description"
             id="org.eclipse.ui.file.exit"
-            name="%command.exit.name">
-         <commandParameter
-               id="mayPrompt"
-               name="%command.exit.mayPrompt.name"
-               optional="true">
-         </commandParameter>
-      </command>
+            name="%command.exit.name"/>
       <command
             name="%command.undo.name"
             description="%command.undo.description"
@@ -1103,6 +1097,7 @@
             id="org.eclipse.ui.window.newEditor" />
       <command
             categoryId="org.eclipse.ui.category.window"
+            defaultHandler="org.eclipse.ui.internal.SplitHandler"
             description="%command.splitEditor.description"
             id="org.eclipse.ui.window.splitEditor"
             name="%command.splitEditor.name">
@@ -1161,18 +1156,6 @@
             description="%command.maximizePart.description"
             categoryId="org.eclipse.ui.category.window"
             id="org.eclipse.ui.window.maximizePart" />
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.handlers.HideTrimBarsHandler"
-            description="%command.windowsHideTrimbars.description"
-            id="org.eclipse.ui.window.hidetrimbars"
-            name="%command.windowsHideTrimbars.name"/>
-      <command
-            categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.handlers.FullScreenHandler"
-            description="%command.fullscreenmode.description"
-            id="org.eclipse.ui.window.fullscreenmode"
-            name="%command.fullscreenmode.name"/>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="org.eclipse.ui.internal.handlers.MinimizePartHandler"
@@ -2256,18 +2239,6 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.ui.internal.SplitHandler"
-            commandId="org.eclipse.ui.window.splitEditor">
-         <enabledWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="org.eclipse.ui.IEditorPart">
-               </instanceof>
-            </with>
-         </enabledWhen>
-      </handler>
-      <handler
             class="org.eclipse.ui.internal.handlers.NewEditorHandler"
             commandId="org.eclipse.ui.window.newEditor">
          <enabledWhen>
@@ -2279,7 +2250,7 @@
             </with>
          </enabledWhen>
       </handler>
-       <handler
+      <handler
             class="org.eclipse.ui.internal.handlers.MaximizePartHandler"
             commandId="org.eclipse.ui.window.maximizePart">
          <enabledWhen>
@@ -2569,5 +2540,14 @@
             class="org.eclipse.ui.internal.about.AboutSystemPage"
             id="31.SystemPage">
           </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <theme
+            id="org.eclipse.ui.theme1">
+      </theme>
+      <themeElementCategory
+            id="org.eclipse.ui.themeElementCategory1">
+      </themeElementCategory>
    </extension>
 </plugin>

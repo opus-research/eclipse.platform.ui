@@ -12,6 +12,7 @@ package org.eclipse.ui.tests.preferences;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -23,7 +24,7 @@ import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
@@ -54,7 +55,8 @@ public class FontPreferenceTestCase extends UITestCase {
     @Override
 	protected void doSetUp() throws Exception {
         super.doSetUp();
-		AbstractUIPlugin plugin = WorkbenchPlugin.getDefault();
+        AbstractUIPlugin plugin = (AbstractUIPlugin) Platform
+                .getPlugin(PlatformUI.PLUGIN_ID);
         preferenceStore = plugin.getPreferenceStore();
 
         //Set up the bogus entry for the bad first test
@@ -147,26 +149,26 @@ public class FontPreferenceTestCase extends UITestCase {
 		// redirect logging so that we catch the error log
 		final boolean[] errorLogged = new boolean[] { false };
 		ILogger logger = Policy.getLog();
-		try {
-			Policy.setLog(new ILogger() {
-				@Override
-				public void log(IStatus status) {
-					if (status != null && status.getSeverity() == IStatus.ERROR && status.getPlugin().equals(Policy.JFACE)) {
-						errorLogged[0] = true;
-					}
-				}} );
-
-
-	    	Job job = new Job("Non-UI thread FontRegistry Access Test") {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					// this should produce no exception, but should log a error
-					boolean created = checkFont(fontRegistry);
-					assertFalse(created);
-					return Status.OK_STATUS;
+		Policy.setLog(new ILogger() {
+			@Override
+			public void log(IStatus status) {
+				if (status != null && status.getSeverity() == IStatus.ERROR && status.getPlugin().equals(Policy.JFACE)) {
+					errorLogged[0] = true;
 				}
-	    	};
-			job.schedule();
+			}} );
+
+
+    	Job job = new Job("Non-UI thread FontRegistry Access Test") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				// this should produce no exception, but should log a error
+				boolean created = checkFont(fontRegistry);
+				assertFalse(created);
+				return Status.OK_STATUS;
+			}
+    	};
+		job.schedule();
+		try {
 			job.join();
 			assertTrue(errorLogged[0]);
 		} catch (InterruptedException e) {

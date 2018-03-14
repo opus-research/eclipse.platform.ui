@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 
 /**
  * Clears the selected working set in the working set action group.
- *
+ * 
  * @since 2.1
  */
 public class ClearWorkingSetAction extends Action {
@@ -28,7 +28,7 @@ public class ClearWorkingSetAction extends Action {
 
     /**
      * Creates a new instance of the receiver.
-     *
+     * 
      * @param actionGroup the action group this action is created in
      */
     public ClearWorkingSetAction(WorkingSetFilterActionGroup actionGroup) {
@@ -43,7 +43,7 @@ public class ClearWorkingSetAction extends Action {
 
     /**
      * Overrides method from Action
-     *
+     * 
      * @see Action#run
      */
     @Override

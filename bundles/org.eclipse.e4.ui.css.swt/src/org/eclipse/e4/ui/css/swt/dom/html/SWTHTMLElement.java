@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008, 2010 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom.html;
 
-import java.util.function.Supplier;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.swt.SWT;
@@ -43,11 +42,10 @@ public class SWTHTMLElement extends WidgetElement {
 	}
 
 	@Override
-	protected Supplier<String> internalGetAttribute(String attr) {
-		if ("type".equals(attr)) {
-			return () -> attributeType != null ? attributeType : "";
-		}
-		return super.internalGetAttribute(attr);
+	public String getAttribute(String attr) {
+		if ("type".equals(attr))
+			return attributeType;
+		return super.getAttribute(attr);
 	}
 
 	@Override
