@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -43,8 +42,8 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 	@Inject
 	private IPresentationEngine engine;
 
-	@Inject
 	@Optional
+	@Inject
 	private Logger logger;
 
 	private MPart partToActivate;
@@ -82,6 +81,11 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 			 */
 			private boolean beingFocused = false;
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Composite#setFocus()
+			 */
 			@Override
 			public boolean setFocus() {
 				if (!beingFocused) {
@@ -196,6 +200,13 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#requiresFocus
+	 * (org.eclipse.e4.ui.model.application.ui.basic.MPart)
+	 */
 	@Override
 	protected boolean requiresFocus(MPart element) {
 		if (element == partToActivate) {
@@ -204,6 +215,13 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		return super.requiresFocus(element);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.PartFactory#hookControllerLogic
+	 * (org.eclipse.e4.ui.model.application.MPart)
+	 */
 	@Override
 	public void hookControllerLogic(final MUIElement me) {
 		super.hookControllerLogic(me);
