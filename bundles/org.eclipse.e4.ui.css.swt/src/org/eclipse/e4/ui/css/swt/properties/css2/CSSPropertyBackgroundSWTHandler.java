@@ -77,14 +77,20 @@ AbstractCSSPropertyBackgroundHandler {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {
 					// tab folder selection manages gradients
-					folder.setSelectionBackground(newColor);
+					if (folder.getSelectionBackground() != newColor) {
+						folder.setSelectionBackground(newColor);
+					}
 				} else {
-					folder.setBackground(newColor);
+					if (folder.getBackground() != newColor) {
+						folder.setBackground(newColor);
+					}
 				}
 			} else if (widget instanceof Control) {
 				GradientBackgroundListener.remove((Control) widget);
-				((Control) widget).setBackground(newColor);
-				CompositeElement.setBackgroundOverriddenByCSSMarker(widget);
+				if (((Control) widget).getBackground() != newColor) {
+					((Control) widget).setBackground(newColor);
+					CompositeElement.setBackgroundOverriddenByCSSMarker(widget);
+				}
 			}
 		} else if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Gradient grad = (Gradient) engine.convert(value, Gradient.class,

@@ -67,13 +67,18 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 			if (widget instanceof CTabItem) {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {
-					folder.setSelectionForeground(newColor);
+					if (folder.getSelectionForeground() != newColor) {
+						folder.setSelectionForeground(newColor);
+					}
 				} else {
-					folder.setForeground(newColor);
+					if (folder.getForeground() != newColor) {
+						folder.setForeground(newColor);
+					}
 				}
-			}
-			else if (widget instanceof Control) {
-				((Control) widget).setForeground(newColor);
+			} else if (widget instanceof Control) {
+				if (((Control) widget).getForeground() != newColor) {
+					((Control) widget).setForeground(newColor);
+				}
 			}
 		}
 	}
