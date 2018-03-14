@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -59,7 +58,6 @@ public class DirectMenuItemRenderer extends MenuItemRenderer {
 
 		MenuItem newItem = new MenuItem((Menu) parent, flags, addIndex);
 		setItemText(itemModel, newItem);
-		newItem.setToolTipText(getToolTipText(itemModel));
 		newItem.setImage(getImage(itemModel));
 		setEnabled(itemModel, newItem);
 		newItem.setEnabled(itemModel.isEnabled());

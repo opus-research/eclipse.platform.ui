@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -75,7 +74,6 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 		}
 		MenuItem newItem = new MenuItem((Menu) parent, flags, addIndex);
 		setItemText(itemModel, newItem);
-		newItem.setToolTipText(getToolTipText(itemModel));
 		setEnabled(itemModel, newItem);
 		newItem.setImage(getImage(itemModel));
 		newItem.setSelection(itemModel.isSelected());

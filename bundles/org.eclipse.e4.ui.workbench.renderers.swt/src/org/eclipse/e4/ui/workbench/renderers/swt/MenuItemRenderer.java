@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,40 +7,30 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
-import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.MenuItem;
@@ -106,8 +96,6 @@ public abstract class MenuItemRenderer extends SWTPartRenderer {
 				setItemText(itemModel, menuItem);
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				menuItem.setImage(getImage(itemModel));
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
-				menuItem.setToolTipText(getToolTipText(itemModel));
 			}
 		}
 	};
@@ -194,54 +182,12 @@ public abstract class MenuItemRenderer extends SWTPartRenderer {
 		}
 	}
 
-	private ParameterizedCommand generateParameterizedCommand(final MHandledItem item,
-			final IEclipseContext lclContext) {
-		ECommandService cmdService = (ECommandService) lclContext.get(ECommandService.class.getName());
-		Map<String, Object> parameters = null;
-		List<MParameter> modelParms = item.getParameters();
-		if (modelParms != null && !modelParms.isEmpty()) {
-			parameters = new HashMap<String, Object>();
-			for (MParameter mParm : modelParms) {
-				parameters.put(mParm.getName(), mParm.getValue());
-			}
-		}
-		ParameterizedCommand cmd = cmdService.createCommand(item.getCommand().getElementId(), parameters);
-		item.setWbCommand(cmd);
-		return cmd;
-	}
-
 	protected void setItemText(MMenuItem model, MenuItem item) {
 		String text = model.getLocalizedLabel();
 		if (text == null) {
 			text = ""; //$NON-NLS-1$
 		}
 		item.setText(text);
-	}
-
-	protected String getToolTipText(MItem item) {
-		String text = item.getLocalizedTooltip();
-		if (item instanceof MHandledItem) {
-			MHandledItem handledItem = (MHandledItem) item;
-			IEclipseContext context = getContext(item);
-			EBindingService bs = (EBindingService) context.get(EBindingService.class.getName());
-			ParameterizedCommand cmd = handledItem.getWbCommand();
-			if (cmd == null) {
-				cmd = generateParameterizedCommand(handledItem, context);
-			}
-			TriggerSequence sequence = bs.getBestSequenceFor(handledItem.getWbCommand());
-			if (sequence != null) {
-				if (text == null) {
-					try {
-						text = cmd.getName();
-					} catch (NotDefinedException e) {
-						return null;
-					}
-				}
-				text = text + " (" + sequence.format() + ')'; //$NON-NLS-1$
-			}
-			return text;
-		}
-		return text;
 	}
 
 	@Override
