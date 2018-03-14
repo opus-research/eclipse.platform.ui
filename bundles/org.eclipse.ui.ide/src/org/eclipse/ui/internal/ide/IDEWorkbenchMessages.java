@@ -18,7 +18,7 @@
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
  * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201, 502050
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201, 502050, 514355
  * Simon Scholz <simon.scholz@vogella.com> - Bug 486777
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
@@ -393,6 +393,9 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String CopyFilesAndFoldersOperation_sourceCannotBeCopiedIntoAVirtualFolder;
 	public static String CopyFilesAndFoldersOperation_copyTitle;
 	public static String CopyFilesAndFoldersOperation_moveTitle;
+	public static String CopyFilesAndFoldersOperation_overwriteButtonLabel;
+	public static String CopyFilesAndFoldersOperation_overwriteAllButtonLabel;
+	public static String CopyFilesAndFoldersOperation_dontOverwriteButtonLabel;
 
 	public static String MoveFilesAndFoldersOperation_sameSourceAndDest;
 	public static String MoveFilesAndFoldersOperation_moveFailedTitle;
@@ -972,6 +975,8 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEApplication_workspaceMandatoryMessage;
 	public static String IDEApplication_workspaceInUseTitle;
 	public static String IDEApplication_workspaceInUseMessage;
+	public static String IDEApplication_workspaceInUse_Cancel;
+	public static String IDEApplication_workspaceInUse_Retry;
 	public static String IDEApplication_workspaceEmptyTitle;
 	public static String IDEApplication_workspaceEmptyMessage;
 	public static String IDEApplication_workspaceInvalidTitle;
