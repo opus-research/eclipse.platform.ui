@@ -47,12 +47,11 @@ class DefaultTaskListResourceAdapter implements ITaskListResourceAdapter {
     @Override
 	public IResource getAffectedResource(IAdaptable adaptable) {
 
-        IResource resource = (IResource) adaptable.getAdapter(IResource.class);
+        IResource resource = adaptable.getAdapter(IResource.class);
         if (resource == null) {
-			return (IFile) adaptable.getAdapter(IFile.class);
-		} else {
-			return resource;
+			return adaptable.getAdapter(IFile.class);
 		}
+		return resource;
 
     }
 
