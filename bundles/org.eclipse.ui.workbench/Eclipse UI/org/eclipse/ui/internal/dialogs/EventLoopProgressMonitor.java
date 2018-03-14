@@ -67,6 +67,9 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
         runEventLoop();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+     */
     @Override
 	public void clearBlocked() {
         Dialog.getBlockedHandler().clearBlocked();
@@ -139,6 +142,9 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+     */
     @Override
 	public void setBlocked(IStatus reason) {
         Dialog.getBlockedHandler().showBlocked(this, reason, taskName);

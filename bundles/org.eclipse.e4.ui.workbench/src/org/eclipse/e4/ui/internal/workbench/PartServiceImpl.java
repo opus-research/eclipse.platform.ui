@@ -1108,8 +1108,7 @@ public class PartServiceImpl implements EPartService {
 			return addedPart;
 		case VISIBLE:
 			MPart activePart = getActivePart();
-			if (activePart == null
-					|| (activePart != addedPart && getParent(activePart) == getParent(addedPart))) {
+			if (activePart == null || getParent(activePart) == getParent(addedPart)) {
 				delegateBringToTop(addedPart);
 				activate(addedPart);
 			} else {
