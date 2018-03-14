@@ -57,10 +57,8 @@ public class ReadmeFilePropertyPage extends PropertyPage {
         return composite;
     }
 
-    /** (non-Javadoc)
-     * Method declared on PreferencePage
-     */
-    public Control createContents(Composite parent) {
+    @Override
+	public Control createContents(Composite parent) {
 
         // ensure the page has no special buttons
         noDefaultAndApplyButton();
@@ -185,7 +183,8 @@ public class ReadmeFilePropertyPage extends PropertyPage {
     /** (non-Javadoc)
      * Method declared on PreferencePage
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         // nothing to do - read-only page
         return true;
     }

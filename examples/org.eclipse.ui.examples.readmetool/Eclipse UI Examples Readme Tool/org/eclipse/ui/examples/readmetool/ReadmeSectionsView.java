@@ -33,10 +33,8 @@ public class ReadmeSectionsView extends ViewPart implements ISelectionListener {
         super();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart
-     */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         viewer = new ListViewer(parent);
 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(),
@@ -59,24 +57,21 @@ public class ReadmeSectionsView extends ViewPart implements ISelectionListener {
      * <code>IWorkbenchPart</code> method runs super
      * and removes itself from the global selection listener. 
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         getSite().getPage().removeSelectionListener(this);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ISelectionListener
-     */
-    public void selectionChanged(IWorkbenchPart part, ISelection sel) {
+    @Override
+	public void selectionChanged(IWorkbenchPart part, ISelection sel) {
         //if the selection is a readme file, get its sections.
         AdaptableList input = ReadmeModelFactory.getInstance().getSections(sel);
         viewer.setInput(input);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart
-     */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         viewer.getControl().setFocus();
     }
 }

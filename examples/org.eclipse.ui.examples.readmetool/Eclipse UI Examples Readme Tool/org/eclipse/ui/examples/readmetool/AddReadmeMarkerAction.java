@@ -59,8 +59,9 @@ public class AddReadmeMarkerAction extends Action {
     /*
      * @see IAction#run()
      */
-    public void run() {
-        Map attributes = new HashMap(11);
+    @Override
+	public void run() {
+        Map<Object, Object> attributes = new HashMap<>(11);
 
         ITextSelection selection = (ITextSelection) textEditor
                 .getSelectionProvider().getSelection();
