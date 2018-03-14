@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -59,7 +58,9 @@ import org.osgi.service.prefs.Preferences;
  */
 public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEditor {
 
+
 	private static boolean DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS = ResourcesPlugin.DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS;
+
 
 	/**
 	 * The resource being edited.
@@ -84,7 +85,8 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	 * @see org.eclipse.core.resources.IContainer#getDefaultCharset()
 	 * @see org.eclipse.core.resources.IFile#getCharset()
 	 */
-	public ResourceEncodingFieldEditor(String labelText, Composite parent, IResource charsetResource) {
+	public ResourceEncodingFieldEditor(String labelText, Composite parent,
+			IResource charsetResource) {
 		super();
 		setLabelAndResource(labelText, charsetResource);
 		createControl(parent);
@@ -100,18 +102,18 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	 *            the parent of the field editor's control
 	 * @param charsetResource
 	 *            must be an <code>IContainer</code> or an <code>IFile</code>.
-	 * @param groupTitle
-	 *            the title for the field editor's control. If groupTitle is
-	 *            <code>null</code> the control will be unlabelled (by default a
-	 *            {@link Composite} instead of a {@link Group}.
+	 *  @param groupTitle
+	 *  		  the title for the field editor's control. If groupTitle is
+	 *            <code>null</code> the control will be unlabelled
+	 *            (by default a {@link Composite} instead of a {@link Group}.
 	 *
 	 * @see org.eclipse.core.resources.IContainer#getDefaultCharset()
 	 * @see org.eclipse.core.resources.IFile#getCharset()
 	 * @see AbstractEncodingFieldEditor#setGroupTitle(String)
 	 * @since 3.3
 	 */
-	public ResourceEncodingFieldEditor(String labelText, Composite parent, IResource charsetResource,
-			String groupTitle) {
+	public ResourceEncodingFieldEditor(String labelText, Composite parent,
+			IResource charsetResource,String groupTitle) {
 		super();
 		setLabelAndResource(labelText, charsetResource);
 		setGroupTitle(groupTitle);
@@ -119,14 +121,14 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	}
 
 	/**
-	 * Set the label text and the resource we are editing.
-	 *
+     * Set the label text and the resource we are editing.
 	 * @param labelText
 	 * @param charsetResource
-	 * @since 3.3
+     * @since 3.3
 	 */
 	private void setLabelAndResource(String labelText, IResource charsetResource) {
-		Assert.isTrue(charsetResource instanceof IContainer || charsetResource instanceof IFile);
+		Assert.isTrue(charsetResource instanceof IContainer
+				|| charsetResource instanceof IFile);
 		setLabelText(labelText);
 		this.resource = charsetResource;
 	}
@@ -140,24 +142,24 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 			return ((IFile) resource).getCharset(false);
 
 		} catch (CoreException e) {// If there is an error return the default
-			IDEWorkbenchPlugin.log(IDEWorkbenchMessages.ResourceEncodingFieldEditor_ErrorLoadingMessage, e.getStatus());
+			IDEWorkbenchPlugin
+					.log(
+							IDEWorkbenchMessages.ResourceEncodingFieldEditor_ErrorLoadingMessage,
+							e.getStatus());
 			return WorkbenchEncoding.getWorkbenchDefaultEncoding();
 		}
 
 	}
 
 	private boolean getStoredSeparateDerivedEncodingsValue() {
-		// be careful looking up for our node so not to create any nodes as side
-		// effect
-		Preferences node = Platform.getPreferencesService().getRootNode().node(ProjectScope.SCOPE);
+		// be careful looking up for our node so not to create any nodes as side effect
+		Preferences node = Platform.getPreferencesService().getRootNode()
+				.node(ProjectScope.SCOPE);
 		String projectName = resource.getName();
 		try {
-			// TODO once bug 90500 is fixed, should be as simple as this:
-			// String path = projectName + IPath.SEPARATOR +
-			// ResourcesPlugin.PI_RESOURCES;
-			// return node.nodeExists(path) ?
-			// node.node(path).getBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS,
-			// false) : false;
+			//TODO once bug 90500 is fixed, should be as simple as this:
+			//			String path = projectName + IPath.SEPARATOR + ResourcesPlugin.PI_RESOURCES;
+			//			return node.nodeExists(path) ? node.node(path).getBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS, false) : false;
 			// for now, take the long way
 			if (!node.nodeExists(projectName))
 				return DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS;
@@ -165,7 +167,8 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 			if (!node.nodeExists(ResourcesPlugin.PI_RESOURCES))
 				return DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS;
 			node = node.node(ResourcesPlugin.PI_RESOURCES);
-			return node.getBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS,
+			return node.getBoolean(
+					ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS,
 					DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS);
 		} catch (BackingStoreException e) {
 			// default value
@@ -174,8 +177,9 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	}
 
 	private boolean hasSameSeparateDerivedEncodings() {
-		return (separateDerivedEncodingsButton == null) || ((separateDerivedEncodingsButton != null)
-				&& (separateDerivedEncodingsButton.getSelection() == getStoredSeparateDerivedEncodingsValue()));
+		return (separateDerivedEncodingsButton == null)
+				|| ((separateDerivedEncodingsButton != null) && (separateDerivedEncodingsButton
+						.getSelection() == getStoredSeparateDerivedEncodingsValue()));
 	}
 
 	@Override
@@ -225,10 +229,9 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 		final String finalEncoding = encoding;
 
-		Job charsetJob = Job.create(IDEWorkbenchMessages.IDEEncoding_EncodingJob, new IJobFunction() {
-
+		Job charsetJob = new Job(IDEWorkbenchMessages.IDEEncoding_EncodingJob) {
 			@Override
-			public IStatus run(IProgressMonitor monitor) {
+			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					if (!hasSameEncoding) {
 						if (resource instanceof IContainer) {
@@ -262,7 +265,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 					return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e.getMessage(), e);
 				}
 			}
-		});
+		};
 
 		charsetJob.schedule();
 
@@ -283,8 +286,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	@Override
 	public void loadDefault() {
-		// Override the loadDefault method as we are not using a preference
-		// store
+		// Override the loadDefault method as we are not using a preference store
 		setPresentsDefaultValue(true);
 		doLoadDefault();
 		refreshValidState();
@@ -345,19 +347,29 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 		if (resource instanceof IFile) {
 			try {
-				IContentDescription description = ((IFile) resource).getContentDescription();
+				IContentDescription description = ((IFile) resource)
+						.getContentDescription();
 				// If we can find a charset from the description then derive
 				// from that
 				if (description == null || description.getCharset() == null) {
-					return NLS.bind(IDEWorkbenchMessages.ResourceInfo_fileContainerEncodingFormat, getDefaultEnc());
+					return NLS
+							.bind(
+									IDEWorkbenchMessages.ResourceInfo_fileContainerEncodingFormat,
+									getDefaultEnc());
 				}
 
 				IContentType contentType = description.getContentType();
 				if (contentType != null && contentType.getDefaultCharset() == description.getCharset()) {
-					return NLS.bind(IDEWorkbenchMessages.ResourceInfo_fileContentTypeEncodingFormat, getDefaultEnc());
+					return NLS
+							.bind(
+									IDEWorkbenchMessages.ResourceInfo_fileContentTypeEncodingFormat,
+									getDefaultEnc());
 				}
 
-				return NLS.bind(IDEWorkbenchMessages.ResourceInfo_fileContentEncodingFormat, getDefaultEnc());
+				return NLS
+						.bind(
+								IDEWorkbenchMessages.ResourceInfo_fileContentEncodingFormat,
+								getDefaultEnc());
 
 			} catch (CoreException exception) {
 				// Do nothing here as we will just try to derive from the
@@ -365,17 +377,24 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 			}
 		}
 
-		return NLS.bind(IDEWorkbenchMessages.ResourceInfo_containerEncodingFormat, getDefaultEnc());
+		return NLS.bind(
+				IDEWorkbenchMessages.ResourceInfo_containerEncodingFormat,
+				getDefaultEnc());
 
 	}
 
 	@Override
 	protected Composite createEncodingGroup(Composite parent, int numColumns) {
 		group = super.createEncodingGroup(parent, numColumns);
-		String byteOrderLabel = IDEEncoding.getByteOrderMarkLabel(getContentDescription());
+		String byteOrderLabel = IDEEncoding
+				.getByteOrderMarkLabel(getContentDescription());
 		if (byteOrderLabel != null) {
 			Label label = new Label(group, SWT.NONE);
-			label.setText(NLS.bind(IDEWorkbenchMessages.WorkbenchPreference_encoding_encodingMessage, byteOrderLabel));
+			label
+					.setText(NLS
+							.bind(
+									IDEWorkbenchMessages.WorkbenchPreference_encoding_encodingMessage,
+									byteOrderLabel));
 			GridData layoutData = new GridData();
 			layoutData.horizontalSpan = numColumns + 1;
 			label.setLayoutData(layoutData);
@@ -389,7 +408,8 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 			separateDerivedEncodingsButton.setLayoutData(data);
 			separateDerivedEncodingsButton
 					.setText(IDEWorkbenchMessages.ResourceEncodingFieldEditor_SeparateDerivedEncodingsLabel);
-			separateDerivedEncodingsButton.setSelection(getStoredSeparateDerivedEncodingsValue());
+			separateDerivedEncodingsButton
+					.setSelection(getStoredSeparateDerivedEncodingsValue());
 		}
 		return group;
 	}
