@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,13 +21,11 @@ import org.eclipse.swt.widgets.Event;
  * <p>
  * <b>Subclasses can implement their custom navigation algorithms</b>
  * </p>
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
-public class CellNavigationStrategy<E,I> {
+public class CellNavigationStrategy {
 	/**
 	 * is the given event an event which moves the selection to another cell
 	 *
@@ -37,7 +35,7 @@ public class CellNavigationStrategy<E,I> {
 	 *            the key event
 	 * @return <code>true</code> if a new cell is searched
 	 */
-	public boolean isNavigationEvent(ColumnViewer<E,I> viewer, Event event) {
+	public boolean isNavigationEvent(ColumnViewer viewer, Event event) {
 		switch (event.keyCode) {
 		case SWT.ARROW_UP:
 		case SWT.ARROW_DOWN:
@@ -62,8 +60,8 @@ public class CellNavigationStrategy<E,I> {
 	 *            the key event
 	 * @return <code>true</code> if this event triggers collapsing of a node
 	 */
-	public boolean isCollapseEvent(ColumnViewer<E,I> viewer,
-			ViewerCell<E> cellToCollapse, Event event) {
+	public boolean isCollapseEvent(ColumnViewer viewer,
+			ViewerCell cellToCollapse, Event event) {
 		return false;
 	}
 
@@ -76,7 +74,7 @@ public class CellNavigationStrategy<E,I> {
 	 *            the key event
 	 * @return <code>true</code> if this event triggers expanding of a node
 	 */
-	public boolean isExpandEvent(ColumnViewer<E,I> viewer, ViewerCell<E> cellToExpand,
+	public boolean isExpandEvent(ColumnViewer viewer, ViewerCell cellToExpand,
 			Event event) {
 		return false;
 	}
@@ -89,7 +87,7 @@ public class CellNavigationStrategy<E,I> {
 	 * @param event
 	 *            the event triggering the expansion
 	 */
-	public void expand(ColumnViewer<E,I> viewer, ViewerCell<E> cellToExpand, Event event) {
+	public void expand(ColumnViewer viewer, ViewerCell cellToExpand, Event event) {
 
 	}
 
@@ -101,7 +99,7 @@ public class CellNavigationStrategy<E,I> {
 	 * @param event
 	 *            the event triggering the expansion
 	 */
-	public void collapse(ColumnViewer<E,I> viewer, ViewerCell<E> cellToCollapse,
+	public void collapse(ColumnViewer viewer, ViewerCell cellToCollapse,
 			Event event) {
 
 	}
@@ -117,8 +115,8 @@ public class CellNavigationStrategy<E,I> {
 	 *         default implementation is taken. E.g. it's fairly impossible to
 	 *         react on PAGE_DOWN requests
 	 */
-	public ViewerCell<E> findSelectedCell(ColumnViewer<E,I> viewer,
-			ViewerCell<E> currentSelectedCell, Event event) {
+	public ViewerCell findSelectedCell(ColumnViewer viewer,
+			ViewerCell currentSelectedCell, Event event) {
 
 		switch (event.keyCode) {
 		case SWT.ARROW_UP:
@@ -156,7 +154,7 @@ public class CellNavigationStrategy<E,I> {
 	 *            the event
 	 * @return <code>true</code> if the event has to be canceled
 	 */
-	public boolean shouldCancelEvent(ColumnViewer<E,I> viewer, Event event) {
+	public boolean shouldCancelEvent(ColumnViewer viewer, Event event) {
 		return event.keyCode == SWT.ARROW_LEFT
 				|| event.keyCode == SWT.ARROW_RIGHT;
 	}
