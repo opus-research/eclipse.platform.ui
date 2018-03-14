@@ -1682,6 +1682,14 @@
                   style="push"
                   tooltip="%menu.toggleCoolbar.tooltip">
             </command>
+            <command
+                  commandId="org.eclipse.ui.edit.text.zoomIn"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.text.zoomOut"
+                  style="push">
+            </command>
          </menu>
       </menuContribution>
 
