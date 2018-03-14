@@ -45,15 +45,13 @@ public class SaveableMockViewPart extends MockViewPart implements
 
 	private boolean adapt;
 
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
         final Button dirtyToggle = new Button(parent, SWT.CHECK);
         dirtyToggle.setText("Dirty");
         dirtyToggle.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setDirty(dirtyToggle.getSelection());
             }
         });
@@ -62,8 +60,7 @@ public class SaveableMockViewPart extends MockViewPart implements
         final Button adaptToggle = new Button(parent, SWT.CHECK);
         adaptToggle.setText("Adapt to resource");
         adaptToggle.addSelectionListener(new SelectionAdapter() {
-        	@Override
-			public void widgetSelected(SelectionEvent e) {
+        	public void widgetSelected(SelectionEvent e) {
         		setAdapt(adaptToggle.getSelection());
         	}
         });
@@ -71,8 +68,7 @@ public class SaveableMockViewPart extends MockViewPart implements
         final Button saveNeededToggle = new Button(parent, SWT.CHECK);
         saveNeededToggle.setText("Save on close");
         saveNeededToggle.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setSaveNeeded(saveNeededToggle.getSelection());
             }
         });
@@ -81,8 +77,7 @@ public class SaveableMockViewPart extends MockViewPart implements
         final Button saveAsToggle = new Button(parent, SWT.CHECK);
         saveAsToggle.setText("Save as allowed");
         saveAsToggle.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 setSaveAsAllowed(saveAsToggle.getSelection());
             }
         });
@@ -99,7 +94,6 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave" );
 	}
@@ -107,7 +101,6 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 		callTrace.add("doSaveAs" );
 	}
@@ -115,7 +108,6 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty" );
 		return isDirty;
@@ -124,7 +116,6 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		callTrace.add("isSaveAsAllowed" );
 		return saveAsAllowed ;
@@ -133,7 +124,6 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 */
-	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded" );
 		return saveNeeded;
@@ -155,7 +145,6 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablesSource#getActiveSaveables()
 	 */
-	@Override
 	public Saveable[] getActiveSaveables() {
 		// TODO Auto-generated method stub
 		return getSaveables();
@@ -164,17 +153,14 @@ public class SaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablesSource#getSaveables()
 	 */
-	@Override
 	public Saveable[] getSaveables() {
 		Saveable[] result = new Saveable[1];
 		result[0] = new DefaultSaveable(this){
-			@Override
 			public Object getAdapter(Class c) {
 				final IFile[] someFile = {null};
 				try {
 					ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
 						
-						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							if (someFile[0] != null) {
 								return false;

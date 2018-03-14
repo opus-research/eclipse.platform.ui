@@ -149,8 +149,7 @@ public class FileStatesPage extends PreferencePage implements
      * @returns Control
      * @param parent Composite
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
                 IIDEHelpContextIds.FILE_STATES_PREFERENCE_PAGE);
@@ -219,8 +218,7 @@ public class FileStatesPage extends PreferencePage implements
      *
      * @param event the event which occurred
      */
-    @Override
-	public void handleEvent(Event event) {
+    public void handleEvent(Event event) {
         checkState();
     }
 
@@ -233,16 +231,14 @@ public class FileStatesPage extends PreferencePage implements
      *
      * @param workbench the workbench
      */
-    @Override
-	public void init(org.eclipse.ui.IWorkbench workbench) {
+    public void init(org.eclipse.ui.IWorkbench workbench) {
     }
 
     /**
      * Performs special processing when this page's Defaults button has been pressed.
      * Reset the entries to their default values.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
         super.performDefaults();
 
         Preferences prefs = ResourcesPlugin.getPlugin().getPluginPreferences();
@@ -265,8 +261,7 @@ public class FileStatesPage extends PreferencePage implements
     /**
      * Perform the result of the OK from the receiver.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
 
         long longevityValue = validateLongTextEntry(longevityText, DAY_LENGTH);
         int maxFileStates = validateMaxFileStates();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -198,7 +197,7 @@ public class ShowInMenu extends ContributionItem implements
 			}
 		}
 		if (sourcePart != null && innerMgr instanceof MenuManager) {
-			ISourceProviderService sps = locator
+			ISourceProviderService sps = (ISourceProviderService) locator
 					.getService(ISourceProviderService.class);
 			ISourceProvider sp = sps
 					.getSourceProvider(ISources.SHOW_IN_SELECTION);
@@ -318,14 +317,17 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @return the source part or <code>null</code>
 	 */
-	protected IWorkbenchPart getSourcePart() {
+	private IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
 
 		if (window == null)
 			return null;
 
 		IWorkbenchPage page = window.getActivePage();
-		return page != null ? page.getActivePart() : null;
+		if (page != null) {
+			return page.getActivePart();
+		}
+		return null;
 	}
 
 	/**
@@ -415,7 +417,7 @@ public class ShowInMenu extends ContributionItem implements
 	protected IWorkbenchWindow getWindow() {
 		if(locator == null) return null;
 		
-		IWorkbenchLocationService wls = locator
+		IWorkbenchLocationService wls = (IWorkbenchLocationService) locator
 				.getService(IWorkbenchLocationService.class);
 
 		if (window == null) {

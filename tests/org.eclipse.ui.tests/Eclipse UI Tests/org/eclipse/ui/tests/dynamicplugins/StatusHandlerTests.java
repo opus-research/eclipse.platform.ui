@@ -182,7 +182,6 @@ public class StatusHandlerTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
 	 */
-	@Override
 	protected String getExtensionId() {
 		return "newStatusHandler1.testDynamicStatusHandlerAddition";
 	}
@@ -192,7 +191,6 @@ public class StatusHandlerTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
 	 */
-	@Override
 	protected String getExtensionPoint() {
 		return "statusHandlers";
 	}
@@ -202,7 +200,6 @@ public class StatusHandlerTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
 	 */
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newStatusHandler1";
 	}
@@ -212,7 +209,6 @@ public class StatusHandlerTests extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
 	 */
-	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicStatusHandler";
 	}

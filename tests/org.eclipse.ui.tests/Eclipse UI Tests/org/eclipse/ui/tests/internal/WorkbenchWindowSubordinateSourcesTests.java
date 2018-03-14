@@ -48,7 +48,6 @@ public class WorkbenchWindowSubordinateSourcesTests extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		window = (WorkbenchWindow) openTestWindow();
 		processEvents();
@@ -135,7 +134,6 @@ public class WorkbenchWindowSubordinateSourcesTests extends UITestCase {
 	private static class PerspectiveL implements IPropertyChangeListener {
 		Boolean val = null;
 
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			val = (Boolean) event.getNewValue();
 		}

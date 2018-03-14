@@ -60,8 +60,7 @@ public class TipsAndTricksAction extends PartEventAction implements
     /**
      *	The user has invoked this action
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -108,8 +107,7 @@ public class TipsAndTricksAction extends PartEventAction implements
             final String href = feature.getTipsAndTricksHref();
             if (href != null) {
                 BusyIndicator.showWhile(shell.getDisplay(), new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         workbenchWindow.getWorkbench().getHelpSystem()
 								.displayHelpResource(href);
                     }
@@ -136,8 +134,7 @@ public class TipsAndTricksAction extends PartEventAction implements
     /* (non-Javadoc)
      * Method declared on ActionFactory.IWorkbenchAction.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;
