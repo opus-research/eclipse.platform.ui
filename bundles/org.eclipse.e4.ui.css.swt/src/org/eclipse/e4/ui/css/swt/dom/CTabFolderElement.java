@@ -8,31 +8,62 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 401439
+ *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import org.eclipse.e4.ui.css.core.dom.ArrayNodeList;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
+import org.eclipse.e4.ui.css.core.dom.ChildVisibilityAwareElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link CTabFolder}.
  *
  */
-public class CTabFolderElement extends CompositeElement {
+public class CTabFolderElement extends CompositeElement implements ChildVisibilityAwareElement {
 	private final static String BACKGROUND_SET_BY_TAB_RENDERER = "bgSetByTabRenderer"; //$NON-NLS-1$
+
+	private SelectionListener selectionListener = new SelectionAdapter() {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			applyStyles(getWidget(), true);
+		}
+
+	};
 
 	public CTabFolderElement(CTabFolder tabFolder, CSSEngine engine) {
 		super(tabFolder, engine);
+	}
+
+	@Override
+	public void initialize() {
+		super.initialize();
+		((CTabFolder) getControl()).addSelectionListener(selectionListener);
+	}
+
+	@Override
+	public void dispose() {
+		CTabFolder ctf = (CTabFolder) getControl();
+		if (ctf != null && !ctf.isDisposed()) {
+			ctf.removeSelectionListener(selectionListener);
+		}
+		super.dispose();
 	}
 
 	/**
@@ -73,26 +104,11 @@ public class CTabFolderElement extends CompositeElement {
 		int childCount = 0;
 		if (widget instanceof Composite) {
 			childCount = ((Composite) widget).getChildren().length;
+
 			if (widget instanceof CTabFolder) {
 				// if it's a CTabFolder, include the child items in the count
-				for (CTabItem tabItem : ((CTabFolder) widget).getItems()) {
-					if (tabItem.isDisposed()) {
-						// This is a workaround for bug 401439.
-						// widget (CTabFolder) is internally marked as inDispose
-						// It has disposed the CTabItem, but has not taken it out of the items array.
-						// The actual part is not attached to the model, but also was not disposed because of an uncaught exception.
-						//
-						// Do not return disposed items to the CSS engine by not including any elements after this disposed item.
-						// Worst case is that several visible items will not be styled.
-						//
-						// Other patches have prevented this code from getting called, so this just is a cautionary measure that may eventually be removed.
-						break;
-					} else {
-						childCount++;
-					}
-				}
+				childCount += ((CTabFolder) widget).getItemCount();
 			}
-
 		}
 		return childCount;
 	}
@@ -151,6 +167,33 @@ public class CTabFolderElement extends CompositeElement {
 				control.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
 			}
 		}
+	}
+
+	@Override
+	public NodeList getVisibleChildNodes() {
+		// CTabFolder#getChildren() exposes the "tab controls" (the toolbars and
+		// the top-right area), as well as the composites used to host the
+		// CTabItem contents. We need to expose both the CTabItems but
+		// just the composite of the active CTabItem
+		CTabFolder folder = (CTabFolder) getWidget();
+		ArrayList<Widget> visible = new ArrayList<Widget>();
+
+		if (folder.getTopRight() != null) {
+			visible.add(folder.getTopRight());
+		}
+		Collections.addAll(visible, folder.getItems());
+		int selected = folder.getSelectionIndex();
+		// if (selected < 0 && folder.getItemCount() > 0) {
+		// selected = 0;
+		// }
+		if (selected >= 0) {
+			CTabItem item = folder.getItem(selected);
+			// If item.getControl() is not yet set, we pretend it doesn't exist
+			if (item.getControl() != null) {
+				visible.add(item.getControl());
+			}
+		}
+		return new ArrayNodeList(visible, engine);
 	}
 }
 
