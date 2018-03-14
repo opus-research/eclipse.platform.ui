@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,9 +33,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
@@ -3605,7 +3607,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 			IWorkbenchPart part = reference.getPart(false);
 			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable != null) {
+			if (saveable != null && !result.contains(saveable)) {
 				if (saveable.isDirty()) {
 					result.add(saveable);
 				}
@@ -3616,21 +3618,41 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	/**
 	 * @return workbench parts which are dirty (implement or adapt to
-	 *         {@link ISaveablePart})
+	 *         {@link ISaveablePart}). Only parts matching different saveables
+	 *         are returned.
 	 */
 	public IWorkbenchPart[] getDirtyWorkbenchParts() {
 		List<IWorkbenchPart> result = new ArrayList<>(3);
+		Map<ISaveablePart, IWorkbenchPart> saveables = new LinkedHashMap<>(3);
 		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
-		for (int i = 0; i < allParts.length; i++) {
-			IWorkbenchPartReference reference = allParts[i];
-
+		for (IWorkbenchPartReference reference : allParts) {
 			IWorkbenchPart part = reference.getPart(false);
 			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable != null) {
-				if (saveable.isDirty()) {
-					result.add(part);
-				}
+			if (saveable == null || !saveable.isDirty()) {
+				continue;
 			}
+			IWorkbenchPart previousPart = saveables.get(saveable);
+			if (previousPart != null) {
+				// We have already a part claiming to handle this saveable.
+				// See bug 470076 where a property view might return
+				// saveable which is in turn just editor part
+				if (previousPart == saveable) {
+					// if the previous part matches saveable, we have a
+					// perfect match already
+					continue;
+				}
+				// if parts provide adapters to same saveable but
+				// saveable itself is not a part, we can try to keep
+				// editors and skip views
+				if (part != saveable && previousPart instanceof IEditorPart) {
+					continue;
+				}
+				// last part wins, since we don't want to return multiple parts
+				// representing same saveables
+				result.remove(previousPart);
+			}
+			result.add(part);
+			saveables.put(saveable, part);
 		}
 		return result.toArray(new IWorkbenchPart[result.size()]);
 	}
@@ -4674,14 +4696,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 					.getWorkingSetManager();
 
 			if (aggregateWorkingSetId == null) {
-				aggregateWorkingSet = findAggregateWorkingSet(workingSetManager);
-				aggregateWorkingSetId = aggregateWorkingSet == null ? getDefaultAggregateWorkingSetId()
-						: aggregateWorkingSet.getName();
+				aggregateWorkingSetId = generateAggregateWorkingSetId();
 			} else {
-				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
-						.getWorkingSet(aggregateWorkingSetId);
+				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager.getWorkingSet(aggregateWorkingSetId);
 			}
-
 			if (aggregateWorkingSet == null) {
 				aggregateWorkingSet = (AggregateWorkingSet) workingSetManager
 						.createAggregateWorkingSet(aggregateWorkingSetId,
@@ -4693,17 +4711,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return aggregateWorkingSet;
 	}
 
-	private String getDefaultAggregateWorkingSetId() {
+	private String generateAggregateWorkingSetId() {
 		return "Aggregate for window " + System.currentTimeMillis(); //$NON-NLS-1$
-	}
-
-	private AggregateWorkingSet findAggregateWorkingSet(IWorkingSetManager workingSetManager) {
-		for (IWorkingSet workingSet : workingSetManager.getAllWorkingSets()) {
-			if (workingSet instanceof AggregateWorkingSet) {
-				return (AggregateWorkingSet) workingSet;
-			}
-		}
-		return null;
 	}
 
 	@Override

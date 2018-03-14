@@ -196,10 +196,11 @@ import org.eclipse.swt.widgets.Scrollable;
 				int pageIncrement = this.fScrollBar.getPageIncrement();
 				if (pos > selection) {
 					this.fScrollBar.setSelection(selection + pageIncrement);
+					notifyScrollbarSelectionChanged(scrollable, SWT.PAGE_DOWN);
 				} else {
 					this.fScrollBar.setSelection(selection - pageIncrement);
+					notifyScrollbarSelectionChanged(scrollable, SWT.PAGE_UP);
 				}
-				notifyScrollbarSelectionChanged(scrollable);
 				return true;
 			}
 		}
@@ -268,7 +269,7 @@ import org.eclipse.swt.widgets.Scrollable;
 			int delta = (currentMousePos - initialMousePos);
 			delta /= this.fScrollBarPositions.fPercentageOfClientAreaFromTotalArea;
 			setPixel(scrollable, fInitialDragPixel + delta);
-			notifyScrollbarSelectionChanged(scrollable);
+			notifyScrollbarSelectionChanged(scrollable, SWT.DRAG);
 			return true;
 		}
 		return false;
@@ -279,8 +280,11 @@ import org.eclipse.swt.widgets.Scrollable;
 	 *
 	 * @param scrollable
 	 *            The current scrollable control.
+	 * @param detail
+	 *            The detail for the scroll (see
+	 *            #org.eclipse.swt.widgets.ScrollBar.wmScrollChild(long, long)).
 	 */
-	protected void notifyScrollbarSelectionChanged(Scrollable scrollable) {
+	protected void notifyScrollbarSelectionChanged(Scrollable scrollable, int detail) {
 		Event e = new Event();
 		e.type = SWT.Selection;
 		e.x = 0;
@@ -294,6 +298,7 @@ import org.eclipse.swt.widgets.Scrollable;
 		e.time = 0;
 		e.data = null;
 		e.character = '\0';
+		e.detail = detail;
 
 		e.doit = true;
 

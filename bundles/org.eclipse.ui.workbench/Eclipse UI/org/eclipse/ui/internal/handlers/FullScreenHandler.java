@@ -4,8 +4,9 @@
  * Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors: Simon Scholz <simon.scholz@vogella.com> - initial API and
- * implementation
+ * Contributors:
+ * 	Simon Scholz <simon.scholz@vogella.com> - initial API and implementation;
+ * 	Patrik Suzzi <psuzzi@gmail.com> - Bug 491572, 491785
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -30,6 +31,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Link;
@@ -38,6 +40,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.keys.IBindingService;
 
 /**
@@ -48,7 +51,10 @@ import org.eclipse.ui.keys.IBindingService;
  */
 public class FullScreenHandler extends AbstractHandler {
 
-	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
+	private static final String FULL_SCREEN_COMMAND_ID = "org.eclipse.ui.window.fullscreenmode"; //$NON-NLS-1$
+	private static final String FULL_SCREEN_COMMAND_DO_NOT_SHOW_INFO_AGAIN_PREF_ID = "org.eclipse.ui.window.fullscreenmode.donotshowinfoagain"; //$NON-NLS-1$
+
+	private boolean showInfoPopup;
 
 	@Override
 	public Object execute(ExecutionEvent event) {
@@ -59,8 +65,11 @@ public class FullScreenHandler extends AbstractHandler {
 		BindingTableManager bindingTableManager = window.getService(BindingTableManager.class);
 		IContextService bindingContextService = window.getService(IContextService.class);
 
+		showInfoPopup = !WorkbenchPlugin.getDefault().getPreferenceStore()
+				.getBoolean(FULL_SCREEN_COMMAND_DO_NOT_SHOW_INFO_AGAIN_PREF_ID);
+
 		Optional<TriggerSequence> sequence = getKeybindingSequence(bindingService, commandService, bindingTableManager,
-				bindingContextService);
+				bindingContextService, FULL_SCREEN_COMMAND_ID);
 
 		String keybinding = sequence.map(t -> t.format()).orElse(""); //$NON-NLS-1$
 
@@ -71,9 +80,11 @@ public class FullScreenHandler extends AbstractHandler {
 			if (!keybinding.isEmpty()) {
 				message = NLS.bind(WorkbenchMessages.ToggleFullScreenMode_ActivationPopup_Description, keybinding);
 			}
-			FullScreenInfoPopup fullScreenInfoPopup = new FullScreenInfoPopup(shell, PopupDialog.HOVER_SHELLSTYLE, true,
-					false, false, false, false, null, null, message);
-			fullScreenInfoPopup.open();
+			if (showInfoPopup) {
+				FullScreenInfoPopup fullScreenInfoPopup = new FullScreenInfoPopup(shell, PopupDialog.HOVER_SHELLSTYLE,
+						true, false, false, false, false, null, null, message);
+				fullScreenInfoPopup.open();
+			}
 		}
 		return Status.OK_STATUS;
 	}
@@ -81,6 +92,7 @@ public class FullScreenHandler extends AbstractHandler {
 	private static class FullScreenInfoPopup extends PopupDialog {
 
 		private String message;
+		private String messageDoNotShowAgain;
 
 		public FullScreenInfoPopup(Shell parent, int shellStyle, boolean takeFocusOnOpen, boolean persistSize,
 				boolean persistLocation, boolean showDialogMenu, boolean showPersistActions, String titleText,
@@ -88,35 +100,50 @@ public class FullScreenHandler extends AbstractHandler {
 			super(parent, shellStyle, takeFocusOnOpen, persistSize, persistLocation, showDialogMenu, showPersistActions,
 					titleText, infoText);
 			this.message = message;
+			this.messageDoNotShowAgain = WorkbenchMessages.ToggleFullScreenMode_ActivationPopup_DoNotShowAgain;
 		}
 
 		@Override
 		protected Point getInitialLocation(Point initialSize) {
-			Rectangle bounds = getShell().getMonitor().getBounds();
+			if (getShell().getParent() == null) {
+				return super.getInitialLocation(initialSize);
+			}
+			Rectangle bounds = getShell().getParent().getMonitor().getBounds();
 			GC gc = new GC(getShell().getDisplay());
 			int textExtendX = gc.textExtent(message).x;
 			gc.dispose();
 
-			return new Point(bounds.width / 2 - textExtendX / 2, bounds.height / 5);
+			return new Point(bounds.x + bounds.width / 2 - textExtendX / 2, bounds.y + bounds.height / 5);
 		}
 
 		@Override
 		protected Control createDialogArea(Composite parent) {
 			Composite composite = (Composite) super.createDialogArea(parent);
 
-			Link link = new Link(composite, SWT.BORDER);
+			Link link = new Link(composite, SWT.NONE);
 			link.setText(message);
-
-			link.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					close();
-				}
-			});
 			GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
 			gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
 			gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
 			link.setLayoutData(gd);
+
+			Button btnDoNotShow = new Button(composite, SWT.CHECK);
+			btnDoNotShow.setText(messageDoNotShowAgain);
+			btnDoNotShow.setSelection(WorkbenchPlugin.getDefault().getPreferenceStore()
+					.getBoolean(FULL_SCREEN_COMMAND_DO_NOT_SHOW_INFO_AGAIN_PREF_ID));
+			GridData gd2 = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
+			gd2.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
+			gd2.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
+			btnDoNotShow.setLayoutData(gd2);
+
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					WorkbenchPlugin.getDefault().getPreferenceStore()
+							.setValue(FULL_SCREEN_COMMAND_DO_NOT_SHOW_INFO_AGAIN_PREF_ID, btnDoNotShow.getSelection());
+					close();
+				}
+			});
 
 			return composite;
 		}
@@ -124,12 +151,13 @@ public class FullScreenHandler extends AbstractHandler {
 	}
 
 	protected Optional<TriggerSequence> getKeybindingSequence(IBindingService bindingService,
-			ECommandService eCommandService, BindingTableManager bindingTableManager, IContextService contextService) {
-		TriggerSequence triggerSequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
+			ECommandService eCommandService, BindingTableManager bindingTableManager, IContextService contextService,
+			String commandId) {
+		TriggerSequence triggerSequence = bindingService.getBestActiveBindingFor(commandId);
 		// FIXME Bug 491701 - [KeyBinding] get best active binding is not
 		// working
 		if (triggerSequence == null) {
-			ParameterizedCommand cmd = eCommandService.createCommand(QUICK_ACCESS_COMMAND_ID, null);
+			ParameterizedCommand cmd = eCommandService.createCommand(commandId, null);
 			ContextSet contextSet = bindingTableManager
 					.createContextSet(Arrays.asList(contextService.getDefinedContexts()));
 			Binding binding = bindingTableManager.getBestSequenceFor(contextSet, cmd);

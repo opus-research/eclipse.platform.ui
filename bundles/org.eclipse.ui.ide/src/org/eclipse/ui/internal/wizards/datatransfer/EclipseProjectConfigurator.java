@@ -12,6 +12,9 @@ package org.eclipse.ui.internal.wizards.datatransfer;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -23,7 +26,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
@@ -38,22 +40,15 @@ public class EclipseProjectConfigurator implements ProjectConfigurator {
 
 	@Override
 	public Set<File> findConfigurableLocations(File root, IProgressMonitor monitor) {
-		HashSet<File> res = new HashSet<>();
-		collectProjectDirectories(res, root, monitor);
+		Set<File> projectFiles = new LinkedHashSet<>();
+		Set<String> visitedDirectories = new HashSet<>();
+		WizardProjectsImportPage.collectProjectFilesFromDirectory(projectFiles, root, visitedDirectories, true,
+				monitor);
+		Set<File> res = new LinkedHashSet<>();
+		for (File projectFile : projectFiles) {
+			res.add(projectFile.getParentFile());
+		}
 		return res;
-	}
-
-	private void collectProjectDirectories(HashSet<File> res, File root, IProgressMonitor monitor) {
-		if (new File(root, IProjectDescription.DESCRIPTION_FILE_NAME).isFile()) {
-			res.add(root);
-		}
-		if (!monitor.isCanceled()) {
-			for (File child : root.listFiles()) {
-				if (child.isDirectory()) {
-					collectProjectDirectories(res, child, monitor);
-				}
-			}
-		}
 	}
 
 	@Override
@@ -62,7 +57,7 @@ public class EclipseProjectConfigurator implements ProjectConfigurator {
 	}
 
 	@Override
-	public Set<IFolder> getDirectoriesToIgnore(IProject project, IProgressMonitor monitor) {
+	public Set<IFolder> getFoldersToIgnore(IProject project, IProgressMonitor monitor) {
 		return null;
 	}
 
@@ -72,8 +67,9 @@ public class EclipseProjectConfigurator implements ProjectConfigurator {
 	}
 
 	@Override
-	public IWizard getConfigurationWizard() {
-		return null;
+	public void removeDirtyDirectories(Map<File, List<ProjectConfigurator>> proposals) {
+		// nothing to do: we cannot infer that a directory is dirty from
+		// .project
 	}
 
 	@Override
