@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.core.runtime.ListenerList;
@@ -206,11 +205,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		}
 	 }
 
-	@PreDestroy
-	public void dispose() {
-		selectionService = null;
-	}
-
 	private void notifyListeners(IWorkbenchPart workbenchPart, ISelection selection,
 			ListenerList listenerList) {
 		for (Object listener : listenerList.getListeners()) {
@@ -293,7 +287,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 			targetedPostSelectionListeners.put(partId, listeners);
 		}
 		if (listeners.size() == 0 && selectionService != null) {
-			selectionService.addPostSelectionListener(partId, targetedPostListener);
+			selectionService.addPostSelectionListener(partId, postListener);
 		}
 		listeners.add(listener);
 	}
@@ -357,7 +351,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		if (listeners != null) {
 			listeners.remove(listener);
 			if (listeners.size() == 0 && selectionService != null) {
-				selectionService.removeSelectionListener(partId, this.targetedListener);
+				selectionService.removeSelectionListener(partId, this.listener);
 			}
 		}
 	}
@@ -387,7 +381,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		if (listeners != null) {
 			listeners.remove(listener);
 			if (listeners.size() == 0 && selectionService != null) {
-				selectionService.removePostSelectionListener(partId, targetedPostListener);
+				selectionService.removePostSelectionListener(partId, postListener);
 			}
 		}
 	}

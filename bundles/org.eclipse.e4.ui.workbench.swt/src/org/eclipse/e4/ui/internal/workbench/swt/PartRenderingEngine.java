@@ -349,7 +349,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 	};
 
-	private StylingPreferencesHandler cssThemeChangedHandler;
+	private CSSThemeChangedHandler cssThemeChangedHandler;
 
 	private IEclipseContext appContext;
 
@@ -482,7 +482,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			eventBroker.subscribe(UIEvents.TrimmedWindow.TOPIC_TRIMBARS,
 					trimHandler);
 
-			cssThemeChangedHandler = new StylingPreferencesHandler(
+			cssThemeChangedHandler = new CSSThemeChangedHandler(
 					context.get(Display.class));
 			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED,
 					cssThemeChangedHandler);
@@ -1250,6 +1250,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
+		IThemeEngine themeEngineForEvent = null;
 		if ("none".equals(cssTheme)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
@@ -1281,6 +1282,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		} else if (cssTheme != null) {
 			final IThemeEngine themeEngine = createThemeEngine(display,
 					appContext);
+			themeEngineForEvent = themeEngine;
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
@@ -1290,7 +1292,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 				themeEngine.registerResourceLocator(new OSGiResourceLocator(
 						cssResourcesURI));
 			}
-			
+
+			themeEngine.restore(cssTheme);
+
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
@@ -1322,9 +1326,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					themeEngine.applyStyles(widget, true);
 				}
 			});
-
-			themeEngine.restore(cssTheme);
-
 		} else if (cssURI != null) {
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
@@ -1415,6 +1416,21 @@ public class PartRenderingEngine implements IPresentationEngine {
 		CSSRenderingUtils cssUtils = ContextInjectionFactory.make(
 				CSSRenderingUtils.class, appContext);
 		appContext.set(CSSRenderingUtils.class, cssUtils);
+
+		IEventBroker broker = appContext.get(IEventBroker.class);
+		if (broker != null) {
+			Map<String, Object> data = null;
+			if (themeEngineForEvent != null) {
+				data = new HashMap<String, Object>();
+				data.put(IThemeEngine.Events.THEME_ENGINE, themeEngineForEvent);
+				data.put(IThemeEngine.Events.THEME,
+						themeEngineForEvent.getActiveTheme());
+				data.put(IThemeEngine.Events.DEVICE, display);
+				data.put(IThemeEngine.Events.RESTORE, false);
+			}
+			broker.send(IThemeEngine.Events.THEME_CHANGED, data);
+			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
+		}
 	}
 
 	private static IThemeEngine createThemeEngine(Display display, IEclipseContext appContext) {
@@ -1432,23 +1448,18 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return themeEngine;
 	}
 
-	public static class StylingPreferencesHandler implements EventHandler {
+	private static class CSSThemeChangedHandler implements EventHandler {
 		private HashSet<IEclipsePreferences> prefs = null;
 
-		public StylingPreferencesHandler(Display display) {
+		public CSSThemeChangedHandler(Display display) {
 			if (display != null) {
-				display.addListener(SWT.Dispose,
-						createOnDisplayDisposedListener());
-			}
-		}
-
-		protected Listener createOnDisplayDisposedListener() {
-			return new Listener() {
+				display.addListener(SWT.Dispose, new Listener() {
 					@Override
 					public void handleEvent(org.eclipse.swt.widgets.Event event) {
 						resetOverriddenPreferences();
 					}
-			};
+				});
+			}
 		}
 
 		@Override
@@ -1457,32 +1468,22 @@ public class PartRenderingEngine implements IPresentationEngine {
 			overridePreferences(getThemeEngine(event));
 		}
 
-		protected void resetOverriddenPreferences() {
+		private void resetOverriddenPreferences() {
 			for (IEclipsePreferences preferences : getPreferences()) {
 				resetOverriddenPreferences(preferences);
 			}
 		}
 
-		protected void resetOverriddenPreferences(
-				IEclipsePreferences preferences) {
-			for (String name : getOverriddenPropertyNames(preferences)) {
+		private void resetOverriddenPreferences(IEclipsePreferences preferences) {
+			for (String name : EclipsePreferencesHelper
+					.getOverriddenPropertyNames(preferences)) {
 				preferences.remove(name);
 			}
-			removeOverriddenPropertyNames(preferences);
+			EclipsePreferencesHelper
+					.removeOverriddenPropertyNames(preferences);
 		}
 
-		protected void removeOverriddenPropertyNames(
-				IEclipsePreferences preferences) {
-			EclipsePreferencesHelper.removeOverriddenPropertyNames(preferences);
-		}
-
-		protected List<String> getOverriddenPropertyNames(
-				IEclipsePreferences preferences) {
-			return EclipsePreferencesHelper
-					.getOverriddenPropertyNames(preferences);
-		}
-
-		protected Set<IEclipsePreferences> getPreferences() {
+		private Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
 				prefs = new HashSet<IEclipsePreferences>();
 				PlatformAdmin admin = WorkbenchSWTActivator.getDefault()
