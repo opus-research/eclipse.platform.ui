@@ -39,15 +39,16 @@ public class IEditorActionBarContributorTest extends UITestCase {
         super(testName);
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
     }
 
     public void testInit() throws Throwable {
-        // From javadoc: "Initializes this contributor, which is expected to 
-        // add contributions as required to the given action bars and global 
+        // From javadoc: "Initializes this contributor, which is expected to
+        // add contributions as required to the given action bars and global
         // action handlers."
 
         // Open a part.

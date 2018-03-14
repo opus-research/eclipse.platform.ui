@@ -21,9 +21,13 @@ import org.eclipse.ui.tests.decorators.DecoratorsTestSuite;
 import org.eclipse.ui.tests.dialogs.UIAutomatedSuite;
 import org.eclipse.ui.tests.encoding.EncodingTestSuite;
 import org.eclipse.ui.tests.fieldassist.FieldAssistTestSuite;
+import org.eclipse.ui.tests.keys.KeysTestSuite;
 import org.eclipse.ui.tests.navigator.NavigatorTestSuite;
 import org.eclipse.ui.tests.operations.OperationsTestSuite;
 import org.eclipse.ui.tests.preferences.PreferencesTestSuite;
+import org.eclipse.ui.tests.progress.ProgressTestSuite;
+import org.eclipse.ui.tests.services.ServicesTestSuite;
+import org.eclipse.ui.tests.themes.ThemesTestSuite;
 
 /**
  * Test all areas of the UI.
@@ -57,13 +61,13 @@ public class UiTestSuite extends TestSuite {
 		addTest(new DataTransferTestSuite());
 		addTest(new PreferencesTestSuite());
 		// addTest(new DynamicPluginsTestSuite());
-		// addTest(new KeysTestSuite());
+		addTest(new KeysTestSuite());
 		// addTest(new MultiPageEditorTestSuite());
 		addTest(new ActivitiesTestSuite());
 		// addTest(new CommandsTestSuite());
 		// addTest(new ContextsTestSuite());
 		// addTest(new DragTestSuite());
-		// addTest(new ThemesTestSuite());
+		addTest(new ThemesTestSuite());
 		// addTest(new IntroTestSuite());
 		// addTest(new MenusTestSuite());
 		addTest(new EncodingTestSuite());
@@ -74,9 +78,9 @@ public class UiTestSuite extends TestSuite {
 		addTest(new FieldAssistTestSuite());
 		// addTest(new MultiEditorTestSuite());
 		// addTest(new TestSuite(FilteredTreeTests.class));
-		// addTest(new ServicesTestSuite());
+		addTest(new ServicesTestSuite());
 		// addTest(new StatusHandlingTestSuite());
 		// addTest(OpenSystemInPlaceEditorTest.suite());
-		// addTest(new ProgressTestSuite());
+		addTest(new ProgressTestSuite());
 	}
 }

@@ -20,11 +20,12 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Provides the parameter values for the show perspective command.
- * 
+ *
  * @since 3.1
  */
 public final class PerspectiveParameterValues implements IParameterValues {
 
+	@Override
 	public final Map getParameterValues() {
 		final Map values = new HashMap();
 

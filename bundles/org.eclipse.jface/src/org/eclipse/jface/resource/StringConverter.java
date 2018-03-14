@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Christian Georgi <christian.georgi@sap.com> - [Themes] Invalid RGB color value in themes extension makes workbench unusable - http://bugs.eclipse.org/419435
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
@@ -76,16 +77,16 @@ public class StringConverter {
      */
     private static final String FONT_SEPARATOR = ";"; //$NON-NLS-1$
 
-    /* (non-Javadoc)
-     * Declare a private constructor to block instantiation.
-     */
+	/**
+	 * Declare a private constructor to block instantiation.
+	 */
     private StringConverter() {
         //no-op
     }
 
     /**
      * Breaks out space-separated words into an array of words.
-     * For example: <code>"no comment"</code> into an array 
+     * For example: <code>"no comment"</code> into an array
      * <code>a[0]="no"</code> and <code>a[1]= "comment"</code>.
      *
      * @param value the string to be converted
@@ -93,7 +94,7 @@ public class StringConverter {
      * @throws DataFormatException thrown if request string could not seperated
      */
     public static String[] asArray(String value) throws DataFormatException {
-        ArrayList list = new ArrayList();
+        ArrayList<String> list = new ArrayList<String>();
         StringTokenizer stok = new StringTokenizer(value);
         while (stok.hasMoreTokens()) {
             list.add(stok.nextToken());
@@ -106,7 +107,7 @@ public class StringConverter {
     /**
      /**
      * Breaks out space-separated words into an array of words.
-     * For example: <code>"no comment"</code> into an array 
+     * For example: <code>"no comment"</code> into an array
      * <code>a[0]="no"</code> and <code>a[1]= "comment"</code>.
      * Returns the given default value if the value cannot be parsed.
      *
@@ -131,7 +132,7 @@ public class StringConverter {
      * or upper case.
      * Similarly, valid representations of <code>false</code> include the strings
      * "<code>f</code>", "<code>false</code>", or equivalent in mixed
-     * or upper case. 
+     * or upper case.
      * </p>
      *
      * @param value the value to be converted
@@ -153,7 +154,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into a boolean.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent a boolean.
      *
      * @param value the value to be converted
@@ -187,7 +188,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into a double.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent a double.
      *
      * @param value the value to be converted
@@ -221,7 +222,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into a float.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent a float.
      *
      * @param value the value to be converted
@@ -298,7 +299,7 @@ public class StringConverter {
 
 	/**
 	 * Returns the result of converting a list of comma-separated tokens into an array
-	 * 
+	 *
 	 * @return the array of string tokens
 	 * @param prop the initial comma-separated string
 	 */
@@ -306,27 +307,27 @@ public class StringConverter {
 		if (prop == null || prop.trim().equals("")) { //$NON-NLS-1$
 			return new String[0];
 		}
-		ArrayList list = new ArrayList();
-		StringTokenizer tokens = new StringTokenizer(prop, separator); 
+		ArrayList<String> list = new ArrayList<String>();
+		StringTokenizer tokens = new StringTokenizer(prop, separator);
 		while (tokens.hasMoreTokens()) {
 			String token = tokens.nextToken().trim();
 			if (!token.equals("")) { //$NON-NLS-1$
 				list.add(token);
 			}
 		}
-		return list.isEmpty() ? new String[0] : (String[]) list.toArray(new String[list.size()]);
+		return list.isEmpty() ? new String[0] : list.toArray(new String[list.size()]);
 	}
 
     /**
      * Convert the given value into an array of SWT font data objects.
-     * 
-     * @param value the font list string 
+     *
+     * @param value the font list string
      * @return the value as a font list
      * @since 3.0
      */
     public static FontData[] asFontDataArray(String value) {
         String[] strings = getArrayFromList(value, FONT_SEPARATOR);
-        ArrayList data = new ArrayList(strings.length);
+        ArrayList<FontData> data = new ArrayList<FontData>(strings.length);
         for (int i = 0; i < strings.length; i++) {
             try {
                 data.add(StringConverter.asFontData(strings[i]));
@@ -334,12 +335,12 @@ public class StringConverter {
                 //do-nothing
             }
         }
-        return (FontData[]) data.toArray(new FontData[data.size()]);
+        return data.toArray(new FontData[data.size()]);
     }
 
     /**
      * Converts the given value into an SWT font data object.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent a font data object.
      *
      * @param value the value to be converted
@@ -373,7 +374,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into an int.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent an int.
      *
      * @param value the value to be converted
@@ -407,7 +408,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into a long.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent a long.
      *
      * @param value the value to be converted
@@ -457,7 +458,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into an SWT point.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent a point.
      *
      * @param value the value to be converted
@@ -513,7 +514,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into an SWT rectangle.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent a rectangle.
      *
      * @param value the value to be converted
@@ -535,7 +536,7 @@ public class StringConverter {
      * <p>
      * A valid RGB color value representation is a string of the form
      * <code><it>red</it>,<it>green</it></code>,<it>blue</it></code> where
-     * <code><it>red</it></code>, <it>green</it></code>, and 
+     * <code><it>red</it></code>, <it>green</it></code>, and
      * <code><it>blue</it></code> are valid ints.
      * </p>
      *
@@ -563,6 +564,8 @@ public class StringConverter {
                 throw new DataFormatException(e.getMessage());
             }
             return new RGB(rval, gval, bval);
+        } catch (IllegalArgumentException e) {
+            throw new DataFormatException(e.getMessage());
         } catch (NoSuchElementException e) {
             throw new DataFormatException(e.getMessage());
         }
@@ -570,7 +573,7 @@ public class StringConverter {
 
     /**
      * Converts the given value into an SWT RGB color value.
-     * Returns the given default value if the 
+     * Returns the given default value if the
      * value does not represent an RGB color value.
      *
      * @param value the value to be converted
@@ -692,7 +695,7 @@ public class StringConverter {
     /**
      * Converts a font data array  to a string. The string representation is
      * that of asString(FontData) seperated by ';'
-     * 
+     *
      * @param value The font data.
      * @return The string representation of the font data arra.
      * @since 3.0
@@ -789,7 +792,7 @@ public class StringConverter {
      * <p>
      * The string representation of an RGB color value has the form
      * <code><it>red</it>,<it>green</it></code>,<it>blue</it></code> where
-     * <code><it>red</it></code>, <it>green</it></code>, and 
+     * <code><it>red</it></code>, <it>green</it></code>, and
      * <code><it>blue</it></code> are string representations of integers.
      * </p>
      *
@@ -821,7 +824,7 @@ public class StringConverter {
     /**
      * Returns the given string with all whitespace characters removed.
      * <p>
-     * All characters that have codes less than or equal to <code>'&#92;u0020'</code> 
+     * All characters that have codes less than or equal to <code>'&#92;u0020'</code>
      * (the space character) are considered to be a white space.
      * </p>
      *
@@ -855,14 +858,15 @@ public class StringConverter {
     }
 
     /**
-     * Converts a font data object to a string representation for display. 
+     * Converts a font data object to a string representation for display.
      * 	The string representation is
      * "font name-style-height" (for example "Times New Roman-bold-36").
      * @param value The font data.
      * @return The string representation of the font data object.
      * @deprecated use asString(FontData)
      */
-    public static String asDisplayableString(FontData value) {
+    @Deprecated
+	public static String asDisplayableString(FontData value) {
         Assert.isNotNull(value);
         StringBuffer buffer = new StringBuffer();
         buffer.append(value.getName());

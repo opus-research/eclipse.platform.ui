@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
@@ -76,18 +77,18 @@ import org.eclipse.ui.internal.util.Util;
  */
 public class EditorRegistry extends EventManager implements IEditorRegistry,
 		IExtensionChangeHandler {
-	
+
 	private final static IEditorDescriptor [] EMPTY = new IEditorDescriptor[0];
-	
+
 	class RelatedRegistry {
 
 		/**
          * Return the objects related to the type.
-         * 
+         *
          * @param type
          * @return the objects related to the type
 		 */
-		public IEditorDescriptor[] getRelatedObjects(IContentType type) {			
+		public IEditorDescriptor[] getRelatedObjects(IContentType type) {
 			IEditorDescriptor[] relatedObjects = (IEditorDescriptor[]) contentTypeToEditorMappings.get(type);
 			if (relatedObjects == null) {
 				return EMPTY;
@@ -105,14 +106,14 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 			if (mapping == null) {
 				return EMPTY;
 			}
-			
+
 			return (IEditorDescriptor[]) WorkbenchActivityHelper.restrictArray(mapping.getEditors());
 		}
-		
+
 	}
-	
+
 	private Map contentTypeToEditorMappings = new HashMap();
-	
+
     /*
      * Cached images - these include images from registered editors (via
      * plugins) and others hence this table is not one to one with the mappings
@@ -124,9 +125,9 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /**
      * Vector of EditorDescriptor - all the editors loaded from plugin files.
      * The list is kept in order to be able to show in the editor selection
-     * dialog of the resource associations page.  This list is sorted based on the 
+     * dialog of the resource associations page.  This list is sorted based on the
      * human readable label of the editor descriptor.
-     * 
+     *
      * @see #comparer
      */
     private List sortedEditorsFromPlugins = new ArrayList();
@@ -143,6 +144,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     private static final Comparator comparer = new Comparator() {
         private Collator collator = Collator.getInstance();
 
+		@Override
 		public int compare(Object arg0, Object arg1) {
 			String s1 = ((IEditorDescriptor) arg0).getLabel();
 			String s2 = ((IEditorDescriptor) arg1).getLabel();
@@ -169,7 +171,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /**
      * Add an editor for the given extensions with the specified (possibly null)
      * extended type. The editor is being registered from a plugin
-     * 
+     *
      * @param editor
      *            The description of the editor (as obtained from the plugin
      *            file and built by the registry reader)
@@ -177,11 +179,11 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
      *            Collection of file extensions the editor applies to
      * @param filenames
      *            Collection of filenames the editor applies to
-     * @param contentTypeVector 
+     * @param contentTypeVector
      * @param bDefault
      *            Indicates whether the editor should be made the default editor
      *            and hence appear first inside a FileEditorMapping
-     * 
+     *
      * This method is not API and should not be called outside the workbench
      * code.
      */
@@ -241,8 +243,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				}
             }
         }
-		
-		
+
+
 		itr = contentTypeVector.iterator();
 		while(itr.hasNext()) {
 			String contentTypeId = (String) itr.next();
@@ -295,14 +297,16 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public void addPropertyListener(IPropertyListener l) {
+    @Override
+	public void addPropertyListener(IPropertyListener l) {
         addListenerObject(l);
     }
 
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public IEditorDescriptor findEditor(String id) {
+    @Override
+	public IEditorDescriptor findEditor(String id) {
         Object desc = mapIDtoEditor.get(id);
         if (WorkbenchActivityHelper.restrictUseOf(desc)) {
         	return null;
@@ -312,7 +316,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Fires a property changed event to all registered listeners.
-     * 
+     *
      * @param type the type of event
      * @see IEditorRegistry#PROP_CONTENTS
      */
@@ -320,8 +324,9 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
         Object[] array = getListeners();
         for (int nX = 0; nX < array.length; nX++) {
             final IPropertyListener l = (IPropertyListener) array[nX];
-            Platform.run(new SafeRunnable() {
-                public void run() {
+            SafeRunner.run(new SafeRunnable() {
+                @Override
+				public void run() {
                     l.propertyChanged(EditorRegistry.this, type);
                 }
             });
@@ -330,10 +335,11 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
-     * 
+     *
      * @deprecated
      */
-    public IEditorDescriptor getDefaultEditor() {
+    @Override
+	public IEditorDescriptor getDefaultEditor() {
         // the default editor will always be the system external editor
         // this should never return null
         return findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
@@ -342,7 +348,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public IEditorDescriptor getDefaultEditor(String filename) {
+    @Override
+	public IEditorDescriptor getDefaultEditor(String filename) {
 		IEditorDescriptor defaultEditor = getDefaultEditor(filename, guessAtContentType(filename));
 		if (defaultEditor != null) {
 			return defaultEditor;
@@ -361,7 +368,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
 	/**
 	 * Return the (approximated) content type for a file with the given name.
-	 * 
+	 *
 	 * @param filename the filename
 	 * @return the content type or <code>null</code> if it could not be determined
 	 * @since 3.1
@@ -372,7 +379,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Returns the default file image descriptor.
-     * 
+     *
      * @return the image descriptor
      */
     private ImageDescriptor getDefaultImage() {
@@ -383,22 +390,25 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public IEditorDescriptor[] getEditors(String filename) {
+    @Override
+	public IEditorDescriptor[] getEditors(String filename) {
 		return getEditors(filename, guessAtContentType(filename));
 	}
 
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public IFileEditorMapping[] getFileEditorMappings() {
+    @Override
+	public IFileEditorMapping[] getFileEditorMappings() {
         FileEditorMapping[] array = typeEditorMappings.allMappings();
         final Collator collator = Collator.getInstance();
         Arrays.sort(array, new Comparator() {
-            
+
             /* (non-Javadoc)
              * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
              */
-            public int compare(Object o1, Object o2) {
+            @Override
+			public int compare(Object o1, Object o2) {
                 String s1 = ((FileEditorMapping) o1).getLabel();
                 String s2 = ((FileEditorMapping) o2).getLabel();
                 return collator.compare(s1, s2);
@@ -410,14 +420,15 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public ImageDescriptor getImageDescriptor(String filename) {
+    @Override
+	public ImageDescriptor getImageDescriptor(String filename) {
 		return getImageDescriptor(filename, guessAtContentType(filename));
 	}
 
 	/**
      * Find the file editor mapping for the file extension. Returns
      * <code>null</code> if not found.
-     * 
+     *
      * @param ext
      *            the file extension
      * @return the mapping, or <code>null</code>
@@ -437,8 +448,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
      * is for the entire filename, and the second mapping is for the filename's
      * extension only. These items can be null if no mapping exist on the
      * filename and/or filename's extension.</p>
-     * 
-     * @param filename the filename 
+     *
+     * @param filename the filename
      * @return the mappings
      */
     private FileEditorMapping[] getMappingForFilename(String filename) {
@@ -503,7 +514,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Return the editors loaded from plugins.
-     * 
+     *
      * @return the sorted array of editors declared in plugins
      * @see #comparer
      */
@@ -517,7 +528,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /**
 	 * Answer an intial id to editor map. This will create a new map and
 	 * populate it with the default system editors.
-	 * 
+	 *
 	 * @param initialSize
 	 *            the initial size of the map
 	 * @return the new map
@@ -533,14 +544,14 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
      * editor with an id of {@link #SYSTEM_EXTERNAL_EDITOR_ID} and may also add
      * an editor with id of {@link #SYSTEM_INPLACE_EDITOR_ID} if the system
      * configuration supports it.
-     * 
+     *
      * @param map the map to augment
      */
     private void addSystemEditors(HashMap map) {
         // there will always be a system external editor descriptor
         EditorDescriptor editor = new EditorDescriptor();
         editor.setID(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
-        editor.setName(WorkbenchMessages.SystemEditorDescription_name); 
+        editor.setName(WorkbenchMessages.SystemEditorDescription_name);
         editor.setOpenMode(EditorDescriptor.OPEN_EXTERNAL);
         // @issue we need a real icon for this editor?
         map.put(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID, editor);
@@ -554,7 +565,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
             // @issue we need a real icon for this editor?
             map.put(IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID, editor);
         }
-        
+
 		EditorDescriptor emptyEditorDescriptor = new EditorDescriptor();
 		emptyEditorDescriptor.setID(EMPTY_EDITOR_ID);
 		emptyEditorDescriptor.setName("(Empty)"); //$NON-NLS-1$
@@ -601,11 +612,11 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Set the default editors according to the preference store which can be
-     * overwritten in the file properties.ini.  In the form: 
+     * overwritten in the file properties.ini.  In the form:
      * <p>
      * <code>ext1:id1;ext2:id2;...</code>
      * </p>
-     * 
+     *
      * @param defaultEditors the default editors to set
      */
     private void setProductDefaults(String defaultEditors) {
@@ -645,7 +656,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Read the editors defined in the preferences store.
-     * 
+     *
      * @param editorTable
      *            Editor table to store the editor definitions.
      * @return true if the table is built succesfully.
@@ -655,7 +666,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
         IPath workbenchStatePath = WorkbenchPlugin.getDefault().getDataLocation();
         if(workbenchStatePath == null) {
 			return false;
-		}        
+		}
         IPreferenceStore store = WorkbenchPlugin.getDefault()
                 .getPreferenceStore();
         Reader reader = null;
@@ -716,7 +727,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
             return false;
         } catch (WorkbenchException e) {
             ErrorDialog.openError((Shell) null, WorkbenchMessages.EditorRegistry_errorTitle,
-                    WorkbenchMessages.EditorRegistry_errorMessage, 
+                    WorkbenchMessages.EditorRegistry_errorMessage,
                     e.getStatus());
             return false;
 		} finally {
@@ -735,12 +746,12 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Read the file types and associate them to their defined editor(s).
-     * 
+     *
      * @param editorTable
      *            The editor table containing the defined editors.
      * @param reader
      *            Reader containing the preferences content for the resources.
-     * 
+     *
      * @throws WorkbenchException
      */
     public void readResources(Map editorTable, Reader reader)
@@ -748,7 +759,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
         XMLMemento memento = XMLMemento.createReadRoot(reader);
         String versionString = memento.getString(IWorkbenchConstants.TAG_VERSION);
         boolean versionIs31 = "3.1".equals(versionString); //$NON-NLS-1$
-        
+
         IMemento[] extMementos = memento
                 .getChildren(IWorkbenchConstants.TAG_INFO);
         for (int i = 0; i < extMementos.length; i++) {
@@ -801,9 +812,9 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
                     }
                 }
             }
-            
+
             List defaultEditors = new ArrayList();
-            
+
             if (versionIs31) { // parse the new format
 				idMementos = extMementos[i]
 						.getChildren(IWorkbenchConstants.TAG_DEFAULT_EDITOR);
@@ -826,12 +837,12 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
             		if (!editors.isEmpty()) {
             			EditorDescriptor editor = (EditorDescriptor) editors.get(0);
             			if (editor != null) {
-                			defaultEditors.add(editor);	
+                			defaultEditors.add(editor);
                 		}
             		}
             		defaultEditors.addAll(Arrays.asList(mapping.getDeclaredDefaultEditors()));
             }
-            
+
             // Add any new editors that have already been read from the registry
             // which were not deleted.
             IEditorDescriptor[] editorsArray = mapping.getEditors();
@@ -851,7 +862,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Determine if the editors list contains the editor descriptor.
-     * 
+     *
      * @param editorsArray
      * 			The list of editors
      * @param editorDescriptor
@@ -876,7 +887,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /**
      * Creates the reader for the resources preferences defined in the
      * preference store.
-     * 
+     *
      * @param editorTable
      *            The editor table containing the defined editors.
      * @return true if the resources are read succesfully.
@@ -954,7 +965,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /**
      * Return a key that combines the file's name and extension of the given
      * mapping
-     * 
+     *
      * @param mapping the mapping to generate a key for
      */
     private String mappingKeyFor(FileEditorMapping mapping) {
@@ -991,7 +1002,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public void removePropertyListener(IPropertyListener l) {
+    @Override
+	public void removePropertyListener(IPropertyListener l) {
         removeListenerObject(l);
     }
 
@@ -1103,7 +1115,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
      * converted into the internal hash table for faster lookup Each mapping
      * goes from an extension to the collection of editors that work on it. This
      * operation will rebuild the internal editor mappings.
-     * 
+     *
      * @param newResourceTypes
      *            te new file editor mappings.
      */
@@ -1121,7 +1133,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
     /*
      * (non-Javadoc) Method declared on IEditorRegistry.
      */
-    public void setDefaultEditor(String fileName, String editorId) {
+    @Override
+	public void setDefaultEditor(String fileName, String editorId) {
         EditorDescriptor desc = (EditorDescriptor) findEditor(editorId);
         FileEditorMapping[] mapping = getMappingForFilename(fileName);
         if (mapping[0] != null) {
@@ -1134,7 +1147,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Alphabetically sort the internal editors.
-     * 
+     *
      * @see #comparer
      */
     private Object[] sortEditors(List unsortedList) {
@@ -1147,7 +1160,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /**
      * Alphabetically sort the internal editors.
-     * 
+     *
      * @see #comparer
      */
     private void sortInternalEditors() {
@@ -1170,7 +1183,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
         /**
          * Put a default mapping into the editor map.
-         * 
+         *
          * @param key the key to set
          * @param value the value to associate
          */
@@ -1180,7 +1193,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
         /**
          * Put a mapping into the user editor map.
-         * 
+         *
          * @param key the key to set
          * @param value the value to associate
          */
@@ -1197,7 +1210,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
          * Return the mapping associated to the key. First searches user
          * map, and then falls back to the default map if there is no match. May
          * return <code>null</code>
-         * 
+         *
          * @param key
          *            the key to search for
          * @return the mapping associated to the key or <code>null</code>
@@ -1213,7 +1226,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
         /**
          * Return all mappings. This will return default mappings overlayed with
          * user mappings.
-         * 
+         *
          * @return the mappings
          */
         public FileEditorMapping[] allMappings() {
@@ -1226,7 +1239,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
         /**
          * Return all user mappings.
-         * 
+         *
          * @return the mappings
          */
         public FileEditorMapping[] userMappings() {
@@ -1238,19 +1251,21 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IEditorRegistry#isSystemInPlaceEditorAvailable(String)
      */
-    public boolean isSystemInPlaceEditorAvailable(String filename) {
+    @Override
+	public boolean isSystemInPlaceEditorAvailable(String filename) {
         return ComponentSupport.inPlaceEditorAvailable(filename);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IEditorRegistry#isSystemExternalEditorAvailable(String)
      */
-    public boolean isSystemExternalEditorAvailable(String filename) {
+    @Override
+	public boolean isSystemExternalEditorAvailable(String filename) {
         int nDot = filename.lastIndexOf('.');
         if (nDot >= 0) {
             String strName = filename.substring(nDot);
@@ -1261,10 +1276,11 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IEditorRegistry#getSystemExternalEditorImageDescriptor(java.lang.String)
      */
-    public ImageDescriptor getSystemExternalEditorImageDescriptor(
+    @Override
+	public ImageDescriptor getSystemExternalEditorImageDescriptor(
             String filename) {
         Program externalProgram = null;
         int extensionIndex = filename.lastIndexOf('.');
@@ -1274,16 +1290,16 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
         }
         if (externalProgram == null) {
             return null;
-        } 
-        
+        }
+
         return new ExternalProgramImageDescriptor(externalProgram);
     }
-    
+
     /**
      * Removes the entry with the value of the editor descriptor from the given
      * map. If the descriptor is the last descriptor in a given
      * FileEditorMapping then the mapping is removed from the map.
-     * 
+     *
      * @param map
      *            the map to search
      * @param desc
@@ -1309,11 +1325,12 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
         }
     }
 
-	
+
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
      */
-    public void removeExtension(IExtension source, Object[] objects) {
+    @Override
+	public void removeExtension(IExtension source, Object[] objects) {
         for (int i = 0; i < objects.length; i++) {
             if (objects[i] instanceof EditorDescriptor) {
                 EditorDescriptor desc = (EditorDescriptor) objects[i];
@@ -1360,7 +1377,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				if (descriptors.length == 1) {
 					return null;
 				}
-				
+
 				IEditorDescriptor[] newDescriptors = new IEditorDescriptor[descriptors.length - 1];
 				if (i == 0) {
 					System.arraycopy(descriptors, 1, newDescriptors, 0, newDescriptors.length);
@@ -1380,6 +1397,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
 	 */
+	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
         EditorRegistryReader eReader = new EditorRegistryReader();
         IConfigurationElement[] elements = extension.getConfigurationElements();
@@ -1399,13 +1417,14 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IEditorRegistry#getDefaultEditor(java.lang.String, org.eclipse.core.runtime.content.IContentType)
 	 */
+	@Override
 	public IEditorDescriptor getDefaultEditor(String fileName, IContentType contentType) {
         return getEditorForContentType(fileName, contentType);
 	}
 
 	/**
 	 * Return the editor for a file with a given content type.
-	 * 
+	 *
 	 * @param filename the file name
 	 * @param contentType the content type
 	 * @return the editor for a file with a given content type
@@ -1424,6 +1443,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IEditorRegistry#getEditors(java.lang.String, org.eclipse.core.runtime.content.IContentType)
 	 */
+	@Override
 	public IEditorDescriptor[] getEditors(String fileName, IContentType contentType) {
 		return findRelatedObjects(contentType, fileName, relatedRegistry);
 	}
@@ -1431,6 +1451,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IEditorRegistry#getImageDescriptor(java.lang.String, org.eclipse.core.runtime.content.IContentType)
 	 */
+	@Override
 	public ImageDescriptor getImageDescriptor(String filename, IContentType contentType) {
         if (filename == null) {
 			return getDefaultImage();
@@ -1439,13 +1460,13 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 		if (contentType != null) {
 			IEditorDescriptor desc = getEditorForContentType(filename, contentType);
 			if (desc != null) {
-				ImageDescriptor anImage = (ImageDescriptor) extensionImages.get(desc);	
+				ImageDescriptor anImage = (ImageDescriptor) extensionImages.get(desc);
 				if (anImage != null) {
 					return anImage;
 				}
 				anImage = desc.getImageDescriptor();
 				extensionImages.put(desc, anImage);
-				return anImage;				
+				return anImage;
 			}
 		}
         // Lookup in the cache first...
@@ -1486,13 +1507,13 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
         return anImage;
 
 	}
-    
+
     /**
 	 * Find objects related to the content type.
-	 * 
+	 *
 	 * This method is temporary and exists only to back us off of the
 	 * soon-to-be-removed IContentTypeManager.IRelatedRegistry API.
-	 * 
+	 *
 	 * @param type
 	 * @param fileName
 	 * @param registry
@@ -1503,7 +1524,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 		List allRelated = new ArrayList();
 		List nonDefaultFileEditors = new ArrayList();
 		IEditorDescriptor [] related;
-		
+
 		if (fileName != null) {
 			FileEditorMapping mapping = getMappingFor(fileName);
 			if (mapping != null) {
@@ -1518,13 +1539,13 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 						}
 					}
 				}
-				
+
 				// add all filename editors to the nonDefaultList
 				// we'll later try to add them all after content types are resolved
 				// duplicates (ie: default editors) will be ignored
 				nonDefaultFileEditors.addAll(Arrays.asList(mapping.getEditors()));
 			}
-			
+
 			int index = fileName.lastIndexOf('.');
 			if (index > -1) {
 				String extension = "*" + fileName.substring(index); //$NON-NLS-1$
@@ -1544,7 +1565,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				}
 			}
 		}
-		
+
 		if (type != null) {
 			// now add any objects directly related to the content type
 			related = registry.getRelatedObjects(type);
@@ -1561,7 +1582,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 		}
 
 		if (type != null) {
-			// now add any indirectly related objects, walking up the content type hierarchy 
+			// now add any indirectly related objects, walking up the content type hierarchy
 			while ((type = type.getBaseType()) != null) {
 				related = registry.getRelatedObjects(type);
 				for (int i = 0; i < related.length; i++) {
@@ -1575,7 +1596,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				}
 			}
 		}
-			
+
 		// add all non-default editors to the list
 		for (Iterator i = nonDefaultFileEditors.iterator(); i.hasNext();) {
 			IEditorDescriptor editor = (IEditorDescriptor) i.next();
@@ -1583,14 +1604,14 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				allRelated.add(editor);
 			}
 		}
-		
+
 		return (IEditorDescriptor []) allRelated.toArray(new IEditorDescriptor [allRelated
 				.size()]);
 	}
 
 	/**
 	 * Return the editors bound to this content type, either directly or indirectly.
-	 * 
+	 *
 	 * @param type the content type to check
 	 * @return the editors
 	 * @since 3.1
@@ -1602,20 +1623,20 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 		if (type == null) {
 			return new IEditorDescriptor [0];
 		}
-		
+
 		Object [] related = relatedRegistry.getRelatedObjects(type);
-		for (int i = 0; i < related.length; i++) {	
+		for (int i = 0; i < related.length; i++) {
 			// we don't want to return duplicates
 			if (!allRelated.contains(related[i])) {
 				// if it's not filtered, add it to the list
 				if (!WorkbenchActivityHelper.filterItem(related[i])) {
 					allRelated.add(related[i]);
 				}
-				
+
 			}
 		}
-		
-		// now add any indirectly related objects, walking up the content type hierarchy 
+
+		// now add any indirectly related objects, walking up the content type hierarchy
 		while ((type = type.getBaseType()) != null) {
 			related = relatedRegistry.getRelatedObjects(type);
 			for (int i = 0; i < related.length; i++) {
@@ -1628,20 +1649,20 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				}
 			}
 		}
-		
+
 		return (IEditorDescriptor[]) allRelated.toArray(new IEditorDescriptor[allRelated.size()]);
 	}
-	
+
 	/**
 	 * Get filemappings for all defined filetypes, including those defined by content type.
-	 * 
+	 *
 	 * @return the filetypes
 	 * @since 3.1
 	 */
 	public IFileEditorMapping [] getUnifiedMappings() {
         IFileEditorMapping[] standardMappings = PlatformUI.getWorkbench()
                 .getEditorRegistry().getFileEditorMappings();
-        
+
         List allMappings = new ArrayList(Arrays.asList(standardMappings));
         // mock-up content type extensions into IFileEditorMappings
         IContentType [] contentTypes = Platform.getContentTypeManager().getAllContentTypes();
@@ -1663,14 +1684,14 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 					allMappings.add(mockMapping);
 				}
 			}
-		
+
 			String [] filenames = type.getFileSpecs(IContentType.FILE_NAME_SPEC);
 			for (int j = 0; j < filenames.length; j++) {
 				String wholename = filenames[j];
-				int idx = wholename.indexOf('.');				
+				int idx = wholename.indexOf('.');
 				String name = idx == -1 ? wholename : wholename.substring(0, idx);
 				String extension = idx == -1 ? "" : wholename.substring(idx + 1); //$NON-NLS-1$
-				
+
 				boolean found = false;
 				for (Iterator k = allMappings.iterator(); k.hasNext();) {
 					IFileEditorMapping mapping = (IFileEditorMapping) k.next();
@@ -1685,11 +1706,11 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				}
 			}
 		}
-        
+
         return (IFileEditorMapping []) allMappings
 				.toArray(new IFileEditorMapping [allMappings.size()]);
 	}
-	
+
 }
 
 
@@ -1698,13 +1719,14 @@ class MockMapping implements IFileEditorMapping {
 	private IContentType contentType;
 	private String extension;
 	private String filename;
-	
+
 	MockMapping(IContentType type, String name, String ext) {
 		this.contentType = type;
 		this.filename = name;
 		this.extension = ext;
 	}
 
+	@Override
 	public IEditorDescriptor getDefaultEditor() {
 		IEditorDescriptor[] candidates = ((EditorRegistry) PlatformUI
 				.getWorkbench().getEditorRegistry())
@@ -1716,6 +1738,7 @@ class MockMapping implements IFileEditorMapping {
 		return candidates[0];
 	}
 
+	@Override
 	public IEditorDescriptor[] getEditors() {
 		IEditorDescriptor[] editorsForContentType = ((EditorRegistry) PlatformUI
 				.getWorkbench().getEditorRegistry())
@@ -1724,14 +1747,17 @@ class MockMapping implements IFileEditorMapping {
 				.restrictArray(editorsForContentType);
 	}
 
+	@Override
 	public IEditorDescriptor[] getDeletedEditors() {
 		return new IEditorDescriptor[0];
 	}
 
+	@Override
 	public String getExtension() {
 		return extension;
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		IEditorDescriptor editor = getDefaultEditor();
 		if (editor == null) {
@@ -1742,17 +1768,20 @@ class MockMapping implements IFileEditorMapping {
 		return editor.getImageDescriptor();
 	}
 
+	@Override
 	public String getLabel() {
-		return filename + '.' + extension; 
+		return filename + '.' + extension;
 	}
 
+	@Override
 	public String getName() {
 		return filename;
-    }	
+    }
 
     /* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

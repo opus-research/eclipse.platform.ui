@@ -35,9 +35,9 @@ import org.eclipse.ui.navigator.resources.ProjectExplorer;
 
 /**
  * Provides children and parents for IWorkingSets.
- * 
+ *
  * @since 3.2.1
- * 
+ *
  */
 public class WorkingSetsContentProvider implements ICommonContentProvider {
 
@@ -60,12 +60,10 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	private IExtensionStateModel extensionStateModel;
 	private CommonNavigator projectExplorer;
 	private CommonViewer viewer;
-	
+
 	private IPropertyChangeListener rootModeListener = new IPropertyChangeListener() {
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-		 */
+
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if(SHOW_TOP_LEVEL_WORKING_SETS.equals(event.getProperty())) {
 				updateRootMode();
@@ -73,36 +71,31 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		}
 
 	};
-	
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
-	 */
+
+	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 		NavigatorContentService cs = (NavigatorContentService) aConfig.getService();
 		viewer = (CommonViewer) cs.getViewer();
 		projectExplorer = viewer.getCommonNavigator();
-		
+
 		extensionStateModel = aConfig.getExtensionStateModel();
 		extensionStateModel.addPropertyChangeListener(rootModeListener);
 		updateRootMode();
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
-	 */
+	@Override
 	public void restoreState(IMemento aMemento) {
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
-	 */
+	@Override
 	public void saveState(IMemento aMemento) {
-		
+
 	}
 
+	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof IWorkingSet) {
 			IWorkingSet workingSet = (IWorkingSet) parentElement;
@@ -129,32 +122,37 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		return children;
 	}
 
+	@Override
 	public Object getParent(Object element) {
 		if (helper != null)
 			return helper.getParent(element);
 		return null;
 	}
 
+	@Override
 	public boolean hasChildren(Object element) {
 		return true;
 	}
 
+	@Override
 	public Object[] getElements(Object inputElement) {
 		return getChildren(inputElement);
 	}
 
+	@Override
 	public void dispose() {
 		helper = null;
 		extensionStateModel.removePropertyChangeListener(rootModeListener);
 	}
 
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput instanceof IWorkingSet) {
 			IWorkingSet rootSet = (IWorkingSet) newInput;
 			helper = new WorkingSetHelper(rootSet);
 		}
 	}
- 
+
 	private void updateRootMode() {
 		if (projectExplorer == null) {
 			return;
@@ -168,11 +166,11 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	protected class WorkingSetHelper {
 
 		private final IWorkingSet workingSet;
-		private final Map parents = new WeakHashMap();
+		private final Map<IAdaptable, IAdaptable> parents = new WeakHashMap<IAdaptable, IAdaptable>();
 
 		/**
 		 * Create a Helper class for the given working set
-		 * 
+		 *
 		 * @param set
 		 *            The set to use to build the item to parent map.
 		 */
@@ -186,12 +184,12 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 
 				IWorkingSet[] components = aggregateSet.getComponents();
 
-				for (int componentIndex = 0; componentIndex < components.length; componentIndex++) {
-					IAdaptable[] elements = getWorkingSetElements(components[componentIndex]);
-					for (int elementsIndex = 0; elementsIndex < elements.length; elementsIndex++) {
-						parents.put(elements[elementsIndex], components[componentIndex]);
+				for (IWorkingSet component : components) {
+					IAdaptable[] elements = getWorkingSetElements(component);
+					for (IAdaptable element : elements) {
+						parents.put(element, component);
 					}
-					parents.put(components[componentIndex], aggregateSet);
+					parents.put(component, aggregateSet);
 
 				}
 			} else {
@@ -203,7 +201,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		}
 
 		/**
-		 * 
+		 *
 		 * @param element
 		 *            An element from the viewer
 		 * @return The parent associated with the element, if any.
@@ -214,7 +212,7 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 			return parents.get(element);
 		}
 	}
-	
+
 
 
 }

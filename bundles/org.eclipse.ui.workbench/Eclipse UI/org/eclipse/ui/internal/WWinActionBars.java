@@ -33,14 +33,16 @@ public class WWinActionBars implements IActionBars2 {
     /**
      * Clears the global action handler list.
      */
-    public void clearGlobalActionHandlers() {
+    @Override
+	public void clearGlobalActionHandlers() {
     }
 
     /**
      * Returns the cool bar manager.
-     * 
+     *
      */
-    public ICoolBarManager getCoolBarManager() {
+    @Override
+	public ICoolBarManager getCoolBarManager() {
         return window.getCoolBarManager2();
     }
 
@@ -51,7 +53,8 @@ public class WWinActionBars implements IActionBars2 {
      * @return an action handler which implements the action ID, or
      *		<code>null</code> if none is registered.
      */
-    public IAction getGlobalActionHandler(String actionID) {
+    @Override
+	public IAction getGlobalActionHandler(String actionID) {
         return null;
     }
 
@@ -61,10 +64,12 @@ public class WWinActionBars implements IActionBars2 {
      *
      * @return the menu manager
      */
-    public IMenuManager getMenuManager() {
+    @Override
+	public IMenuManager getMenuManager() {
         return window.getMenuManager();
     }
 
+	@Override
 	public final IServiceLocator getServiceLocator() {
 		return window;
 	}
@@ -75,15 +80,17 @@ public class WWinActionBars implements IActionBars2 {
      *
      * @return the status line manager
      */
-    public IStatusLineManager getStatusLineManager() {
+    @Override
+	public IStatusLineManager getStatusLineManager() {
         return window.getStatusLineManager();
     }
 
     /**
      * Returns the tool bar manager.
-     * 
+     *
      */
-    public IToolBarManager getToolBarManager() {
+    @Override
+	public IToolBarManager getToolBarManager() {
         // This should never be called
         Assert.isTrue(false);
         return null;
@@ -98,18 +105,20 @@ public class WWinActionBars implements IActionBars2 {
      * @see IWorkbenchActions
      *
      * @param actionID an action ID declared in the registry
-     * @param handler an action which implements the action ID.  
+     * @param handler an action which implements the action ID.
      *		<code>null</code> may be passed to deregister a handler.
      */
-    public void setGlobalActionHandler(String actionID, IAction handler) {
+    @Override
+	public void setGlobalActionHandler(String actionID, IAction handler) {
     }
 
 	/**
      * Commits all UI changes.  This should be called
-     * after additions or subtractions have been made to a 
+     * after additions or subtractions have been made to a
      * menu, status line, or toolbar.
      */
-    public void updateActionBars() {
+    @Override
+	public void updateActionBars() {
         window.updateActionBars();
     }
 }

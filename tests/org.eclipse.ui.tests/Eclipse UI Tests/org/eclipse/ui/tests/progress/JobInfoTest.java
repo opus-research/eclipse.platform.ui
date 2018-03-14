@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,21 +12,17 @@
 
 package org.eclipse.ui.tests.progress;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.internal.jobs.InternalJob;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.internal.progress.JobInfo;
 
 public class JobInfoTest extends TestCase {
 
-	
+
 	/**
 	 * @see org.eclipse.core.internal.jobs.InternalJob
 	 */
@@ -43,19 +39,20 @@ public class JobInfoTest extends TestCase {
 	 * @see org.eclipse.core.internal.jobs.InternalJob
 	 */
 	static final int YIELDING = 0x40;
-	
+
 	private List jobinfos = new ArrayList();
-	
+
 	/**
 	 * @throws java.lang.Exception
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		int counter = 0;
 		counter = createAndAddJobInfos(false, false, ABOUT_TO_RUN, counter);
 		counter = createAndAddJobInfos(false, true,  ABOUT_TO_RUN, counter);
 		counter = createAndAddJobInfos(true, false,  ABOUT_TO_RUN, counter);
 		counter = createAndAddJobInfos(true, true,  ABOUT_TO_RUN, counter);
-		
+
 		counter = createAndAddJobInfos(false, false, ABOUT_TO_SCHEDULE, counter);
 		counter = createAndAddJobInfos(false, true, ABOUT_TO_SCHEDULE, counter);
 		counter = createAndAddJobInfos(true, false, ABOUT_TO_SCHEDULE, counter);
@@ -65,17 +62,17 @@ public class JobInfoTest extends TestCase {
 		counter = createAndAddJobInfos(false, true, Job.SLEEPING, counter);
 		counter = createAndAddJobInfos(true, false, Job.SLEEPING, counter);
 		counter = createAndAddJobInfos(true, true, Job.SLEEPING, counter);
-		
+
 		counter = createAndAddJobInfos(false, false, Job.WAITING, counter);
 		counter = createAndAddJobInfos(false, true, Job.WAITING, counter);
 		counter = createAndAddJobInfos(true, false, Job.WAITING, counter);
 		counter = createAndAddJobInfos(true, true, Job.WAITING, counter);
-		
+
 		counter = createAndAddJobInfos(false, false, Job.RUNNING, counter);
 		counter = createAndAddJobInfos(false, true, Job.RUNNING, counter);
 		counter = createAndAddJobInfos(true, false, Job.RUNNING, counter);
 		counter = createAndAddJobInfos(true, true, Job.RUNNING, counter);
-		
+
 	}
 
 	/**
@@ -121,7 +118,7 @@ public class JobInfoTest extends TestCase {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param user
 	 * @param system
@@ -132,7 +129,7 @@ public class JobInfoTest extends TestCase {
 	private int createAndAddJobInfos(boolean user, boolean system, int jobstate, int counter) {
 		TestJob job;
 		JobInfo ji;
-		
+
 		job = new TestJob("Job" + (counter++));
 		job.setUser(user);
 		job.setSystem(system);
@@ -140,7 +137,7 @@ public class JobInfoTest extends TestCase {
 		job.setInternalJobState(jobstate);
 		ji = new ExtendedJobInfo(job);
 		jobinfos.add(ji);
-		
+
 		job = new TestJob("Job" + (counter++));
 		job.setUser(user);
 		job.setSystem(system);
@@ -148,7 +145,7 @@ public class JobInfoTest extends TestCase {
 		job.setInternalJobState(jobstate);
 		ji = new ExtendedJobInfo(job);
 		jobinfos.add(ji);
-		
+
 		job = new TestJob("Job" + (counter++));
 		job.setUser(user);
 		job.setSystem(system);
@@ -156,7 +153,7 @@ public class JobInfoTest extends TestCase {
 		job.setInternalJobState(jobstate);
 		ji = new ExtendedJobInfo(job);
 		jobinfos.add(ji);
-		
+
 		job = new TestJob("Job" + (counter++));
 		job.setUser(user);
 		job.setSystem(system);
@@ -164,7 +161,7 @@ public class JobInfoTest extends TestCase {
 		job.setInternalJobState(jobstate);
 		ji = new ExtendedJobInfo(job);
 		jobinfos.add(ji);
-		
+
 		job = new TestJob("Job" + (counter++));
 		job.setUser(user);
 		job.setSystem(system);
@@ -172,7 +169,7 @@ public class JobInfoTest extends TestCase {
 		job.setInternalJobState(jobstate);
 		ji = new ExtendedJobInfo(job);
 		jobinfos.add(ji);
-		
+
 		job = new TestJob("Job" + (counter++));
 		job.setUser(user);
 		job.setSystem(system);
@@ -180,56 +177,8 @@ public class JobInfoTest extends TestCase {
 		job.setInternalJobState(jobstate);
 		ji = new ExtendedJobInfo(job);
 		jobinfos.add(ji);
-		
+
 		return counter;
 	}
 
-	/*
-	 * ========================================================================
-	 */
-
-	/**
-	 * Only provides better readable {@link #toString()} method.
-	 */
-	private static class ExtendedJobInfo extends JobInfo {
-
-		public ExtendedJobInfo(Job enclosingJob) {
-			super(enclosingJob);
-		}
-
-		public String toString() {
-			return "ExtendedJobInfo [getName()=" + getJob().getName() + ", getPriority()="
-						+ getJob().getPriority() + ", getState()=" + getJob().getState()
-						+ ", isSystem()=" + getJob().isSystem() + ", isUser()=" + getJob().isUser()
-						+ "]";
-		}
-		
-	}
-	
-	/**
-	 * Enables access to internal state, by using reflection
-	 * Provides better readable {@link #toString()} method.
-	 */
-	private static class TestJob extends Job {
-
-		public TestJob(String name) {
-			super(name);
-		}
-
-		protected IStatus run(IProgressMonitor monitor) {
-			throw new UnsupportedOperationException("Not implemented, because of just a unit test");
-		}
-		
-		public void setInternalJobState(int state) {
-			try {
-				final Field field = InternalJob.class.getDeclaredField("flags");
-				field.setAccessible(true); // hack for testing
-				field.set(this, new Integer(state));
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
-		}
-
-	}
 }

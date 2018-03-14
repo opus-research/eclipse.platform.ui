@@ -22,7 +22,8 @@ public class FullTextDecoratorRunnable extends FullDecoratorRunnable {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.ISafeRunnable#run()
      */
-    public void run() throws Exception {
+    @Override
+	public void run() throws Exception {
         result = decorator.decorateText(start, element);
     }
 
@@ -55,6 +56,6 @@ public class FullTextDecoratorRunnable extends FullDecoratorRunnable {
 	 * @since 3.1
 	 */
 	void clearReferences() {
-		decorator = null;		
+		decorator = null;
 	}
 }

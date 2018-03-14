@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.services;
@@ -78,15 +79,16 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.AbstractSourceProvider#initialize(org.eclipse.ui.services
 	 * .IServiceLocator)
 	 */
+	@Override
 	public void initialize(IServiceLocator locator) {
 //		this.locator = locator;
 		super.initialize(locator);
-		IWorkbenchLocationService wls = (IWorkbenchLocationService) locator
+		IWorkbenchLocationService wls = locator
 				.getService(IWorkbenchLocationService.class);
 		workbench = wls.getWorkbench();
 		workbench.addWindowListener(windowListener);
@@ -97,9 +99,10 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISourceProvider#dispose()
 	 */
+	@Override
 	public void dispose() {
 		if (lastWindow != null)
 			lastWindow.getSelectionService().removeSelectionListener(this);
@@ -114,18 +117,20 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
 	 */
+	@Override
 	public String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
 	 */
+	@Override
 	public Map getCurrentState() {
 
 		final Map currentState = new HashMap();
@@ -161,6 +166,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 		return sources;
 	}
 
+	@Override
 	public final void selectionChanged(final IWorkbenchPart part,
 			final ISelection newSelection) {
 
@@ -231,22 +237,27 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	private final IPartListener partListener = new IPartListener() {
 
+		@Override
 		public final void partActivated(final IWorkbenchPart part) {
 			checkActivePart();
 		}
 
+		@Override
 		public final void partBroughtToTop(final IWorkbenchPart part) {
 			checkActivePart();
 		}
 
+		@Override
 		public final void partClosed(final IWorkbenchPart part) {
 			checkActivePart();
 		}
 
+		@Override
 		public final void partDeactivated(final IWorkbenchPart part) {
 			checkActivePart();
 		}
 
+		@Override
 		public final void partOpened(final IWorkbenchPart part) {
 			checkActivePart();
 		}
@@ -255,10 +266,12 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	private final IWindowListener windowListener = new IWindowListener() {
 
+		@Override
 		public final void windowActivated(final IWorkbenchWindow window) {
 			checkActivePart();
 		}
 
+		@Override
 		public final void windowClosed(final IWorkbenchWindow window) {
 			if (window != null) {
 				window.getPartService().removePartListener(partListener);
@@ -266,10 +279,12 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 			checkActivePart();
 		}
 
+		@Override
 		public final void windowDeactivated(final IWorkbenchWindow window) {
 			checkActivePart();
 		}
 
+		@Override
 		public final void windowOpened(final IWorkbenchWindow window) {
 			if (window != null) {
 				window.getPartService().addPartListener(partListener);
@@ -279,7 +294,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	};
 
 	private IEditorInput lastEditorInput;
-	
+
 	public void handleCheck(Shell s) {
 		if (s != lastActiveShell) {
 			lastActiveShell = s;
@@ -409,7 +424,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return (IShowInSource) Util.getAdapter(sourcePart, IShowInSource.class);
+		return Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {
@@ -430,7 +445,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	private IWorkbenchWindow getActiveWindow() {
 		final Shell newActiveShell = workbench.getDisplay().getActiveShell();
-		final IContextService contextService = (IContextService) workbench
+		final IContextService contextService = workbench
 				.getService(IContextService.class);
 		if (contextService != null) {
 			final int shellType = contextService.getShellType(newActiveShell);
@@ -545,7 +560,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	 * be null if the last call to
 	 * <code>workbench.getActiveWorkbenchWindow()</code> returned
 	 * <code>null</code>.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private WorkbenchWindow lastActiveWorkbenchWindow = null;
@@ -553,7 +568,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	/**
 	 * The result of the last visibility check on the coolbar of the last active
 	 * workbench window.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private Boolean lastCoolbarVisibility = Boolean.FALSE;
@@ -561,7 +576,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	/**
 	 * The result of the last visibility check on the perspective bar of the
 	 * last active workbench window.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private Boolean lastPerspectiveBarVisibility = Boolean.FALSE;
@@ -569,25 +584,26 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	/**
 	 * The result of the last visibility check on the status line for the last
 	 * workbench window.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	private Boolean lastStatusLineVisibility = Boolean.FALSE;
 
 	/**
 	 * The last perspective id that was provided by this source.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	private String lastPerspectiveId = null;
 
 	/**
 	 * The listener to individual window properties.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (WorkbenchWindow.PROP_COOLBAR_VISIBLE
 					.equals(event.getProperty())) {
@@ -631,6 +647,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	};
 
 	IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
+		@Override
 		public void perspectiveActivated(IWorkbenchPage page,
 				IPerspectiveDescriptor perspective) {
 			String id = perspective == null ? null : perspective.getId();
@@ -648,12 +665,14 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 			lastPerspectiveId = id;
 		}
 
+		@Override
 		public void perspectiveChanged(IWorkbenchPage page,
 				IPerspectiveDescriptor perspective, String changeId) {
 		}
 	};
-	
+
 	private IPropertyListener editorListener = new IPropertyListener() {
+		@Override
 		public void propertyChanged(Object source, int propId) {
 			if (propId == IEditorPart.PROP_INPUT) {
 				handleInputChanged((IEditorPart) source);
@@ -669,6 +688,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 		/**
 		 * Notifies all listeners that the source has changed.
 		 */
+		@Override
 		public final void handleEvent(final Event event) {
 			if (!(event.widget instanceof Shell)) {
 				if (DEBUG) {
@@ -890,7 +910,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 					.addPerspectiveListener(perspectiveListener);
 		}
 	}
-	
+
 	private void hookListener(IEditorPart lastActiveEditor,
 			IEditorPart newActiveEditor) {
 		if (lastActiveEditor!=null) {
@@ -910,7 +930,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 		 * We will fallback to the workbench window, but only if a dialog is not
 		 * open.
 		 */
-		final IContextService contextService = (IContextService) workbench
+		final IContextService contextService = workbench
 				.getService(IContextService.class);
 		if (contextService == null) {
 			return;

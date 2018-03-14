@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
+ *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 
 package org.eclipse.ui.views.bookmarkexplorer;
@@ -91,6 +93,7 @@ import org.eclipse.ui.views.navigator.ShowInNavigatorAction;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
+@Deprecated
 public class BookmarkNavigator extends ViewPart {
     private Table table;
 
@@ -154,7 +157,7 @@ public class BookmarkNavigator extends ViewPart {
     private static final String TAG_VERTICAL_POSITION = "verticalPosition";//$NON-NLS-1$
 
     private static final String TAG_HORIZONTAL_POSITION = "horizontalPosition";//$NON-NLS-1$
-	
+
     class SortByAction extends Action {
 
         private int column;
@@ -166,7 +169,8 @@ public class BookmarkNavigator extends ViewPart {
             this.column = column;
         }
 
-        public void run() {
+        @Override
+		public void run() {
         	comparator.setTopPriority(column);
             updateSortState();
             viewer.refresh();
@@ -191,7 +195,8 @@ public class BookmarkNavigator extends ViewPart {
             this.direction = direction;
         }
 
-        public void run() {
+        @Override
+		public void run() {
         	comparator.setTopPriorityDirection(direction);
             updateSortState();
             viewer.refresh();
@@ -222,7 +227,7 @@ public class BookmarkNavigator extends ViewPart {
         // Create the actions.
         openAction = new OpenBookmarkAction(this);
         openAction
-                .setImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/gotoobj_tsk.gif"));//$NON-NLS-1$
+                .setImageDescriptor(IDEWorkbenchPlugin.getIDEImageDescriptor("elcl16/gotoobj_tsk.png"));//$NON-NLS-1$
 
         copyAction = new CopyBookmarkAction(this);
         copyAction.setImageDescriptor(sharedImages
@@ -252,7 +257,8 @@ public class BookmarkNavigator extends ViewPart {
         MenuManager mgr = new MenuManager();
         mgr.setRemoveAllWhenShown(true);
         mgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager mgr) {
+            @Override
+			public void menuAboutToShow(IMenuManager mgr) {
                 fillContextMenu(mgr);
             }
         });
@@ -279,18 +285,21 @@ public class BookmarkNavigator extends ViewPart {
 
         // Set the double click action.
         viewer.addOpenListener(new IOpenListener() {
-            public void open(OpenEvent event) {
+            @Override
+			public void open(OpenEvent event) {
                 openAction.run();
             }
         });
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            public void selectionChanged(SelectionChangedEvent event) {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
                 handleSelectionChanged((IStructuredSelection) event
                         .getSelection());
             }
         });
         viewer.getControl().addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) {
+            @Override
+			public void keyPressed(KeyEvent e) {
                 handleKeyPressed(e);
             }
         });
@@ -299,7 +308,8 @@ public class BookmarkNavigator extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         clipboard = new Clipboard(parent.getDisplay());
         createTable(parent);
         viewer = new TableViewer(table);
@@ -334,7 +344,8 @@ public class BookmarkNavigator extends ViewPart {
                 IBookmarkHelpContextIds.BOOKMARK_VIEW);
     }
 
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (clipboard != null) {
 			clipboard.dispose();
 		}
@@ -359,26 +370,26 @@ public class BookmarkNavigator extends ViewPart {
         manager.add(editAction);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(Class)
-     */
-    public Object getAdapter(Class adapter) {
-        if (adapter == IShowInSource.class) {
-            return new IShowInSource() {
-                public ShowInContext getShowInContext() {
+    @Override
+	public <T> T getAdapter(Class<T> adapterClass) {
+		if (adapterClass == IShowInSource.class) {
+			return adapterClass.cast(new IShowInSource() {
+                @Override
+				public ShowInContext getShowInContext() {
                     return new ShowInContext(null, getViewer().getSelection());
                 }
-            };
+			});
         }
-        if (adapter == IShowInTargetList.class) {
-            return new IShowInTargetList() {
-                public String[] getShowInTargetIds() {
+		if (adapterClass == IShowInTargetList.class) {
+			return adapterClass.cast(new IShowInTargetList() {
+                @Override
+				public String[] getShowInTargetIds() {
                     return new String[] { IPageLayout.ID_RES_NAV };
                 }
 
-            };
+			});
         }
-        return super.getAdapter(adapter);
+		return super.getAdapter(adapterClass);
     }
 
     /**
@@ -439,7 +450,8 @@ public class BookmarkNavigator extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IViewPart.
      */
-    public void init(IViewSite site, IMemento memento) throws PartInitException {
+    @Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -452,11 +464,13 @@ public class BookmarkNavigator extends ViewPart {
         Transfer[] transferTypes = new Transfer[] {
                 MarkerTransfer.getInstance(), TextTransfer.getInstance() };
         DragSourceListener listener = new DragSourceAdapter() {
-            public void dragSetData(DragSourceEvent event) {
+            @Override
+			public void dragSetData(DragSourceEvent event) {
                 performDragSetData(event);
             }
 
-            public void dragFinished(DragSourceEvent event) {
+            @Override
+			public void dragFinished(DragSourceEvent event) {
             }
         };
         viewer.addDragSupport(operations, transferTypes, listener);
@@ -545,7 +559,8 @@ public class BookmarkNavigator extends ViewPart {
         viewer.refresh();
     }
 
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
         if (viewer == null) {
             if (this.memento != null) {
 				memento.putMemento(this.memento);
@@ -581,7 +596,8 @@ public class BookmarkNavigator extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         if (viewer != null) {
 			viewer.getControl().setFocus();
 		}
@@ -598,7 +614,8 @@ public class BookmarkNavigator extends ViewPart {
              * presses on the same column header will
              * toggle sorting order (ascending/descending).
              */
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 // column selected - first column doesn't count
                 int column = table.indexOf((TableColumn) e.widget) - 1;
                 if (column == comparator.getTopPriority()) {

@@ -21,7 +21,7 @@ import org.eclipse.ui.internal.misc.Policy;
 /**
  * A handler that wraps a legacy handler. This provide backward compatibility
  * with the handlers release in Eclipse 3.0.
- * 
+ *
  * @since 3.1
  */
 public final class LegacyHandlerWrapper implements IHandler {
@@ -40,7 +40,7 @@ public final class LegacyHandlerWrapper implements IHandler {
 
 	/**
 	 * Constructs a new instance of <code>HandlerWrapper</code>.
-	 * 
+	 *
 	 * @param handler
 	 *            The handler that should be wrapped; must not be
 	 *            <code>null</code>.
@@ -56,9 +56,10 @@ public final class LegacyHandlerWrapper implements IHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.IHandler#addHandlerListener(org.eclipse.core.commands.IHandlerListener)
 	 */
+	@Override
 	public final void addHandlerListener(final IHandlerListener handlerListener) {
 		handler.addHandlerListener(new LegacyHandlerListenerWrapper(this,
 				handlerListener));
@@ -66,13 +67,15 @@ public final class LegacyHandlerWrapper implements IHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.IHandler#dispose()
 	 */
+	@Override
 	public final void dispose() {
 		handler.dispose();
 	}
 
+	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof org.eclipse.ui.commands.IHandler) {
 			return this.handler == object;
@@ -87,9 +90,10 @@ public final class LegacyHandlerWrapper implements IHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
+	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {
 		// Debugging output
@@ -112,10 +116,12 @@ public final class LegacyHandlerWrapper implements IHandler {
 		}
 	}
 
+	@Override
 	public final int hashCode() {
 		return this.handler.hashCode();
 	}
 
+	@Override
 	public final boolean isEnabled() {
 		final Object enabled = handler.getAttributeValuesByName().get(
 				ILegacyAttributeNames.ENABLED);
@@ -126,6 +132,7 @@ public final class LegacyHandlerWrapper implements IHandler {
 		return true;
 	}
 
+	@Override
 	public final boolean isHandled() {
 		final Object handled = handler.getAttributeValuesByName().get(
 				ILegacyAttributeNames.HANDLED);
@@ -136,12 +143,14 @@ public final class LegacyHandlerWrapper implements IHandler {
 		return true;
 	}
 
+	@Override
 	public final void removeHandlerListener(
 			final IHandlerListener handlerListener) {
 		handler.removeHandlerListener(new LegacyHandlerListenerWrapper(this,
 				handlerListener));
 	}
 
+	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 

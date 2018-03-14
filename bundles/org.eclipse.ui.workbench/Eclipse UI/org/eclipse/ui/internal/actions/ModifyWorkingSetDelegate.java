@@ -50,7 +50,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class ModifyWorkingSetDelegate extends
 		AbstractWorkingSetPulldownDelegate implements IExecutableExtension, IActionDelegate2 {
@@ -64,6 +64,7 @@ public class ModifyWorkingSetDelegate extends
 			super(WorkbenchMessages.NewWorkingSet);
 		}
 
+		@Override
 		public void run() {
 			IWorkingSetManager manager = WorkbenchPlugin.getDefault()
 			.getWorkingSetManager();
@@ -73,7 +74,7 @@ public class ModifyWorkingSetDelegate extends
 			// creation page
 			WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench()
 								.getDisplay().getActiveShell(), wizard);
-		
+
 			dialog.create();
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
 					IWorkbenchHelpContextIds.WORKING_SET_NEW_WIZARD);
@@ -82,7 +83,7 @@ public class ModifyWorkingSetDelegate extends
 				if(workingSet != null) {
 					manager.addWorkingSet(workingSet);
 				}
-			}			
+			}
 		}
 
 	}
@@ -105,6 +106,7 @@ public class ModifyWorkingSetDelegate extends
 			setImageDescriptor(set.getImageDescriptor());
 		}
 
+		@Override
 		public void run() {
 
 			Collection oldElements = Arrays.asList(set.getElements());
@@ -121,8 +123,9 @@ public class ModifyWorkingSetDelegate extends
 					.toArray(new IAdaptable[newElements.size()]));
 		}
 	}
-	
+
 	private QuickMenuCreator contextMenuCreator = new QuickMenuCreator() {
+		@Override
 		protected void fillMenu(IMenuManager menu) {
 			ModifyWorkingSetDelegate.this.fillMenu(menu);
 		}
@@ -132,12 +135,13 @@ public class ModifyWorkingSetDelegate extends
 
 	private IPropertyChangeListener listener = new IPropertyChangeListener() {
 
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			refreshEnablement();
 		}
 
 		/**
-		 * 
+		 *
 		 */
 		private void refreshEnablement() {
 			selectionChanged(actionProxy, getSelection());
@@ -147,23 +151,25 @@ public class ModifyWorkingSetDelegate extends
 	private IAction actionProxy;
 
 	/**
-	 * 
+	 *
 	 */
 	public ModifyWorkingSetDelegate() {
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
+	@Override
 	public void run(IAction action) {
 		contextMenuCreator.createMenu();
 	}
-	 
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction, org.eclipse.swt.widgets.Event)
 	 */
+	@Override
 	public void runWithEvent(IAction action, Event event) {
 		if (event.type == SWT.KeyDown || event.type == SWT.KeyUp)
 			run(action);
@@ -171,9 +177,10 @@ public class ModifyWorkingSetDelegate extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.actions.AbstractWorkingSetPulldownDelegate#init(org.eclipse.ui.IWorkbenchWindow)
 	 */
+	@Override
 	public void init(IWorkbenchWindow window) {
 		super.init(window);
 		getWindow().getWorkbench().getWorkingSetManager()
@@ -182,16 +189,18 @@ public class ModifyWorkingSetDelegate extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.actions.AbstractWorkingSetPulldownDelegate#dispose()
 	 */
+	@Override
 	public void dispose() {
 		getWindow().getWorkbench().getWorkingSetManager()
 				.removePropertyChangeListener(listener);
 		super.dispose();
 		contextMenuCreator.dispose();
 	}
-	
+
+	@Override
 	public void fillMenu(Menu menu) {
 		List menuItems = getItems();
 		for (int i = 0; i < menuItems.size(); i++) {
@@ -211,14 +220,14 @@ public class ModifyWorkingSetDelegate extends
 				item = new Separator();
 				item.fill(menu, -1);
 			}
-			
+
 			item = new ActionContributionItem(new NewWorkingSetAction());
 			item.fill(menu, -1);
 		}
 	}
 	/**
 	 * Return the list of items to show in the submenu.
-	 * 
+	 *
 	 * @return the items to show in the submenu
 	 */
 	private List getItems() {
@@ -232,10 +241,10 @@ public class ModifyWorkingSetDelegate extends
 			}
 			return menuItems;
 		}
-		
+
 		IWorkingSet[][] typedSets = splitSets();
 		Object [] selectedElements = ((IStructuredSelection)selection).toArray();
-	
+
 		// keep a tab of whether or not we need a separator. If a given type
 		// of working set has contributed some items then this will be true
 		// after the processing of the working set type. The next type will
@@ -243,7 +252,7 @@ public class ModifyWorkingSetDelegate extends
 		// items of its own. In this way the list will never end with a
 		// separator.
 		boolean needsSeparator = false;
-		
+
 		for (int i = 0; i < typedSets.length; i++) {
 			int oldCount = menuItems.size();
 
@@ -278,7 +287,7 @@ public class ModifyWorkingSetDelegate extends
 						}
 					}
 				}
-				
+
 				if (visible) {
 					if (needsSeparator) {
 						menuItems.add(new Separator());
@@ -318,10 +327,11 @@ public class ModifyWorkingSetDelegate extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.actions.AbstractWorkingSetPulldownDelegate#selectionChanged(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
+	@Override
 	public void selectionChanged(IAction actionProxy, ISelection selection) {
 		super.selectionChanged(actionProxy, selection);
 		if (selection instanceof IStructuredSelection) {
@@ -337,7 +347,7 @@ public class ModifyWorkingSetDelegate extends
 				}
 			}
 			actionProxy.setEnabled(minimallyOkay);
-			
+
 		}
 		else
 			actionProxy.setEnabled(false);
@@ -345,10 +355,11 @@ public class ModifyWorkingSetDelegate extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
+	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
 		if (data instanceof String) {
@@ -359,6 +370,7 @@ public class ModifyWorkingSetDelegate extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
 	 */
+	@Override
 	public void init(IAction action) {
 		this.actionProxy = action;
 	}

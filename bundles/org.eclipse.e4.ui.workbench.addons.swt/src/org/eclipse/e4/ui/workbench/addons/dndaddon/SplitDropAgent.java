@@ -20,6 +20,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -87,6 +88,15 @@ public class SplitDropAgent extends DropAgent {
 			dropStack = (MPartStack) parent;
 		}
 
+		// You can only drag MParts from window to window
+		if (!(dragElement instanceof MPart)) {
+			EModelService ms = dndManager.getModelService();
+			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
+			MWindow dropWin = ms.getTopLevelWindowFor(dropStack);
+			if (dragElementWin != dropWin)
+				return false;
+		}
+
 		// We can't split ourselves with if the element being dragged is the only element in the
 		// stack (we check for '2' because the dragAgent puts a Drag Placeholder in the stack)
 		MUIElement dragParent = dragElement.getParent();
@@ -100,7 +110,7 @@ public class SplitDropAgent extends DropAgent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragEnter(org.eclipse.e4.ui.model.
 	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
 	 */
@@ -151,7 +161,7 @@ public class SplitDropAgent extends DropAgent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave(org.eclipse.e4.ui.model.
 	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
 	 */
@@ -178,7 +188,7 @@ public class SplitDropAgent extends DropAgent {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#track(org.eclipse.e4.ui.model.application
 	 * .ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
@@ -218,7 +228,7 @@ public class SplitDropAgent extends DropAgent {
 	 * for 'edges' you can modify the effect of the drop. If the drop area is at the edge of the
 	 * perspective stack a modified drop will place it *outside* the perspectives. If the drop area
 	 * is the shared area then a modified drop will drop *inside* the shared area.
-	 * 
+	 *
 	 * @return Whether this is a 'modified' drop.
 	 */
 	private boolean getModified() {
@@ -342,13 +352,8 @@ public class SplitDropAgent extends DropAgent {
 			if (!dndManager.isModified) {
 				relTo = (MPartSashContainerElement) outerRelTo;
 			}
-		} else if (onEdge) {
+		} else if (getModified()) {
 			relTo = (MPartSashContainerElement) outerRelTo;
-			if (outerRelTo instanceof MPerspectiveStack) {
-				if (!getModified())
-					relTo = (MPartSashContainerElement) ((MPerspectiveStack) outerRelTo)
-							.getSelectedElement().getChildren().get(0);
-			}
 		}
 
 		if (dragElement instanceof MPartStack) {

@@ -19,7 +19,7 @@ import org.eclipse.core.databinding.property.Properties;
 import org.eclipse.core.databinding.property.list.IListProperty;
 import org.eclipse.core.databinding.property.set.ISetProperty;
 import org.eclipse.core.databinding.property.value.IValueProperty;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.viewers.AbstractTableViewer;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.StructuredViewer;
@@ -27,14 +27,14 @@ import org.eclipse.jface.viewers.StructuredViewer;
 /**
  * Helper methods for binding observables to a {@link StructuredViewer} or
  * {@link AbstractTableViewer}.
- * 
+ *
  * @since 1.3
  */
 public class ViewerSupport {
 	/**
 	 * Binds the viewer to the specified input, using the specified label
 	 * property to generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer to set up
 	 * @param input
@@ -50,7 +50,7 @@ public class ViewerSupport {
 	/**
 	 * Binds the viewer to the specified input, using the specified label
 	 * properties to generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer to set up
 	 * @param input
@@ -75,7 +75,7 @@ public class ViewerSupport {
 	/**
 	 * Binds the viewer to the specified input, using the specified label
 	 * property to generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer to set up
 	 * @param input
@@ -91,7 +91,7 @@ public class ViewerSupport {
 	/**
 	 * Binds the viewer to the specified input, using the specified label
 	 * properties to generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer to set up
 	 * @param input
@@ -117,7 +117,7 @@ public class ViewerSupport {
 	 * Binds the viewer to the specified input, using the specified children
 	 * property to generate child nodes, and the specified label property to
 	 * generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the tree viewer to set up
 	 * @param input
@@ -137,7 +137,7 @@ public class ViewerSupport {
 	 * Binds the viewer to the specified input, using the specified children
 	 * property to generate child nodes, and the specified label properties to
 	 * generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the tree viewer to set up
 	 * @param input
@@ -150,7 +150,7 @@ public class ViewerSupport {
 	 */
 	public static void bind(AbstractTreeViewer viewer, Object input,
 			IListProperty childrenProperty, IValueProperty[] labelProperties) {
-		Realm realm = SWTObservables.getRealm(viewer.getControl().getDisplay());
+		Realm realm = DisplayRealm.getRealm(viewer.getControl().getDisplay());
 		ObservableListTreeContentProvider contentProvider = new ObservableListTreeContentProvider(
 				childrenProperty.listFactory(realm), null);
 		if (viewer.getInput() != null)
@@ -167,7 +167,7 @@ public class ViewerSupport {
 	 * Binds the viewer to the specified input, using the specified children
 	 * property to generate child nodes, and the specified label property to
 	 * generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the tree viewer to set up
 	 * @param input
@@ -187,7 +187,7 @@ public class ViewerSupport {
 	 * Binds the viewer to the specified input, using the specified children
 	 * property to generate child nodes, and the specified label properties to
 	 * generate labels.
-	 * 
+	 *
 	 * @param viewer
 	 *            the tree viewer to set up
 	 * @param input
@@ -200,7 +200,7 @@ public class ViewerSupport {
 	 */
 	public static void bind(AbstractTreeViewer viewer, Object input,
 			ISetProperty childrenProperty, IValueProperty[] labelProperties) {
-		Realm realm = SWTObservables.getRealm(viewer.getControl().getDisplay());
+		Realm realm = DisplayRealm.getRealm(viewer.getControl().getDisplay());
 		ObservableSetTreeContentProvider contentProvider = new ObservableSetTreeContentProvider(
 				childrenProperty.setFactory(realm), null);
 		if (viewer.getInput() != null)

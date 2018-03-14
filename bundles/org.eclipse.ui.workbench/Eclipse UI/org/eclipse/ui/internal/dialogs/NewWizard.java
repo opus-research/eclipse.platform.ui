@@ -43,7 +43,8 @@ public class NewWizard extends Wizard {
     /**
      * Create the wizard pages
      */
-    public void addPages() {
+    @Override
+	public void addPages() {
         IWizardCategory root = WorkbenchPlugin.getDefault().getNewWizardRegistry().getRootCategory();
         IWizardDescriptor [] primary = WorkbenchPlugin.getDefault().getNewWizardRegistry().getPrimaryWizards();
 
@@ -72,7 +73,7 @@ public class NewWizard extends Wizard {
      * Returns the id of the category of wizards to show or <code>null</code>
      * to show all categories. If no entries can be found with this id then all
      * categories are shown.
-     * 
+     *
      * @return String or <code>null</code>.
      */
     public String getCategoryId() {
@@ -120,10 +121,11 @@ public class NewWizard extends Wizard {
     /**
      * The user has pressed Finish. Instruct self's pages to finish, and answer
      * a boolean indicating success.
-     * 
+     *
      * @return boolean
      */
-    public boolean performFinish() {
+    @Override
+	public boolean performFinish() {
         //save our selection state
         mainPage.saveWidgetValues();
         // if we're finishing from the main page then perform finish on the selected wizard.
@@ -141,7 +143,7 @@ public class NewWizard extends Wizard {
      * Sets the id of the category of wizards to show or <code>null</code> to
      * show all categories. If no entries can be found with this id then all
      * categories are shown.
-     * 
+     *
      * @param id may be <code>null</code>.
      */
     public void setCategoryId(String id) {
@@ -156,11 +158,9 @@ public class NewWizard extends Wizard {
     public void setProjectsOnly(boolean b) {
         projectsOnly = b;
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.IWizard#canFinish()
-     */
-    public boolean canFinish() {
+
+    @Override
+	public boolean canFinish() {
          // we can finish if the first page is current and the the page can finish early.
 	    	if (getContainer().getCurrentPage() == mainPage) {
 	    		if (mainPage.canFinishEarly()) {

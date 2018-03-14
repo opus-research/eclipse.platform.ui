@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Control;
  * Note that the SWT <code>List</code> control only supports the display of strings, not icons.
  * If you need to show icons for items, use <code>TableViewer</code> instead.
  * </p>
- * 
+ *
  * @see TableViewer
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -46,7 +46,7 @@ public class ListViewer extends AbstractListViewer {
     /**
      * Creates a list viewer on a newly-created list control under the given parent.
      * The list control is created using the SWT style bits <code>MULTI, H_SCROLL, V_SCROLL,</code> and <code>BORDER</code>.
-     * The viewer has no input, no content provider, a default label provider, 
+     * The viewer has no input, no content provider, a default label provider,
      * no sorter, and no filters.
      *
      * @param parent the parent control
@@ -58,7 +58,7 @@ public class ListViewer extends AbstractListViewer {
     /**
      * Creates a list viewer on a newly-created list control under the given parent.
      * The list control is created using the given SWT style bits.
-     * The viewer has no input, no content provider, a default label provider, 
+     * The viewer has no input, no content provider, a default label provider,
      * no sorter, and no filters.
      *
      * @param parent the parent control
@@ -70,7 +70,7 @@ public class ListViewer extends AbstractListViewer {
 
     /**
      * Creates a list viewer on the given list control.
-     * The viewer has no input, no content provider, a default label provider, 
+     * The viewer has no input, no content provider, a default label provider,
      * no sorter, and no filters.
      *
      * @param list the list control
@@ -80,10 +80,8 @@ public class ListViewer extends AbstractListViewer {
         hookControl(list);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Viewer.
-     */
-    public Control getControl() {
+    @Override
+	public Control getControl() {
         return list;
     }
 
@@ -96,11 +94,8 @@ public class ListViewer extends AbstractListViewer {
         return list;
     }
 
-    /*
-     * Non-Javadoc.
-     * Method defined on StructuredViewer.
-     */
-    public void reveal(Object element) {
+    @Override
+	public void reveal(Object element) {
         Assert.isNotNull(element);
         int index = getElementIndex(element);
         if (index == -1) {
@@ -124,94 +119,67 @@ public class ListViewer extends AbstractListViewer {
         list.setTopIndex(newTop);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listAdd(java.lang.String, int)
-     */
-    protected void listAdd(String string, int index) {
+    @Override
+	protected void listAdd(String string, int index) {
         list.add(string, index);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetItem(int, java.lang.String)
-     */
-    protected void listSetItem(int index, String string) {
+    @Override
+	protected void listSetItem(int index, String string) {
         list.setItem(index, string);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listGetSelectionIndices()
-     */
-    protected int[] listGetSelectionIndices() {
+    @Override
+	protected int[] listGetSelectionIndices() {
         return list.getSelectionIndices();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listGetItemCount()
-     */
-    protected int listGetItemCount() {
+    @Override
+	protected int listGetItemCount() {
         return list.getItemCount();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetItems(java.lang.String[])
-     */
-    protected void listSetItems(String[] labels) {
+    @Override
+	protected void listSetItems(String[] labels) {
         list.setItems(labels);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listRemoveAll()
-     */
-    protected void listRemoveAll() {
+    @Override
+	protected void listRemoveAll() {
         list.removeAll();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listRemove(int)
-     */
-    protected void listRemove(int index) {
+    @Override
+	protected void listRemove(int index) {
         list.remove(index);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listSelectAndShow(int[])
-     */
-    protected void listSetSelection(int[] ixs) {
+    @Override
+	protected void listSetSelection(int[] ixs) {
         list.setSelection(ixs);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listDeselectAll()
-     */
-    protected void listDeselectAll() {
+    @Override
+	protected void listDeselectAll() {
         list.deselectAll();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listShowSelection()
-     */
-    protected void listShowSelection() {
+    @Override
+	protected void listShowSelection() {
         list.showSelection();
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listGetTopIndex()
-     */
-    protected int listGetTopIndex() {
+
+    @Override
+	protected int listGetTopIndex() {
     	return list.getTopIndex();
     }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetTopIndex(int)
-     */
-    protected void listSetTopIndex(int index) {
+
+    @Override
+	protected void listSetTopIndex(int index) {
     	list.setTopIndex(index);
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.AbstractListViewer#setSelectionToWidget(java.util.List, boolean)
-	 */
+	@Override
 	protected void setSelectionToWidget(List in, boolean reveal) {
 		if( reveal ) {
 			super.setSelectionToWidget(in, reveal);
@@ -237,6 +205,5 @@ public class ListViewer extends AbstractListViewer {
 	        }
 		}
 	}
-    
-    
+
 }

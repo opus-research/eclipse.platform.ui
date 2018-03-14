@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Alexander Kurtakov <akurtako@redhat.com> - Bug 459761
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -17,14 +18,14 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * A decorating label provider is a label provider which combines 
+ * A decorating label provider is a label provider which combines
  * a nested label provider and an optional decorator.
- * The decorator decorates the label text, image, font and colors provided by 
+ * The decorator decorates the label text, image, font and colors provided by
  * the nested label provider.
  */
-public class DecoratingLabelProvider extends LabelProvider implements
-        ILabelProvider, IViewerLabelProvider, IColorProvider, IFontProvider, ITreePathLabelProvider {
-		
+public class DecoratingLabelProvider extends LabelProvider implements IViewerLabelProvider, IColorProvider,
+		IFontProvider, ITreePathLabelProvider {
+
     private ILabelProvider provider;
 
     private ILabelDecorator decorator;
@@ -54,7 +55,8 @@ public class DecoratingLabelProvider extends LabelProvider implements
      *
      * @param listener a label provider listener
      */
-    public void addListener(ILabelProviderListener listener) {
+    @Override
+	public void addListener(ILabelProviderListener listener) {
         super.addListener(listener);
         provider.addListener(listener);
         if (decorator != null) {
@@ -67,7 +69,8 @@ public class DecoratingLabelProvider extends LabelProvider implements
      * The <code>DecoratingLabelProvider</code> implementation of this <code>IBaseLabelProvider</code> method
      * disposes both the nested label provider and the label decorator.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         provider.dispose();
         if (decorator != null) {
             decorator.dispose();
@@ -75,13 +78,14 @@ public class DecoratingLabelProvider extends LabelProvider implements
     }
 
     /**
-     * The <code>DecoratingLabelProvider</code> implementation of this 
+     * The <code>DecoratingLabelProvider</code> implementation of this
      * <code>ILabelProvider</code> method returns the image provided
-     * by the nested label provider's <code>getImage</code> method, 
+     * by the nested label provider's <code>getImage</code> method,
      * decorated with the decoration provided by the label decorator's
      * <code>decorateImage</code> method.
      */
-    public Image getImage(Object element) {
+    @Override
+	public Image getImage(Object element) {
         Image image = provider.getImage(element);
         if (decorator != null) {
         	if (decorator instanceof LabelDecorator) {
@@ -119,13 +123,14 @@ public class DecoratingLabelProvider extends LabelProvider implements
     }
 
     /**
-     * The <code>DecoratingLabelProvider</code> implementation of this 
+     * The <code>DecoratingLabelProvider</code> implementation of this
      * <code>ILabelProvider</code> method returns the text label provided
-     * by the nested label provider's <code>getText</code> method, 
+     * by the nested label provider's <code>getText</code> method,
      * decorated with the decoration provided by the label decorator's
      * <code>decorateText</code> method.
      */
-    public String getText(Object element) {
+    @Override
+	public String getText(Object element) {
         String text = provider.getText(element);
         if (decorator != null) {
         	if (decorator instanceof LabelDecorator) {
@@ -145,12 +150,13 @@ public class DecoratingLabelProvider extends LabelProvider implements
     }
 
     /**
-     * The <code>DecoratingLabelProvider</code> implementation of this 
+     * The <code>DecoratingLabelProvider</code> implementation of this
      * <code>IBaseLabelProvider</code> method returns <code>true</code> if the corresponding method
-     * on the nested label provider returns <code>true</code> or if the corresponding method on the 
+     * on the nested label provider returns <code>true</code> or if the corresponding method on the
      * decorator returns <code>true</code>.
      */
-    public boolean isLabelProperty(Object element, String property) {
+    @Override
+	public boolean isLabelProperty(Object element, String property) {
         if (provider.isLabelProperty(element, property)) {
 			return true;
 		}
@@ -166,7 +172,8 @@ public class DecoratingLabelProvider extends LabelProvider implements
      *
      * @param listener a label provider listener
      */
-    public void removeListener(ILabelProviderListener listener) {
+    @Override
+	public void removeListener(ILabelProviderListener listener) {
         super.removeListener(listener);
         provider.removeListener(listener);
         if (decorator != null) {
@@ -205,12 +212,8 @@ public class DecoratingLabelProvider extends LabelProvider implements
         }
     }
 
-
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel, java.lang.Object)
-     */
-    public void updateLabel(ViewerLabel settings, Object element) {
+    @Override
+	public void updateLabel(ViewerLabel settings, Object element) {
 
         ILabelDecorator currentDecorator = getLabelDecorator();
         String oldText = settings.getText();
@@ -233,7 +236,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
         if (decorationReady || oldImage == null) {
             settings.setImage(getImage(element));
         }
- 
+
         if(decorationReady) {
 			updateForDecorationReady(settings,element);
 		}
@@ -247,42 +250,36 @@ public class DecoratingLabelProvider extends LabelProvider implements
 	 * @since 3.1
 	 */
 	protected void updateForDecorationReady(ViewerLabel settings, Object element) {
-		
+
 		if(decorator instanceof IColorDecorator){
 			IColorDecorator colorDecorator = (IColorDecorator) decorator;
 			settings.setBackground(colorDecorator.decorateBackground(element));
 			settings.setForeground(colorDecorator.decorateForeground(element));
 		}
-		
+
 		if(decorator instanceof IFontDecorator) {
 			settings.setFont(((IFontDecorator) decorator).decorateFont(element));
 		}
-		
+
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-	 */
+
+	@Override
 	public Color getBackground(Object element) {
 		if(provider instanceof IColorProvider) {
 			return ((IColorProvider) provider).getBackground(element);
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-	 */
+
+	@Override
 	public Font getFont(Object element) {
 		if(provider instanceof IFontProvider) {
 			return ((IFontProvider) provider).getFont(element);
 		}
 		return null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-	 */
+
+	@Override
 	public Color getForeground(Object element) {
 		if(provider instanceof IColorProvider) {
 			return ((IColorProvider) provider).getForeground(element);
@@ -292,21 +289,21 @@ public class DecoratingLabelProvider extends LabelProvider implements
 
     /**
      * Return the decoration context associated with this label provider.
-     * It will be passed to the decorator if the decorator is an 
+     * It will be passed to the decorator if the decorator is an
      * instance of {@link LabelDecorator}.
      * @return the decoration context associated with this label provider
-     * 
+     *
      * @since 3.2
      */
     public IDecorationContext getDecorationContext() {
 		return decorationContext;
 	}
-    
+
     /**
-     * Set the decoration context that will be based to the decorator 
+     * Set the decoration context that will be based to the decorator
      * for this label provider if that decorator implements {@link LabelDecorator}.
      * @param decorationContext the decoration context.
-     * 
+     *
      * @since 3.2
      */
 	public void setDecorationContext(IDecorationContext decorationContext) {
@@ -314,9 +311,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
 		this.decorationContext = decorationContext;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreePathLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel, org.eclipse.jface.viewers.TreePath)
-	 */
+	@Override
 	public void updateLabel(ViewerLabel settings, TreePath elementPath) {
         ILabelDecorator currentDecorator = getLabelDecorator();
         String oldText = settings.getText();
@@ -350,12 +345,12 @@ public class DecoratingLabelProvider extends LabelProvider implements
 	                || settings.getText().length() == 0) {
 				settings.setText(getText(element));
 			}
-	
+
 	        Image oldImage = settings.getImage();
 	        if (decorationReady || oldImage == null) {
 	            settings.setImage(getImage(element));
 	        }
-	 
+
 	        if(decorationReady) {
 				updateForDecorationReady(settings,element);
 			}
@@ -379,7 +374,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
 	            Image image = labelDecorator.decorateImage(settings.getImage(), element, getDecorationContext());
 	            if (image != null)
 	            	settings.setImage(image);
-	            
+
 			} else {
 				String text = decorator.decorateText(settings.getText(), element);
 	            if (text != null && text.length() > 0)
@@ -397,7 +392,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
     			if (foreground != null)
     				settings.setForeground(foreground);
     		}
-    		
+
     		if(decorator instanceof IFontDecorator) {
     			Font font = ((IFontDecorator) decorator).decorateFont(element);
     			if (font != null)

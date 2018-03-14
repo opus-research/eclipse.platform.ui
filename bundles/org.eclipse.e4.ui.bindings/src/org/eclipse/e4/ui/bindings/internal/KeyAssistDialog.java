@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.TableItem;
  * <p>
  * The methods on this class are not thread-safe and must be run from the UI thread.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public class KeyAssistDialog extends PopupDialog {
@@ -89,7 +89,7 @@ public class KeyAssistDialog extends PopupDialog {
 
 	/**
 	 * A sorted map of conflicts or partial matches to be used when the dialog pops up.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private Collection<Binding> matches;
@@ -101,7 +101,7 @@ public class KeyAssistDialog extends PopupDialog {
 	 * constructed, it contains no widgets. The dialog is first created with no parent. If a parent
 	 * is required, call <code>setParentShell()</code>. Also, between uses, it might be necessary to
 	 * call <code>setParentShell()</code> as well.
-	 * 
+	 *
 	 * @param context
 	 *            The context in which this dialog is created; must not be <code>null</code>.
 	 * @param associatedKeyboard
@@ -127,9 +127,10 @@ public class KeyAssistDialog extends PopupDialog {
 	 * Closes this shell, but first remembers some state of the dialog. This way it will have a
 	 * response if asked to open the dialog again or if asked to open the keys preference page. This
 	 * does not remember the internal state.
-	 * 
+	 *
 	 * @return Whether the shell was already closed.
 	 */
+	@Override
 	public boolean close() {
 		return close(false);
 	}
@@ -137,7 +138,7 @@ public class KeyAssistDialog extends PopupDialog {
 	/**
 	 * Closes this shell, but first remembers some state of the dialog. This way it will have a
 	 * response if asked to open the dialog again or if asked to open the keys preference page.
-	 * 
+	 *
 	 * @param rememberState
 	 *            Whether the internal state should be remembered.
 	 * @return Whether the shell was already closed.
@@ -149,7 +150,7 @@ public class KeyAssistDialog extends PopupDialog {
 	/**
 	 * Closes this shell, but first remembers some state of the dialog. This way it will have a
 	 * response if asked to open the dialog again or if asked to open the keys preference page.
-	 * 
+	 *
 	 * @param rememberState
 	 *            Whether the internal state should be remembered.
 	 * @param resetState
@@ -183,7 +184,7 @@ public class KeyAssistDialog extends PopupDialog {
 	 * Sets the position for the dialog based on the position of the workbench window. The dialog is
 	 * flush with the bottom right corner of the workbench window. However, the dialog will not
 	 * appear outside of the display's client area.
-	 * 
+	 *
 	 * @param size
 	 *            The final size of the dialog; must not be <code>null</code>.
 	 */
@@ -215,7 +216,7 @@ public class KeyAssistDialog extends PopupDialog {
 	 * previous width, if it exists. Otherwise, it is simply the packed width of the dialog. The
 	 * maximum width is 40% of the workbench window's width. The dialog's height is the packed
 	 * height of the dialog to a maximum of half the height of the workbench window.
-	 * 
+	 *
 	 * @return The size of the dialog
 	 */
 	private Point configureSize() {
@@ -252,10 +253,11 @@ public class KeyAssistDialog extends PopupDialog {
 	/**
 	 * Creates the content area for the key assistant. This creates a table and places it inside the
 	 * composite. The composite will contain a list of all the key bindings.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent composite to contain the dialog area; must not be <code>null</code>.
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		// Create a composite for the dialog area.
@@ -290,7 +292,7 @@ public class KeyAssistDialog extends PopupDialog {
 	 * Creates an empty dialog area with a simple message saying there were no matches. This is used
 	 * if no partial matches could be found. This should not really ever happen, but might be
 	 * possible if the commands are changing while waiting for this dialog to open.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent composite for the dialog area; must not be <code>null</code>.
 	 */
@@ -305,7 +307,7 @@ public class KeyAssistDialog extends PopupDialog {
 	 * Creates a dialog area with a table of the partial matches for the current key binding state.
 	 * The table will be either the minimum width, or <code>previousWidth</code> if it is not
 	 * <code>NO_REMEMBERED_WIDTH</code>.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent composite for the dialog area; must not be <code>null</code>.
 	 * @param partialMatches
@@ -354,6 +356,7 @@ public class KeyAssistDialog extends PopupDialog {
 		 * If you double-click on the table, it should execute the selected command.
 		 */
 		completionsTable.addListener(SWT.DefaultSelection, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				executeKeyBinding(event);
 			}
@@ -391,6 +394,7 @@ public class KeyAssistDialog extends PopupDialog {
 		Collection<Binding> activeBindings = bindingService.getActiveBindings();
 		Collection<Binding> conflictBindings = bindingService.getAllConflicts();
 		Collection<Binding> sortedMatches = new TreeSet<Binding>(new Comparator<Binding>() {
+			@Override
 			public int compare(Binding binding1, Binding binding2) {
 				ParameterizedCommand cmdA = binding1.getParameterizedCommand();
 				ParameterizedCommand cmdB = binding2.getParameterizedCommand();
@@ -452,9 +456,10 @@ public class KeyAssistDialog extends PopupDialog {
 	 * Opens this dialog. This method can be called multiple times on the same dialog. This only
 	 * opens the dialog if there is no remembered state; if there is remembered state, then it tries
 	 * to open the preference page instead.
-	 * 
+	 *
 	 * @return The return code from this dialog.
 	 */
+	@Override
 	public int open() {
 		// If the dialog is already open, dispose the shell and recreate it.
 		Shell shell = getShell();
@@ -476,12 +481,13 @@ public class KeyAssistDialog extends PopupDialog {
 
 	/**
 	 * Opens this dialog with the list of bindings for the user to select from.
-	 * 
+	 *
 	 * @return The return code from this dialog.
 	 * @since 3.3
 	 */
 	public int open(Collection<Binding> bindings) {
 		matches = new TreeSet<Binding>(new Comparator<Binding>() {
+			@Override
 			public int compare(Binding a, Binding b) {
 				Binding bindingA = a;
 				Binding bindingB = b;
@@ -516,18 +522,19 @@ public class KeyAssistDialog extends PopupDialog {
 
 	/**
 	 * Exposing this within the keys package.
-	 * 
+	 *
 	 * @param newParentShell
 	 *            The new parent shell; this value may be <code>null</code> if there is to be no
 	 *            parent.
 	 */
+	@Override
 	public void setParentShell(Shell newParentShell) {
 		super.setParentShell(newParentShell);
 	}
 
 	/**
 	 * Returns the currently selected binding from the table if the table is not disposed
-	 * 
+	 *
 	 * @return the currently selected binding or <code>null</code>
 	 */
 	protected Binding getSelectedBinding() {

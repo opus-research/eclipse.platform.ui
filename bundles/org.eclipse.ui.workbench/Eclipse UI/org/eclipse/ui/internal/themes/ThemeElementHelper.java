@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,12 +13,12 @@ package org.eclipse.ui.internal.themes;
 import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -31,11 +31,21 @@ import org.eclipse.ui.themes.IThemeManager;
  * @since 3.0
  */
 public final class ThemeElementHelper {
+	public static void populateDefinition(org.eclipse.e4.ui.css.swt.theme.ITheme cssTheme,
+			ITheme theme, FontRegistry registry, FontDefinition definition, IPreferenceStore store) {
+		String key = createPreferenceKey(cssTheme, theme, definition.getId());
+		String value = store.getString(key);
+		if (!IPreferenceStore.STRING_DEFAULT_DEFAULT.equals(value)) {
+			definition.appendState(ThemeElementDefinition.State.OVERRIDDEN);
+			definition.appendState(ThemeElementDefinition.State.MODIFIED_BY_USER);
+			registry.put(definition.getId(), PreferenceConverter.basicGetFontData(value));
+		}
+	}
 
     public static void populateRegistry(ITheme theme,
             FontDefinition[] definitions, IPreferenceStore store) {
-        // sort the definitions by dependant ordering so that we process 
-        // ancestors before children.		
+        // sort the definitions by dependant ordering so that we process
+        // ancestors before children.
         FontDefinition[] copyOfDefinitions = null;
 
         // the colors to set a default value for, but not a registry value
@@ -80,9 +90,9 @@ public final class ThemeElementHelper {
     }
 
     /**
-     * Installs the given font in the preference store and optionally the font 
+     * Installs the given font in the preference store and optionally the font
      * registry.
-     * 
+     *
      * @param definition
      *            the font definition
      * @param registry
@@ -111,7 +121,7 @@ public final class ThemeElementHelper {
 			defaultFont = registry.filterData(defaultFontData, display);
 		} else {
             // values pushed in from jface property files.  Very ugly.
-			
+
 			//If in high contrast, ignore the defaults in jface and use the default (system) font.
 			//This is a hack to address bug #205474. See bug #228207 for a future fix.
 			FontData[] fontData = JFaceResources.getFontRegistry().getFontData(
@@ -144,10 +154,21 @@ public final class ThemeElementHelper {
         }
     }
 
+	public static void populateDefinition(org.eclipse.e4.ui.css.swt.theme.ITheme cssTheme,
+			ITheme theme, ColorRegistry registry, ColorDefinition definition, IPreferenceStore store) {
+		String key = createPreferenceKey(cssTheme, theme, definition.getId());
+		String value = store.getString(key);
+		if (!IPreferenceStore.STRING_DEFAULT_DEFAULT.equals(value)) {
+			definition.appendState(ThemeElementDefinition.State.OVERRIDDEN);
+			definition.appendState(ThemeElementDefinition.State.MODIFIED_BY_USER);
+			registry.put(definition.getId(), StringConverter.asRGB(value));
+		}
+	}
+
     public static void populateRegistry(ITheme theme,
             ColorDefinition[] definitions, IPreferenceStore store) {
-        // sort the definitions by dependant ordering so that we process 
-        // ancestors before children.		
+        // sort the definitions by dependant ordering so that we process
+        // ancestors before children.
 
         ColorDefinition[] copyOfDefinitions = null;
 
@@ -182,7 +203,7 @@ public final class ThemeElementHelper {
     /**
      * Return the definitions that should have their default preference value
      * set but nothing else.
-     * 
+     *
      * @param definitions the definitions that will be fully handled
      * @return the remaining definitions that should be defaulted
      */
@@ -200,7 +221,7 @@ public final class ThemeElementHelper {
     /**
      * Return the definitions that should have their default preference value
      * set but nothing else.
-     * 
+     *
      * @param definitions the definitions that will be fully handled
      * @return the remaining definitions that should be defaulted
      */
@@ -238,10 +259,10 @@ public final class ThemeElementHelper {
             IHierarchalThemeElementDefinition[] allDefs) {
         SortedSet set = new TreeSet(IThemeRegistry.ID_COMPARATOR);
         set.addAll(Arrays.asList(definitions));
-        
+
         IHierarchalThemeElementDefinition copy [] = new IHierarchalThemeElementDefinition[allDefs.length];
 		System.arraycopy(allDefs, 0, copy, 0, allDefs.length);
-		
+
         Arrays.sort(allDefs, new IThemeRegistry.HierarchyComparator(copy));
         for (int i = 0; i < allDefs.length; i++) {
             IHierarchalThemeElementDefinition def = allDefs[i];
@@ -255,9 +276,9 @@ public final class ThemeElementHelper {
     }
 
     /**
-     * Installs the given color in the preference store and optionally the color 
+     * Installs the given color in the preference store and optionally the color
      * registry.
-     * 
+     *
      * @param definition
      *            the color definition
      * @param theme
@@ -267,18 +288,18 @@ public final class ThemeElementHelper {
      * @param setInRegistry
      * 			  whether the color should be put into the registry
      */
-    
+
     private static void installColor(ColorDefinition definition, ITheme theme,
             IPreferenceStore store, boolean setInRegistry) {
 
         //TODO: store shouldn't be null, should assert instead of checking null all over
-    	
+
     	ColorRegistry registry = theme.getColorRegistry();
 
         String id = definition.getId();
         String key = createPreferenceKey(theme, id);
-        RGB prefColor = store != null 
-        	? PreferenceConverter.getColor(store, key) 
+        RGB prefColor = store != null
+        	? PreferenceConverter.getColor(store, key)
         	: null;
 		RGB defaultColor;
 		if (definition.getValue() != null) {
@@ -289,14 +310,14 @@ public final class ThemeElementHelper {
 		} else {
 			defaultColor = null;
 		}
-     
+
         if (defaultColor == null) {
 			// default is null, likely because we have a bad definition - the
 			// defaultsTo color doesn't exist. We still need a sensible default,
 			// however.
 			defaultColor = PreferenceConverter.COLOR_DEFAULT_DEFAULT;
 		}
-        	
+
 		if (prefColor == null || prefColor == PreferenceConverter.COLOR_DEFAULT_DEFAULT) {
 			if (definition.getValue() != null) {
 				prefColor = definition.getValue();
@@ -329,6 +350,12 @@ public final class ThemeElementHelper {
 
         return themeId + '.' + id;
     }
+
+	public static String createPreferenceKey(org.eclipse.e4.ui.css.swt.theme.ITheme cssTheme,
+			ITheme theme, String id) {
+		String cssThemePrefix = cssTheme != null ? cssTheme.getId() + '.' : ""; //$NON-NLS-1$
+		return cssThemePrefix + createPreferenceKey(theme, id);
+	}
 
     /**
      * @param theme

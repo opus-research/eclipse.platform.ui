@@ -33,7 +33,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param structured
 	 *            The Viewer we are providing content for
 	 * @param debug
@@ -55,7 +55,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	/**
 	 * Return a listener for kept jobs.
-	 * 
+	 *
 	 * @return KeptJobsListener
 	 */
 	private KeptJobsListener getKeptJobListener() {
@@ -63,33 +63,37 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.ui.internal.progress.FinishedJobs.KeptJobsListener#finished(org.eclipse.ui.internal.progress.JobTreeElement)
 			 */
+			@Override
 			public void finished(JobTreeElement jte) {
 				final JobTreeElement element = jte;
 				Job updateJob = new WorkbenchJob("Refresh finished") {//$NON-NLS-1$
 					/*
 					 * (non-Javadoc)
-					 * 
+					 *
 					 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
 					 */
+					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						refresh(new Object[] { element });
 						return Status.OK_STATUS;
 					}
-					
+
 					/* (non-Javadoc)
 					 * @see org.eclipse.ui.progress.WorkbenchJob#shouldSchedule()
 					 */
+					@Override
 					public boolean shouldSchedule() {
 						return !progressViewer.getControl().isDisposed();
 					}
-					
-					
+
+
 					/* (non-Javadoc)
 					 * @see org.eclipse.ui.progress.WorkbenchJob#shouldRun()
 					 */
+					@Override
 					public boolean shouldRun() {
 						return !progressViewer.getControl().isDisposed();
 					}
@@ -101,17 +105,19 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.ui.internal.progress.FinishedJobs.KeptJobsListener#removed(org.eclipse.ui.internal.progress.JobTreeElement)
 			 */
+			@Override
 			public void removed(JobTreeElement jte) {
 				final JobTreeElement element = jte;
 				Job updateJob = new WorkbenchJob("Remove finished") {//$NON-NLS-1$
 					/*
 					 * (non-Javadoc)
-					 * 
+					 *
 					 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
 					 */
+					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						if (element == null) {
 							refresh();
@@ -133,18 +139,20 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.IProgressUpdateCollector#refresh()
 	 */
+	@Override
 	public void refresh() {
 		progressViewer.refresh(true);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.internal.progress.IProgressUpdateCollector#refresh(org.eclipse.ui.internal.progress.JobTreeElement[])
 	 */
+	@Override
 	public void refresh(Object[] elements) {
 		Object[] refreshes = getRoots(elements, true);
 		for (int i = 0; i < refreshes.length; i++) {
@@ -154,9 +162,10 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 	 */
+	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements = super.getElements(inputElement);
 
@@ -190,7 +199,7 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 	/**
 	 * Get the root elements of the passed elements as we only show roots.
 	 * Replace the element with its parent if subWithParent is true
-	 * 
+	 *
 	 * @param elements
 	 *            the array of elements.
 	 * @param subWithParent
@@ -220,11 +229,13 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 		return roots.toArray();
 	}
 
+	@Override
 	public void add(Object[] elements) {
 		progressViewer.add(elements);
 
 	}
 
+	@Override
 	public void remove(Object[] elements) {
 		progressViewer.remove(elements);
 
@@ -232,9 +243,10 @@ public class ProgressViewerContentProvider extends ProgressContentProvider {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		if (keptJobListener != null) {

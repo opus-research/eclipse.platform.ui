@@ -22,39 +22,40 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
  *
  */
 public class EditActionProvider extends CommonActionProvider {
-	 
+
 	private EditActionGroup editGroup;
 
 	private ICommonActionExtensionSite site;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
-	 */
+	@Override
 	public void init(ICommonActionExtensionSite anActionSite) {
 		site = anActionSite;
 		editGroup = new EditActionGroup(site.getViewSite().getShell());
- 
+
 	}
 
-	public void dispose() { 
+	@Override
+	public void dispose() {
 		editGroup.dispose();
 	}
 
-	public void fillActionBars(IActionBars actionBars) { 
+	@Override
+	public void fillActionBars(IActionBars actionBars) {
 		editGroup.fillActionBars(actionBars);
 	}
 
-	public void fillContextMenu(IMenuManager menu) { 
+	@Override
+	public void fillContextMenu(IMenuManager menu) {
 		editGroup.fillContextMenu(menu);
 	}
 
-	public void setContext(ActionContext context) { 
+	@Override
+	public void setContext(ActionContext context) {
 		editGroup.setContext(context);
 	}
 
-	public void updateActionBars() { 
+	@Override
+	public void updateActionBars() {
 		editGroup.updateActionBars();
 	}
 }

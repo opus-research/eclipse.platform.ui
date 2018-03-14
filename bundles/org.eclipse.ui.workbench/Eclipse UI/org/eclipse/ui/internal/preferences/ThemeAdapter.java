@@ -26,76 +26,81 @@ import org.eclipse.ui.themes.ITheme;
 public class ThemeAdapter extends PropertyMapAdapter {
 
     private ITheme targetTheme;
-    
+
     private IPropertyChangeListener listener = new IPropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent event) {
+        @Override
+		public void propertyChange(PropertyChangeEvent event) {
             firePropertyChange(event.getProperty());
         }
     };
-    
+
     public ThemeAdapter(ITheme targetTheme) {
         this.targetTheme = targetTheme;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.PropertyMapAdapter#attachListener()
      */
-    protected void attachListener() {
+    @Override
+	protected void attachListener() {
         targetTheme.addPropertyChangeListener(listener);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.PropertyMapAdapter#detachListener()
      */
-    protected void detachListener() {
+    @Override
+	protected void detachListener() {
         targetTheme.removePropertyChangeListener(listener);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#getKeySet()
      */
-    public Set keySet() {
+    @Override
+	public Set keySet() {
         return getKeySet(targetTheme);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#getValue(java.lang.String, java.lang.Class)
      */
-    public Object getValue(String propertyId, Class propertyType) {
+    @Override
+	public Object getValue(String propertyId, Class propertyType) {
         return getValue(targetTheme, propertyId, propertyType);
     }
 
     public static Set getKeySet(ITheme targetTheme) {
         Set result = new HashSet();
-        
+
         result.addAll(targetTheme.keySet());
         result.addAll(targetTheme.getColorRegistry().getKeySet());
         result.addAll(targetTheme.getFontRegistry().getKeySet());
-        
-        return result;        
+
+        return result;
     }
-    
+
     public static Object getValue(ITheme targetTheme, String propertyId, Class propertyType) {
 
         if (propertyType.isAssignableFrom(String.class)) {
             return targetTheme.getString(propertyId);
         }
-        
+
         if (propertyType.isAssignableFrom(Color.class)) {
             Color result = targetTheme.getColorRegistry().get(propertyId);
             if (result != null) {
                 return result;
             }
         }
-        
+
         if (propertyType.isAssignableFrom(Font.class)) {
             FontRegistry fonts = targetTheme.getFontRegistry();
-            
+
             if (fonts.hasValueFor(propertyId)) {
                 return fonts.get(propertyId);
             }
         }
-        
+
         if (propertyType == Integer.class) {
             return new Integer(targetTheme.getInt(propertyId));
         }
@@ -103,22 +108,24 @@ public class ThemeAdapter extends PropertyMapAdapter {
         if (propertyType == Boolean.class) {
             return targetTheme.getBoolean(propertyId) ? Boolean.TRUE : Boolean.FALSE;
         }
-        
+
         return null;
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#propertyExists(java.lang.String)
      */
-    public boolean propertyExists(String propertyId) {
+    @Override
+	public boolean propertyExists(String propertyId) {
         return keySet().contains(propertyId);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.IPropertyMap#setValue(java.lang.String)
      */
-    public void setValue(String propertyId, Object newValue) {
-        throw new UnsupportedOperationException();        
+    @Override
+	public void setValue(String propertyId, Object newValue) {
+        throw new UnsupportedOperationException();
     }
 
 }

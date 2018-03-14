@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -16,7 +16,6 @@ import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.impl.MinimalEObjectImpl.Container;
 
 /**
  * <!-- begin-user-doc -->
@@ -24,15 +23,15 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl.Container;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.StringToStringMapImpl#getTypedKey <em>Key</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.StringToStringMapImpl#getTypedValue <em>Value</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */
-public class StringToStringMapImpl extends Container implements BasicEMap.Entry<String,String> {
+public class StringToStringMapImpl extends org.eclipse.emf.ecore.impl.MinimalEObjectImpl.Container implements BasicEMap.Entry<String,String> {
 	/**
 	 * The default value of the '{@link #getTypedKey() <em>Key</em>}' attribute.
 	 * <!-- begin-user-doc -->

@@ -24,13 +24,13 @@ import org.eclipse.swt.widgets.Listener;
 /**
  * OwnerDrawLabelProvider is an abstract implementation of a label provider that
  * handles custom draw.
- * 
+ *
  * <p>
  * <b>This class is intended to be subclassed by implementors.</b>
  * </p>
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 
@@ -43,6 +43,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 			this.viewer = viewer;
 		}
 
+		@Override
 		public void handleEvent(Event event) {
 			ViewerColumn column = viewer.getViewerColumn(event.index);
 			if (column != null && (enabledGlobally > 0 || enabledColumns.contains(column))) {
@@ -70,15 +71,16 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 
 	/**
 	 * Set up the owner draw callbacks for the viewer.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer the owner draw is set up
-	 * 
+	 *
 	 * @deprecated Since 3.4, the default implementation of
 	 *             {@link CellLabelProvider#initialize(ColumnViewer, ViewerColumn)}
 	 *             in this class will set up the necessary owner draw callbacks
 	 *             automatically. Calls to this method can be removed.
 	 */
+	@Deprecated
 	public static void setUpOwnerDraw(final ColumnViewer viewer) {
 		getOrCreateOwnerDrawListener(viewer).enabledGlobally++;
 	}
@@ -100,12 +102,13 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 
 	/**
 	 * Create a new instance of the receiver based on a column viewer.
-	 * 
+	 *
 	 */
 	public OwnerDrawLabelProvider() {
 
 	}
 
+	@Override
 	public void dispose(ColumnViewer viewer, ViewerColumn column) {
 		if (!viewer.getControl().isDisposed()) {
 			setOwnerDrawEnabled(viewer, column, false);
@@ -122,6 +125,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * implementation or, alternatively,
 	 * {@link #initialize(ColumnViewer, ViewerColumn, boolean)}.
 	 */
+	@Override
 	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
 		this.initialize(viewer, column, true);
 	}
@@ -133,7 +137,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * <code>super.initialize(ColumnViewer, ViewerColumn)</code>, and then
 	 * enables or disables owner draw by calling
 	 * {@link #setOwnerDrawEnabled(ColumnViewer, ViewerColumn, boolean)}.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer
 	 * @param column
@@ -142,7 +146,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * @param enableOwnerDraw
 	 *            <code>true</code> if owner draw should be enabled for the
 	 *            given viewer and column, <code>false</code> otherwise.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	final protected void initialize(ColumnViewer viewer, ViewerColumn column,
@@ -151,6 +155,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 		setOwnerDrawEnabled(viewer, column, enableOwnerDraw);
 	}
 
+	@Override
 	public void update(ViewerCell cell) {
 		// Force a redraw
 		Rectangle cellBounds = cell.getBounds();
@@ -166,7 +171,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * implementation causes non-native behavior on some platforms. Subclasses
 	 * should override this method and <b>not</b> call the super
 	 * implementation.
-	 * 
+	 *
 	 * @param event
 	 *            the erase event
 	 * @param element
@@ -200,7 +205,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 
 	/**
 	 * Handle the measure event.
-	 * 
+	 *
 	 * @param event
 	 *            the measure event
 	 * @param element
@@ -211,7 +216,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 
 	/**
 	 * Handle the paint event.
-	 * 
+	 *
 	 * @param event
 	 *            the paint event
 	 * @param element
@@ -227,7 +232,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * {@link #initialize(ColumnViewer, ViewerColumn)} and
 	 * {@link #dispose(ColumnViewer, ViewerColumn)} but may be called from
 	 * subclasses to enable or disable owner draw dynamically.
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer
 	 * @param column
@@ -236,7 +241,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * @param enabled
 	 *            <code>true</code> if owner draw should be enabled,
 	 *            <code>false</code> otherwise
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	protected void setOwnerDrawEnabled(ColumnViewer viewer,

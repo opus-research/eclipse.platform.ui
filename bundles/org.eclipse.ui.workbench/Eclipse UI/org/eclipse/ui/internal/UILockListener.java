@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM - Initial API and implementation
  *     Jeremiah Lott (jeremiah.lott@timesys.com) - fix for deadlock bug 76378
- *     
+ *
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -107,13 +107,15 @@ public class UILockListener extends LockListener {
         this.display = display;
     }
 
-    public void aboutToRelease() {
+    @Override
+	public void aboutToRelease() {
         if (isUI()) {
 			ui = null;
 		}
     }
 
-    public boolean aboutToWait(Thread lockOwner) {
+    @Override
+	public boolean aboutToWait(Thread lockOwner) {
         if (isUI()) {
             // If a syncExec was executed from the current operation, it
             // has already acquired the lock. So, just return true.
@@ -137,11 +139,7 @@ public class UILockListener extends LockListener {
         pendingWork.add(work);
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.jobs.LockListener#canBlock()
-	 */
+	@Override
 	public boolean canBlock() {
 		return !isUI();
 	}

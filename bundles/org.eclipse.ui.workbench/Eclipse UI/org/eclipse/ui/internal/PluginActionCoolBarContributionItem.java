@@ -34,20 +34,16 @@ public class PluginActionCoolBarContributionItem extends
         setActionSetId(((WWinPluginAction) action).getActionSetId());
     }
 
-    public String getActionSetId() {
+    @Override
+	public String getActionSetId() {
         return actionSetId;
     }
 
-    public void setActionSetId(String id) {
+    @Override
+	public void setActionSetId(String id) {
         this.actionSetId = id;
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.PluginActionContributionItem#invalidateParent()
-	 */
 	@Override
 	protected void invalidateParent() {
 		super.invalidateParent();
@@ -61,6 +57,7 @@ public class PluginActionCoolBarContributionItem extends
 	}
 
 	private static Runnable updater = new Runnable() {
+		@Override
 		public void run() {
 			IContributionManager[] managers = managersToUpdate
 					.toArray(new IContributionManager[managersToUpdate.size()]);

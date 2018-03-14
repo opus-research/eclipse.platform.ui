@@ -24,30 +24,31 @@ import org.eclipse.ui.internal.dialogs.PropertyDialog;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class PropertyDialogHandler extends AbstractHandler {
 
 	private String initialPageId = null;
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		PreferenceDialog dialog;
 		Object element = null;
 		ISelection currentSelection = HandlerUtil.getCurrentSelection(event);
 		IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
 		Shell shell;
-		
+
 		if (currentSelection instanceof IStructuredSelection) {
 			element = ((IStructuredSelection) currentSelection)
 					.getFirstElement();
 		} else {
 			return null;
 		}
-		
+
 		if (activeWorkbenchWindow != null){
 			shell = activeWorkbenchWindow.getShell();
 			dialog = PropertyDialog.createDialogOn(shell,

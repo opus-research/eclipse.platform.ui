@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -45,9 +47,9 @@ import org.eclipse.swt.widgets.Shell;
  * A dialog that prompts for a directory to use as a workspace.
  */
 public class ChooseWorkspaceDialog extends TitleAreaDialog {
-	
+
 	private static final String DIALOG_SETTINGS_SECTION = "ChooseWorkspaceDialogSettings"; //$NON-NLS-1$
-	
+
 	private ChooseWorkspaceData launchData;
 
     private Combo text;
@@ -60,10 +62,10 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * argument data object.
      * @param parentShell the parent shell for this dialog
      * @param launchData the launch data from past launches
-     * 
+     *
      * @param suppressAskAgain
      *            true means the dialog will not have a "don't ask again" button
-     * @param centerOnMonitor indicates whether the dialog should be centered on 
+     * @param centerOnMonitor indicates whether the dialog should be centered on
      * the monitor or according to it's parent if there is one
      */
     public ChooseWorkspaceDialog(Shell parentShell,
@@ -81,7 +83,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * The parameter can be used to override the users preference.  For example,
      * this is important in cases where the default selection is already in use
      * and the user is forced to choose a different one.
-     * 
+     *
      * @param force
      *            true if the dialog should be opened regardless of the value of
      *            the show dialog checkbox
@@ -90,7 +92,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         if (force || launchData.getShowDialog()) {
             open();
 
-            // 70576: make sure dialog gets dismissed on ESC too
+			// Bug 70576: Dialog gets dismissed via ESC and via the window's
+			// close box. Make sure the launch doesn't continue with the default
+			// workspace.
             if (getReturnCode() == CANCEL) {
 				launchData.workspaceSelected(null);
 			}
@@ -123,7 +127,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * @param parent the parent composite to contain the dialog area
      * @return the dialog area control
      */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         String productName = getWindowTitle();
 
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -140,14 +145,15 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         if (!suppressAskAgain) {
 			createShowDialogButton(composite);
 		}
-        
-        // look for the eclipse.gcj property.  
+
+        // look for the eclipse.gcj property.
         // If true, then we dont need any warning messages.
         // someone is asserting that we're okay on GCJ
         boolean gcj = Boolean.getBoolean("eclipse.gcj"); //$NON-NLS-1$
 		String vmName = System.getProperty("java.vm.name");//$NON-NLS-1$
 		if (!gcj && vmName != null && vmName.indexOf("libgcj") != -1) { //$NON-NLS-1$
 			composite.getDisplay().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					// set this via an async - if we set it directly the dialog
 					// will
@@ -157,14 +163,14 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 				}
 			});
 		}
-        
+
         Dialog.applyDialogFont(composite);
         return composite;
     }
 
 	/**
 	 * Returns the title that the dialog (or splash) should have.
-	 * 
+	 *
 	 * @return the window title
 	 * @since 3.4
 	 */
@@ -180,20 +186,22 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		return productName;
 	}
 
-    /**
-     * Configures the given shell in preparation for opening this window
-     * in it.
-     * <p>
-     * The default implementation of this framework method
-     * sets the shell's image and gives it a grid layout. 
-     * Subclasses may extend or reimplement.
-     * </p>
-     * 
-     * @param shell the shell
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_dialogName);
+		shell.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				// Bug 462707: [WorkbenchLauncher] dialog not closed on ESC.
+				// The dialog doesn't always have a parent, so
+				// Shell#traverseEscape() doesn't always close it for free.
+				if (e.detail == SWT.TRAVERSE_ESCAPE) {
+					e.detail = SWT.TRAVERSE_NONE;
+					cancelPressed();
+				}
+			}
+		});
     }
 
     /**
@@ -204,7 +212,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * and closes the dialog. Subclasses may override.
      * </p>
      */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         launchData.workspaceSelected(TextProcessor.deprocess(getWorkspaceLocation()));
         super.okPressed();
     }
@@ -217,15 +226,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		return text.getText();
 	}
 
-    /**
-     * Notifies that the cancel button of this dialog has been pressed.
-     * <p>
-     * The <code>Dialog</code> implementation of this framework method sets
-     * this dialog's return code to <code>Window.CANCEL</code>
-     * and closes the dialog. Subclasses may override if desired.
-     * </p>
-     */
-    protected void cancelPressed() {
+    @Override
+	protected void cancelPressed() {
         launchData.workspaceSelected(null);
         super.cancelPressed();
     }
@@ -250,10 +252,11 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         label.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_workspaceEntryLabel);
 
         text = new Combo(panel, SWT.BORDER | SWT.LEAD | SWT.DROP_DOWN);
-        text.setFocus();        
+        text.setFocus();
         text.setLayoutData(new GridData(400, SWT.DEFAULT));
         text.addModifyListener(new ModifyListener(){
-        	public void modifyText(ModifyEvent e) {
+        	@Override
+			public void modifyText(ModifyEvent e) {
         		Button okButton = getButton(Window.OK);
         		if(okButton != null && !okButton.isDisposed()) {
         			boolean nonWhitespaceFound = false;
@@ -277,7 +280,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         data.horizontalAlignment = GridData.HORIZONTAL_ALIGN_END;
         browseButton.setLayoutData(data);
         browseButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SHEET);
                 dialog.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_directoryBrowserTitle);
                 dialog.setMessage(IDEWorkbenchMessages.ChooseWorkspaceDialog_directoryBrowserMessage);
@@ -296,7 +300,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      * works toward the root until there is a directory for which File.exists
      * returns true. Return the current working dir if the text box does not
      * contain a valid path.
-     * 
+     *
      * @return closest parent that exists or an empty string
      */
     private String getInitialBrowsePath() {
@@ -310,11 +314,12 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
     }
 
 	/*
-	 * see org.eclipse.jface.Window.getInitialLocation() 
+	 * see org.eclipse.jface.Window.getInitialLocation()
 	 */
+	@Override
 	protected Point getInitialLocation(Point initialSize) {
 		Composite parent = getShell().getParent();
-		
+
 		if (!centerOnMonitor || parent == null) {
 			return super.getInitialLocation(initialSize);
 		}
@@ -348,7 +353,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         button.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_useDefaultMessage);
         button.setSelection(!launchData.getShowDialog());
         button.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 launchData.toggleShowDialog();
             }
         });
@@ -365,12 +371,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         text.setText(TextProcessor.process((text.getItemCount() > 0 ? text
 				.getItem(0) : launchData.getInitialDefault())));
     }
-    
-	/* (non-Javadoc)
-     * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
-     * 
-     * @since 3.2
-     */
+
+	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		// If we were explicitly instructed to center on the monitor, then
 		// do not provide any settings for retrieving a different location or, worse,
@@ -378,12 +380,12 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		if (centerOnMonitor) {
 			return null;
 		}
-		
+
         IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
         if (section == null) {
             section = settings.addNewSection(DIALOG_SETTINGS_SECTION);
-        } 
+        }
         return section;
 	}
 

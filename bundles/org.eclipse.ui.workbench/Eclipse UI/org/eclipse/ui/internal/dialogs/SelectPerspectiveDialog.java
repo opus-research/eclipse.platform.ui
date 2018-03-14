@@ -40,8 +40,6 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.activities.ws.ActivityMessages;
 import org.eclipse.ui.internal.activities.ws.ActivityViewerFilter;
 import org.eclipse.ui.internal.activities.ws.WorkbenchTriggerPoints;
-import org.eclipse.ui.internal.decorators.ContributingPluginDecorator;
-import org.eclipse.ui.internal.registry.PerspectiveDescriptor;
 import org.eclipse.ui.model.PerspectiveLabelProvider;
 
 /**
@@ -68,7 +66,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * PerspectiveDialog constructor comment.
-     * 
+     *
      * @param parentShell the parent shell
      * @param perspReg the perspective registry
      */
@@ -79,22 +77,14 @@ public class SelectPerspectiveDialog extends Dialog implements
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.dialogs.Dialog#cancelPressed()
-     */
-    protected void cancelPressed() {
+    @Override
+	protected void cancelPressed() {
         perspDesc = null;
         super.cancelPressed();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(WorkbenchMessages.SelectPerspective_shellTitle);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
@@ -108,10 +98,11 @@ public class SelectPerspectiveDialog extends Dialog implements
      * cancel buttons using the <code>createButton</code> framework method.
      * Subclasses may override.
      * </p>
-     * 
+     *
      * @param parent the button bar composite
      */
-    protected void createButtonsForButtonBar(Composite parent) {
+    @Override
+	protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
@@ -122,11 +113,12 @@ public class SelectPerspectiveDialog extends Dialog implements
     /**
      * Creates and returns the contents of the upper part of this dialog (above
      * the button bar).
-     * 
+     *
      * @param parent the parent composite to contain the dialog area
      * @return the dialog area control
      */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         // Run super.
         Composite composite = (Composite) super.createDialogArea(parent);
         composite.setFont(parent.getFont());
@@ -149,7 +141,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Create a show all button in the parent.
-     * 
+     *
      * @param parent the parent <code>Composite</code>.
      */
     private void createShowAllButton(Composite parent) {
@@ -158,10 +150,8 @@ public class SelectPerspectiveDialog extends Dialog implements
                 .setText(ActivityMessages.Perspective_showAll);
         showAllButton.addSelectionListener(new SelectionAdapter() {
 
-            /* (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 if (showAllButton.getSelection()) {
                     list.resetFilters();
                 } else {
@@ -174,7 +164,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Create a new viewer in the parent.
-     * 
+     *
      * @param parent the parent <code>Composite</code>.
      */
     private void createViewer(Composite parent) {
@@ -182,23 +172,15 @@ public class SelectPerspectiveDialog extends Dialog implements
         list = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
                 | SWT.BORDER);
         list.getTable().setFont(parent.getFont());
-		list.setLabelProvider(new DelegatingLabelProviderWithTooltip(
-				new PerspectiveLabelProvider(), PlatformUI.getWorkbench().getDecoratorManager()
-						.getLabelDecorator(ContributingPluginDecorator.ID)) {
-			protected Object unwrapElement(Object element) {
-				if (element instanceof PerspectiveDescriptor) {
-					element = ((PerspectiveDescriptor) element).getConfigElement();
-				}
-				return element;
-			}
-		});
+		list.setLabelProvider(new PerspectiveLabelProvider());
         list.setContentProvider(new PerspContentProvider());
         list.addFilter(activityViewerFilter);
         list.setComparator(new ViewerComparator());
         list.setInput(perspReg);
         list.addSelectionChangedListener(this);
         list.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
                 handleDoubleClickEvent();
             }
         });
@@ -206,7 +188,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Returns the current selection.
-     * 
+     *
      * @return the current selection
      */
     public IPerspectiveDescriptor getSelection() {
@@ -222,7 +204,7 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Layout the top control.
-     * 
+     *
      * @param control the control.
      */
     private void layoutTopControl(Control control) {
@@ -234,10 +216,11 @@ public class SelectPerspectiveDialog extends Dialog implements
 
     /**
      * Notifies that the selection has changed.
-     * 
+     *
      * @param event event object describing the change
      */
-    public void selectionChanged(SelectionChangedEvent event) {
+    @Override
+	public void selectionChanged(SelectionChangedEvent event) {
         updateSelection(event);
         updateButtons();
     }
@@ -263,10 +246,8 @@ public class SelectPerspectiveDialog extends Dialog implements
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-     */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         ITriggerPoint triggerPoint = PlatformUI.getWorkbench()
                 .getActivitySupport().getTriggerPointManager().getTriggerPoint(
                         WorkbenchTriggerPoints.OPEN_PERSPECITVE_DIALOG);
@@ -274,12 +255,9 @@ public class SelectPerspectiveDialog extends Dialog implements
 			super.okPressed();
 		}
     }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
-    protected boolean isResizable() {
+
+    @Override
+	protected boolean isResizable() {
     	return true;
     }
 }

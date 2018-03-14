@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,22 +26,23 @@ import org.eclipse.jface.preference.IPreferenceStore;
  * <p>
  * Clients may instantiate this class, but must not extend.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public class ToggleState extends PersistentState {
 
 	/**
-	 * Constructs a new <code>ToggleState</code>. By default, the toggle is
-	 * off (e.g., <code>false</code>).
+	 * Constructs a new <code>ToggleState</code>. By default, the toggle is off
+	 * (e.g., <code>false</code>).
 	 */
 	public ToggleState() {
 		setValue(Boolean.FALSE);
 	}
 
+	@Override
 	public final void load(final IPreferenceStore store,
 			final String preferenceKey) {
-		final boolean currentValue = ((Boolean) getValue()).booleanValue(); 
+		final boolean currentValue = ((Boolean) getValue()).booleanValue();
 		store.setDefault(preferenceKey, currentValue);
 		if (shouldPersist() && (store.contains(preferenceKey))) {
 			final boolean value = store.getBoolean(preferenceKey);
@@ -49,6 +50,7 @@ public class ToggleState extends PersistentState {
 		}
 	}
 
+	@Override
 	public final void save(final IPreferenceStore store,
 			final String preferenceKey) {
 		if (shouldPersist()) {
@@ -59,6 +61,7 @@ public class ToggleState extends PersistentState {
 		}
 	}
 
+	@Override
 	public void setValue(final Object value) {
 		if (!(value instanceof Boolean)) {
 			throw new IllegalArgumentException(

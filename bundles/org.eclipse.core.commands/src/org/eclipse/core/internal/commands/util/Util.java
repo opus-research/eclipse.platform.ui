@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 
 package org.eclipse.core.internal.commands.util;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,9 +23,11 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.eclipse.core.commands.Command;
+
 /**
  * A class providing utility functions for the commands plug-in.
- * 
+ *
  * @since 3.1
  */
 public final class Util {
@@ -52,7 +55,7 @@ public final class Util {
     /**
      * Asserts the the given object is an instance of the given class --
      * optionally allowing the object to be <code>null</code>.
-     * 
+     *
      * @param object
      *            The object for which the type should be checked.
      * @param c
@@ -78,7 +81,7 @@ public final class Util {
     /**
      * Compares two boolean values. <code>false</code> is considered to be
      * less than <code>true</code>.
-     * 
+     *
      * @param left
      *            The left value to compare.
      * @param right
@@ -97,7 +100,7 @@ public final class Util {
     /**
      * Compares two comparable objects, but with protection against
      * <code>null</code>.
-     * 
+     *
      * @param left
      *            The left value to compare; may be <code>null</code>.
      * @param right
@@ -126,7 +129,7 @@ public final class Util {
      * Compares two integer values. This method fails if the distance between
      * <code>left</code> and <code>right</code> is greater than
      * <code>Integer.MAX_VALUE</code>.
-     * 
+     *
      * @param left
      *            The left value to compare.
      * @param right
@@ -141,7 +144,7 @@ public final class Util {
      * Compares two objects that are not otherwise comparable. If neither object
      * is <code>null</code>, then the string representation of each object is
      * used.
-     * 
+     *
      * @param left
      *            The left value to compare. The string representation of this
      *            value must not be <code>null</code>.
@@ -170,7 +173,7 @@ public final class Util {
 
     /**
      * Decides whether two booleans are equal.
-     * 
+     *
      * @param left
      *            The first boolean to compare; may be <code>null</code>.
      * @param right
@@ -185,7 +188,7 @@ public final class Util {
     /**
      * Decides whether two objects are equal -- defending against
      * <code>null</code>.
-     * 
+     *
      * @param left
      *            The first object to compare; may be <code>null</code>.
      * @param right
@@ -202,7 +205,7 @@ public final class Util {
 	 * Tests whether two arrays of objects are equal to each other. The arrays
 	 * must not be <code>null</code>, but their elements may be
 	 * <code>null</code>.
-	 * 
+	 *
 	 * @param leftArray
 	 *            The left array to compare; may be <code>null</code>, and
 	 *            may be empty and may contain <code>null</code> elements.
@@ -240,7 +243,7 @@ public final class Util {
 
     /**
      * Computes the hash code for an integer.
-     * 
+     *
      * @param i
      *            The integer for which a hash code should be computed.
      * @return <code>i</code>.
@@ -252,7 +255,7 @@ public final class Util {
     /**
      * Computes the hash code for an object, but with defense against
      * <code>null</code>.
-     * 
+     *
      * @param object
      *            The object for which a hash code is needed; may be
      *            <code>null</code>.
@@ -267,7 +270,7 @@ public final class Util {
      * Makes a type-safe copy of the given map. This method should be used when
      * a map is crossing an API boundary (i.e., from a hostile plug-in into
      * internal code, or vice versa).
-     * 
+     *
      * @param map
      *            The map which should be copied; must not be <code>null</code>.
      * @param keyClass
@@ -305,7 +308,7 @@ public final class Util {
      * Makes a type-safe copy of the given set. This method should be used when
      * a set is crossing an API boundary (i.e., from a hostile plug-in into
      * internal code, or vice versa).
-     * 
+     *
      * @param set
      *            The set which should be copied; must not be <code>null</code>.
      * @param c
@@ -322,7 +325,7 @@ public final class Util {
      * Makes a type-safe copy of the given set. This method should be used when
      * a set is crossing an API boundary (i.e., from a hostile plug-in into
      * internal code, or vice versa).
-     * 
+     *
      * @param set
      *            The set which should be copied; must not be <code>null</code>.
      * @param c
@@ -347,6 +350,37 @@ public final class Util {
 
         return set;
     }
+
+	/**
+	 * Returns context help ID which is directly assigned to the command.
+	 * Context help IDs assigned to related handlers are ignored.
+	 *
+	 * @param command
+	 *            The command from which the context help ID is retrieved.
+	 * @return The help context ID assigned to the command; may be
+	 *         <code>null</code>.
+	 */
+	public static final String getHelpContextId(Command command) {
+		Method method = null;
+		try {
+			method = Command.class.getDeclaredMethod("getHelpContextId", null); //$NON-NLS-1$
+		} catch (Exception e) {
+			// do nothing
+		}
+
+		String contextId = null;
+		if (method != null) {
+			boolean accessible = method.isAccessible();
+			method.setAccessible(true);
+			try {
+				contextId = (String) method.invoke(command, null);
+			} catch (Exception e) {
+				// do nothing
+			}
+			method.setAccessible(accessible);
+		}
+		return contextId;
+	}
 
     /**
      * The utility class is meant to just provide static members.

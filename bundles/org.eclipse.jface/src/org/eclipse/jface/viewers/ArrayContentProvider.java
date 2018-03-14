@@ -18,8 +18,8 @@ import java.util.Collection;
  * the case where the viewer input is an unchanging array or collection of elements.
  * <p>
  * This class is not intended to be subclassed outside the viewer framework.
- * </p> 
- * 
+ * </p>
+ *
  * @since 2.1
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -31,9 +31,9 @@ public class ArrayContentProvider implements IStructuredContentProvider {
 	 * Returns an instance of ArrayContentProvider. Since instances of this
 	 * class do not maintain any state, they can be shared between multiple
 	 * clients.
-	 * 
+	 *
 	 * @return an instance of ArrayContentProvider
-	 * 
+	 *
 	 * @since 3.5
 	 */
 	public static ArrayContentProvider getInstance() {
@@ -46,9 +46,10 @@ public class ArrayContentProvider implements IStructuredContentProvider {
 	}
     /**
      * Returns the elements in the input, which must be either an array or a
-     * <code>Collection</code>. 
+     * <code>Collection</code>.
      */
-    public Object[] getElements(Object inputElement) {
+    @Override
+	public Object[] getElements(Object inputElement) {
         if (inputElement instanceof Object[]) {
 			return (Object[]) inputElement;
 		}
@@ -61,14 +62,16 @@ public class ArrayContentProvider implements IStructuredContentProvider {
     /**
      * This implementation does nothing.
      */
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    @Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // do nothing.
     }
 
     /**
      * This implementation does nothing.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         // do nothing.
     }
 }

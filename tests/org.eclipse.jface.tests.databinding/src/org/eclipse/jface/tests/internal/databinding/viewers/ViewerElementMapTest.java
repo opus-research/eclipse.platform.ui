@@ -19,10 +19,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.internal.databinding.viewers.ViewerElementMap;
 import org.eclipse.jface.viewers.IElementComparer;
-
-import junit.framework.TestCase;
 
 /**
  * @since 1.2
@@ -34,6 +34,7 @@ public class ViewerElementMapTest extends TestCase {
 	Object key;
 	Object value;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		comparer = new IdentityElementComparer();
@@ -59,7 +60,7 @@ public class ViewerElementMapTest extends TestCase {
 	}
 
 	public void testConstructorWithCollection_ContainsAllEntries() {
-		Map toCopy = new HashMap();
+		Map<Object, Object> toCopy = new HashMap<Object, Object>();
 		toCopy.put(new Object(), new Object());
 		map = new ViewerElementMap(toCopy, new IdentityElementComparer());
 		assertEquals(toCopy, map);
@@ -106,7 +107,7 @@ public class ViewerElementMapTest extends TestCase {
 	}
 
 	public void testPutAll() {
-		Map other = new HashMap();
+		Map<Object, Object> other = new HashMap<Object, Object>();
 		other.put(key, value);
 
 		assertTrue(map.isEmpty());
@@ -322,13 +323,11 @@ public class ViewerElementMapTest extends TestCase {
 
 	public void testEntrySet_ContainsAll() {
 		Set entrySet = map.entrySet();
-		assertFalse(entrySet.containsAll(Collections
-				.singleton(new MapEntryStub(key, value))));
+		assertFalse(entrySet.containsAll(Collections.singleton(new MapEntryStub(key, value))));
 		assertTrue(entrySet.containsAll(Collections.EMPTY_SET));
 
 		map.put(key, value);
-		assertTrue(entrySet.containsAll(Collections.singleton(new MapEntryStub(
-				key, value))));
+		assertTrue(entrySet.containsAll(Collections.singleton(new MapEntryStub(key, value))));
 	}
 
 	public void testEntrySet_IsEmpty() {
@@ -365,8 +364,7 @@ public class ViewerElementMapTest extends TestCase {
 
 		map.put(key, value);
 		assertEquals(1, map.size());
-		assertTrue(entrySet.removeAll(Collections.singleton(new MapEntryStub(
-				key, value))));
+		assertTrue(entrySet.removeAll(Collections.singleton(new MapEntryStub(key, value))));
 		assertTrue(map.isEmpty());
 	}
 
@@ -376,8 +374,7 @@ public class ViewerElementMapTest extends TestCase {
 
 		map.put(key, value);
 		assertEquals(1, map.size());
-		assertFalse(entrySet.retainAll(Collections.singleton(new MapEntryStub(
-				key, value))));
+		assertFalse(entrySet.retainAll(Collections.singleton(new MapEntryStub(key, value))));
 		assertEquals(1, map.size());
 		assertTrue(entrySet.retainAll(Collections.EMPTY_SET));
 		assertTrue(map.isEmpty());
@@ -416,13 +413,11 @@ public class ViewerElementMapTest extends TestCase {
 		assertTrue(entrySet.equals(entrySet));
 
 		assertTrue(entrySet.equals(Collections.EMPTY_SET));
-		assertFalse(entrySet.equals(Collections.singleton(new MapEntryStub(key,
-				value))));
+		assertFalse(entrySet.equals(Collections.singleton(new MapEntryStub(key, value))));
 
 		map.put(key, value);
 		assertFalse(entrySet.equals(Collections.EMPTY_SET));
-		assertTrue(entrySet.equals(Collections.singleton(new MapEntryStub(key,
-				value))));
+		assertTrue(entrySet.equals(Collections.singleton(new MapEntryStub(key, value))));
 	}
 
 	public void testEntrySet_HashCode() {
@@ -494,10 +489,12 @@ public class ViewerElementMapTest extends TestCase {
 	}
 
 	static class IdentityElementComparer implements IElementComparer {
+		@Override
 		public boolean equals(Object a, Object b) {
 			return a == b;
 		}
 
+		@Override
 		public int hashCode(Object element) {
 			return System.identityHashCode(element);
 		}
@@ -512,22 +509,27 @@ public class ViewerElementMapTest extends TestCase {
 			this.value = value;
 		}
 
+		@Override
 		public Object getKey() {
 			return key;
 		}
 
+		@Override
 		public Object getValue() {
 			return value;
 		}
 
+		@Override
 		public Object setValue(Object value) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public int hashCode() {
 			throw new UnsupportedOperationException();
 		}

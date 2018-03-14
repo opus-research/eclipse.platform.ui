@@ -25,7 +25,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class ConflictModel extends CommonModel {
 
@@ -65,7 +65,7 @@ public class ConflictModel extends CommonModel {
 	 * Sets the conflicts to the given collection. Any conflicts in the
 	 * collection that do not exist in the <code>bindingModel</code> are
 	 * removed.
-	 * 
+	 *
 	 * @param conflicts
 	 *            The conflicts to set.
 	 */
@@ -230,6 +230,7 @@ public class ConflictModel extends CommonModel {
 			}
 		}
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == ConflictModel.this
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event

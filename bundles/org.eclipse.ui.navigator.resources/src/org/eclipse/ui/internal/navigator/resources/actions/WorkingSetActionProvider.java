@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     anton.leherbauer@windriver.com - bug 212389 [CommonNavigator] working set issues: 
+ *     anton.leherbauer@windriver.com - bug 212389 [CommonNavigator] working set issues:
  *         missing project, window working set inconsistency
  *******************************************************************************/
 
@@ -41,14 +41,14 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class WorkingSetActionProvider extends CommonActionProvider {
 
 	private static final String TAG_CURRENT_WORKING_SET_NAME = "currentWorkingSetName"; //$NON-NLS-1$
 
 	private static final String WORKING_SET_FILTER_ID = "org.eclipse.ui.navigator.resources.filters.workingSet"; //$NON-NLS-1$
-	
+
 	private boolean contributedToViewMenu = false;
 
 	private CommonViewer viewer;
@@ -56,7 +56,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 	private INavigatorContentService contentService;
 
 	private NavigatorFilterService filterService;
-	
+
 	private WorkingSetFilterActionGroup workingSetActionGroup;
 	private WorkingSetRootModeActionGroup workingSetRootModeActionGroup;
 
@@ -68,17 +68,18 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 	private IWorkingSet workingSet;
 
 	private IPropertyChangeListener topLevelModeListener;
-	
+
 	private boolean ignoreFilterChangeEvents;
 
 	/**
 	 * Provides a smart listener to monitor changes to the Working Set Manager.
-	 * 
+	 *
 	 */
 	public class WorkingSetManagerListener implements IPropertyChangeListener {
 
 		private boolean listening = false;
 
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			String property = event.getProperty();
 			Object newValue = event.getNewValue();
@@ -138,11 +139,12 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 	}
 
 	private IPropertyChangeListener filterChangeListener = new IPropertyChangeListener() {
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
-			
+
 			if (ignoreFilterChangeEvents)
 				return;
-			
+
 			IWorkingSet newWorkingSet = (IWorkingSet) event.getNewValue();
 
 			setWorkingSet(newWorkingSet);
@@ -179,6 +181,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 		private IWorkingSet savedWorkingSet;
 
+		@Override
 		public void onExtensionActivation(String aViewerId, String[] theNavigatorExtensionIds, boolean isActive) {
 
 			for (int i = 0; i < theNavigatorExtensionIds.length; i++) {
@@ -208,6 +211,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 	};
 
+	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		viewer = (CommonViewer) aSite.getStructuredViewer();
 		contentService = aSite.getContentService();
@@ -219,6 +223,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		workingSetRootModeActionGroup = new WorkingSetRootModeActionGroup(viewer, extensionStateModel);
 
 		topLevelModeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				setWorkingSet(workingSet);
 				viewer.getFrameList().reset();
@@ -256,9 +261,9 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 	private void setWorkingSetFilter(IWorkingSet workingSet) {
 		setWorkingSetFilter(workingSet, FIRST_TIME);
 	}
-	
+
 	private static final boolean FIRST_TIME = true;
-	
+
 	private void setWorkingSetFilter(IWorkingSet workingSet, boolean firstTime) {
 		ResourceWorkingSetFilter workingSetFilter = null;
 		ViewerFilter[] filters = viewer.getFilters();
@@ -285,7 +290,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 	/**
 	 * Set current active working set.
-	 * 
+	 *
 	 * @param workingSet
 	 *            working set to be activated, may be <code>null</code>
 	 */
@@ -298,8 +303,8 @@ public class WorkingSetActionProvider extends CommonActionProvider {
         	workingSetActionGroup.setWorkingSet(workingSet);
         } finally {
         	ignoreFilterChangeEvents = false;
-       	}		
-		
+       	}
+
 		if (viewer != null) {
 			setWorkingSetFilter(workingSet);
 			if (workingSet == null || emptyWorkingSet
@@ -321,11 +326,13 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		}
 	}
 
+	@Override
 	public void restoreState(final IMemento aMemento) {
 		super.restoreState(aMemento);
 
 		// Need to run this async to avoid being reentered when processing a selection change
 		viewer.getControl().getShell().getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				boolean showWorkingSets = true;
 				if (aMemento != null) {
@@ -349,6 +356,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		});
 	}
 
+	@Override
 	public void saveState(IMemento aMemento) {
 		super.saveState(aMemento);
 
@@ -364,6 +372,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 	}
 
+	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		if (!contributedToViewMenu) {
 			try {
@@ -378,6 +387,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		}
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 		workingSetActionGroup.dispose();
@@ -393,7 +403,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 	/**
 	 * This is used only for the tests.
-	 * 
+	 *
 	 * @return a PropertyChangeListener
 	 */
 	public IPropertyChangeListener getFilterChangeListener() {

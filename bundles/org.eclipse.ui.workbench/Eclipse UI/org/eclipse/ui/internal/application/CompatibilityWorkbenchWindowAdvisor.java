@@ -23,7 +23,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
  * An implementation of <code>WorkbenchWindowAdvisor</code> that
  * calls back to the 3.0 legacy methods on <code>WorkbenchAdvisor</code>
  * for backwards compatibility.
- * 
+ *
  * @since 3.1
  */
 public class CompatibilityWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -32,7 +32,7 @@ public class CompatibilityWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
 
     /**
      * Creates a new compatibility workbench window advisor.
-     * 
+     *
      * @param wbAdvisor the workbench advisor
      * @param windowConfigurer the window configurer
      */
@@ -41,35 +41,43 @@ public class CompatibilityWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
         this.wbAdvisor = wbAdvisor;
     }
 
-    public void preWindowOpen() {
+    @Override
+	public void preWindowOpen() {
         wbAdvisor.preWindowOpen(getWindowConfigurer());
     }
 
-    public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
+    @Override
+	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
         return new CompatibilityActionBarAdvisor(wbAdvisor, configurer);
     }
-    
-    public void postWindowRestore() throws WorkbenchException {
+
+    @Override
+	public void postWindowRestore() throws WorkbenchException {
         wbAdvisor.postWindowRestore(getWindowConfigurer());
     }
 
-    public void openIntro() {
+    @Override
+	public void openIntro() {
         wbAdvisor.openIntro(getWindowConfigurer());
     }
 
-    public void postWindowCreate() {
+    @Override
+	public void postWindowCreate() {
         wbAdvisor.postWindowCreate(getWindowConfigurer());
     }
 
-    public void postWindowOpen() {
+    @Override
+	public void postWindowOpen() {
         wbAdvisor.postWindowOpen(getWindowConfigurer());
     }
 
-    public boolean preWindowShellClose() {
+    @Override
+	public boolean preWindowShellClose() {
         return wbAdvisor.preWindowShellClose(getWindowConfigurer());
     }
 
-    public void postWindowClose() {
+    @Override
+	public void postWindowClose() {
         wbAdvisor.postWindowClose(getWindowConfigurer());
     }
 
@@ -81,9 +89,10 @@ public class CompatibilityWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
         return wbAdvisor.getDefaultPageInput();
     }
 
-    public void createWindowContents(Shell shell) {
+    @Override
+	public void createWindowContents(Shell shell) {
         wbAdvisor.createWindowContents(getWindowConfigurer(), shell);
     }
 
- 
+
 }

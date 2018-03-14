@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -30,15 +30,16 @@ import java.util.List;
  * 'StackElement' (which is an empty stub used only to constran the stack's types.
  * </p>
  * @since 1.0
+ * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
  * The following features are supported:
+ * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.MElementContainer#getChildren <em>Children</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.MElementContainer#getSelectedElement <em>Selected Element</em>}</li>
  * </ul>
- * </p>
  *
  * @model abstract="true"
  * @generated
@@ -46,7 +47,6 @@ import java.util.List;
 public interface MElementContainer<T extends MUIElement> extends MUIElement {
 	/**
 	 * Returns the value of the '<em><b>Children</b></em>' containment reference list.
-	 * The list contents are of type {@link T}.
 	 * It is bidirectional and its opposite is '{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getParent <em>Parent</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

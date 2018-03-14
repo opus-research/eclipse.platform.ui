@@ -20,10 +20,8 @@ public class TestColorFactory implements IColorFactory {
 
     public static final RGB RGB = new RGB(91, 92, 93);
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.themes.IColorFactory#createColor()
-     */
-    public RGB createColor() {
+    @Override
+	public RGB createColor() {
         return RGB;
     }
 

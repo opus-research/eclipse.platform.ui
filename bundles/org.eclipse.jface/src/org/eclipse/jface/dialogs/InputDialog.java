@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ public class InputDialog extends Dialog {
      * Error message label widget.
      */
     private Text errorMessageText;
-    
+
     /**
      * Error message string.
      */
@@ -76,7 +76,7 @@ public class InputDialog extends Dialog {
      * <p>
      * Note that the <code>open</code> method blocks for input dialogs.
      * </p>
-     * 
+     *
      * @param parentShell
      *            the parent shell, or <code>null</code> to create a top-level
      *            shell
@@ -103,10 +103,8 @@ public class InputDialog extends Dialog {
         this.validator = validator;
     }
 
-    /*
-     * (non-Javadoc) Method declared on Dialog.
-     */
-    protected void buttonPressed(int buttonId) {
+    @Override
+	protected void buttonPressed(int buttonId) {
         if (buttonId == IDialogConstants.OK_ID) {
             value = text.getText();
         } else {
@@ -115,24 +113,16 @@ public class InputDialog extends Dialog {
         super.buttonPressed(buttonId);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         if (title != null) {
 			shell.setText(title);
 		}
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
-    protected void createButtonsForButtonBar(Composite parent) {
+    @Override
+	protected void createButtonsForButtonBar(Composite parent) {
         // create OK and Cancel buttons by default
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
@@ -147,10 +137,8 @@ public class InputDialog extends Dialog {
         }
     }
 
-    /*
-     * (non-Javadoc) Method declared on Dialog.
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         // create composite
         Composite composite = (Composite) super.createDialogArea(parent);
         // create message
@@ -168,7 +156,8 @@ public class InputDialog extends Dialog {
         text.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.HORIZONTAL_ALIGN_FILL));
         text.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
+            @Override
+			public void modifyText(ModifyEvent e) {
                 validateInput();
             }
         });
@@ -187,17 +176,18 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the error message label.
-     * 
+     *
      * @return the error message label
      * @deprecated use setErrorMessage(String) instead
      */
-    protected Label getErrorMessageLabel() {
+    @Deprecated
+	protected Label getErrorMessageLabel() {
         return null;
     }
 
     /**
      * Returns the ok button.
-     * 
+     *
      * @return the ok button
      */
     protected Button getOkButton() {
@@ -206,7 +196,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the text area.
-     * 
+     *
      * @return the text area
      */
     protected Text getText() {
@@ -215,7 +205,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the validator.
-     * 
+     *
      * @return the validator
      */
     protected IInputValidator getValidator() {
@@ -224,7 +214,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the string typed into this input dialog.
-     * 
+     *
      * @return the input string
      */
     public String getValue() {
@@ -253,7 +243,7 @@ public class InputDialog extends Dialog {
     /**
      * Sets or clears the error message.
      * If not <code>null</code>, the OK button is disabled.
-     * 
+     *
      * @param errorMessage
      *            the error message, or <code>null</code> to clear
      * @since 3.0
@@ -278,14 +268,14 @@ public class InputDialog extends Dialog {
     		}
     	}
     }
-    
+
 	/**
 	 * Returns the style bits that should be used for the input text field.
 	 * Defaults to a single line entry. Subclasses may override.
-	 * 
+	 *
 	 * @return the integer style bits that should be used when creating the
 	 *         input text
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	protected int getInputTextStyle() {

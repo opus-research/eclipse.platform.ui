@@ -37,7 +37,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * PluginActionSet constructor comment.
-     * 
+     *
      * @param desc the descriptor
      */
     public PluginActionSet(ActionSetDescriptor desc) {
@@ -47,7 +47,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Adds one plugin action ref to the list.
-     * 
+     *
      * @param action the action
      */
     public void addPluginAction(WWinPluginAction action) {
@@ -56,7 +56,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Returns the list of plugin actions for the set.
-     * 
+     *
      * @return the actions for the set
      */
     public IAction[] getPluginActions() {
@@ -68,7 +68,8 @@ public class PluginActionSet implements IActionSet {
     /**
      * Disposes of this action set.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         Iterator iter = pluginActions.iterator();
         while (iter.hasNext()) {
             WWinPluginAction action = (WWinPluginAction) iter.next();
@@ -90,7 +91,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Returns the configuration element.
-     * 
+     *
      * @return the configuration element
      */
     public IConfigurationElement getConfigElement() {
@@ -99,7 +100,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Returns the underlying descriptor.
-     * 
+     *
      * @return the descriptor
      */
     public ActionSetDescriptor getDesc() {
@@ -113,7 +114,8 @@ public class PluginActionSet implements IActionSet {
      * @param window the workbench window
      * @param bars the action bars
      */
-    public void init(IWorkbenchWindow window, IActionBars bars) {
+    @Override
+	public void init(IWorkbenchWindow window, IActionBars bars) {
         this.bars = (ActionSetActionBars) bars;
     }
 
@@ -123,4 +125,11 @@ public class PluginActionSet implements IActionSet {
 		}
 		disposableBuilder = builder;
 	}
+
+	@Override
+	public String toString() {
+		return "PluginActionSet [desc=" + desc + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ (pluginActions != null ? "actions=" + pluginActions : "") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 }

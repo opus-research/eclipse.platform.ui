@@ -84,7 +84,7 @@ public class NewWizardAction extends Action implements
      * enabled state.
      */
     private PerspectiveTracker tracker;
-    
+
     /**
      * Create a new instance of this class.
      * @param window
@@ -102,17 +102,18 @@ public class NewWizardAction extends Action implements
                 .getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD));
         setDisabledImageDescriptor(images
                 .getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD_DISABLED));
-        setToolTipText(WorkbenchMessages.NewWizardAction_toolTip); 
+        setToolTipText(WorkbenchMessages.NewWizardAction_toolTip);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 				IWorkbenchHelpContextIds.NEW_ACTION);
     }
 
     /**
      * Create a new instance of this class
-     * 
+     *
      * @deprecated use the constructor <code>NewWizardAction(IWorkbenchWindow)</code>
      */
-    public NewWizardAction() {
+    @Deprecated
+	public NewWizardAction() {
         this(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
     }
 
@@ -138,16 +139,16 @@ public class NewWizardAction extends Action implements
 	 * <p>
 	 * Sets the title of the wizard window
 	 * <p>
-	 * 
+	 *
 	 * <p>
 	 * If the title of the wizard window is <code>null</code>, the default
 	 * wizard window title will be used.
 	 * </p>
-	 * 
+	 *
 	 * @param windowTitle
 	 *            The title of the wizard window, otherwise <code>null</code>
 	 *            (default wizard window title).
-	 * 
+	 *
 	 * @since 3.6
 	 */
 	public void setWizardWindowTitle(String windowTitle) {
@@ -157,7 +158,8 @@ public class NewWizardAction extends Action implements
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    public void run() {
+    @Override
+	public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -215,7 +217,8 @@ public class NewWizardAction extends Action implements
      * Method declared on ActionFactory.IWorkbenchAction.
      * @since 3.0
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;

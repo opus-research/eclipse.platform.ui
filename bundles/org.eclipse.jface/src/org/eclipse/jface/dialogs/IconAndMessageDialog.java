@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Constructor for IconAndMessageDialog.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell, or <code>null</code> to create a top-level
 	 *            shell
@@ -75,7 +75,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 	 * <strong>Note:</strong> Clients are expected to call this method, otherwise
 	 * neither the icon nor the message will appear.
 	 * </p>
-	 * 
+	 *
 	 * @param composite
 	 *            The composite to parent from.
 	 * @return Control
@@ -130,12 +130,13 @@ public abstract class IconAndMessageDialog extends Dialog {
 	/**
 	 * Add an accessible listener to the label if it can be inferred from the
 	 * image.
-	 * 
+	 *
 	 * @param label
 	 * @param image
 	 */
 	private void addAccessibleListeners(Label label, final Image image) {
 		label.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+			@Override
 			public void getName(AccessibleEvent event) {
 				final String accessibleMessage = getAccessibleMessageFor(image);
 				if (accessibleMessage == null) {
@@ -148,9 +149,9 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Returns the style for the message label.
-	 * 
+	 *
 	 * @return the style for the message label
-	 * 
+	 *
 	 * @since 3.0
 	 */
 	protected int getMessageLabelStyle() {
@@ -160,6 +161,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 	/*
 	 * @see Dialog.createButtonBar()
 	 */
+	@Override
 	protected Control createButtonBar(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(0) // this is incremented
@@ -179,7 +181,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 	 * <p>
 	 * Subclasses may override.
 	 * </p>
-	 * 
+	 *
 	 * @return the image to display beside the message
 	 * @since 2.0
 	 */
@@ -188,6 +190,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 	/*
 	 * @see Dialog.createContents(Composite)
 	 */
+	@Override
 	protected Control createContents(Composite parent) {
 		// initialize the dialog units
 		initializeDialogUnits(parent);
@@ -203,7 +206,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Get the number of columns in the layout of the Shell of the dialog.
-	 * 
+	 *
 	 * @return int
 	 * @since 3.3
 	 */
@@ -213,7 +216,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Create the dialog area and the button bar for the receiver.
-	 * 
+	 *
 	 * @param parent
 	 */
 	protected void createDialogAndButtonArea(Composite parent) {
@@ -226,7 +229,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Return the <code>Image</code> to be used when displaying an error.
-	 * 
+	 *
 	 * @return image the error image
 	 */
 	public Image getErrorImage() {
@@ -235,7 +238,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Return the <code>Image</code> to be used when displaying a warning.
-	 * 
+	 *
 	 * @return image the warning image
 	 */
 	public Image getWarningImage() {
@@ -244,7 +247,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Return the <code>Image</code> to be used when displaying information.
-	 * 
+	 *
 	 * @return image the information image
 	 */
 	public Image getInfoImage() {
@@ -253,7 +256,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Return the <code>Image</code> to be used when displaying a question.
-	 * 
+	 *
 	 * @return image the question image
 	 */
 	public Image getQuestionImage() {
@@ -262,7 +265,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 	/**
 	 * Get an <code>Image</code> from the provide SWT image constant.
-	 * 
+	 *
 	 * @param imageID
 	 *            the SWT image constant
 	 * @return image the image
@@ -287,6 +290,7 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 		final Image[] image = new Image[1];
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				image[0] = display.getSystemImage(imageID);
 			}

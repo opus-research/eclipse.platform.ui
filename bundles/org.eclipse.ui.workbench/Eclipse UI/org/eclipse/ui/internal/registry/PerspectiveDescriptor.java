@@ -34,7 +34,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * <li>It <code>hasCustomFile</code>, in which case the user created a new
  * perspective.</li>
  * </ol>
- * 
+ *
  */
 public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 		IPluginContribution {
@@ -79,15 +79,17 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 		}
 	}
 
+	@Override
 	public String getDescription() {
 		return configElement == null ? null : RegistryReader.getDescription(configElement);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPerspectiveDescriptor#getId()
 	 */
+	@Override
 	public String getId() {
 		return id;
 	}
@@ -102,9 +104,10 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPerspectiveDescriptor#getImageDescriptor()
 	 */
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		if (image != null)
 			return image;
@@ -127,9 +130,10 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPerspectiveDescriptor#getLabel()
 	 */
+	@Override
 	public String getLabel() {
 		return configElement == null ? label : configElement
 				.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
@@ -137,25 +141,27 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
+	@Override
 	public String getLocalId() {
 		return getId();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
+	@Override
 	public String getPluginId() {
 		return configElement == null ? pluginId : configElement.getNamespaceIdentifier();
 	}
 
 	/**
 	 * Returns <code>true</code> if this perspective has a custom definition.
-	 * 
+	 *
 	 * @return whether this perspective has a custom definition
 	 */
 	public boolean hasCustomDefinition() {
@@ -169,7 +175,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 	/**
 	 * Returns <code>true</code> if this perspective is predefined by an
 	 * extension.
-	 * 
+	 *
 	 * @return boolean whether this perspective is predefined by an extension
 	 */
 	public boolean isPredefined() {
@@ -178,13 +184,14 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/**
 	 * Returns <code>true</code> if this perspective is a singleton.
-	 * 
+	 *
 	 * @return whether this perspective is a singleton
 	 */
 	public boolean isSingleton() {
 		return false;
 	}
 
+	@Override
 	public String toString() {
 		return this.getClass().getName() + " {id=" + getId() + "}"; //$NON-NLS-1$//$NON-NLS-2$
 	}

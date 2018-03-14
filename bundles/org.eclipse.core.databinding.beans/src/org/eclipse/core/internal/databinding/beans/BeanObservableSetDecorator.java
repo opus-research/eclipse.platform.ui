@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 
 /**
  * {@link IBeanObservable} decorator for an {@link IObservableSet}.
- * 
+ *
  * @since 3.3
  */
 public class BeanObservableSetDecorator extends DecoratingObservableSet
@@ -39,11 +39,13 @@ public class BeanObservableSetDecorator extends DecoratingObservableSet
 		this.propertyDescriptor = propertyDescriptor;
 	}
 
+	@Override
 	public synchronized void dispose() {
 		this.propertyDescriptor = null;
 		super.dispose();
 	}
 
+	@Override
 	public Object getObserved() {
 		IObservable decorated = getDecorated();
 		if (decorated instanceof IObserving)
@@ -51,6 +53,7 @@ public class BeanObservableSetDecorator extends DecoratingObservableSet
 		return null;
 	}
 
+	@Override
 	public PropertyDescriptor getPropertyDescriptor() {
 		return propertyDescriptor;
 	}

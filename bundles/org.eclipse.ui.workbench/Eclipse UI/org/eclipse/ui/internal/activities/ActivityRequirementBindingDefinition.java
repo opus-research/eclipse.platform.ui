@@ -93,7 +93,8 @@ public final class ActivityRequirementBindingDefinition {
         return compareTo;
     }
 
-    public boolean equals(Object object) {
+    @Override
+	public boolean equals(Object object) {
         if (!(object instanceof ActivityRequirementBindingDefinition)) {
 			return false;
 		}
@@ -103,11 +104,11 @@ public final class ActivityRequirementBindingDefinition {
                 castedObject.requiredActivityId)) {
             return false;
         }
-        
+
         if (!Util.equals(activityId, castedObject.activityId)) {
             return false;
         }
-        
+
         return Util.equals(sourceId, castedObject.sourceId);
     }
 
@@ -123,7 +124,8 @@ public final class ActivityRequirementBindingDefinition {
         return sourceId;
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR
                     + Util.hashCode(requiredActivityId);
@@ -137,7 +139,8 @@ public final class ActivityRequirementBindingDefinition {
         return hashCode;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

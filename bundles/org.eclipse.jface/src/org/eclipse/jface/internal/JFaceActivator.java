@@ -22,17 +22,13 @@ public class JFaceActivator implements BundleActivator {
 
 	private static BundleContext bundleContext;
 
-	/* (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		bundleContext = context;
 		InternalPolicy.OSGI_AVAILABLE = true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		InternalPolicy.OSGI_AVAILABLE = false;
 		bundleContext = null;
@@ -42,7 +38,7 @@ public class JFaceActivator implements BundleActivator {
 	 * Return the bundle context for this bundle, or <code>null</code> if
 	 * there is not one. (for instance if the bundle is not activated or we aren't
 	 * running OSGi.
-	 * 
+	 *
 	 * @return the bundle context or <code>null</code>
 	 */
 	public static BundleContext getBundleContext() {
@@ -52,7 +48,7 @@ public class JFaceActivator implements BundleActivator {
 	/**
 	 * Return the Bundle object for JFace. Returns <code>null</code> if it is not
 	 * available.
-	 * 
+	 *
 	 * @return the bundle or <code>null</code>
 	 */
 	public static Bundle getBundle() {

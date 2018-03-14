@@ -25,7 +25,7 @@ import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * Action to open the help search.
- * 
+ *
  * @since 3.1
  */
 public class HelpSearchAction extends Action implements IWorkbenchAction {
@@ -44,7 +44,7 @@ public class HelpSearchAction extends Action implements IWorkbenchAction {
 
     /**
      * Constructor for use by ActionFactory.
-     * 
+     *
      * @param window the window
      */
     public HelpSearchAction(IWorkbenchWindow window) {
@@ -58,7 +58,7 @@ public class HelpSearchAction extends Action implements IWorkbenchAction {
         String overrideText = PrefUtil.getAPIPreferenceStore().getString(
                 IWorkbenchPreferenceConstants.HELP_SEARCH_ACTION_TEXT);
         if ("".equals(overrideText)) { //$NON-NLS-1$
-            setText(WorkbenchMessages.HelpSearchAction_text); 
+            setText(WorkbenchMessages.HelpSearchAction_text);
             setToolTipText(WorkbenchMessages.HelpSearchAction_toolTip);
         } else {
             setText(overrideText);
@@ -73,14 +73,16 @@ public class HelpSearchAction extends Action implements IWorkbenchAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    public void run() {
+    @Override
+	public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
         }
         //This may take a while, so use the busy indicator
         BusyIndicator.showWhile(null, new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
             	workbenchWindow.getWorkbench().getHelpSystem().displaySearch();
             }
         });
@@ -89,7 +91,8 @@ public class HelpSearchAction extends Action implements IWorkbenchAction {
     /* (non-Javadoc)
      * Method declared on ActionFactory.IWorkbenchAction.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         workbenchWindow = null;
     }
 
