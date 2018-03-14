@@ -336,10 +336,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	 * @see org.eclipse.ui.IWorkbenchPartReference#getTitleToolTip()
 	 */
 	public String getTitleToolTip() {
-		String toolTip = (String) part.getTransientData().get(
-				IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
-		if (toolTip == null || toolTip.length() == 0)
-			toolTip = part.getLocalizedTooltip();
+		String toolTip = part.getLocalizedTooltip();
 		return Util.safeString(toolTip);
 	}
 

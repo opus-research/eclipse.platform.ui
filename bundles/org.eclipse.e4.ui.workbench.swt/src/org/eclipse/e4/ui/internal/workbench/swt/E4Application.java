@@ -456,6 +456,13 @@ public class E4Application implements IApplication {
 		serviceContext.set(IExceptionHandler.class, exceptionHandler);
 		serviceContext.set(IExtensionRegistry.class, registry);
 
+		// translation
+		String locale = Locale.getDefault().toString();
+		serviceContext.set(TranslationService.LOCALE, locale);
+		TranslationService bundleTranslationProvider = TranslationProviderFactory
+				.bundleTranslationService(serviceContext);
+		serviceContext.set(TranslationService.class, bundleTranslationProvider);
+
 		serviceContext.set(Adapter.class, ContextInjectionFactory.make(
 				EclipseAdapter.class, serviceContext));
 
@@ -508,13 +515,6 @@ public class E4Application implements IApplication {
 					String id) {
 			}
 		});
-
-		// translation
-		String locale = Locale.getDefault().toString();
-		appContext.set(TranslationService.LOCALE, locale);
-		TranslationService bundleTranslationProvider = TranslationProviderFactory
-				.bundleTranslationService(appContext);
-		appContext.set(TranslationService.class, bundleTranslationProvider);
 
 		return appContext;
 	}
