@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 403081, 403083
  *     Bruce Skingle <Bruce.Skingle@immutify.com> - Bug 442570
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -55,7 +56,7 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 		final MMenu menuModel = renderer.getMenuModel(menuManager);
 		final Menu menu = menuManager.getMenu();
 		if (menuModel instanceof MPopupMenu) {
-			hidePopup(menu, (MPopupMenu) menuModel);
+			hidePopup(menu, (MPopupMenu) menuModel, menuManager);
 		}
 		if (menuModel != null && menu != null)
 			processDynamicElements((MenuManager) manager, menu, menuModel);
@@ -72,7 +73,7 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	private void processDynamicElements(final MenuManager menuManager, Menu menu, final MMenu menuModel) {
 		// We need to make a copy of the dynamic items which need to be removed
 		// because the actual remove happens asynchronously.
-		final Map<MDynamicMenuContribution, ArrayList<MMenuElement>> toBeHidden = new HashMap<MDynamicMenuContribution, ArrayList<MMenuElement>>();
+		final Map<MDynamicMenuContribution, ArrayList<MMenuElement>> toBeHidden = new HashMap<>();
 
 		for (MMenuElement currentMenuElement : menuModel.getChildren()) {
 			if (currentMenuElement instanceof MDynamicMenuContribution) {
@@ -87,34 +88,39 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 		}
 
 		if (!menu.isDisposed()) {
-			for (Entry<MDynamicMenuContribution, ArrayList<MMenuElement>> entry : toBeHidden.entrySet()) {
-				MDynamicMenuContribution currentMenuElement = entry.getKey();
-				Object contribution = currentMenuElement.getObject();
-				IEclipseContext dynamicMenuContext = EclipseContextFactory.create();
+			menu.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					for (Entry<MDynamicMenuContribution, ArrayList<MMenuElement>> entry : toBeHidden.entrySet()) {
+						MDynamicMenuContribution currentMenuElement = entry.getKey();
+						Object contribution = currentMenuElement.getObject();
+						IEclipseContext dynamicMenuContext = EclipseContextFactory.create();
 
-				ArrayList<MMenuElement> mel = entry.getValue();
+						ArrayList<MMenuElement> mel = entry.getValue();
 
-				dynamicMenuContext.set(List.class, mel);
-				IEclipseContext parentContext = modelService.getContainingContext(currentMenuElement);
-				ContextInjectionFactory.invoke(contribution, AboutToHide.class, parentContext,
-						dynamicMenuContext, null);
-				dynamicMenuContext.dispose();
-				// remove existing entries for this dynamic
-				// contribution item if there are any
-				if (mel != null && mel.size() > 0) {
-					renderer.removeDynamicMenuContributions(menuManager, menuModel, mel);
-				}
+						dynamicMenuContext.set(List.class, mel);
+						IEclipseContext parentContext = modelService.getContainingContext(currentMenuElement);
+						ContextInjectionFactory.invoke(contribution, AboutToHide.class, parentContext,
+								dynamicMenuContext, null);
+						dynamicMenuContext.dispose();
+						// remove existing entries for this dynamic
+						// contribution item if there are any
+						if (mel != null && mel.size() > 0) {
+							renderer.removeDynamicMenuContributions(menuManager, menuModel, mel);
+						}
 
-				// make existing entries for this dynamic contribution
-				// item invisible if there are any
-				if (mel != null && mel.size() > 0) {
-					for (MMenuElement item : mel) {
-						item.setVisible(false);
+						// make existing entries for this dynamic contribution
+						// item invisible if there are any
+						if (mel != null && mel.size() > 0) {
+							for (MMenuElement item : mel) {
+								item.setVisible(false);
+							}
+						}
+						currentMenuElement.getTransientData()
+								.remove(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
 					}
 				}
-				currentMenuElement.getTransientData()
-						.remove(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
-			}
+			});
 		}
 	}
 
@@ -122,17 +128,23 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	public void menuAboutToHide(IMenuManager manager) {
 	}
 
-	private void hidePopup(Menu menu, MPopupMenu menuModel) {
+	private void hidePopup(Menu menu, MPopupMenu menuModel,
+			MenuManager menuManager) {
 		final IEclipseContext popupContext = menuModel.getContext();
 		final IEclipseContext originalChild = (IEclipseContext) popupContext
 				.get(MenuManagerRendererFilter.TMP_ORIGINAL_CONTEXT);
 		popupContext.remove(MenuManagerRendererFilter.TMP_ORIGINAL_CONTEXT);
 		if (!menu.isDisposed()) {
-			if (originalChild == null) {
-				popupContext.deactivate();
-			} else {
-				originalChild.activate();
-			}
+			menu.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (originalChild == null) {
+						popupContext.deactivate();
+					} else {
+						originalChild.activate();
+					}
+				}
+			});
 		}
 	}
 }

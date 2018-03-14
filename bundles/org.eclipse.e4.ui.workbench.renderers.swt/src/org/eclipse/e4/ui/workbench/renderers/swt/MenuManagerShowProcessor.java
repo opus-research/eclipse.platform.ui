@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063,398865,398866,403081,403083
  *     Bruce Skingle <Bruce.Skingle@immutify.com> - Bug 442570
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -26,7 +27,6 @@ import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -66,16 +66,10 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	private IContributionFactory contributionFactory;
 
 	@Inject
-	private MApplication application;
-
-	@Inject
 	@Optional
 	private Logger logger;
 
-	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
-
-	// Use to resolve the context for dynamic menu children.
-	private static final String DYNAMIC_MENU_CONTEXT = "ModelUtils.dynamicMenuContext"; //$NON-NLS-1$
+	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<>();
 
 	@Override
 	public void menuAboutToShow(IMenuManager manager) {
@@ -88,9 +82,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 		if (menuModel != null && menuManager != null) {
 			cleanUp(menu, menuModel, menuManager);
-		}
-		if (menuModel != null) {
-			addContextToDynamicElements(menuModel);
 		}
 		if (menuModel instanceof MPopupMenu) {
 			showPopup(menu, (MPopupMenu) menuModel, menuManager);
@@ -157,7 +148,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 				IEclipseContext dynamicMenuContext = EclipseContextFactory
 						.create();
-				ArrayList<MMenuElement> mel = new ArrayList<MMenuElement>();
+				ArrayList<MMenuElement> mel = new ArrayList<>();
 				dynamicMenuContext.set(List.class, mel);
 				IEclipseContext parentContext = modelService
 						.getContainingContext(currentMenuElement);
@@ -194,35 +185,11 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 							menuElement.setElementId(currentMenuElement
 									.getElementId() + "." + j); //$NON-NLS-1$
 						}
-
-						// Store the application on the dymanic menu so the
-						// @Execute method has access to it a context,
-						// even after the SWT.Hide event has caused the model to
-						// be torn-down.
-						menuElement.getTransientData().put(DYNAMIC_MENU_CONTEXT, application);
 						menuModel.getChildren().add(position++, menuElement);
 						renderer.modelProcessSwitch(menuManager, menuElement);
 					}
 					currentMenuElement.getTransientData().put(DYNAMIC_ELEMENT_STORAGE_KEY, mel);
 				}
-			}
-		}
-	}
-
-	/**
-	 * Dynamic menus are hidden before the selected event (in SWT) so we tag the
-	 * context onto the element to ensure it's usable when handlers need to be
-	 * executed (i.e. after the menu is hidden and it's model torn-down).
-	 */
-	private void addContextToDynamicElements(MMenu menuModel) {
-		MMenuElement[] ml = menuModel.getChildren().toArray(new MMenuElement[menuModel.getChildren().size()]);
-		for (int i = 0; i < ml.length; i++) {
-			MMenuElement currentMenuElement = ml[i];
-			if (currentMenuElement instanceof MDynamicMenuContribution) {
-				// Store the application on the dynamic menu so the @Execute
-				// method has access to it a context, even after the SWT.Hide
-				// event has caused the model to be torn-down.
-				currentMenuElement.getTransientData().put(DYNAMIC_MENU_CONTEXT, application);
 			}
 		}
 	}
