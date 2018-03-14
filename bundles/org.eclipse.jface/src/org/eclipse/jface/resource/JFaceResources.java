@@ -439,7 +439,7 @@ public class JFaceResources {
 				PreferenceDialog.PREF_DLG_TITLE_IMG,
 				ICONS_PATH + "pref_dialog_title.png", PreferenceDialog.class, "images/pref_dialog_title.png");//$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(bundle, PopupDialog.POPUP_IMG_MENU, ICONS_PATH
-				+ "popup_menu.gif", PopupDialog.class, "images/popup_menu.gif");//$NON-NLS-1$ //$NON-NLS-2$
+				+ "popup_menu.png", PopupDialog.class, "images/popup_menu.png");//$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(
 				bundle,
 				PopupDialog.POPUP_IMG_MENU_DISABLED,
