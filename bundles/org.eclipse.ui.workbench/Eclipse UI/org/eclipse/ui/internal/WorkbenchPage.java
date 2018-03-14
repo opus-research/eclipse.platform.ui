@@ -1437,7 +1437,7 @@ public class WorkbenchPage implements IWorkbenchPage {
         }
 
 		// notify the model manager before the close
-		List<IEditorPart> partsToClose = new ArrayList<IEditorPart>();
+		List<IWorkbenchPart> partsToClose = new ArrayList<>();
 		for (IEditorReference ref : editorRefs) {
 			IEditorPart refPart = ref.getEditor(false);
 			if (refPart != null) {
@@ -2516,16 +2516,14 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			List<MPlaceholder> placeholders = modelService.findElements(window, null,
-					MPlaceholder.class, null, scope);
+			Set<MUIElement> parts = new HashSet<MUIElement>();
+			parts.addAll(modelService.findElements(window, null, MPlaceholder.class, null, scope));
+			parts.addAll(modelService.findElements(window, null, MPart.class, null, scope));
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				for (MPlaceholder placeholder : placeholders) {
-					if (reference.getModel() == placeholder.getRef()
-							&& placeholder.isToBeRendered()) {
-						// only rendered placeholders are valid view references
-						visibleReferences.add(reference);
-					}
+				if (parts.contains(reference.getModel()) && reference.getModel().isToBeRendered()) {
+					// only rendered placeholders are valid view references
+					visibleReferences.add(reference);
 				}
 			}
 			return visibleReferences.toArray(new IViewReference[visibleReferences.size()]);

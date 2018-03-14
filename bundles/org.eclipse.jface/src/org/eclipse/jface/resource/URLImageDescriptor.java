@@ -49,7 +49,7 @@ class URLImageDescriptor extends ImageDescriptor {
 			URL xUrl = getxURL(url, zoom);
 			if (xUrl == null)
 				return null;
-			return getFilePath(xUrl); // can be null!
+			return getFilePath(xUrl, zoom == 100); // can be null!
 		}
 	}
 
@@ -136,8 +136,21 @@ class URLImageDescriptor extends ImageDescriptor {
 
 	private static InputStream getStream(URL url) {
 		try {
+			if (InternalPolicy.OSGI_AVAILABLE) {
+				URL platformURL = FileLocator.find(url);
+				if (platformURL != null) {
+					url = platformURL;
+				}
+			}
 			return new BufferedInputStream(url.openStream());
 		} catch (IOException e) {
+			if (InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x) {
+				String path = url.getPath();
+				if (path.endsWith("@2x.png") || path.endsWith("@1.5x.png")) { //$NON-NLS-1$ //$NON-NLS-2$
+					String message = "High-resolution image missing: " + url; //$NON-NLS-1$
+					Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, e));
+				}
+			}
 			return null;
 		}
 	}
@@ -166,6 +179,9 @@ class URLImageDescriptor extends ImageDescriptor {
 		if (dot != -1 && (zoom == 150 || zoom == 200)) {
 			String lead = path.substring(0, dot);
 			String tail = path.substring(dot);
+			if (InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x_PNG_FOR_GIF && ".gif".equalsIgnoreCase(tail)) { //$NON-NLS-1$
+				tail = ".png"; //$NON-NLS-1$
+			}
 			String x = zoom == 150 ? "@1.5x" : "@2x"; //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				String file = lead + x + tail;
@@ -187,7 +203,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 *
 	 * @return {@link String} or <code>null</code> if the file cannot be found
 	 */
-	private static String getFilePath(URL url) {
+	private static String getFilePath(URL url, boolean logIOException) {
 
 		try {
 			if (!InternalPolicy.OSGI_AVAILABLE) {
@@ -196,13 +212,25 @@ class URLImageDescriptor extends ImageDescriptor {
 				return null;
 			}
 
+			URL platformURL = FileLocator.find(url);
+			if (platformURL != null) {
+				url = platformURL;
+			}
 			URL locatedURL = FileLocator.toFileURL(url);
 			if (FILE_PROTOCOL.equalsIgnoreCase(locatedURL.getProtocol()))
 				return new Path(locatedURL.getPath()).toOSString();
 			return null;
 
 		} catch (IOException e) {
-			Policy.logException(e);
+			if (logIOException) {
+				Policy.logException(e);
+			} else if (InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x) {
+				String path = url.getPath();
+				if (path.endsWith("@2x.png") || path.endsWith("@1.5x.png")) { //$NON-NLS-1$ //$NON-NLS-2$
+					String message = "High-resolution image missing: " + url; //$NON-NLS-1$
+					Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, e));
+				}
+			}
 			return null;
 		}
 	}
@@ -217,7 +245,7 @@ class URLImageDescriptor extends ImageDescriptor {
 		try {
 
 			if (InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x) {
-				if (InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY) {
+				if (!InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY) {
 					try {
 						return new Image(device, new URLImageFileNameProvider(url));
 					} catch (SWTException exception) {
@@ -252,7 +280,7 @@ class URLImageDescriptor extends ImageDescriptor {
 			}
 
 			// Try to see if we can optimize using SWTs file based image support.
-			String path = getFilePath(url);
+			String path = getFilePath(url, true);
 			if (path != null) {
 				try {
 					return new Image(device, path);
