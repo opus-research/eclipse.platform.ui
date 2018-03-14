@@ -142,7 +142,6 @@ class IDEIdleHelper {
 		//hook idle handler
 		final Display display = configurer.getWorkbench().getDisplay();
 		handler = new Runnable() {
-					@Override
 					public void run() {
 						if (!display.isDisposed() && !configurer.getWorkbench().isClosing()) {
 							int nextInterval;
@@ -162,7 +161,6 @@ class IDEIdleHelper {
 					}
 				};
 		idleListener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				display.timerExec(IDLE_INTERVAL, handler);
 			}
@@ -176,7 +174,6 @@ class IDEIdleHelper {
 	 */
 	private void createGarbageCollectionJob() {
 		gcJob = new Job(IDEWorkbenchMessages.IDEIdleHelper_backgroundGC) {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				final Display display = configurer.getWorkbench().getDisplay();
 				if (display != null && !display.isDisposed()) {
@@ -218,7 +215,6 @@ class IDEIdleHelper {
 		if (display != null && !display.isDisposed()) {
 			try {
 				display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						display.timerExec(-1, handler);
 						display.removeFilter(SWT.KeyUp, idleListener);
