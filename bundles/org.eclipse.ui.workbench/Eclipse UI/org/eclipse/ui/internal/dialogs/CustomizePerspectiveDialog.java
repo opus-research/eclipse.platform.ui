@@ -3524,6 +3524,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		super.okPressed();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.TrayDialog#close()
+	 */
 	@Override
 	public boolean close() {
 		tooltipHeading.dispose();
@@ -3565,6 +3570,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 */
 	@Override
 	protected boolean isResizable() {
 		return true;
