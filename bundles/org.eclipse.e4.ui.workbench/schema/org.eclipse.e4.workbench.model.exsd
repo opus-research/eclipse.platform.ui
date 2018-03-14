@@ -70,6 +70,22 @@ Whenever possible, the model extensions of dependent bundles are processed befor
                </appInfo>
             </annotation>
          </attribute>
+         <attribute name="compatibility" type="boolean">
+            <annotation>
+               <documentation>
+                  This fields controls the merging of fragments in case of programming against the compatibility layer. It is ignored when running in pure e4 mode.
+&lt;p&gt;&lt;/p&gt;
+Specify one of the following options
+&lt;p&gt;&lt;/p&gt;
+&lt;dl&gt;
+&lt;dt&gt;false (default)&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The fragment will be merged  before the workbench model is created.&lt;/dd&gt;
+&lt;dt&gt;true&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The fragment will be merged after the workbench model is created.&lt;/dd&gt;
+&lt;/dl&gt;
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -97,6 +113,22 @@ Whenever possible, the model extensions of dependent bundles are processed befor
             <annotation>
                <documentation>
                   This flag specifies that the processor has to be invoked before model fragments are added.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="compatibility" type="boolean">
+            <annotation>
+               <documentation>
+                  This fields controls the execution of processors in case of programming against the compatibility layer. It is ignored when running in pure e4 mode.
+&lt;p&gt;&lt;/p&gt;
+Specify one of the following options
+&lt;p&gt;&lt;/p&gt;
+&lt;dl&gt;
+&lt;dt&gt;false (default)&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The processor will be called  before the workbench model is created.&lt;/dd&gt;
+&lt;dt&gt;true&lt;/dt&gt;
+&lt;dd&gt;When running in compatibility mode: The processor will be called after the workbench model is created.&lt;/dd&gt;
+&lt;/dl&gt;
                </documentation>
             </annotation>
          </attribute>
@@ -164,7 +196,6 @@ Whenever possible, the model extensions of dependent bundles are processed befor
    &lt;/extension&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
-
       </documentation>
    </annotation>
 
@@ -180,7 +211,6 @@ All rights reserved. This program and the accompanying materials are made
 available under the terms of the Eclipse Public License v1.0 which accompanies
 this distribution, and is available at &lt;a 
 href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
-
       </documentation>
    </annotation>
 
