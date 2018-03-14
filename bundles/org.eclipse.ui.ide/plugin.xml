@@ -2392,4 +2392,12 @@
       </perspectiveExtension>
    </extension>
 
+   <extension
+         id="org.eclipse.ui.ide.fragment"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            uri="fragment.e4xmi">
+      </fragment>
+   </extension>
+
 </plugin>

@@ -94,24 +94,6 @@
                label="%menu.editor.label"
                mnemonic="%menu.editor.mnemonic">
             <command
-                  commandId="org.eclipse.ui.window.splitEditor"
-                  mnemonic="%command.split.horizontal.mnemonic"
-                  style="push">
-               <parameter
-                     name="Splitter.isHorizontal"
-                     value="true">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.splitEditor"
-                  mnemonic="%command.split.vertical.mnemonic"
-                  style="push">
-               <parameter
-                     name="Splitter.isHorizontal"
-                     value="false">
-               </parameter>
-            </command>
-            <command
                   commandId="org.eclipse.ui.window.newEditor"
                   label="%command.clone.label"
                   mnemonic="%command.clone.mnemonic"
