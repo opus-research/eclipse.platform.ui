@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -144,7 +143,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 *            a progress monitor
 	 * @return The result of the execution
 	 */
-	final IStatus execute(List<? extends IResource> resources, IProgressMonitor monitor) {
+	final IStatus execute(List<IResource> resources, IProgressMonitor monitor) {
 		MultiStatus errors = null;
 		// 1FTIMQN: ITPCORE:WIN - clients required to do too much iteration work
 		if (shouldPerformResourcePruning()) {
@@ -157,7 +156,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 		// call setTaskName as its the only was to assure the task name is
 		// set in the monitor (see bug 31824)
 		monitor.setTaskName(getOperationMessage());
-		Iterator<? extends IResource> resourcesEnum = resources.iterator();
+		Iterator<IResource> resourcesEnum = resources.iterator();
 		try {
 			while (resourcesEnum.hasNext()) {
 				IResource resource = resourcesEnum.next();
@@ -295,7 +294,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 *         after pruning.
 	 * @see #shouldPerformResourcePruning
 	 */
-	List<IResource> pruneResources(List<? extends IResource> resourceCollection) {
+	List<IResource> pruneResources(List<IResource> resourceCollection) {
 		List<IResource> prunedList = new ArrayList<IResource>(resourceCollection);
 		Iterator<IResource> elementsEnum = prunedList.iterator();
 		while (elementsEnum.hasNext()) {
@@ -412,7 +411,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 *
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
-	protected List<? extends IResource> getActionResources() {
+	protected List<IResource> getActionResources() {
 		return getSelectedResources();
 	}
 
