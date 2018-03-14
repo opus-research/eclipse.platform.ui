@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -27,7 +28,8 @@ public abstract class ModelReconcilerMenuContributionTest extends
 			String after) {
 		MApplication application = createApplication();
 
-		MMenuContribution contribution = ems.createModelElement(MMenuContribution.class);
+		MMenuContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createMenuContribution();
 		application.getMenuContributions().add(contribution);
 		contribution.setPositionInParent(before);
 
@@ -84,7 +86,8 @@ public abstract class ModelReconcilerMenuContributionTest extends
 	private void testMenuContribution_ParentID(String before, String after) {
 		MApplication application = createApplication();
 
-		MMenuContribution contribution = ems.createModelElement(MMenuContribution.class);
+		MMenuContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createMenuContribution();
 		application.getMenuContributions().add(contribution);
 		contribution.setParentId(before);
 

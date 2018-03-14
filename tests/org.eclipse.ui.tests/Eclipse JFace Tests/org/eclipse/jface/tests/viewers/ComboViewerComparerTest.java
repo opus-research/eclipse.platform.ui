@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.util.ILogger;
@@ -26,17 +28,11 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import junit.framework.TestCase;
-
 public class ComboViewerComparerTest extends TestCase {
 
 	private Shell shell;
 
 	private StructuredViewer viewer;
-
-	private ILogger oldLogger;
-
-	private ISafeRunnableRunner oldRunner;
 
 	private static final class TestElement {
 
@@ -80,8 +76,6 @@ public class ComboViewerComparerTest extends TestCase {
 
 	@Override
 	protected void setUp() {
-		oldLogger = Policy.getLog();
-		oldRunner = SafeRunnable.getRunner();
 		Policy.setLog(new ILogger() {
 			@Override
 			public void log(IStatus status) {
@@ -111,8 +105,6 @@ public class ComboViewerComparerTest extends TestCase {
 
 	@Override
 	protected void tearDown() {
-		Policy.setLog(oldLogger);
-		SafeRunnable.setRunner(oldRunner);
 		processEvents();
 		viewer = null;
 		if (shell != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,8 +18,10 @@ import java.util.Collection;
 import org.eclipse.e4.ui.internal.workbench.ModelReconcilingService;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
+import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.IModelReconcilingService;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
@@ -35,7 +37,7 @@ public class E4XMIResourceFactoryTest extends ModelReconcilerTest {
 
 		application = createApplication();
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
 		assertFalse(getId(application).equals(getId(window)));
@@ -50,14 +52,14 @@ public class E4XMIResourceFactoryTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MWindow window1 = ems.createModelElement(MWindow.class);
+		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window1);
 
 		Object state = reconciler.serialize();
 
 		application = createApplication();
 
-		MWindow window2 = ems.createModelElement(MWindow.class);
+		MWindow window2 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window2);
 
 		Collection<ModelDelta> deltas = constructDeltas(application, state);
@@ -88,14 +90,14 @@ public class E4XMIResourceFactoryTest extends ModelReconcilerTest {
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MCommand command = ems.createModelElement(MCommand.class);
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 		command.setElementId("id");
 		application.getCommands().add(command);
 
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setElementId("id");
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
