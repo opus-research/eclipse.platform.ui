@@ -13,13 +13,13 @@ package org.eclipse.ui.internal.decorators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.internal.IObjectContributor;
 import org.eclipse.ui.internal.ObjectContributorManager;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -234,7 +234,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * @return LightweightDecoratorDefinition[]
 	 */
 	LightweightDecoratorDefinition[] enabledDefinitions() {
-		ArrayList<LightweightDecoratorDefinition> result = new ArrayList<LightweightDecoratorDefinition>();
+		ArrayList result = new ArrayList();
 		for (int i = 0; i < lightweightDefinitions.length; i++) {
 			if (lightweightDefinitions[i].isEnabled()) {
 				result.add(lightweightDefinitions[i]);
@@ -307,13 +307,15 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			return EMPTY_LIGHTWEIGHT_DEF;
 		}
 
-		List<Object> elements = new ArrayList<Object>(1);
+		List elements = new ArrayList(1);
 		elements.add(element);
 		LightweightDecoratorDefinition[] decoratorArray = EMPTY_LIGHTWEIGHT_DEF;
-		List<IObjectContributor> contributors = getContributors(elements);
+		List contributors = getContributors(elements);
 		if (!contributors.isEmpty()) {
-			Collection<DecoratorDefinition> decorators = DecoratorManager.getDecoratorsFor(element,
-					contributors.toArray(new DecoratorDefinition[contributors.size()]));
+			Collection decorators = DecoratorManager.getDecoratorsFor(element,
+					(DecoratorDefinition[]) contributors
+							.toArray(new DecoratorDefinition[contributors
+									.size()]));
 			if (decorators.size() > 0) {
 				decoratorArray = new LightweightDecoratorDefinition[decorators
 						.size()];

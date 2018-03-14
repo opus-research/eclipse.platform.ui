@@ -13,6 +13,7 @@ package org.eclipse.ui.internal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
@@ -59,15 +60,15 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
         // According to the dictionary, a selection is "one that
         // is selected", or "a collection of selected things".  
         // In reflection of this, we deal with one or a collection.
-		List<Object> elements = null;
+        List elements = null;
         if (selection instanceof IStructuredSelection) {
             elements = ((IStructuredSelection) selection).toList();
         } else {
-			elements = new ArrayList<Object>(1);
+            elements = new ArrayList(1);
             elements.add(selection);
         }
 
-		List<IObjectContributor> contributors = getContributors(elements);
+        List contributors = getContributors(elements);
        
         if (contributors.isEmpty()) {
 			return false;
@@ -76,8 +77,8 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
         // First pass, add the menus and collect the overrides. Prune from the
         // list any non-applicable contributions.
         boolean actualContributions = false;
-		ArrayList<String> overrides = new ArrayList<String>(4);
-		for (Iterator<IObjectContributor> it = contributors.iterator(); it.hasNext();) {
+        ArrayList overrides = new ArrayList(4);
+        for (Iterator it = contributors.iterator(); it.hasNext();) {
 			IObjectActionContributor contributor = (IObjectActionContributor) it.next();
             if (!isApplicableTo(elements, contributor)) {
             	it.remove();            
@@ -91,7 +92,7 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
         
         // Second pass, add the contributions that are applicable to
         // the selection.
-		for (Iterator<IObjectContributor> it = contributors.iterator(); it.hasNext();) {
+        for (Iterator it = contributors.iterator(); it.hasNext();) {
 			IObjectActionContributor contributor = (IObjectActionContributor) it.next();        
             if (contributor.contributeObjectActions(part, popupMenu, selProv,
                     overrides)) {

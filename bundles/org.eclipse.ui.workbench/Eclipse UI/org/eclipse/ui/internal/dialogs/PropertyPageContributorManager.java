@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.internal.IObjectContributor;
 import org.eclipse.ui.internal.ObjectContributorManager;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.registry.PropertyPagesRegistryReader;
@@ -79,13 +78,13 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 	 */
 	public boolean contribute(PropertyPageManager manager, Object object) {
 
-		Collection<IObjectContributor> result = null;
+		Collection result = null;
 		if (object instanceof IStructuredSelection) {
 			Object[] objs = ((IStructuredSelection) object).toArray();
 			for (int i = 0; i < objs.length; i++) {
-				List<IObjectContributor> contribs = getContributors(objs[i]);
+				List contribs = getContributors(objs[i]);
 				if (result == null)
-					result = new LinkedHashSet<IObjectContributor>(contribs);
+					result = new LinkedHashSet(contribs);
 				else
 					result.retainAll(contribs);
 			}
@@ -97,16 +96,17 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 		}
 
 		// Build the category nodes
-		List<CategorizedPageNode> catNodes = buildNodeList(result);
-		Iterator<CategorizedPageNode> resultIterator = catNodes.iterator();
+		List catNodes = buildNodeList(result);
+		Iterator resultIterator = catNodes.iterator();
 
 		// K(CategorizedPageNode) V(PreferenceNode - property page)
-		Map<CategorizedPageNode, PreferenceNode> catPageNodeToPages = new HashMap<CategorizedPageNode, PreferenceNode>();
+		Map catPageNodeToPages = new HashMap();
 
 		// Allow each contributor to add its page to the manager.
 		boolean actualContributions = false;
 		while (resultIterator.hasNext()) {
-			CategorizedPageNode next = resultIterator.next();
+			CategorizedPageNode next = (CategorizedPageNode) resultIterator
+					.next();
 			IPropertyPageContributor ppcont = next.contributor;
 			if (!ppcont.isApplicableTo(object)) {
 				continue;
@@ -122,13 +122,14 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 		if (actualContributions) {
 			resultIterator = catNodes.iterator();
 			while (resultIterator.hasNext()) {
-				CategorizedPageNode next = resultIterator.next();
-				PreferenceNode child = catPageNodeToPages.get(next);
+				CategorizedPageNode next = (CategorizedPageNode) resultIterator
+						.next();
+				PreferenceNode child = (PreferenceNode) catPageNodeToPages.get(next);
 				if (child == null)
 					continue;
 				PreferenceNode parent = null;
 				if (next.parent != null)
-					parent = catPageNodeToPages.get(next.parent);
+					parent = (PreferenceNode) catPageNodeToPages.get(next.parent);
 				
 				if (parent == null) {
 					manager.addToRoot(child);
@@ -145,19 +146,19 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 	 * @param nodes
 	 * @return List of CategorizedPageNode
 	 */
-	private List<CategorizedPageNode> buildNodeList(Collection<IObjectContributor> nodes) {
-		Hashtable<String, CategorizedPageNode> mapping = new Hashtable<String, CategorizedPageNode>();
+	private List buildNodeList(Collection nodes) {
+		Hashtable mapping = new Hashtable();
 		
-		Iterator<IObjectContributor> nodesIterator = nodes.iterator();
+		Iterator nodesIterator = nodes.iterator();
 		while(nodesIterator.hasNext()){
 			RegistryPageContributor page = (RegistryPageContributor) nodesIterator.next();
 			mapping.put(page.getPageId(),new CategorizedPageNode(page));
 		}
 		
-		Iterator<CategorizedPageNode> values = mapping.values().iterator();
-		List<CategorizedPageNode> returnValue = new ArrayList<CategorizedPageNode>();
+		Iterator values = mapping.values().iterator();
+		List returnValue = new ArrayList();
 		while(values.hasNext()){
-			CategorizedPageNode next = values.next();
+			CategorizedPageNode next = (CategorizedPageNode) values.next();
 			returnValue.add(next);
 			if(next.contributor.getCategory() == null) {
 				continue;
@@ -207,12 +208,12 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 	 * @param element
 	 * @return Collection of PropertyPageContribution
 	 */
-	public Collection<RegistryPageContributor> getApplicableContributors(Object element) {
+	public Collection getApplicableContributors(Object element) {
 		if (element instanceof IStructuredSelection)
 			return getApplicableContributors((IStructuredSelection) element);
-		Collection<IObjectContributor> contributors = getContributors(element);
-		Collection<RegistryPageContributor> result = new ArrayList<RegistryPageContributor>();
-		for (Iterator<IObjectContributor> iter = contributors.iterator(); iter.hasNext();) {
+		Collection contributors = getContributors(element);
+		Collection result = new ArrayList();
+		for (Iterator iter = contributors.iterator(); iter.hasNext();) {
 			RegistryPageContributor contributor = (RegistryPageContributor) iter.next();
 			if(contributor.isApplicableTo(element))
 				result.add(contributor);
@@ -228,15 +229,14 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 	 * @return Collection of applicable property page contributors
 	 * @since 3.7
 	 */
-	public Collection<RegistryPageContributor> getApplicableContributors(
-			IStructuredSelection selection) {
-		Iterator<?> it = selection.iterator();
-		Collection<RegistryPageContributor> result = null;
+	public Collection getApplicableContributors(IStructuredSelection selection) {
+		Iterator it = selection.iterator();
+		Collection result = null;
 		while (it.hasNext()) {
 			Object element = it.next();
-			Collection<RegistryPageContributor> collection = getApplicableContributors(element);
+			Collection collection = getApplicableContributors(element);
 			if (result == null)
-				result = new LinkedHashSet<RegistryPageContributor>(collection);
+				result = new LinkedHashSet(collection);
 			else
 				result.retainAll(collection);
 		}
@@ -253,7 +253,9 @@ public class PropertyPageContributorManager extends ObjectContributorManager {
 		return result;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.ObjectContributorManager#getExtensionPointFilter()
+	 */
 	protected String getExtensionPointFilter() {
 		return IWorkbenchRegistryConstants.PL_PROPERTY_PAGES;
 	}

@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.contexts;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.eclipse.core.commands.contexts.ContextManagerEvent;
 import org.eclipse.core.commands.contexts.IContextManagerListener;
 import org.eclipse.ui.AbstractSourceProvider;
@@ -46,7 +47,7 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 
 	public final void contextManagerChanged(final ContextManagerEvent event) {
 		if (event.isActiveContextsChanged()) {
-			final Map<String, Collection<String>> currentState = getCurrentState();
+			final Map currentState = getCurrentState();
 
 			if (DEBUG) {
 				logDebuggingInfo("Contexts changed to " //$NON-NLS-1$
@@ -61,9 +62,10 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 		contextService.removeContextManagerListener(this);
 	}
 
-	public final Map<String, Collection<String>> getCurrentState() {
-		final Map<String, Collection<String>> currentState = new TreeMap<String, Collection<String>>();
-		final Collection<String> activeContextIds = contextService.getActiveContextIds();
+	public final Map getCurrentState() {
+		final Map currentState = new TreeMap();
+		final Collection activeContextIds = contextService
+				.getActiveContextIds();
 		currentState.put(ISources.ACTIVE_CONTEXT_NAME, activeContextIds);
 		return currentState;
 	}
@@ -72,7 +74,11 @@ public final class ActiveContextSourceProvider extends AbstractSourceProvider
 		return PROVIDED_SOURCE_NAMES;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.AbstractSourceProvider#initialize(org.eclipse.ui.services.IServiceLocator)
+	 */
 	public void initialize(IServiceLocator locator) {
 		contextService = (IContextService) locator
 				.getService(IContextService.class);

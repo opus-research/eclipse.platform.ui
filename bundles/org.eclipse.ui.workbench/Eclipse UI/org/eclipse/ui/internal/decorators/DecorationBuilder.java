@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.decorators;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DecorationContext;
 import org.eclipse.jface.viewers.IDecoration;
@@ -29,9 +30,9 @@ public class DecorationBuilder implements IDecoration {
 
 	private static int DECORATOR_ARRAY_SIZE = 6;
 
-	private List<String> prefixes = new ArrayList<String>();
+	private List prefixes = new ArrayList();
 
-	private List<String> suffixes = new ArrayList<String>();
+	private List suffixes = new ArrayList();
 
 	private ImageDescriptor[] descriptors = new ImageDescriptor[DECORATOR_ARRAY_SIZE];
 
@@ -135,8 +136,8 @@ public class DecorationBuilder implements IDecoration {
 		if (clearReplacementImage) {
 			descriptors[IDecoration.REPLACE] = null;
 		}
-		DecorationResult newResult = new DecorationResult(new ArrayList<String>(prefixes),
-				new ArrayList<String>(suffixes), descriptors,
+		DecorationResult newResult = new DecorationResult(new ArrayList(
+				prefixes), new ArrayList(suffixes), descriptors,
 				foregroundColor, backgroundColor, font);
 
 		return newResult;
@@ -184,25 +185,42 @@ public class DecorationBuilder implements IDecoration {
 		valueSet = true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IDecoration#setBackgroundColor(org.eclipse.swt.graphics.Color)
+	 */
+
 	public void setBackgroundColor(Color bgColor) {
 		this.backgroundColor = bgColor;
 		valueSet = true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IDecoration#setFont(org.eclipse.swt.graphics.Font)
+	 */
 	public void setFont(Font newFont) {
 		this.font = newFont;
 		valueSet = true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IDecoration#setForegroundColor(org.eclipse.swt.graphics.Color)
+	 */
 	public void setForegroundColor(Color fgColor) {
 		this.foregroundColor = fgColor;
 		valueSet = true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IDecoration#getDecorationContext()
+	 */
 	public IDecorationContext getDecorationContext() {
 		return context;
 	}

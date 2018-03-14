@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.dialogs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IProduct;
@@ -74,7 +75,7 @@ public class AboutDialog extends TrayDialog {
 
     private AboutBundleGroupData[] bundleGroupInfos;
 
-	private ArrayList<Image> images = new ArrayList<Image>();
+    private ArrayList images = new ArrayList();
 
     private AboutFeaturesButtonManager buttonManager = new AboutFeaturesButtonManager();
 
@@ -99,7 +100,7 @@ public class AboutDialog extends TrayDialog {
 
         // create a descriptive object for each BundleGroup
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-		LinkedList<AboutBundleGroupData> groups = new LinkedList<AboutBundleGroupData>();
+        LinkedList groups = new LinkedList();
         if (providers != null) {
 			for (int i = 0; i < providers.length; ++i) {
                 IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
@@ -108,7 +109,8 @@ public class AboutDialog extends TrayDialog {
 				}
             }
 		}
-		bundleGroupInfos = groups.toArray(new AboutBundleGroupData[0]);
+        bundleGroupInfos = (AboutBundleGroupData[]) groups
+                .toArray(new AboutBundleGroupData[0]);
     }
 
     /*
@@ -135,7 +137,7 @@ public class AboutDialog extends TrayDialog {
     public boolean close() {
         // dispose all images
         for (int i = 0; i < images.size(); ++i) {
-			Image image = images.get(i);
+            Image image = (Image) images.get(i);
             image.dispose();
         }
 
