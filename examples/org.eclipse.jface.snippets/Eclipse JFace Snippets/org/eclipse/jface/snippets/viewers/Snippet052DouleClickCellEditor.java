@@ -43,7 +43,6 @@ public class Snippet052DouleClickCellEditor {
 		 *
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (MyModel[]) inputElement;
 		}
@@ -53,7 +52,6 @@ public class Snippet052DouleClickCellEditor {
 		 *
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 
 		}
@@ -64,7 +62,6 @@ public class Snippet052DouleClickCellEditor {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -80,7 +77,6 @@ public class Snippet052DouleClickCellEditor {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -95,17 +91,14 @@ public class Snippet052DouleClickCellEditor {
 				new TextCellEditor(v.getTable()) });
 		v.setCellModifier(new ICellModifier() {
 
-			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
-			@Override
 			public Object getValue(Object element, String property) {
 				return "Column " + property + " => " + element.toString();
 			}
 
-			@Override
 			public void modify(Object element, String property, Object value) {
 
 			}
@@ -116,7 +109,6 @@ public class Snippet052DouleClickCellEditor {
 
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
 				v) {
-			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL

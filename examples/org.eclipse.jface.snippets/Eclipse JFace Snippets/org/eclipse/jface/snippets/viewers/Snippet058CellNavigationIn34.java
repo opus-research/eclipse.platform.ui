@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006, 2008 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Niels Lippke - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -41,24 +40,21 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example for full feature cell navigation until bug 230955 is fixed
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>, Niels Lippke <niels.lippke@airpas.com>
- *
+ * 
  */
 public class Snippet058CellNavigationIn34 {
 
 	private class MyContentProvider implements IStructuredContentProvider {
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (Person[]) inputElement;
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
@@ -80,29 +76,26 @@ public class Snippet058CellNavigationIn34 {
 	}
 
 	protected abstract class AbstractEditingSupport extends EditingSupport {
-		private final CellEditor editor;
+		private CellEditor editor;
 
 		public AbstractEditingSupport(TableViewer viewer) {
 			super(viewer);
 			this.editor = new TextCellEditor(viewer.getTable());
 		}
-
+		
 		public AbstractEditingSupport(TableViewer viewer, CellEditor editor) {
 			super(viewer);
 			this.editor = editor;
 		}
 
-		@Override
 		protected boolean canEdit(Object element) {
 			return true;
 		}
 
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			doSetValue(element, value);
 			getViewer().update(element, null);
@@ -121,7 +114,6 @@ public class Snippet058CellNavigationIn34 {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).givenname;
 			}
@@ -129,12 +121,10 @@ public class Snippet058CellNavigationIn34 {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).givenname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).givenname = value.toString();
 			}
@@ -147,7 +137,6 @@ public class Snippet058CellNavigationIn34 {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).surname;
 			}
@@ -156,12 +145,10 @@ public class Snippet058CellNavigationIn34 {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).surname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).surname = value.toString();
 			}
@@ -174,22 +161,19 @@ public class Snippet058CellNavigationIn34 {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).email;
 			}
 
 		});
 
-
+		
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
-			protected Object getValue(Object element) {
-				return ((Person) element).email;
+			protected Object getValue(Object element) {				
+				return ((Person) element).email;	
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).email = value.toString();
 			}
@@ -203,29 +187,26 @@ public class Snippet058CellNavigationIn34 {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).gender;
 			}
 
 		});
-
-		ComboBoxCellEditor editor = new ComboBoxCellEditor(v.getTable(), new String[] {"M","F"});
-		editor.setActivationStyle(ComboBoxCellEditor.DROP_DOWN_ON_TRAVERSE_ACTIVATION |
+		
+		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer) v).getTable(), new String[] {"M","F"});
+		editor.setActivationStyle(ComboBoxCellEditor.DROP_DOWN_ON_TRAVERSE_ACTIVATION | 
 				ComboBoxCellEditor.DROP_DOWN_ON_PROGRAMMATIC_ACTIVATION |
 				ComboBoxCellEditor.DROP_DOWN_ON_MOUSE_ACTIVATION |
 				ComboBoxCellEditor.DROP_DOWN_ON_KEY_ACTIVATION);
-
+		
 		column.setEditingSupport(new AbstractEditingSupport(v, editor) {
 
-			@Override
 			protected Object getValue(Object element) {
 				if (((Person) element).gender.equals("M"))
 					return new Integer(0);
 				return new Integer(1);
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				if (((Integer) value).intValue() == 0) {
 					((Person) element).gender = "M";
@@ -235,27 +216,25 @@ public class Snippet058CellNavigationIn34 {
 			}
 
 		});
-
+		
 		CellNavigationStrategy naviStrat = new CellNavigationStrategy() {
 
-			@Override
 			public ViewerCell findSelectedCell(ColumnViewer viewer,
 					ViewerCell currentSelectedCell, Event event) {
 				ViewerCell cell = super.findSelectedCell(viewer, currentSelectedCell, event);
-
+				
 				if( cell != null ) {
 					v.getTable().showColumn(v.getTable().getColumn(cell.getColumnIndex()));
 				}
-
+				
 				return cell;
 			}
-
+			
 		};
-
+		
 		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(v,new FocusCellOwnerDrawHighlighter(v),naviStrat);
-
+		
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
-			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
@@ -264,40 +243,36 @@ public class Snippet058CellNavigationIn34 {
 						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
 			}
 		};
-
+		
 		TableViewerEditor.create(v, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
 				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
 				| ColumnViewerEditor.TABBING_VERTICAL | ColumnViewerEditor.KEYBOARD_ACTIVATION);
-
+		
 		v.getColumnViewerEditor().addEditorActivationListener(new ColumnViewerEditorActivationListener() {
 
-			@Override
 			public void afterEditorActivated(
 					ColumnViewerEditorActivationEvent event) {
-
+				
 			}
 
-			@Override
 			public void afterEditorDeactivated(
 					ColumnViewerEditorDeactivationEvent event) {
-
+				
 			}
 
-			@Override
 			public void beforeEditorActivated(
 					ColumnViewerEditorActivationEvent event) {
 				ViewerCell cell = (ViewerCell) event.getSource();
 				v.getTable().showColumn(v.getTable().getColumn(cell.getColumnIndex()));
 			}
 
-			@Override
 			public void beforeEditorDeactivated(
 					ColumnViewerEditorDeactivationEvent event) {
-
+				
 			}
-
+			
 		});
-
+		
 		Person[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);

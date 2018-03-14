@@ -160,6 +160,13 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		if (element == null || element.getWidget() == null)
 			return;
 
+		if (element instanceof MPartStack
+				&& element.getRenderer() instanceof StackRenderer) {
+			StackRenderer sr = (StackRenderer) element.getRenderer();
+			CTabFolder ctf = (CTabFolder) element.getWidget();
+			sr.clearTR(ctf);
+		}
+
 		if (element instanceof MPlaceholder) {
 			MPlaceholder ph = (MPlaceholder) element;
 			element = ph.getRef();
@@ -213,7 +220,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			if (curSel instanceof MPlaceholder) {
 				part.setCurSharedRef((MPlaceholder) curSel);
 			}
-			sr.adjustTopRight(ctf);
+			sr.adjustTR(ctf, part);
 		}
 
 		if (element instanceof MPlaceholder && element.getWidget() != null) {
