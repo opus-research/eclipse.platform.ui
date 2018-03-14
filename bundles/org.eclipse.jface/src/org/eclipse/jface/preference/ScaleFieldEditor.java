@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Wedia - Joel DRIGO (joel.drigo@wedia-group.com): Bug 470866
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -350,4 +351,14 @@ public class ScaleFieldEditor extends FieldEditor {
             oldValue = newValue;
         }
     }
+
+	/**
+	 * Bug 470866 fix
+	 */
+	@Override
+	public void setEnabled(boolean enabled, Composite parent) {
+		super.setEnabled(enabled, parent);
+		getScaleControl().setEnabled(enabled);
+	}
+
 }
