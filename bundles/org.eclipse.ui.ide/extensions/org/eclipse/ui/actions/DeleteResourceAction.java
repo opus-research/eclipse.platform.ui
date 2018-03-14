@@ -111,14 +111,12 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		/*
 		 * (non-Javadoc) Method declared on Window.
 		 */
-		@Override
 		protected void configureShell(Shell newShell) {
 			super.configureShell(newShell);
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
 					IIDEHelpContextIds.DELETE_PROJECT_DIALOG);
 		}
 
-		@Override
 		protected Control createCustomArea(Composite parent) {
 			Composite composite = new Composite(parent, SWT.NONE);
 			composite.setLayout(new GridLayout());
@@ -155,7 +153,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			// corresponding radio button.
 			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=172574
 			detailsLabel.addMouseListener(new MouseAdapter() {
-				@Override
 				public void mouseUp(MouseEvent e) {
 					deleteContent = true;
 					radio1.setSelection(deleteContent);
@@ -179,7 +176,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		}
 
 		private SelectionListener selectionListener = new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Button button = (Button) e.widget;
 				if (button.getSelection()) {
@@ -197,7 +193,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		 * 
 		 * @see org.eclipse.jface.window.Window#open()
 		 */
-		@Override
 		public int open() {
 			// Override Window#open() to allow for non-interactive testing.
 			if (fIsTesting) {
@@ -248,13 +243,11 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	 * @deprecated Should take an IShellProvider, see
 	 *             {@link #DeleteResourceAction(IShellProvider)}
 	 */
-	@Deprecated
 	public DeleteResourceAction(final Shell shell) {
 		super(IDEWorkbenchMessages.DeleteResourceAction_text);
 		Assert.isNotNull(shell);
 		initAction();
 		setShellProvider(new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return shell;
 			}
@@ -474,7 +467,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	/*
 	 * (non-Javadoc) Method declared on IAction.
 	 */
-	@Override
 	public void run() {
 		final IResource[] resources = getSelectedResourcesArray();
 
@@ -500,7 +492,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				if (resources.length == 0)
 					return Status.CANCEL_STATUS;
@@ -513,7 +504,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 			 */
-			@Override
 			public boolean belongsTo(Object family) {
 				if (IDEWorkbenchMessages.DeleteResourceAction_jobName
 						.equals(family)) {
@@ -537,7 +527,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		// periodic updates
 		Job deleteJob = new Job(
 				IDEWorkbenchMessages.DeleteResourceAction_jobName) {
-			@Override
 			public IStatus run(final IProgressMonitor monitor) {
 				try {
 					final DeleteResourcesOperation op = 
@@ -555,7 +544,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 							/* (non-Javadoc)
 							 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
 							 */
-							@Override
 							public IStatus runInUIThread(
 									IProgressMonitor monitor) {
 								return op.computeExecutionStatus(monitor);
@@ -592,7 +580,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 			 */
-			@Override
 			public boolean belongsTo(Object family) {
 				if (IDEWorkbenchMessages.DeleteResourceAction_jobName
 						.equals(family)) {
@@ -611,7 +598,6 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	 * <code>SelectionListenerAction</code> method disables the action if the
 	 * selection contains phantom resources or non-resources
 	 */
-	@Override
 	protected boolean updateSelection(IStructuredSelection selection) {
 		return super.updateSelection(selection)
 				&& canDelete(getSelectedResourcesArray());

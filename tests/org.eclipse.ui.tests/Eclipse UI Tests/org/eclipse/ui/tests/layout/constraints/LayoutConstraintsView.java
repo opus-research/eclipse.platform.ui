@@ -50,8 +50,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
     private Text fixedAreaText;
     private Text sampleImplementation;
 
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         control = parent;
 
         Composite buttonBar = new Composite(parent, SWT.NONE);
@@ -64,8 +63,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
                 /* (non-Javadoc)
                  * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
                  */
-                @Override
-				public void widgetSelected(SelectionEvent e) {
+                public void widgetSelected(SelectionEvent e) {
                     applyPressed();
                 }
             });
@@ -77,8 +75,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
                 /* (non-Javadoc)
                  * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
                  */
-                @Override
-				public void widgetSelected(SelectionEvent e) {
+                public void widgetSelected(SelectionEvent e) {
                     minWidthText.setText("");
                     maxWidthText.setText("");
                     quantizedWidthText.setText("");
@@ -97,8 +94,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
                 /* (non-Javadoc)
                  * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
                  */
-                @Override
-				public void widgetSelected(SelectionEvent e) {
+                public void widgetSelected(SelectionEvent e) {
                     try {
                         getSite().getPage().showView("org.eclipse.ui.tests.layout.constraints.LayoutConstraintsView", 
                                 "" + System.currentTimeMillis(), IWorkbenchPage.VIEW_ACTIVATE);
@@ -171,8 +167,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
     /* (non-Javadoc)
      * @see org.eclipse.ui.ISizeProvider#getSizeFlags(boolean)
      */
-    @Override
-	public int getSizeFlags(boolean width) {
+    public int getSizeFlags(boolean width) {
         int flags = 0;
         if (width) {
             if (minWidth != ISizeProvider.INFINITE) {
@@ -274,16 +269,14 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
         return new Text(parent, SWT.BORDER);		
     }
 
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         control.setFocus();
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)
      */
-    @Override
-	public int computePreferredSize(boolean width, int availableParallel,
+    public int computePreferredSize(boolean width, int availableParallel,
             int availablePerpendicular, int preferredResult) {
 
         int result = preferredResult;

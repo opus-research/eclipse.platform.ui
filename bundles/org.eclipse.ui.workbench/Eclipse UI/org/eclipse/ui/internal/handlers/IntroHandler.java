@@ -44,7 +44,6 @@ public class IntroHandler extends AbstractHandler {
 	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
 	 * ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) {
 
 		if (introDescriptor == null) {
@@ -63,7 +62,6 @@ public class IntroHandler extends AbstractHandler {
 	 * 
 	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
 	 */
-	@Override
 	public boolean isEnabled() {
 
 		boolean enabled = false;

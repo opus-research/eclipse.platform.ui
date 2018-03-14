@@ -39,8 +39,7 @@ public abstract class MockWorkbenchPart extends MockPart implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.api.MockPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 		parent.setLayout(new GridLayout());
 		
@@ -48,32 +47,28 @@ public abstract class MockWorkbenchPart extends MockPart implements
         label.setText(title);
     }
 
-    @Override
-	public IWorkbenchPartSite getSite() {
+    public IWorkbenchPartSite getSite() {
         return site;
     }
 
     /**
      * @see IWorkbenchPart#getTitle()
      */
-    @Override
-	public String getTitle() {
+    public String getTitle() {
         return title;
     }
 
     /**
      * @see IWorkbenchPart#getTitleToolTip()
      */
-    @Override
-	public String getTitleToolTip() {
+    public String getTitleToolTip() {
         return title;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.api.MockPart#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setInitializationData(IConfigurationElement config,
+    public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) throws CoreException {
         // TODO Auto-generated method stub
         super.setInitializationData(config, propertyName, data);

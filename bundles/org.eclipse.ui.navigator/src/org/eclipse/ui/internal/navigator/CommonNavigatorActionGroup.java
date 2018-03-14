@@ -103,7 +103,6 @@ public class CommonNavigatorActionGroup extends ActionGroup {
         upAction = new UpAction(frameList);
         
 		frameList.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FrameList.P_RESET)) {
 					upAction.setEnabled(false);
@@ -152,7 +151,6 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 	 * 
 	 * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
 	 */
-	@Override
 	public void fillActionBars(IActionBars actionBars) {
 
         actionBars.setGlobalActionHandler(ActionFactory.BACK.getId(),
@@ -222,7 +220,6 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 	 * 
 	 * @see org.eclipse.ui.actions.ActionGroup#dispose()
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
         backAction.dispose();

@@ -108,7 +108,6 @@ public class IntroTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
 	 */
-	@Override
 	protected String getExtensionId() {		
 		return "newIntro1.testDynamicIntroAddition";
 	}
@@ -116,7 +115,6 @@ public class IntroTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
 	 */
-	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_INTRO;
 	}
@@ -124,7 +122,6 @@ public class IntroTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
 	 */
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newIntro1";
 	}
@@ -132,8 +129,7 @@ public class IntroTests extends DynamicTestCase {
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
      */
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         oldDesc = Workbench.getInstance().getIntroDescriptor();
         window = openTestWindow();
@@ -142,8 +138,7 @@ public class IntroTests extends DynamicTestCase {
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
      */
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         super.doTearDown();
         Workbench.getInstance().setIntroDescriptor(oldDesc);
     }    
@@ -151,7 +146,6 @@ public class IntroTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
 	 */
-	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicIntro";
 	}

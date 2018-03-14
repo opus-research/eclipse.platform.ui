@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Eric Rizzo and others.
+ * Copyright (c) 2009 Eric Rizzo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Eric Rizzo - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -17,7 +16,6 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -34,7 +32,6 @@ public class Snippet034ComboViewerAndEnum {
 		final Person model = new Person("Pat", Gender.Unknown);
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				final Shell shell = new View(model).createShell();
 				// The SWT event loop
@@ -121,8 +118,8 @@ public class Snippet034ComboViewerAndEnum {
 			// Bind the fields
 			DataBindingContext bindingContext = new DataBindingContext();
 
-			IObservableValue widgetObservable = WidgetProperties.text(SWT.Modify).observe(
-					name);
+			IObservableValue widgetObservable = SWTObservables.observeText(
+					name, SWT.Modify);
 			bindingContext.bindValue(widgetObservable, PojoObservables
 					.observeValue(viewModel, "name"));
 

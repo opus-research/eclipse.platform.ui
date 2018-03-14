@@ -26,13 +26,11 @@ public class PreferenceDialogWrapper extends PreferenceDialog implements IWorkbe
         super(parentShell, manager);
     }
 
-    @Override
-	public boolean showPage(IPreferenceNode node) {
+    public boolean showPage(IPreferenceNode node) {
         return super.showPage(node);
     }
 
-    @Override
-	public IPreferencePage getPage(IPreferenceNode node) {
+    public IPreferencePage getPage(IPreferenceNode node) {
         if (node == null)
             return null;
 
@@ -46,12 +44,10 @@ public class PreferenceDialogWrapper extends PreferenceDialog implements IWorkbe
         return node.getPage();
     }
 
-	@Override
 	public IWorkingCopyManager getWorkingCopyManager() {
 		return new WorkingCopyManager();
 	}
 
-	@Override
 	public boolean openPage(String preferencePageId, Object data) {
 		return false;
 	}
@@ -59,7 +55,6 @@ public class PreferenceDialogWrapper extends PreferenceDialog implements IWorkbe
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.preferences.IWorkbenchPreferenceContainer#registerUpdateJob(org.eclipse.core.runtime.jobs.Job)
 	 */
-	@Override
 	public void registerUpdateJob(Job job) {
 		//Do nothing as we are not testing this.
 	}

@@ -40,8 +40,7 @@ public class UIEditWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         super(name);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         WorkingSetRegistry registry = WorkbenchPlugin.getDefault()
                 .getWorkingSetRegistry();
         fDefaultEditPage = registry.getDefaultWorkingSetPage();

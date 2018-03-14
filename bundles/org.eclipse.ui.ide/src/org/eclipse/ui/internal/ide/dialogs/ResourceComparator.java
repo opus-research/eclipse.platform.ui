@@ -81,8 +81,7 @@ public class ResourceComparator extends ViewerComparator {
     /* (non-Javadoc)
      * Method declared on ViewerSorter.
      */
-    @Override
-	public int compare(Viewer viewer, Object o1, Object o2) {
+    public int compare(Viewer viewer, Object o1, Object o2) {
         //have to deal with non-resources in navigator
         //if one or both objects are not resources, returned a comparison 
         //based on class.

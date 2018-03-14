@@ -88,7 +88,6 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
 	 * #getId()
 	 */
-	@Override
 	public String getId() {
 		return descriptor.getId();
 	}
@@ -100,7 +99,6 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
 	 * #getDescriptor()
 	 */
-	@Override
 	public INavigatorContentDescriptor getDescriptor() {
 		return descriptor;
 	}
@@ -111,7 +109,6 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * @see
 	 * org.eclipse.ui.navigator.INavigatorContentExtension#getContentProvider()
 	 */
-	@Override
 	public ITreeContentProvider getContentProvider() {
 		return internalGetContentProvider().getDelegateContentProvider();
 	}
@@ -126,7 +123,6 @@ public class NavigatorContentExtension implements IMementoAware,
 		}
 		synchronized (this) {
 			SafeRunner.run(new NavigatorSafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					if (contentProvider == null) {
 						ITreeContentProvider treeContentProvider = descriptor
@@ -144,7 +140,6 @@ public class NavigatorContentExtension implements IMementoAware,
 					}
 				}
 
-				@Override
 				public void handleException(Throwable e) {
 					super.handleException(e);
 					contentProviderInitializationFailed = true;
@@ -166,14 +161,12 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
 	 * #getLabelProvider()
 	 */
-	@Override
 	public ICommonLabelProvider getLabelProvider() {
 		if (labelProvider != null || labelProviderInitializationFailed) {
 			return labelProvider;
 		}
 		synchronized (this) {
 			SafeRunner.run(new NavigatorSafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					if (labelProvider == null) {
 						ILabelProvider tempLabelProvider = descriptor.createLabelProvider();
@@ -191,7 +184,6 @@ public class NavigatorContentExtension implements IMementoAware,
 					}
 				}
 
-				@Override
 				public void handleException(Throwable e) {
 					super.handleException(e);
 					labelProviderInitializationFailed = true;
@@ -213,7 +205,6 @@ public class NavigatorContentExtension implements IMementoAware,
 			synchronized (this) {
 
 				SafeRunner.run(new NavigatorSafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						if (contentProvider != null) {
 							contentProvider.dispose();
@@ -223,7 +214,6 @@ public class NavigatorContentExtension implements IMementoAware,
 				});
 
 				SafeRunner.run(new NavigatorSafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						if (labelProvider != null) {
 							labelProvider
@@ -252,7 +242,6 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
 	 * #getAdapter(java.lang.Class)
 	 */
-	@Override
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
@@ -286,12 +275,10 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
 	 * #isLoaded()
 	 */
-	@Override
 	public boolean isLoaded() {
 		return contentProvider != null;
 	}
 
-	@Override
 	public void restoreState(IMemento aMemento) {
 		synchronized (this) {
 			appliedMemento = aMemento;
@@ -301,7 +288,6 @@ public class NavigatorContentExtension implements IMementoAware,
 		}
 	}
 
-	@Override
 	public void saveState(IMemento aMemento) {
 		synchronized (this) {
 			if (contentProvider != null
@@ -334,7 +320,6 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
 	 * #getStateModel()
 	 */
-	@Override
 	public IExtensionStateModel getStateModel() {
 		return contentService.getExtensionStateService()
 				.getExtensionStateModel(getDescriptor());
@@ -414,7 +399,6 @@ public class NavigatorContentExtension implements IMementoAware,
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		return descriptor.toString() + " Instance"; //$NON-NLS-1$
 	}

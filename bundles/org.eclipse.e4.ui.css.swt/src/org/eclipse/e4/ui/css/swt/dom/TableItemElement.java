@@ -52,13 +52,11 @@ public class TableItemElement extends ItemElement {
 	@Override
 	public void reset() {
 		TableItem tableItem = getTableItem();
-		Table parent = tableItem.getParent();
 
-		if (!parent.isDisposed()) {
-			parent.setForeground(null);
-			parent.setBackground(null);
-			CSSSWTFontHelper.restoreDefaultFont(parent);
-		}
+		Table parent = tableItem.getParent();
+		parent.setForeground(null);
+		parent.setBackground(null);
+		CSSSWTFontHelper.restoreDefaultFont(parent);
 
 		tableItem.setForeground(null);
 		tableItem.setBackground(null);

@@ -36,7 +36,6 @@ import org.osgi.framework.FrameworkUtil;
  */
 public class PluginContributionAdapterFactory implements IAdapterFactory {
 
-	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType != ContributionInfo.class) {
 			return null;
@@ -90,7 +89,6 @@ public class PluginContributionAdapterFactory implements IAdapterFactory {
 		return null;
 	}
 
-	@Override
 	public Class[] getAdapterList() {
 		return new Class[] { ContributionInfo.class };
 	}

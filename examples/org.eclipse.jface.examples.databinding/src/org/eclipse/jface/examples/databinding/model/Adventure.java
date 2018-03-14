@@ -53,7 +53,6 @@ public class Adventure extends ModelObject {
 	
 	public IValidator getMaxNumberOfPeopleDomainValidator() {
 		return new IValidator() {
-			@Override
 			public IStatus validate(Object value) {
 				int intValue = ((Integer)value).intValue();
 				if (intValue < 1 || intValue > 20) {

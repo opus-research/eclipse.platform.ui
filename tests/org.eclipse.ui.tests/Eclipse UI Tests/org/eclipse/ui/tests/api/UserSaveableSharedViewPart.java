@@ -37,7 +37,6 @@ public class UserSaveableSharedViewPart extends MockViewPart implements
 	 * 
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave");
 		fSharedModel.isDirty = false;
@@ -48,7 +47,6 @@ public class UserSaveableSharedViewPart extends MockViewPart implements
 	 * 
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 		callTrace.add("doSaveAs");
 	}
@@ -58,7 +56,6 @@ public class UserSaveableSharedViewPart extends MockViewPart implements
 	 * 
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty");
 		return fSharedModel.isDirty;
@@ -69,7 +66,6 @@ public class UserSaveableSharedViewPart extends MockViewPart implements
 	 * 
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
@@ -79,7 +75,6 @@ public class UserSaveableSharedViewPart extends MockViewPart implements
 	 * 
 	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 */
-	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded");
 		return fSharedModel.isDirty;

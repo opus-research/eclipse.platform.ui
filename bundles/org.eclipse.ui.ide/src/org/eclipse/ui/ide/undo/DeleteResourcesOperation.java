@@ -62,7 +62,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		delete(monitor, uiInfo, deleteContent);
@@ -76,7 +75,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		recreate(monitor, uiInfo);
@@ -88,7 +86,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
 	 *      int)
 	 */
-	@Override
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
 		boolean modified = false;
@@ -116,7 +113,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#getExecuteSchedulingRule()
 	 */
-	@Override
 	protected ISchedulingRule getExecuteSchedulingRule() {
 		return super.computeDeleteSchedulingRule();
 	}
@@ -126,7 +122,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#getUndoSchedulingRule()
 	 */
-	@Override
 	protected ISchedulingRule getUndoSchedulingRule() {
 		return super.computeCreateSchedulingRule();
 	}
@@ -139,7 +134,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeExecutionStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeExecutionStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeExecutionStatus(monitor);
 		if (status.isOK()) {
@@ -155,7 +149,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeUndoableStatus(monitor);
 		if (status.isOK()) {
@@ -174,7 +167,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeRedoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeRedoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeRedoableStatus(monitor);
 		if (status.isOK()) {
@@ -188,7 +180,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#appendDescriptiveText(java.lang.StringBuffer)
 	 */
-	@Override
 	protected void appendDescriptiveText(StringBuffer text) {
 		super.appendDescriptiveText(text);
 		text.append(" deleteContent: "); //$NON-NLS-1$
@@ -202,7 +193,6 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 	 * to specify whether project children should be checked, but it is too late
 	 * to do that now. See https://bugs.eclipse.org/bugs/show_bug.cgi?id=180758
 	 */
-	@Override
 	IStatus checkReadOnlyResources(IResource[] resourcesToCheck) {
 		// If we aren't deleting content of projects, don't bother
 		// checking the read only status of projects or their children.

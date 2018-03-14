@@ -86,12 +86,10 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 *            <code>null</code> if there is no text
 	 * @deprecated See {@link #WorkspaceAction(IShellProvider, String)}
 	 */
-	@Deprecated
 	protected WorkspaceAction(final Shell shell, String text) {
 		super(text);
 		Assert.isNotNull(shell);
 		shellProvider = new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return shell;
 			} };
@@ -260,7 +258,6 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 * 
 	 * @since 3.1
 	 */
-	@Deprecated
 	protected void invokeOperation(IResource resource,
 			IProgressMonitor monitor) throws CoreException {
 		
@@ -333,7 +330,6 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 * Subclasses may extend this method.
 	 * </p>
 	 */
-	@Override
 	public void run() {
 		IStatus[] errorStatus = new IStatus[1];
 		try {
@@ -390,7 +386,6 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 * returns <code>false</code>, the overriding method should also return
 	 * <code>false</code>.
 	 */
-	@Override
 	protected boolean updateSelection(IStructuredSelection selection) {
 		if (!super.updateSelection(selection) || selection.isEmpty()) {
 			return false;
@@ -469,7 +464,6 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 			 */
-			@Override
 			public boolean belongsTo(Object family) {
 				if (jobFamilies == null || family == null) {
 					return false;
@@ -487,7 +481,6 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 			 * 
 			 * @see org.eclipse.core.resources.WorkspaceJob#runInWorkspace(org.eclipse.core.runtime.IProgressMonitor)
 			 */
-			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				return WorkspaceAction.this.execute(resources, monitor);
 			}
@@ -521,7 +514,6 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 */
 	protected IRunnableWithProgress createOperation(final IStatus[] errorStatus) {
 		return new WorkspaceModifyOperation() {
-			@Override
 			public void execute(IProgressMonitor monitor) {
 				errorStatus[0] = WorkspaceAction.this.execute(
 						getActionResources(), monitor);

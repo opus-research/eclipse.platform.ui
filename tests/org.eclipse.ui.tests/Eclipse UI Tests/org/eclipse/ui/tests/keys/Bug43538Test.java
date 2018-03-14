@@ -52,7 +52,6 @@ public class Bug43538Test extends UITestCase {
 		Listener listener = new Listener() {
 			int count = 0;
 
-			@Override
 			public void handleEvent(Event event) {
 				if (event.stateMask == SWT.CTRL) {
 					assertEquals(

@@ -97,8 +97,7 @@ public final class MutableActivityManager extends AbstractActivityManager
     private Job deferredIdentifierJob = null;
     
     private final IActivityRegistryListener activityRegistryListener = new IActivityRegistryListener() {
-                @Override
-				public void activityRegistryChanged(
+                public void activityRegistryChanged(
                         ActivityRegistryEvent activityRegistryEvent) {
                     readRegistry(false);
                 }
@@ -133,7 +132,6 @@ public final class MutableActivityManager extends AbstractActivityManager
         readRegistry(true);
     }
 
-	@Override
 	synchronized public IActivity getActivity(String activityId) {
         if (activityId == null) {
 			throw new NullPointerException();
@@ -150,7 +148,6 @@ public final class MutableActivityManager extends AbstractActivityManager
         return activity;
     }
 
-	@Override
 	synchronized public ICategory getCategory(String categoryId) {
         if (categoryId == null) {
 			throw new NullPointerException();
@@ -167,22 +164,18 @@ public final class MutableActivityManager extends AbstractActivityManager
         return category;
     }
 
-	@Override
 	synchronized public Set getDefinedActivityIds() {
         return Collections.unmodifiableSet(definedActivityIds);
     }
 
-	@Override
 	synchronized public Set getDefinedCategoryIds() {
         return Collections.unmodifiableSet(definedCategoryIds);
     }
 
-	@Override
 	synchronized public Set getEnabledActivityIds() {
         return Collections.unmodifiableSet(enabledActivityIds);
     }
 
-	@Override
 	synchronized public IIdentifier getIdentifier(String identifierId) {
         if (identifierId == null) {
 			throw new NullPointerException();
@@ -529,7 +522,6 @@ public final class MutableActivityManager extends AbstractActivityManager
 		}
 	}
 
-	@Override
 	synchronized public void setEnabledActivityIds(Set enabledActivityIds) {
         enabledActivityIds = new HashSet(enabledActivityIds);
         Set requiredActivityIds = new HashSet(enabledActivityIds);
@@ -677,7 +669,6 @@ public final class MutableActivityManager extends AbstractActivityManager
     }
 
     private IPropertyChangeListener enabledWhenListener = new IPropertyChangeListener() {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (addingEvaluationListener) {
 				return;
@@ -914,7 +905,6 @@ public final class MutableActivityManager extends AbstractActivityManager
     /* (non-Javadoc)
      * @see java.lang.Object#clone()
      */
-	@Override
 	synchronized public Object clone() {
         MutableActivityManager clone = new MutableActivityManager(advisor, activityRegistry);
         clone.setEnabledActivityIds(getEnabledActivityIds());
@@ -934,8 +924,7 @@ public final class MutableActivityManager extends AbstractActivityManager
                 /* (non-Javadoc)
                  * @see org.eclipse.core.internal.jobs.InternalJob#run(org.eclipse.core.runtime.IProgressMonitor)
                  */
-                @Override
-				protected IStatus run(IProgressMonitor monitor) {
+                protected IStatus run(IProgressMonitor monitor) {
                     while (!deferredIdentifiers.isEmpty()) {
                         Identifier identifier = (Identifier) deferredIdentifiers.remove(0);
                         Set activityIds = new HashSet();
@@ -958,7 +947,6 @@ public final class MutableActivityManager extends AbstractActivityManager
                                     identifierEvent);
                             UIJob notifyJob = new UIJob("Identifier Update Job") { //$NON-NLS-1$
 
-								@Override
 								public IStatus runInUIThread(
 										IProgressMonitor monitor) {
 									notifyIdentifiers(identifierEventsByIdentifierId);

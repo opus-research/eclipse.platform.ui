@@ -27,8 +27,7 @@ import org.eclipse.ui.ide.ResourceUtil;
  */
 public class MockEditorMatchingStrategy implements IEditorMatchingStrategy {
 
-    @Override
-	public boolean matches(IEditorReference editorRef, IEditorInput input) {
+    public boolean matches(IEditorReference editorRef, IEditorInput input) {
         IFile inputFile = ResourceUtil.getFile(input);
         if (inputFile != null && inputFile.getParent() instanceof IProject) {
             String name = inputFile.getName();

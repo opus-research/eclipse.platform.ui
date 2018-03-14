@@ -63,7 +63,6 @@ public class MultiInstancePropertySheetTest extends AbstractPropertySheetTest {
 	 * by mishandling of events are not propagated back to our test methods.
 	 */
 	private ILogListener logListener = new ILogListener() {		
-		@Override
 		public void logging(IStatus status, String plugin) {
 			// check if it's an error
 			if (status.getSeverity() == IStatus.ERROR) {
@@ -90,7 +89,6 @@ public class MultiInstancePropertySheetTest extends AbstractPropertySheetTest {
 	 * @see
 	 * org.eclipse.ui.tests.propertysheet.AbstractPropertySheetTest#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		// open the property sheet with the TestPropertySheetPage
@@ -113,7 +111,6 @@ public class MultiInstancePropertySheetTest extends AbstractPropertySheetTest {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 	    activePage.resetPerspective();         
 		super.doTearDown();
@@ -302,7 +299,7 @@ public class MultiInstancePropertySheetTest extends AbstractPropertySheetTest {
 		// pressed
 		activePage.activate(propertySheet);
 
-		IHandlerService handlerService = PlatformUI
+		IHandlerService handlerService = (IHandlerService) PlatformUI
 				.getWorkbench().getService(IHandlerService.class);
 		Event event = new Event();
 		handlerService.executeCommand(NewPropertySheetHandler.ID, event);

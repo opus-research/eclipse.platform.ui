@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 442043
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -45,12 +44,10 @@ public class IEditorRegistryTest extends TestCase {
 		super(testName);
 	}
 
-	@Override
 	public void setUp() {
 		fReg = PlatformUI.getWorkbench().getEditorRegistry();
 	}
 
-	@Override
 	public void tearDown() {
 		if (proj != null) {
 			try {
@@ -412,8 +409,7 @@ public class IEditorRegistryTest extends TestCase {
 
 	public void testSwitchDefaultToExternalBug236104() {
 		IEditorDescriptor htmlDescriptor = fReg.getDefaultEditor("test.html");
-		assertNotNull("Default editor for html files should not be null",
-				htmlDescriptor);
+		assertNotNull(htmlDescriptor);
 
 		IFileEditorMapping[] src = fReg.getFileEditorMappings();
 		FileEditorMapping[] maps = new FileEditorMapping[src.length];
@@ -427,7 +423,7 @@ public class IEditorRegistryTest extends TestCase {
 			}
 		}
 
-		assertNotNull("Parameter map should not be null", map);
+		assertNotNull(map);
 
 		EditorDescriptor replacementDescriptor = EditorDescriptor
 				.createForProgram("notepad.exe");
@@ -443,12 +439,8 @@ public class IEditorRegistryTest extends TestCase {
 			IEditorDescriptor newDescriptor = fReg
 					.getDefaultEditor("test.html");
 
-			assertEquals(
-					"Parameter replaceDescriptor should be the same as parameter new Descriptor",
-					replacementDescriptor, newDescriptor);
-			assertFalse(
-					"Parameter replaceDescriptor should not be equals to htmlDescriptor",
-					replacementDescriptor.equals(htmlDescriptor));
+			assertEquals(replacementDescriptor, newDescriptor);
+			assertFalse(replacementDescriptor.equals(htmlDescriptor));
 		} finally {
 			src = fReg.getFileEditorMappings();
 			maps = new FileEditorMapping[src.length];
@@ -462,9 +454,7 @@ public class IEditorRegistryTest extends TestCase {
 				}
 			}
 
-			assertNotNull(
-					"Parameter map should not be null before setting the default editor",
-					map);
+			assertNotNull(map);
 
 			map.setDefaultEditor((EditorDescriptor) htmlDescriptor);
 			((EditorRegistry) fReg).setFileEditorMappings(maps);
@@ -484,7 +474,6 @@ public class IEditorRegistryTest extends TestCase {
 
 		final Throwable[] thrownException = new Throwable[1];
 		ILogListener listener = new ILogListener() {
-			@Override
 			public void logging(IStatus status, String plugin) {
 				Throwable throwable = status.getException();
 				if (throwable == null) {

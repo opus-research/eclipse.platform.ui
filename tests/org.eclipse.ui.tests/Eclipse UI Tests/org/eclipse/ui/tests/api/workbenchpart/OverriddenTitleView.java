@@ -30,8 +30,7 @@ public class OverriddenTitleView extends EmptyView {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPart#getTitle()
      */
-    @Override
-	public String getTitle() {
+    public String getTitle() {
         return overriddenTitle;
     }
 

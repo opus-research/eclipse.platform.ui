@@ -66,7 +66,6 @@ public class OpenWorkspaceAction extends Action implements
 		 * 
 		 * @see org.eclipse.jface.action.Action#run()
 		 */
-		@Override
 		public void run() {
 			OpenWorkspaceAction.this.run();
 		}
@@ -98,7 +97,6 @@ public class OpenWorkspaceAction extends Action implements
 		 * 
 		 * @see org.eclipse.jface.action.Action#run()
 		 */
-		@Override
 		public void run() {
 			data.workspaceSelected(location);
 			data.writePersistedData();
@@ -165,11 +163,9 @@ public class OpenWorkspaceAction extends Action implements
 		 * 
 		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
 		 */
-		@Override
 		public Menu getMenu(Control parent) {
 			createDropDownMenuMgr();
 			dropDownMenuMgr.addMenuListener(new IMenuListener() {
-				@Override
 				public void menuAboutToShow(IMenuManager manager) {
 					IContributionItem[] items = getContributionItems();
 					for (int i = 0; i < items.length; i++) {
@@ -186,12 +182,10 @@ public class OpenWorkspaceAction extends Action implements
 		 * 
 		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
 		 */
-		@Override
 		public Menu getMenu(Menu parent) {
 			createDropDownMenuMgr();
 			final Menu menu = new Menu(parent);
 			menu.addListener(SWT.Show, new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					if (menu.isDisposed()) {
 						return;
@@ -216,7 +210,6 @@ public class OpenWorkspaceAction extends Action implements
 		 * 
 		 * @see org.eclipse.jface.action.IMenuCreator#dispose()
 		 */
-		@Override
 		public void dispose() {
 			if (dropDownMenuMgr != null) {
 				dropDownMenuMgr.dispose();
@@ -262,7 +255,6 @@ public class OpenWorkspaceAction extends Action implements
 	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
 		String path = promptForWorkspace();
 		if (path == null) {
@@ -388,7 +380,6 @@ public class OpenWorkspaceAction extends Action implements
 	 * 
 	 * @see org.eclipse.jface.action.Action#dispose()
 	 */
-	@Override
 	public void dispose() {
 		window = null;
 	}

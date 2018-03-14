@@ -39,7 +39,6 @@ public class DynamicInvalidContributionTest extends DynamicTestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
 	 */
-	@Override
 	protected String getExtensionId() {
 		return "menu.invalid.menu.contribution";
 	}
@@ -50,7 +49,6 @@ public class DynamicInvalidContributionTest extends DynamicTestCase {
 	 * @see
 	 * org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
 	 */
-	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_MENUS;
 	}
@@ -61,7 +59,6 @@ public class DynamicInvalidContributionTest extends DynamicTestCase {
 	 * @see
 	 * org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
 	 */
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newInvalidMenuContribution1";
 	}

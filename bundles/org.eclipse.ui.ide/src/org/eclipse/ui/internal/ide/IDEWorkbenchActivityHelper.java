@@ -102,8 +102,7 @@ public class IDEWorkbenchActivityHelper {
         // for dynamic UI
         Platform.getExtensionRegistry().addRegistryChangeListener(
                 new IRegistryChangeListener() {
-                    @Override
-					public void registryChanged(IRegistryChangeEvent event) {
+                    public void registryChanged(IRegistryChangeEvent event) {
                         if (event.getExtensionDeltas(
                                 "org.eclipse.core.resources", "natures").length > 0) { //$NON-NLS-1$ //$NON-NLS-2$
 							loadNatures();
@@ -133,13 +132,11 @@ public class IDEWorkbenchActivityHelper {
             final String pluginId = extension.getNamespaceIdentifier();
             String natureId = extension.getUniqueIdentifier();
             natureMap.put(natureId, new IPluginContribution() {
-                @Override
-				public String getLocalId() {
+                public String getLocalId() {
                     return localId;
                 }
 
-                @Override
-				public String getPluginId() {
+                public String getPluginId() {
                     return pluginId;
                 }
             });
@@ -157,8 +154,7 @@ public class IDEWorkbenchActivityHelper {
              * (non-Javadoc) @see
              * org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
              */
-            @Override
-			public void resourceChanged(IResourceChangeEvent event) {
+            public void resourceChanged(IResourceChangeEvent event) {
                 if (!WorkbenchActivityHelper.isFiltering()) {
 					return;
 				}
@@ -254,7 +250,6 @@ public class IDEWorkbenchActivityHelper {
 		if (needsUpdate) {
 			if (fUpdateJob == null) {
 				fUpdateJob = new WorkbenchJob(IDEWorkbenchMessages.IDEWorkbenchActivityHelper_jobName) { 
-					@Override
 					public IStatus runInUIThread(
 							IProgressMonitor monitor) {
 						runPendingUpdates();

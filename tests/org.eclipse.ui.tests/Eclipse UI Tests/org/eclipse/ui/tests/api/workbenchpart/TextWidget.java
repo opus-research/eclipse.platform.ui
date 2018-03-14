@@ -42,11 +42,9 @@ public class TextWidget extends WorkbenchWindowControlContribution {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.action.ControlContribution#createControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createControl(Composite parent) {
 		Composite textHolder = new Composite(parent, SWT.NONE);
 		textHolder.setLayout(new Layout() {
-			@Override
 			protected Point computeSize(Composite composite, int wHint,
 					int hHint, boolean flushCache) {
 				Text tw = (Text) composite.getChildren()[0];
@@ -59,7 +57,6 @@ public class TextWidget extends WorkbenchWindowControlContribution {
 				return twSize;
 			}
 
-			@Override
 			protected void layout(Composite composite, boolean flushCache) {
 				Text tw = (Text) composite.getChildren()[0];
 				Point twSize = tw.computeSize(SWT.DEFAULT, SWT.DEFAULT, flushCache);

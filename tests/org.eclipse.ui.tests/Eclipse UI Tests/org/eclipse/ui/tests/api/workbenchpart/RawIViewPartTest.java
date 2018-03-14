@@ -49,8 +49,7 @@ public class RawIViewPartTest extends UITestCase {
         /* (non-Javadoc)
          * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
          */
-        @Override
-		public void propertyChanged(Object source, int propId) {
+        public void propertyChanged(Object source, int propId) {
             switch (propId) {
             case IWorkbenchPartConstants.PROP_TITLE:
                 titleChangeEvent = true;
@@ -65,8 +64,7 @@ public class RawIViewPartTest extends UITestCase {
         }
     };
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         window = openTestWindow();
         page = window.getActivePage();
@@ -83,8 +81,7 @@ public class RawIViewPartTest extends UITestCase {
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
      */
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         view.removePropertyListener(propertyListener);
         page.hideView(view);
         super.doTearDown();

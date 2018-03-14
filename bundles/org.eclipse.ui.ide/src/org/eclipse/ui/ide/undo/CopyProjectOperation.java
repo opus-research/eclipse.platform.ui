@@ -99,7 +99,6 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractCopyOrMoveResourcesOperation#computeMoveOrCopyStatus()
 	 */
-	@Override
 	protected IStatus computeMoveOrCopyStatus() {
 		IStatus status = Status.OK_STATUS;
 		IProject project = getProposedProjectHandle();
@@ -124,7 +123,6 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		IProject newProject = copyProject(originalProject, destination,
@@ -141,7 +139,6 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		// Delete the project that was copied
@@ -158,7 +155,6 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractCopyOrMoveResourcesOperation#isDestinationPathValid(org.eclipse.core.resources.IResource,
 	 *      int)
 	 */
-	@Override
 	protected boolean isDestinationPathValid(IResource resource, int index) {
 		// path has already been validated in #computeMoveOrCopyStatus()
 		return true;
@@ -170,7 +166,6 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractCopyOrMoveResourcesOperation#getProposedName(org.eclipse.core.resources.IResource,
 	 *      int)
 	 */
-	@Override
 	protected String getProposedName(IResource resource, int index) {
 		return destination.lastSegment();
 	}
@@ -181,7 +176,6 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
 	 *      int)
 	 */
-	@Override
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
 		boolean update = false;
@@ -206,7 +200,6 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	 * 
 	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeUndoableStatus(monitor);
 		if (!status.isOK()) {

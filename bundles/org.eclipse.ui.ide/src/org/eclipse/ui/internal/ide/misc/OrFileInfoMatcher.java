@@ -24,7 +24,6 @@ public class OrFileInfoMatcher extends CompoundFileInfoMatcher {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.AbstractFileInfoMatcher#matches(org.eclipse.core.filesystem.IFileInfo)
 	 */
-	@Override
 	public boolean matches(IContainer parent, IFileInfo fileInfo) throws CoreException {
 		if (matchers.length > 0) {
 			for (int i = 0; i < matchers.length; i++) {

@@ -43,7 +43,6 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void apply(MarkerFieldFilter filter) {
 		((CompletionFieldFilter) filter).setCompletion(completionState);
 
@@ -54,7 +53,6 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createContents(Composite parent) {
 
 		GridLayout layout = new GridLayout(2, false);
@@ -70,7 +68,6 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateCompletion(CompletionFieldFilter.COMPLETED,
 						completeButton.getSelection());
@@ -86,7 +83,6 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateCompletion(CompletionFieldFilter.NOT_COMPLETED,
 						incompleteButton.getSelection());
@@ -116,7 +112,6 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		completionState = ((CompletionFieldFilter) filter).getCompletion();
 
@@ -130,7 +125,6 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#getTitle()
 	 */
-	@Override
 	public String getTitle() {
 		return MarkerMessages.filtersDialog_completionTitle;
 	}

@@ -98,8 +98,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
     private boolean defaultOrderInitiallySelected;
 
     private IPropertyChangeListener validityChangeListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 				updateValidState();
 			}
@@ -116,8 +115,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
         IProject[] allProjects = getWorkspace().getRoot().getProjects();
 
         ILabelProvider labelProvider = new LabelProvider() {
-            @Override
-			public String getText(Object element) {
+            public String getText(Object element) {
                 return (String) element;
             }
         };
@@ -129,8 +127,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
         ListSelectionDialog dialog = new ListSelectionDialog(this.getShell(),
                 this, contentsProvider, labelProvider,
                 PROJECT_SELECTION_MESSAGE) {
-        	@Override
-			protected int getShellStyle() {
+        	protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
         	}
         };
@@ -200,8 +197,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
      * @param parent the parent composite
      * @return the new control
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
                 IIDEHelpContextIds.BUILD_ORDER_PREFERENCE_PAGE);
@@ -278,8 +274,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
         this.defaultOrderButton.setSelection(selected);
         this.defaultOrderButton.setText(DEFAULTS_LABEL);
         SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 defaultsButtonSelected(defaultOrderButton.getSelection());
             }
         };
@@ -322,8 +317,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
         setButtonLayoutData(upButton);
 
         SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 moveSelectionUp();
             }
         };
@@ -334,8 +328,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
         downButton.setText(DOWN_LABEL);
         downButton.setEnabled(enableComposite);
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 moveSelectionDown();
             }
         };
@@ -347,8 +340,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
                 | SWT.PUSH);
         addButton.setText(ADD_LABEL);
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 addProject();
             }
         };
@@ -361,8 +353,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
                 | SWT.PUSH);
         removeButton.setText(REMOVE_LABEL);
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 removeSelection();
             }
         };
@@ -385,8 +376,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
 
         maxItersField = new IntegerFieldEditor(
                 "", IDEWorkbenchMessages.BuildOrderPreference_maxIterationsLabel, maxItersComposite) { //$NON-NLS-1$
-            @Override
-			protected void doLoad() {
+            protected void doLoad() {
                 Text text = getTextControl();
                 if (text != null) {
                     int value = getWorkspace().getDescription()
@@ -395,8 +385,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
                 }
             }
 
-            @Override
-			protected void doLoadDefault() {
+            protected void doLoadDefault() {
                 Text text = getTextControl();
                 if (text != null) {
                     int value = ResourcesPlugin.getPlugin()
@@ -407,8 +396,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
                 valueChanged();
             }
 
-            @Override
-			protected void doStore() {
+            protected void doStore() {
                 // handled specially in performOK()
                 throw new UnsupportedOperationException();
             }
@@ -504,8 +492,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
     /**
      * See IWorkbenchPreferencePage. This class does nothing with he Workbench.
      */
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
         this.workbench = workbench;
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
     }
@@ -547,8 +534,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
      * Performs special processing when this page's Defaults button has been pressed.
      * In this case change the defaultOrderButton to have it's selection set to true.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
         this.defaultOrderButton.setSelection(true);
         defaultsButtonSelected(true);
         maxItersField.loadDefault();
@@ -559,8 +545,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
      * OK has been pressed. If the defualt button is pressed then reset the build order to false;
      * otherwise set it to the contents of the list.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
 
         String[] buildOrder = null;
         boolean useDefault = defaultOrderButton.getSelection();

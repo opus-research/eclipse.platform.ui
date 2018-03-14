@@ -26,17 +26,14 @@ public class ScaleSelectionProperty extends WidgetIntValueProperty {
 		super(SWT.Selection);
 	}
 
-	@Override
 	int doGetIntValue(Object source) {
 		return ((Scale) source).getSelection();
 	}
 
-	@Override
 	void doSetIntValue(Object source, int value) {
 		((Scale) source).setSelection(value);
 	}
 
-	@Override
 	public String toString() {
 		return "Scale.selection <int>"; //$NON-NLS-1$
 	}

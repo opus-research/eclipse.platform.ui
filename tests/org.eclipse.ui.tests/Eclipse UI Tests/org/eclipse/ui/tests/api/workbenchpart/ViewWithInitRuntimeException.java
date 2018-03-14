@@ -20,21 +20,18 @@ import org.eclipse.ui.part.ViewPart;
 
 public class ViewWithInitRuntimeException extends ViewPart {
 
-    @Override
-	public void init(IViewSite site) throws PartInitException {
+    public void init(IViewSite site) throws PartInitException {
         throw new RuntimeException("This exception was thrown intentionally as part of an error handling test");
     }
     
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         parent.setLayout(new FillLayout());
         
         Label message = new Label(parent, SWT.NONE);
         message.setText("This view threw an exception on init. You should not be able to read this");
     }
 
-    @Override
-	public void setFocus() {
+    public void setFocus() {
 
     }
 

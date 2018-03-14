@@ -79,8 +79,7 @@ public interface IDecoratorManager extends IDelayedLabelDecorator{
      * @return the lightweight label decorator
      * @deprecated use getBaseLabelProvider(String) instead.
      */
-    @Deprecated
-	ILightweightLabelDecorator getLightweightLabelDecorator(String decoratorId);
+    ILightweightLabelDecorator getLightweightLabelDecorator(String decoratorId);
 
     /**
      * Returns whether the specified decorator is enabled.

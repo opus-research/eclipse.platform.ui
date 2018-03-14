@@ -55,8 +55,7 @@ public class TableSortDialog extends TrayDialog {
     private boolean dirty;
 
     private final Comparator columnComparator = new Comparator() {
-        @Override
-		public int compare(Object arg0, Object arg1) {
+        public int compare(Object arg0, Object arg1) {
             int index0 = -1;
             int index1 = -1;
             for (int i = 0; i < propertyText.length; i++) {
@@ -85,8 +84,7 @@ public class TableSortDialog extends TrayDialog {
     /* (non-Javadoc)
      * Method declared on Window.
      */
-    @Override
-	protected void configureShell(Shell newShell) {
+    protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText(MarkerMessages.sortDialog_title);
     }
@@ -94,8 +92,7 @@ public class TableSortDialog extends TrayDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
         if (sorter == null) {
 			return composite;
@@ -151,24 +148,21 @@ public class TableSortDialog extends TrayDialog {
             ascendingButtons[i] = new Button(directionGroup, SWT.RADIO);
             ascendingButtons[i].setText(getAscendingText(i));
             ascendingButtons[i].addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent e) {
+                public void widgetSelected(SelectionEvent e) {
                     markDirty();
                 }
             });
             descendingButtons[i] = new Button(directionGroup, SWT.RADIO);
             descendingButtons[i].setText(getDescendingText(i));
             descendingButtons[i].addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent e) {
+                public void widgetSelected(SelectionEvent e) {
                     markDirty();
                 }
             });
 
             if (i < priorityCombos.length - 1) {
                 priorityCombos[i].addSelectionListener(new SelectionAdapter() {
-                    @Override
-					public void widgetSelected(SelectionEvent e) {
+                    public void widgetSelected(SelectionEvent e) {
                         int oldSelectionDirection = TableComparator.ASCENDING;
                         if (descendingButtons[index].getSelection()) {
 							oldSelectionDirection = TableComparator.DESCENDING;
@@ -240,8 +234,7 @@ public class TableSortDialog extends TrayDialog {
                 });
             } else {
                 priorityCombos[i].addSelectionListener(new SelectionAdapter() {
-                    @Override
-					public void widgetSelected(SelectionEvent e) {
+                    public void widgetSelected(SelectionEvent e) {
                         markDirty();
                     }
                 });
@@ -300,8 +293,7 @@ public class TableSortDialog extends TrayDialog {
         setButtonSize(defaultsButton, new GridData(
                 GridData.HORIZONTAL_ALIGN_END | GridData.FILL_HORIZONTAL));
         defaultsButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 restoreDefaults();
                 markDirty();
             }
@@ -344,8 +336,7 @@ public class TableSortDialog extends TrayDialog {
         }
     }
 
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         if (isDirty()) {
             for (int i = priorityCombos.length - 1; i >= 0; i--) {
                 String column = priorityCombos[i].getItem(priorityCombos[i]

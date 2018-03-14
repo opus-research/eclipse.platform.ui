@@ -59,7 +59,6 @@ public class ArbitraryPropertyTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow();
@@ -71,7 +70,6 @@ public class ArbitraryPropertyTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 	}
@@ -83,7 +81,6 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 		String firedNV = null;
 
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			firedProp = event.getProperty();
 			firedOV = (String) event.getOldValue();
@@ -120,37 +117,30 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 	public void testEditorProperties() throws Exception {
 		IFileEditorInput input = new IFileEditorInput() {
-			@Override
 			public boolean exists() {
 				return true;
 			}
 
-			@Override
 			public ImageDescriptor getImageDescriptor() {
 				return null;
 			}
 
-			@Override
 			public String getName() {
 				return "MyInputFile";
 			}
 
-			@Override
 			public IPersistableElement getPersistable() {
 				return null;
 			}
 
-			@Override
 			public String getToolTipText() {
 				return "My Input File";
 			}
 
-			@Override
 			public Object getAdapter(Class adapter) {
 				return null;
 			}
 
-			@Override
 			public IFile getFile() {
 				return null;
 			}
@@ -160,7 +150,6 @@ public class ArbitraryPropertyTest extends UITestCase {
 			 * 
 			 * @throws CoreException
 			 */
-			@Override
 			public IStorage getStorage() throws CoreException {
 				return null;
 			}

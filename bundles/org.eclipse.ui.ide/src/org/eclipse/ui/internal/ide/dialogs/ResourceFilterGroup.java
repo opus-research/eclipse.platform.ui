@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Freescale Semiconductor and others.
+ * Copyright (c) 2008, 2012 Freescale Semiconductor and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - [252996] initial API and implementation
  *     IBM Corporation - ongoing implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -159,42 +158,42 @@ public class ResourceFilterGroup {
 	private IContainer resource = nonExistantResource;
 
 	/**
-	 *
+	 * 
 	 */
 	public ResourceFilterGroup() {
 		ImageDescriptor fileIconDescriptor = AbstractUIPlugin
 		.imageDescriptorFromPlugin(IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/obj16/fileType_filter.png"); //$NON-NLS-1$
+				"$nl$/icons/full/obj16/fileType_filter.gif"); //$NON-NLS-1$
 		if (fileIconDescriptor != null)
 			fileIcon = fileIconDescriptor.createImage();
-
+		
 		ImageDescriptor folderIconDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
 				IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/obj16/folderType_filter.png"); //$NON-NLS-1$
+				"$nl$/icons/full/obj16/folderType_filter.gif"); //$NON-NLS-1$
 		if (folderIconDescriptor != null)
 			folderIcon = folderIconDescriptor.createImage();
-
+		
 		ImageDescriptor fileFolderIconDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
 				IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/obj16/fileFolderType_filter.png"); //$NON-NLS-1$
+				"$nl$/icons/full/obj16/fileFolderType_filter.gif"); //$NON-NLS-1$
 		if (fileFolderIconDescriptor != null)
 			fileFolderIcon = fileFolderIconDescriptor.createImage();
-
+		
 		ImageDescriptor descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
 				IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/obj16/includeMode_filter.png"); //$NON-NLS-1$
+				"$nl$/icons/full/obj16/includeMode_filter.gif"); //$NON-NLS-1$
 		if (descriptor != null)
 			includeIcon = descriptor.createImage();
-
+		
 		descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
 				IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/obj16/excludeMode_filter.png"); //$NON-NLS-1$
+				"$nl$/icons/full/obj16/excludeMode_filter.gif"); //$NON-NLS-1$
 		if (descriptor != null)
 			excludeIcon = descriptor.createImage();
-
+		
 		ImageDescriptor inheritableIconDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
 				IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/obj16/inheritable_filter.png"); //$NON-NLS-1$
+				"$nl$/icons/full/obj16/inheritable_filter.gif"); //$NON-NLS-1$
 		if (inheritableIconDescriptor != null)
 			inheritableIcon = inheritableIconDescriptor.createImage();
 	}
@@ -308,17 +307,14 @@ public class ResourceFilterGroup {
 			changed = true;
 		}
 
-		@Override
 		public int getChildrenLimit() {
 			return Integer.MAX_VALUE;
 		}
 
-		@Override
 		protected void argumentsChanged() {
 			changed = true;
 		}
 
-		@Override
 		public boolean hasChanged() {
 			if (changed)
 				return true;
@@ -343,7 +339,6 @@ public class ResourceFilterGroup {
 			return false;
 		}
 
-		@Override
 		public void removeAll() {
 			if (children.size() > 0) {
 				super.removeAll();
@@ -358,7 +353,6 @@ public class ResourceFilterGroup {
 
 	class TreeContentProvider implements ITreeContentProvider {
 		
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement == filters) {
 				if (filters.getChildren().length > 0)
@@ -381,7 +375,6 @@ public class ResourceFilterGroup {
 			return null;
 		}
 
-		@Override
 		public Object getParent(Object element) {
 			if (element instanceof String)
 				return filters;
@@ -394,7 +387,6 @@ public class ResourceFilterGroup {
 			return null;
 		}
 
-		@Override
 		public boolean hasChildren(Object element) {
 			if (element instanceof FilterCopy || element instanceof String) {
 				Object[] children = getChildren(element);
@@ -403,16 +395,13 @@ public class ResourceFilterGroup {
 			return false;
 		}
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return getChildren(inputElement);
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}
@@ -426,13 +415,11 @@ public class ResourceFilterGroup {
 		public LabelProvider() {
 			util = new FilterTypeUtil();
 			fBoldStyler= new Styler() {
-				@Override
 				public void applyStyles(TextStyle textStyle) {
 					textStyle.font= boldFont;
 				}
 			};
 			fPlainStyler= new Styler() {
-				@Override
 				public void applyStyles(TextStyle textStyle) {
 					textStyle.font= plainFont;
 				}
@@ -459,7 +446,6 @@ public class ResourceFilterGroup {
 			return copy.isUnderAGroupFilter();
 		}
 
-		@Override
 		public void update(ViewerCell cell) {
 			int columnIndex = cell.getColumnIndex();
 			String column = getColumnID(columnIndex);
@@ -541,7 +527,6 @@ public class ResourceFilterGroup {
 			return ui.formatStyledText(filter, fPlainStyler, fBoldStyler);
 		}
 
-		@Override
 		protected void measure(Event event, Object element) {
 			super.measure(event, element);
 		}
@@ -556,7 +541,6 @@ public class ResourceFilterGroup {
 	}
 	
 	class CellModifier implements ICellModifier {
-		@Override
 		public boolean canModify(Object element, String property) {
 			FilterCopy filter = (FilterCopy) element;
 			if (property.equals(FilterTypeUtil.ARGUMENTS)
@@ -565,13 +549,11 @@ public class ResourceFilterGroup {
 			return true;
 		}
 
-		@Override
 		public Object getValue(Object element, String property) {
 			FilterCopy filter = (FilterCopy) element;
 			return FilterTypeUtil.getValue(filter, property);
 		}
 
-		@Override
 		public void modify(Object element, String property, Object value) {
 			FilterCopy filter = (FilterCopy) ((TableItem) element).getData();
 			FilterTypeUtil.setValue(filter, property, value);
@@ -658,7 +640,6 @@ public class ResourceFilterGroup {
 		filterView.getTree().setFont(parent.getFont());
 
 		filterView.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				refreshEnablement();
 			}
@@ -695,7 +676,6 @@ public class ResourceFilterGroup {
 		}
 
 		filterView.getTree().addMouseListener(new MouseListener() {
-			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				if (!handleEdit()) {
 					ISelection selection = filterView.getSelection();
@@ -708,11 +688,9 @@ public class ResourceFilterGroup {
 				}
 			}
 
-			@Override
 			public void mouseDown(MouseEvent e) {
 			}
 
-			@Override
 			public void mouseUp(MouseEvent e) {
 			}
 		});
@@ -724,7 +702,6 @@ public class ResourceFilterGroup {
 				new FilterCopyDrop(filterView));
 
 		filterView.getTree().addMenuDetectListener(new MenuDetectListener() {
-			@Override
 			public void menuDetected(MenuDetectEvent e) {
 				MenuManager mgr = new MenuManager();
 				mgr.add(addSubFilterAction);
@@ -760,11 +737,9 @@ public class ResourceFilterGroup {
 							null));
 		}
 
-		@Override
 		public void run() {
 			handleEdit();
 		}
-		@Override
 		public boolean isEnabled() {
 			ISelection selection = filterView.getSelection();
 			if (selection instanceof IStructuredSelection) {
@@ -786,11 +761,9 @@ public class ResourceFilterGroup {
 							null));
 		}
 
-		@Override
 		public void run() {
 			handleRemove();
 		}
-		@Override
 		public boolean isEnabled() {
 			ISelection selection = filterView.getSelection();
 			if (selection instanceof IStructuredSelection) {
@@ -819,7 +792,6 @@ public class ResourceFilterGroup {
 		 * 
 		 * @see org.eclipse.jface.action.Action#run()
 		 */
-		@Override
 		public void run() {
 			ISelection selection = filterView.getSelection();
 			if (selection instanceof IStructuredSelection) {
@@ -834,7 +806,6 @@ public class ResourceFilterGroup {
 		 * 
 		 * @see org.eclipse.jface.action.Action#isEnabled()
 		 */
-		@Override
 		public boolean isEnabled() {
 			ISelection selection = filterView.getSelection();
 			if (selection instanceof IStructuredSelection) {
@@ -942,7 +913,6 @@ public class ResourceFilterGroup {
 		 * org.eclipse.jface.viewers.ViewerDropAdapter#performDrop(java.lang
 		 * .Object)
 		 */
-		@Override
 		public boolean performDrop(Object data) {
 			Object target = getCurrentTarget();
 			if (target == null)
@@ -979,7 +949,6 @@ public class ResourceFilterGroup {
 		 * org.eclipse.jface.viewers.ViewerDropAdapter#validateDrop(java.lang
 		 * .Object, int, org.eclipse.swt.dnd.TransferData)
 		 */
-		@Override
 		public boolean validateDrop(Object target, int operation,
 				TransferData transferType) {
 			if (filterCopyTransfer.isSupportedType(transferType)) {
@@ -1000,7 +969,6 @@ public class ResourceFilterGroup {
 		 * org.eclipse.swt.dnd.DragSourceListener#dragFinished(org.eclipse.swt
 		 * .dnd.DragSourceEvent)
 		 */
-		@Override
 		public void dragFinished(DragSourceEvent event) {
 			if (event.detail == DND.DROP_MOVE) {
 				// nothing
@@ -1014,7 +982,6 @@ public class ResourceFilterGroup {
 		 * org.eclipse.swt.dnd.DragSourceListener#dragSetData(org.eclipse.swt
 		 * .dnd.DragSourceEvent)
 		 */
-		@Override
 		public void dragSetData(DragSourceEvent event) {
 			if (filterCopyTransfer.isSupportedType(event.dataType)) {
 				event.data = getFilterCopySelection();
@@ -1028,7 +995,6 @@ public class ResourceFilterGroup {
 		 * org.eclipse.swt.dnd.DragSourceListener#dragStart(org.eclipse.swt.
 		 * dnd.DragSourceEvent)
 		 */
-		@Override
 		public void dragStart(DragSourceEvent event) {
 			if (getFilterCopySelection().length == 0)
 				event.doit = false;
@@ -1053,7 +1019,6 @@ public class ResourceFilterGroup {
 		addButton.setLayoutData(data);
 		setButtonDimensionHint(addButton);
 		addButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleAdd(false);
 			}
@@ -1066,7 +1031,6 @@ public class ResourceFilterGroup {
 		addGroupButton.setLayoutData(data);
 		setButtonDimensionHint(addGroupButton);
 		addGroupButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleAdd(true);
 			}
@@ -1080,7 +1044,6 @@ public class ResourceFilterGroup {
 		editButton.setLayoutData(data);
 		setButtonDimensionHint(editButton);
 		editButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleEdit();
 			}
@@ -1096,7 +1059,6 @@ public class ResourceFilterGroup {
 		removeButton.setLayoutData(data);
 		setButtonDimensionHint(removeButton);
 		removeButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleRemove();
 			}
@@ -1334,7 +1296,6 @@ public class ResourceFilterGroup {
 		private FilterCopyTransfer() {
 		}
 
-		@Override
 		public void javaToNative(Object object, TransferData transferData) {
 			if (object == null || !(object instanceof FilterCopy[]))
 				return;
@@ -1354,7 +1315,6 @@ public class ResourceFilterGroup {
 			}
 		}
 
-		@Override
 		public Object nativeToJava(TransferData transferData) {
 			if (isSupportedType(transferData)) {
 				byte[] buffer = (byte[]) super.nativeToJava(transferData);
@@ -1389,12 +1349,10 @@ public class ResourceFilterGroup {
 		private final String MYTYPENAME = "org.eclipse.ui.ide.internal.filterCopy"; //$NON-NLS-1$
 		private final int MYTYPEID = registerType(MYTYPENAME);
 
-		@Override
 		protected String[] getTypeNames() {
 			return new String[] { MYTYPENAME };
 		}
 
-		@Override
 		protected int[] getTypeIds() {
 			return new int[] { MYTYPEID };
 		}
@@ -1548,7 +1506,6 @@ class FilterTypeUtil {
 	 */
 	private static void sortDescriptors(IFilterMatcherDescriptor[] descriptors) {
 		Arrays.sort(descriptors, new Comparator() {
-			@Override
 			public int compare(Object arg0, Object arg1) {
 				if (((IFilterMatcherDescriptor) arg0).getId().equals(FileInfoAttributesMatcher.ID))
 					return -1;
@@ -1727,17 +1684,14 @@ class FilterCopy extends UIResourceFilterDescription {
 		return id;
 	}
 
-	@Override
 	public IPath getPath() {
 		return path;
 	}
 
-	@Override
 	public IProject getProject() {
 		return project;
 	}
 
-	@Override
 	public int getType() {
 		return type;
 	}
@@ -1784,7 +1738,6 @@ class FilterCopy extends UIResourceFilterDescription {
 		return 0;
 	}
 
-	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof FilterCopy))
 			return false;
@@ -1892,7 +1845,6 @@ class FilterCopy extends UIResourceFilterDescription {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.resources.IResourceFilterDescription#getFileInfoMatcherDescription()
 	 */
-	@Override
 	public FileInfoMatcherDescription getFileInfoMatcherDescription() {
 		
 		
@@ -1931,17 +1883,11 @@ class FilterEditDialog extends TrayDialog {
 
 	TreeMap/*<String, ICustomFilterArgumentUI */ customfilterArgumentMap = new TreeMap();
 	ICustomFilterArgumentUI currentCustomFilterArgumentUI = new ICustomFilterArgumentUI() {
-		@Override
 		public Object getID() {return "dummy";} //$NON-NLS-1$
-		@Override
 		public void create(Composite argumentComposite, Font font) {}
-		@Override
 		public void dispose() {}
-		@Override
 		public void selectionChanged() {}
-		@Override
 		public String validate() {return null;}
-		@Override
 		public StyledString formatStyledText(FilterCopy filter,
 				Styler fPlainStyler, Styler fBoldStyler) {return null;}
 	};
@@ -1976,7 +1922,6 @@ class FilterEditDialog extends TrayDialog {
 	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
 	 * .Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		parent.setLayoutData(data);
@@ -2028,7 +1973,6 @@ class FilterEditDialog extends TrayDialog {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createButtonBar(Composite parent) {
 		Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
@@ -2107,7 +2051,6 @@ class FilterEditDialog extends TrayDialog {
 		inherited.setLayoutData(data);
 		inherited.setFont(font);
 		inherited.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.INHERITABLE,
 						new Boolean(inherited.getSelection()));
@@ -2129,7 +2072,6 @@ class FilterEditDialog extends TrayDialog {
 		includeButton.setLayoutData(data);
 		includeButton.setFont(font);
 		includeButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.MODE,
 						new Integer(0));
@@ -2143,7 +2085,6 @@ class FilterEditDialog extends TrayDialog {
 		excludeButton.setLayoutData(data);
 		excludeButton.setFont(font);
 		excludeButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.MODE,
 						new Integer(1));
@@ -2195,7 +2136,6 @@ class FilterEditDialog extends TrayDialog {
 		idCombo.setLayoutData(data);
 		idCombo.setFont(font);
 		idCombo.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.ID, idCombo
 						.getItem(idCombo.getSelectionIndex()));
@@ -2318,21 +2258,18 @@ class FilterEditDialog extends TrayDialog {
 		filesAndFoldersButton.setFont(font);
 
 		filesButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.TARGET,
 						new Integer(0));
 			}
 		});
 		foldersButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.TARGET,
 						new Integer(1));
 			}
 		});
 		filesAndFoldersButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.TARGET,
 						new Integer(2));
@@ -2347,7 +2284,6 @@ class FilterEditDialog extends TrayDialog {
 		createInheritableArea(font, targetComposite);
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 		Control control = super.createContents(parent);
 		initialize();
@@ -2368,12 +2304,10 @@ class FilterEditDialog extends TrayDialog {
 	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
 	 */
-	@Override
 	protected boolean isResizable() {
 		return true;
 	}
 
-	@Override
 	protected void configureShell(Shell newShell) {
 		String title = null;
 		if (creatingNewFilter) {
@@ -2394,7 +2328,6 @@ class FilterEditDialog extends TrayDialog {
 	protected void update() {
 	}
 
-	@Override
 	protected void okPressed() {
 		// see if the initialize causes an exception
 		if (filter.hasStringArguments()) {
@@ -2514,7 +2447,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#getID()
 	 */
-	@Override
 	public Object getID() {
 		return FileInfoAttributesMatcher.ID;
 	}
@@ -2522,7 +2454,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#dispose()
 	 */
-	@Override
 	public void dispose() {
 		Widget list[] = new Widget[] {multiKey, multiOperator, multiArgumentComposite, stringArgumentComposite, stringTextArgumentComposite, arguments, argumentsLabel, argumentsCaseSensitive, argumentsRegularExpresion, attributeStringArgumentComposite, description, conditionComposite, descriptionComposite, dummyLabel1, dummyLabel2};
 		for (int i = 0; i < list.length; i++) {
@@ -2553,7 +2484,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#create(org.eclipse.swt.widgets.Composite, org.eclipse.swt.graphics.Font)
 	 */
-	@Override
 	public void create(Composite argumentComposite, Font font) {
 		shell = argumentComposite.getShell();
 		GridLayout layout = new GridLayout();
@@ -2668,7 +2598,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		multiKey.setLayoutData(data);
 		multiKey.setFont(font);
 		multiKey.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setupMultiOperatorAndField(true);
 				storeMultiSelection();
@@ -2692,7 +2621,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		multiOperator.setLayoutData(data);
 		multiOperator.setFont(font);
 		multiOperator.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setupMultiOperatorAndField(false);
 				storeMultiSelection();
@@ -2782,7 +2710,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 			arguments.setLayoutData(data);
 			arguments.setFont(multiArgumentComposite.getFont());
 			arguments.addModifyListener(new ModifyListener() {
-				@Override
 				public void modifyText(ModifyEvent e) {
 					validateInputText();
 				}
@@ -2838,13 +2765,11 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 			}
 
 			arguments.addModifyListener(new ModifyListener() {
-				@Override
 				public void modifyText(ModifyEvent e) {
 					storeMultiSelection();
 				}
 			});
 			argumentsRegularExpresion.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					setupDescriptionText(null);
 					storeMultiSelection();
@@ -2853,7 +2778,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 				}
 			});
 			argumentsCaseSensitive.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					storeMultiSelection();
 				}
@@ -2877,7 +2801,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 			arguments.setLayoutData(data);
 			arguments.setFont(multiArgumentComposite.getFont());
 			arguments.addModifyListener(new ModifyListener() {
-				@Override
 				public void modifyText(ModifyEvent e) {
 					validateInputText();
 				}
@@ -2892,7 +2815,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 			}
 			
 			arguments.addModifyListener(new ModifyListener() {
-				@Override
 				public void modifyText(ModifyEvent e) {
 					storeMultiSelection();
 				}
@@ -2905,7 +2827,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 			argumentsDate.setLayoutData(data);
 			argumentsDate.setFont(multiArgumentComposite.getFont());
 			argumentsDate.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					storeMultiSelection();
 				}
@@ -2935,7 +2856,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 			argumentsBoolean.setFont(multiArgumentComposite.getFont());
 			argumentsBoolean.setItems(new String[] {MultiMatcherLocalization.getLocalMultiMatcherKey(Boolean.TRUE.toString()), MultiMatcherLocalization.getLocalMultiMatcherKey(Boolean.FALSE.toString())});
 			argumentsBoolean.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					storeMultiSelection();
 				}
@@ -3106,7 +3026,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#selectionChanged()
 	 */
-	@Override
 	public void selectionChanged() {
 	}
 
@@ -3115,7 +3034,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		dialog.updateFinishControls();
 	}
 
-	@Override
 	public String validate() {
 		String message = null;
 		if (intiantiatedKeyOperatorType != null) {
@@ -3176,7 +3094,6 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#formatStyledText(org.eclipse.ui.internal.ide.dialogs.FilterCopy, org.eclipse.jface.viewers.StyledString.Styler, org.eclipse.jface.viewers.StyledString.Styler)
 	 */
-	@Override
 	public StyledString formatStyledText(FilterCopy filter,
 			Styler fPlainStyler, Styler fBoldStyler) {
 		return new StyledString(formatMultiMatcherArgument(filter), fPlainStyler);
@@ -3235,7 +3152,6 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#getID()
 	 */
-	@Override
 	public Object getID() {
 		return new String();
 	}
@@ -3243,7 +3159,6 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#dispose()
 	 */
-	@Override
 	public void dispose() {
 		Widget list[] = new Widget[] {arguments, argumentsLabel, description};
 		for (int i = 0; i < list.length; i++) {
@@ -3260,7 +3175,6 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#create(org.eclipse.swt.widgets.Composite, org.eclipse.swt.graphics.Font)
 	 */
-	@Override
 	public void create(Composite argumentComposite, Font font) {
 		shell = argumentComposite.getShell();
 		GridLayout layout = new GridLayout();
@@ -3290,7 +3204,6 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		arguments.setLayoutData(data);
 		arguments.setFont(font);
 		arguments.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				FilterTypeUtil.setValue(filter, FilterTypeUtil.ARGUMENTS,
 						arguments.getText());
@@ -3336,7 +3249,6 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#selectionChanged()
 	 */
-	@Override
 	public void selectionChanged() {
 		if (arguments != null)
 			arguments.setEnabled(filter.hasStringArguments());
@@ -3364,7 +3276,6 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		description.setFont(font);
 	}
 
-	@Override
 	public String validate(){
 		return null;
 	}
@@ -3372,7 +3283,6 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.ide.dialogs.ICustomFilterArgumentUI#formatStyledText(org.eclipse.ui.internal.ide.dialogs.FilterCopy, org.eclipse.jface.viewers.StyledString.Styler, org.eclipse.jface.viewers.StyledString.Styler)
 	 */
-	@Override
 	public StyledString formatStyledText(FilterCopy filter,
 			Styler fPlainStyler, Styler fBoldStyler) {
 		return new StyledString(filter.getArguments() != null ? filter

@@ -42,7 +42,6 @@ public class ActionMarkCompleted extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
 		IMarker[] markers = getSelectedMarkers();
 		Map attrs = new HashMap();
@@ -58,7 +57,6 @@ public class ActionMarkCompleted extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(false);
 		if (selection == null || selection.isEmpty()) {

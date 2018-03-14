@@ -61,7 +61,6 @@ public class NewWizardTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
 	 */
-	@Override
 	protected String getExtensionId() {		
 		return "newNewWizard1.testDynamicNewWizardAddition";
 	}
@@ -69,7 +68,6 @@ public class NewWizardTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
 	 */
-	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_NEW;
 	}
@@ -77,7 +75,6 @@ public class NewWizardTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
 	 */
-	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newNewWizard1";
 	}
@@ -85,7 +82,6 @@ public class NewWizardTests extends DynamicTestCase {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
 	 */
-	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicWizard";
 	}

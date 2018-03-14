@@ -20,7 +20,6 @@ import org.w3c.dom.css.CSSValue;
 public class CSSPropertyColorDefinitionHandler implements ICSSPropertyHandler {
 	private final static String COLOR_PROP = "color";
 	
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if (element instanceof ColorDefinitionElement && COLOR_PROP.equals(property)) {
@@ -31,7 +30,6 @@ public class CSSPropertyColorDefinitionHandler implements ICSSPropertyHandler {
 		return false;
 	}
 
-	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		return null;

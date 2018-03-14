@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,9 +53,9 @@ public final class HelpContextIdTest extends UITestCase {
 	 *             defined.
 	 */
 	public final void testHelpContextId() throws NotDefinedException {
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
-		final IHandlerService handlerService = fWorkbench
+		final IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		String helpContextId = null;
 
@@ -67,7 +67,6 @@ public final class HelpContextIdTest extends UITestCase {
 
 		// Retract the handler help context id by creating a handler conflict.
 		handlerService.activateHandler(COMMAND_ID, new AbstractHandler() {
-			@Override
 			public final Object execute(final ExecutionEvent event) {
 				return null;
 			}
@@ -76,9 +75,17 @@ public final class HelpContextIdTest extends UITestCase {
 		assertEquals("The help context id should now be that of the command",
 				COMMAND_HELP_ID, helpContextId);
 
-		// Now re-define the command with a different help context id.
+		// Now undefine the command and check that an exception is thrown.
 		final Command command = commandService.getCommand(COMMAND_ID);
 		command.undefine();
+		try {
+			helpContextId = commandService.getHelpContextId(COMMAND_ID);
+			fail("A NotDefinedException should have been thrown");
+		} catch (final NotDefinedException e) {
+			// success
+		}
+
+		// Now define the command with a different help context id.
 		command.define("New Name", null, commandService.getCategory(null),
 				null, null, NEW_HELP_ID);
 		helpContextId = commandService.getHelpContextId(COMMAND_ID);

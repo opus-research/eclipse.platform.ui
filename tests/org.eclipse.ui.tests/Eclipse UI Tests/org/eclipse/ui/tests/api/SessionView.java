@@ -37,8 +37,7 @@ public class SessionView extends MockViewPart {
     /**
      * @see IViewPart#init(IViewSite, IMemento)
      */
-    @Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+    public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -46,8 +45,7 @@ public class SessionView extends MockViewPart {
     /**
      * Create an IMemento.
      */
-    @Override
-	public void saveState(IMemento memento) {
+    public void saveState(IMemento memento) {
         createMementoState(memento);
     }
 

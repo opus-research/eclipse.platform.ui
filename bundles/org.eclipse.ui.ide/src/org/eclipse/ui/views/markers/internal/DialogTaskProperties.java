@@ -68,8 +68,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
      *  (non-Javadoc)
      * @see org.eclipse.ui.views.markers.internal.DialogMarkerProperties#createAttributesArea(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	protected void createAttributesArea(Composite parent) {
+    protected void createAttributesArea(Composite parent) {
     	createSeperator(parent);
         super.createAttributesArea(parent);
 
@@ -88,8 +87,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
                 PRIORITY_LOW });
         // Prevent Esc and Return from closing the dialog when the combo is active.
         priorityCombo.addTraverseListener(new TraverseListener() {
-            @Override
-			public void keyTraversed(TraverseEvent e) {
+            public void keyTraversed(TraverseEvent e) {
                 if (e.detail == SWT.TRAVERSE_ESCAPE
                         || e.detail == SWT.TRAVERSE_RETURN) {
                     e.doit = false;
@@ -97,8 +95,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
             }
         });
         priorityCombo.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 if (getMarker() == null) {
                     Map initialAttributes = getInitialAttributes();
                     initialAttributes.put(IMarker.PRIORITY, new Integer(
@@ -114,8 +111,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
         gridData.horizontalIndent = convertHorizontalDLUsToPixels(20);
         completedCheckbox.setLayoutData(gridData);
         completedCheckbox.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 if (getMarker() == null) {
                     Map initialAttributes = getInitialAttributes();
                     initialAttributes.put(IMarker.DONE, completedCheckbox.getSelection() ? Boolean.TRUE : Boolean.FALSE);
@@ -156,8 +152,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
      *  (non-Javadoc)
      * @see org.eclipse.ui.views.markers.internal.DialogMarkerProperties#updateEnablement()
      */
-    @Override
-	protected void updateEnablement() {
+    protected void updateEnablement() {
         super.updateEnablement();
         priorityCombo.setEnabled(isEditable());
         completedCheckbox.setEnabled(isEditable());
@@ -167,8 +162,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
      * (non-Javadoc)
      * @see org.eclipse.ui.views.markers.internal.DialogMarkerProperties#updateDialogForNewMarker()
      */
-    @Override
-	protected void updateDialogForNewMarker() {
+    protected void updateDialogForNewMarker() {
         Map initialAttributes = getInitialAttributes();
         int priority = getPriority();
         initialAttributes.put(IMarker.PRIORITY, new Integer(priority));
@@ -189,8 +183,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
      *  (non-Javadoc)
      * @see org.eclipse.ui.views.markers.internal.DialogMarkerProperties#updateDialogFromMarker()
      */
-    @Override
-	protected void updateDialogFromMarker() {
+    protected void updateDialogFromMarker() {
         Map initialAttributes = getInitialAttributes();
         int priority = getPriority();
         initialAttributes.put(IMarker.PRIORITY, new Integer(priority));
@@ -223,8 +216,7 @@ public class DialogTaskProperties extends DialogMarkerProperties {
      *  (non-Javadoc)
      * @see org.eclipse.ui.views.markers.internal.DialogMarkerProperties#getMarkerAttributes()
      */
-    @Override
-	protected Map getMarkerAttributes() {
+    protected Map getMarkerAttributes() {
         Map attrs = super.getMarkerAttributes();
         attrs.put(IMarker.PRIORITY, new Integer(getPriorityFromDialog()));
         attrs.put(IMarker.DONE, completedCheckbox.getSelection() ? Boolean.TRUE : Boolean.FALSE);
@@ -240,7 +232,6 @@ public class DialogTaskProperties extends DialogMarkerProperties {
      * 
      * @since 3.3
      */
-	@Override
 	protected String getModifyOperationTitle() {
 		return MarkerMessages.modifyTask_title;
 	}
@@ -250,7 +241,6 @@ public class DialogTaskProperties extends DialogMarkerProperties {
      * 
      * @since 3.3
      */
-	@Override
 	protected String getCreateOperationTitle() {
 		return MarkerMessages.DialogTaskProperties_CreateTask;
 		

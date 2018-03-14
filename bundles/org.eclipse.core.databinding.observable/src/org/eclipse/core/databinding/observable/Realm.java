@@ -134,7 +134,6 @@ public abstract class Realm {
 			safeRunnable = (ISafeRunnable) runnable;
 		} else {
 			safeRunnable = new ISafeRunnable() {
-				@Override
 				public void handleException(Throwable exception) {
 					Policy
 							.getLog()
@@ -145,7 +144,6 @@ public abstract class Realm {
 											IStatus.OK,
 											"Unhandled exception: " + exception.getMessage(), exception)); //$NON-NLS-1$
 				}
-				@Override
 				public void run() throws Exception {
 					runnable.run();
 				}
@@ -229,7 +227,6 @@ public abstract class Realm {
 					timer = new Timer(true);
 				}
 				timer.schedule(new TimerTask() {
-					@Override
 					public void run() {
 						asyncExec(runnable);
 					}
@@ -245,7 +242,6 @@ public abstract class Realm {
 	private void ensureWorkerThreadIsRunning() {
 		if (workerThread == null) {
 			workerThread = new Thread() {
-				@Override
 				public void run() {
 					try {
 						while (true) {
@@ -309,7 +305,6 @@ public abstract class Realm {
 			this.runnable = runnable;
 		}
 
-		@Override
 		public void run() {
 			try {
 				safeRun(runnable);

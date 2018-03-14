@@ -34,7 +34,6 @@ public class TestPreferenceInitializer extends AbstractPreferenceInitializer {
 	 * 
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
-	@Override
 	public void initializeDefaultPreferences() {
 
 		IScopeContext context = new DefaultScope();

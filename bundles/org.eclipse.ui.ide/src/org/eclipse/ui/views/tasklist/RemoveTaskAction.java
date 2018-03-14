@@ -45,8 +45,7 @@ class RemoveTaskAction extends TaskAction {
     /**
      * Removes all the tasks in the current selection from the task list.
      */
-    @Override
-	public void run() {
+    public void run() {
         TaskList taskList = getTaskList();
         TableViewer viewer = taskList.getTableViewer();
         IStructuredSelection selection = (IStructuredSelection) viewer

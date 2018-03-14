@@ -32,10 +32,8 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 public class NestedSyncExecDeadlockTest extends TestCase {
 
 	private class ResourceListener implements IResourceChangeListener {
-		@Override
 		public void resourceChanged(IResourceChangeEvent event) {
 			Display.getDefault().syncExec(new Runnable() {
-				@Override
 				public void run() {
 				}
 			});
@@ -58,14 +56,11 @@ public class NestedSyncExecDeadlockTest extends TestCase {
 	public void doTest(final long timeToSleep) throws Exception {
 		ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
 		dialog.run(true, false, new WorkspaceModifyOperation() {
-			@Override
 			public void execute(final IProgressMonitor pm) {
 				Display.getDefault().syncExec(new Runnable() {
-					@Override
 					public void run() {
 						try {
 							workspace.run(new IWorkspaceRunnable() {
-								@Override
 								public void run(IProgressMonitor mon) throws CoreException {
 									project.touch(null);
 									try {
@@ -77,7 +72,6 @@ public class NestedSyncExecDeadlockTest extends TestCase {
 								}
 							}, workspace.getRoot(), IResource.NONE, pm);
 							workspace.run(new IWorkspaceRunnable() {
-								@Override
 								public void run(IProgressMonitor mon) {
 								}
 							}, pm);
@@ -91,7 +85,6 @@ public class NestedSyncExecDeadlockTest extends TestCase {
 		});
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		project = workspace.getRoot().getProject("test-deadlock");
 
@@ -104,7 +97,6 @@ public class NestedSyncExecDeadlockTest extends TestCase {
 		workspace.addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		if (listener != null) {
 			workspace.removeResourceChangeListener(listener);

@@ -252,12 +252,10 @@ public class ResourceInfoPage extends PropertyPage {
 			((GridData) locationTitle.getLayoutData()).verticalIndent = verticalIndent;
 			((GridData) locationValue.getLayoutData()).verticalIndent = verticalIndent;
 			editButton.addSelectionListener(new SelectionListener() {
-				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					editLinkLocation();
 				}
 
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					editLinkLocation();
 				}
@@ -388,7 +386,6 @@ public class ResourceInfoPage extends PropertyPage {
 		}
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
@@ -453,7 +450,6 @@ public class ResourceInfoPage extends PropertyPage {
 				 * 
 				 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 				 */
-				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 						setValid(encodingEditor.isValid());
@@ -859,7 +855,6 @@ public class ResourceInfoPage extends PropertyPage {
 	/*
 	 * @see PreferencePage#performDefaults()
 	 */
-	@Override
 	protected void performDefaults() {
 
 		IResource resource = (IResource) getElement().getAdapter(
@@ -933,7 +928,6 @@ public class ResourceInfoPage extends PropertyPage {
 	private IResourceChange getAttributesChange(final boolean changedAttrs[],
 			final boolean finalAttrs[]) {
 		return new IResourceChange() {
-			@Override
 			public String getMessage() {
 				String message = ""; //$NON-NLS-1$
 				if (changedAttrs[0])
@@ -948,7 +942,6 @@ public class ResourceInfoPage extends PropertyPage {
 				return message;
 			}
 
-			@Override
 			public void performChange(IResource resource) throws CoreException {
 				ResourceAttributes attrs = resource.getResourceAttributes();
 				if (attrs != null) {
@@ -967,7 +960,6 @@ public class ResourceInfoPage extends PropertyPage {
 	private IResourceChange getPermissionsChange(final int changedPermissions,
 			final int finalPermissions) {
 		return new IResourceChange() {
-			@Override
 			public String getMessage() {
 				// iterated with [j][i]
 				int permissionMasks[][] = new int[][] {
@@ -1005,7 +997,6 @@ public class ResourceInfoPage extends PropertyPage {
 				return message;
 			}
 
-			@Override
 			public void performChange(IResource resource) {
 				int permissions = fetchPermissions(resource);
 				// add permissions
@@ -1024,7 +1015,6 @@ public class ResourceInfoPage extends PropertyPage {
 		final List/*<IResource>*/ toVisit = new ArrayList/*<IResource>*/();
 		visited.add(resource.getLocationURI());
 		resource.accept(new IResourceProxyVisitor() {
-			@Override
 			public boolean visit(IResourceProxy proxy) {
 				IResource childResource = proxy.requestResource();
 				URI uri = childResource.getLocationURI();
@@ -1060,7 +1050,6 @@ public class ResourceInfoPage extends PropertyPage {
 
 	private void scheduleRecursiveChangesJob(final IResource resource, final List/*<IResourceChange>*/ changes) {
 		new Job(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName) {
-			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				try {
 					List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
@@ -1102,7 +1091,6 @@ public class ResourceInfoPage extends PropertyPage {
 	/**
 	 * Apply the read only state and the encoding to the resource.
 	 */
-	@Override
 	public boolean performOk() {
 
 		IResource resource = (IResource) getElement().getAdapter(

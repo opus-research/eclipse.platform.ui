@@ -39,8 +39,7 @@ public class EditorDragSource extends TestDragSource {
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.dnd.TestDragSource#getName()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         String title = "editor " + editorIdx;
 
         if (wholeFolder) {
@@ -52,8 +51,7 @@ public class EditorDragSource extends TestDragSource {
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.dnd.TestDragSource#drag(org.eclipse.swt.graphics.Point)
      */
-    @Override
-	public void drag(TestDropLocation target) {
+    public void drag(TestDropLocation target) {
         DragOperations.drag(getPart(), target, wholeFolder);
     }
 

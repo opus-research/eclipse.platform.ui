@@ -29,7 +29,6 @@ package org.eclipse.ui.keys;
  * @since 3.0
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public abstract class NaturalKey extends Key {
 
 	/**

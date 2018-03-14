@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 440810
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
@@ -91,7 +91,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		progressRegion = region;
 		mouseListener = new MouseAdapter() {
-			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				doAction();
 			}
@@ -149,7 +148,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		if (prop instanceof ParameterizedCommand) {
 			ParameterizedCommand command = (ParameterizedCommand) prop;
 			IWorkbenchWindow window = getWindow();
-			IHandlerService service = window
+			IHandlerService service = (IHandlerService) window
 					.getService(IHandlerService.class);
 			Exception exception = null;
 			try {
@@ -257,8 +256,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolbar.getParent().layout(); // must layout
 		
     	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-        	@Override
-			public void getName(AccessibleEvent e) {
+        	public void getName(AccessibleEvent e) {
         		e.result = tt;
         	}
         });
@@ -269,7 +267,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createAnimationItem(Composite parent) {
 
 		if (okImage == null) {
@@ -284,7 +281,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		top = new Composite(parent, SWT.NULL);
 		top.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				FinishedJobs.getInstance().removeListener(
 						ProgressAnimationItem.this);
@@ -329,7 +325,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		toolButton = new ToolItem(toolbar, SWT.NONE);
 		toolButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				doAction();
 			}
@@ -356,7 +351,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
 	 */
-	@Override
 	public Control getControl() {
 		return top;
 	}
@@ -366,7 +360,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
 	 */
-	@Override
 	void animationDone() {
 		super.animationDone();
 		animationRunning = false;
@@ -389,7 +382,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
 	 */
-	@Override
 	void animationStart() {
 		super.animationStart();
 		animationRunning = true;
@@ -400,22 +392,18 @@ public class ProgressAnimationItem extends AnimationItem implements
 		refresh();
 	}
 
-	@Override
 	public void removed(JobTreeElement info) {
 		final Display display = Display.getDefault();
 		display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				refresh();
 			}
 		});
 	}
 
-	@Override
 	public void finished(final JobTreeElement jte) {
 		final Display display = Display.getDefault();
 		display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				refresh();
 			}

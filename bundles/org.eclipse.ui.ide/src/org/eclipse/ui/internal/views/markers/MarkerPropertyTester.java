@@ -88,7 +88,6 @@ public class MarkerPropertyTester extends PropertyTester {
 	public MarkerPropertyTester() {
 	}
 
-	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		return test(((IMarker) receiver), property, expectedValue.toString());

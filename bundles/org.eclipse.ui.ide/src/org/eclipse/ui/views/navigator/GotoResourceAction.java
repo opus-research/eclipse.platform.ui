@@ -21,7 +21,6 @@ import org.eclipse.ui.PlatformUI;
  * the user.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class GotoResourceAction extends ResourceNavigatorAction {
     /**
      * Creates a new instance of the class.
@@ -41,8 +40,7 @@ public class GotoResourceAction extends ResourceNavigatorAction {
      * the user to select a resource and change the selection in
      * the navigator.
      */
-    @Override
-	public void run() {
+    public void run() {
         IContainer container = (IContainer) getViewer().getInput();
         GotoResourceDialog dialog = new GotoResourceDialog(getShell(),
                 container, IResource.FILE | IResource.FOLDER

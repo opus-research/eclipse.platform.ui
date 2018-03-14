@@ -27,12 +27,10 @@ public class ComboSingleSelectionIndexProperty extends
 		super(new int[] { SWT.Selection, SWT.DefaultSelection });
 	}
 
-	@Override
 	int doGetIntValue(Object source) {
 		return ((Combo) source).getSelectionIndex();
 	}
 
-	@Override
 	void doSetIntValue(Object source, int value) {
 		if (value == -1)
 			((Combo) source).deselectAll();
@@ -40,7 +38,6 @@ public class ComboSingleSelectionIndexProperty extends
 			((Combo) source).select(value);
 	}
 
-	@Override
 	public String toString() {
 		return "Combo.selectionIndex <int>"; //$NON-NLS-1$
 	}

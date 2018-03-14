@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sebastian Davids <sdavids@gmx.de> - Fix for Bug 73612
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
+ *     Sebastian Davids <sdavids@gmx.de> - Fix for Bug 73612  
+ *        	[Markers] "Open All" does not work with multi-select in the bookmarks view
  *******************************************************************************/
 
 package org.eclipse.ui.views.markers.internal;
@@ -39,15 +39,15 @@ import org.eclipse.ui.statushandlers.StatusManager;
  */
 public class ActionOpenMarker extends MarkerSelectionProviderAction {
 
-	private final String IMAGE_PATH = "elcl16/gotoobj_tsk.png"; //$NON-NLS-1$
+	private final String IMAGE_PATH = "elcl16/gotoobj_tsk.gif"; //$NON-NLS-1$
 
-	private final String DISABLED_IMAGE_PATH = "dlcl16/gotoobj_tsk.png"; //$NON-NLS-1$
+	private final String DISABLED_IMAGE_PATH = "dlcl16/gotoobj_tsk.gif"; //$NON-NLS-1$
 
 	protected IWorkbenchPart part;
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param part
 	 * @param provider
 	 */
@@ -65,7 +65,6 @@ public class ActionOpenMarker extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
 		IMarker[] markers = getSelectedMarkers();
 		for (int i = 0; i < markers.length; i++) {
@@ -149,7 +148,6 @@ public class ActionOpenMarker extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		if (Util.allConcreteSelection(selection)) {
 			Iterator nodes = selection.iterator();

@@ -33,7 +33,6 @@ public class TestNewPropertySheetHandler extends NewPropertySheetHandler {
 	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#execute(org.eclipse
 	 * .core.commands.ExecutionEvent)
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		return super.execute(event);
 	}
@@ -45,7 +44,6 @@ public class TestNewPropertySheetHandler extends NewPropertySheetHandler {
 	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#getShowInContext
 	 * (org.eclipse.core.commands.ExecutionEvent)
 	 */
-	@Override
 	public PropertyShowInContext getShowInContext(ExecutionEvent event)
 			throws ExecutionException {
 		return super.getShowInContext(event);
@@ -59,7 +57,6 @@ public class TestNewPropertySheetHandler extends NewPropertySheetHandler {
 	 * (org.eclipse.core.commands.ExecutionEvent,
 	 * org.eclipse.ui.views.properties.PropertyShowInContext)
 	 */
-	@Override
 	protected PropertySheet findPropertySheet(ExecutionEvent event,
 			PropertyShowInContext context) throws PartInitException,
 			ExecutionException {

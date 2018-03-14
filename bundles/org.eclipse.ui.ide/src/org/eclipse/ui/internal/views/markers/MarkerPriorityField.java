@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -55,7 +54,6 @@ public class MarkerPriorityField extends MarkerField {
 		 * 
 		 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
 		 */
-		@Override
 		protected boolean canEdit(Object element) {
 			if (element instanceof MarkerEntry)
 				return ((MarkerEntry) element).getAttributeValue(
@@ -68,7 +66,6 @@ public class MarkerPriorityField extends MarkerField {
 		 * 
 		 * @see org.eclipse.jface.viewers.EditingSupport#getCellEditor(java.lang.Object)
 		 */
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
@@ -78,7 +75,6 @@ public class MarkerPriorityField extends MarkerField {
 		 * 
 		 * @see org.eclipse.jface.viewers.EditingSupport#getValue(java.lang.Object)
 		 */
-		@Override
 		protected Object getValue(Object element) {
 			return new Integer(((MarkerEntry) element).getAttributeValue(
 					IMarker.PRIORITY, IMarker.PRIORITY_NORMAL));
@@ -90,7 +86,6 @@ public class MarkerPriorityField extends MarkerField {
 		 * @see org.eclipse.jface.viewers.EditingSupport#setValue(java.lang.Object,
 		 *      java.lang.Object)
 		 */
-		@Override
 		protected void setValue(Object element, Object value) {
 			MarkerEntry entry = (MarkerEntry) element;
 			Integer integerValue = (Integer) value;
@@ -104,9 +99,9 @@ public class MarkerPriorityField extends MarkerField {
 		}
 	}
 
-	static final String HIGH_PRIORITY_IMAGE_PATH = "$nl$/icons/full/obj16/hprio_tsk.png"; //$NON-NLS-1$
+	static final String HIGH_PRIORITY_IMAGE_PATH = "$nl$/icons/full/obj16/hprio_tsk.gif"; //$NON-NLS-1$
 
-	static final String LOW_PRIORITY_IMAGE_PATH = "$nl$/icons/full/obj16/lprio_tsk.png"; //$NON-NLS-1$
+	static final String LOW_PRIORITY_IMAGE_PATH = "$nl$/icons/full/obj16/lprio_tsk.gif"; //$NON-NLS-1$
 
 	private static String[] priorities = new String[] {
 			MarkerMessages.priority_low, MarkerMessages.priority_normal,
@@ -125,7 +120,6 @@ public class MarkerPriorityField extends MarkerField {
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#compare(org.eclipse.ui.internal.provisional.views.markers.api.MarkerItem,
 	 *      org.eclipse.ui.internal.provisional.views.markers.api.MarkerItem)
 	 */
-	@Override
 	public int compare(MarkerItem item1, MarkerItem item2) {
 		return item2.getAttributeValue(IMarker.PRIORITY,
 				IMarker.PRIORITY_NORMAL)
@@ -138,7 +132,6 @@ public class MarkerPriorityField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#getColumnHeaderText()
 	 */
-	@Override
 	public String getColumnHeaderText() {
 		return MarkerSupportInternalUtilities.EMPTY_STRING;
 	}
@@ -148,7 +141,6 @@ public class MarkerPriorityField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getColumnTooltipText()
 	 */
-	@Override
 	public String getColumnTooltipText() {
 		return getName();
 	}
@@ -158,7 +150,6 @@ public class MarkerPriorityField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getDefaultColumnWidth(org.eclipse.swt.widgets.Control)
 	 */
-	@Override
 	public int getDefaultColumnWidth(Control control) {
 		return getHighPriorityImage().getBounds().width;
 	}
@@ -168,7 +159,6 @@ public class MarkerPriorityField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getEditingSupport(org.eclipse.jface.viewers.ColumnViewer)
 	 */
-	@Override
 	public EditingSupport getEditingSupport(ColumnViewer viewer) {
 		return new PriorityEditingSupport(viewer);
 	}
@@ -188,7 +178,6 @@ public class MarkerPriorityField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
 	 */
-	@Override
 	public String getValue(MarkerItem item) {
 		return MarkerSupportInternalUtilities.EMPTY_STRING;
 	}
@@ -198,7 +187,6 @@ public class MarkerPriorityField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.views.markers.MarkerField#update(org.eclipse.jface.viewers.ViewerCell)
 	 */
-	@Override
 	public void update(ViewerCell cell) {
 		super.update(cell);
 		try {

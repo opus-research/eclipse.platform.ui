@@ -36,8 +36,7 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
          * 
          * @see org.eclipse.jface.tests.viewers.StructuredViewerTest.TestLabelProvider#getImage(java.lang.Object)
          */
-        @Override
-		public Image getImage(Object element) {
+        public Image getImage(Object element) {
             return getMissingImage();
         }
 
@@ -51,8 +50,7 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
      *  (non-Javadoc)
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#getTestLabelProvider()
      */
-    @Override
-	public IBaseLabelProvider getTestLabelProvider() {
+    public IBaseLabelProvider getTestLabelProvider() {
         return new CheckboxMissingTableTestLabelProvider();
     }
 
@@ -61,8 +59,7 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
      * 
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#tearDown()
      */
-    @Override
-	public void tearDown() {
+    public void tearDown() {
         super.tearDown();
         if (testImage != null) {
             testImage.dispose();
@@ -73,8 +70,7 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
     /* (non-Javadoc)
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#testLabelProvider()
      */
-    @Override
-	public void testLabelProvider() {
+    public void testLabelProvider() {
         super.testLabelProvider();
     }
 

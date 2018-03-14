@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,18 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
@@ -26,11 +26,28 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example usage of ITableLabelProvider using images and labels
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet024TableViewerExploreNewAPI {
+
+	private class MyContentProvider implements IStructuredContentProvider {
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			return (Person[]) inputElement;
+		}
+
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		}
+
+	}
 
 	public class Person {
 		public String givenname;
@@ -74,9 +91,12 @@ public class Snippet024TableViewerExploreNewAPI {
 
 	public Snippet024TableViewerExploreNewAPI(Shell shell) {
 		TableViewer v = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		v.setContentProvider(new MyContentProvider());
 
-		TableViewerColumn column = createColumnFor(v, "Givenname");
+		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
+		column.getColumn().setWidth(200);
+		column.getColumn().setText("Givenname");
+		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
@@ -99,7 +119,10 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		});
 
-		column = createColumnFor(v, "Surname");
+		column = new TableViewerColumn(v, SWT.NONE);
+		column.getColumn().setWidth(200);
+		column.getColumn().setText("Surname");
+		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
@@ -123,7 +146,10 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		});
 
-		column = createColumnFor(v, "E-Mail");
+		column = new TableViewerColumn(v, SWT.NONE);
+		column.getColumn().setWidth(200);
+		column.getColumn().setText("E-Mail");
+		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
@@ -147,28 +173,22 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		});
 
-		v.setInput(createModel());
+		Person[] model = createModel();
+		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private TableViewerColumn createColumnFor(TableViewer viewer, String label) {
-		TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
-		column.getColumn().setWidth(200);
-		column.getColumn().setText(label);
-		column.getColumn().setMoveable(true);
-		return column;
-	}
-
 	private Person[] createModel() {
-		return new Person[] {
-				new Person("Tom", "Schindl", "tom.schindl@bestsolution.at"),
-				new Person("Boris", "Bokowski", "Boris_Bokowski@ca.ibm.com"),
-				new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com"),
-				new Person("Wayne", "Beaton", "wayne@eclipse.org"),
-				new Person("Lars", "Vogel", "lars.vogel@gmail.com"),
-				new Person("Hendrik", "Still", "hendrik.still@vogella.com"),
-				new Person("Jeanderson", "Candido", "jeandersonbc@gmail.com") };
+		Person[] elements = new Person[4];
+		elements[0] = new Person("Tom", "Schindl",
+				"tom.schindl@bestsolution.at");
+		elements[1] = new Person("Boris", "Bokowski",
+				"Boris_Bokowski@ca.ibm.com");
+		elements[2] = new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com");
+		elements[3] = new Person("Wayne", "Beaton", "wayne@eclipse.org");
+
+		return elements;
 	}
 
 	/**
@@ -186,7 +206,9 @@ public class Snippet024TableViewerExploreNewAPI {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
+
 		display.dispose();
+
 	}
 
 }

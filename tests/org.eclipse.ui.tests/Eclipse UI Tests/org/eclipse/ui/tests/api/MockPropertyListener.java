@@ -33,8 +33,7 @@ public class MockPropertyListener implements IPropertyListener {
     /**
      * @see IPropertyListener#propertyChanged(Object, int)
      */
-    @Override
-	public void propertyChanged(Object source, int propId) {
+    public void propertyChanged(Object source, int propId) {
         if (source == sourceMask && propId == sourceId)
             callTrace.add("propertyChanged");
     }

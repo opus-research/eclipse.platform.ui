@@ -26,8 +26,7 @@ public abstract class UITestCaseWithResult extends UITestCase implements AutoTes
     /* (non-Javadoc)
      * @see junit.framework.TestCase#runTest()
      */
-    @Override
-	protected final void runTest() throws Throwable {
+    protected final void runTest() throws Throwable {
         String testName = getName();
         
         TestResult result;

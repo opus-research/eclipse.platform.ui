@@ -22,11 +22,10 @@ import org.eclipse.ui.contexts.IContextService;
 
 public class ContextIdValues implements IParameterValues {
 
-	@Override
 	public Map getParameterValues() {
 		Map values = new HashMap();
 
-		IContextService contextService = PlatformUI
+		IContextService contextService = (IContextService) PlatformUI
 				.getWorkbench().getService(IContextService.class);
 		Context[] definedContexts = contextService.getDefinedContexts();
 		try {

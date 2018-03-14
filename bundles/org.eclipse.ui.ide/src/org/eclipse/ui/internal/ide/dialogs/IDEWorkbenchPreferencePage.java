@@ -36,8 +36,7 @@ public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
      * 
      * @see org.eclipse.jface.preference.PreferencePage
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.WORKBENCH_PREFERENCE_PAGE);
@@ -63,16 +62,14 @@ public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
     /**
      * The default button has been pressed.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
 		super.performDefaults();
     }
 
     /**
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         return super.performOk();
     }
    

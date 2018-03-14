@@ -36,8 +36,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
     /* (non-Javadoc)
      * Method declared on IImportStructureProvider
      */
-    @Override
-	public List getChildren(Object element) {
+    public List getChildren(Object element) {
         File folder = (File) element;
         String[] children = folder.list();
         int childrenLength = children == null ? 0 : children.length;
@@ -76,8 +75,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
 	/* (non-Javadoc)
      * Method declared on IImportStructureProvider
      */
-    @Override
-	public InputStream getContents(Object element) {
+    public InputStream getContents(Object element) {
         try {
             return new FileInputStream((File) element);
         } catch (FileNotFoundException e) {
@@ -89,16 +87,14 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
     /* (non-Javadoc)
      * Method declared on IImportStructureProvider
      */
-    @Override
-	public String getFullPath(Object element) {
+    public String getFullPath(Object element) {
         return ((File) element).getPath();
     }
 
     /* (non-Javadoc)
      * Method declared on IImportStructureProvider
      */
-    @Override
-	public String getLabel(Object element) {
+    public String getLabel(Object element) {
 
         //Get the name - if it is empty then return the path as it is a file root
         File file = (File) element;
@@ -112,8 +108,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
     /* (non-Javadoc)
      * Method declared on IImportStructureProvider
      */
-    @Override
-	public boolean isFolder(Object element) {
+    public boolean isFolder(Object element) {
         return ((File) element).isDirectory();
     }
     
