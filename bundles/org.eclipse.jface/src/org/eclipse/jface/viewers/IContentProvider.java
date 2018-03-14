@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 477779
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -25,9 +24,11 @@ public interface IContentProvider {
      * The viewer should not be updated during this call, as it is in the process
      * of being disposed.
      * </p>
+     * <p>
+     * The default implementation does nothing.
+     * </p>
      */
 	default public void dispose() {
-		// default implementation does nothing
 	}
 
     /**
@@ -43,6 +44,9 @@ public interface IContentProvider {
      * The viewer should not be updated during this call, as it might be in the process
      * of being disposed.
      * </p>
+     * <p>
+     * The default implementation does nothing.
+     * </p>
      *
      * @param viewer the viewer
      * @param oldInput the old input element, or <code>null</code> if the viewer
@@ -51,6 +55,5 @@ public interface IContentProvider {
      *   does not have an input
      */
 	default public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		// default implementation does nothing
 	}
 }
