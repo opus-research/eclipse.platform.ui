@@ -7,9 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285, 472654, 495718
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476, 461573
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 442285, 487348
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497618
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -562,6 +563,8 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			String newName = (String) newValue;
 			cti.setText(getLabel(part, newName));
 			break;
+		case UIEvents.Dirtyable.DIRTY:
+			cti.setText(getLabel(part, part.getLocalizedLabel()));
 		case UIEvents.UILabel.ICONURI:
 			cti.setImage(getImage(part));
 			break;
@@ -569,18 +572,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		case UIEvents.UILabel.LOCALIZED_TOOLTIP:
 			String newTTip = (String) newValue;
 			cti.setToolTipText(getToolTip(newTTip));
-			break;
-		case UIEvents.Dirtyable.DIRTY:
-			Boolean dirtyState = (Boolean) newValue;
-			String text = cti.getText();
-			boolean hasAsterisk = text.length() > 0 && text.charAt(0) == '*';
-			if (dirtyState.booleanValue()) {
-				if (!hasAsterisk) {
-					cti.setText('*' + text);
-				}
-			} else if (hasAsterisk) {
-				cti.setText(text.substring(1));
-			}
 			break;
 		case UIEvents.Part.CLOSEABLE:
 			Boolean closeableState = (Boolean) newValue;
@@ -1169,7 +1160,30 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		});
 	}
 
+	/**
+	 * Shows a popup dialog with the list of editors availavle in a given
+	 * {@link CTabFolder}. By default the popup origin will be located close to
+	 * the chevron location.
+	 *
+	 * @param stack
+	 * @param ctf
+	 */
 	public void showAvailableItems(MElementContainer<?> stack, CTabFolder ctf) {
+		showAvailableItems(stack, ctf, false);
+	}
+
+	/**
+	 * Shows a popup dialog with the list of editors available in the given
+	 * CTabFolder. If {@code forceCenter} enabled, the dialog is centered
+	 * horizontally; otherwise, the dialog origin is placed at chevron location.
+	 * he dialog is placed at
+	 *
+	 * @param stack
+	 * @param ctf
+	 * @param forceCenter
+	 *            center the dialog if true
+	 */
+	public void showAvailableItems(MElementContainer<?> stack, CTabFolder ctf, boolean forceCenter) {
 		IEclipseContext ctxt = getContext(stack);
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(), SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this, getMRUValueFromPreferences());
@@ -1178,14 +1192,24 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		Point size = editorList.computeSizeHint();
 		editorList.setSize(size.x, size.y);
 
-		Point location = ctf.toDisplay(getChevronLocation(ctf));
-		Monitor mon = ctf.getMonitor();
-		Rectangle bounds = mon.getClientArea();
-		if (location.x + size.x > bounds.x + bounds.width) {
-			location.x = bounds.x + bounds.width - size.x;
-		}
-		if (location.y + size.y > bounds.y + bounds.height) {
-			location.y = bounds.y + bounds.height - size.y;
+		Point location = null;
+		if (forceCenter) {
+			// placed to the center
+			Rectangle ca = ctf.getClientArea();
+			location = ctf.toDisplay(ca.x, ca.y);
+			location.x = Math.max(0, (location.x + ((ca.width - size.x) / 2)));
+			location.y = Math.max(0, (location.y + ((ca.height - size.y) / 3)));
+		} else {
+			// placed at chevron location
+			location = ctf.toDisplay(getChevronLocation(ctf));
+			Monitor mon = ctf.getMonitor();
+			Rectangle bounds = mon.getClientArea();
+			if (location.x + size.x > bounds.x + bounds.width) {
+				location.x = bounds.x + bounds.width - size.x;
+			}
+			if (location.y + size.y > bounds.y + bounds.height) {
+				location.y = bounds.y + bounds.height - size.y;
+			}
 		}
 		editorList.setLocation(location);
 

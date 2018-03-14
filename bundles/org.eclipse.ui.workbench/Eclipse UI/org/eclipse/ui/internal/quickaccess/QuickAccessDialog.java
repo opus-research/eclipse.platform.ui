@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,22 +9,17 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     René Brandstetter - Bug 433778
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491410
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionDelta;
-import org.eclipse.core.runtime.IRegistryChangeEvent;
-import org.eclipse.core.runtime.IRegistryChangeListener;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -48,7 +43,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -80,8 +74,7 @@ public class QuickAccessDialog extends PopupDialog {
 	static final int MAXIMUM_NUMBER_OF_TEXT_ENTRIES_PER_ELEMENT = 3;
 	protected Map textMap = new HashMap();
 	protected Map elementMap = new HashMap();
-
-	private IRegistryChangeListener registryChangeListener;
+	protected Map providerMap;
 
 	public QuickAccessDialog(final IWorkbenchWindow window, final Command invokingCommand) {
 		super(ProgressManagerUtil.getDefaultParent(), SWT.RESIZE, true, true, // persist
@@ -96,7 +89,6 @@ public class QuickAccessDialog extends PopupDialog {
 		BusyIndicator.showWhile(window.getShell() == null ? null : window.getShell().getDisplay(),
 				new Runnable() {
 
-
 					@Override
 					public void run() {
 						final CommandProvider commandProvider = new CommandProvider();
@@ -109,47 +101,11 @@ public class QuickAccessDialog extends PopupDialog {
 								new PerspectiveProvider(), commandProvider, new ActionProvider(),
 								new WizardProvider(), new PreferenceProvider(),
 								new PropertiesProvider() };
-				/*
-				 * Listen to changes in the registry. If an extension is removed
-				 * that contains something in our previousPicksList, then remove
-				 * it from that list.
-				 */
-				registryChangeListener = new IRegistryChangeListener() {
-					@Override
-					public void registryChanged(IRegistryChangeEvent event) {
-						for (IExtensionDelta delta : event.getExtensionDeltas()) {
-							if (delta.getKind() != IExtensionDelta.REMOVED)
-								continue;
-							for (IConfigurationElement element : delta.getExtension().getConfigurationElements()) {
-								removeElementsNamed(getProviderId(element));
-							}
+						providerMap = new HashMap();
+						for (int i = 0; i < providers.length; i++) {
+							providerMap.put(providers[i].getId(), providers[i]);
 						}
-					}
-
-					private String getProviderId(IConfigurationElement element) {
-						return element.getNamespaceIdentifier()
-								+ "." + element.getAttribute(ExtensionQuickAccessProvider.ATTRIBUTE_ID); //$NON-NLS-1$
-					}
-
-					private void removeElementsNamed(String id) {
-						Iterator<QuickAccessElement> iterator = previousPicksList.iterator();
-						while (iterator.hasNext()) {
-							QuickAccessProvider provider = iterator.next().getProvider();
-							if (provider instanceof ExtensionQuickAccessProvider) {
-								if (((ExtensionQuickAccessProvider) provider).getId() == id) {
-									iterator.remove();
-									for (QuickAccessElement element : provider.getElements()) {
-										elementMap.remove(element.getId());
-									}
-								}
-							}
-						}
-					}
-				};
-				Platform.getExtensionRegistry().addRegistryChangeListener(registryChangeListener,
-						"org.eclipse.ui.workbench"); //$NON-NLS-1$
-
-				QuickAccessDialog.this.contents = new QuickAccessContents(providers, model.getContext()) {
+						QuickAccessDialog.this.contents = new QuickAccessContents(providers) {
 							@Override
 							protected void updateFeedback(boolean filterTextEmpty,
 									boolean showAllMatches) {
@@ -284,18 +240,7 @@ public class QuickAccessDialog extends PopupDialog {
 						create();
 					}
 				});
-		// Ugly hack to avoid bug 184045. If this gets fixed, replace the
-		// following code with a call to refresh("").
-		getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				final Shell shell = getShell();
-				if (shell != null && !shell.isDisposed()) {
-					Point size = shell.getSize();
-					shell.setSize(size.x, size.y + 1);
-				}
-			}
-		});
+		QuickAccessDialog.this.contents.refresh(""); //$NON-NLS-1$
 	}
 
 	@Override
@@ -366,7 +311,6 @@ public class QuickAccessDialog extends PopupDialog {
 
 	@Override
 	public boolean close() {
-		Platform.getExtensionRegistry().removeRegistryChangeListener(registryChangeListener);
 		storeDialog(getDialogSettings());
 		return super.close();
 	}
@@ -442,24 +386,11 @@ public class QuickAccessDialog extends PopupDialog {
 			elementMap = new HashMap();
 			textMap = new HashMap();
 			previousPicksList = new LinkedList();
-
-			/*
-			 * Moved from the constructor. We only ever use this map in this
-			 * method and this private method is only called once, so create the
-			 * map only when it's required. Keeping this as a field would
-			 * require that we remove references to providers when the bundle
-			 * that defines the provider is deactivated.
-			 */
-			Map<String, QuickAccessProvider> providerMap = new HashMap<>();
-			for (QuickAccessProvider provider : contents.getProviders()) {
-				providerMap.put(provider.getId(), provider);
-			}
-
 			if (orderedElements != null && orderedProviders != null && textEntries != null
 					&& textArray != null) {
 				int arrayIndex = 0;
 				for (int i = 0; i < orderedElements.length; i++) {
-					QuickAccessProvider quickAccessProvider = providerMap
+					QuickAccessProvider quickAccessProvider = (QuickAccessProvider) providerMap
 							.get(orderedProviders[i]);
 					int numTexts = Integer.parseInt(textEntries[i]);
 					if (quickAccessProvider != null) {

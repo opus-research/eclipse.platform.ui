@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,14 +89,12 @@ public class WorkbenchMenuService implements IMenuService {
 
 	@Override
 	public void addSourceProvider(ISourceProvider provider) {
-		// TODO Auto-generated method 
+		// TODO Auto-generated method
 
 	}
 
 	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -193,8 +191,7 @@ public class WorkbenchMenuService implements IMenuService {
 		if (serviceLocator == null)
 			return null;
 
-		IWorkbenchLocationService wls = (IWorkbenchLocationService) serviceLocator
-				.getService(IWorkbenchLocationService.class);
+		IWorkbenchLocationService wls = serviceLocator.getService(IWorkbenchLocationService.class);
 
 		IWorkbenchWindow window = null;
 		if (window == null) {

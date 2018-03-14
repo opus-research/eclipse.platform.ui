@@ -460,7 +460,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/**
 	 * Listener list for registered IWorkbenchListeners .
 	 */
-	private ListenerList workbenchListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList<IWorkbenchListener> workbenchListeners = new ListenerList<>(ListenerList.IDENTITY);
 
 	private ServiceRegistration workbenchService;
 
@@ -661,6 +661,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
 
 					IProgressMonitor progressMonitor = null;
+					SynchronousBundleListener bundleListener = null;
 					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
@@ -668,7 +669,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
 									.getBundleCount() / 10);
 							progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
-							SynchronousBundleListener bundleListener = workbench.new StartupProgressBundleListener(
+							bundleListener = workbench.new StartupProgressBundleListener(
 									progressMonitor, (int) (expectedProgressCount * cutoff));
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
@@ -682,8 +683,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 								WorkbenchPlugin.getDefault().getViewRegistry());
 						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration finished", null)); //$NON-NLS-1$
 					}
+
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
+						if (bundleListener != null) {
+							WorkbenchPlugin.getDefault().removeBundleListener(bundleListener);
+						}
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
 						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
 						wms.dispose();
@@ -978,9 +983,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	boolean firePreShutdown(final boolean forced) {
-		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (final IWorkbenchListener l : workbenchListeners) {
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -1001,9 +1004,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	void firePostShutdown() {
-		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (final IWorkbenchListener l : workbenchListeners) {
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -2317,7 +2318,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		// TODO Correctly order service initialization
 		// there needs to be some serious consideration given to
 		// the services, and hooking them up in the correct order
-		final IEvaluationService evaluationService = (IEvaluationService) serviceLocator
+		final IEvaluationService evaluationService = serviceLocator
 				.getService(IEvaluationService.class);
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
@@ -2518,7 +2519,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 					return;
 				}
 
-				final IHandlerService handlerService = (IHandlerService) getService(IHandlerService.class);
+				final IHandlerService handlerService = getService(IHandlerService.class);
 
 				try {
 					handlerService.executeCommand(commandId, event);
@@ -3526,18 +3527,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	}
 
 	@Override
-	public final Object getAdapter(final Class key) {
-		return serviceLocator.getService(key);
+	public final <T> T getAdapter(final Class<T> key) {
+		return key.cast(serviceLocator.getService(key));
 	}
 
 
 	@Override
-	public final Object getService(final Class key) {
+	public final <T> T getService(final Class<T> key) {
 		return serviceLocator.getService(key);
 	}
 
 	@Override
-	public final boolean hasService(final Class key) {
+	public final boolean hasService(final Class<?> key) {
 		return serviceLocator.hasService(key);
 	}
 

@@ -10,8 +10,7 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452
- *     Wayne Beaton (The Eclipse Foundation) - Bug 162006
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452, 459989
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -20,18 +19,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IRegistryChangeEvent;
-import org.eclipse.core.runtime.IRegistryChangeListener;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.Util;
@@ -82,33 +77,18 @@ import org.eclipse.ui.themes.ColorUtil;
  */
 public abstract class QuickAccessContents {
 	/**
-	 *
-	 */
-	static final String QUICK_ACCESS_EXTENSION_POINT = "org.eclipse.ui.workbench.quickAccess"; //$NON-NLS-1$
-	/**
 	 * When opened in a popup we were given the command used to open it. Now
 	 * that we have a shell, we are just using a hard coded command id.
 	 */
 	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
 	private static final int INITIAL_COUNT_PER_PROVIDER = 5;
 	private static final int MAX_COUNT_TOTAL = 20;
+	/** Minumum length to suggest the user to search typed text in the Help */
+	private static final int MIN_SEARCH_LENGTH = 3;
 
 	protected Text filterText;
 
-	private QuickAccessProvider[] baseProviders;
 	private QuickAccessProvider[] providers;
-	private IEclipseContext context;
-
-	/**
-	 * When the extension registry changes, recompute the providers.
-	 */
-	private IRegistryChangeListener registryChangeListener = new IRegistryChangeListener() {
-		@Override
-		public void registryChanged(IRegistryChangeEvent event) {
-			computeProviders();
-			resetProviders();
-		}
-	};
 
 	protected Table table;
 	protected Label infoLabel;
@@ -128,33 +108,8 @@ public abstract class QuickAccessContents {
 	protected boolean resized = false;
 	private TriggerSequence keySequence;
 
-	public QuickAccessContents(QuickAccessProvider[] providers, IEclipseContext context) {
-		baseProviders = providers;
-		this.context = context;
-		computeProviders();
-
-		Platform.getExtensionRegistry().addRegistryChangeListener(registryChangeListener, "org.eclipse.ui.workbench"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Computes the full set of providers starting with the base
-	 * (built-in/system) providers, then adding providers contributed via the
-	 * "quickAccess" extension point. This method destructively modifies the
-	 * {@link QuickAccessContents#providers} field with up-to-date information
-	 * based on information provided from the extension registry.
-	 */
-	private void computeProviders() {
-		List<QuickAccessProvider> extensionProviders = new ArrayList<>();
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IConfigurationElement[] config = registry.getConfigurationElementsFor(QUICK_ACCESS_EXTENSION_POINT);
-		for (IConfigurationElement element : config) {
-			extensionProviders.add(new ExtensionQuickAccessProvider(element, context));
-		}
-
-		providers = new QuickAccessProvider[baseProviders.length + extensionProviders.size()];
-		System.arraycopy(baseProviders, 0, providers, 0, baseProviders.length);
-		for (int index = 0; index < extensionProviders.size(); index++)
-			providers[index + baseProviders.length] = extensionProviders.get(index);
+	public QuickAccessContents(QuickAccessProvider[] providers) {
+		this.providers = providers;
 	}
 
 	/**
@@ -178,10 +133,18 @@ public abstract class QuickAccessContents {
 		if (table != null) {
 			boolean filterTextEmpty = filter.length() == 0;
 
+			// extra entry added when the user activates help search
+			// (extensible)
+			List<QuickAccessEntry> extraEntries = new ArrayList<>();
+			if (filter.length() > MIN_SEARCH_LENGTH) {
+				extraEntries.add(makeHelpSearchEntry(filter));
+			}
+
 			// perfect match, to be selected in the table if not null
 			QuickAccessElement perfectMatch = getPerfectMatch(filter);
-			List<QuickAccessEntry>[] entries = computeMatchingEntries(filter, perfectMatch);
-			int selectionIndex = refreshTable(perfectMatch, entries);
+
+			List<QuickAccessEntry>[] entries = computeMatchingEntries(filter, perfectMatch, extraEntries);
+			int selectionIndex = refreshTable(perfectMatch, entries, extraEntries);
 
 			if (table.getItemCount() > 0) {
 				table.setSelection(selectionIndex);
@@ -197,6 +160,66 @@ public abstract class QuickAccessContents {
 
 			updateFeedback(filterTextEmpty, showAllMatches);
 		}
+	}
+
+	QuickAccessEntry searchHelpEntry = null;
+	QuickAccessProvider searchHelpProvider = null;
+	QuickAccessSearchElement searchHelpElement = null;
+
+	/**
+	 * Instantiate a new {@link QuickAccessEntry} to search the given text in
+	 * the eclipse help
+	 *
+	 * @param text
+	 *            String to search in the Eclipse Help
+	 *
+	 * @return the {@link QuickAccessEntry} to perform the action
+	 */
+	private QuickAccessEntry makeHelpSearchEntry(String text) {
+		if (searchHelpEntry == null) {
+			searchHelpProvider = Stream.of(providers).filter(p -> p instanceof ActionProvider).findFirst().get();
+			searchHelpElement = new QuickAccessSearchElement(searchHelpProvider);
+			searchHelpEntry = new QuickAccessEntry(searchHelpElement, searchHelpProvider, new int[][] {},
+					new int[][] {}, QuickAccessEntry.MATCH_PERFECT);
+		}
+		searchHelpElement.searchText = text;
+		return searchHelpEntry;
+	}
+
+	static class QuickAccessSearchElement extends QuickAccessElement {
+
+		/** identifier */
+		private static final String SEARCH_IN_HELP_ID = "search.in.help"; //$NON-NLS-1$
+
+		String searchText;
+
+		/**
+		 * @param provider
+		 */
+		public QuickAccessSearchElement(QuickAccessProvider provider) {
+			super(provider);
+		}
+
+		@Override
+		public String getLabel() {
+			return NLS.bind(QuickAccessMessages.QuickAccessContents_SearchInHelpLabel, searchText);
+		}
+
+		@Override
+		public String getId() {
+			return SEARCH_IN_HELP_ID;
+		}
+
+		@Override
+		public void execute() {
+			PlatformUI.getWorkbench().getHelpSystem().search(searchText);
+		}
+
+		@Override
+		public ImageDescriptor getImageDescriptor() {
+			return null;
+		}
+
 	}
 
 	/**
@@ -281,9 +304,12 @@ public abstract class QuickAccessContents {
 		return showAllMatches;
 	}
 
-	private int refreshTable(QuickAccessElement perfectMatch, List<QuickAccessEntry>[] entries) {
-		if (table.getItemCount() > entries.length
-				&& table.getItemCount() - entries.length > 20) {
+	private int refreshTable(QuickAccessElement perfectMatch, List<QuickAccessEntry>[] entries,
+			List<QuickAccessEntry> extraEntries) {
+		// search help extra entry: not from search or previous picks.
+		int nExtraEntries = (extraEntries == null) ? 0 : extraEntries.size();
+		if (table.getItemCount() > (entries.length + nExtraEntries)
+				&& table.getItemCount() - (entries.length + nExtraEntries) > 20) {
 			table.removeAll();
 		}
 		TableItem[] items = table.getItems();
@@ -320,6 +346,11 @@ public abstract class QuickAccessContents {
 				}
 			}
 		}
+		// add extra entry
+		for (QuickAccessEntry entry : extraEntries) {
+			TableItem item = new TableItem(table, SWT.NONE);
+			item.setData(entry);
+		}
 		if (index < items.length) {
 			table.remove(index, items.length - 1);
 		}
@@ -354,16 +385,19 @@ public abstract class QuickAccessContents {
 	 * @param perfectMatch
 	 *            a quick access element that should be given priority or
 	 *            <code>null</code>
-	 * @return the array of lists (one per provider) containg the quick access
+	 * @param extraEntries
+	 *            extra entries that will be added to the tabular visualization
+	 *            after computing matching entries, i.e. Search in Help
+	 * @return the array of lists (one per provider) contains the quick access
 	 *         entries that should be added to the table, possibly empty
 	 */
 	private List<QuickAccessEntry>[] computeMatchingEntries(String filter,
-			QuickAccessElement perfectMatch) {
+			QuickAccessElement perfectMatch, List<QuickAccessEntry> extraEntries) {
 		// collect matches in an array of lists
 		@SuppressWarnings("unchecked")
 		List<QuickAccessEntry>[] entries = new List[providers.length];
-
-		int maxCount = computeNumberOfItems();
+		// extra entries are limiting the number of items for search results
+		int maxCount = computeNumberOfItems() - extraEntries.size();
 		int[] indexPerProvider = new int[providers.length];
 		int countPerProvider = Math.min(maxCount / 4, INITIAL_COUNT_PER_PROVIDER);
 		int prevPick = 0;
@@ -525,9 +559,6 @@ public abstract class QuickAccessContents {
 			resourceManager.dispose();
 			resourceManager = null;
 		}
-
-		Platform.getExtensionRegistry().removeRegistryChangeListener(registryChangeListener);
-
 	}
 
 	protected IDialogSettings getDialogSettings() {
@@ -856,13 +887,6 @@ public abstract class QuickAccessContents {
 		for (QuickAccessProvider provider : providers) {
 			provider.reset();
 		}
-	}
-
-	/**
-	 * @return
-	 */
-	public QuickAccessProvider[] getProviders() {
-		return providers;
 	}
 
 }

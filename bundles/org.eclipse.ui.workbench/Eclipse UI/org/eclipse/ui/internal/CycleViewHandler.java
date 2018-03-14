@@ -8,7 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063, 495917
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -24,6 +25,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorPart;
@@ -31,6 +33,7 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 
 /**
  * This handler is used to switch between parts using the keyboard.
@@ -69,15 +72,7 @@ public class CycleViewHandler extends CycleBaseHandler {
 
 			if (part.getTags().contains("Editor")) { //$NON-NLS-1$
 				if (includeEditor.getAndSet(false)) {
-					IEditorPart activeEditor = page.getActiveEditor();
-					TableItem item = new TableItem(table, SWT.NONE);
-					item.setText(WorkbenchMessages.CyclePartAction_editor);
-					item.setImage(activeEditor.getTitleImage());
-					if (activeEditor.getSite() instanceof PartSite) {
-						item.setData(((PartSite) activeEditor.getSite()).getPartReference());
-					} else {
-						item.setData(part);
-					}
+					createEditorItem(table, page, part);
 				}
 			} else {
 				TableItem item = new TableItem(table, SWT.NONE);
@@ -96,27 +91,58 @@ public class CycleViewHandler extends CycleBaseHandler {
 
 	}
 
+	private void createEditorItem(Table table, WorkbenchPage page, MPart part) {
+		Object object = part.getObject();
+		TableItem item = new TableItem(table, SWT.NONE);
+		item.setText(WorkbenchMessages.CyclePartAction_editor);
+		if (object instanceof CompatibilityEditor) {
+			IEditorPart editor = ((CompatibilityEditor) object).getEditor();
+			item.setImage(editor.getTitleImage());
+			if (editor.getSite() instanceof PartSite) {
+				item.setData(((PartSite) editor.getSite()).getPartReference());
+				return;
+			}
+		} else {
+			item.setImage(getImage(page, part));
+		}
+		item.setData(part);
+	}
+
+	private Image getImage(WorkbenchPage page, MPart part) {
+		Object renderer = part.getRenderer();
+		if (renderer instanceof SWTPartRenderer) {
+			SWTPartRenderer partRenderer = (SWTPartRenderer) renderer;
+			return partRenderer.getImage(part);
+		}
+		WorkbenchWindow wbw = (WorkbenchWindow) page.getWorkbenchWindow();
+		if (wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
+			SWTPartRenderer partRenderer = (SWTPartRenderer) wbw.getModel().getRenderer();
+			return partRenderer.getImage(part);
+		}
+
+		return null;
+	}
+
 	@Override
 	protected ParameterizedCommand getBackwardCommand() {
-		// TODO Auto-generated method stub
-		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
-		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW);
-		ParameterizedCommand commandBack = new ParameterizedCommand(command, null);
-		return commandBack;
+		return getParametrizedCommand(IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW);
 	}
 
 	@Override
 	protected ParameterizedCommand getForwardCommand() {
-		// TODO Auto-generated method stub
+		return getParametrizedCommand(IWorkbenchCommandConstants.WINDOW_NEXT_VIEW);
+	}
+
+    private ParameterizedCommand getParametrizedCommand(String workbenchCommand)
+	{
 		final ICommandService commandService = window.getWorkbench().getService(ICommandService.class);
-		final Command command = commandService.getCommand(IWorkbenchCommandConstants.WINDOW_NEXT_VIEW);
-		ParameterizedCommand commandF = new ParameterizedCommand(command, null);
-		return commandF;
+		final Command command = commandService.getCommand(workbenchCommand);
+		ParameterizedCommand parameterizedCommand = new ParameterizedCommand(command, null);
+		return parameterizedCommand;
 	}
 
 	@Override
 	protected String getTableHeader(IWorkbenchPart activePart) {
-		// TODO Auto-generated method stub
 		return WorkbenchMessages.CyclePartAction_header;
 	}
 
