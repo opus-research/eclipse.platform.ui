@@ -82,10 +82,13 @@ public class IWorkbenchPartTestableTests extends UITestCase {
 			String title = null;
 			IWorkbenchPartTestable testable = null;
 			if (parts instanceof IWorkbenchPart[]) {
-				testable = ((IWorkbenchPart) part).getSite().getAdapter(IWorkbenchPartTestable.class);
+				testable = (IWorkbenchPartTestable) ((IWorkbenchPart) part)
+						.getSite().getAdapter(IWorkbenchPartTestable.class);
 				title = ((IWorkbenchPart) part).getTitle();
 			} else {
-				testable = ((IIntroPart) part).getIntroSite().getAdapter(IWorkbenchPartTestable.class);
+				testable = (IWorkbenchPartTestable) ((IIntroPart) part)
+						.getIntroSite()
+						.getAdapter(IWorkbenchPartTestable.class);
 				title = ((IIntroPart) part).getTitle();
 			}
 			assertNotNull(title + " has null testable", testable);

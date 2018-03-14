@@ -51,19 +51,19 @@ public class ResourceTestHelper {
 
 	public static IFile[] findFiles(String prefix, String suffix, int i, int n) {
 		IWorkspaceRoot root= getRoot();
-		List<IFile> files= new ArrayList<IFile>(n - i);
+		List files= new ArrayList(n - i);
 		for (int j= i; j < i + n; j++) {
 			String path= root.getLocation().toString() + "/" + prefix + j + suffix;
 			files.add(findFile(path));
 		}
-		return files.toArray(new IFile[files.size()]);
+		return (IFile[]) files.toArray(new IFile[files.size()]);
 	}
 
 	public static StringBuffer read(String src) throws IOException, CoreException {
 		return FileTool.read(new InputStreamReader(getRoot().getFile(new Path(src)).getContents()));
 	}
 
-	public static void write(String dest, final String content) throws CoreException {
+	public static void write(String dest, final String content) throws IOException, CoreException {
 		InputStream stream= new InputStream() {
 			private Reader fReader= new StringReader(content);
 			public int read() throws IOException {
@@ -78,7 +78,7 @@ public class ResourceTestHelper {
 		
 		StringBuffer s= read(src);
 		
-		List<Integer> positions= identifierPositions(s, srcName);
+		List positions= identifierPositions(s, srcName);
 		
 		for (int j= 0; j < n; j++) {
 			StringBuffer c= new StringBuffer(s.toString());
@@ -89,22 +89,22 @@ public class ResourceTestHelper {
 
 	public static void copy(String src, String dest, String srcName, String destName) throws IOException, CoreException {
 		StringBuffer buf= read(src);
-		List<Integer> positions= identifierPositions(buf, srcName);
+		List positions= identifierPositions(buf, srcName);
 		replacePositions(buf, srcName.length(), destName, positions);
 		write(dest, buf.toString());
 	}
 
-	private static void replacePositions(StringBuffer c, int origLength, String string, List<Integer> positions) {
+	private static void replacePositions(StringBuffer c, int origLength, String string, List positions) {
 		int offset= 0;
-		for (Iterator<Integer> iter= positions.iterator(); iter.hasNext();) {
-			int position= iter.next().intValue();
+		for (Iterator iter= positions.iterator(); iter.hasNext();) {
+			int position= ((Integer) iter.next()).intValue();
 			c.replace(offset + position, offset + position + origLength, string);
 			offset += string.length() - origLength;
 		}
 	}
 
-	private static List<Integer> identifierPositions(StringBuffer buffer, String identifier) {
-		List<Integer> positions= new ArrayList<Integer>();
+	private static List identifierPositions(StringBuffer buffer, String identifier) {
+		List positions= new ArrayList();
 		int i= -1;
 		while (true) {
 			i= buffer.indexOf(identifier, i + 1);

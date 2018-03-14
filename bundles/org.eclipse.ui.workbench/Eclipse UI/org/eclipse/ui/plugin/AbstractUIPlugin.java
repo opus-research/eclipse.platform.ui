@@ -282,7 +282,7 @@ public abstract class AbstractUIPlugin extends Plugin {
     public IPreferenceStore getPreferenceStore() {
         // Create the preference store lazily.
         if (preferenceStore == null) {
-			preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, getBundle().getSymbolicName());
+            preferenceStore = new ScopedPreferenceStore(new InstanceScope(),getBundle().getSymbolicName());
 
         }
         return preferenceStore;

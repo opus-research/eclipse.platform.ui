@@ -88,7 +88,7 @@ public class EditorWidgetFactory extends TestWidgetFactory {
     /* (non-Javadoc)
      * @see org.eclipse.ui.tests.performance.layout.TestWidgetFactory#getControl()
      */
-    public Composite getControl() {
+    public Composite getControl() throws CoreException, WorkbenchException {
         return ctrl;
     }
     

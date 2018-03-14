@@ -73,7 +73,8 @@ public final class HandlersExtensionDynamicTest extends DynamicTestCase {
 	 * extension. It tests that the data then doesn't exist.
 	 */
 	public final void testHandlers() {
-		final ICommandService commandService = getWorkbench().getAdapter(ICommandService.class);
+		final ICommandService commandService = (ICommandService) getWorkbench()
+				.getAdapter(ICommandService.class);
 		Command command;
 
 		command = commandService.getCommand("monkey");

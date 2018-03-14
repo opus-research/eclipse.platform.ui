@@ -4,6 +4,7 @@ Bundle-Name: Performance Plug-in
 Bundle-SymbolicName: org.eclipse.ui.tests.performance;singleton:=true
 Bundle-Version: 1.2.500.qualifier
 Bundle-Activator: org.eclipse.ui.tests.performance.UIPerformancePlugin
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.tests.harness,

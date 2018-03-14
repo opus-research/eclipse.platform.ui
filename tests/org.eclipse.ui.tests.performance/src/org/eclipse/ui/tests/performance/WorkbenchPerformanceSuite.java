@@ -12,7 +12,6 @@
 package org.eclipse.ui.tests.performance;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -157,7 +156,7 @@ class WorkbenchPerformanceSuite extends TestSuite {
     }
     
     public static String[] getAllPerspectiveIds() {
-        List<String> result = new ArrayList<String>();
+        ArrayList result = new ArrayList();
         IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench().getPerspectiveRegistry().getPerspectives();
         
         for (int i = 0; i < perspectives.length; i++) {
@@ -166,7 +165,7 @@ class WorkbenchPerformanceSuite extends TestSuite {
             result.add(id);
         }
 
-        return result.toArray(new String[result.size()]);
+        return (String[]) result.toArray(new String[result.size()]);
     }
     
     /**
