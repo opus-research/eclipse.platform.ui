@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,9 @@
  * IBM - Initial API and implementation
  * Sebastian Davids - bug 128529
  * Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
+ * Tristan Hume - <trishume@gmail.com> -
+ * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
+ * 		Implemented workbench auto-save to correctly restore state in case of crash.
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -24,8 +27,6 @@ public class WorkbenchMessages extends NLS {
 
 
 	public static String ThemeChangeWarningText;
-
-	public static String ThemeChangeWarningTitle;
 
 	public static String BundleSigningTray_Cant_Find_Service;
 
@@ -323,6 +324,7 @@ public class WorkbenchMessages extends NLS {
 	public static String AboutPluginsDialog_columns;
 	public static String AboutPluginsDialog_errorTitle;
 	public static String AboutPluginsDialog_unableToOpenFile;
+	public static String AboutPluginsDialog_filterTextMessage;
 	public static String AboutFeaturesDialog_shellTitle;
 	public static String AboutFeaturesDialog_featureName;
 	public static String AboutFeaturesDialog_featureId;
@@ -470,9 +472,9 @@ public class WorkbenchMessages extends NLS {
 	// public static String ViewsPreference_perspectiveBar_topLeft;
 	// public static String ViewsPreference_perspectiveBar_left;
 	// public static String ViewsPreference_traditionalTabs;
-	// public static String ViewsPreference_currentTheme;
-	// public static String ViewsPreference_currentThemeDescription;
-	// public static String ViewsPreference_currentThemeFormat;
+	public static String ViewsPreference_currentTheme;
+	public static String ViewsPreference_currentThemeDescription;
+	public static String ViewsPreference_currentThemeFormat;
 	public static String ViewsPreference_enableAnimations;
 	public static String ViewsPreference_useColoredLabels;
 	// public static String ViewsPreference_override;
@@ -551,6 +553,17 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_noEffectOnAllViews;
 	public static String WorkbenchPreference_HeapStatusButton;
 	public static String WorkbenchPreference_HeapStatusButtonToolTip;
+
+	// --- Globalization -----
+	public static String GlobalizationPreference_nlExtensions;
+	public static String GlobalizationPreference_layoutDirection;
+	public static String GlobalizationPreference_bidiSupport;
+	public static String GlobalizationPreference_textDirection;
+	public static String GlobalizationPreference_defaultDirection;
+	public static String GlobalizationPreference_ltrDirection;
+	public static String GlobalizationPreference_autoDirection;
+	public static String GlobalizationPreference_rtlDirection;
+	public static String GlobalizationPreference_restartWidget;
 
 	// --- Fonts ---
 	public static String FontsPreference_useSystemFont;
@@ -806,6 +819,8 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_reuseEditorsThresholdError;
 	public static String WorkbenchPreference_recentFiles;
 	public static String WorkbenchPreference_recentFilesError;
+	public static String WorkbenchPreference_workbenchSaveInterval;
+	public static String WorkbenchPreference_workbenchSaveIntervalError;
 	public static String WorkbenchEditorsAction_label;
 	public static String WorkbookEditorsAction_label;
 
@@ -1005,6 +1020,12 @@ public class WorkbenchMessages extends NLS {
 //	public static String ShowKyrsoftViewAction_KyrsoftNotInstalled;
 //	public static String ShowKyrsoftViewAction_OpenPerspectiveFirst;
 //	public static String ShowKyrsoftViewAction_ErrorShowingKyrsoftView;
+
+
+	public static String SplitValues_Horizontal;
+
+
+	public static String SplitValues_Vertical;
 
 
     // ==============================================================================

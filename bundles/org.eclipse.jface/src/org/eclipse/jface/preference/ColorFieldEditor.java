@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,6 +55,7 @@ public class ColorFieldEditor extends FieldEditor {
 	/*
 	 * (non-Javadoc) Method declared on FieldEditor.
 	 */
+	@Override
 	protected void adjustForNumColumns(int numColumns) {
 		((GridData) colorSelector.getButton().getLayoutData()).horizontalSpan = numColumns - 1;
 	}
@@ -88,6 +89,7 @@ public class ColorFieldEditor extends FieldEditor {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite, int)
 	 */
+	@Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
 		Control control = getLabelControl(parent);
 		GridData gd = new GridData();
@@ -103,6 +105,7 @@ public class ColorFieldEditor extends FieldEditor {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.FieldEditor#doLoad()
 	 */
+	@Override
 	protected void doLoad() {
 		if (colorSelector == null) {
 			return;
@@ -114,6 +117,7 @@ public class ColorFieldEditor extends FieldEditor {
 	/*
 	 * (non-Javadoc) Method declared on FieldEditor.
 	 */
+	@Override
 	protected void doLoadDefault() {
 		if (colorSelector == null) {
 			return;
@@ -125,6 +129,7 @@ public class ColorFieldEditor extends FieldEditor {
 	/*
 	 * (non-Javadoc) Method declared on FieldEditor.
 	 */
+	@Override
 	protected void doStore() {
 		PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(),
 				colorSelector.getColorValue());
@@ -151,6 +156,7 @@ public class ColorFieldEditor extends FieldEditor {
 			colorSelector = new ColorSelector(parent);
 			colorSelector.addListener(new IPropertyChangeListener() {
 				// forward the property change of the color selector
+				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					ColorFieldEditor.this.fireValueChanged(event.getProperty(),
 							event.getOldValue(), event.getNewValue());
@@ -167,6 +173,7 @@ public class ColorFieldEditor extends FieldEditor {
 	/*
 	 * (non-Javadoc) Method declared on FieldEditor.
 	 */
+	@Override
 	public int getNumberOfControls() {
 		return 2;
 	}
@@ -177,6 +184,7 @@ public class ColorFieldEditor extends FieldEditor {
 	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean,
 	 *      org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);
 		getChangeControl(parent).setEnabled(enabled);

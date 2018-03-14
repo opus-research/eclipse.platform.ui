@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     James Blackburn (Broadcom Corp.) Bug 86973 Allow path pattern matching
+ *     Anton Leherbauer (Wind River Systems, Inc.) - Bug 415099 Terminating with "<" or " " (space) does not work for extensions
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -562,13 +562,30 @@ public class FilteredResourcesSelectionDialog extends
 	protected void fillContentProvider(AbstractContentProvider contentProvider,
 			ItemsFilter itemsFilter, IProgressMonitor progressMonitor)
 			throws CoreException {
-		if (itemsFilter instanceof ResourceFilter)
-			container.accept(new ResourceProxyVisitor(contentProvider,
-					(ResourceFilter) itemsFilter, progressMonitor),
-					IResource.NONE);
-		if (progressMonitor != null)
-			progressMonitor.done();
-
+		if (itemsFilter instanceof ResourceFilter) {
+			IResource[] members = container.members();
+			progressMonitor
+					.beginTask(
+							WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
+							members.length);
+			
+			ResourceProxyVisitor visitor = new ResourceProxyVisitor(
+					contentProvider, (ResourceFilter) itemsFilter,
+					progressMonitor);
+			
+			if (visitor.visit(container.createProxy())) {
+				for (int i= 0; i < members.length; i++) {
+					IResource member = members[i];
+					if (member.isAccessible())
+						member.accept(visitor, IResource.NONE);
+					progressMonitor.worked(1);
+					if (progressMonitor.isCanceled())
+						break;
+				}
+			}
+			
+		}
+		progressMonitor.done();
 	}
 
 	/**
@@ -818,8 +835,6 @@ public class FilteredResourcesSelectionDialog extends
 
 		private IProgressMonitor progressMonitor;
 
-		private List projects;
-
 		/**
 		 * Creates new ResourceProxyVisitor instance.
 		 * 
@@ -835,14 +850,6 @@ public class FilteredResourcesSelectionDialog extends
 			this.proxyContentProvider = contentProvider;
 			this.resourceFilter = resourceFilter;
 			this.progressMonitor = progressMonitor;
-			IResource[] resources = container.members();
-			this.projects = new ArrayList(Arrays.asList(resources));
-
-			if (progressMonitor != null)
-				progressMonitor
-						.beginTask(
-								WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
-								projects.size());
 		}
 
 		/*
@@ -856,11 +863,6 @@ public class FilteredResourcesSelectionDialog extends
 				return false;
 
 			IResource resource = proxy.requestResource();
-
-			if (this.projects.remove((resource.getProject()))
-					|| this.projects.remove((resource))) {
-				progressMonitor.worked(1);
-			}
 
 			proxyContentProvider.add(resource, resourceFilter);
 
@@ -943,6 +945,7 @@ public class FilteredResourcesSelectionDialog extends
 			this(container, showDerived, typeMask);
 
 			String stringPattern = getPattern();
+			int matchRule = getMatchRule();
 			String filenamePattern;
 			
 			int sep = stringPattern.lastIndexOf(IPath.SEPARATOR);
@@ -967,20 +970,35 @@ public class FilteredResourcesSelectionDialog extends
 					this.containerPattern= new SearchPattern(SearchPattern.RULE_EXACT_MATCH | SearchPattern.RULE_PREFIX_MATCH | SearchPattern.RULE_PATTERN_MATCH);
 					this.containerPattern.setPattern(containerPattern);
 				}
+				boolean isPrefixPattern = matchRule == SearchPattern.RULE_PREFIX_MATCH
+						|| (matchRule == SearchPattern.RULE_PATTERN_MATCH && filenamePattern.endsWith("*")); //$NON-NLS-1$
+				if (!isPrefixPattern)
+					// Add '<' again as it was removed by SearchPattern
+					filenamePattern += '<';
+				else if (filenamePattern.endsWith("*") && !filenamePattern.equals("**")) //$NON-NLS-1$ //$NON-NLS-2$
+					// Remove added '*' as the filename pattern might be a camel case pattern
+					filenamePattern = filenamePattern.substring(0, filenamePattern.length() - 1);
 				patternMatcher.setPattern(filenamePattern);
-				
+				// Update filenamePattern and matchRule as they might have changed
+				filenamePattern = getPattern();
+				matchRule = getMatchRule();
 			} else {
 				filenamePattern= stringPattern;
 			}
 			
 			int lastPatternDot = filenamePattern.lastIndexOf('.');
 			if (lastPatternDot != -1) {
-				char last = filenamePattern.charAt(filenamePattern.length() - 1);
-				if (last != ' ' && last != '<' && getMatchRule() != SearchPattern.RULE_EXACT_MATCH) {
+				if (matchRule != SearchPattern.RULE_EXACT_MATCH) {
 					namePattern = new SearchPattern();
 					namePattern.setPattern(filenamePattern.substring(0, lastPatternDot));
+					String extensionPatternStr = filenamePattern.substring(lastPatternDot + 1);
+					// Add a '<' except this is a camel case pattern or a prefix pattern
+					if (matchRule != SearchPattern.RULE_CAMELCASE_MATCH
+							&& matchRule != SearchPattern.RULE_PREFIX_MATCH
+							&& !extensionPatternStr.endsWith("*")) //$NON-NLS-1$
+						extensionPatternStr += '<';
 					extensionPattern = new SearchPattern();
-					extensionPattern.setPattern(filenamePattern.substring(lastPatternDot + 1));
+					extensionPattern.setPattern(extensionPatternStr);
 				}
 			}
 
@@ -1020,10 +1038,12 @@ public class FilteredResourcesSelectionDialog extends
 				return false;
 			}
 			IResource resource = (IResource) item;
-			if ((!this.showDerived && resource.isDerived())
-					|| ((this.filterTypeMask & resource.getType()) == 0))
-				return false;
+			return (this.filterTypeMask & resource.getType()) != 0
+					&& matchName(resource)
+					&& (this.showDerived || !resource.isDerived());
+		}
 
+		private boolean matchName(IResource resource) {
 			String name = resource.getName();
 			if (nameMatches(name)) {
 				if (containerPattern != null) {

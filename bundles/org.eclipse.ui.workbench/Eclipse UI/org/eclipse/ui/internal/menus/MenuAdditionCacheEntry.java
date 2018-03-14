@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 221662 [Contributions] Extension point org.eclipse.ui.menus: sub menu contribution does not have icon even if specified
+ *     Christian Walther (Indel AG) - Bug 398631: Use correct menu item icon from commandImages
+ *     Christian Walther (Indel AG) - Bug 384056: Use disabled icon from extension definition
  *******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -18,6 +20,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
+import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
@@ -29,7 +32,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
@@ -47,6 +50,7 @@ import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.services.ServiceLocator;
+import org.eclipse.ui.menus.CommandContributionItem;
 
 public class MenuAdditionCacheEntry {
 	final static String MAIN_TOOLBAR = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
@@ -209,7 +213,7 @@ public class MenuAdditionCacheEntry {
 			} else if (IWorkbenchRegistryConstants.TAG_DYNAMIC.equals(itemType)) {
 				ContextFunction generator = new ContextFunction() {
 					@Override
-					public Object compute(IEclipseContext context) {
+					public Object compute(IEclipseContext context, String contextKey) {
 						ServiceLocator sl = new ServiceLocator();
 						sl.setContext(context);
 						DynamicMenuContributionItem item = new DynamicMenuContributionItem(
@@ -218,9 +222,9 @@ public class MenuAdditionCacheEntry {
 					}
 				};
 
-				MRenderedMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createRenderedMenuItem();
+				MMenuItem menuItem = RenderedElementUtil.createRenderedMenuItem();
 				menuItem.setElementId(id);
-				menuItem.setContributionItem(generator);
+				RenderedElementUtil.setContributionManager(menuItem, generator);
 				menuItem.setVisibleWhen(MenuHelper.getVisibleWhen(child));
 				container.getChildren().add(menuItem);
 			}
@@ -258,7 +262,11 @@ public class MenuAdditionCacheEntry {
 			ICommandImageService commandImageService = application.getContext().get(
 					ICommandImageService.class);
 			ImageDescriptor descriptor = commandImageService == null ? null : commandImageService
-					.getImageDescriptor(item.getElementId());
+					.getImageDescriptor(commandId);
+			if (descriptor == null) {
+				descriptor = commandImageService == null ? null : commandImageService
+						.getImageDescriptor(item.getElementId());
+			}
 			if (descriptor != null) {
 				item.setIconURI(MenuHelper.getImageUrl(descriptor));
 			}
@@ -275,6 +283,7 @@ public class MenuAdditionCacheEntry {
 	}
 
 	private class IdListener implements IIdentifierListener {
+		@Override
 		public void identifierChanged(IdentifierEvent identifierEvent) {
 			application.getContext().set(identifierEvent.getIdentifier().getId(),
 					identifierEvent.getIdentifier().isEnabled());
@@ -453,10 +462,11 @@ public class MenuAdditionCacheEntry {
 			ICommandImageService commandImageService = application.getContext().get(
 					ICommandImageService.class);
 			ImageDescriptor descriptor = commandImageService == null ? null : commandImageService
-					.getImageDescriptor(commandId);
+					.getImageDescriptor(commandId, ICommandImageService.IMAGE_STYLE_TOOLBAR);
 			if (descriptor == null) {
 				descriptor = commandImageService == null ? null : commandImageService
-						.getImageDescriptor(item.getElementId());
+						.getImageDescriptor(item.getElementId(),
+								ICommandImageService.IMAGE_STYLE_TOOLBAR);
 				if (descriptor == null) {
 					item.setLabel(MenuHelper.getLabel(commandAddition));
 				} else {
@@ -468,6 +478,30 @@ public class MenuAdditionCacheEntry {
 		} else {
 			item.setIconURI(iconUrl);
 		}
+
+		iconUrl = MenuHelper.getIconURI(commandAddition,
+				IWorkbenchRegistryConstants.ATT_DISABLEDICON);
+		if (iconUrl == null) {
+			ICommandImageService commandImageService = application.getContext().get(
+					ICommandImageService.class);
+			if (commandImageService != null) {
+				ImageDescriptor descriptor = commandImageService.getImageDescriptor(commandId,
+						ICommandImageService.TYPE_DISABLED,
+						ICommandImageService.IMAGE_STYLE_TOOLBAR);
+				if (descriptor == null) {
+					descriptor = commandImageService.getImageDescriptor(item.getElementId(),
+							ICommandImageService.TYPE_DISABLED,
+							ICommandImageService.IMAGE_STYLE_TOOLBAR);
+				}
+				if (descriptor != null) {
+					iconUrl = MenuHelper.getImageUrl(descriptor);
+				}
+			}
+		}
+		if (iconUrl != null) {
+			MenuHelper.setDisabledIconURI(item, iconUrl);
+		}
+
 		item.setTooltip(MenuHelper.getTooltip(commandAddition));
 		item.setType(MenuHelper.getStyle(commandAddition));
 		if (MenuHelper.hasPulldownStyle(commandAddition)) {
@@ -477,6 +511,12 @@ public class MenuAdditionCacheEntry {
 			item.setMenu(element);
 		}
 		item.setVisibleWhen(MenuHelper.getVisibleWhen(commandAddition));
+
+		if (MenuHelper.getMode(commandAddition) == CommandContributionItem.MODE_FORCE_TEXT) {
+			item.getTags().add("FORCE_TEXT"); //$NON-NLS-1$
+			item.setLabel(MenuHelper.getLabel(commandAddition));
+		}
+
 		createIdentifierTracker(item);
 		return item;
 	}
