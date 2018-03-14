@@ -401,46 +401,6 @@ public class TableViewer extends AbstractTableViewer {
 		refresh(getRoot(), updateLabels, reveal);
 	}
 
-	/**
-	 * Updates the given elements' presentation when one or more of their
-	 * properties change. Only the given elements are updated
-	 * <p>
-	 * if filter is set, the elements visibility will be checked. If the element
-	 * is not represented by a Widget and the filter matches the
-	 * {@link TableViewer#add(Object[])} will be performed, otherwise the
-	 * {@link TableViewer#update(Object[], String[])} will be performed.
-	 *
-	 * @param element
-	 *            the element
-	 * @param properties
-	 *            the properties that have changed, or <code>null</code> to
-	 *            indicate unknown
-	 */
-	@Override
-	public void update(Object element, String[] properties) {
-
-		ViewerFilter[] filters = getFilters();
-		if (filters != null) {
-
-			/*
-			 * if properties are null, there is no refiltering. force
-			 * refiltering here, if properties null
-			 */
-			if (properties == null) {
-				properties = new String[] { "" }; //$NON-NLS-1$
-			}
-
-			if (findItems(element).length > 0) {
-				super.update(element, properties);
-			} else {
-				super.add(element);
-			}
-
-		} else {
-			super.update(element, properties);
-		}
-	}
-
 	@Override
 	public void remove(Object[] elements) {
 		assertElementsNotNull(elements);
