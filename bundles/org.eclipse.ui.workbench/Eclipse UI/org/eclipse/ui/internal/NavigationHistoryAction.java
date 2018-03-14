@@ -13,7 +13,6 @@ package org.eclipse.ui.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -44,9 +43,11 @@ public class NavigationHistoryAction extends PageEventAction {
     private int MAX_HISTORY_LENGTH = 9;
 
     private class MenuCreator implements IMenuCreator {
+		@Override
         public void dispose() {
         }
 
+		@Override
         public Menu getMenu(Menu parent) {
         	setMenu(new Menu(parent));
         	fillMenu(historyMenu);
@@ -54,6 +55,7 @@ public class NavigationHistoryAction extends PageEventAction {
             return historyMenu;
         }
 
+		@Override
         public Menu getMenu(Control parent) {
         	setMenu(new Menu(parent));
         	fillMenu(historyMenu);
@@ -69,6 +71,7 @@ public class NavigationHistoryAction extends PageEventAction {
     
     private void initMenu() {
     	historyMenu.addMenuListener(new MenuAdapter() {
+			@Override
     		public void menuShown(MenuEvent e) {
     			if (recreateMenu) {
 					Menu m = (Menu) e.widget;
@@ -114,6 +117,7 @@ public class NavigationHistoryAction extends PageEventAction {
     			}
     			item.setText(text);
     			item.addSelectionListener(new SelectionAdapter() {
+					@Override
     				public void widgetSelected(SelectionEvent e) {
     					history
     					.shiftCurrentEntry(
@@ -126,6 +130,7 @@ public class NavigationHistoryAction extends PageEventAction {
     	recreateMenu = false;
     }
     
+	@Override
     public void dispose() {
     	super.dispose();
     	if (historyMenu != null) {
@@ -178,9 +183,7 @@ public class NavigationHistoryAction extends PageEventAction {
         setMenuCreator(new MenuCreator());
     }
 
-    /* (non-Javadoc)
-     * Method declared on PageEventAction.
-     */
+	@Override
     public void pageClosed(IWorkbenchPage page) {
         super.pageClosed(page);
         setEnabled(false);
@@ -188,11 +191,12 @@ public class NavigationHistoryAction extends PageEventAction {
 
     private NavigationHistoryEntry[] collapseEntries(
             NavigationHistoryEntry[] entries, int entriesCount[]) {
-        ArrayList allEntries = new ArrayList(Arrays.asList(entries));
+		ArrayList<NavigationHistoryEntry> allEntries = new ArrayList<NavigationHistoryEntry>(
+				Arrays.asList(entries));
         NavigationHistoryEntry previousEntry = null;
         int i = -1;
-        for (Iterator iter = allEntries.iterator(); iter.hasNext();) {
-            NavigationHistoryEntry entry = (NavigationHistoryEntry) iter.next();
+		for (Iterator<NavigationHistoryEntry> iter = allEntries.iterator(); iter.hasNext();) {
+			NavigationHistoryEntry entry = iter.next();
             if (previousEntry != null) {
                 String text = previousEntry.getHistoryText();
                 if (text != null) {
@@ -208,12 +212,10 @@ public class NavigationHistoryAction extends PageEventAction {
             i++;
         }
         entries = new NavigationHistoryEntry[allEntries.size()];
-        return (NavigationHistoryEntry[]) allEntries.toArray(entries);
+		return allEntries.toArray(entries);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PageEventAction.
-     */
+	@Override
     public void pageActivated(IWorkbenchPage page) {
         super.pageActivated(page);
         NavigationHistory nh = (NavigationHistory) page.getNavigationHistory();
@@ -224,9 +226,7 @@ public class NavigationHistoryAction extends PageEventAction {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on IAction.
-     */
+	@Override
     public void run() {
         if (getWorkbenchWindow() == null) {
             // action has been disposed
