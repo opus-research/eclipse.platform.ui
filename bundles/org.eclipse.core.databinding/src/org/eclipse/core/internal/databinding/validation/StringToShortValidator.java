@@ -19,7 +19,7 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 public class StringToShortValidator extends AbstractStringToNumberValidator {
 	private static final Short MIN = new Short(Short.MIN_VALUE);
 	private static final Short MAX = new Short(Short.MAX_VALUE);
-	
+
 	/**
 	 * @param converter
 	 */
@@ -27,9 +27,6 @@ public class StringToShortValidator extends AbstractStringToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.internal.databinding.validation.AbstractStringToNumberValidator#inRange(java.lang.Number)
-	 */
 	@Override
 	protected boolean isInRange(Number number) {
 		return StringToNumberParser.inShortRange(number);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,27 +7,28 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
-import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.swt.widgets.Display;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.ui.internal.themes.ColorDefinition;
 import org.eclipse.ui.internal.themes.FontDefinition;
 import org.eclipse.ui.internal.themes.ThemesExtension;
+import org.junit.Test;
 
-@SuppressWarnings("restriction")
 public class ThemesExtensionTest extends CSSSWTTestCase {
-	private Display display;
 
-	@Override
-	protected void setUp() throws Exception {
-		display = Display.getDefault();
-	}
-
-	public void testThemesExtension() throws Exception {
+	@Test
+	public void testThemesExtension() {
 		//given
-		CSSEngine engine = createEngine("ThemesExtension {font-definition: '#org-eclipse-ui-workbench-FONT_DEF_1'," +
+		engine = createEngine(
+				"ThemesExtension {font-definition: '#org-eclipse-ui-workbench-FONT_DEF_1',"
+						+
 				"'#org-eclipse-ui-workbench-FONT_DEF_2'; color-definition: '#org-eclipse-ui-workbench-COLOR_DEF_1';}", display);
 		ThemesExtension themesExtention = new ThemesExtension();
 

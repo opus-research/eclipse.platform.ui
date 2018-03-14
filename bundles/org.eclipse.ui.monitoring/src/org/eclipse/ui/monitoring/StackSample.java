@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, 2015 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.lang.management.ThreadInfo;
 /**
  * A sample of the stack that contains the stack traces and the time stamp.
  *
+ * @noextend This class is not intended to be subclassed by clients.
  * @since 1.0
  */
 public class StackSample {
@@ -39,7 +40,7 @@ public class StackSample {
 	 * Returns the time stamp in milliseconds since January 1, 1970 UTC for this
 	 * {@code StackSample}.
 	 */
-	public long getTimestamp() {
+	public final long getTimestamp() {
 		return timestamp;
 	}
 
@@ -47,7 +48,7 @@ public class StackSample {
 	 * Returns an array of {@code ThreadInfo}s for this {@code StackSample}. The display thread is
 	 * always the first in the array.
 	 */
-	public ThreadInfo[] getStackTraces() {
+	public final ThreadInfo[] getStackTraces() {
 		return traces;
 	}
 
@@ -55,10 +56,10 @@ public class StackSample {
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append("At ");
+		buf.append("At "); //$NON-NLS-1$
 		buf.append(timestamp);
 		if (traces.length != 0) {
-			buf.append(" threads:\n");
+			buf.append(" threads:\n"); //$NON-NLS-1$
 			for (ThreadInfo threadInfo : traces) {
 				buf.append(threadInfo.toString());
 			}

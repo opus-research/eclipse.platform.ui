@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
  *******************************************************************************/
@@ -32,7 +32,7 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 
 	/**
 	 * Creates a resource filter edit dialog.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 */
@@ -45,30 +45,18 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 
 	/**
 	 * Set the container resource to be edited.
-	 * 
+	 *
 	 * @param container
 	 */
 	public void setContainer(IContainer container) {
 		resourceFilterGroup.setContainer(container);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
-	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
-	 * .Shell)
-	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -76,13 +64,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 				IIDEHelpContextIds.EDIT_RESOURCE_FILTER_DIALOG);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse
-	 * .swt.widgets.Composite)
-	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
@@ -91,13 +72,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 				IDialogConstants.CANCEL_LABEL, false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -105,11 +79,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 		return dialogArea;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#close()
-	 */
 	@Override
 	public boolean close() {
 		resourceFilterGroup.dispose();
@@ -139,11 +108,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 		resourceFilterGroup.setFilters(filters);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
-	 */
 	@Override
 	protected void okPressed() {
 		// Sets the dialog result to the selected path variable name(s).

@@ -11,9 +11,9 @@
 
 package org.eclipse.ui.tests.operations;
 
+import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.PlatformUI;
@@ -21,7 +21,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests the Operations Framework API.
- * 
+ *
  * @since 3.1
  */
 public class WorkbenchOperationHistoryTests extends UITestCase {
@@ -73,12 +73,12 @@ public class WorkbenchOperationHistoryTests extends UITestCase {
 		history.dispose(IOperationHistory.GLOBAL_UNDO_CONTEXT, true, true, true);
 		super.doTearDown();
 	}
-	
+
 	public void testWorkspaceAdapter() {
-		IUndoContext workspaceContext = (IUndoContext)ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
+		IUndoContext workspaceContext = ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
 		assertTrue("Should have context registered on workspace", workspaceContext == context);
 	}
-	
+
 	public void testMatchingContext() {
 		IUndoContext newContext = new IUndoContext() {
 			@Override

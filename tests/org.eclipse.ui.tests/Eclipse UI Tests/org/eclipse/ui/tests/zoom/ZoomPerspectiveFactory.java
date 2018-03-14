@@ -26,10 +26,7 @@ public class ZoomPerspectiveFactory implements IPerspectiveFactory {
     public static final String STACK1_VIEW3 = IPageLayout.ID_TASK_LIST;
     public static final String UNSTACKED_VIEW1 = IPageLayout.ID_RES_NAV;
     public static final String FASTVIEW1 = IPageLayout.ID_BOOKMARKS;
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
-     */
+
     @Override
 	public void createInitialLayout(IPageLayout layout) {
         String folderId = "org.eclipse.ui.test.zoom.mystack";
@@ -40,9 +37,9 @@ public class ZoomPerspectiveFactory implements IPerspectiveFactory {
         folder.addView(STACK1_VIEW2);
         folder.addPlaceholder(STACK1_PLACEHOLDER1);
         folder.addView(STACK1_VIEW3);
-        
+
         layout.addView(UNSTACKED_VIEW1,  IPageLayout.TOP, 0.5f, IPageLayout.ID_EDITOR_AREA);
-        
+
 //        layout.addFastView(FASTVIEW1);
     }
 }

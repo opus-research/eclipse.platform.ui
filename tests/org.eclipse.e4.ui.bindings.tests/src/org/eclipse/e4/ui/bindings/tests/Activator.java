@@ -13,12 +13,10 @@ package org.eclipse.e4.ui.bindings.tests;
 
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
-import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -30,7 +28,7 @@ public class Activator implements BundleActivator {
 
 	// The shared instance
 	private static Activator plugin;
-	
+
 	private IEclipseContext appContext;
 	private IEclipseContext serviceContext;
 

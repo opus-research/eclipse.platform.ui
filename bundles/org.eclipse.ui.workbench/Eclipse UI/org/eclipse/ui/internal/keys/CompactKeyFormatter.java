@@ -27,16 +27,11 @@ import org.eclipse.ui.keys.NaturalKey;
 /**
  * A key formatter providing a special compact format for displaying key
  * bindings.
- * 
+ *
  * @since 3.0
  */
 public class CompactKeyFormatter extends NativeKeyFormatter {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
-     */
     @Override
 	public String format(KeySequence keySequence) {
         StringBuffer stringBuffer = new StringBuffer();
@@ -73,11 +68,6 @@ public class CompactKeyFormatter extends NativeKeyFormatter {
         return stringBuffer.toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.KeyFormatter#formatKeyStroke(org.eclipse.ui.keys.KeyStroke)
-     */
     public String formatKeyStrokes(Set modifierKeys, List naturalKeys) {
         StringBuffer stringBuffer = new StringBuffer();
         String keyDelimiter = getKeyDelimiter();

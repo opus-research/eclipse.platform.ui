@@ -25,15 +25,15 @@ import org.junit.Test;
  *
  */
 public class Bug397302Tests {
-	
+
 	/**
 	 * @since 3.5
 	 *
 	 */
 	private static class TestListener implements ISourceProviderListener {
-		
+
 		private long callCount = 0;
-		
+
 		public long getCallCount() {
 			return callCount;
 		}
@@ -43,18 +43,12 @@ public class Bug397302Tests {
 		public TestListener() {
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProviderListener#sourceChanged(int, java.lang.String, java.lang.Object)
-		 */
 		@Override
 		public void sourceChanged(int sourcePriority, String sourceName,
 				Object sourceValue) {
 			++callCount;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProviderListener#sourceChanged(int, java.util.Map)
-		 */
 		@Override
 		public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
 			++callCount;
@@ -63,37 +57,28 @@ public class Bug397302Tests {
 
 	private static final class TestSourceProvider extends AbstractSourceProvider {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProvider#dispose()
-		 */
 		@Override
 		public void dispose() {
 			// do nothing
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
-		 */
 		@Override
 		public Map getCurrentState() {
 			return Collections.EMPTY_MAP;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
-		 */
 		@Override
 		public String[] getProvidedSourceNames() {
 			return new String[] {};
 		}
 
 		/**
-		 * 
+		 *
 		 */
 		public void callOut() {
 			this.fireSourceChanged(0, Collections.EMPTY_MAP);
 		}
-		
+
 	}
 
 	/**
@@ -107,41 +92,41 @@ public class Bug397302Tests {
 		// keep weak references so we can check on the GC status later on...
 		final WeakReference<TestListener> listenerARef = new WeakReference<TestListener>(a);
 		final WeakReference<TestListener> listenerBRef = new WeakReference<TestListener>(b);
-		
+
 		// add listeners, call out the them, and verify that they got called.
 		testSourceProvider.addSourceProviderListener(a);
 		testSourceProvider.addSourceProviderListener(b);
-		
+
 		testSourceProvider.callOut();
-		
+
 		Assert.assertEquals(1, a.getCallCount());
 		Assert.assertEquals(1, b.getCallCount());
 
 		// remove listeners, call out to them, and verify that they no longer got called
 		testSourceProvider.removeSourceProviderListener(a);
 		testSourceProvider.removeSourceProviderListener(b);
-		
+
 		testSourceProvider.callOut();
-		
+
 		Assert.assertEquals(1, a.getCallCount());
-		Assert.assertEquals(1, b.getCallCount());		
+		Assert.assertEquals(1, b.getCallCount());
 
 		// loose our strong references to a & b, force a GC, and see whether either gets leaked.
 		// Test: The bug asserts that B has been leaked. Force a GC, and test whether
-		// our weak references have gone null of not. If there is no leak, then both 
+		// our weak references have gone null of not. If there is no leak, then both
 		// should be null.
 		a = null;
 		b = null;
-		
+
 		System.gc();
-		
+
 		Assert.assertNull("Reference A", listenerARef.get());
 		Assert.assertNull("Reference B", listenerBRef.get());
-		
-		// Need this to prevent the above GC call from sweeping everything up before we're ready. 
+
+		// Need this to prevent the above GC call from sweeping everything up before we're ready.
 		// See this only when NOT in debug.
 		testSourceProvider.callOut();
-		
+
 	}
 
 	/**
@@ -151,19 +136,16 @@ public class Bug397302Tests {
 	public void testRemoveDuringCallOut() {
 		final TestSourceProvider testSourceProvider = new TestSourceProvider();
 		final TestListener testListener = new TestListener() {
-			/* (non-Javadoc)
-			 * @see org.eclipse.ui.tests.leaks.Bug397302Tests.TestListener#sourceChanged(int, java.util.Map)
-			 */
 			@Override
 			public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
 				testSourceProvider.removeSourceProviderListener(this);
 			}
-			
+
 		};
 		testSourceProvider.addSourceProviderListener(testListener);
-		
+
 		// With improper protection, this was can through something like ConcurrentModificationException
 		testSourceProvider.callOut();
-		
+
 	}
 }

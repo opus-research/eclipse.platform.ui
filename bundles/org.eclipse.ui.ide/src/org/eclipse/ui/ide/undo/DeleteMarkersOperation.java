@@ -23,18 +23,18 @@ import org.eclipse.ui.internal.ide.undo.UndoMessages;
  * A DeleteMarkersOperation represents an undoable operation for deleting one or
  * more markers in the workspace. Clients may call the public API from a
  * background thread.
- * 
+ *
  * This class is intended to be instantiated and used by clients. It is not
  * intended to be subclassed by clients.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class DeleteMarkersOperation extends AbstractMarkersOperation {
 
 	/**
 	 * Create an undoable operation that can delete the specified markers.
-	 * 
+	 *
 	 * @param markers
 	 *            the markers to be deleted
 	 * @param name
@@ -46,12 +46,7 @@ public class DeleteMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map execution to marker deletion.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable info)
@@ -66,12 +61,7 @@ public class DeleteMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map undo to marker creation.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable info)
@@ -86,11 +76,7 @@ public class DeleteMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map the undo status to marker creation status.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractMarkersOperation#getBasicUndoStatus()
 	 */
 	@Override
 	protected IStatus getBasicUndoStatus() {
@@ -98,11 +84,7 @@ public class DeleteMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map the redo status to marker deletion status.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractMarkersOperation#getBasicRedoStatus()
 	 */
 	@Override
 	protected IStatus getBasicRedoStatus() {

@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * @since 1.0
- * 
+ *
  */
 public class ValidationStatusMap extends ObservableMap {
 
@@ -144,11 +144,6 @@ public class ValidationStatusMap extends ObservableMap {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.databinding.observable.list.ObservableList#dispose()
-	 */
 	@Override
 	public synchronized void dispose() {
 		bindings.removeChangeListener(markDirtyChangeListener);
@@ -162,14 +157,14 @@ public class ValidationStatusMap extends ObservableMap {
 			observableValue.removeChangeListener(markDirtyChangeListener);
 		}
 	}
-	
+
 	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		// this ensures that the next change will be seen by the new listener.
 		recompute();
 		super.addChangeListener(listener);
 	}
-	
+
 	@Override
 	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		// this ensures that the next change will be seen by the new listener.

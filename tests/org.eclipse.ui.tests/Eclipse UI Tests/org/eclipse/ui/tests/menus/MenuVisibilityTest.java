@@ -50,7 +50,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class MenuVisibilityTest extends UITestCase {
 
@@ -73,11 +73,6 @@ public class MenuVisibilityTest extends UITestCase {
 	public void testBasicContribution() throws Exception {
 
 		IAction a = new Action() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.action.Action#run()
-			 */
 			@Override
 			public void run() {
 				System.out.println("Hello action");
@@ -90,12 +85,6 @@ public class MenuVisibilityTest extends UITestCase {
 				new String[] { ISources.ACTIVE_CONTEXT_NAME });
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
-			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
-			 */
 			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
@@ -105,7 +94,7 @@ public class MenuVisibilityTest extends UITestCase {
 
 		menuService.addContributionFactory(factory);
 		menuService.populateContributionManager(manager, LOCATION);
-		
+
 		Shell shell = window.getShell();
 
 		// Test the initial menu creation
@@ -114,7 +103,7 @@ public class MenuVisibilityTest extends UITestCase {
 		e.type = SWT.Show;
 		e.widget = menuBar;
 		menuBar.notifyListeners(SWT.Show, e);
-		
+
 		assertFalse("starting state", item.isVisible());
 
 		activeContext = contextService
@@ -128,7 +117,7 @@ public class MenuVisibilityTest extends UITestCase {
 		menuBar.notifyListeners(SWT.Show, e);
 
 		assertFalse("after deactivation", item.isVisible());
-		
+
 		menuService.releaseContributions(manager);
 		menuService.removeContributionFactory(factory);
 		manager.dispose();
@@ -136,11 +125,6 @@ public class MenuVisibilityTest extends UITestCase {
 
 	public void testExtensionContributionExpression() throws Exception {
 		IAction a = new Action() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.action.Action#run()
-			 */
 			@Override
 			public void run() {
 				System.out.println("Hello action");
@@ -156,11 +140,9 @@ public class MenuVisibilityTest extends UITestCase {
 
 		IConfigurationElement[] mas = extension.getConfigurationElements();
 		final Expression activeContextExpr[] = new Expression[1];
-		for (int i = 0; i < mas.length; i++) {
-			IConfigurationElement ma = mas[i];
+		for (IConfigurationElement ma : mas) {
 			IConfigurationElement[] items = ma.getChildren();
-			for (int j = 0; j < items.length; j++) {
-				IConfigurationElement item = items[j];
+			for (IConfigurationElement item : items) {
 				String id = item.getAttribute("id");
 				if (id != null
 						&& id.equals("org.eclipse.ui.tests.menus.itemX1")) {
@@ -174,12 +156,6 @@ public class MenuVisibilityTest extends UITestCase {
 		assertNotNull("Failed to find expression", activeContextExpr[0]);
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
-			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
-			 */
 			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
@@ -199,7 +175,7 @@ public class MenuVisibilityTest extends UITestCase {
 		assertTrue("active context", aci.isVisible());
 		menu.notifyListeners(SWT.Hide, new Event());
 
-		
+
 		contextService.deactivateContext(activeContext);
 		activeContext = null;
 
@@ -275,11 +251,6 @@ public class MenuVisibilityTest extends UITestCase {
 		manager.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -296,11 +267,6 @@ public class MenuVisibilityTest extends UITestCase {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		if (activeContext != null) {

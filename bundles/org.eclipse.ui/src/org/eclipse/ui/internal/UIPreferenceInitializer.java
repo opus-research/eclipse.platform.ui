@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Kiryl Kazakevich, Intel - bug 88359
  *     Tonny Madsen, RCP Company - bug 201055
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -34,14 +35,14 @@ import org.osgi.service.prefs.BackingStoreException;
  * initialized properly when running without
  * org.eclipse.core.runtime.compatibility. For more details, see bug 58975 - New
  * preference mechanism does not properly initialize defaults.
- * 
+ *
  * @since 3.0
  */
 public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public void initializeDefaultPreferences() {
 
-		
+
 		IScopeContext context = new DefaultScope();
 		IEclipsePreferences node = context.getNode(UIPlugin.getDefault()
 				.getBundle().getSymbolicName());
@@ -64,9 +65,6 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 		node.putBoolean(IWorkbenchPreferenceConstants.LINK_NAVIGATOR_TO_EDITOR,
 				false);
 
-		// Appearance / Presentation preferences
-		node.put(IWorkbenchPreferenceConstants.PRESENTATION_FACTORY_ID,
-				IWorkbenchConstants.DEFAULT_PRESENTATION_ID);
 		node
 				.putBoolean(
 						IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
@@ -152,7 +150,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 		node.putInt(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION, SWT.TOP);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS, true);
-		
+
 		node.putInt(IWorkbenchPreferenceConstants.RECENTLY_USED_WORKINGSETS_SIZE, 5);
 
 		migrateInternalPreferences();
@@ -180,7 +178,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 				.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
 					/*
 					 * (non-Javadoc)
-					 * 
+					 *
 					 * @see
 					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
 					 * .INodeChangeListener
@@ -199,7 +197,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 					/*
 					 * (non-Javadoc)
-					 * 
+					 *
 					 * @see
 					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
 					 * .INodeChangeListener
@@ -229,12 +227,12 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 					internalStore.getInt(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION));
 			internalStore
 				.setToDefault(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION);
-		}		
+		}
 
 		// Is there a value there?
 		if (internalStore
 				.contains(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION)) {
-				
+
 			apiStore.setValue(
 					IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION,
 					internalStore.getInt(IWorkbenchPreferenceConstants.EDITOR_TAB_POSITION));

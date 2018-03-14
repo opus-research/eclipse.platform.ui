@@ -19,7 +19,7 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 public class StringToDoubleValidator extends AbstractStringToNumberValidator {
 	private static final Double MIN = new Double(-Double.MAX_VALUE);
 	private static final Double MAX = new Double(Double.MAX_VALUE);
-	
+
 	/**
 	 * @param converter
 	 */
@@ -27,11 +27,6 @@ public class StringToDoubleValidator extends AbstractStringToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.internal.databinding.validation.AbstractStringToNumberValidator#inRange(java.lang.Number)
-	 */
 	@Override
 	protected boolean isInRange(Number number) {
 		return StringToNumberParser.inDoubleRange(number);

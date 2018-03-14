@@ -52,9 +52,9 @@ import org.eclipse.ui.preferences.SettingsTransfer;
 /**
  * The ChooseWorkspaceWithSettingsDialog is the dialog used to switch workspaces
  * with an optional settings export.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
@@ -79,7 +79,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Open a new instance of the receiver.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param launchData
 	 * @param suppressAskAgain
@@ -91,11 +91,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		super(parentShell, launchData, suppressAskAgain, centerOnMonitor);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.ide.ChooseWorkspaceDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control top = super.createDialogArea(parent);
@@ -109,7 +104,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Create the controls for selecting the controls we are going to export.
-	 * 
+	 *
 	 * @param workArea
 	 */
 	private void createSettingsControls(Composite workArea) {
@@ -119,7 +114,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				toolkit.dispose();
-				
+
 			}});
 		final ScrolledForm form = toolkit.createScrolledForm(workArea);
 		form.setBackground(workArea.getBackground());
@@ -139,11 +134,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 			boolean notExpanded = true;
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.forms.events.IExpansionListener#expansionStateChanged(org.eclipse.ui.forms.events.ExpansionEvent)
-			 */
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(true);
@@ -162,11 +152,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.forms.events.IExpansionListener#expansionStateChanging(org.eclipse.ui.forms.events.ExpansionEvent)
-			 */
 			@Override
 			public void expansionStateChanging(ExpansionEvent e) {
 				// Nothing to do here
@@ -187,7 +172,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Create the buttons for the settings transfer.
-	 * 
+	 *
 	 * @param toolkit
 	 * @param sectionClient
 	 * @return boolean <code>true</code> if any were selected
@@ -227,11 +212,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 			button.setBackground(sectionClient.getBackground());
 			button.addSelectionListener(new SelectionAdapter() {
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-				 */
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if (button.getSelection())
@@ -247,7 +227,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Get the settings for the receiver based on the entries in section.
-	 * 
+	 *
 	 * @param section
 	 * @return String[] or <code>null</code>
 	 */
@@ -260,11 +240,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.ide.ChooseWorkspaceDialog#okPressed()
-	 */
 	@Override
 	protected void okPressed() {
 		Iterator settingsIterator = selectedSettings.iterator();
@@ -300,7 +275,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Save the ids of the selected elements.
-	 * 
+	 *
 	 * @param selectionIDs
 	 */
 	private void saveSettings(String[] selectionIDs) {
@@ -317,7 +292,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Take the values from element and execute the class for path.
-	 * 
+	 *
 	 * @param elem
 	 * @param path
 	 * @return IStatus the result of the settings transfer.
@@ -328,11 +303,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		final IStatus[] exceptions = new IStatus[1];
 
 		SafeRunner.run(new ISafeRunnable() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
-			 */
 			@Override
 			public void run() throws Exception {
 
@@ -346,11 +316,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
-			 */
 			@Override
 			public void handleException(Throwable exception) {
 				exceptions[0] = StatusUtil
@@ -372,11 +337,6 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsStrategy()
-	 */
 	@Override
 	protected int getDialogBoundsStrategy() {
 		return DIALOG_PERSISTLOCATION;

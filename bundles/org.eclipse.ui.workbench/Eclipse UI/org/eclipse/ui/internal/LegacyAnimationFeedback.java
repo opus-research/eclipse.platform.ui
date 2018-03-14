@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Creates an animation feedback that will morph the start rectangle to the end rectangle
  * for AnimationEngine.
- * 
+ *
  * @since 3.3
  *
  */
@@ -61,9 +61,6 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		getAnimationShell().getDisplay().update();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#initialize(org.eclipse.ui.internal.AnimationEngine)
-	 */
 	@Override
 	public void initialize(AnimationEngine engine) {
 		Color color = getAnimationShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
@@ -74,13 +71,10 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		getAnimationShell().setRegion(shellRegion);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#dispose()
-	 */
 	@Override
 	public void dispose() {
 		super.dispose();
-		
+
 		if (!shellRegion.isDisposed())
 			shellRegion.dispose();
 	}
@@ -93,7 +87,7 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 	public boolean jobInit(AnimationEngine engine) {
 		if (!super.jobInit(engine))
 			return false;
-		
+
 		// Compute the shell's bounds
 		Rectangle shellBounds = Geometry.copy((Rectangle) getStartRects()
 				.get(0));
@@ -107,7 +101,7 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		// Making the shell visible will be slow on old video cards, so only start
 		// the timer once it is visible.
 		getAnimationShell().setVisible(true);
-		
+
 		return true;  // OK to go...
 	}
 

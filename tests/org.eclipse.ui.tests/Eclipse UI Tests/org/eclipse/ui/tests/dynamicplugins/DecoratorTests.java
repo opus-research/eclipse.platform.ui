@@ -19,7 +19,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  * @since 3.1
  */
 public class DecoratorTests extends DynamicTestCase {
-	
+
 	public static final String FULL1 = "fullDecorator1";
 	public static final String LIGHT1 = "lightDecorator1";
 	public static final String LIGHT2 = "lightDecorator2";
@@ -30,7 +30,7 @@ public class DecoratorTests extends DynamicTestCase {
 	public DecoratorTests(String testName) {
 		super(testName);
 	}
-	
+
 	public void testDecorators() {
 		assertFalse(hasDecorator(FULL1));
 		assertFalse(hasDecorator(LIGHT1));
@@ -44,44 +44,33 @@ public class DecoratorTests extends DynamicTestCase {
 		assertFalse(hasDecorator(LIGHT1));
 		assertFalse(hasDecorator(LIGHT2));
 	}
-	
+
 	public boolean hasDecorator(String id) {
 		DecoratorManager manager = WorkbenchPlugin.getDefault().getDecoratorManager();
 		DecoratorDefinition [] definitions = manager.getAllDecoratorDefinitions();
-		for (int i = 0; i < definitions.length; i++) {
-			if (definitions[i].getId().equals(id))
+		for (DecoratorDefinition definition : definitions) {
+			if (definition.getId().equals(id)) {
 				return true;
+			}
 		}
 		return false;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
-	 */
+
 	@Override
 	protected String getExtensionId() {
 		return "newDecorator1.testDynamicDecoratorAddition";
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
-	 */
 	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_DECORATORS;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
-	 */
 	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newDecorator1";
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
-	 */
+
 	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicLabelDecorator";

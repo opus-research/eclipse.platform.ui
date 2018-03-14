@@ -22,16 +22,16 @@ import org.eclipse.ui.ide.IDEEncoding;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class EncodingFieldEditor extends AbstractEncodingFieldEditor {
 
-	
+
 	/**
 	 * Creates a new encoding field editor with the given preference name, label
 	 * and parent.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -64,27 +64,22 @@ public final class EncodingFieldEditor extends AbstractEncodingFieldEditor {
 		init(name, labelText);
 		createControl(parent);
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.ide.dialogs.AbstractEncodingFieldEditor#getStoredValue()
-	 */
+
 	@Override
 	protected String getStoredValue() {
 		return getPreferenceStore().getString(getPreferenceName());
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
-	 */
+
 	@Override
 	protected void doStore() {
 		String encoding = getSelectedEncoding();
-		
+
 		if(hasSameEncoding(encoding)) {
 			return;
 		}
-		
+
 		IDEEncoding.addIDEEncoding(encoding);
-		
+
 		if (encoding.equals(getDefaultEnc())) {
 			getPreferenceStore().setToDefault(getPreferenceName());
 		} else {

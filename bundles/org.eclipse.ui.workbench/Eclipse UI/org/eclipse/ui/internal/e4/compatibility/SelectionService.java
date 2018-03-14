@@ -135,7 +135,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 	/**
 	 * Updates the selection of the workbench window with that of the active
 	 * part's.
-	 * 
+	 *
 	 * @param activePart
 	 *            the currently active part
 	 */
@@ -150,13 +150,27 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 				if (applicationContext.getActiveChild() == context) {
 					application.getContext().set(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Notifies selection listeners about selection change caused by active part
+	 * change.
+	 *
+	 * @param activePart
+	 *            the currently active part
+	 */
+	public void notifyListeners(IWorkbenchPart activePart) {
+		if (activePart != null) {
+			ISelectionProvider selectionProvider = activePart.getSite().getSelectionProvider();
+			if (selectionProvider != null) {
+				ISelection selection = selectionProvider.getSelection();
 
 				notifyListeners(activePart, selection, listeners);
-				notifyListeners(activePart, selection, activePart.getSite().getId(),
-						targetedListeners);
+				notifyListeners(activePart, selection, activePart.getSite().getId(), targetedListeners);
 				notifyListeners(activePart, selection, postSelectionListeners);
-				notifyListeners(activePart, selection, activePart.getSite().getId(),
-						targetedPostSelectionListeners);
+				notifyListeners(activePart, selection, activePart.getSite().getId(), targetedPostSelectionListeners);
 			}
 		}
 	}
@@ -208,7 +222,12 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	@PreDestroy
 	public void dispose() {
+		setSelectionService(null);
 		selectionService = null;
+		listeners.clear();
+		postSelectionListeners.clear();
+		targetedListeners.clear();
+		targetedPostSelectionListeners.clear();
 	}
 
 	private void notifyListeners(IWorkbenchPart workbenchPart, ISelection selection,
@@ -236,7 +255,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#addSelectionListener(org.eclipse.ui.
 	 * ISelectionListener)
@@ -248,7 +267,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#addSelectionListener(java.lang.String,
 	 * org.eclipse.ui.ISelectionListener)
@@ -268,7 +287,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#addPostSelectionListener(org.eclipse
 	 * .ui.ISelectionListener)
@@ -280,7 +299,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#addPostSelectionListener(java.lang.String
 	 * , org.eclipse.ui.ISelectionListener)
@@ -300,7 +319,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISelectionService#getSelection()
 	 */
 	@Override
@@ -320,7 +339,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISelectionService#getSelection(java.lang.String)
 	 */
 	@Override
@@ -334,7 +353,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#removeSelectionListener(org.eclipse.
 	 * ui.ISelectionListener)
@@ -346,7 +365,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#removeSelectionListener(java.lang.String
 	 * , org.eclipse.ui.ISelectionListener)
@@ -364,7 +383,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#removePostSelectionListener(org.eclipse
 	 * .ui.ISelectionListener)
@@ -376,7 +395,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.ISelectionService#removePostSelectionListener(java.lang
 	 * .String, org.eclipse.ui.ISelectionListener)
@@ -394,7 +413,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(
 	 * org.eclipse.jface.viewers.SelectionChangedEvent)
