@@ -13,7 +13,6 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.swt.widgets.Display;
 
 public class ToolItemUpdater {
@@ -32,10 +31,9 @@ public class ToolItemUpdater {
 		itemsToCheck.remove(item);
 	}
 
-	public void updateContributionItems(Selector selector) {
+	public void updateContributionItems() {
 		for (final HandledContributionItem hci : itemsToCheck) {
-			if (hci.model != null && hci.model.getParent() != null
-					&& selector.select(hci.model)) {
+			if (hci.model != null && hci.model.getParent() != null) {
 				hci.updateItemEnablement();
 			} else {
 				orphanedToolItems.add(hci);

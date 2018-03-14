@@ -83,17 +83,14 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 
 	private class MyContentProvider implements IStructuredContentProvider {
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (Person[]) inputElement;
 		}
 
-		@Override
 		public void dispose() {
 
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -108,12 +105,10 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 			this.viewer = viewer;
 		}
 
-		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
-		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			return ((Person) element)
 					.getValue(viewer.getColumnProperties()[columnIndex]
@@ -128,17 +123,14 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 			this.viewer = viewer;
 		}
 
-		@Override
 		public boolean canModify(Object element, String property) {
 			return true;
 		}
 
-		@Override
 		public Object getValue(Object element, String property) {
 			return ((Person) element).getValue(property);
 		}
 
-		@Override
 		public void modify(Object element, String property, Object value) {
 			((Person) ((Item) element).getData()).setValue(property, value
 					.toString());
@@ -182,7 +174,6 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 	private void triggerColumnSelectedColumn(final TableViewer v) {
 		v.getTable().addMouseListener(new MouseAdapter() {
 
-			@Override
 			public void mouseDown(MouseEvent e) {
 				int x = 0;
 				for (int i = 0; i < v.getTable().getColumnCount(); i++) {
@@ -201,21 +192,18 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		final MenuManager mgr = new MenuManager();
 
 		final Action insertEmailBefore = new Action("Insert E-Mail before") {
-			@Override
 			public void run() {
 				addEmailColumn(v, activeColumn);
 			}
 		};
 
 		final Action insertEmailAfter = new Action("Insert E-Mail after") {
-			@Override
 			public void run() {
 				addEmailColumn(v, activeColumn + 1);
 			}
 		};
 
 		final Action removeEmail = new Action("Remove E-Mail") {
-			@Override
 			public void run() {
 				removeEmailColumn(v);
 			}
@@ -224,7 +212,6 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		mgr.setRemoveAllWhenShown(true);
 		mgr.addMenuListener(new IMenuListener() {
 
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				if (v.getTable().getColumnCount() == 2) {
 					manager.add(insertEmailBefore);

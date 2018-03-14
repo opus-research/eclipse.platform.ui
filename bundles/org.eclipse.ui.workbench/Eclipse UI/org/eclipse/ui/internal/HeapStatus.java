@@ -27,6 +27,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -48,7 +49,6 @@ public class HeapStatus extends Composite {
 
 	private boolean armed;
 	private Image gcImage;
-	private Image disabledGcImage;
 	private Color bgCol, usedMemCol, lowMemCol, freeMemCol, topLeftCol, bottomRightCol, sepCol, textCol, markCol, armCol;  
     private Canvas button;
 	private IPreferenceStore prefStore;
@@ -67,9 +67,7 @@ public class HeapStatus extends Composite {
 	private float lowMemThreshold = 0.05f;
 	private boolean showLowMemThreshold = true;
 	private boolean updateTooltip = false;
-
-	protected volatile boolean isInGC = false;
-
+	
     private final Runnable timer = new Runnable() {
         public void run() {
             if (!isDisposed()) {
@@ -121,12 +119,11 @@ public class HeapStatus extends Composite {
         button.setToolTipText(WorkbenchMessages.HeapStatus_buttonToolTip);
         
 		ImageDescriptor imageDesc = WorkbenchImages.getWorkbenchImageDescriptor("elcl16/trash.png"); //$NON-NLS-1$
-		Display display = getDisplay();
 		gcImage = imageDesc.createImage();
 		if (gcImage != null) {
 			imgBounds = gcImage.getBounds();
-			disabledGcImage = new Image(display, gcImage, SWT.IMAGE_DISABLE);
 		}
+		Display display = getDisplay();
 		usedMemCol = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 		lowMemCol = new Color(display, 255, 70, 70);  // medium red 
 		freeMemCol = new Color(display, 255, 190, 125);  // light orange
@@ -158,10 +155,8 @@ public class HeapStatus extends Composite {
                     break;
                 case SWT.MouseUp:
                     if (event.button == 1) {
-						if (!isInGC) {
-							arm(false);
-							gc(); 
-						}
+                        gc();
+                        arm(false);
                     }
                     break;
                 case SWT.MouseDown:
@@ -169,8 +164,7 @@ public class HeapStatus extends Composite {
 	                    if (event.widget == HeapStatus.this) {
 							setMark();
 						} else if (event.widget == button) {
-							if (!isInGC)
-								arm(true);
+							arm(true);
 						}
                     }
                     break;
@@ -240,9 +234,6 @@ public class HeapStatus extends Composite {
     	if (gcImage != null) {
 			gcImage.dispose();
 		}
-		if (disabledGcImage != null) {
-			disabledGcImage.dispose();
-		}
        
         if (lowMemCol != null) {
 			lowMemCol.dispose();
@@ -277,15 +268,6 @@ public class HeapStatus extends Composite {
         button.redraw();
         button.update();
     }
-
-	private void gcRunning(boolean isInGC) {
-		if (this.isInGC == isInGC) {
-			return;
-		}
-		this.isInGC = isInGC;
-		 button.redraw();
-		 button.update();
-	}
 
     /**
      * Creates the context menu
@@ -332,20 +314,26 @@ public class HeapStatus extends Composite {
     }
     
     private void gc() {
-		gcRunning(true);
-		Thread t = new Thread() {
+    	BusyIndicator.showWhile(getDisplay(), new Runnable() {
 			public void run() {
-				busyGC();
-				getDisplay().asyncExec(new Runnable() {
+				Thread t = new Thread() {
 					public void run() {
-						if (!isDisposed()) {
-							gcRunning(false);
+						busyGC();
+					}};
+				t.start();
+				while(t.isAlive()) {
+					try {
+						Display d = getDisplay();
+						while(d != null && !d.isDisposed() && d.readAndDispatch()) {
+							// loop
 						}
+						t.join(10);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
 					}
-				});
+				}
 			}
-		};
-		t.start();
+		});
     }
 
     private void busyGC() {
@@ -357,13 +345,7 @@ public class HeapStatus extends Composite {
     
     private void paintButton(GC gc) {
         Rectangle rect = button.getClientArea();
-		if (isInGC) {
-			if (disabledGcImage != null) {
-				int buttonY = (rect.height - imgBounds.height) / 2 + rect.y;
-				gc.drawImage(disabledGcImage, rect.x, buttonY);
-			}
-			return;
-		}
+        
         if (armed) {
             gc.setBackground(armCol);
             gc.fillRectangle(rect.x, rect.y, rect.width, rect.height);
