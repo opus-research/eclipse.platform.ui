@@ -65,11 +65,31 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	private boolean relayout = true;
 
+	private boolean adjustForScrollBar = false;
+
 	private Listener resizeListener = event -> {
 		if (!inupdateMode) {
 			updateColumnData(event.widget);
 		}
 	};
+
+	/**
+	 * Creates a new abstract column layout.
+	 */
+	public AbstractColumnLayout() {
+	}
+
+	/**
+	 * Creates a new abstract column layout.
+	 *
+	 * @param adjustForScrollBar
+	 *            <code>true</code> if the layout should reserve space for the
+	 *            vertical scroll bar
+	 * @since 3.12
+	 */
+	public AbstractColumnLayout(boolean adjustForScrollBar) {
+		this.adjustForScrollBar = adjustForScrollBar;
+	}
 
 	/**
 	 * Adds a new column of data to this table layout.
@@ -105,7 +125,10 @@ public abstract class AbstractColumnLayout extends Layout {
 			int hHint) {
 		Point result = scrollable.computeSize(wHint, hHint);
 
-		int width = 0;
+		int width = scrollable.getBorderWidth() * 2;
+		if (adjustForScrollBar && scrollable.getVerticalBar() != null) {
+			width += scrollable.getVerticalBar().getThumbTrackBounds().width;
+		}
 		int size = getColumnCount(scrollable);
 		for (int i = 0; i < size; ++i) {
 			ColumnLayoutData layoutData = getLayoutData(scrollable, i);
@@ -122,8 +145,7 @@ public abstract class AbstractColumnLayout extends Layout {
 				Assert.isTrue(false, "Unknown column layout data"); //$NON-NLS-1$
 			}
 		}
-		if (width > result.x)
-			result.x = width;
+		result.x = Math.min(width, result.x);
 
 		return result;
 	}
@@ -167,6 +189,9 @@ public abstract class AbstractColumnLayout extends Layout {
 			} else {
 				Assert.isTrue(false, "Unknown column layout data"); //$NON-NLS-1$
 			}
+		}
+		if (adjustForScrollBar && scrollable.getVerticalBar() != null) {
+			fixedWidth += scrollable.getVerticalBar().getThumbTrackBounds().width;
 		}
 
 		boolean recalculate;
