@@ -225,10 +225,7 @@ public class TrimStack {
 		if (trimStackTB == null || trimStackTB.isDisposed() || minimizedElement.getWidget() == null)
 			return;
 
-		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(changedElement instanceof MUIElement)) {
-			return;
-		}
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 
 		String key;
 		if (UIEvents.isREMOVE(event)) {
@@ -240,11 +237,11 @@ public class TrimStack {
 		}
 
 		if (key.equals(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setImage(getImage((MUILabel) toolItem.getData()));
 		} else if (key.equals(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setToolTipText(getLabelText((MUILabel) toolItem.getData()));
 		}
@@ -995,20 +992,18 @@ public class TrimStack {
 
 				// See if we can find an element to activate...
 				MPart partToActivate = null;
-				MUIElement selectedElement = area.getSelectedElement();
+				MElementContainer<?> curContainer = area;
+				MUIElement selectedElement = curContainer.getSelectedElement();
 				while (partToActivate == null && selectedElement != null) {
-					if (selectedElement instanceof MPart) {
-						partToActivate = (MPart) selectedElement;
-					} else if (selectedElement instanceof MPlaceholder) {
-						MPlaceholder ph = (MPlaceholder) selectedElement;
+					if (curContainer.getSelectedElement() instanceof MPart) {
+						partToActivate = (MPart) curContainer.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MPlaceholder) {
+						MPlaceholder ph = (MPlaceholder) curContainer.getSelectedElement();
 						if (ph.getRef() instanceof MPart) {
 							partToActivate = (MPart) ph.getRef();
-						} else {
-							selectedElement = null;
 						}
-					} else if (selectedElement instanceof MElementContainer<?>) {
-						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
-						selectedElement = (MElementContainer<?>) container.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MElementContainer<?>) {
+						curContainer = (MElementContainer<?>) curContainer.getSelectedElement();
 					}
 				}
 
