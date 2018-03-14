@@ -35,7 +35,6 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -48,7 +47,7 @@ public class GradientBackgroundListener implements Listener {
 	private final Control control;
 	private boolean radialGradient;
 	Image gradientImage;
-
+	
 	private DisposeListener disposeListener = new DisposeListener() {
 		public void widgetDisposed(DisposeEvent e) {
 			dispose();
@@ -63,8 +62,8 @@ public class GradientBackgroundListener implements Listener {
 			Class.forName("java.awt.RadialGradientPaint"); //$NON-NLS-1$
 			isRadialSupported = true;
 		} catch (Exception e) {
-			//			System.err
-			//					.println("Warning - radial gradients are only supported in Java 6 and higher, using linear gradient instead"); //$NON-NLS-1$
+//			System.err
+//					.println("Warning - radial gradients are only supported in Java 6 and higher, using linear gradient instead"); //$NON-NLS-1$
 			isRadialSupported = false;
 		}
 
@@ -116,17 +115,17 @@ public class GradientBackgroundListener implements Listener {
 		if (size.x <= 0 || size.y <= 0) {
 			return;
 		}
-
+		
 		// hold onto our old image for disposal, if necessary
 		Image oldImage = control.getBackgroundImage();
 		if(oldImage != gradientImage) {
 			oldImage = null;
 		}
-
+		
 		/*
 		 * Draw the new background.  Radial backgrounds have to be generated
 		 * for the full size of the control's size; linear backgrounds are
-		 * just a slice for the control's height that is then repeated.
+		 * just a slice for the control's height that is then repeated. 
 		 */
 
 		// If Java 5 or lower is used, radial gradients are not supported yet
@@ -169,28 +168,17 @@ public class GradientBackgroundListener implements Listener {
 			fillGradient(gc, new Rectangle(0, 0, x, y), colors,
 					CSSSWTColorHelper.getPercents(grad), grad.getVerticalGradient());
 			gc.dispose();
-			for (Color c : colors) {
+			for (Iterator<Color> iterator = colors.iterator(); iterator
+					.hasNext();) {
+				Color c = iterator.next();
 				c.dispose(); // Dispose colors too.
 			}
 		}
 		if (gradientImage != null) {
 			control.setBackgroundImage(gradientImage);
-			if (control instanceof Composite) {
-				setBackgroundImageForChildren((Composite) control,
-						gradientImage);
-			}
 		}
 		if (oldImage != null && oldImage != gradientImage) {
 			oldImage.dispose();
-		}
-	}
-
-	private void setBackgroundImageForChildren(Composite parent, Image image) {
-		for (Control child : parent.getChildren()) {
-			if (child.getBackgroundImage() == null) {
-				child.setBackground(image.getBackground());
-				child.setBackgroundImage(null);
-			}
 		}
 	}
 
@@ -288,7 +276,7 @@ public class GradientBackgroundListener implements Listener {
 			int i;
 			for (i = 0; i < classes.length; i++) {
 				if ("java.awt.MultipleGradientPaint.CycleMethod" //$NON-NLS-1$
-						.equals(classes[i].getCanonicalName())) {
+				.equals(classes[i].getCanonicalName())) {
 					break;
 				}
 			}
@@ -304,7 +292,7 @@ public class GradientBackgroundListener implements Listener {
 			g2.setPaint((java.awt.Paint) radialGradientPaint);
 		} catch (Exception e) {
 			System.err
-			.println("Warning - radial gradients are only supported in Java 6 and higher, using flat background color instead"); //$NON-NLS-1$
+					.println("Warning - radial gradients are only supported in Java 6 and higher, using flat background color instead"); //$NON-NLS-1$
 			g2.setColor(colorArray[0]);
 		}
 
