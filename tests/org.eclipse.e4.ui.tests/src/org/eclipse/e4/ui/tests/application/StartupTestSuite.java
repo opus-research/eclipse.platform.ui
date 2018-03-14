@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,34 +7,28 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
-public class StartupTestSuite extends TestSuite {
+@RunWith(Suite.class)
+@SuiteClasses({ EModelServiceTest.class,
+	EModelServiceFindTest.class,
+	EModelServiceInsertTest.class,
+	EPartServiceTest.class,
+	ESelectionServiceTest.class,
+	EventBrokerTest.class,
+	HeadlessContactsDemoTest.class,
+	HeadlessPhotoDemoTest.class,
+	UIEventsTest.class,
+	UIContactsDemoTest.class,
+	UIPhotoDemoTest.class })
 
-	public static Test suite() {
-		TestSuite suite = new StartupTestSuite();
-
-		suite.addTestSuite(EModelServiceTest.class);
-		suite.addTestSuite(EModelServiceFindTest.class);
-		suite.addTestSuite(EModelServiceInsertTest.class);
-		suite.addTestSuite(EPartServiceTest.class);
-		suite.addTestSuite(ESelectionServiceTest.class);
-		suite.addTestSuite(EventBrokerTest.class);
-
-		suite.addTestSuite(HeadlessContactsDemoTest.class);
-		suite.addTestSuite(HeadlessPhotoDemoTest.class);
-
-		// suite.addTestSuite(UIContactsDemoTest.class);
-		// suite.addTestSuite(UIPhotoDemoTest.class);
-
-		suite.addTestSuite(UIEventsTest.class);
-
-		return suite;
-	}
-
+public class StartupTestSuite {
+	
 }

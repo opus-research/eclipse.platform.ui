@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +23,7 @@ import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
+import org.junit.Test;
 
 public abstract class ModelReconcilerApplicationElementTest extends
 		ModelReconcilerTest {
@@ -55,33 +60,39 @@ public abstract class ModelReconcilerApplicationElementTest extends
 		assertTrue(application.getTags().containsAll(mergedTagsList));
 	}
 
+	@Test
 	public void testApplicationElement_Style() {
 		testApplicationElement_Style(new String[0], new String[0],
 				new String[0], new String[0]);
 	}
 
+	@Test
 	public void testApplicationElement_Style2() {
 		testApplicationElement_Style(new String[] { "cvs" }, new String[0],
 				new String[] { "cvs" }, new String[0]);
 	}
 
+	@Test
 	public void testApplicationElement_Style3() {
 		testApplicationElement_Style(new String[] { "cvs" },
 				new String[] { "cvs" }, new String[] { "cvs" },
 				new String[] { "cvs" });
 	}
 
+	@Test
 	public void testApplicationElement_Style4() {
 		testApplicationElement_Style(new String[] { "cvs" }, new String[] {
 				"cvs", "scm" }, new String[] { "cvs" }, new String[] { "cvs",
 				"scm" });
 	}
 
+	@Test
 	public void testApplicationElement_Style5() {
 		testApplicationElement_Style(new String[0], new String[] { "cvs" },
 				new String[] { "scm" }, new String[] { "scm", "cvs" });
 	}
 
+	@Test
 	public void testApplicationElement_Tags_New() {
 		MApplication application = createApplication();
 
@@ -144,10 +155,12 @@ public abstract class ModelReconcilerApplicationElementTest extends
 		assertEquals("commandId", command.getElementId());
 	}
 
+	@Test
 	public void testApplicationElement_Id_New_True() {
 		testApplicationElement_Id_New(true);
 	}
 
+	@Test
 	public void testApplicationElement_Id_New_False() {
 		testApplicationElement_Id_New(false);
 	}
@@ -176,42 +189,52 @@ public abstract class ModelReconcilerApplicationElementTest extends
 		assertEquals(after, application.getElementId());
 	}
 
+	@Test
 	public void testApplicationElement_Id_NullNull() {
 		testApplicationElement_Id(null, null);
 	}
 
+	@Test
 	public void testApplicationElement_Id_NullEmpty() {
 		testApplicationElement_Id(null, "");
 	}
 
+	@Test
 	public void testApplicationElement_Id_NullString() {
 		testApplicationElement_Id(null, "id");
 	}
 
+	@Test
 	public void testApplicationElement_Id_EmptyNull() {
 		testApplicationElement_Id("", null);
 	}
 
+	@Test
 	public void testApplicationElement_Id_EmptyEmpty() {
 		testApplicationElement_Id("", "");
 	}
 
+	@Test
 	public void testApplicationElement_Id_EmptyString() {
 		testApplicationElement_Id("", "id");
 	}
 
+	@Test
 	public void testApplicationElement_Id_StringNull() {
 		testApplicationElement_Id("id", null);
 	}
 
+	@Test
 	public void testApplicationElement_Id_StringEmpty() {
 		testApplicationElement_Id("id", "");
 	}
 
+	@Test
 	public void testApplicationElement_Id_StringStringUnchanged() {
 		testApplicationElement_Id("id", "id");
 	}
 
+	@Test
 	public void testApplicationElement_Id_StringStringChanged() {
 		testApplicationElement_Id("id", "id3");
 	}
