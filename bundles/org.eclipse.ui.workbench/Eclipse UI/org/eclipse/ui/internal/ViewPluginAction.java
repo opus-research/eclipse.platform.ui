@@ -38,6 +38,9 @@ public final class ViewPluginAction extends PartPluginAction {
         registerSelectionListener(viewPart);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
@@ -49,6 +52,9 @@ public final class ViewPluginAction extends PartPluginAction {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected void initDelegate() {
         super.initDelegate();
@@ -66,6 +72,9 @@ public final class ViewPluginAction extends PartPluginAction {
         return super.isOkToCreateDelegate() && viewPart != null;
     }
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.PluginAction#dispose()
+	 */
 	@Override
 	public void dispose() {
 		unregisterSelectionListener(viewPart);

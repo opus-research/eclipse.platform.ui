@@ -100,6 +100,11 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		this.parent = parent;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.INestableKeyBindingService#activateKeyBindingService(org.eclipse.ui.IWorkbenchSite)
+     */
     @Override
 	public boolean activateKeyBindingService(IWorkbenchSite nestedSite) {
         if (disposed) {
@@ -257,6 +262,11 @@ public final class KeyBindingService implements INestableKeyBindingService {
 	}
 
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.INestableKeyBindingService#getKeyBindingService(org.eclipse.ui.IWorkbenchSite)
+     */
 	@Override
 	public IKeyBindingService getKeyBindingService(IWorkbenchSite nestedSite) {
 		if (disposed) {
@@ -349,6 +359,11 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		}
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.INestableKeyBindingService#removeKeyBindingService(org.eclipse.ui.IWorkbenchSite)
+     */
 	@Override
 	public boolean removeKeyBindingService(IWorkbenchSite nestedSite) {
 		if (disposed) {
