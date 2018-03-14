@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,12 +12,16 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.helpers;
 
+import static org.eclipse.e4.ui.css.swt.helpers.ThemeElementDefinitionHelper.normalizeId;
+
 import org.eclipse.e4.ui.css.core.css2.CSS2FontHelper;
 import org.eclipse.e4.ui.css.core.css2.CSS2FontPropertiesHelpers;
 import org.eclipse.e4.ui.css.core.css2.CSS2PrimitiveValueImpl;
 import org.eclipse.e4.ui.css.core.dom.properties.css2.CSS2FontProperties;
 import org.eclipse.e4.ui.css.core.dom.properties.css2.CSS2FontPropertiesImpl;
 import org.eclipse.e4.ui.css.core.engine.CSSElementContext;
+import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
+import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Font;
@@ -26,6 +30,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.css.CSSPrimitiveValue;
+import org.w3c.dom.css.CSSValue;
 
 /**
  * CSS SWT Font Helper to :
@@ -35,6 +40,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * </ul>
  */
 public class CSSSWTFontHelper {
+	public static final String FONT_DEFINITION_MARKER = "#";
 
 	/**
 	 * Get CSS2FontProperties from Control stored into Data of Control. If
@@ -143,27 +149,74 @@ public class CSSSWTFontHelper {
 	public static FontData getFontData(CSS2FontProperties fontProperties,
 			FontData oldFontData) {
 		FontData newFontData = new FontData();
-		// Style
-		int style = getSWTStyle(fontProperties, oldFontData);
-		newFontData.setStyle(style);
-		// Height
-		CSSPrimitiveValue cssFontSize = fontProperties.getSize();
-		if (cssFontSize != null) {
-			newFontData.setHeight((int) (cssFontSize)
-					.getFloatValue(CSSPrimitiveValue.CSS_PT));
-		} else {
-			if (oldFontData != null)
-				newFontData.setHeight(oldFontData.getHeight());
-		}
+
 		// Family
 		CSSPrimitiveValue cssFontFamily = fontProperties.getFamily();
-		if (cssFontFamily != null)
+		FontData[] fontDataByDefinition = new FontData[0];
+		boolean fontDefinitionAsFamily = hasFontDefinitionAsFamily(fontProperties);
+
+		if (fontDefinitionAsFamily) {
+			fontDataByDefinition = findFontDataByDefinition(cssFontFamily);
+			if (fontDataByDefinition.length > 0) {
+				newFontData.setName(fontDataByDefinition[0].getName());
+			}
+		} else if (cssFontFamily != null) {
 			newFontData.setName(cssFontFamily.getStringValue());
-		else {
-			if (oldFontData != null)
-				newFontData.setName(oldFontData.getName());
 		}
+
+		boolean fontFamilySet = newFontData.getName() != null && newFontData.getName().trim().length() > 0;
+		if (!fontFamilySet && oldFontData != null) {
+			newFontData.setName(oldFontData.getName());
+		}
+
+		// Style
+		int style = getSWTStyle(fontProperties, oldFontData);
+		if (fontDefinitionAsFamily && fontDataByDefinition.length > 0 && style == SWT.NORMAL) {
+			newFontData.setStyle(fontDataByDefinition[0].getStyle());
+		} else {
+			newFontData.setStyle(style);
+		}
+
+		// Height
+		CSSPrimitiveValue cssFontSize = fontProperties.getSize();
+		boolean fontHeightSet = false;
+
+		if (cssFontSize == null || cssFontSize.getCssText() == null) {
+			if (fontDefinitionAsFamily && fontDataByDefinition.length > 0) {
+				newFontData.setHeight(fontDataByDefinition[0].getHeight());
+				fontHeightSet = true;
+			}
+		} else if (cssFontSize != null) {
+			newFontData.setHeight((int) (cssFontSize).getFloatValue(CSSPrimitiveValue.CSS_PT));
+			fontHeightSet = true;
+		}
+		if (!fontHeightSet && oldFontData != null) {
+			newFontData.setHeight(oldFontData.getHeight());
+		}
+
 		return newFontData;
+	}
+
+	public static boolean hasFontDefinitionAsFamily(CSSValue value) {
+		if (value instanceof CSS2FontProperties) {
+			CSS2FontProperties props = (CSS2FontProperties) value;
+			return props.getFamily() != null
+					&& props.getFamily().getStringValue()
+					.startsWith(FONT_DEFINITION_MARKER);
+		}
+		return false;
+	}
+
+	private static FontData[] findFontDataByDefinition(CSSPrimitiveValue cssFontFamily) {
+		IColorAndFontProvider provider = CSSActivator.getDefault().getColorAndFontProvider();
+		FontData[] result = new FontData[0];
+		if (provider != null) {
+			FontData[] fontData = provider.getFont(normalizeId(cssFontFamily.getStringValue().substring(1)));
+			if (fontData != null) {
+				result = fontData;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -175,8 +228,9 @@ public class CSSSWTFontHelper {
 	 */
 	public static int getSWTStyle(CSS2FontProperties fontProperties,
 			FontData fontData) {
-		if (fontData == null)
+		if (fontData == null) {
 			return SWT.NONE;
+		}
 
 		int fontStyle = fontData.getStyle();
 		// CSS2 font-style
@@ -186,8 +240,9 @@ public class CSSSWTFontHelper {
 			if ("italic".equals(style)) {
 				fontStyle = fontStyle | SWT.ITALIC;
 			} else {
-				if (fontStyle == (fontStyle | SWT.ITALIC))
+				if (fontStyle == (fontStyle | SWT.ITALIC)) {
 					fontStyle = fontStyle ^ SWT.ITALIC;
+				}
 			}
 		}
 		// CSS font-weight
@@ -197,8 +252,9 @@ public class CSSSWTFontHelper {
 			if ("bold".equals(weight.toLowerCase())) {
 				fontStyle = fontStyle | SWT.BOLD;
 			} else {
-				if (fontStyle == (fontStyle | SWT.BOLD))
+				if (fontStyle == (fontStyle | SWT.BOLD)) {
 					fontStyle = fontStyle ^ SWT.BOLD;
+				}
 			}
 		}
 		return fontStyle;
@@ -255,8 +311,9 @@ public class CSSSWTFontHelper {
 	}
 
 	public static String getFontSize(FontData fontData) {
-		if (fontData != null)
+		if (fontData != null) {
 			return CSS2FontHelper.getFontSize(fontData.getHeight());
+		}
 		return null;
 	}
 
@@ -376,8 +433,9 @@ public class CSSSWTFontHelper {
 	 */
 	public static FontData getFirstFontData(Control control) {
 		Font font = control.getFont();
-		if (font == null)
+		if (font == null) {
 			return null;
+		}
 		return getFirstFontData(font);
 	}
 
@@ -390,11 +448,12 @@ public class CSSSWTFontHelper {
 	 */
 	public static FontData getFirstFontData(Font font) {
 		FontData[] fontDatas = font.getFontData();
-		if (fontDatas == null || fontDatas.length < 1)
+		if (fontDatas == null || fontDatas.length < 1) {
 			return null;
+		}
 		return fontDatas[0];
 	}
-	
+
 	private static Font getFont(Widget widget) {
 		if (widget instanceof CTabItem) {
 			return ((CTabItem) widget).getFont();
