@@ -11,7 +11,6 @@
  *     Matthew Hall - initial API and implementation (bug 239900)
  *     Matthew Hall - bugs 237856, 275058, 278550
  *     Ovidio Mallo - bugs 237856, 248877
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 468903
  ******************************************************************************/
 
 package org.eclipse.jface.databinding.dialog;
@@ -60,32 +59,11 @@ public class DialogPageSupport {
 	 *
 	 * @param dialogPage
 	 * @param dbc
-	 * @return an instance of DialogPageSupport
+	 * @return an instance of WizardPageSupport
 	 */
 	public static DialogPageSupport create(DialogPage dialogPage,
 			DataBindingContext dbc) {
 		return new DialogPageSupport(dialogPage, dbc);
-	}
-
-	/**
-	 * Connect the validation result from the given data binding context to the
-	 * given dialog page. The page's error message will not be set at time of
-	 * creation, ensuring that the dialog page does not show an error right
-	 * away. Upon any validation result change, the dialog page's error message
-	 * will be updated according to the current validation result and also
-	 * reseted to the initial message and message type in case the validation
-	 * status equals {@link IStatus#isOK()}.
-	 *
-	 * @param dialogPage
-	 * @param dbc
-	 * @return an instance of DialogPageSupport
-	 *
-	 * @since 1.8
-	 */
-	public static DialogPageSupport createWithInitialMessageReset(DialogPage dialogPage, DataBindingContext dbc) {
-		DialogPageSupport dialogPageSupport = new DialogPageSupport(dialogPage, dbc);
-		dialogPageSupport.setValidationMessageProvider(new ValidationMessageProvider(dialogPage));
-		return dialogPageSupport;
 	}
 
 	private DialogPage dialogPage;

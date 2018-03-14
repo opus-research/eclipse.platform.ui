@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Alexander Fedorov <Alexander.Fedorov@borland.com> - Bug 172000
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
+ *     Alexander Fedorov <Alexander.Fedorov@borland.com>
+ *     		- Bug 172000 [Wizards] WizardNewFileCreationPage should support overwriting existing resources
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Iterator;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -190,9 +189,12 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			});
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FILE,
-				e -> {
-					setPageComplete(validatePage());
-					firstLinkCheck = false;
+				new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						setPageComplete(validatePage());
+						firstLinkCheck = false;
+					}
 				}, new CreateLinkedResourceGroup.IStringValue() {
 					@Override
 					public void setValue(String string) {
@@ -227,6 +229,9 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 				});
 	}
 
+	/**
+	 * (non-Javadoc) Method declared on IDialogPage.
+	 */
 	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
@@ -394,8 +399,11 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 								null,
 								NLS.bind(
 										IDEWorkbenchMessages.WizardNewFileCreationPage_createLinkLocationQuestion, linkTargetPath),
-								MessageDialog.QUESTION_WITH_CANCEL, 0, IDialogConstants.YES_LABEL,
-								IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL);
+								MessageDialog.QUESTION_WITH_CANCEL,
+								new String[] { IDialogConstants.YES_LABEL,
+					                    IDialogConstants.NO_LABEL,
+					                    IDialogConstants.CANCEL_LABEL },
+								0);
 						int result = dlg.open();
 						if (result == Window.OK) {
 							store.getParent().mkdir(0, new NullProgressMonitor());
@@ -431,50 +439,56 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			}
 		}
 
-		IRunnableWithProgress op = monitor -> {
-			CreateFileOperation op1 = new CreateFileOperation(newFileHandle,
-					linkTargetPath, initialContents,
-					IDEWorkbenchMessages.WizardNewFileCreationPage_title);
-			try {
-				// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-				// directly execute the operation so that the undo state is
-				// not preserved.  Making this undoable resulted in too many
-				// accidental file deletions.
-				op1.execute(monitor, WorkspaceUndoUtil
-						.getUIInfoAdapter(getShell()));
-			} catch (final ExecutionException e) {
-				getContainer().getShell().getDisplay().syncExec(
-						() -> {
-							if (e.getCause() instanceof CoreException) {
-								ErrorDialog
-										.openError(
-												getContainer()
-														.getShell(), // Was
-												// Utilities.getFocusShell()
-												IDEWorkbenchMessages.WizardNewFileCreationPage_errorTitle,
-												null, // no special
-												// message
-												((CoreException) e
-														.getCause())
-														.getStatus());
-							} else {
-								IDEWorkbenchPlugin
-										.log(
-												getClass(),
-												"createNewFile()", e.getCause()); //$NON-NLS-1$
-								MessageDialog
-										.openError(
-												getContainer()
-														.getShell(),
-												IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorTitle,
-												NLS
-														.bind(
-																IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorMessage,
-																e
-																		.getCause()
-																		.getMessage()));
-							}
-						});
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) {
+				CreateFileOperation op = new CreateFileOperation(newFileHandle,
+						linkTargetPath, initialContents,
+						IDEWorkbenchMessages.WizardNewFileCreationPage_title);
+				try {
+					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+					// directly execute the operation so that the undo state is
+					// not preserved.  Making this undoable resulted in too many
+					// accidental file deletions.
+					op.execute(monitor, WorkspaceUndoUtil
+							.getUIInfoAdapter(getShell()));
+				} catch (final ExecutionException e) {
+					getContainer().getShell().getDisplay().syncExec(
+							new Runnable() {
+								@Override
+								public void run() {
+									if (e.getCause() instanceof CoreException) {
+										ErrorDialog
+												.openError(
+														getContainer()
+																.getShell(), // Was
+														// Utilities.getFocusShell()
+														IDEWorkbenchMessages.WizardNewFileCreationPage_errorTitle,
+														null, // no special
+														// message
+														((CoreException) e
+																.getCause())
+																.getStatus());
+									} else {
+										IDEWorkbenchPlugin
+												.log(
+														getClass(),
+														"createNewFile()", e.getCause()); //$NON-NLS-1$
+										MessageDialog
+												.openError(
+														getContainer()
+																.getShell(),
+														IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorTitle,
+														NLS
+																.bind(
+																		IDEWorkbenchMessages.WizardNewFileCreationPage_internalErrorMessage,
+																		e
+																				.getCause()
+																				.getMessage()));
+									}
+								}
+							});
+				}
 			}
 		};
 		try {

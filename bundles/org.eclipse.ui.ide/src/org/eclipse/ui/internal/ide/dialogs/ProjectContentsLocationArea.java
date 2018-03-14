@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -237,7 +239,12 @@ public class ProjectContentsLocationArea {
 			}
 		}
 
-		locationPathField.addModifyListener(e -> errorReporter.reportError(checkValidLocation(), false));
+		locationPathField.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				errorReporter.reportError(checkValidLocation(), false);
+			}
+		});
 	}
 
 	/**
