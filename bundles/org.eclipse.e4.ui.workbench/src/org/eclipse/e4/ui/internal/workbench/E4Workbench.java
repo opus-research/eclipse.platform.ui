@@ -177,7 +177,11 @@ public class E4Workbench implements IWorkbench {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.workbench.IWorkbench#close()
+	 */
 	public boolean close() {
 		if (renderer != null) {
 			renderer.stop();
