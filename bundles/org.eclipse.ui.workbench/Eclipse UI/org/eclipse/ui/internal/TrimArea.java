@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal;
 
 import java.util.List;
+
 import org.eclipse.swt.graphics.Rectangle;
 
 /**
