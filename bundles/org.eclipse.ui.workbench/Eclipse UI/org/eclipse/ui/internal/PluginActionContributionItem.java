@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,10 +75,8 @@ public class PluginActionContributionItem extends ActionContributionItem
 		}
     }
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
-     */
-    public void setParent(IContributionManager parent) {
+    @Override
+	public void setParent(IContributionManager parent) {
         IContributionManager oldParent = getParent();
         super.setParent(parent);
         if (oldParent == parent) {
@@ -130,27 +128,22 @@ public class PluginActionContributionItem extends ActionContributionItem
      * method notifies the delegate if loaded and implements the <code>IActionDelegate2</code>
      * interface.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         unhookListeners();
         disposeIdentifier();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.action.ActionContributionItem#isVisible()
-     */
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         if (identifier != null && !identifier.isEnabled()) {
 			return false;
 		}
         return super.isVisible();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.IIdentifierListener#identifierChanged(org.eclipse.ui.activities.IdentifierEvent)
-     */
-    public void identifierChanged(IdentifierEvent identifierEvent) {
+    @Override
+	public void identifierChanged(IdentifierEvent identifierEvent) {
         invalidateParent();
     }
 
@@ -166,10 +159,8 @@ public class PluginActionContributionItem extends ActionContributionItem
 		}
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
-     */
-    public void activityManagerChanged(ActivityManagerEvent activityManagerEvent) {
+    @Override
+	public void activityManagerChanged(ActivityManagerEvent activityManagerEvent) {
         // ensure that if we're going from a non-filtering state that we get an identifier
         // and vice versa.
         if (WorkbenchActivityHelper.isFiltering() && identifier == null) {

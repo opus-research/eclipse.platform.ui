@@ -25,12 +25,8 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  */
 public class ErrorPreferencePage extends EmptyPreferencePage {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
-     */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
         Text text = new Text(parent, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
         text.setForeground(JFaceColors.getErrorText(text.getDisplay()));
         text.setBackground(text.getDisplay().getSystemColor(

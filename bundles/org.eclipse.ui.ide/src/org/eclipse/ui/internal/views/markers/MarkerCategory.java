@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,6 +56,7 @@ class MarkerCategory extends MarkerSupportItem {
 	 * @see
 	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getChildren()
 	 */
+	@Override
 	MarkerSupportItem[] getChildren() {
 		if (children == null) {
 			MarkerItem[] allMarkers = markers.getMarkerEntryArray();
@@ -76,6 +77,7 @@ class MarkerCategory extends MarkerSupportItem {
 	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getChildrenCount
 	 * ()
 	 */
+	@Override
 	int getChildrenCount() {
 		return end - start + 1;
 	}
@@ -86,6 +88,7 @@ class MarkerCategory extends MarkerSupportItem {
 	 * @see
 	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getDescription()
 	 */
+	@Override
 	String getDescription() {
 		//see Bug 294959
 		//if(refreshing){
@@ -150,6 +153,7 @@ class MarkerCategory extends MarkerSupportItem {
 	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getParent()
 	 */
+	@Override
 	MarkerSupportItem getParent() {
 		return null;
 	}
@@ -159,6 +163,7 @@ class MarkerCategory extends MarkerSupportItem {
 	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#isConcrete()
 	 */
+	@Override
 	boolean isConcrete() {
 		return false;
 	}
@@ -166,6 +171,7 @@ class MarkerCategory extends MarkerSupportItem {
 	/**
 	 * Clear the cached values for performance reasons.
 	 */
+	@Override
 	void clearCache() {
 		MarkerSupportItem[] entries = getChildren();
 		for (int i = 0; i < entries.length; i++) {
@@ -176,6 +182,7 @@ class MarkerCategory extends MarkerSupportItem {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -188,6 +195,7 @@ class MarkerCategory extends MarkerSupportItem {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

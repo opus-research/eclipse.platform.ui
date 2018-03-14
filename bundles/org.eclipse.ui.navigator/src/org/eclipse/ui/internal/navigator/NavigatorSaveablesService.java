@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -59,7 +59,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 
 	private NavigatorContentService contentService;
 
-	private static List instances = new ArrayList();
+	private static List<NavigatorSaveablesService> instances = new ArrayList<NavigatorSaveablesService>();
 
 	/**
 	 * @param contentService
@@ -88,16 +88,16 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		synchronized(instances) {
 			if (event.getType() == BundleEvent.STARTED) {
 				// System.out.println("bundle started: " + event.getBundle().getSymbolicName()); //$NON-NLS-1$
-				for (Iterator it = instances.iterator(); it.hasNext();) {
-					NavigatorSaveablesService instance = (NavigatorSaveablesService) it
+				for (Iterator<NavigatorSaveablesService> it = instances.iterator(); it.hasNext();) {
+					NavigatorSaveablesService instance = it
 							.next();
 					instance.handleBundleStarted(event.getBundle()
 							.getSymbolicName());
 				}
 			} else if (event.getType() == BundleEvent.STOPPED) {
 				// System.out.println("bundle stopped: " + event.getBundle().getSymbolicName()); //$NON-NLS-1$
-				for (Iterator it = instances.iterator(); it.hasNext();) {
-					NavigatorSaveablesService instance = (NavigatorSaveablesService) it
+				for (Iterator<NavigatorSaveablesService> it = instances.iterator(); it.hasNext();) {
+					NavigatorSaveablesService instance = it
 							.next();
 					instance.handleBundleStopped(event.getBundle()
 							.getSymbolicName());
@@ -107,6 +107,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	}
 
 	private class LifecycleListener implements ISaveablesLifecycleListener {
+		@Override
 		public void handleLifecycleEvent(SaveablesLifecycleEvent event) {
 			Saveable[] saveables = event.getSaveables();
 			Saveable[] shownSaveables = null;
@@ -123,9 +124,9 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 						recomputeSaveablesAndNotify(false, null);
 						break;
 					case SaveablesLifecycleEvent.DIRTY_CHANGED:
-						Set result = new HashSet(Arrays.asList(currentSaveables));
+						Set<Saveable> result = new HashSet<Saveable>(Arrays.asList(currentSaveables));
 						result.retainAll(Arrays.asList(saveables));
-						shownSaveables = (Saveable[]) result.toArray(new Saveable[result.size()]);
+						shownSaveables = result.toArray(new Saveable[result.size()]);
 						break;
 					}
 				}
@@ -153,6 +154,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 
 	private DisposeListener disposeListener = new DisposeListener() {
 
+		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			// synchronize in the same order as in the init method.
 			synchronized (instances) {
@@ -176,13 +178,13 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		}
 	};
 
-	private Map inactivePluginsWithSaveablesProviders;
+	private Map<String, List> inactivePluginsWithSaveablesProviders;
 
     /**
 	 * a TreeMap (NavigatorContentDescriptor->SaveablesProvider) which uses
 	 * ExtensionPriorityComparator.INSTANCE as its Comparator
 	 */
-	private Map saveablesProviderMap;
+	private Map<NavigatorContentDescriptor, SaveablesProvider> saveablesProviderMap;
 
 	/**
 	 * Implementation note: This is not synchronized at the method level because it needs to
@@ -193,6 +195,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	 * @param outsideListener
 	 * 
 	 */
+	@Override
 	public void init(final ISaveablesSource saveablesSource,
 			final StructuredViewer viewer,
 			ISaveablesLifecycleListener outsideListener) {
@@ -230,8 +233,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 				.getContentProvider();
 		boolean isTreepathContentProvider = contentProvider instanceof ITreePathContentProvider;
 		Object viewerInput = viewer.getInput();
-		List result = new ArrayList();
-		Set roots = new HashSet(Arrays.asList(contentProvider
+		List<Saveable> result = new ArrayList<Saveable>();
+		Set<Object> roots = new HashSet<Object>(Arrays.asList(contentProvider
 				.getElements(viewerInput)));
 		SaveablesProvider[] saveablesProviders = getSaveablesProviders();
 		for (int i = 0; i < saveablesProviders.length; i++) {
@@ -276,21 +279,25 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 				}
 			}
 		}
-		return (Saveable[]) result.toArray(new Saveable[result.size()]);
+		return result.toArray(new Saveable[result.size()]);
 	}
 
+	@Override
 	public synchronized Saveable[] getActiveSaveables() {
-		ITreeContentProvider contentProvider = (ITreeContentProvider) viewer
+		if(!isDisposed()){
+			ITreeContentProvider contentProvider = (ITreeContentProvider) viewer
 				.getContentProvider();
-		IStructuredSelection selection = (IStructuredSelection) viewer
-				.getSelection();
-		if (selection instanceof ITreeSelection) {
-			return getActiveSaveablesFromTreeSelection((ITreeSelection) selection);
-		} else if (contentProvider instanceof ITreePathContentProvider) {
-			return getActiveSaveablesFromTreePathProvider(selection, (ITreePathContentProvider) contentProvider);
-		} else {
-			return getActiveSaveablesFromTreeProvider(selection, contentProvider);
+			IStructuredSelection selection = (IStructuredSelection) viewer
+					.getSelection();
+			if (selection instanceof ITreeSelection) {
+				return getActiveSaveablesFromTreeSelection((ITreeSelection) selection);
+			} else if (contentProvider instanceof ITreePathContentProvider) {
+				return getActiveSaveablesFromTreePathProvider(selection, (ITreePathContentProvider) contentProvider);
+			} else {
+				return getActiveSaveablesFromTreeProvider(selection, contentProvider);
+			}
 		}
+		return new Saveable[0];
 	}
 	
 	/**
@@ -299,7 +306,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	 */
 	private Saveable[] getActiveSaveablesFromTreeSelection(
 			ITreeSelection selection) {
-		Set result = new HashSet();
+		Set<Saveable> result = new HashSet<Saveable>();
 		TreePath[] paths = selection.getPaths();
 		for (int i = 0; i < paths.length; i++) {
 			TreePath path = paths[i];
@@ -308,7 +315,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 				result.add(saveable);
 			}
 		}
-		return (Saveable[]) result.toArray(new Saveable[result.size()]);
+		return result.toArray(new Saveable[result.size()]);
 	}
 
 	/**
@@ -318,7 +325,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	 */
 	private Saveable[] getActiveSaveablesFromTreePathProvider(
 			IStructuredSelection selection, ITreePathContentProvider provider) {
-		Set result = new HashSet();
+		Set<Saveable> result = new HashSet<Saveable>();
 		for (Iterator it = selection.iterator(); it.hasNext();) {
 			Object element = it.next();
 			Saveable saveable = getSaveable(element);
@@ -332,7 +339,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 				}
 			}
 		}
-		return (Saveable[]) result.toArray(new Saveable[result.size()]);
+		return result.toArray(new Saveable[result.size()]);
 	}
 
 	/**
@@ -342,7 +349,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	 */
 	private Saveable[] getActiveSaveablesFromTreeProvider(
 			IStructuredSelection selection, ITreeContentProvider contentProvider) {
-		Set result = new HashSet();
+		Set<Saveable> result = new HashSet<Saveable>();
 		for (Iterator it = selection.iterator(); it.hasNext();) {
 			Object element = it.next();
 			Saveable saveable = findSaveable(element, contentProvider);
@@ -350,7 +357,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 				result.add(saveable);
 			}
 		}
-		return (Saveable[]) result.toArray(new Saveable[result.size()]);
+		return result.toArray(new Saveable[result.size()]);
 	}
 
 	/**
@@ -409,10 +416,10 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			// has the side effect of recomputing saveablesProviderMap:
 			getSaveablesProviders();
 		}
-        for(Iterator sItr = saveablesProviderMap.keySet().iterator(); sItr.hasNext();) {
-        	NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) sItr.next();
+        for(Iterator<NavigatorContentDescriptor> sItr = saveablesProviderMap.keySet().iterator(); sItr.hasNext();) {
+        	NavigatorContentDescriptor descriptor = sItr.next();
                 if(descriptor.isTriggerPoint(element) || descriptor.isPossibleChild(element)) {
-                	SaveablesProvider provider = (SaveablesProvider) saveablesProviderMap.get(descriptor);
+                	SaveablesProvider provider = saveablesProviderMap.get(descriptor);
                 	Saveable  saveable = provider.getSaveable(element);
                         if(saveable != null) {
                                 return saveable;
@@ -425,6 +432,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	/**
 	 * @return the saveables
 	 */
+	@Override
 	public synchronized Saveable[] getSaveables() {
 		return currentSaveables;
 	}
@@ -435,20 +443,20 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	private SaveablesProvider[] getSaveablesProviders() {
 		// TODO optimize this
 		if (saveablesProviders == null) {
-			inactivePluginsWithSaveablesProviders = new HashMap();
-			saveablesProviderMap = new TreeMap(ExtensionSequenceNumberComparator.INSTANCE);
+			inactivePluginsWithSaveablesProviders = new HashMap<String, List>();
+			saveablesProviderMap = new TreeMap<NavigatorContentDescriptor, SaveablesProvider>(ExtensionSequenceNumberComparator.INSTANCE);
 			INavigatorContentDescriptor[] descriptors = contentService
 					.getActiveDescriptorsWithSaveables();
-			List result = new ArrayList();
+			List<SaveablesProvider> result = new ArrayList<SaveablesProvider>();
 			for (int i = 0; i < descriptors.length; i++) {
 				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) descriptors[i];
 				String pluginId = ((NavigatorContentDescriptor) descriptor)
 						.getContribution().getPluginId();
 				if (Platform.getBundle(pluginId).getState() != Bundle.ACTIVE) {
-					List inactiveDescriptors = (List) inactivePluginsWithSaveablesProviders
+					List<NavigatorContentDescriptor> inactiveDescriptors = inactivePluginsWithSaveablesProviders
 							.get(pluginId);
 					if (inactiveDescriptors == null) {
-						inactiveDescriptors = new ArrayList();
+						inactiveDescriptors = new ArrayList<NavigatorContentDescriptor>();
 						inactivePluginsWithSaveablesProviders.put(pluginId,
 								inactiveDescriptors);
 					}
@@ -462,7 +470,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 					}
 				}
 			}
-			saveablesProviders = (SaveablesProvider[]) result
+			saveablesProviders = result
 					.toArray(new SaveablesProvider[result.size()]);
 		}
 		return saveablesProviders;
@@ -499,22 +507,23 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 				updateSaveablesProviders(startedBundleIdOrNull);
 			}
 		}
-		Set oldSaveables = new HashSet(Arrays.asList(currentSaveables));
+		Set<Saveable> oldSaveables = new HashSet<Saveable>(Arrays.asList(currentSaveables));
 		currentSaveables = computeSaveables();
-		Set newSaveables = new HashSet(Arrays.asList(currentSaveables));
-		final Set removedSaveables = new HashSet(oldSaveables);
+		Set<Saveable> newSaveables = new HashSet<Saveable>(Arrays.asList(currentSaveables));
+		final Set<Saveable> removedSaveables = new HashSet<Saveable>(oldSaveables);
 		removedSaveables.removeAll(newSaveables);
-		final Set addedSaveables = new HashSet(newSaveables);
+		final Set<Saveable> addedSaveables = new HashSet<Saveable>(newSaveables);
 		addedSaveables.removeAll(oldSaveables);
 		if (addedSaveables.size() > 0) {
 			Display.getDefault().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (isDisposed()) {
 						return;
 					}
 					outsideListener.handleLifecycleEvent(new SaveablesLifecycleEvent(
 							saveablesSource, SaveablesLifecycleEvent.POST_OPEN,
-							(Saveable[]) addedSaveables
+							addedSaveables
 							.toArray(new Saveable[addedSaveables.size()]),
 							false));
 				}
@@ -525,6 +534,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		// an appropriate PRE_CLOSE
 		if (removedSaveables.size() > 0) {
 			Display.getDefault().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (isDisposed()) {
 						return;
@@ -533,14 +543,14 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 							.handleLifecycleEvent(new SaveablesLifecycleEvent(
 									saveablesSource,
 									SaveablesLifecycleEvent.PRE_CLOSE,
-									(Saveable[]) removedSaveables
+									removedSaveables
 											.toArray(new Saveable[removedSaveables
 													.size()]), true));
 					outsideListener
 							.handleLifecycleEvent(new SaveablesLifecycleEvent(
 									saveablesSource,
 									SaveablesLifecycleEvent.POST_CLOSE,
-									(Saveable[]) removedSaveables
+									removedSaveables
 											.toArray(new Saveable[removedSaveables
 													.size()]), false));
 				}
@@ -552,8 +562,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	 * @param startedBundleId
 	 */
 	private void updateSaveablesProviders(String startedBundleId) {
-		List result = new ArrayList(Arrays.asList(saveablesProviders));
-		List descriptors = (List) inactivePluginsWithSaveablesProviders
+		List<SaveablesProvider> result = new ArrayList<SaveablesProvider>(Arrays.asList(saveablesProviders));
+		List descriptors = inactivePluginsWithSaveablesProviders
 				.get(startedBundleId);
 		for (Iterator it = descriptors.iterator(); it.hasNext();) {
 			NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) it
@@ -565,7 +575,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 				saveablesProviderMap.put(descriptor, saveablesProvider);
 			}
 		}
-		saveablesProviders = (SaveablesProvider[]) result
+		saveablesProviders = result
 				.toArray(new SaveablesProvider[result.size()]);
 	}
 
@@ -589,9 +599,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener#onVisibilityOrActivationChange()
-	 */
+	@Override
 	public synchronized void onVisibilityOrActivationChange() {
 		if (!isDisposed()) {
 			recomputeSaveablesAndNotify(true, null);

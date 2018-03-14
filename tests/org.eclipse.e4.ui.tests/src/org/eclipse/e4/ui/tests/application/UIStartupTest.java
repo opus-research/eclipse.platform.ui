@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
@@ -106,7 +106,7 @@ public abstract class UIStartupTest extends HeadlessApplicationTest {
 	public void testGetFirstPart_GetContext() {
 		// need to wrap this since the renderer will try build the UI for the
 		// part if it hasn't been built
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			public void run() {
 				UIStartupTest.super.testGetFirstPart_GetContext();
 			}
@@ -116,7 +116,7 @@ public abstract class UIStartupTest extends HeadlessApplicationTest {
 	public void testGetSecondPart_GetContext() {
 		// need to wrap this since the renderer will try build the UI for the
 		// part if it hasn't been built
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			public void run() {
 				UIStartupTest.super.testGetSecondPart_GetContext();
 			}
@@ -155,7 +155,7 @@ public abstract class UIStartupTest extends HeadlessApplicationTest {
 	@Override
 	protected IEclipseContext createApplicationContext() {
 		final IEclipseContext[] contexts = new IEclipseContext[1];
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			public void run() {
 				contexts[0] = UIStartupTest.super.createApplicationContext();
 				contexts[0].set(IResourceUtilities.class.getName(),
@@ -191,7 +191,7 @@ public abstract class UIStartupTest extends HeadlessApplicationTest {
 	}
 
 	protected void createGUI(final MUIElement uiRoot) {
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			public void run() {
 				UIStartupTest.super.createGUI(uiRoot);
 			}

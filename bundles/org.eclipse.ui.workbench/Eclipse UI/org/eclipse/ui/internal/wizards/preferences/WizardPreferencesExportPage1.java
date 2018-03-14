@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.preferences.PreferenceTransferElement;
 
@@ -60,6 +61,7 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 	 * 
 	 * @return java.lang.String
 	 */
+	@Override
 	protected String getDestinationValue() {
 		String idealSuffix = getOutputSuffix();
         String destinationText = super.getDestinationValue();
@@ -72,7 +74,7 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
                 && !destinationText.endsWith(File.separator)) {
             int dotIndex = destinationText.lastIndexOf('.');
             if (dotIndex != -1) {
-                // the last path seperator index
+				// the last path separator index
                 int pathSepIndex = destinationText.lastIndexOf(File.separator);
                 if (pathSepIndex != -1 && dotIndex < pathSepIndex) {
                     destinationText += idealSuffix;
@@ -86,10 +88,12 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
     }
 
 		
+	@Override
 	protected String getAllButtonText() {
 		return PreferencesMessages.WizardPreferencesExportPage1_all;
 	}
 
+	@Override
 	protected String getChooseButtonText() {
 		return PreferencesMessages.WizardPreferencesExportPage1_choose;
 	}
@@ -97,6 +101,7 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 	/**
 	 * @param composite
 	 */
+	@Override
 	protected void createTransferArea(Composite composite) {
 		createTransfersList(composite);
 		createDestinationGroup(composite);
@@ -108,6 +113,7 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 	 * 
 	 * @return java.lang.String
 	 */
+	@Override
 	protected String getDestinationLabel() {
 		return PreferencesMessages.WizardPreferencesExportPage1_file;
 	}
@@ -115,6 +121,7 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 	/*
 	 * return the PreferenceTransgerElements specified
 	 */
+	@Override
 	protected PreferenceTransferElement[] getTransfers() {
 		PreferenceTransferElement[] elements = super.getTransfers();
 		PreferenceTransferElement[] returnElements = new PreferenceTransferElement[elements.length];
@@ -123,11 +130,9 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 		IPreferencesService service = Platform.getPreferencesService();
 		int count = 0;
 		try {
-			for (int i = 0; i < elements.length; i++) {
-				PreferenceTransferElement element = elements[i];
+			for (PreferenceTransferElement element : elements) {
 				filters[0] = element.getFilter();
-				matches = service.matches((IEclipsePreferences) service
-						.getRootNode().node("instance"), filters); //$NON-NLS-1$
+				matches = service.matches((IEclipsePreferences) service.getRootNode().node("instance"), filters); //$NON-NLS-1$
 				if (matches.length > 0) {
 					returnElements[count++] = element;
 				}
@@ -143,9 +148,10 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 
 	/**
 	 * @param transfers
-	 * @return <code>true</code> if the transfer was succesful, and
+	 * @return <code>true</code> if the transfer was successful, and
 	 *         <code>false</code> otherwise
 	 */
+	@Override
 	protected boolean transfer(IPreferenceFilter[] transfers) {
 		File exportFile = new File(getDestinationValue());
 		if (!ensureTargetIsValid(exportFile)) {
@@ -157,21 +163,14 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 				try {
 					fos = new FileOutputStream(exportFile);
 				} catch (FileNotFoundException e) {
-					WorkbenchPlugin.log(e.getMessage(), e);
-					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), new String(), e.getLocalizedMessage(),
-							SWT.SHEET);
+					reportException(e);
 					return false;
 				}
 				IPreferencesService service = Platform.getPreferencesService();
 				try {
-					service.exportPreferences(service.getRootNode(), transfers,
-							fos);
+					service.exportPreferences(service.getRootNode(), transfers, fos);
 				} catch (CoreException e) {
-					WorkbenchPlugin.log(e.getMessage(), e);
-					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), new String(), e.getLocalizedMessage(),
-							SWT.SHEET);
+					reportException(e);
 					return false;
 				}
 			}
@@ -180,10 +179,7 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 				try {
 					fos.close();
 				} catch (IOException e) {
-					WorkbenchPlugin.log(e.getMessage(), e);
-					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), new String(), e.getLocalizedMessage(),
-							SWT.SHEET);
+					reportException(e);
 					return false;
 				}
 			}
@@ -191,28 +187,29 @@ public class WizardPreferencesExportPage1 extends WizardPreferencesPage  {
 		return true;
 	}
 
+	@Override
 	protected String getFileDialogTitle() {
 		return PreferencesMessages.WizardPreferencesExportPage1_title;
 	}
 
+	@Override
 	protected int getFileDialogStyle() {
 		return SWT.SAVE | SWT.SHEET;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getInvalidDestinationMessage()
-	 */
+	@Override
 	protected String getInvalidDestinationMessage() {
 		return PreferencesMessages.WizardPreferencesExportPage1_noPrefFile;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#
-	 * shouldSaveTransferAll()
-	 */
+	@Override
 	protected boolean shouldSaveTransferAll() {
 		return true;
+	}
+
+	private void reportException(Exception e) {
+		Shell shell = getControl().getShell();
+		WorkbenchPlugin.log(e.getMessage(), e);
+		MessageDialog.open(MessageDialog.ERROR, shell, new String(), e.getLocalizedMessage(), SWT.SHEET);
 	}
 }

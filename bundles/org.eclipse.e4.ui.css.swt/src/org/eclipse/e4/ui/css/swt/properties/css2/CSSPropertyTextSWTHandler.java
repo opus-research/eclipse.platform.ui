@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.e4.ui.css.core.dom.properties.css2.AbstractCSSPropertyTextHan
 import org.eclipse.e4.ui.css.core.dom.properties.css2.ICSSPropertyTextHandler;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
+import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
 import org.eclipse.e4.ui.css.swt.helpers.SWTElementHelpers;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -31,6 +32,7 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 
 	public final static ICSSPropertyTextHandler INSTANCE = new CSSPropertyTextSWTHandler();
 
+	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
@@ -42,6 +44,7 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 
 	}
 
+	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
@@ -51,29 +54,34 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 		return null;
 	}
 
+	@Override
 	public void applyCSSPropertyColor(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
 			Color newColor = (Color) engine.convert(value, Color.class, widget
 					.getDisplay());
+			if (newColor == null || newColor.isDisposed()) {
+				return;
+			}
+
 			if (widget instanceof CTabItem) {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {
-					folder.setSelectionForeground(newColor);
+					CSSSWTColorHelper.setSelectionForeground(folder, newColor);
 				} else {
-					folder.setForeground(newColor);
+					CSSSWTColorHelper.setForeground(folder, newColor);
 				}
+			} else if (widget instanceof Control) {
+				CSSSWTColorHelper.setForeground((Control) widget, newColor);
 			}
-			else if (widget instanceof Control) {
-				  ((Control) widget).setForeground(newColor);
-				}
 		}
 	}
 
+	@Override
 	public void applyCSSPropertyTextTransform(Object element,
 			final CSSValue value, String pseudo, CSSEngine engine)
-			throws Exception {
+					throws Exception {
 		Widget widget = (Widget) element;
 		String defaultText = (String) widget.getData(CSSSWTConstants.TEXT_KEY);
 		if (element instanceof Text) {
@@ -84,6 +92,7 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 				if (listener == null) {
 					// Add ModifyListener
 					listener = new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent e) {
 							// System.out.println(e);
 							// int start = e.start;
@@ -104,14 +113,15 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 			String oldText = text.getText();
 			String newText = getTextTransform(text.getText(), value,
 					defaultText);
-			if (!oldText.equals(newText))
+			if (!oldText.equals(newText)) {
 				text.setText(newText);
+			}
 		}
 		if (element instanceof Label) {
 			Label label = (Label) element;
 			label
-					.setText(getTextTransform(label.getText(), value,
-							defaultText));
+			.setText(getTextTransform(label.getText(), value,
+					defaultText));
 			return;
 		}
 		if (element instanceof Button) {
@@ -122,22 +132,24 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 		}
 	}
 
+	@Override
 	public String retrieveCSSPropertyColor(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		Color color = null;
 		if (widget instanceof CTabItem) {
 			if ("selected".equals(pseudo)) {
-				color = ((CTabItem) widget).getParent().getSelectionForeground();	
+				color = ((CTabItem) widget).getParent().getSelectionForeground();
 			} else {
 				color = ((CTabItem) widget).getParent().getForeground();
 			}
 		} else if (widget instanceof Control) {
-			color = ((Control) widget).getForeground();	
+			color = ((Control) widget).getForeground();
 		}
 		return engine.convert(color, Color.class, null);
 	}
 
+	@Override
 	public String retrieveCSSPropertyTextTransform(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		String text = null;
@@ -148,13 +160,15 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 		// } else {
 		if (widget instanceof Label) {
 			text = ((Label) element).getText();
-			if (text != null)
+			if (text != null) {
 				widget.setData(CSSSWTConstants.TEXT_KEY, text);
+			}
 		} else {
 			if (widget instanceof Button) {
 				text = ((Button) element).getText();
-				if (text != null)
+				if (text != null) {
 					widget.setData(CSSSWTConstants.TEXT_KEY, text);
+				}
 			}
 		}
 		// }

@@ -166,6 +166,7 @@ public class ProjectContentsLocationArea {
 		createUserEntryArea(projectGroup, defaultEnabled);
 
 		useDefaultsButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				boolean useDefaults = useDefaultsButton.getSelection();
 
@@ -218,6 +219,7 @@ public class ProjectContentsLocationArea {
 		browseButton = new Button(composite, SWT.PUSH);
 		browseButton.setText(BROWSE_LABEL);
 		browseButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				handleLocationBrowseButtonPressed();
 			}
@@ -238,11 +240,7 @@ public class ProjectContentsLocationArea {
 		}
 
 		locationPathField.addModifyListener(new ModifyListener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
-			 */
+			@Override
 			public void modifyText(ModifyEvent e) {
 				errorReporter.reportError(checkValidLocation(), false);
 			}

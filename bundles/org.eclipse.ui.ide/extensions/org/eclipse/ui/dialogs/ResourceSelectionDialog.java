@@ -111,24 +111,21 @@ public class ResourceSelectionDialog extends SelectionDialog {
         getOkButton().setEnabled(selectionGroup.getCheckedElementCount() > 0);
     }
 
-    /* (non-Javadoc)
-     * Method declared in Window.
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.RESOURCE_SELECTION_DIALOG);
     }
 
-    public void create() {
+    @Override
+	public void create() {
         super.create();
         initializeDialog();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -150,10 +147,12 @@ public class ResourceSelectionDialog extends SelectionDialog {
                 SIZING_SELECTION_WIDGET_WIDTH, SIZING_SELECTION_WIDGET_HEIGHT);
 
         composite.addControlListener(new ControlListener() {
-            public void controlMoved(ControlEvent e) {
+            @Override
+			public void controlMoved(ControlEvent e) {
             }
 
-            public void controlResized(ControlEvent e) {
+            @Override
+			public void controlResized(ControlEvent e) {
                 //Also try and reset the size of the columns as appropriate
                 TableColumn[] columns = selectionGroup.getListTable()
                         .getColumns();
@@ -172,7 +171,8 @@ public class ResourceSelectionDialog extends SelectionDialog {
      */
     private ITreeContentProvider getResourceProvider(final int resourceType) {
         return new WorkbenchContentProvider() {
-            public Object[] getChildren(Object o) {
+            @Override
+			public Object[] getChildren(Object o) {
                 if (o instanceof IContainer) {
                     IResource[] members = null;
                     try {
@@ -206,7 +206,8 @@ public class ResourceSelectionDialog extends SelectionDialog {
      */
     private void initializeDialog() {
         selectionGroup.addCheckStateListener(new ICheckStateListener() {
-            public void checkStateChanged(CheckStateChangedEvent event) {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
                 getOkButton().setEnabled(
                         selectionGroup.getCheckedElementCount() > 0);
             }
@@ -224,7 +225,8 @@ public class ResourceSelectionDialog extends SelectionDialog {
      * <code>Dialog</code> method builds a list of the selected resources for later 
      * retrieval by the client and closes this dialog.
      */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         Iterator resultEnum = selectionGroup.getAllCheckedListItems();
         ArrayList list = new ArrayList();
         while (resultEnum.hasNext()) {

@@ -80,6 +80,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * The help listener.
 	 */
 	private static class WorkbenchHelpListener implements HelpListener {
+		@Override
 		public void helpRequested(HelpEvent event) {
 
 			if (getInstance().getHelpUI() == null) {
@@ -169,27 +170,18 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 	/**
 	 * Handles dynamic removal of the help system.
-	 * 
+	 *
 	 * @since 3.1
 	 */
-    /**
-     * Handles dynamic removal of the help system.
-     * 
-     * @since 3.1
-     */
     private IExtensionChangeHandler handler = new IExtensionChangeHandler() {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
-         */
-        public void addExtension(IExtensionTracker tracker,IExtension extension) {
+
+    	@Override
+		public void addExtension(IExtensionTracker tracker,IExtension extension) {
             //Do nothing
         }
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
-         */
-        public void removeExtension(IExtension source, Object[] objects) {
+
+        @Override
+		public void removeExtension(IExtension source, Object[] objects) {
             for (int i = 0; i < objects.length; i++) {
                 if (objects[i] == pluggableHelpUI) {
                     isInitialized = false;
@@ -211,6 +203,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	private class CompatibilityIHelpImplementation implements IHelp {
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayHelp() {
 			// real method - forward to help UI if available
 			AbstractHelpUI helpUI = getHelpUI();
@@ -220,6 +214,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayContext(IContext context, int x, int y) {
 			// real method - forward to help UI if available
 			AbstractHelpUI helpUI = getHelpUI();
@@ -229,6 +225,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayContext(String contextId, int x, int y) {
 			// convenience method - funnel through the real method
 			IContext context = HelpSystem.getContext(contextId);
@@ -238,6 +236,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayHelpResource(String href) {
 			// real method - forward to help UI if available
 			AbstractHelpUI helpUI = getHelpUI();
@@ -247,48 +247,64 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayHelpResource(IHelpResource helpResource) {
 			// convenience method - funnel through the real method
 			displayHelpResource(helpResource.getHref());
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayHelp(String toc) {
 			// deprecated method - funnel through the real method
 			displayHelpResource(toc);
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayHelp(String toc, String selectedTopic) {
 			// deprecated method - funnel through the real method
 			displayHelpResource(selectedTopic);
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayHelp(String contextId, int x, int y) {
 			// deprecated method - funnel through the real method
 			displayContext(contextId, x, y);
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public void displayHelp(IContext context, int x, int y) {
 			// deprecated method - funnel through the real method
 			displayContext(context, x, y);
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public IContext getContext(String contextId) {
 			// non-UI method - forward to HelpSystem
 			return HelpSystem.getContext(contextId);
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public IToc[] getTocs() {
 			// non-UI method - forward to HelpSystem
 			return HelpSystem.getTocs();
 		}
 
 		/** @deprecated */
+		@Deprecated
+		@Override
 		public boolean isContextHelpDisplayed() {
 			// real method - forward to pluggedhelp UI
 			return isContextHelpDisplayed();
@@ -309,6 +325,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			this.title = title;
 		}
 
+		@Override
 		public String getTitle() {
 			if (context instanceof IContext2) {
 				String ctitle = ((IContext2)context).getTitle();
@@ -319,6 +336,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			return title;
 		}
 
+		@Override
 		public String getStyledText() {
 			if (context instanceof IContext2) {
 				return ((IContext2)context).getStyledText();
@@ -326,6 +344,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			return context.getText();
 		}
 
+		@Override
 		public String getCategory(IHelpResource topic) {
 			if (context instanceof IContext2) {
 				return ((IContext2)context).getCategory(topic);
@@ -333,10 +352,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			return null;
 		}
 
+		@Override
 		public IHelpResource[] getRelatedTopics() {
 			return context.getRelatedTopics();
 		}
 
+		@Override
 		public String getText() {
 			return context.getText();
 		}
@@ -434,11 +455,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see java.lang.Runnable#run()
-			 */
+			@Override
 			public void run() {
 				// get the help UI extension from the registry
 				IExtensionPoint point = Platform.getExtensionRegistry()
@@ -560,6 +577,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 *             {@link org.eclipse.help.HelpSystem HelpSystem}instead of the
 	 *             IHelp methods on the object returned by this method.
 	 */
+	@Deprecated
 	public IHelp getHelpSupport() {
 		AbstractHelpUI helpUI = getHelpUI();
 		if (helpUI != null && helpCompatibilityWrapper == null) {
@@ -586,12 +604,14 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 *            contexts (type <code>IContext</code>)
 	 * @deprecated use setHelp with a single context id parameter
 	 */
+	@Deprecated
 	public void setHelp(IAction action, final Object[] contexts) {
 		for (int i = 0; i < contexts.length; i++) {
 			Assert.isTrue(contexts[i] instanceof String
 					|| contexts[i] instanceof IContext);
 		}
 		action.setHelpListener(new HelpListener() {
+			@Override
 			public void helpRequested(HelpEvent event) {
 				if (contexts != null && contexts.length > 0
 						&& getHelpUI() != null) {
@@ -628,8 +648,10 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * @deprecated context computers are no longer supported, clients should
 	 *             implement their own help listener
 	 */
+	@Deprecated
 	public void setHelp(IAction action, final IContextComputer computer) {
 		action.setHelpListener(new HelpListener() {
+			@Override
 			public void helpRequested(HelpEvent event) {
 				Object[] helpContexts = computer.computeContexts(event);
 				if (helpContexts != null && helpContexts.length > 0
@@ -668,6 +690,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 *            contexts (type <code>IContext</code>)
 	 * @deprecated use setHelp with single context id parameter
 	 */
+	@Deprecated
 	public void setHelp(Control control, Object[] contexts) {
 		for (int i = 0; i < contexts.length; i++) {
 			Assert.isTrue(contexts[i] instanceof String
@@ -696,6 +719,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * @deprecated context computers are no longer supported, clients should
 	 *             implement their own help listener
 	 */
+	@Deprecated
 	public void setHelp(Control control, IContextComputer computer) {
 		control.setData(HELP_KEY, computer);
 		// ensure that the listener is only registered once
@@ -719,6 +743,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 *            contexts (type <code>IContext</code>)
 	 * @deprecated use setHelp with single context id parameter
 	 */
+	@Deprecated
 	public void setHelp(Menu menu, Object[] contexts) {
 		for (int i = 0; i < contexts.length; i++) {
 			Assert.isTrue(contexts[i] instanceof String
@@ -746,6 +771,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * @deprecated context computers are no longer supported, clients should
 	 *             implement their own help listener
 	 */
+	@Deprecated
 	public void setHelp(Menu menu, IContextComputer computer) {
 		menu.setData(HELP_KEY, computer);
 		// ensure that the listener is only registered once
@@ -769,6 +795,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 *            contexts (type <code>IContext</code>)
 	 * @deprecated use setHelp with single context id parameter
 	 */
+	@Deprecated
 	public void setHelp(MenuItem item, Object[] contexts) {
 		for (int i = 0; i < contexts.length; i++) {
 			Assert.isTrue(contexts[i] instanceof String
@@ -796,6 +823,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * @deprecated context computers are no longer supported, clients should
 	 *             implement their own help listener
 	 */
+	@Deprecated
 	public void setHelp(MenuItem item, IContextComputer computer) {
 		item.setData(HELP_KEY, computer);
 		// ensure that the listener is only registered once
@@ -818,6 +846,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		// final String contextId = command.getHelpId();
 		final String contextId = ""; //$NON-NLS-1$
 		return new HelpListener() {
+			@Override
 			public void helpRequested(HelpEvent event) {
 				if (getHelpUI() != null) {
 					IContext context = HelpSystem.getContext(contextId);
@@ -831,57 +860,39 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelp()
-	 */
+	@Override
 	public void displayHelp() {
 		AbstractHelpUI helpUI = getHelpUI();
 		if (helpUI != null) {
 			helpUI.displayHelp();
 		}
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displaySearch()
-	 */
+
+	@Override
 	public void displaySearch() {
 		AbstractHelpUI helpUI = getHelpUI();
 		if (helpUI != null) {
 			helpUI.displaySearch();
 		}
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displaySearch()
-	 */
+
+	@Override
 	public void displayDynamicHelp() {
 		AbstractHelpUI helpUI = getHelpUI();
 		if (helpUI != null) {
 			helpUI.displayDynamicHelp();
 		}
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#search(java.lang.String)
-	 */
+
+	@Override
 	public void search(String expression) {
 		AbstractHelpUI helpUI = getHelpUI();
 		if (helpUI != null) {
 			helpUI.search(expression);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#resolve(java.lang.String, boolean)
-	 */
+
+	@Override
 	public URL resolve(String href, boolean documentOnly) {
 		AbstractHelpUI helpUI = getHelpUI();
 		if (helpUI != null) {
@@ -889,13 +900,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 		return null;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayContext(org.eclipse.help.IContext,
-	 *      int, int)
-	 */
+
+	@Override
 	public void displayContext(IContext context, int x, int y) {
 		if (context == null) {
 			throw new IllegalArgumentException();
@@ -906,11 +912,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelpResource(java.lang.String)
-	 */
+	@Override
 	public void displayHelpResource(String href) {
 		if (href == null) {
 			throw new IllegalArgumentException();
@@ -921,11 +923,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelp(java.lang.String)
-	 */
+	@Override
 	public void displayHelp(String contextId) {
 		IContext context = HelpSystem.getContext(contextId);
 		if (context != null) {
@@ -934,11 +932,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#displayHelp(org.eclipse.help.IContext)
-	 */
+	@Override
 	public void displayHelp(IContext context) {
 		Point point = computePopUpLocation(Display.getCurrent());
 		AbstractHelpUI helpUI = getHelpUI();
@@ -947,11 +941,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#isContextHelpDisplayed()
-	 */
+	@Override
 	public boolean isContextHelpDisplayed() {
 		if (!isInitialized) {
 			return false;
@@ -960,16 +950,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		return helpUI != null && helpUI.isContextHelpDisplayed();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.jface.action.IAction,
-	 *      java.lang.String)
-	 */
+	@Override
 	public void setHelp(final IAction action, final String contextId) {
 		if (WorkbenchPlugin.DEBUG)
 			setHelpTrace(contextId);
 		action.setHelpListener(new HelpListener() {
+			@Override
 			public void helpRequested(HelpEvent event) {
 				if (getHelpUI() != null) {
 					IContext context = HelpSystem.getContext(contextId);
@@ -984,12 +970,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.swt.widgets.Control,
-	 *      java.lang.String)
-	 */
+	@Override
 	public void setHelp(Control control, String contextId) {
 		if (WorkbenchPlugin.DEBUG)
 			setHelpTrace(contextId);
@@ -999,12 +980,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		control.addHelpListener(getHelpListener());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.swt.widgets.Menu,
-	 *      java.lang.String)
-	 */
+	@Override
 	public void setHelp(Menu menu, String contextId) {
 		if (WorkbenchPlugin.DEBUG)
 			setHelpTrace(contextId);
@@ -1014,12 +990,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		menu.addHelpListener(getHelpListener());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#setHelp(org.eclipse.swt.widgets.MenuItem,
-	 *      java.lang.String)
-	 */
+	@Override
 	public void setHelp(MenuItem item, String contextId) {
 
 		if (WorkbenchPlugin.DEBUG)
@@ -1032,8 +1003,6 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Traces all calls to the setHelp method in an attempt to find and report
 	 * duplicated context IDs.
 	 */
@@ -1066,9 +1035,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.help.IWorkbenchHelpSystem#hasHelpUI()
-	 */
+	@Override
 	public boolean hasHelpUI() {
 		return getHelpUI() != null;
 	}

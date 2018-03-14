@@ -76,11 +76,11 @@ public abstract class UIWorkingSetWizardsAuto extends UITestCase {
                 .getControl(), Tree.class);
         Tree tree = (Tree) widgets.get(0);
         TreeItem[] treeItems = tree.getItems();
-        for (int i = 0; i < treeItems.length; i++) {
-            treeItems[i].setChecked(true);
+        for (TreeItem treeItem : treeItems) {
+            treeItem.setChecked(true);
             Event event = new Event();
             event.detail = SWT.CHECK;
-            event.item = treeItems[i];
+            event.item = treeItem;
             tree.notifyListeners(SWT.Selection, event);
         }
     }
@@ -111,8 +111,7 @@ public abstract class UIWorkingSetWizardsAuto extends UITestCase {
         Widget[] children = composite.getChildren();
         List selectedChildren = new ArrayList();
 
-        for (int i = 0; i < children.length; i++) {
-            Widget child = children[i];
+        for (Widget child : children) {
             if (child.getClass() == clazz) {
                 selectedChildren.add(child);
             }
@@ -127,7 +126,8 @@ public abstract class UIWorkingSetWizardsAuto extends UITestCase {
      * <code>fWizard</code> must be initialized by subclasses prior to
      * calling this.
      */
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
 
         fWizardDialog = new WizardDialog(getShell(), fWizard);
@@ -141,8 +141,8 @@ public abstract class UIWorkingSetWizardsAuto extends UITestCase {
         IWorkingSetManager workingSetManager = fWorkbench
                 .getWorkingSetManager();
         IWorkingSet[] workingSets = workingSetManager.getWorkingSets();
-        for (int i = 0; i < workingSets.length; i++) {
-            workingSetManager.removeWorkingSet(workingSets[i]);
+        for (IWorkingSet workingSet : workingSets) {
+            workingSetManager.removeWorkingSet(workingSet);
         }
         setupResources();
     }
@@ -161,17 +161,17 @@ public abstract class UIWorkingSetWizardsAuto extends UITestCase {
         textWidget.notifyListeners(SWT.Modify, new Event());
     }
 
-    protected void doTearDown() throws Exception {
+    @Override
+	protected void doTearDown() throws Exception {
         deleteResources();
         super.doTearDown();
     }
-    
+
     protected WorkingSetDescriptor[] getEditableWorkingSetDescriptors() {
         WorkingSetRegistry registry = WorkbenchPlugin.getDefault().getWorkingSetRegistry();
         WorkingSetDescriptor[] all = registry.getWorkingSetDescriptors();
         ArrayList editable = new ArrayList(all.length);
-        for (int i = 0; i < all.length; i++) {
-            WorkingSetDescriptor descriptor = all[i];
+        for (WorkingSetDescriptor descriptor : all) {
             if (descriptor.isEditable()) {
                 editable.add(descriptor);
             }

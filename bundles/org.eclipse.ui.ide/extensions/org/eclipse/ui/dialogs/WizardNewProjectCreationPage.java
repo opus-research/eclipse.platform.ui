@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -65,7 +66,8 @@ public class WizardNewProjectCreationPage extends WizardPage {
     Text projectNameField;
 
     private Listener nameModifyListener = new Listener() {
-        public void handleEvent(Event e) {
+        @Override
+		public void handleEvent(Event e) {
         	setLocationForSelection();
             boolean valid = validatePage();
             setPageComplete(valid);
@@ -104,6 +106,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	 *             implementation.
 	 * @since 3.4
 	 */
+	@Deprecated
 	public WizardNewProjectCreationPage(String pageName,
 			IStructuredSelection selection, String[] workingSetTypes) {
 		this(pageName);
@@ -112,7 +115,8 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	/** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
     
 
@@ -171,9 +175,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
 	 */
 	private IErrorMessageReporter getErrorReporter() {
 		return new IErrorMessageReporter(){
-			/* (non-Javadoc)
-			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
-			 */
+			@Override
 			public void reportError(String errorMessage, boolean infoOnly) {
 				if (infoOnly) {
 					setMessage(errorMessage, IStatus.INFO);
@@ -222,6 +224,7 @@ public class WizardNewProjectCreationPage extends WizardPage {
 			projectNameField.setText(initialProjectFieldValue);
 		}
         projectNameField.addListener(SWT.Modify, nameModifyListener);
+        BidiUtils.applyBidiProcessing(projectNameField, BidiUtils.BTD_DEFAULT);
     }
 
 
@@ -378,7 +381,8 @@ public class WizardNewProjectCreationPage extends WizardPage {
     /*
      * see @DialogPage.setVisible(boolean)
      */
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
 			projectNameField.setFocus();

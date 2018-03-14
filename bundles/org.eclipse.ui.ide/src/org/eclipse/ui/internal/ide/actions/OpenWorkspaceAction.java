@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,11 +61,7 @@ public class OpenWorkspaceAction extends Action implements
 			setToolTipText(IDEWorkbenchMessages.OpenWorkspaceAction_toolTip);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.Action#run()
-		 */
+		@Override
 		public void run() {
 			OpenWorkspaceAction.this.run();
 		}
@@ -92,11 +88,7 @@ public class OpenWorkspaceAction extends Action implements
 			this.data = data;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.Action#run()
-		 */
+		@Override
 		public void run() {
 			data.workspaceSelected(location);
 			data.writePersistedData();
@@ -158,14 +150,11 @@ public class OpenWorkspaceAction extends Action implements
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
-		 */
+		@Override
 		public Menu getMenu(Control parent) {
 			createDropDownMenuMgr();
 			dropDownMenuMgr.addMenuListener(new IMenuListener() {
+				@Override
 				public void menuAboutToShow(IMenuManager manager) {
 					IContributionItem[] items = getContributionItems();
 					for (int i = 0; i < items.length; i++) {
@@ -177,15 +166,12 @@ public class OpenWorkspaceAction extends Action implements
 			return dropDownMenuMgr.createContextMenu(parent);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
-		 */
+		@Override
 		public Menu getMenu(Menu parent) {
 			createDropDownMenuMgr();
 			final Menu menu = new Menu(parent);
 			menu.addListener(SWT.Show, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					if (menu.isDisposed()) {
 						return;
@@ -205,11 +191,7 @@ public class OpenWorkspaceAction extends Action implements
 			return menu;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.action.IMenuCreator#dispose()
-		 */
+		@Override
 		public void dispose() {
 			if (dropDownMenuMgr != null) {
 				dropDownMenuMgr.dispose();
@@ -250,11 +232,7 @@ public class OpenWorkspaceAction extends Action implements
 		setMenuCreator(new MenuCreator());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
+	@Override
 	public void run() {
 		String path = promptForWorkspace();
 		if (path == null) {
@@ -347,14 +325,17 @@ public class OpenWorkspaceAction extends Action implements
 			result.append(workspace);
 			result.append(NEW_LINE);
 		} else {
-			// find the index of the arg to replace its value
+			// find the index of the arg to add/replace its value
 			int cmd_data_pos = property.lastIndexOf(CMD_DATA);
 			if (cmd_data_pos != -1) {
 				cmd_data_pos += CMD_DATA.length() + 1;
 				result.append(property.substring(0, cmd_data_pos));
 				result.append(workspace);
-				result.append(property.substring(property.indexOf('\n',
-						cmd_data_pos)));
+				// append from the next arg
+				int nextArg = property.indexOf("\n-", cmd_data_pos - 1); //$NON-NLS-1$
+				if (nextArg != -1) {
+					result.append(property.substring(nextArg));
+				}
 			} else {
 				result.append(CMD_DATA);
 				result.append(NEW_LINE);
@@ -367,6 +348,9 @@ public class OpenWorkspaceAction extends Action implements
 		// put the vmargs back at the very end (the eclipse.commands property
 		// already contains the -vm arg)
 		if (vmargs != null) {
+			if (result.charAt(result.length() - 1) != '\n') {
+				result.append('\n');
+			}
 			result.append(CMD_VMARGS);
 			result.append(NEW_LINE);
 			result.append(vmargs);
@@ -375,11 +359,7 @@ public class OpenWorkspaceAction extends Action implements
 		return result.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.Action#dispose()
-	 */
+	@Override
 	public void dispose() {
 		window = null;
 	}

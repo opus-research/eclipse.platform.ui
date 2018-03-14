@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 180308
  *******************************************************************************/
 package org.eclipse.ui.internal.menus;
 
@@ -39,6 +40,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
+import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -57,8 +59,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
@@ -103,7 +103,7 @@ public class MenuHelper {
 		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
 	}
 
-	public static final String MAIN_MENU_ID = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
+	public static final String MAIN_MENU_ID = ActionSet.MAIN_MENU;
 	private static Field urlField;
 
 	/**
@@ -498,14 +498,14 @@ public class MenuHelper {
 		String pulldown = element.getAttribute("pulldown"); //$NON-NLS-1$
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)
 				|| (pulldown != null && pulldown.equals("true"))) { //$NON-NLS-1$
-			MRenderedMenuItem item = MenuFactoryImpl.eINSTANCE.createRenderedMenuItem();
+			MMenuItem item = RenderedElementUtil.createRenderedMenuItem();
 			item.setLabel(text);
 			if (iconUri != null) {
 				item.setIconURI(iconUri);
 			}
 			IContextFunction generator = new ContextFunction() {
 				@Override
-				public Object compute(IEclipseContext context) {
+				public Object compute(IEclipseContext context, String contextKey) {
 					IWorkbenchWindow window = context.get(IWorkbenchWindow.class);
 					if (window == null) {
 						return null;
@@ -522,7 +522,7 @@ public class MenuHelper {
 					};
 				}
 			};
-			item.setContributionItem(generator);
+			RenderedElementUtil.setContributionManager(item, generator);
 			return item;
 		}
 
@@ -595,12 +595,12 @@ public class MenuHelper {
 
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)
 				|| (pulldown != null && pulldown.equals("true"))) { //$NON-NLS-1$
-			MRenderedMenu menu = MenuFactoryImpl.eINSTANCE.createRenderedMenu();
+			MMenu menu = RenderedElementUtil.createRenderedMenu();
 			ECommandService cs = app.getContext().get(ECommandService.class);
 			final ParameterizedCommand parmCmd = cs.createCommand(cmdId, null);
 			IContextFunction generator = new ContextFunction() {
 				@Override
-				public Object compute(IEclipseContext context) {
+				public Object compute(IEclipseContext context, String contextKey) {
 					return new IMenuCreator() {
 						private ActionDelegateHandlerProxy handlerProxy;
 
@@ -632,6 +632,7 @@ public class MenuHelper {
 							return (IWorkbenchWindowPulldownDelegate) handlerProxy.getDelegate();
 						}
 
+						@Override
 						public Menu getMenu(Menu parent) {
 							IWorkbenchWindowPulldownDelegate2 delegate = (IWorkbenchWindowPulldownDelegate2) getDelegate();
 							if (delegate == null) {
@@ -640,10 +641,12 @@ public class MenuHelper {
 							return delegate.getMenu(parent);
 						}
 
+						@Override
 						public Menu getMenu(Control parent) {
 							return getDelegate() == null ? null : getDelegate().getMenu(parent);
 						}
 
+						@Override
 						public void dispose() {
 							if (handlerProxy != null) {
 								handlerProxy.dispose();
@@ -653,7 +656,7 @@ public class MenuHelper {
 					};
 				}
 			};
-			menu.setContributionManager(generator);
+			RenderedElementUtil.setContributionManager(menu, generator);
 			item.setMenu(menu);
 		}
 		
@@ -722,7 +725,7 @@ public class MenuHelper {
 			}
 
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				final MHandledItem model = context.get(MHandledItem.class);
 				if (model == null) {
 					return null;
@@ -730,6 +733,7 @@ public class MenuHelper {
 				ActionDescriptor desc = getDescriptor(context);
 				final IAction action = desc.getAction();
 				final IPropertyChangeListener propListener = new IPropertyChangeListener() {
+					@Override
 					public void propertyChange(PropertyChangeEvent event) {
 						if (IAction.CHECKED.equals(event.getProperty())) {
 							boolean checked = false;
@@ -742,6 +746,7 @@ public class MenuHelper {
 				};
 				action.addPropertyChangeListener(propListener);
 				Runnable obj = new Runnable() {
+					@Override
 					@Execute
 					public void run() {
 						action.removePropertyChangeListener(propListener);
@@ -802,9 +807,16 @@ public class MenuHelper {
 				MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
 				toolItem.setCommand(command);
 				toolItem.setContributorURI(command.getContributorURI());
+				toolItem.setVisible(cci.isVisible());
 
 				String iconURI = null;
 				String disabledIconURI = null;
+
+				toolItem.setType(ItemType.PUSH);
+				if (data.style == CommandContributionItem.STYLE_CHECK)
+					toolItem.setType(ItemType.CHECK);
+				else if (data.style == CommandContributionItem.STYLE_RADIO)
+					toolItem.setType(ItemType.RADIO);
 
 				if (data.icon != null) {
 					iconURI = getIconURI(data.icon, application.getContext());
@@ -857,6 +869,7 @@ public class MenuHelper {
 					MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
 					toolItem.setCommand(command);
 					toolItem.setContributorURI(command.getContributorURI());
+					toolItem.setVisible(item.isVisible());
 
 					String iconURI = getIconURI(action.getImageDescriptor(),
 							application.getContext());
@@ -898,7 +911,6 @@ public class MenuHelper {
 					}
 					String itemId = item.getId();
 					toolItem.setElementId(itemId == null ? id : itemId);
-
 					return toolItem;
 				}
 			}
@@ -906,6 +918,7 @@ public class MenuHelper {
 			final MDirectToolItem toolItem = MenuFactoryImpl.eINSTANCE.createDirectToolItem();
 			String itemId = item.getId();
 			toolItem.setElementId(itemId);
+			toolItem.setVisible(item.isVisible());
 			String iconURI = getIconURI(action.getImageDescriptor(), application.getContext());
 			if (iconURI == null) {
 				if (itemId == null) {
@@ -948,6 +961,7 @@ public class MenuHelper {
 			toolItem.setEnabled(action.isEnabled());
 
 			final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					String property = event.getProperty();
 					if (property.equals(IAction.ENABLED)) {
@@ -965,6 +979,7 @@ public class MenuHelper {
 			// DirectContributionItem#handleWidgetDispose()
 			action.addPropertyChangeListener(propertyListener);
 			toolItem.getTransientData().put(DirectContributionItem.DISPOSABLE, new Runnable() {
+						@Override
 						public void run() {
 							action.removePropertyChangeListener(propertyListener);
 						}

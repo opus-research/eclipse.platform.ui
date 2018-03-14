@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,9 +129,7 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
         reader.readPopupContributors(this);
     }
     
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
-	 */
+	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension addedExtension) {
         IConfigurationElement[] addedElements = addedExtension.getConfigurationElements();
         for (int i = 0; i < addedElements.length; i++) {
@@ -141,9 +139,7 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
         }
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.ObjectContributorManager#getExtensionPointFilter()
-	 */
+	@Override
 	protected String getExtensionPointFilter() {
 		return IWorkbenchRegistryConstants.PL_POPUP_MENU;
 	}

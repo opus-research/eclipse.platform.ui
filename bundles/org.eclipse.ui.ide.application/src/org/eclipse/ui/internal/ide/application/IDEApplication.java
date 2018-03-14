@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Helmut J. Haigermoser -  Bug 359838 - The "Workspace Unavailable" error
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422954
+ *     Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -26,24 +28,30 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceData;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceDialog;
+import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 /**
  * The "main program" for the Eclipse IDE.
@@ -59,9 +67,17 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
     private static final String VERSION_FILENAME = "version.ini"; //$NON-NLS-1$
 
-    private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
+    // Use the branding plug-in of the platform feature since this is most likely
+    // to change on an update of the IDE.
+    private static final String WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME = "org.eclipse.platform"; //$NON-NLS-1$
+    private static final Version WORKSPACE_CHECK_REFERENCE_BUNDLE_VERSION;
+    static {
+        Bundle bundle = Platform.getBundle(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME);
+        WORKSPACE_CHECK_REFERENCE_BUNDLE_VERSION = bundle != null ? bundle.getVersion() : null/*not installed*/;
+    }
 
-    private static final String WORKSPACE_VERSION_VALUE = "1"; //$NON-NLS-1$
+    private static final String WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME_LEGACY = "org.eclipse.core.runtime"; //$NON-NLS-1$
+    private static final String WORKSPACE_CHECK_LEGACY_VERSION_INCREMENTED = "2"; //$NON-NLS-1$   legacy version=1
 
     private static final String PROP_EXIT_CODE = "eclipse.exitcode"; //$NON-NLS-1$
 
@@ -89,10 +105,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         // There is nothing to do for IDEApplication
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext context)
-     */
-    public Object start(IApplicationContext appContext) throws Exception {
+    @Override
+	public Object start(IApplicationContext appContext) throws Exception {
         Display display = createDisplay();
         // processor must be created before we start event loop
         DelayedEventsProcessor processor = new DelayedEventsProcessor(display);
@@ -107,13 +121,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         		// the task bar and without these calls you'd have the default icon 
         		// with no message.
         		shell.setText(ChooseWorkspaceDialog.getWindowTitle());
-        		shell.setImages(Dialog.getDefaultImages());
+        		shell.setImages(Window.getDefaultImages());
         	}
            
             Object instanceLocationCheck = checkInstanceLocation(shell, appContext.getArguments());
 			if (instanceLocationCheck != null) {
             	WorkbenchPlugin.unsetSplashShell(display);
-                Platform.endSplash();
+                appContext.applicationRunning();
                 return instanceLocationCheck;
             }
 
@@ -154,10 +168,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return PlatformUI.createDisplay();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
-     */
-    public void setInitializationData(IConfigurationElement config,
+    @Override
+	public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) {
         // There is nothing to do for IDEApplication
     }
@@ -170,7 +182,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return <code>null</code> if a valid instance location has been set and an exit code
      *         otherwise
      */
-    private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
+    @SuppressWarnings("rawtypes")
+	private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
         // -data @none was specified but an ide requires workspace
         Location instanceLoc = Platform.getInstanceLocation();
         if (instanceLoc == null) {
@@ -247,7 +260,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             try {
                 // the operation will fail if the url is not a valid
                 // instance data area, so other checking is unneeded
-                if (instanceLoc.setURL(workspaceUrl, true)) {
+                if (instanceLoc.set(workspaceUrl, true)) {
                     launchData.writePersistedData();
                     writeWorkspaceVersion();
                     return null;
@@ -259,7 +272,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                                 IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
                                 IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
                 return EXIT_OK;
-            }
+            } catch (IOException e) {
+            	  MessageDialog
+                  .openError(
+                          shell,
+                          IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
+                          IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
+			}
 
             // by this point it has been determined that the workspace is
             // already in use -- force the user to choose again
@@ -268,7 +287,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         }
     }
 
-	private static boolean isDevLaunchMode(Map args) {
+    @SuppressWarnings("rawtypes")
+    private static boolean isDevLaunchMode(Map args) {
 		// see org.eclipse.pde.internal.core.PluginPathFinder.isDevLaunchMode()
 		if (Boolean.getBoolean("eclipse.pde.launch")) //$NON-NLS-1$
 			return true;
@@ -294,7 +314,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         URL url = null;
         do {
         	// okay to use the shell now - this is the splash shell
-            new ChooseWorkspaceDialog(shell, launchData, false, true).prompt(force);
+			new ChooseWorkspaceDialog(shell, launchData, false, true) {
+				@Override
+				protected Shell getParentShell() {
+					return null;
+				}
+			}.prompt(force);
             String instancePath = launchData.getSelection();
             if (instancePath == null) {
 				return null;
@@ -355,8 +380,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			return false;
 		}
 
-        String version = readWorkspaceVersion(url);
+        if (WORKSPACE_CHECK_REFERENCE_BUNDLE_VERSION == null) {
+            // no reference bundle installed, no check possible
+            return true;
+        }
 
+        Version version = readWorkspaceVersion(url);
         // if the version could not be read, then there is not any existing
         // workspace data to trample, e.g., perhaps its a new directory that
         // is just starting to be used as a workspace
@@ -364,33 +393,62 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			return true;
 		}
 
-        final int ide_version = Integer.parseInt(WORKSPACE_VERSION_VALUE);
-        int workspace_version = Integer.parseInt(version);
+        final Version ide_version = toMajorMinorVersion(WORKSPACE_CHECK_REFERENCE_BUNDLE_VERSION);
+        Version workspace_version = toMajorMinorVersion(version);
+        int versionCompareResult = workspace_version.compareTo(ide_version);
 
         // equality test is required since any version difference (newer
         // or older) may result in data being trampled
-        if (workspace_version == ide_version) {
+		if (versionCompareResult == 0) {
 			return true;
 		}
 
-        // At this point workspace has been detected to be from a version
-        // other than the current ide version -- find out if the user wants
-        // to use it anyhow.
-        String title = IDEWorkbenchMessages.IDEApplication_versionTitle;
-        String message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage, url.getFile());
+		// At this point workspace has been detected to be from a version
+		// other than the current ide version -- find out if the user wants
+		// to use it anyhow.
+		int severity;
+		String title;
+		String message;
+		if (versionCompareResult < 0) {
+			// Workspace < IDE. Update must be possible without issues,
+			// so only inform user about it.
+			severity = MessageDialog.INFORMATION;
+			title = IDEWorkbenchMessages.IDEApplication_versionTitle_olderWorkspace;
+			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_olderWorkspace, url.getFile());
+		} else {
+			// Workspace > IDE. It must have been opened with a newer IDE version.
+			// Downgrade might be problematic, so warn user about it.
+			severity = MessageDialog.WARNING;
+			title = IDEWorkbenchMessages.IDEApplication_versionTitle_newerWorkspace;
+			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_newerWorkspace, url.getFile());
+		}
 
-        MessageBox mbox = new MessageBox(shell, SWT.OK | SWT.CANCEL
-                | SWT.ICON_WARNING | SWT.APPLICATION_MODAL);
-        mbox.setText(title);
-        mbox.setMessage(message);
-        return mbox.open() == SWT.OK;
-    }
+		IPersistentPreferenceStore prefStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, IDEWorkbenchPlugin.IDE_WORKBENCH);
+		boolean keepOnWarning = prefStore.getBoolean(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY);
+		if (keepOnWarning) {
+			MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell, title, null, message, severity,
+					new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0,
+					IDEWorkbenchMessages.IDEApplication_version_doNotWarnAgain, false);
+			if (dialog.open() != Window.OK) {
+				return false;
+			}
+			keepOnWarning = !dialog.getToggleState();
+			try {
+				prefStore.setValue(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY, keepOnWarning);
+				prefStore.save();
+			} catch (IOException e) {
+				IDEWorkbenchPlugin.log("Error writing to configuration preferences", //$NON-NLS-1$
+					new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e.getMessage(), e));
+			}
+		}
+		return true;
+	}
 
     /**
      * Look at the argument URL for the workspace's version information. Return
      * that version if found and null otherwise.
      */
-    private static String readWorkspaceVersion(URL workspace) {
+    private static Version readWorkspaceVersion(URL workspace) {
         File versionFile = getVersionFile(workspace, false);
         if (versionFile == null || !versionFile.exists()) {
 			return null;
@@ -408,12 +466,27 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 is.close();
             }
 
-            return props.getProperty(WORKSPACE_VERSION_KEY);
+            String versionString = props.getProperty(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME);
+            if (versionString != null) {
+                return Version.parseVersion(versionString);
+            }
+            versionString= props.getProperty(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME_LEGACY);
+            if (versionString != null) {
+                return Version.parseVersion(versionString);
+            }
+            return null;
         } catch (IOException e) {
-            IDEWorkbenchPlugin.log("Could not read version file", new Status( //$NON-NLS-1$
+            IDEWorkbenchPlugin.log("Could not read version file " + versionFile, new Status( //$NON-NLS-1$
                     IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH,
                     IStatus.ERROR,
-                    e.getMessage() == null ? "" : e.getMessage(), //$NON-NLS-1$, 
+                    e.getMessage() == null ? "" : e.getMessage(), //$NON-NLS-1$
+                    e));
+            return null;
+        } catch (IllegalArgumentException e) {
+            IDEWorkbenchPlugin.log("Could not parse version in " + versionFile, new Status( //$NON-NLS-1$
+                    IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH,
+                    IStatus.ERROR,
+                    e.getMessage() == null ? "" : e.getMessage(), //$NON-NLS-1$
                     e));
             return null;
         }
@@ -425,6 +498,11 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * so the function is silent about failure
      */
     private static void writeWorkspaceVersion() {
+        if (WORKSPACE_CHECK_REFERENCE_BUNDLE_VERSION == null) {
+            // no reference bundle installed, no check possible
+            return;
+        }
+
         Location instanceLoc = Platform.getInstanceLocation();
         if (instanceLoc == null || instanceLoc.isReadOnly()) {
 			return;
@@ -437,11 +515,17 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
         OutputStream output = null;
         try {
-            String versionLine = WORKSPACE_VERSION_KEY + '='
-                    + WORKSPACE_VERSION_VALUE;
-
             output = new FileOutputStream(versionFile);
-            output.write(versionLine.getBytes("UTF-8")); //$NON-NLS-1$
+            Properties props = new Properties();
+
+            // write new property
+            props.setProperty(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME, WORKSPACE_CHECK_REFERENCE_BUNDLE_VERSION.toString());
+
+            // write legacy property with an incremented version,
+            // so that pre-4.4 IDEs will also warn about the workspace
+            props.setProperty(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME_LEGACY, WORKSPACE_CHECK_LEGACY_VERSION_INCREMENTED);
+
+            props.store(output, null);
         } catch (IOException e) {
             IDEWorkbenchPlugin.log("Could not write version file", //$NON-NLS-1$
                     StatusUtil.newStatus(IStatus.ERROR, e.getMessage(), e));
@@ -493,15 +577,21 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.equinox.app.IApplication#stop()
+    /**
+     * @return the major and minor parts of the given version
      */
+    private static Version toMajorMinorVersion(Version version) {
+        return new Version(version.getMajor(), version.getMinor(), 0);
+    }
+
+	@Override
 	public void stop() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null)
 			return;
 		final Display display = workbench.getDisplay();
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!display.isDisposed())
 					workbench.close();
