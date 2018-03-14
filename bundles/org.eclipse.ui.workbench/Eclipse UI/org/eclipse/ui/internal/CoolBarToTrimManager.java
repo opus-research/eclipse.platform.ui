@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,12 +9,14 @@
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237
+ *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -22,11 +24,14 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.renderers.swt.HandledContributionItem;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.jface.action.AbstractGroupMarker;
@@ -46,6 +51,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.menus.CommandContributionItem;
@@ -73,7 +79,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	private static final String TOOLBAR_SEPARATOR = "toolbarSeparator"; //$NON-NLS-1$
 	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
-	private static final String OBJECT = "coolbar.object"; //$NON-NLS-1$
+	public static final String OBJECT = "coolbar.object"; //$NON-NLS-1$
 	private static final String PREV_CHILD_VISIBLE = "prevChildVisible"; //$NON-NLS-1$
 	private MTrimBar topTrim;
 	private List<MTrimElement> workbenchTrimElements;
@@ -128,7 +134,8 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		}
 
 		if (item instanceof IToolBarContributionItem) {
-			IToolBarManager mgr = ((IToolBarContributionItem) item).getToolBarManager();
+			IToolBarContributionItem tbc = (IToolBarContributionItem) item;
+			IToolBarManager mgr = tbc.getToolBarManager();
 			if (!(mgr instanceof ToolBarManager)) {
 				return;
 			}
@@ -147,6 +154,10 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			}
 			toolBar.setElementId(item.getId());
 			toolBar.getTransientData().put(OBJECT, item);
+			String toolbarLabel = getToolbarLabel(application, item.getId());
+			if (toolbarLabel != null) {
+				toolBar.getTransientData().put("Name", toolbarLabel); //$NON-NLS-1$
+			}
 			renderer.linkModelToManager(toolBar, manager);
 			toolBar.setToBeRendered(true);
 			if (!tbFound) {
@@ -198,6 +209,49 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			workbenchTrimElements.add(toolBar);
 		}
 
+	}
+
+	public static String getToolbarLabel(MApplication application, MUIElement elt) {
+		String name = getTransientName(elt);
+		if (name != null) {
+			return name;
+		}
+		String elementId = elt.getElementId();
+		return getToolbarLabel(application, elementId);
+	}
+
+	// See MenuAdditionCacheEntry
+	private static String getToolbarLabel(MApplication application, String elementId) {
+		String name;
+		if (IWorkbenchActionConstants.TOOLBAR_FILE.equalsIgnoreCase(elementId)) {
+			return WorkbenchMessages.WorkbenchWindow_FileToolbar;
+		}
+		if (IWorkbenchActionConstants.TOOLBAR_NAVIGATE.equalsIgnoreCase(elementId)) {
+			return WorkbenchMessages.WorkbenchWindow_NavigateToolbar;
+		}
+		if (IWorkbenchActionConstants.TOOLBAR_HELP.equalsIgnoreCase(elementId)) {
+			return WorkbenchMessages.WorkbenchWindow_HelpToolbar;
+		}
+		List<MTrimContribution> trimContributions = application.getTrimContributions();
+		for (MTrimContribution mtb : trimContributions) {
+			for (MTrimElement e : mtb.getChildren()) {
+				if (e.getElementId().equals(elementId)) {
+					name = getTransientName(e);
+					if (name != null) {
+						return name;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	static String getTransientName(MUIElement elt) {
+		Object name = elt.getTransientData().get("Name"); //$NON-NLS-1$
+		if (name instanceof String) {
+			return (String) name;
+		}
+		return null;
 	}
 
 	@Override
@@ -490,7 +544,13 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			ToolBarManagerRenderer renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(el, null);
 			final ToolBarManager manager = renderer.getManager(el);
 			if (manager != null) {
+				boolean wasVisible = el.isVisible();
 				fill(el, manager);
+				// fix for bug 383569#25: if the toolbar model changed the
+				// visibility we must create (or remove) SWT toolbar widgets
+				if (el.isVisible() != wasVisible) {
+					manager.update(true);
+				}
 				// TODO: Hack to work around Bug 370961
 				ToolBar tb = manager.getControl();
 				if (tb != null && !tb.isDisposed()) {
@@ -537,7 +597,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	private void fill(MToolBar container, IContributionManager manager) {
 		ToolBarManagerRenderer renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(container, null);
 
-		for (IContributionItem item : manager.getItems()) {
+		IContributionItem[] items = manager.getItems();
+		for (int index = 0; index < items.length; index++) {
+			IContributionItem item = items[index];
 			if (item == null) {
 				continue;
 			}
@@ -545,6 +607,17 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			if (toolBarElem != null) {
 				if (container.isVisible()) {
 					setChildVisible(toolBarElem, item, manager);
+					continue;
+				}
+				if (item.isSeparator() || item.isGroupMarker()) {
+					continue;
+				}
+				// partial fix for bug 383569, introduced via fix for bug 402429
+				// If the toolbar is hidden but one of the children is not,
+				// make both the child and the toolbar visible
+				if (isChildVisible(item, manager)) {
+					setChildVisible(toolBarElem, item, manager);
+					container.setVisible(true);
 				}
 				continue;
 			}
@@ -558,12 +631,25 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			} else if (item instanceof IContributionManager) {
 				fill(container, (IContributionManager) item);
 			} else if (item instanceof CommandContributionItem) {
-				CommandContributionItem cci = (CommandContributionItem) item;
-				MToolItem toolItem = MenuHelper.createToolItem(application, cci);
-				manager.remove(item);
-				if (toolItem != null) {
-					container.getChildren().add(toolItem);
+				MHandledToolItem toolItem = MenuHelper.createToolItem(application, (CommandContributionItem) item);
+				if (toolItem == null) {
+					continue;
 				}
+				// this section below should match what's in
+				// org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer.processHandledItem(ToolBarManager,
+				// MHandledToolItem)
+				toolItem.setRenderer(renderer);
+				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
+						window.getContext());
+				if (manager instanceof ContributionManager) {
+					ContributionManager cm = (ContributionManager) manager;
+					cm.insert(index, ci);
+					cm.remove(item);
+				}
+				ci.setModel(toolItem);
+				ci.setVisible(toolItem.isVisible());
+				renderer.linkModelToContribution(toolItem, ci);
+				container.getChildren().add(toolItem);
 			} else {
 				MToolItem toolItem = OpaqueElementUtil.createOpaqueToolItem();
 				toolItem.setElementId(item.getId());
@@ -579,32 +665,45 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	}
 
 	private void setChildVisible(MToolBarElement modelItem, IContributionItem item, IContributionManager manager) {
-		Boolean currentChildVisible = isChildVisible(item, manager);
+		Boolean overridenVisibility = getOverridenVisibility(item, manager);
 		Boolean prevChildVisible = (Boolean) modelItem.getTransientData().get(PREV_CHILD_VISIBLE);
 
-		if (currentChildVisible != null) {
+		if (overridenVisibility != null) {
 			if (prevChildVisible == null) {
 				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
-				modelItem.setVisible(currentChildVisible);
+				modelItem.setVisible(overridenVisibility);
+			} else {
+				return;
 			}
 		} else if (prevChildVisible != null) {
 			modelItem.setVisible(prevChildVisible);
 			modelItem.getTransientData().remove(PREV_CHILD_VISIBLE);
+		} else {
+			modelItem.setVisible(item.isVisible());
 		}
 	}
 
-	private Boolean isChildVisible(IContributionItem item, IContributionManager manager) {
-		Boolean v;
+	/**
+	 * Checks if the item's visibility is overridden by the given manager
+	 *
+	 * @return non null overridden visibility value (if it is overridden), null
+	 *         otherwise
+	 */
+	private Boolean getOverridenVisibility(IContributionItem item, IContributionManager manager) {
 		IContributionManagerOverrides overrides = manager.getOverrides();
-		if (overrides == null) {
-			v = null;
-		} else {
-			v = overrides.getVisible(item);
+		return overrides == null ? null : overrides.getVisible(item);
 		}
 
-		if (v != null) {
-			return v.booleanValue();
-		}
-		return null;
+	/**
+	 * Computes real item visibility considering possibly overridden state from
+	 * manager
+	 */
+	private boolean isChildVisible(IContributionItem item, IContributionManager manager) {
+		Boolean v = getOverridenVisibility(item, manager);
+		return v == null ? item.isVisible() : v.booleanValue();
+	}
+
+	public MTrimBar getTopTrim() {
+		return topTrim;
 	}
 }
