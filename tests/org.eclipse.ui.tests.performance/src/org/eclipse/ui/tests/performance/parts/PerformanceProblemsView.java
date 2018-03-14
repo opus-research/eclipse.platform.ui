@@ -12,7 +12,7 @@
 package org.eclipse.ui.tests.performance.parts;
 
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.views.markers.internal.ProblemView;
+import org.eclipse.ui.internal.views.markers.ProblemsView;
 
 /**
  * PerformanceProblemsView is a problems view created
@@ -20,9 +20,9 @@ import org.eclipse.ui.views.markers.internal.ProblemView;
  * @since 3.2
  *
  */
-public class PerformanceProblemsView extends ProblemView {
+public class PerformanceProblemsView extends ProblemsView {
 
 	public Tree getTreeWidget(){
-		return getTree();
+		return getTreeWidget();
 	}
 }
