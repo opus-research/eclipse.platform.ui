@@ -12,6 +12,7 @@ package org.eclipse.ui.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -20,7 +21,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ui.IStartup;
-import org.eclipse.ui.internal.misc.UIStats;
 import org.osgi.framework.Bundle;
 
 /**
@@ -84,14 +84,9 @@ public class EarlyStartupRunnable extends SafeRunnable {
     }
 
     private void runEarlyStartup(Object executableExtension) {
-		if (executableExtension instanceof IStartup) {
-			String methodName = executableExtension.getClass().getName() + ".earlyStartup"; //$NON-NLS-1$
-			try {
-				UIStats.start(UIStats.EARLY_STARTUP, methodName);
-				((IStartup) executableExtension).earlyStartup();
-			} finally {
-				UIStats.end(UIStats.EARLY_STARTUP, executableExtension, methodName);
-			}
+        if (executableExtension != null
+                && executableExtension instanceof IStartup) {
+			((IStartup) executableExtension).earlyStartup();
 		} else {
             IStatus status = new Status(IStatus.ERROR,
                     extension.getNamespace(), 0,
