@@ -9,15 +9,16 @@
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535
- *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -82,9 +83,7 @@ import org.osgi.service.event.EventHandler;
 /**
  * Create a contribute part.
  */
-public class ToolBarManagerRenderer
-		extends
-		ContributionManagerRenderer<MToolBar, MToolBarElement, ToolBarManager, ToolBarContributionRecord> {
+public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private static final Selector ALL_SELECTOR = new Selector() {
 
@@ -97,16 +96,25 @@ public class ToolBarManagerRenderer
 	public static final String POST_PROCESSING_FUNCTION = "ToolBarManagerRenderer.postProcess.func"; //$NON-NLS-1$
 	public static final String POST_PROCESSING_DISPOSE = "ToolBarManagerRenderer.postProcess.dispose"; //$NON-NLS-1$
 	public static final String UPDATE_VARS = "ToolBarManagerRenderer.updateVars"; //$NON-NLS-1$
-	private static final String DISPOSE_ADDED = "ToolBarManagerRenderer.disposeAdded"; //$NON-NLS-1$
 
 	/**
 	 * This is a persistedState 'key' which can be used by the renderer
 	 * implementation to decide that a user interface element has been hidden by
 	 * the user
-	 * 
+	 *
 	 */
 	// TODO migrate to IPresentationEngine after the Luna release
 	public static final String HIDDEN_BY_USER = "HIDDEN_BY_USER"; //$NON-NLS-1$
+
+	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<MToolBar, ToolBarManager>();
+	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<ToolBarManager, MToolBar>();
+
+	private Map<MToolBarElement, IContributionItem> modelToContribution = new HashMap<MToolBarElement, IContributionItem>();
+	private Map<IContributionItem, MToolBarElement> contributionToModel = new HashMap<IContributionItem, MToolBarElement>();
+
+	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<MToolBarElement, ToolBarContributionRecord>();
+
+	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
@@ -115,12 +123,17 @@ public class ToolBarManagerRenderer
 	 */
 	private Menu toolbarMenu;
 
+	// @Inject
+	// private Logger logger;
+
 	@Inject
 	private MApplication application;
 
 	@Inject
 	EModelService modelService;
 
+	@Inject
+	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
@@ -179,9 +192,8 @@ public class ToolBarManagerRenderer
 						}
 					}
 				} else {
-					IContributionItem ici = getContribution(itemModel);
-					clearModelToContribution(itemModel, ici);
-
+					IContributionItem ici = modelToContribution
+							.remove(itemModel);
 					if (ici != null && parent != null) {
 						parent.remove(ici);
 					}
@@ -340,10 +352,8 @@ public class ToolBarManagerRenderer
 		}
 	}
 
-	@Override
 	@PostConstruct
 	public void init() {
-		super.init();
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
@@ -376,7 +386,6 @@ public class ToolBarManagerRenderer
 		context.runAndTrack(enablementUpdater);
 	}
 
-	@Override
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
@@ -384,7 +393,6 @@ public class ToolBarManagerRenderer
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
 		eventBroker.unsubscribe(childAdditionUpdater);
-		super.contextDisposed();
 	}
 
 	@Override
@@ -451,36 +459,10 @@ public class ToolBarManagerRenderer
 	 * @param elementId
 	 */
 	public void processContribution(MToolBar toolbarModel, String elementId) {
-
-		ToolBarManager manager = getManager(toolbarModel);
-		if (manager != null && manager.getControl() != null) {
-			addCleanupDisposeListener(toolbarModel, manager.getControl());
-		}
-
 		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
 		ContributionsAnalyzer.XXXgatherToolBarContributions(toolbarModel,
 				application.getToolBarContributions(), elementId, toContribute);
 		generateContributions(toolbarModel, toContribute);
-	}
-
-	/**
-	 * @param manager
-	 * @param control
-	 */
-	private void addCleanupDisposeListener(final MToolBar toolbarModel,
-			ToolBar control) {
-
-		if (!toolbarModel.getTags().contains(DISPOSE_ADDED)) {
-			toolbarModel.getTags().add(DISPOSE_ADDED);
-			control.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					cleanUp(toolbarModel);
-					toolbarModel.getTags().remove(DISPOSE_ADDED);
-				}
-			});
-		}
-
 	}
 
 	/**
@@ -589,6 +571,13 @@ public class ToolBarManagerRenderer
 		bar.setData(manager);
 		bar.setData(AbstractPartRenderer.OWNING_ME, element);
 		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
+		bar.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				cleanUp((MToolBar) element);
+				toolbarMenu = null;
+			}
+		});
 		return bar;
 	}
 
@@ -596,7 +585,8 @@ public class ToolBarManagerRenderer
 	 * @param element
 	 */
 	protected void cleanUp(MToolBar toolbarModel) {
-		Collection<ToolBarContributionRecord> vals = getList(toolbarModel);
+		Collection<ToolBarContributionRecord> vals = modelContributionToRecord
+				.values();
 		for (ToolBarContributionRecord record : vals
 				.toArray(new ToolBarContributionRecord[vals.size()])) {
 			if (record.toolbarModel == toolbarModel) {
@@ -615,7 +605,7 @@ public class ToolBarManagerRenderer
 
 	public void cleanUpCopy(ToolBarContributionRecord record,
 			MToolBarElement copy) {
-		removeContributionRecord(copy);
+		modelContributionToRecord.remove(copy);
 		IContributionItem ici = getContribution(copy);
 		clearModelToContribution(copy, ici);
 		if (ici != null) {
@@ -912,12 +902,62 @@ public class ToolBarManagerRenderer
 		}
 	}
 
+	public ToolBarManager getManager(MToolBar model) {
+		return modelToManager.get(model);
+	}
+
 	public MToolBar getToolBarModel(ToolBarManager manager) {
-		return getModel(manager);
+		return managerToModel.get(manager);
+	}
+
+	public void linkModelToManager(MToolBar model, ToolBarManager manager) {
+		modelToManager.put(model, manager);
+		managerToModel.put(manager, model);
+	}
+
+	public void clearModelToManager(MToolBar model, ToolBarManager manager) {
+		modelToManager.remove(model);
+		managerToModel.remove(manager);
+	}
+
+	public IContributionItem getContribution(MToolBarElement element) {
+		return modelToContribution.get(element);
 	}
 
 	public MToolBarElement getToolElement(IContributionItem item) {
-		return getModelElement(item);
+		return contributionToModel.get(item);
+	}
+
+	public void linkModelToContribution(MToolBarElement model,
+			IContributionItem item) {
+		modelToContribution.put(model, item);
+		contributionToModel.put(item, model);
+	}
+
+	public void clearModelToContribution(MToolBarElement model,
+			IContributionItem item) {
+		modelToContribution.remove(model);
+		contributionToModel.remove(item);
+	}
+
+	public ArrayList<ToolBarContributionRecord> getList(MToolBarElement item) {
+		ArrayList<ToolBarContributionRecord> tmp = sharedElementToRecord
+				.get(item);
+		if (tmp == null) {
+			tmp = new ArrayList<ToolBarContributionRecord>();
+			sharedElementToRecord.put(item, tmp);
+		}
+		return tmp;
+	}
+
+	public void linkElementToContributionRecord(MToolBarElement element,
+			ToolBarContributionRecord record) {
+		modelContributionToRecord.put(element, record);
+	}
+
+	public ToolBarContributionRecord getContributionRecord(
+			MToolBarElement element) {
+		return modelContributionToRecord.get(element);
 	}
 
 	public void reconcileManagerToModel(IToolBarManager menuManager,
@@ -1000,7 +1040,7 @@ public class ToolBarManagerRenderer
 
 	/**
 	 * Removes the IPresentationEngine.HIDDEN_BY_USER from the toolbars
-	 * 
+	 *
 	 * @param toolbarModel
 	 */
 	private void removeHiddenByUserTags(MToolBar toolbarModel) {
