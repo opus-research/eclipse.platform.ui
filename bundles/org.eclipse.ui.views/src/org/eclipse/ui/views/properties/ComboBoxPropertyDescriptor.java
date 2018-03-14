@@ -67,8 +67,7 @@ public class ComboBoxPropertyDescriptor extends PropertyDescriptor {
      * The editor is configured with the current validator if there is one.
      * </p>
      */
-    @Override
-	public CellEditor createPropertyEditor(Composite parent) {
+    public CellEditor createPropertyEditor(Composite parent) {
         CellEditor editor = new ComboBoxCellEditor(parent, labels,
                 SWT.READ_ONLY);
         if (getValidator() != null) {
@@ -86,8 +85,7 @@ public class ComboBoxPropertyDescriptor extends PropertyDescriptor {
      *
      * @see #setLabelProvider(ILabelProvider)
      */
-    @Override
-	public ILabelProvider getLabelProvider() {
+    public ILabelProvider getLabelProvider() {
         if (isLabelProviderSet()) {
 			return super.getLabelProvider();
 		}

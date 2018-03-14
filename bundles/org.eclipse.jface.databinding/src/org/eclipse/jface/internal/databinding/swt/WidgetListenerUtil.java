@@ -38,7 +38,6 @@ public class WidgetListenerUtil {
 			widget.addListener(event, listener);
 		} else {
 			SWTObservables.getRealm(display).exec(new Runnable() {
-				@Override
 				public void run() {
 					if (!widget.isDisposed())
 						widget.addListener(event, listener);
@@ -64,7 +63,6 @@ public class WidgetListenerUtil {
 			widget.removeListener(event, listener);
 		} else {
 			SWTObservables.getRealm(display).exec(new Runnable() {
-				@Override
 				public void run() {
 					if (!widget.isDisposed())
 						widget.removeListener(event, listener);
