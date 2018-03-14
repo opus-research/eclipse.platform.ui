@@ -88,7 +88,7 @@ public class FoldersView extends ViewPart {
 	@Override
 	public void init(IViewSite site) throws PartInitException {
 		super.init(site);
-		mailService = site.getService(IMailService.class);
+		mailService = (IMailService) site.getService(IMailService.class);
 	}
 
 	@Override

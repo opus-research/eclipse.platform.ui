@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 169876)
  *     Elias Volanakis <elias@eclipsesource.com> - bug 271720
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -85,11 +84,11 @@ import org.eclipse.core.runtime.Assert;
  *
  * @since 1.2
  */
-public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
-	private IObservableValue<Date> dateObservable;
-	private IObservableValue<Date> timeObservable;
+public class DateAndTimeObservableValue extends AbstractObservableValue {
+	private IObservableValue dateObservable;
+	private IObservableValue timeObservable;
 	private PrivateInterface privateInterface;
-	private Date cachedValue;
+	private Object cachedValue;
 	private boolean updating;
 
 	private class PrivateInterface implements IChangeListener, IStaleListener,
@@ -113,9 +112,9 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 	}
 
 	// One calendar per thread to preserve thread-safety
-	private static final ThreadLocal<Calendar> calendar = new ThreadLocal<Calendar>() {
+	private static final ThreadLocal calendar = new ThreadLocal() {
 		@Override
-		protected Calendar initialValue() {
+		protected Object initialValue() {
 			return Calendar.getInstance();
 		}
 	};
@@ -131,8 +130,8 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 	 *            the observable used for the time component (hour, minute,
 	 *            second and millisecond) of the constructed observable.
 	 */
-	public DateAndTimeObservableValue(IObservableValue<Date> dateObservable,
-			IObservableValue<Date> timeObservable) {
+	public DateAndTimeObservableValue(IObservableValue dateObservable,
+			IObservableValue timeObservable) {
 		super(dateObservable.getRealm());
 		this.dateObservable = dateObservable;
 		this.timeObservable = timeObservable;
@@ -141,8 +140,8 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 				timeObservable.getRealm()));
 
 		privateInterface = new PrivateInterface();
-
 		dateObservable.addDisposeListener(privateInterface);
+		timeObservable.addDisposeListener(privateInterface);
 	}
 
 	@Override
@@ -178,25 +177,22 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 
 	private void notifyIfChanged() {
 		if (hasListeners()) {
-			Date oldValue = cachedValue;
-			Date newValue = cachedValue = doGetValue();
+			Object oldValue = cachedValue;
+			Object newValue = cachedValue = doGetValue();
 			if (!Util.equals(oldValue, newValue))
 				fireValueChange(Diffs.createValueDiff(oldValue, newValue));
 		}
 	}
 
-	/**
-	 * @since 1.6
-	 */
 	@Override
-	protected Date doGetValue() {
-		Date dateValue = dateObservable.getValue();
+	protected Object doGetValue() {
+		Date dateValue = (Date) dateObservable.getValue();
 		if (dateValue == null)
 			return null;
 
-		Date timeValue = timeObservable.getValue();
+		Date timeValue = (Date) timeObservable.getValue();
 
-		Calendar cal = calendar.get();
+		Calendar cal = (Calendar) calendar.get();
 
 		cal.setTime(dateValue);
 		int year = cal.get(Calendar.YEAR);
@@ -218,19 +214,18 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 		return cal.getTime();
 	}
 
-	/**
-	 * @since 1.6
-	 */
 	@Override
-	protected void doSetValue(Date combinedDate) {
+	protected void doSetValue(Object value) {
+		Date date = (Date) value;
+
 		Date dateValue;
 		Date timeValue;
 
-		Calendar cal = calendar.get();
-		if (combinedDate == null)
+		Calendar cal = (Calendar) calendar.get();
+		if (date == null)
 			cal.clear();
 		else
-			cal.setTime(combinedDate);
+			cal.setTime(date);
 
 		int year = cal.get(Calendar.YEAR);
 		int month = cal.get(Calendar.MONTH);
@@ -240,10 +235,10 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 		int second = cal.get(Calendar.SECOND);
 		int millis = cal.get(Calendar.MILLISECOND);
 
-		if (combinedDate == null) {
+		if (date == null) {
 			dateValue = null;
 		} else {
-			dateValue = dateObservable.getValue();
+			dateValue = (Date) dateObservable.getValue();
 			if (dateValue == null)
 				cal.clear();
 			else
@@ -254,7 +249,7 @@ public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
 			dateValue = cal.getTime();
 		}
 
-		timeValue = timeObservable.getValue();
+		timeValue = (Date) timeObservable.getValue();
 		if (timeValue == null)
 			cal.clear();
 		else

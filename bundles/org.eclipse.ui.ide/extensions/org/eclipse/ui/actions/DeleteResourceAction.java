@@ -7,9 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Benjamin Muskalla <b.muskalla@gmx.net> - Bug 172574
+ *     Benjamin Muskalla <b.muskalla@gmx.net>
+ *     - Fix for bug 172574 - [IDE] DeleteProjectDialog inconsequent selection behavior
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -81,10 +81,10 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			super(parentShell, getTitle(projects), null, // accept the
 					// default window
 					// icon
-					getMessage(projects), MessageDialog.QUESTION, 0,
+					getMessage(projects), MessageDialog.QUESTION, new String[] {
 							IDialogConstants.YES_LABEL,
-					IDialogConstants.NO_LABEL);
-
+							IDialogConstants.NO_LABEL }, 0); // yes is the
+			// default
 			this.projects = projects;
 			setShellStyle(getShellStyle() | SWT.SHEET);
 		}
@@ -244,7 +244,12 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		super(IDEWorkbenchMessages.DeleteResourceAction_text);
 		Assert.isNotNull(shell);
 		initAction();
-		setShellProvider(() -> shell);
+		setShellProvider(new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return shell;
+			}
+		});
 	}
 
 	/**

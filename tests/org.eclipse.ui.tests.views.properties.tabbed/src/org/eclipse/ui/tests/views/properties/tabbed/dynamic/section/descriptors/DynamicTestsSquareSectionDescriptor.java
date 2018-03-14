@@ -35,22 +35,18 @@ public class DynamicTestsSquareSectionDescriptor extends
 		super(typeMapper);
 	}
 
-	@Override
 	public IFilter getFilter() {
 		return new DynamicTestsSquareSectionFilter();
 	}
 
-	@Override
 	public String getId() {
 		return "DynamicTestsSquareSection"; //$NON-NLS-1$
 	}
 
-	@Override
 	public ISection getSectionClass() {
 		return new DynamicTestsSquareSection();
 	}
 
-	@Override
 	public String getTargetTab() {
 		return "ShapeTab"; //$NON-NLS-1$
 	}

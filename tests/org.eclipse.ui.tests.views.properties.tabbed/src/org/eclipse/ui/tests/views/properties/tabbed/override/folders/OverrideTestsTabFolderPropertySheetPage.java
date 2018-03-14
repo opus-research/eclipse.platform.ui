@@ -35,7 +35,11 @@ public class OverrideTestsTabFolderPropertySheetPage implements
 
 	private OverrideTestsTabFolderPropertySheetPageContentManager contentManager;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.IPage#createControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControl(Composite parent) {
 		composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new FillLayout());
@@ -43,27 +47,48 @@ public class OverrideTestsTabFolderPropertySheetPage implements
 				composite);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.IPage#dispose()
+	 */
 	public void dispose() {
 		composite.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.IPage#getControl()
+	 */
 	public Control getControl() {
 		return composite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart,
+	 *      org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		contentManager.selectionChanged(part, selection);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.IPage#setActionBars(org.eclipse.ui.IActionBars)
+	 */
 	public void setActionBars(IActionBars actionBars) {
 		// Not implemented
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.IPage#setFocus()
+	 */
 	public void setFocus() {
 		composite.setFocus();
 	}
