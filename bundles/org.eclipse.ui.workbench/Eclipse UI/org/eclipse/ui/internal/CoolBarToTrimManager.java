@@ -641,16 +641,16 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				toolItem.setRenderer(renderer);
 				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
 						window.getContext());
-				
+
 				if (manager instanceof ContributionManager) {
 					// set basic attributes to the item before adding to the manager
 					ci.setId(toolItem.getElementId());
 					ci.setVisible(toolItem.isVisible());
-					
+
 					ContributionManager cm = (ContributionManager) manager;
 					cm.insert(index, ci);
 					cm.remove(item);
-					
+
 					// explicitly dispose contribution since it is now
 					// disconnected from manager
 					item.dispose();

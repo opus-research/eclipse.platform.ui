@@ -298,7 +298,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 				if (!(part instanceof IEditorPart)) {
 					return;
 				}
-				// required to update the "toggled" state based on the current editor 
+				// update the "toggled" state based on the current editor
 				ICommandService commandService = window.getService(ICommandService.class);
 				commandService.refreshElements(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR, null);
 			}
