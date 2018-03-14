@@ -8,9 +8,10 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535, 433234, 431868
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -112,7 +113,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Inject
 	private MApplication application;
 
-	@SuppressWarnings("hiding")
 	@Inject
 	EModelService modelService;
 
@@ -213,6 +213,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			ToolBar tb = parent.getControl();
 			if (tb != null && !tb.isDisposed()) {
 				tb.pack(true);
+				if (tb.getParent() != null) {
+					tb.getParent().pack(true);
+				}
 				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 			}
 		}
@@ -265,7 +268,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private HashSet<String> updateVariables = new HashSet<String>();
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicDirtyChanged(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
@@ -321,7 +323,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicAppStartup(@UIEventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) Event event) {
@@ -942,13 +943,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#postProcess
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public void postProcess(MUIElement element) {
 		if (element instanceof MToolBar) {

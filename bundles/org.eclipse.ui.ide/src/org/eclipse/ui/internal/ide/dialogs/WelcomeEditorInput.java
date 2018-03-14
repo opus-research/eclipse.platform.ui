@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -39,29 +40,36 @@ public class WelcomeEditorInput implements IEditorInput {
         aboutInfo = info;
     }
 
-    public boolean exists() {
+    @Override
+	public boolean exists() {
         return false;
     }
 
-    public Object getAdapter(Class adapter) {
+    @Override
+	public <T> T getAdapter(Class<T> adapter) {
         return null;
     }
 
-    public ImageDescriptor getImageDescriptor() {
+    @Override
+	public ImageDescriptor getImageDescriptor() {
         return null;
     }
 
-    public String getName() {
+    @Override
+	public String getName() {
         return IDEWorkbenchMessages.WelcomeEditor_title;
     }
 
-    public IPersistableElement getPersistable() {
+    @Override
+	public IPersistableElement getPersistable() {
         return new IPersistableElement() {
-            public String getFactoryId() {
+            @Override
+			public String getFactoryId() {
                 return FACTORY_ID;
             }
 
-            public void saveState(IMemento memento) {
+            @Override
+			public void saveState(IMemento memento) {
                 memento.putString(FEATURE_ID, aboutInfo.getFeatureId() + ':'
                         + aboutInfo.getVersionId());
             }
@@ -72,7 +80,8 @@ public class WelcomeEditorInput implements IEditorInput {
         return aboutInfo;
     }
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if ((o != null) && (o instanceof WelcomeEditorInput)) {
             if (((WelcomeEditorInput) o).aboutInfo.getFeatureId().equals(
                     aboutInfo.getFeatureId())) {
@@ -82,7 +91,8 @@ public class WelcomeEditorInput implements IEditorInput {
         return false;
     }
 
-    public String getToolTipText() {
+    @Override
+	public String getToolTipText() {
         return NLS.bind(IDEWorkbenchMessages.WelcomeEditor_toolTip, aboutInfo.getFeatureLabel());
     }
 }

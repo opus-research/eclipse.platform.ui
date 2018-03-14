@@ -46,46 +46,28 @@ public class WorkingSetTests extends DynamicTestCase {
 		super(testName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
-	 */
+	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicWorkingSetElementAdapter";
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#testClass()
-	 */
+
+	@Override
 	public void testClass() throws Exception {
 		super.testClass();
 		// commented out for now - it's causing grief
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
-	 */
+	@Override
 	protected String getExtensionId() {
 		return "newWorkingSet1.testDynamicWorkingSetAddition1";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
-	 */
+	@Override
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_WORKINGSETS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
-	 */
+	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newWorkingSet1";
 	}
@@ -105,6 +87,7 @@ public class WorkingSetTests extends DynamicTestCase {
 
 		IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				synchronized (this) {
 					events[0] = event;
@@ -179,9 +162,11 @@ public class WorkingSetTests extends DynamicTestCase {
 				.getWorkingSetManager();
 		IAdaptable adaptable = new IAdaptable() {
 
+			@Override
 			public Object getAdapter(Class adapter) {
-				if (adapter == IResource.class)
+				if (adapter == IResource.class) {
 					return ResourcesPlugin.getWorkspace().getRoot();
+				}
 				return null;
 			}
 		};
@@ -224,9 +209,11 @@ public class WorkingSetTests extends DynamicTestCase {
 				.getWorkingSetManager();
 		IAdaptable adaptable = new IAdaptable() {
 
+			@Override
 			public Object getAdapter(Class adapter) {
-				if (adapter == IResource.class)
+				if (adapter == IResource.class) {
 					return ResourcesPlugin.getWorkspace().getRoot();
+				}
 				return null;
 			}
 		};

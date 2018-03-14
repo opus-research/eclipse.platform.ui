@@ -50,20 +50,19 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
     private Text fixedAreaText;
     private Text sampleImplementation;
 
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         control = parent;
 
         Composite buttonBar = new Composite(parent, SWT.NONE);
-        {	
+        {
             GridDataFactory buttonData = GridDataFactory.fillDefaults().grab(true, false);
 
             Button applyButton = new Button(buttonBar, SWT.PUSH);
             applyButton.setText("Apply");
             applyButton.addSelectionListener(new SelectionAdapter() {
-                /* (non-Javadoc)
-                 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-                 */
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     applyPressed();
                 }
             });
@@ -72,10 +71,8 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
             Button clearButton = new Button(buttonBar, SWT.PUSH);
             clearButton.setText("Reset");
             clearButton.addSelectionListener(new SelectionAdapter() {
-                /* (non-Javadoc)
-                 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-                 */
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     minWidthText.setText("");
                     maxWidthText.setText("");
                     quantizedWidthText.setText("");
@@ -91,12 +88,10 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
             Button newViewButton = new Button(buttonBar, SWT.PUSH);
             newViewButton.setText("New View");
             newViewButton.addSelectionListener(new SelectionAdapter() {
-                /* (non-Javadoc)
-                 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-                 */
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     try {
-                        getSite().getPage().showView("org.eclipse.ui.tests.layout.constraints.LayoutConstraintsView", 
+                        getSite().getPage().showView("org.eclipse.ui.tests.layout.constraints.LayoutConstraintsView",
                                 "" + System.currentTimeMillis(), IWorkbenchPage.VIEW_ACTIVATE);
                     } catch (PartInitException e1) {
                         MessageDialog.openError(getSite().getShell(), "Error opening view", "Unable to open view.");
@@ -109,25 +104,25 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
         }
         GridDataFactory.fillDefaults().grab(true, false).span(2,1).applyTo(buttonBar);
 
-        new Label(parent, SWT.NONE).setText("Min Width"); 
+        new Label(parent, SWT.NONE).setText("Min Width");
         minWidthText = createText(parent);
 
-        new Label(parent, SWT.NONE).setText("Max Width (blank = unbounded)"); 
+        new Label(parent, SWT.NONE).setText("Max Width (blank = unbounded)");
         maxWidthText = createText(parent);
 
-        new Label(parent, SWT.NONE).setText("Quantized Width (blank = none)"); 
+        new Label(parent, SWT.NONE).setText("Quantized Width (blank = none)");
         quantizedWidthText = createText(parent);
 
-        new Label(parent, SWT.NONE).setText("Min Height"); 
+        new Label(parent, SWT.NONE).setText("Min Height");
         minHeightText = createText(parent);
 
         new Label(parent, SWT.NONE).setText("Max Height (blank = unbounded)");
         maxHeightText = createText(parent);
 
-        new Label(parent, SWT.NONE).setText("Quantized Height (blank = none)"); 
-        quantizedHeightText = createText(parent);		
+        new Label(parent, SWT.NONE).setText("Quantized Height (blank = none)");
+        quantizedHeightText = createText(parent);
 
-        new Label(parent, SWT.NONE).setText("Fixed Area (blank = none"); 
+        new Label(parent, SWT.NONE).setText("Fixed Area (blank = none");
         fixedAreaText = createText(parent);
 
         sampleImplementation = new Text(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -142,7 +137,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
     }
 
     /**
-     * 
+     *
      */
     protected void applyPressed() {
         // Copy the values from the text boxes
@@ -164,10 +159,8 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
         updateLayout();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.ISizeProvider#getSizeFlags(boolean)
-     */
-    public int getSizeFlags(boolean width) {
+    @Override
+	public int getSizeFlags(boolean width) {
         int flags = 0;
         if (width) {
             if (minWidth != ISizeProvider.INFINITE) {
@@ -194,7 +187,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
             }
             if (fixedArea != ISizeProvider.INFINITE) {
                 flags |= SWT.WRAP;
-            }			
+            }
         }
 
         return flags;
@@ -232,7 +225,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
         }
         if (fixedArea != ISizeProvider.INFINITE) {
             result.append("\t\tflags |= SWT.WRAP;\n");
-        }     
+        }
         result.append("\t}\n");
         result.append("\treturn flags;\n");
         result.append("}\n\n");
@@ -256,7 +249,7 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
     }
 
     /**
-     * 
+     *
      */
     protected void updateLayout() {
         firePropertyChange(IWorkbenchPartConstants.PROP_PREFERRED_SIZE);
@@ -266,17 +259,16 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
      * @param parent
      */
     private Text createText(Composite parent) {
-        return new Text(parent, SWT.BORDER);		
+        return new Text(parent, SWT.BORDER);
     }
 
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         control.setFocus();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)
-     */
-    public int computePreferredSize(boolean width, int availableParallel,
+    @Override
+	public int computePreferredSize(boolean width, int availableParallel,
             int availablePerpendicular, int preferredResult) {
 
         int result = preferredResult;
@@ -284,7 +276,9 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
         if (fixedArea != ISizeProvider.INFINITE) {
             // Try to maintain a fixed area
             result = (availablePerpendicular != 0) ? fixedArea / availablePerpendicular : 0;
-            if (result < 30) result = 30;
+            if (result < 30) {
+				result = 30;
+			}
         }
 
         if (width) {
@@ -295,11 +289,15 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
             }
             if (minWidth != ISizeProvider.INFINITE) {
                 // Ensure we go no smaller than the minimum size
-                if (result < minWidth) result = minWidth;
+                if (result < minWidth) {
+					result = minWidth;
+				}
             }
             if (maxWidth != ISizeProvider.INFINITE) {
                 // Ensure we go no larger than the maximum size
-                if (result > maxWidth) result = maxWidth;
+                if (result > maxWidth) {
+					result = maxWidth;
+				}
             }
         } else {
             // Jump to the nearest multiple of the quantized size
@@ -309,17 +307,25 @@ public class LayoutConstraintsView extends ViewPart implements ISizeProvider {
             }
             if (minHeight != ISizeProvider.INFINITE) {
                 // Ensure we go no smaller than the minimum size
-                if (result < minHeight) result = minHeight;
+                if (result < minHeight) {
+					result = minHeight;
+				}
             }
             if (maxHeight != ISizeProvider.INFINITE) {
                 // Ensure we go no larger than the maximum size
-                if (result > maxHeight) result = maxHeight;
+                if (result > maxHeight) {
+					result = maxHeight;
+				}
             }
         }
 
         // Ensure that we do not use more than the available space
-        if (result > availableParallel) result = availableParallel;
-        if (result < 0) result = 0;
+        if (result > availableParallel) {
+			result = availableParallel;
+		}
+        if (result < 0) {
+			result = 0;
+		}
         return result;
     }
 

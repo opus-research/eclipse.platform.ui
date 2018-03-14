@@ -21,7 +21,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests the new help context identifier support on commands and handlers.
- * 
+ *
  * @since 3.2
  */
 public final class HelpContextIdTest extends UITestCase {
@@ -36,7 +36,7 @@ public final class HelpContextIdTest extends UITestCase {
 
 	/**
 	 * Constructs a new instance of <code>HelpContextIdTest</code>
-	 * 
+	 *
 	 * @param testName
 	 *            The name of the test; may be <code>null</code>.
 	 */
@@ -47,15 +47,15 @@ public final class HelpContextIdTest extends UITestCase {
 	/**
 	 * Tests the reading of the help context identifier of the registry, as well
 	 * as programmatic changes. It does not test whether there is notification.
-	 * 
+	 *
 	 * @throws NotDefinedException
 	 *             If the command defined in the registry is somehow not
 	 *             defined.
 	 */
 	public final void testHelpContextId() throws NotDefinedException {
-		final ICommandService commandService = (ICommandService) fWorkbench
+		final ICommandService commandService = fWorkbench
 				.getService(ICommandService.class);
-		final IHandlerService handlerService = (IHandlerService) fWorkbench
+		final IHandlerService handlerService = fWorkbench
 				.getService(IHandlerService.class);
 		String helpContextId = null;
 
@@ -67,6 +67,7 @@ public final class HelpContextIdTest extends UITestCase {
 
 		// Retract the handler help context id by creating a handler conflict.
 		handlerService.activateHandler(COMMAND_ID, new AbstractHandler() {
+			@Override
 			public final Object execute(final ExecutionEvent event) {
 				return null;
 			}

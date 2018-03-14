@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * An abstract field editor that manages a list of input values. 
+ * An abstract field editor that manages a list of input values.
  * The editor displays a list containing the values, buttons for
  * adding and removing values, and Up and Down buttons to adjust
  * the order of elements in the list.
@@ -79,14 +79,14 @@ public abstract class ListEditor extends FieldEditor {
     private SelectionListener selectionListener;
 
     /**
-     * Creates a new list field editor 
+     * Creates a new list field editor
      */
     protected ListEditor() {
     }
 
     /**
      * Creates a list field editor.
-     * 
+     *
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -114,9 +114,6 @@ public abstract class ListEditor extends FieldEditor {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void adjustForNumColumns(int numColumns) {
         Control control = getLabelControl();
@@ -138,7 +135,7 @@ public abstract class ListEditor extends FieldEditor {
 
     /**
      * Combines the given list of items into a single string.
-     * This method is the converse of <code>parseString</code>. 
+     * This method is the converse of <code>parseString</code>.
      * <p>
      * Subclasses must implement this method.
      * </p>
@@ -151,7 +148,7 @@ public abstract class ListEditor extends FieldEditor {
 
     /**
      * Helper method to create a push button.
-     * 
+     *
      * @param parent the parent control
      * @param key the resource name used to supply the button's label text
      * @return Button
@@ -193,9 +190,6 @@ public abstract class ListEditor extends FieldEditor {
         };
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
         Control control = getLabelControl(parent);
@@ -216,9 +210,6 @@ public abstract class ListEditor extends FieldEditor {
         buttonBox.setLayoutData(gd);
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doLoad() {
         if (list != null) {
@@ -230,9 +221,6 @@ public abstract class ListEditor extends FieldEditor {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doLoadDefault() {
         if (list != null) {
@@ -246,9 +234,6 @@ public abstract class ListEditor extends FieldEditor {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doStore() {
         String s = createList(list.getItems());
@@ -331,9 +316,6 @@ public abstract class ListEditor extends FieldEditor {
      */
     protected abstract String getNewInputObject();
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	public int getNumberOfControls() {
         return 2;
@@ -370,7 +352,7 @@ public abstract class ListEditor extends FieldEditor {
 
     /**
      * Splits the given string into a list of strings.
-     * This method is the converse of <code>createList</code>. 
+     * This method is the converse of <code>createList</code>.
      * <p>
      * Subclasses must implement this method.
      * </p>
@@ -389,23 +371,24 @@ public abstract class ListEditor extends FieldEditor {
         int index = list.getSelectionIndex();
         if (index >= 0) {
             list.remove(index);
+			list.select(index >= list.getItemCount() ? index - 1 : index);
             selectionChanged();
         }
     }
 
 	/**
 	 * Invoked when the selection in the list has changed.
-	 * 
+	 *
 	 * <p>
 	 * The default implementation of this method utilizes the selection index
 	 * and the size of the list to toggle the enablement of the up, down and
 	 * remove buttons.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Sublcasses may override.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.5
 	 */
     protected void selectionChanged() {
@@ -418,9 +401,6 @@ public abstract class ListEditor extends FieldEditor {
         downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	public void setFocus() {
         if (list != null) {
@@ -468,50 +448,50 @@ public abstract class ListEditor extends FieldEditor {
         upButton.setEnabled(enabled);
         downButton.setEnabled(enabled);
     }
-    
+
     /**
-     * Return the Add button.  
-     * 
+     * Return the Add button.
+     *
      * @return the button
      * @since 3.5
      */
     protected Button getAddButton() {
     	return addButton;
     }
-    
+
     /**
-     * Return the Remove button.  
-     * 
+     * Return the Remove button.
+     *
      * @return the button
      * @since 3.5
      */
     protected Button getRemoveButton() {
     	return removeButton;
     }
-    
+
     /**
-     * Return the Up button.  
-     * 
+     * Return the Up button.
+     *
      * @return the button
      * @since 3.5
      */
     protected Button getUpButton() {
     	return upButton;
     }
-    
+
     /**
-     * Return the Down button.  
-     * 
+     * Return the Down button.
+     *
      * @return the button
      * @since 3.5
      */
     protected Button getDownButton() {
     	return downButton;
     }
-    
+
     /**
      * Return the List.
-     * 
+     *
      * @return the list
      * @since 3.5
      */

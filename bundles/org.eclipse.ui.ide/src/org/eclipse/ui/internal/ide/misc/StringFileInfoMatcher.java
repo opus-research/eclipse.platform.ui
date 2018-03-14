@@ -26,7 +26,7 @@ public class StringFileInfoMatcher extends AbstractFileInfoMatcher {
 	/**
 	 */
 	public static String ID = "org.eclipse.ui.ide.patternFilterMatcher"; //$NON-NLS-1$
-	
+
 	StringMatcher matcher = null;
 	/**
 	 * Creates a new factory for this filter type.
@@ -34,17 +34,13 @@ public class StringFileInfoMatcher extends AbstractFileInfoMatcher {
 	public StringFileInfoMatcher() {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.resources.AbstractFileInfoMatcher#initialize(org.eclipse.core.resources.IProject, java.lang.Object)
-	 */
+	@Override
 	public void initialize(IProject project, Object arguments) throws CoreException {
 		if ((arguments instanceof String) && ((String) arguments).length() > 0)
 			matcher = new StringMatcher((String) arguments, true, false);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.resources.AbstractFileInfoMatcher#matches(org.eclipse.core.filesystem.IFileInfo)
-	 */
+	@Override
 	public boolean matches(IContainer parent, IFileInfo fileInfo) throws CoreException {
 		if (matcher != null)
 			return matcher.match(fileInfo.getName());
