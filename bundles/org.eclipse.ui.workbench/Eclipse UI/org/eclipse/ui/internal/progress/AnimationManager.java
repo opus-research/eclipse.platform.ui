@@ -47,7 +47,7 @@ public class AnimationManager {
 
     /**
      * Get the background color to be used.
-     *
+     * 
      * @param control
      *            The source of the display.
      * @return Color
@@ -64,11 +64,10 @@ public class AnimationManager {
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
              */
-            @Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+            public IStatus runInUIThread(IProgressMonitor monitor) {
 
                 if (animated) {
 					animationProcessor.animationStarted();
@@ -79,7 +78,7 @@ public class AnimationManager {
             }
         };
         animationUpdateJob.setSystem(true);
-
+        
         listener = getProgressListener();
         ProgressManager.getInstance().addListener(listener);
 
@@ -88,7 +87,7 @@ public class AnimationManager {
 
     /**
      * Add an item to the list
-     *
+     * 
      * @param item
      */
     void addItem(final AnimationItem item) {
@@ -97,7 +96,7 @@ public class AnimationManager {
 
     /**
      * Remove an item from the list
-     *
+     * 
      * @param item
      */
     void removeItem(final AnimationItem item) {
@@ -106,7 +105,7 @@ public class AnimationManager {
 
     /**
      * Return whether or not the current state is animated.
-     *
+     * 
      * @return boolean
      */
     boolean isAnimated() {
@@ -115,7 +114,7 @@ public class AnimationManager {
 
     /**
      * Set whether or not the receiver is animated.
-     *
+     * 
      * @param boolean
      */
     void setAnimated(final boolean bool) {
@@ -137,21 +136,19 @@ public class AnimationManager {
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addJob(org.eclipse.ui.internal.progress.JobInfo)
              */
-            @Override
-			public void addJob(JobInfo info) {
+            public void addJob(JobInfo info) {
                 incrementJobCount(info);
             }
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshJobInfo(org.eclipse.ui.internal.progress.JobInfo)
              */
-            @Override
-			public void refreshJobInfo(JobInfo info) {
+            public void refreshJobInfo(JobInfo info) {
                 int state = info.getJob().getState();
                 if (state == Job.RUNNING) {
 					addJob(info);
@@ -162,11 +159,10 @@ public class AnimationManager {
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshAll()
              */
-            @Override
-			public void refreshAll() {
+            public void refreshAll() {
                 ProgressManager manager = ProgressManager.getInstance();
                 jobs.clear();
                 setAnimated(false);
@@ -178,21 +174,19 @@ public class AnimationManager {
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#remove(org.eclipse.ui.internal.progress.JobInfo)
              */
-            @Override
-			public void removeJob(JobInfo info) {
+            public void removeJob(JobInfo info) {
                 decrementJobCount(info.getJob());
             }
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#showsDebug()
              */
-            @Override
-			public boolean showsDebug() {
+            public boolean showsDebug() {
                 return false;
             }
 
@@ -229,31 +223,28 @@ public class AnimationManager {
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addGroup(org.eclipse.ui.internal.progress.GroupInfo)
              */
-            @Override
-			public void addGroup(GroupInfo info) {
+            public void addGroup(GroupInfo info) {
                 //Don't care about groups
             }
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeGroup(org.eclipse.ui.internal.progress.GroupInfo)
              */
-            @Override
-			public void removeGroup(GroupInfo group) {
+            public void removeGroup(GroupInfo group) {
                 //Don't care about groups
             }
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshGroup(org.eclipse.ui.internal.progress.GroupInfo)
              */
-            @Override
-			public void refreshGroup(GroupInfo info) {
+            public void refreshGroup(GroupInfo info) {
                 //Don't care about groups
             }
         };
@@ -261,7 +252,7 @@ public class AnimationManager {
 
     /**
      * Get the preferred width for widgets displaying the animation.
-     *
+     * 
      * @return int. Return 0 if there is no image data.
      */
     int getPreferredWidth() {

@@ -13,7 +13,7 @@ package org.eclipse.jface.internal.databinding.swt;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public abstract class SingleSelectionIndexProperty extends
 		WidgetIntValueProperty {
@@ -24,7 +24,6 @@ public abstract class SingleSelectionIndexProperty extends
 		super(events);
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		super.doSetValue(source, value == null ? new Integer(-1) : value);
 	}

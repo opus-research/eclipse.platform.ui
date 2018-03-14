@@ -63,7 +63,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * The shell in which to show any dialogs.
 	 * @deprecated the shell provider should be used instead.
 	 */
-	@Deprecated
 	protected Shell shell;
 
 	/**
@@ -82,20 +81,19 @@ public class CopyProjectAction extends SelectionListenerAction {
 
 	/**
 	 * Creates a new project copy action with the default text.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
-	 *
+	 * 
 	 * @deprecated {@link #CopyProjectAction(IShellProvider)}
 	 */
-	@Deprecated
 	public CopyProjectAction(Shell shell) {
 		this(shell, COPY_TITLE);
 	}
 
 	/**
 	 * Creates a new project copy action with the default text.
-	 *
+	 * 
 	 * @param provider
 	 * 				the IShellProvider for any dialogs
 	 * @since 3.4
@@ -103,32 +101,30 @@ public class CopyProjectAction extends SelectionListenerAction {
 	public CopyProjectAction(IShellProvider provider){
 		this(provider, COPY_TITLE);
 	}
-
+	
 	/**
 	 * Creates a new project copy action with the given text.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
 	 * @param name
 	 *            the string used as the text for the action, or
 	 *            <code>null</code> if there is no text
-	 *
+	 * 
 	 * @deprecated {@link #CopyProjectAction(IShellProvider, String)}
 	 */
-	@Deprecated
 	CopyProjectAction(final Shell shell, String name) {
 		super(name);
 		Assert.isNotNull(shell);
 		shellProvider = new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return shell;
 			} };
 			initAction();
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * @param provider
 	 *            the IShellProvider for any dialogs
 	 * @param name
@@ -141,7 +137,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 		shellProvider = provider;
 		initAction();
 	}
-
+	
 	private void initAction(){
 		shell = shellProvider.getShell();
 		setToolTipText(COPY_TOOL_TIP);
@@ -153,7 +149,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 	/**
 	 * Create a new IProjectDescription for the copy using the name and path
 	 * selected from the dialog.
-	 *
+	 * 
 	 * @return IProjectDescription
 	 * @param project
 	 *            the source project
@@ -183,7 +179,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * <p>
 	 * Note that this method must be called from UI thread.
 	 * </p>
-	 *
+	 * 
 	 * @param message
 	 *            the message
 	 */
@@ -193,20 +189,19 @@ public class CopyProjectAction extends SelectionListenerAction {
 
 	/**
 	 * Return the title of the errors dialog.
-	 *
+	 * 
 	 * @return java.lang.String
-	 *
+	 * 
 	 * @deprecated As of 3.3, the undoable operation created by this action
 	 *             handles error dialogs.
 	 */
-	@Deprecated
 	protected String getErrorsTitle() {
 		return PROBLEMS_TITLE;
 	}
 
 	/**
 	 * Get the plugin used by a copy action
-	 *
+	 * 
 	 * @return AbstractUIPlugin
 	 */
 	protected org.eclipse.ui.plugin.AbstractUIPlugin getPlugin() {
@@ -215,7 +210,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 
 	/**
 	 * Copies the project to the new values.
-	 *
+	 * 
 	 * @param project
 	 *            the project to copy
 	 * @param projectName
@@ -228,7 +223,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	boolean performCopy(final IProject project, final String projectName,
 			final URI newLocation) {
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				org.eclipse.ui.ide.undo.CopyProjectOperation op = new org.eclipse.ui.ide.undo.CopyProjectOperation(
 						project, projectName, newLocation, getText());
@@ -265,7 +259,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 	/**
 	 * Query for a new project name and destination using the parameters in the
 	 * existing project.
-	 *
+	 * 
 	 * @return Object [] or null if the selection is cancelled
 	 * @param project
 	 *            the project we are going to copy.
@@ -281,7 +275,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 	/**
 	 * Records the core exception to be displayed to the user once the action is
 	 * finished.
-	 *
+	 * 
 	 * @param error
 	 *            a <code>CoreException</code>
 	 */
@@ -292,7 +286,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	/**
 	 * Implementation of method defined on <code>IAction</code>.
 	 */
-	@Override
 	public void run() {
 
 		errorStatus = null;
@@ -327,7 +320,6 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * <code>SelectionListenerAction</code> method enables this action only if
 	 * there is a single selection which is a project.
 	 */
-	@Override
 	protected boolean updateSelection(IStructuredSelection selection) {
 		if (!super.updateSelection(selection)) {
 			return false;
@@ -352,7 +344,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 	/**
 	 * Returns the model provider ids that are known to the client that
 	 * instantiated this operation.
-	 *
+	 * 
 	 * @return the model provider ids that are known to the client that
 	 *         instantiated this operation.
 	 * @since 3.2
@@ -365,7 +357,7 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 * Sets the model provider ids that are known to the client that
 	 * instantiated this operation. Any potential side effects reported by these
 	 * models during validation will be ignored.
-	 *
+	 * 
 	 * @param modelProviderIds
 	 *            the model providers known to the client who is using this
 	 *            operation.

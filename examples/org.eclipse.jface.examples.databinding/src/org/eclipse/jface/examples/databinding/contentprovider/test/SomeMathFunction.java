@@ -24,23 +24,23 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * <li>Round to nearest integer</li>
  * <li>Do nothing</li>
  * </ul>
- *
+ * 
  * @since 1.0
  */
 public class SomeMathFunction extends ComputedObservableMap {
 
 	/**
-	 *
+	 * 
 	 */
 	public static final int OP_IDENTITY = 0;
 
 	/**
-	 *
+	 * 
 	 */
 	public static final int OP_MULTIPLY = 1;
 
 	/**
-	 *
+	 * 
 	 */
 	public static final int OP_ROUND = 2;
 
@@ -71,27 +71,22 @@ public class SomeMathFunction extends ComputedObservableMap {
 		// domain.toCollection()
 		fireMapChange(new MapDiff() {
 
-			@Override
 			public Set getAddedKeys() {
 				return Collections.EMPTY_SET;
 			}
 
-			@Override
 			public Set getChangedKeys() {
 				return keySet();
 			}
 
-			@Override
 			public Object getNewValue(Object key) {
 				return doComputeResult(key, operation);
 			}
 
-			@Override
 			public Object getOldValue(Object key) {
 				return doComputeResult(key, oldOp);
 			}
 
-			@Override
 			public Set getRemovedKeys() {
 				return Collections.EMPTY_SET;
 			}
@@ -110,22 +105,18 @@ public class SomeMathFunction extends ComputedObservableMap {
 		return element;
 	}
 
-	@Override
 	protected Object doGet(Object key) {
 		return doComputeResult(key, this.op);
 	}
 
-	@Override
 	protected Object doPut(Object key, Object value) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	protected void hookListener(Object addedKey) {
 		// ignore, no need to listen to immutable Double objects
 	}
 
-	@Override
 	protected void unhookListener(Object removedKey) {
 		// ignore, no need to listen to immutable Double objects
 	}

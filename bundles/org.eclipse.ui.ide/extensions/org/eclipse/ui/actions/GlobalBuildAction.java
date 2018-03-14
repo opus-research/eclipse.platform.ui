@@ -64,7 +64,7 @@ public class GlobalBuildAction extends Action implements
      * Creates a new action of the appropriate type. The action id is
      * <code>IWorkbenchActionConstants.BUILD</code> for incremental builds and
      * <code>IWorkbenchActionConstants.REBUILD_ALL</code> for full builds.
-     *
+     * 
      * @param workbench
      *            the active workbench
      * @param shell
@@ -73,11 +73,10 @@ public class GlobalBuildAction extends Action implements
      *            the type of build; one of
      *            <code>IncrementalProjectBuilder.INCREMENTAL_BUILD</code> or
      *            <code>IncrementalProjectBuilder.FULL_BUILD</code>
-     *
+     * 
      * @deprecated use GlobalBuildAction(IWorkbenchWindow, type) instead
      */
-    @Deprecated
-	public GlobalBuildAction(IWorkbench workbench, Shell shell, int type) {
+    public GlobalBuildAction(IWorkbench workbench, Shell shell, int type) {
         // always use active window; ignore shell
         this(workbench.getActiveWorkbenchWindow(), type);
         Assert.isNotNull(shell);
@@ -87,7 +86,7 @@ public class GlobalBuildAction extends Action implements
      * Creates a new action of the appropriate type. The action id is
      * <code>IWorkbenchActionConstants.BUILD</code> for incremental builds and
      * <code>IWorkbenchActionConstants.REBUILD_ALL</code> for full builds.
-     *
+     * 
      * @param window
      *            the window in which this action appears
      * @param type
@@ -103,7 +102,7 @@ public class GlobalBuildAction extends Action implements
 
     /**
      * Sets the build type.
-     *
+     * 
      * @param type
      *            the type of build; one of
      *            <code>IncrementalProjectBuilder.INCREMENTAL_BUILD</code> or
@@ -172,11 +171,10 @@ public class GlobalBuildAction extends Action implements
         Job buildJob = new Job(IDEWorkbenchMessages.GlobalBuildAction_jobTitle) {
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
              */
-            @Override
-			protected IStatus run(IProgressMonitor monitor) {
+            protected IStatus run(IProgressMonitor monitor) {
                 monitor.beginTask(getOperationMessage(), 100);
                 try {
                     ResourcesPlugin.getWorkspace().build(buildType,
@@ -191,11 +189,10 @@ public class GlobalBuildAction extends Action implements
 
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
              */
-            @Override
-			public boolean belongsTo(Object family) {
+            public boolean belongsTo(Object family) {
                 return ResourcesPlugin.FAMILY_MANUAL_BUILD == family;
             }
         };
@@ -213,12 +210,11 @@ public class GlobalBuildAction extends Action implements
 
     /*
      * (non-Javadoc) Method declared on IAction.
-     *
+     * 
      * Builds all projects within the workspace. Saves all editors prior to
      * build depending on user's preference.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -270,11 +266,10 @@ public class GlobalBuildAction extends Action implements
 
     /*
      * (non-Javadoc) Method declared on ActionFactory.IWorkbenchAction.
-     *
+     * 
      * @since 3.0
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;
@@ -286,7 +281,7 @@ public class GlobalBuildAction extends Action implements
      * Verify that no manual build is running. If it is then give the use the
      * option to cancel. If they cancel, cancel the jobs and return true,
      * otherwise return false.
-     *
+     * 
      * @return whether or not there is a manual build job running.
      */
     private boolean verifyNoManualRunning() {

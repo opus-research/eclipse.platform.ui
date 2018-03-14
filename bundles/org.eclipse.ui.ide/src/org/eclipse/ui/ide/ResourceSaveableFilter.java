@@ -27,9 +27,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  * A saveable filter where the given savable must either match one of the given roots or be a direct
  * or indirect child of one of the roots.
- *
+ * 
  * @since 3.9
- *
+ * 
  */
 public class ResourceSaveableFilter implements ISaveableFilter {
 
@@ -37,14 +37,15 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 
 	/**
 	 * Creates a new filter.
-	 *
+	 * 
 	 * @param roots the save roots
 	 */
 	public ResourceSaveableFilter(IResource[] roots) {
 		this.roots = roots;
 	}
 
-	@Override
+	/* (non-Javadoc) @see org.eclipse.ui.ISaveableFilter#select(org.eclipse.ui.Saveable, org.eclipse.ui.IWorkbenchPart[])
+	 */
 	public boolean select(Saveable saveable, IWorkbenchPart[] containingParts) {
 		if (isDescendantOfRoots(saveable)) {
 			return true;
@@ -65,7 +66,7 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 	/**
 	 * Return whether the given saveable contains any resources that are descendants of the root
 	 * resources.
-	 *
+	 * 
 	 * @param saveable the saveable
 	 * @return whether the given saveable contains any resources that are descendants of the root
 	 *         resources
@@ -107,7 +108,7 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 	/**
 	 * Return whether the given resource is either equal to or a descendant of one of the given
 	 * roots.
-	 *
+	 * 
 	 * @param resource the resource to be tested
 	 * @return whether the given resource is either equal to or a descendant of one of the given
 	 *         roots
@@ -125,7 +126,7 @@ public class ResourceSaveableFilter implements ISaveableFilter {
 	/**
 	 * Return whether the given dirty editor part is editing resources that are
 	 * descendants of the given roots.
-	 *
+	 * 
 	 * @param part the dirty editor part
 	 * @return whether the given dirty editor part is editing resources that are
 	 *         descendants of the given roots

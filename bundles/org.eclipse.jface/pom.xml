@@ -14,25 +14,23 @@
   <parent>
     <artifactId>eclipse.platform.ui</artifactId>
     <groupId>eclipse.platform.ui</groupId>
-    <version>4.5.0-SNAPSHOT</version>
+    <version>4.3.0-SNAPSHOT</version>
     <relativePath>../../</relativePath>
   </parent>
   <groupId>org.eclipse.jface</groupId>
   <artifactId>org.eclipse.jface</artifactId>
-  <version>3.11.0-SNAPSHOT</version>
+  <version>3.9.2-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
   <build>
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-compiler-plugin</artifactId>
-        <version>${tycho.version}</version>
+        <artifactId>target-platform-configuration</artifactId>
         <configuration>
-          <compilerArgs>
-            <arg>-warn:-raw,unchecked</arg>
-          </compilerArgs>
+          <!-- juno version of this bundle was aparently compiled against jdk 1.4 librariesF-->
+          <executionEnvironment>J2SE-1.4</executionEnvironment>
         </configuration>
       </plugin>
     </plugins>
- </build>
+  </build>
 </project>

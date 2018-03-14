@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
+
+import org.eclipse.e4.core.commands.ExpressionContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.expressions.ExpressionInfo;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -130,31 +129,11 @@ public class ToolBarContributionRecord {
 		return currentVisibility;
 	}
 
-	public void collectInfo(ExpressionInfo info) {
-		ContributionsAnalyzer.collectInfo(info,
-				toolbarContribution.getVisibleWhen());
-		for (MToolBarElement item : generatedElements) {
-			ContributionsAnalyzer.collectInfo(info, item.getVisibleWhen());
-		}
-		for (MToolBarElement item : sharedElements) {
-			ContributionsAnalyzer.collectInfo(info, item.getVisibleWhen());
-		}
-	}
-
 	public boolean anyVisibleWhen() {
 		if (toolbarContribution.getVisibleWhen() != null) {
 			return true;
 		}
-
-		List<MToolBarElement> childrenToInspect;
-		if (toolbarContribution.getTransientData().get(FACTORY) != null) {
-			// See mergeIntoModel
-			childrenToInspect = this.generatedElements;
-		} else {
-			childrenToInspect = toolbarContribution.getChildren();
-		}
-
-		for (MToolBarElement child : childrenToInspect) {
+		for (MToolBarElement child : toolbarContribution.getChildren()) {
 			if (child.getVisibleWhen() != null
 					|| child.getPersistedState().get(
 							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
@@ -221,8 +200,8 @@ public class ToolBarContributionRecord {
 		}
 		IEclipseContext staticContext = getStaticContext();
 		staticContext.remove(List.class);
-		factoryDispose = (Runnable) ((IContextFunction) obj).compute(
-				staticContext, null);
+		factoryDispose = (Runnable) ((IContextFunction) obj)
+				.compute(staticContext, null);
 		return staticContext.get(List.class);
 	}
 

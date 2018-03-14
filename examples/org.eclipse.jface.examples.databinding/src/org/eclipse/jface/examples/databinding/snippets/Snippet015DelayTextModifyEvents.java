@@ -2,7 +2,7 @@
  * Copyright (c) 2007, 2009 Matthew Hall and others. All rights reserved. This program and the
  * accompanying materials are made available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  * 		Matthew Hall - initial API and implementation (bug 180746)
  * 		Boris Bokowski, IBM - initial API and implementation
@@ -14,8 +14,8 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.internal.databinding.provisional.swt.ControlUpdater;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -65,7 +65,6 @@ public class Snippet015DelayTextModifyEvents {
 
 		final IObservableValue stale1 = Observables.observeStale(delayed1);
 		new ControlUpdater(field2) {
-			@Override
 			protected void updateControl() {
 				boolean stale = ((Boolean) stale1.getValue()).booleanValue();
 				field2.setFont(stale ? italicFont : shellFont);
@@ -74,7 +73,6 @@ public class Snippet015DelayTextModifyEvents {
 
 		final IObservableValue stale2 = Observables.observeStale(delayed2);
 		new ControlUpdater(field1) {
-			@Override
 			protected void updateControl() {
 				boolean stale = ((Boolean) stale2.getValue()).booleanValue();
 				field1.setFont(stale ? italicFont : shellFont);
@@ -99,8 +97,7 @@ public class Snippet015DelayTextModifyEvents {
 	public static void main(String[] args) {
 		final Display display = new Display();
 
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
-			@Override
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			public void run() {
 				Shell shell = new Shell();
 				shell.setLayout(new GridLayout(3, false));

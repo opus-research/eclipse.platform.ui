@@ -44,18 +44,15 @@ public class ExportWizard extends Wizard {
             super(w, ss, e, s, WorkbenchTriggerPoints.EXPORT_WIZARDS);
         }
 
-        @Override
-		public void createControl(Composite parent) {
+        public void createControl(Composite parent) {
             super.createControl(parent);
             workbench.getHelpSystem().setHelp(getControl(),
                     IWorkbenchHelpContextIds.EXPORT_WIZARD_SELECTION_WIZARD_PAGE);
         }
 
-        @Override
-		protected IWizardNode createWizardNode(WorkbenchWizardElement element) {
+        protected IWizardNode createWizardNode(WorkbenchWizardElement element) {
             return new WorkbenchWizardNode(this, element) {
-                @Override
-				public IWorkbenchWizard createWizard() throws CoreException {
+                public IWorkbenchWizard createWizard() throws CoreException {
                     return wizardElement.createWizard();
                 }
             };
@@ -65,8 +62,7 @@ public class ExportWizard extends Wizard {
     /**
      * Creates the wizard's pages lazily.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         addPage(new SelectionPage(this.theWorkbench, this.selection,
                 getAvailableExportWizards(), WorkbenchMessages.ExportWizard_selectDestination));
     }
@@ -85,12 +81,12 @@ public class ExportWizard extends Wizard {
 		if (otherCategory == null) {
 			return new AdaptableList();
 		}
-		return otherCategory.getWizardAdaptableList();
+		return otherCategory.getWizardAdaptableList();    
 	}
 
     /**
      * Initializes the wizard.
-     *
+     * 
      * @param aWorkbench the workbench
      * @param currentSelection the current selectio
      */
@@ -99,18 +95,17 @@ public class ExportWizard extends Wizard {
         this.theWorkbench = aWorkbench;
         this.selection = currentSelection;
 
-        setWindowTitle(WorkbenchMessages.ExportWizard_title);
+        setWindowTitle(WorkbenchMessages.ExportWizard_title); 
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_EXPORT_WIZ));
         setNeedsProgressMonitor(true);
     }
 
     /**
-     * Subclasses must implement this <code>IWizard</code> method
+     * Subclasses must implement this <code>IWizard</code> method 
      * to perform any special finish processing for their wizard.
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
         ((SelectionPage) getPages()[0]).saveWidgetValues();
         return true;
     }

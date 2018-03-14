@@ -29,7 +29,7 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @since 1.2
  */
 public class BidiObservableMap extends DecoratingObservableMap {
@@ -42,7 +42,7 @@ public class BidiObservableMap extends DecoratingObservableMap {
 
 	/**
 	 * Constructs a BidirectionalMap tracking the given observable map.
-	 *
+	 * 
 	 * @param wrappedMap
 	 *            the observable map to track
 	 */
@@ -50,7 +50,6 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		super(wrappedMap, false);
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		valuesToKeys = new HashMap();
 		for (Iterator it = entrySet().iterator(); it.hasNext();) {
@@ -60,14 +59,12 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		super.firstListenerAdded();
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
 		valuesToKeys.clear();
 		valuesToKeys = null;
 	}
 
-	@Override
 	protected void handleMapChange(MapChangeEvent event) {
 		MapDiff diff = event.diff;
 		for (Iterator it = diff.getAddedKeys().iterator(); it.hasNext();) {
@@ -86,7 +83,6 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		super.handleMapChange(event);
 	}
 
-	@Override
 	public boolean containsValue(Object value) {
 		getterCalled();
 		// Faster lookup
@@ -97,7 +93,7 @@ public class BidiObservableMap extends DecoratingObservableMap {
 
 	/**
 	 * Adds a mapping from value to key in the valuesToKeys map.
-	 *
+	 * 
 	 * @param key
 	 *            the key being mapped
 	 * @param value
@@ -123,7 +119,7 @@ public class BidiObservableMap extends DecoratingObservableMap {
 
 	/**
 	 * Removes a mapping from value to key in the valuesToKeys map.
-	 *
+	 * 
 	 * @param key
 	 *            the key being unmapped
 	 * @param value
@@ -147,7 +143,7 @@ public class BidiObservableMap extends DecoratingObservableMap {
 
 	/**
 	 * Returns the Set of keys that currently map to the given value.
-	 *
+	 * 
 	 * @param value
 	 *            the value associated with the keys in the returned Set.
 	 * @return the Set of keys that map to the given value. If no keys map to
@@ -169,7 +165,7 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	/**
 	 * Iterates the map and returns the set of keys which currently map to the
 	 * given value.
-	 *
+	 * 
 	 * @param value
 	 *            the value to search for
 	 * @return the set of keys which currently map to the specified value.
@@ -184,7 +180,6 @@ public class BidiObservableMap extends DecoratingObservableMap {
 		return keys;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (valuesToKeys != null) {
 			valuesToKeys.clear();

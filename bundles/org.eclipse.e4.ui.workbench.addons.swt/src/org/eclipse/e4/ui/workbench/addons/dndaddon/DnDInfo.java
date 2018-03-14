@@ -158,7 +158,9 @@ class DnDInfo {
 
 		MUIElement element = (MUIElement) ctrl.getData(AbstractPartRenderer.OWNING_ME);
 		if (element != null) {
-			return element;
+			if (modelService.getTopLevelWindowFor(element) == topLevelWindow)
+				return element;
+			return null;
 		}
 
 		return getModelElement(ctrl.getParent());
@@ -167,12 +169,6 @@ class DnDInfo {
 	public void update() {
 		final Display display = Display.getCurrent();
 		if (display == null)
-			return;
-
-		// If we're in the same location presume the info is OK
-		Point cPoint = display.getCursorLocation();
-		if (cPoint != null && cursorPos != null && cPoint.x == cursorPos.x
-				&& cPoint.y == cursorPos.y)
 			return;
 
 		reset();

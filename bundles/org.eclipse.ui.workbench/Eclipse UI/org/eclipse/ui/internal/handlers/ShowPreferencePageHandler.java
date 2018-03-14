@@ -30,7 +30,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class ShowPreferencePageHandler extends AbstractHandler {
@@ -40,7 +40,6 @@ public final class ShowPreferencePageHandler extends AbstractHandler {
 		super();
 	}
 
-	@Override
 	public final Object execute(final ExecutionEvent event) {
 		final String preferencePageId = event
 				.getParameter(IWorkbenchCommandConstants.WINDOW_PREFERENCES_PARM_PAGEID);

@@ -30,7 +30,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
     /**
      * Create a new instance of the receiver and listen to the animation
      * manager.
-     *
+     * 
      * @param animationManager
      */
     ProgressAnimationProcessor(AnimationManager animationManager) {
@@ -41,7 +41,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#startAnimation(org.eclipse.core.runtime.IProgressMonitor)
      */
     public void startAnimationLoop(IProgressMonitor monitor) {
@@ -68,39 +68,36 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#addItem(org.eclipse.ui.internal.progress.AnimationItem)
      */
-    @Override
-	public void addItem(AnimationItem item) {
+    public void addItem(AnimationItem item) {
         Assert.isTrue(item instanceof ProgressAnimationItem);
         items.add(item);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#removeItem(org.eclipse.ui.internal.progress.AnimationItem)
      */
-    @Override
-	public void removeItem(AnimationItem item) {
+    public void removeItem(AnimationItem item) {
         Assert.isTrue(item instanceof ProgressAnimationItem);
         items.remove(item);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#hasItems()
      */
-    @Override
-	public boolean hasItems() {
+    public boolean hasItems() {
         return items.size() > 0;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#itemsInactiveRedraw()
      */
     public void itemsInactiveRedraw() {
@@ -110,11 +107,10 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#animationStarted(org.eclipse.core.runtime.IProgressMonitor)
      */
-    @Override
-	public void animationStarted() {
+    public void animationStarted() {
         AnimationItem[] animationItems = getAnimationItems();
         for (int i = 0; i < animationItems.length; i++) {
             animationItems[i].animationStart();
@@ -124,17 +120,16 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#getPreferredWidth()
      */
-    @Override
-	public int getPreferredWidth() {
+    public int getPreferredWidth() {
         return 30;
     }
 
     /**
      * Get the animation items currently registered for the receiver.
-     *
+     * 
      * @return ProgressAnimationItem[]
      */
     private ProgressAnimationItem[] getAnimationItems() {
@@ -147,8 +142,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#animationFinished()
      */
-    @Override
-	public void animationFinished() {
+    public void animationFinished() {
         AnimationItem[] animationItems = getAnimationItems();
         for (int i = 0; i < animationItems.length; i++) {
             animationItems[i].animationDone();
@@ -159,8 +153,7 @@ class ProgressAnimationProcessor implements IAnimationProcessor {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.IAnimationProcessor#isProcessorJob(org.eclipse.core.runtime.jobs.Job)
      */
-    @Override
-	public boolean isProcessorJob(Job job) {
+    public boolean isProcessorJob(Job job) {
         // We have no jobs
         return false;
     }

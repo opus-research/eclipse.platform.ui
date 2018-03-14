@@ -37,7 +37,7 @@ import org.eclipse.ui.internal.services.RegistryPersistence;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 final public class MenuPersistence extends RegistryPersistence {
@@ -51,7 +51,6 @@ final public class MenuPersistence extends RegistryPersistence {
 	private ArrayList<MTrimContribution> trimContributions = new ArrayList<MTrimContribution>();
 
 	private final Comparator<IConfigurationElement> comparer = new Comparator<IConfigurationElement>() {
-		@Override
 		public int compare(IConfigurationElement c1, IConfigurationElement c2) {
 			return c1.getContributor().getName().compareToIgnoreCase(c2.getContributor().getName());
 		}
@@ -74,7 +73,7 @@ final public class MenuPersistence extends RegistryPersistence {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.services.RegistryPersistence#dispose()
 	 */
 	@Override
@@ -89,7 +88,7 @@ final public class MenuPersistence extends RegistryPersistence {
 	}
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.e4.ui.tests.workbench.RegistryPersistence#isChangeImportant
 	 * (org.eclipse.core.runtime.IRegistryChangeEvent)
@@ -104,7 +103,6 @@ final public class MenuPersistence extends RegistryPersistence {
 		read();
 	}
 
-	@Override
 	protected final void read() {
 		super.read();
 

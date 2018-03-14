@@ -41,7 +41,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Create a new instance of <code>LightweightActionDescriptor</code>.
-     *
+     * 
      * @param actionElement the configuration element
      */
     public LightweightActionDescriptor(IConfigurationElement actionElement) {
@@ -65,8 +65,7 @@ public class LightweightActionDescriptor implements IAdaptable,
      * associated with this object. Returns <code>null</code> if
      * no such object can be found.
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
 			return this;
 		}
@@ -75,7 +74,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's description.
-     *
+     * 
      * @return the description
      */
     public String getDescription() {
@@ -84,7 +83,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's id.
-     *
+     * 
      * @return the id
      */
     public String getId() {
@@ -93,7 +92,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's image descriptor.
-     *
+     * 
      * @return the image descriptor
      */
     public ImageDescriptor getImageDescriptor() {
@@ -103,8 +102,7 @@ public class LightweightActionDescriptor implements IAdaptable,
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object o) {
+    public ImageDescriptor getImageDescriptor(Object o) {
         if (o == this) {
 			return getImageDescriptor();
 		}
@@ -113,7 +111,7 @@ public class LightweightActionDescriptor implements IAdaptable,
 
     /**
      * Returns the action's label.
-     *
+     * 
      * @return the label
      */
     public String getLabel() {
@@ -123,8 +121,7 @@ public class LightweightActionDescriptor implements IAdaptable,
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
         if (o == this) {
             String text = getLabel();
             int end = text.lastIndexOf('@');
@@ -139,16 +136,14 @@ public class LightweightActionDescriptor implements IAdaptable,
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
         return NO_CHILDREN;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
      */
-    @Override
-	public Object getParent(Object o) {
+    public Object getParent(Object o) {
         return null;
     }
 }

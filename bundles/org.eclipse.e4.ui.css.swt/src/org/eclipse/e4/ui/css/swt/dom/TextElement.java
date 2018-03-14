@@ -19,12 +19,11 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link Text}.
- *
+ * 
  */
 public class TextElement extends ControlElement {
-
+	
 	ModifyListener modifyListener = new ModifyListener() {
-		@Override
 		public void modifyText(ModifyEvent e) {
 			doApplyStyles();
 		}
@@ -34,22 +33,20 @@ public class TextElement extends ControlElement {
 		super(text, engine);
 	}
 
-	@Override
 	public void initialize() {
 		super.initialize();
 
-		if (!dynamicEnabled) return;
-
+		if (!dynamicEnabled) return; 
+		
 		Text text = getText();
 		text.addModifyListener(modifyListener);
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 
-		if (!dynamicEnabled) return;
-
+		if (!dynamicEnabled) return; 
+		
 		Text text = getText();
 		if (!text.isDisposed()) {
 			text.removeModifyListener(modifyListener);

@@ -25,7 +25,7 @@ import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * Action to open the help contents.
- *
+ * 
  * @since 3.0
  */
 public class HelpContentsAction extends Action implements IWorkbenchAction {
@@ -44,7 +44,7 @@ public class HelpContentsAction extends Action implements IWorkbenchAction {
 
     /**
      * Constructor for use by ActionFactory.
-     *
+     * 
      * @param window the window
      */
     public HelpContentsAction(IWorkbenchWindow window) {
@@ -73,16 +73,14 @@ public class HelpContentsAction extends Action implements IWorkbenchAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
         }
         //This may take a while, so use the busy indicator
         BusyIndicator.showWhile(null, new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
             	workbenchWindow.getWorkbench().getHelpSystem().displayHelp();
             }
         });
@@ -91,8 +89,7 @@ public class HelpContentsAction extends Action implements IWorkbenchAction {
     /* (non-Javadoc)
      * Method declared on ActionFactory.IWorkbenchAction.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         workbenchWindow = null;
     }
 

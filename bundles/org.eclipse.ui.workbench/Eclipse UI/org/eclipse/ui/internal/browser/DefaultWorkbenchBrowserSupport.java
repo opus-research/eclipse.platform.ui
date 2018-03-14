@@ -22,7 +22,7 @@ import org.eclipse.ui.browser.IWebBrowser;
  * This class is used when no alternative implementation is plugged in via the
  * 'org.eclipse.ui.browserSupport' extension point.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public class DefaultWorkbenchBrowserSupport extends
@@ -56,11 +56,10 @@ public class DefaultWorkbenchBrowserSupport extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
 	 *      java.lang.String, java.lang.String, java.lang.String)
 	 */
-	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
 		IWebBrowser browser = findBrowser(browserId == null? getDefaultId():browserId);
@@ -74,14 +73,13 @@ public class DefaultWorkbenchBrowserSupport extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
 	 */
-	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return createBrowser(AS_EXTERNAL, browserId, null, null);
 	}
-
+	
 	private String getDefaultId() {
 		String id = null;
 		for (int i = 0; i < Integer.MAX_VALUE; i++) {

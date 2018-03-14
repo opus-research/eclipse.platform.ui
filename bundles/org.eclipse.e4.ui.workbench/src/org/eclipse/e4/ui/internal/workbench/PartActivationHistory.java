@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,7 +65,7 @@ class PartActivationHistory {
 	/**
 	 * Places the specified part at the end of the activation history if it is not already in the
 	 * list. If it is already in the activation history, then its position will not change.
-	 *
+	 * 
 	 * @param part
 	 *            the part to possibly add to the end of the activation history
 	 */
@@ -77,7 +77,7 @@ class PartActivationHistory {
 
 	/**
 	 * Adds the specified part to the front of the activation history.
-	 *
+	 * 
 	 * @param part
 	 *            the part to insert into the front of the activation history
 	 */

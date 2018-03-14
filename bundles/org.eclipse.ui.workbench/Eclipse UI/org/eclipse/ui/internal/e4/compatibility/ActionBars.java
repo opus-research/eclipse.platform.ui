@@ -47,10 +47,9 @@ public class ActionBars extends SubActionBars {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IActionBars#getMenuManager()
 	 */
-	@Override
 	public IMenuManager getMenuManager() {
 		if (menuManager == null) {
 			menuManager = new MenuManager();
@@ -61,10 +60,9 @@ public class ActionBars extends SubActionBars {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IActionBars#getToolBarManager()
 	 */
-	@Override
 	public IToolBarManager getToolBarManager() {
 		if (toolbarManager == null) {
 			toolbarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT | SWT.WRAP);
@@ -74,10 +72,9 @@ public class ActionBars extends SubActionBars {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IActionBars#updateActionBars()
 	 */
-	@Override
 	public void updateActionBars() {
 		// FIXME compat: updateActionBars : should do something useful
 		getStatusLineManager().update(false);
@@ -123,7 +120,9 @@ public class ActionBars extends SubActionBars {
 			if (renderer instanceof StackRenderer) {
 				StackRenderer stackRenderer = (StackRenderer) renderer;
 				CTabFolder folder = (CTabFolder) parent.getWidget();
-				stackRenderer.adjustTopRight(folder);
+				stackRenderer.disposeViewMenu(folder);
+				stackRenderer.setupMenuButton(part, folder);
+				stackRenderer.layoutTopRight(folder);
 			}
 		}
 
@@ -187,7 +186,7 @@ public class ActionBars extends SubActionBars {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.SubActionBars#dispose()
 	 */
 	@Override

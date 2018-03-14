@@ -25,7 +25,6 @@ import org.eclipse.ui.internal.e4.compatibility.E4Util;
 public class ClosePerspectiveHandler extends AbstractHandler {
 
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
 				.getActiveWorkbenchWindow(event);

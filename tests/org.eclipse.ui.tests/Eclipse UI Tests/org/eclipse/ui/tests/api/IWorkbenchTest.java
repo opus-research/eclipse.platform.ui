@@ -98,7 +98,7 @@ public class IWorkbenchTest extends UITestCase {
         workingSetManager = fWorkbench.getWorkingSetManager();
         assertEquals(1, workingSetManager.getWorkingSets().length);
         assertEquals(workingSet, workingSetManager.getWorkingSets()[0]);
-
+        
         workingSetManager.removeWorkingSet(workingSet);
     }
 
@@ -109,14 +109,12 @@ public class IWorkbenchTest extends UITestCase {
         int num = 3;
 
         IWorkbenchWindow[] newWins = new IWorkbenchWindow[num];
-        for (int i = 0; i < num; i++) {
-			newWins[i] = openTestWindow();
-		}
+        for (int i = 0; i < num; i++)
+            newWins[i] = openTestWindow();
 
         wins = fWorkbench.getWorkbenchWindows();
-        for (int i = 0; i < num; i++) {
-			assertTrue(ArrayUtil.contains(wins, newWins[i]));
-		}
+        for (int i = 0; i < num; i++)
+            assertTrue(ArrayUtil.contains(wins, newWins[i]));
 
         assertEquals(wins.length, oldTotal + num);
 
@@ -129,7 +127,7 @@ public class IWorkbenchTest extends UITestCase {
      * openWorkbenchWindow(String, IAdaptable)
      */
     public void XXXtestOpenWorkbenchWindow() throws Throwable {
-        // open a window with valid perspective
+        // open a window with valid perspective 
         IWorkbenchWindow win = null;
         try {
             win = fWorkbench.openWorkbenchWindow(EmptyPerspective.PERSP_ID, getPageInput());
@@ -138,9 +136,8 @@ public class IWorkbenchTest extends UITestCase {
             assertEquals(EmptyPerspective.PERSP_ID, win.getActivePage()
                     .getPerspective().getId());
         } finally {
-            if (win != null) {
-				win.close();
-			}
+            if (win != null)
+                win.close();
         }
 
         // open a window with invalid perspective. WorkbenchException is expected.
@@ -158,7 +155,7 @@ public class IWorkbenchTest extends UITestCase {
      * openWorkbenchWindow(IAdaptable)
      */
     public void XXXtestOpenWorkbenchWindow2() throws Throwable {
-        // open a window with valid perspective
+        // open a window with valid perspective 
         IWorkbenchWindow win = null;
 
         try {
@@ -172,9 +169,8 @@ public class IWorkbenchTest extends UITestCase {
                     defaultID);
 
         } finally {
-            if (win != null) {
-				win.close();
-			}
+            if (win != null)
+                win.close();
         }
     }
 
@@ -185,16 +181,16 @@ public class IWorkbenchTest extends UITestCase {
             /*
              * Commented out until test case can be updated to match new
              * implementation of single page per window
-             *
+             * 
              // Open test window.
              win = fWorkbench.openWorkbenchWindow(ResourcesPlugin.getWorkspace());
              assertNotNull(win);
 
              // Set platform pref for openPage.
              IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES,
+             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES, 
              true);
-
+             
              // Call openPage twice with the same input.
              // Verify that we get the same page back both times.
              page1 = fWorkbench.openPage(ResourcesPlugin.getWorkspace());
@@ -204,7 +200,7 @@ public class IWorkbenchTest extends UITestCase {
              assertEquals("Pages should be equal", page1, page2);
 
              // Reset platform pref for openPage.
-             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES,
+             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES, 
              false);
              */
             // Call openPage twice with the same input.
@@ -222,9 +218,8 @@ public class IWorkbenchTest extends UITestCase {
              */
         } finally {
             // Close test window.
-            if (win != null) {
-				win.close();
-			}
+            if (win != null)
+                win.close();
         }
     }
 
@@ -235,16 +230,16 @@ public class IWorkbenchTest extends UITestCase {
             /*
              * Commented out until test case can be updated to match new
              * implementation of single page per window
-             *
+             * 
              // Open test window.
              win = fWorkbench.openWorkbenchWindow(ResourcesPlugin.getWorkspace());
              assertNotNull(win);
 
              // Set platform pref for openPage.
              IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES,
+             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES, 
              true);
-
+             
              // Call openPage twice with the same input.
              // Verify that we get the same page back both times.
              page1 = fWorkbench.openPage(EmptyPerspective.PERSP_ID,
@@ -256,9 +251,9 @@ public class IWorkbenchTest extends UITestCase {
              assertEquals("Pages should be equal", page1, page2);
 
              // Reset platform pref for openPage.
-             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES,
+             store.setValue(IPreferenceConstants.REUSE_PERSPECTIVES, 
              false);
-
+             
              // Call openPage twice with the same input.
              // Verify that we get two different pages back.
              page1 = fWorkbench.openPage(EmptyPerspective.PERSP_ID,
@@ -270,15 +265,14 @@ public class IWorkbenchTest extends UITestCase {
              */
         } finally {
             // Close test window.
-            if (win != null) {
-				win.close();
-			}
+            if (win != null)
+                win.close();
         }
     }
 
     /**
-     * close() couldn't be tested because calling close() would lead to early termination
-     * to entire test suites
+     * close() couldn't be tested because calling close() would lead to early termination 
+     * to entire test suites		
      */
     public void testClose() {
     }

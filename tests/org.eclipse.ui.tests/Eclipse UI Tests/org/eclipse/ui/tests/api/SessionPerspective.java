@@ -23,8 +23,7 @@ public class SessionPerspective implements IPerspectiveFactory {
     /**
      * @see IPerspectiveFactory#createInitialLayout(IPageLayout)
      */
-    @Override
-	public void createInitialLayout(IPageLayout layout) {
+    public void createInitialLayout(IPageLayout layout) {
         String editorArea = layout.getEditorArea();
         layout
                 .addView(SessionView.VIEW_ID, IPageLayout.LEFT, 0.33f,

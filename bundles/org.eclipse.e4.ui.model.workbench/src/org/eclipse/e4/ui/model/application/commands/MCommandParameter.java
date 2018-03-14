@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -22,17 +22,16 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  * This represents the format of a parameter to be used in a Command.
  * </p>
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
  * The following features are supported:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.commands.MCommandParameter#getName <em>Name</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.commands.MCommandParameter#getTypeId <em>Type Id</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.commands.MCommandParameter#isOptional <em>Optional</em>}</li>
  * </ul>
+ * </p>
  *
  * @model
  * @generated

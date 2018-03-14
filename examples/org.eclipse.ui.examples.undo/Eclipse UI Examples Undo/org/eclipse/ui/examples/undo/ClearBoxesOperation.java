@@ -28,13 +28,16 @@ public class ClearBoxesOperation extends BoxOperation {
 	/*
 	 * The boxes that are saved after clearing
 	 */
-	private List<Box> savedBoxes = new ArrayList<Box>();
-
+	private List savedBoxes = new ArrayList();
+	
 	public ClearBoxesOperation(String label, IUndoContext context, Boxes boxes, Canvas canvas) {
 		super(label, context, boxes, null, canvas);
 	}
 
-	@Override
+	/*
+	 *  (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.IUndoableOperation#execute(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info){
 		savedBoxes = boxes.getBoxes();
 		boxes.clear();
@@ -42,12 +45,18 @@ public class ClearBoxesOperation extends BoxOperation {
 		return Status.OK_STATUS;
 	}
 
-	@Override
+	/*
+	 *  (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.IUndoableOperation#redo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 		return execute(monitor, info);
 	}
 
-	@Override
+	/*
+	 *  (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.IUndoableOperation#undo(org.eclipse.core.runtime.IProgressMonitor, org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 		boxes.setBoxes(savedBoxes);
 		canvas.redraw();

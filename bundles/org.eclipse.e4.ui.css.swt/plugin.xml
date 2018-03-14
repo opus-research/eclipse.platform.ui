@@ -36,20 +36,6 @@
          
          <!-- these should be obviated by 4.2M6 --> 
       </provider>
-      
-      <!-- Theme element definitions -->
-      <provider
-			class="org.eclipse.e4.ui.css.swt.dom.definition.ThemeElementDefinitionProvider">
-		 <widget class="org.eclipse.ui.internal.themes.FontDefinition"/>
-		 <widget class="org.eclipse.ui.internal.themes.ColorDefinition"/>
-		 <widget class="org.eclipse.ui.internal.themes.ThemesExtension"/>
-      </provider>
-
-	  <!-- IEclipsePreferences -->
-      <provider
-			class="org.eclipse.e4.ui.css.swt.dom.preference.EclipsePreferencesProvider">
-		 <widget class="org.eclipse.core.runtime.preferences.IEclipsePreferences"/>
-      </provider>
    </extension>
    
    
@@ -477,41 +463,6 @@
          <property-name
                name="swt-background-mode">
          </property-name>
-      </handler>
-      
-      
-      <!-- Theme element definitions -->            
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.definition.ThemeDefinitionElement"
-            handler="org.eclipse.e4.ui.css.swt.properties.definition.CSSPropertyThemeElementDefinitionHandler">
-       	 <property-name name="category"/>
-         <property-name name="label"/>       
-         <property-name name="description"/>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.definition.FontDefinitionElement"
-            handler="org.eclipse.e4.ui.css.swt.properties.definition.CSSPropertyFontDefinitionHandler">
-       	 <property-name name="font-family"/>
-         <property-name name="font-size"/>       
-         <property-name name="font-style"/>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.definition.ColorDefinitionElement"
-            handler="org.eclipse.e4.ui.css.swt.properties.definition.CSSPropertyColorDefinitionHandler">
-       	 <property-name name="color"/>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.definition.ThemesExtensionElement"
-            handler="org.eclipse.e4.ui.css.swt.properties.definition.CSSPropertyThemesExtensionHandler">
-       	 <property-name name="font-definition"/>
-       	 <property-name name="color-definition"/>
-      </handler>
-
-      <!-- IEclipsePreferences -->
-      <handler
-          adapter="org.eclipse.e4.ui.css.swt.dom.preference.EclipsePreferencesElement"
-          handler="org.eclipse.e4.ui.css.swt.properties.preference.EclipsePreferencesHandler">
-          <property-name name="preferences"/>
       </handler>
    </extension>
                

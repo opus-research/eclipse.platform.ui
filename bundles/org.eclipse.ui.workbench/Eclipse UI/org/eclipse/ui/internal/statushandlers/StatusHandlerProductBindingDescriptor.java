@@ -17,12 +17,12 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 
 /**
  * The status handler product binding descriptor.
- *
+ * 
  * @since 3.3
  */
 class StatusHandlerProductBindingDescriptor implements
 		IPluginContribution {
-
+	
 	/**
 	 * Handler id attribute. Value <code>handlerId</code>.
 	 */
@@ -50,20 +50,18 @@ class StatusHandlerProductBindingDescriptor implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
-	@Override
 	public String getLocalId() {
 		return id;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
-	@Override
 	public String getPluginId() {
 		return pluginId;
 	}

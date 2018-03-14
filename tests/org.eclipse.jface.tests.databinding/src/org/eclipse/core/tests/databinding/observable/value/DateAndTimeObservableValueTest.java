@@ -22,7 +22,7 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 1.0
- *
+ * 
  */
 public class DateAndTimeObservableValueTest extends
 		AbstractDefaultRealmTestCase {
@@ -30,7 +30,6 @@ public class DateAndTimeObservableValueTest extends
 	private IObservableValue time;
 	private IObservableValue dateAndTime;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

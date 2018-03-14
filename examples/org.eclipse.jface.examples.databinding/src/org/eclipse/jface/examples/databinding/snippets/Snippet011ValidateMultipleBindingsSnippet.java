@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2007, 2014 Brad Reynolds and others.
+ /*******************************************************************************
+ * Copyright (c) 2007 Brad Reynolds and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     Brad Reynolds - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 434287
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -23,8 +21,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -36,14 +33,13 @@ import org.eclipse.swt.widgets.Text;
  * Snippet that validates values across multiple bindings on change of each
  * observable. If the values of the target observables are not equal the model
  * is not updated. When the values are equal they will be written to sysout.
- *
+ * 
  * @author Brad Reynolds
  */
 public class Snippet011ValidateMultipleBindingsSnippet {
 	public static void main(String[] args) {
-		Realm.runWithDefault(DisplayRealm.getRealm(Display.getDefault()),
+		Realm.runWithDefault(SWTObservables.getRealm(Display.getDefault()),
 				new Runnable() {
-					@Override
 					public void run() {
 						Snippet011ValidateMultipleBindingsSnippet.run();
 					}
@@ -57,18 +53,17 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 		final Model model = new Model();
 
 		DataBindingContext dbc = new DataBindingContext();
-		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(view.text1),
+		dbc.bindValue(SWTObservables.observeText(view.text1, SWT.Modify),
 				model.value1, new UpdateValueStrategy()
 						.setAfterConvertValidator(new CrossFieldValidator(
 								model.value2)), null);
-		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(view.text2),
+		dbc.bindValue(SWTObservables.observeText(view.text2, SWT.Modify),
 				model.value2, new UpdateValueStrategy()
 						.setAfterConvertValidator(new CrossFieldValidator(
 								model.value1)), null);
 
 		// DEBUG - print to show value change
 		model.value1.addValueChangeListener(new IValueChangeListener() {
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				System.out.println("Value 1: " + model.value1.getValue());
 			}
@@ -76,7 +71,6 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 
 		// DEBUG - print to show value change
 		model.value2.addValueChangeListener(new IValueChangeListener() {
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				System.out.println("Value 2: " + model.value2.getValue());
 			}
@@ -94,11 +88,11 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 
 	/**
 	 * @since 3.2
-	 *
+	 * 
 	 */
 	private static final class CrossFieldValidator implements IValidator {
 		/**
-		 *
+		 * 
 		 */
 		private final IObservableValue other;
 
@@ -109,15 +103,10 @@ public class Snippet011ValidateMultipleBindingsSnippet {
 			this.other = other;
 		}
 
-		@Override
 		public IStatus validate(Object value) {
 			if (!value.equals(other.getValue())) {
-				// DEBUG - print validation result
-				System.out.println("Validation fine");
 				return ValidationStatus.ok();
 			}
-			// DEBUG - print validation result
-			System.out.println("Validation error: values cannot be the same");
 			return ValidationStatus.error("values cannot be the same");
 		}
 	}

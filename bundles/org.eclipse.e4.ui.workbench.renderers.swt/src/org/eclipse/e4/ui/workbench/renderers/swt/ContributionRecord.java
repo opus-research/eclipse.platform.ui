@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,10 +42,10 @@ public class ContributionRecord {
 	static final String STATIC_CONTEXT = "ContributionFactoryContext"; //$NON-NLS-1$
 
 	MMenu menuModel;
-	private MMenuContribution menuContribution;
-	private ArrayList<MMenuElement> generatedElements = new ArrayList<MMenuElement>();
-	private HashSet<MMenuElement> sharedElements = new HashSet<MMenuElement>();
-	private MenuManagerRenderer renderer;
+	MMenuContribution menuContribution;
+	ArrayList<MMenuElement> generatedElements = new ArrayList<MMenuElement>();
+	HashSet<MMenuElement> sharedElements = new HashSet<MMenuElement>();
+	MenuManagerRenderer renderer;
 	boolean isVisible = true;
 	private IEclipseContext infoContext;
 	private Runnable factoryDispose;
@@ -67,7 +67,7 @@ public class ContributionRecord {
 
 	/**
 	 * Access to analyze for tests. For Looking, not touching!
-	 *
+	 * 
 	 * @return the shared elements collection
 	 */
 	public Collection<MMenuElement> getSharedElements() {
@@ -76,7 +76,7 @@ public class ContributionRecord {
 
 	/**
 	 * Access to analyze for tests. For Looking, not touching!
-	 *
+	 * 
 	 * @return the generated elements collection
 	 */
 	public Collection<MMenuElement> getGeneratedElements() {

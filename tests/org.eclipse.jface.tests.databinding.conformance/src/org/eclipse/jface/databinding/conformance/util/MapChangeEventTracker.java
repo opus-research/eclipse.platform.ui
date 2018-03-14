@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 444829
  *******************************************************************************/
 package org.eclipse.jface.databinding.conformance.util;
 
 import java.util.List;
 
-import org.eclipse.core.databinding.observable.IObservablesListener;
 import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.map.MapChangeEvent;
@@ -26,29 +24,28 @@ public class MapChangeEventTracker implements IMapChangeListener {
 
 	public MapChangeEvent event;
 
-	public List<IObservablesListener> queue;
-
+	public List queue;
+	
 	public MapChangeEventTracker() {
 		this(null);
 	}
-
-	public MapChangeEventTracker(List<IObservablesListener> queue) {
+	
+	public MapChangeEventTracker(List queue) {
 		this.queue = queue;
 	}
 
-	@Override
 	public void handleMapChange(MapChangeEvent event) {
 		count++;
 		this.event = event;
-
+		
 		if (queue != null) {
 			queue.add(this);
 		}
 	}
-
+	
 	/**
 	 * Convenience method to register a new listener.
-	 *
+	 * 
 	 * @param observable
 	 * @return tracker
 	 */

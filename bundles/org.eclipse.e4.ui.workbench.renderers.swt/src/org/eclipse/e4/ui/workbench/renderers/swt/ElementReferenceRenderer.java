@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -22,7 +22,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -34,12 +33,11 @@ import org.eclipse.swt.widgets.Control;
 public class ElementReferenceRenderer extends SWTPartRenderer {
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
-	private Map<MUIElement, Set<MPlaceholder>> renderedMap;
+	Map<MUIElement, Set<MPlaceholder>> renderedMap;
 
 	@Inject
-	private IPresentationEngine renderingEngine;
+	IPresentationEngine renderingEngine;
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		MPlaceholder ph = (MPlaceholder) element;
 		final MUIElement ref = ph.getRef();
@@ -57,35 +55,35 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 		Composite newComp = new Composite((Composite) parent, SWT.NONE);
 		newComp.setLayout(new FillLayout());
 
-		// if the placeholder is *not* in the currently active perspective
-		// then don't re-parent the current view
-		int phLoc = modelService.getElementLocation(ph);
-		if (phLoc == EModelService.IN_ACTIVE_PERSPECTIVE
-				|| phLoc == EModelService.IN_SHARED_AREA
-				|| phLoc == EModelService.OUTSIDE_PERSPECTIVE) {
-			Control refWidget = (Control) ref.getWidget();
-			if (refWidget == null) {
-				ref.setToBeRendered(true);
-				refWidget = (Control) renderingEngine.createGui(ref, newComp,
-						getContextForParent(ref));
-			} else {
-				if (refWidget.getParent() != newComp) {
-					refWidget.setParent(newComp);
-				}
+		Control refWidget = (Control) ref.getWidget();
+		if (refWidget == null) {
+			ref.setToBeRendered(true);
+			refWidget = (Control) renderingEngine.createGui(ref, newComp,
+					getContextForParent(ref));
+		} else {
+			if (refWidget.getParent() != newComp) {
+				refWidget.setParent(newComp);
 			}
+		}
 
-			if (ref instanceof MContext) {
-				IEclipseContext context = ((MContext) ref).getContext();
-				IEclipseContext newParentContext = getContext(ph);
-				if (context.getParent() != newParentContext) {
-					context.setParent(newParentContext);
-				}
+		if (ref instanceof MContext) {
+			IEclipseContext context = ((MContext) ref).getContext();
+			IEclipseContext newParentContext = getContext(ph);
+			if (context.getParent() != newParentContext) {
+				context.setParent(newParentContext);
 			}
 		}
 
 		return newComp;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#disposeWidget
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
 	public void disposeWidget(MUIElement element) {
 		MPlaceholder ph = (MPlaceholder) element;

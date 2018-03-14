@@ -30,7 +30,7 @@ import org.eclipse.ui.keys.NaturalKey;
  * key formatting functionality. It is recommended that those people
  * implementing their own key formatters subclass from here, rather than
  * implementing <code>KeyFormatter</code> directly.
- *
+ * 
  * @since 3.0
  */
 public abstract class AbstractKeyFormatter implements IKeyFormatter {
@@ -56,14 +56,22 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
     private final static ResourceBundle RESOURCE_BUNDLE = ResourceBundle
             .getBundle(AbstractKeyFormatter.class.getName());
 
-    @Override
-	public String format(Key key) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
+     */
+    public String format(Key key) {
         String name = key.toString();
         return Util.translateString(RESOURCE_BUNDLE, name, name, false, false);
     }
 
-    @Override
-	public String format(KeySequence keySequence) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
+     */
+    public String format(KeySequence keySequence) {
         StringBuffer stringBuffer = new StringBuffer();
 
         Iterator keyStrokeItr = keySequence.getKeyStrokes().iterator();
@@ -78,8 +86,12 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
         return stringBuffer.toString();
     }
 
-    @Override
-	public String format(KeyStroke keyStroke) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.KeyFormatter#formatKeyStroke(org.eclipse.ui.keys.KeyStroke)
+     */
+    public String format(KeyStroke keyStroke) {
         String keyDelimiter = getKeyDelimiter();
 
         // Format the modifier keys, in sorted order.
@@ -105,7 +117,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
     /**
      * An accessor for the delimiter you wish to use between keys. This is used
      * by the default format implementations to determine the key delimiter.
-     *
+     * 
      * @return The delimiter to use between keys; should not be <code>null</code>.
      */
     protected abstract String getKeyDelimiter();
@@ -114,7 +126,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
      * An accessor for the delimiter you wish to use between key strokes. This
      * used by the default format implementations to determine the key stroke
      * delimiter.
-     *
+     * 
      * @return The delimiter to use between key strokes; should not be <code>null</code>.
      */
     protected abstract String getKeyStrokeDelimiter();
@@ -123,7 +135,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
      * An accessor for the comparator to use for sorting modifier keys. This is
      * used by the default format implementations to sort the modifier keys
      * before formatting them into a string.
-     *
+     * 
      * @return The comparator to use to sort modifier keys; must not be <code>null</code>.
      */
     protected abstract Comparator getModifierKeyComparator();

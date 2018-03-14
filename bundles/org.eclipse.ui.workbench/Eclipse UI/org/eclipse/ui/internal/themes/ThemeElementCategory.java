@@ -36,10 +36,10 @@ public class ThemeElementCategory implements IPluginContribution,
     private String pluginId;
 
     /**
-     *
+     * 
      * @param label
      * @param id
-     * @param parentId
+     * @param parentId 
      * @param description
      * @param pluginId
      * @param element
@@ -72,8 +72,7 @@ public class ThemeElementCategory implements IPluginContribution,
     /**
      * @return Returns the description.
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -87,32 +86,28 @@ public class ThemeElementCategory implements IPluginContribution,
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeElementDefinition#getId()
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return id;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeElementDefinition#getLabel()
      */
-    @Override
-	public String getName() {
+    public String getName() {
         return label;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getLocalId()
      */
-    @Override
-	public String getLocalId() {
+    public String getLocalId() {
         return id;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getPluginId()
      */
-    @Override
-	public String getPluginId() {
+    public String getPluginId() {
         return pluginId;
     }
 
@@ -122,23 +117,21 @@ public class ThemeElementCategory implements IPluginContribution,
     public String getParentId() {
         return parentId;
     }
-
+    
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj instanceof ThemeElementCategory) {
             return getId().equals(((ThemeElementCategory)obj).getId());
         }
         return false;
     }
-
+    
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return id.hashCode();
-    }
+    }    
 }

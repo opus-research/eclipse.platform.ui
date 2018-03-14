@@ -44,7 +44,6 @@ public class ObjectToPrimitiveValidator implements IValidator {
 		return this.toType;
 	}
 
-	@Override
 	public IStatus validate(Object value) {
 		return doValidate(value);
 	}

@@ -68,7 +68,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * default, pruning does not occur and it is assumed that clients of the
  * particular undo context are pruning the history when necessary.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public abstract class OperationHistoryActionHandler extends Action implements
@@ -80,21 +80,18 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		/**
 		 * @see IPartListener#partActivated(IWorkbenchPart)
 		 */
-		@Override
 		public void partActivated(IWorkbenchPart part) {
 		}
 
 		/**
 		 * @see IPartListener#partBroughtToTop(IWorkbenchPart)
 		 */
-		@Override
 		public void partBroughtToTop(IWorkbenchPart part) {
 		}
 
 		/**
 		 * @see IPartListener#partClosed(IWorkbenchPart)
 		 */
-		@Override
 		public void partClosed(IWorkbenchPart part) {
 			if (site != null && part.equals(site.getPart())) {
 				dispose();
@@ -110,30 +107,27 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		/**
 		 * @see IPartListener#partDeactivated(IWorkbenchPart)
 		 */
-		@Override
 		public void partDeactivated(IWorkbenchPart part) {
 		}
 
 		/**
 		 * @see IPartListener#partOpened(IWorkbenchPart)
 		 */
-		@Override
 		public void partOpened(IWorkbenchPart part) {
 		}
 
 	}
 
 	private class HistoryListener implements IOperationHistoryListener {
-		@Override
 		public void historyNotification(final OperationHistoryEvent event) {
 			IWorkbenchWindow workbenchWindow = getWorkbenchWindow();
 			if (workbenchWindow == null)
 				return;
-
+			
 			Display display = workbenchWindow.getWorkbench().getDisplay();
 			if (display == null)
 				return;
-
+			
 			switch (event.getEventType()) {
 			case OperationHistoryEvent.OPERATION_ADDED:
 			case OperationHistoryEvent.OPERATION_REMOVED:
@@ -141,7 +135,6 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			case OperationHistoryEvent.REDONE:
 				if (event.getOperation().hasContext(undoContext)) {
 					display.asyncExec(new Runnable() {
-						@Override
 						public void run() {
 							update();
 						}
@@ -151,7 +144,6 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			case OperationHistoryEvent.OPERATION_NOT_OK:
 				if (event.getOperation().hasContext(undoContext)) {
 					display.asyncExec(new Runnable() {
-						@Override
 						public void run() {
 							if (pruning) {
 								IStatus status = event.getStatus();
@@ -177,7 +169,6 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			case OperationHistoryEvent.OPERATION_CHANGED:
 				if (event.getOperation() == getOperation()) {
 					display.asyncExec(new Runnable() {
-						@Override
 						public void run() {
 							update();
 						}
@@ -203,7 +194,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	/**
 	 * Construct an operation history action for the specified workbench window
 	 * with the specified undo context.
-	 *
+	 * 
 	 * @param site -
 	 *            the workbench part site for the action.
 	 * @param context -
@@ -221,7 +212,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		update();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
+	 */
 	public void dispose() {
 
 		IOperationHistory history = getHistory();
@@ -290,7 +285,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 */
 	abstract IUndoableOperation getOperation();
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#run()
+	 */
 	public final void run() {
 		if (isInvalid()) {
 			return;
@@ -301,7 +300,6 @@ public abstract class OperationHistoryActionHandler extends Action implements
 				getWorkbenchWindow().getWorkbench().getProgressService()
 						.getLongOperationTime());
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor pm)
 					throws InvocationTargetException {
 				try {
@@ -341,7 +339,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 
 	abstract IStatus runCommand(IProgressMonitor pm) throws ExecutionException;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IUndoContext.class)) {
 			return undoContext;
@@ -383,7 +385,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 
 	/**
 	 * The undo and redo subclasses should implement this.
-	 *
+	 * 
 	 * @return - a boolean indicating enablement state
 	 */
 	abstract boolean shouldBeEnabled();
@@ -392,7 +394,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 * Set the context shown by the handler. Normally the context is set up when
 	 * the action handler is created, but the context can also be changed
 	 * dynamically.
-	 *
+	 * 
 	 * @param context
 	 *            the context to be used for the undo history
 	 */
@@ -409,11 +411,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 * Specify whether the action handler should actively prune the operation
 	 * history when invalid operations are encountered. The default value is
 	 * <code>false</code>.
-	 *
+	 * 
 	 * @param prune
 	 *            <code>true</code> if the history should be pruned by the
 	 *            handler, and <code>false</code> if it should not.
-	 *
+	 * 
 	 */
 	public void setPruneHistory(boolean prune) {
 		pruning = prune;
