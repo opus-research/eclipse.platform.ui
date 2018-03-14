@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -30,8 +31,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
@@ -147,7 +146,7 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
-import org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog;
+import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityView;
@@ -156,6 +155,7 @@ import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.misc.ExternalEditor;
+import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.internal.registry.ActionSetRegistry;
@@ -163,6 +163,7 @@ import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.registry.PerspectiveDescriptor;
+import org.eclipse.ui.internal.registry.PerspectiveRegistry;
 import org.eclipse.ui.internal.registry.UIExtensionTracker;
 import org.eclipse.ui.internal.registry.ViewDescriptor;
 import org.eclipse.ui.internal.tweaklets.TabBehaviour;
@@ -194,12 +195,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 		public void partActivated(MPart part) {
 			// update the workbench window's current selection with the active
 			// part's selection
-			SelectionService service = (SelectionService) getWorkbenchWindow()
-					.getSelectionService();
-			service.updateSelection(getWorkbenchPart(part));
+			IWorkbenchPart workbenchPart = getWorkbenchPart(part);
+			selectionService.updateSelection(workbenchPart);
 
 			updateActivations(part);
 			firePartActivated(part);
+			selectionService.notifyListeners(workbenchPart);
 		}
 
 		@Override
@@ -325,32 +326,32 @@ public class WorkbenchPage implements IWorkbenchPage {
 		try {
 			service.deferUpdates(true);
 			if (newPersp != null) {
-				IActionSetDescriptor[] newAlwaysOn = newPersp.getAlwaysOnActionSets();
-				for (int i = 0; i < newAlwaysOn.length; i++) {
-					IActionSetDescriptor descriptor = newAlwaysOn[i];
+				List<IActionSetDescriptor> newAlwaysOn = newPersp.getAlwaysOnActionSets();
+				for (int i = 0; i < newAlwaysOn.size(); i++) {
+					IActionSetDescriptor descriptor = newAlwaysOn.get(i);
 
 					actionSets.showAction(descriptor);
 				}
 
-				IActionSetDescriptor[] newAlwaysOff = newPersp.getAlwaysOffActionSets();
-				for (int i = 0; i < newAlwaysOff.length; i++) {
-					IActionSetDescriptor descriptor = newAlwaysOff[i];
+				List<IActionSetDescriptor> newAlwaysOff = newPersp.getAlwaysOffActionSets();
+				for (int i = 0; i < newAlwaysOff.size(); i++) {
+					IActionSetDescriptor descriptor = newAlwaysOff.get(i);
 
 					actionSets.maskAction(descriptor);
 				}
 			}
 
 			if (oldPersp != null) {
-				IActionSetDescriptor[] newAlwaysOn = oldPersp.getAlwaysOnActionSets();
-				for (int i = 0; i < newAlwaysOn.length; i++) {
-					IActionSetDescriptor descriptor = newAlwaysOn[i];
+				List<IActionSetDescriptor> oldAlwaysOn = oldPersp.getAlwaysOnActionSets();
+				for (int i = 0; i < oldAlwaysOn.size(); i++) {
+					IActionSetDescriptor descriptor = oldAlwaysOn.get(i);
 
 					actionSets.hideAction(descriptor);
 				}
 
-				IActionSetDescriptor[] newAlwaysOff = oldPersp.getAlwaysOffActionSets();
-				for (int i = 0; i < newAlwaysOff.length; i++) {
-					IActionSetDescriptor descriptor = newAlwaysOff[i];
+				List<IActionSetDescriptor> oldAlwaysOff = oldPersp.getAlwaysOffActionSets();
+				for (int i = 0; i < oldAlwaysOff.size(); i++) {
+					IActionSetDescriptor descriptor = oldAlwaysOff.get(i);
 
 					actionSets.unmaskAction(descriptor);
 				}
@@ -529,11 +530,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     private Composite composite;
     
-	private List<ISelectionListener> selectionListeners = new ArrayList<ISelectionListener>();
-	private List<ISelectionListener> postSelectionListeners = new ArrayList<ISelectionListener>();
-	private Map<String, List<ISelectionListener>> targetedSelectionListeners = new HashMap<String, List<ISelectionListener>>();
-	private Map<String, List<ISelectionListener>> targetedPostSelectionListeners = new HashMap<String, List<ISelectionListener>>();
-
     private ListenerList propertyChangeListeners = new ListenerList();
 
     private IActionBars actionBars;
@@ -840,6 +836,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	private EPartService partService;
 
+	private SelectionService selectionService;
+
 	private MApplication application;
 
 	private MWindow window;
@@ -1014,37 +1012,23 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public void addSelectionListener(ISelectionListener listener) {
-		selectionListeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addSelectionListener(listener);
+		selectionService.addSelectionListener(listener);
     }
 
     @Override
 	public void addSelectionListener(String partId, ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedSelectionListeners.get(partId);
-		if (listeners == null) {
-			listeners = new ArrayList<ISelectionListener>();
-			targetedSelectionListeners.put(partId, listeners);
-		}
-		listeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addSelectionListener(partId, listener);
+		selectionService.addSelectionListener(partId, listener);
     }
 
     @Override
 	public void addPostSelectionListener(ISelectionListener listener) {
-		postSelectionListeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addPostSelectionListener(listener);
+		selectionService.addPostSelectionListener(listener);
     }
 
     @Override
 	public void addPostSelectionListener(String partId,
             ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedPostSelectionListeners.get(partId);
-		if (listeners == null) {
-			listeners = new ArrayList<ISelectionListener>();
-			targetedPostSelectionListeners.put(partId, listeners);
-		}
-		listeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addPostSelectionListener(partId, listener);
+		selectionService.addPostSelectionListener(partId, listener);
     }
     
     /**
@@ -1777,7 +1761,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return false;
 		}
 
-		for (MPart part : partService.getParts()) {
+		Collection<MPart> partsToHide = partService.getParts();
+		// workaround for bug 455281
+		List<MPart> partsOutsidePersp = modelService.findElements(window, null, MPart.class, null,
+				EModelService.OUTSIDE_PERSPECTIVE);
+		partsToHide.removeAll(partsOutsidePersp);
+
+		for (MPart part : partsToHide) {
 			// no save, no confirm, force
 			hidePart(part, false, true, true);
 		}
@@ -1810,39 +1800,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 			broker.unsubscribe(childrenHandler);
 			partEvents.clear();
 
-			ISelectionService selectionService = getWorkbenchWindow().getSelectionService();
-			for (ISelectionListener listener : selectionListeners) {
-				selectionService.removeSelectionListener(listener);
-			}
-
-			for (Entry<String, List<ISelectionListener>> entries : targetedSelectionListeners
-					.entrySet()) {
-				String partId = entries.getKey();
-				for (ISelectionListener listener : entries.getValue()) {
-					selectionService.removeSelectionListener(partId, listener);
-				}
-			}
-
-			for (ISelectionListener listener : postSelectionListeners) {
-				selectionService.removePostSelectionListener(listener);
-			}
-
-			for (Entry<String, List<ISelectionListener>> entries : targetedPostSelectionListeners
-					.entrySet()) {
-				String partId = entries.getKey();
-				for (ISelectionListener listener : entries.getValue()) {
-					selectionService.removePostSelectionListener(partId, listener);
-				}
-			}
-
 			partListenerList.clear();
 			partListener2List.clear();
 			propertyChangeListeners.clear();
 
-			selectionListeners.clear();
-			postSelectionListeners.clear();
-			targetedSelectionListeners.clear();
-			targetedPostSelectionListeners.clear();
+			selectionService.dispose();
 
 			ContextInjectionFactory.uninject(this, window.getContext());
 		}
@@ -2485,12 +2447,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public ISelection getSelection() {
-		return getWorkbenchWindow().getSelectionService().getSelection();
+		return selectionService.getSelection();
     }
 
     @Override
 	public ISelection getSelection(String partId) {
-		return getWorkbenchWindow().getSelectionService().getSelection(partId);
+		return selectionService.getSelection(partId);
     }
 
 	/**
@@ -2556,9 +2518,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return new IViewReference[0];
 	}
 
-    /**
-     * See IWorkbenchPage.
-     */
+	/**
+	 * See IWorkbenchPage.
+	 */
     @Override
 	public IViewPart[] getViews() {
 		IViewReference[] viewReferences = getViewReferences();
@@ -2674,6 +2636,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		this.broker = broker;
 		this.window = window;
 		this.partService = partService;
+		selectionService = ContextInjectionFactory.make(SelectionService.class, window.getContext());
 
 		partService.addPartListener(e4PartListener);
 
@@ -2862,11 +2825,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private void addActionSet(MPerspective perspective, MPerspective temporary) {
 		List<String> tags = perspective.getTags();
 		List<String> extendedTags = temporary.getTags();
-		String excludedTags = perspective.getPersistedState().get(
-				ModeledPageLayout.HIDDEN_ITEMS_KEY);
 		for (String extendedTag : extendedTags) {
-			if (!tags.contains(extendedTag) && excludedTags != null
-					&& !excludedTags.contains(extendedTag + ",")) { //$NON-NLS-1$
+			if (!tags.contains(extendedTag)) {
 				tags.add(extendedTag);
 			}
 		}
@@ -3332,34 +3292,24 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public void removeSelectionListener(ISelectionListener listener) {
-		selectionListeners.remove(listener);
-		getWorkbenchWindow().getSelectionService().removeSelectionListener(listener);
+		selectionService.removeSelectionListener(listener);
     }
 
     @Override
 	public void removeSelectionListener(String partId,
             ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedSelectionListeners.get(partId);
-		if (listeners != null) {
-			listeners.remove(listener);
-		}
-		getWorkbenchWindow().getSelectionService().removeSelectionListener(partId, listener);
+		selectionService.removeSelectionListener(partId, listener);
     }
 
     @Override
 	public void removePostSelectionListener(ISelectionListener listener) {
-		postSelectionListeners.remove(listener);
-		getWorkbenchWindow().getSelectionService().removePostSelectionListener(listener);
+		selectionService.removePostSelectionListener(listener);
     }
 
     @Override
 	public void removePostSelectionListener(String partId,
             ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedPostSelectionListeners.get(partId);
-		if (listeners != null) {
-			listeners.remove(listener);
-		}
-		getWorkbenchWindow().getSelectionService().removePostSelectionListener(partId, listener);
+		selectionService.removePostSelectionListener(partId, listener);
     }
 
 
@@ -3468,7 +3418,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		String hiddenItems = dummyPerspective.getPersistedState().get(ModeledPageLayout.HIDDEN_ITEMS_KEY);
 		persp.getPersistedState().put(ModeledPageLayout.HIDDEN_ITEMS_KEY, hiddenItems);
 		
-		// legacyWindow.getMenuManager().updateAll(true);
+		legacyWindow.getMenuManager().updateAll(true);
 		// ((ICoolBarManager2) ((WorkbenchWindow)
 		// getWorkbenchWindow()).getCoolBarManager2())
 		// .resetItemOrder();
@@ -3504,8 +3454,18 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 
 		// deactivate and activate other action sets as
-		updateActionSets(getPerspective(persp), getPerspective(dummyPerspective));
+		Perspective oldPersp = getPerspective(persp);
+		Perspective dummyPersp = getPerspective(dummyPerspective);
+		updateActionSets(oldPersp, dummyPersp);
+		oldPersp.getAlwaysOnActionSets().clear();
+		oldPersp.getAlwaysOnActionSets().addAll(dummyPersp.getAlwaysOnActionSets());
+		oldPersp.getAlwaysOffActionSets().clear();
+		oldPersp.getAlwaysOffActionSets().addAll(dummyPersp.getAlwaysOffActionSets());
+
 		modelToPerspectiveMapping.remove(dummyPerspective);
+
+		// partly fixing toolbar refresh issue, see bug 383569 comment 10
+		legacyWindow.updateActionSets();
 
 		// migrate the tags
 		List<String> tags = persp.getTags();
@@ -3910,13 +3870,50 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return null;
 		}
 		if (!modelToPerspectiveMapping.containsKey(mperspective)) {
-			Perspective p = new Perspective(
-					(PerspectiveDescriptor) getPerspectiveDesc(mperspective.getElementId()),
-					mperspective, this);
+			boolean fixedPerspective = false;
+			PerspectiveDescriptor perspectiveDesc = (PerspectiveDescriptor) getPerspectiveDesc(mperspective.getElementId());
+			if (perspectiveDesc == null) {
+				fixedPerspective = true;
+				perspectiveDesc = fixOrphanPerspective(mperspective);
+			}
+			Perspective p = new Perspective(perspectiveDesc, mperspective, this);
 			modelToPerspectiveMapping.put(mperspective, p);
 			p.initActionSets();
+			if (fixedPerspective) {
+				UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_SAVED, mperspective);
+			}
 		}
 		return modelToPerspectiveMapping.get(mperspective);
+	}
+
+	/**
+	 * An 'orphan' perspective is one that was originally created through a
+	 * contribution but whose contributing bundle is no longer available. In
+	 * order to allow it to behave correctly within the environment (for Close,
+	 * Reset...) we turn it into a 'custom' perspective on its first activation.
+	 *
+	 * @return
+	 */
+	private PerspectiveDescriptor fixOrphanPerspective(MPerspective mperspective) {
+		PerspectiveRegistry reg = (PerspectiveRegistry) PlatformUI.getWorkbench().getPerspectiveRegistry();
+		String perspId = mperspective.getElementId();
+		String label = mperspective.getLabel();
+		String msg = "Perspective with name '" + label + "' and id '" + perspId + "' has been made into a local copy"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		IStatus status = StatusUtil.newStatus(IStatus.WARNING, msg, null);
+		StatusManager.getManager().handle(status, StatusManager.LOG);
+
+		String newDescId = NLS.bind(WorkbenchMessages.Perspective_localCopyLabel, label);
+		while (reg.findPerspectiveWithId(newDescId) != null) {
+			newDescId = NLS.bind(WorkbenchMessages.Perspective_localCopyLabel, newDescId);
+		}
+		PerspectiveDescriptor pd = new PerspectiveDescriptor(perspId, label, null);
+		PerspectiveDescriptor newDesc = reg.createPerspective(newDescId, pd);
+		mperspective.setElementId(newDesc.getId());
+		mperspective.setLabel(newDesc.getLabel());
+		sortedPerspectives.add(newDesc);
+		modelService.cloneElement(mperspective, application);
+		newDesc.setHasCustomDefinition(true);
+		return newDesc;
 	}
 
 	@Override
@@ -3987,6 +3984,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		perspectives.setSelectedElement(modelPerspective);
 
 		modelPerspective.getContext().activate();
+		modelPerspective.getContext().set(ISelectionService.class, selectionService);
 
 		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
@@ -4096,6 +4094,12 @@ public class WorkbenchPage implements IWorkbenchPage {
              
              IActionSetDescriptor desc = reg.findActionSet(actionSetID);
              if (desc != null) {
+				List<IActionSetDescriptor> offActionSets = persp.getAlwaysOffActionSets();
+				for (IActionSetDescriptor off : offActionSets) {
+					if (off.getId().equals(desc.getId())) {
+						return;
+					}
+				}
                  persp.addActionSet(desc);
                  legacyWindow.updateActionSets();
                  legacyWindow.firePerspectiveChanged(this, getPerspective(),

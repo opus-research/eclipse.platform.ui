@@ -363,7 +363,7 @@ public final class ObjectContributionTest extends UITestCase {
      * @param commandIds the command ids that should appear in the menu
      * @param selection the selection on which to contribute object contributions
      */
-    public void assertPopupMenus(String name, String[] commandIds, final ISelection selection, Class<?> selectionType, boolean existance) {
+    public void assertPopupMenus(String name, String[] commandIds, final ISelection selection, Class selectionType, boolean existance) {
     	ISelectionProvider selectionProvider = new ISelectionProvider() {
 			public void addSelectionChangedListener(ISelectionChangedListener listener) {
 			}
@@ -405,8 +405,8 @@ public final class ObjectContributionTest extends UITestCase {
         
         // Check to see if the appropriate object contributions are present.
         final IContributionItem[] items = fakeMenuManager.getItems();
-        Set<String> seenCommands = new HashSet<String>(Arrays.asList(commandIds));
-        List<String> commands = new ArrayList<String>(Arrays.asList(commandIds));
+        Set seenCommands = new HashSet(Arrays.asList(commandIds));
+        List commands = new ArrayList(Arrays.asList(commandIds));
         for (int i = 0; i < items.length; i++) {
            IContributionItem contributionItem = items[i];
            // Step 1: test the selection
@@ -420,7 +420,7 @@ public final class ObjectContributionTest extends UITestCase {
 					// converted
 					ISelection s = null;
 					if (s instanceof IStructuredSelection) {
-						for (Iterator<?> it = ((IStructuredSelection) s).iterator(); it.hasNext();) {
+						for (Iterator it = ((IStructuredSelection) s).iterator(); it.hasNext();) {
 							Object element = it.next();
 							assertTrue(name + " selection not converted", selectionType.isInstance(element));
 						}
