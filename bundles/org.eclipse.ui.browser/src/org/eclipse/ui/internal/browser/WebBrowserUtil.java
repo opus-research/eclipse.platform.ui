@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -364,10 +364,7 @@ public class WebBrowserUtil {
 
 		int urlIndex = params.indexOf(IBrowserDescriptor.URL_PARAMETER);
 		if (urlIndex >= 0)
-			params = params.substring(0, urlIndex)
-					+ url
-					+ params.substring(urlIndex
-							+ IBrowserDescriptor.URL_PARAMETER.length());
+			params = params.replaceAll(IBrowserDescriptor.URL_PARAMETER, url);
 		else {
 			if (params.length() != 0 && !params.endsWith(" ")) //$NON-NLS-1$
 				params += " "; //$NON-NLS-1$
