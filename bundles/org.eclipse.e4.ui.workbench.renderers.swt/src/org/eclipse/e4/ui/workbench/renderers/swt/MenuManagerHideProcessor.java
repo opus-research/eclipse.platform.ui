@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug403081
- *     Marco Descher <marco@descher.at> - Bug 403083
+ *     Marco Descher <marco@descher.at> - Bug403081, 403083, 442570
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -64,7 +64,7 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 			hidePopup(menu, (MPopupMenu) menuModel, menuManager);
 		}
 		if (menuModel != null && menu != null)
-			processDynamicElements(menu, menuModel);
+			processDynamicElements((MenuManager) manager, menu, menuModel);
 	}
 
 	/**
@@ -75,7 +75,8 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	 * @param menuModel
 	 * 
 	 */
-	private void processDynamicElements(Menu menu, final MMenu menuModel) {
+	private void processDynamicElements(final MenuManager menuManager,
+			Menu menu, final MMenu menuModel) {
 		if (!menu.isDisposed()) {
 			menu.getDisplay().asyncExec(new Runnable() {
 				@Override
@@ -92,9 +93,11 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 
 							IEclipseContext dynamicMenuContext = EclipseContextFactory
 									.create();
+
+							final Map<String, Object> storageMap = currentMenuElement
+									.getTransientData();
 							@SuppressWarnings("unchecked")
-							ArrayList<MMenuElement> mel = (ArrayList<MMenuElement>) currentMenuElement
-									.getTransientData()
+							ArrayList<MMenuElement> mel = (ArrayList<MMenuElement>) storageMap
 									.get(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
 							dynamicMenuContext.set(List.class, mel);
 							IEclipseContext parentContext = modelService
@@ -103,14 +106,22 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 									AboutToHide.class, parentContext,
 									dynamicMenuContext, null);
 							dynamicMenuContext.dispose();
-						}
 
+							// remove existing entries for this dynamic
+							// contribution item if there are any
+							if (mel != null && mel.size() > 0) {
+								renderer.removeDynamicMenuContributions(
+										menuManager, menuModel, mel);
+							}
+
+							storageMap
+									.remove(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
+						}
 					}
 
 				}
 			});
 		}
-
 	}
 
 	/*
