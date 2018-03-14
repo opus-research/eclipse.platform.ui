@@ -20,7 +20,7 @@ import org.eclipse.ui.ide.IUnknownEditorStrategy;
  * @since 3.12
  *
  */
-public class AskUserViaPopupUnknownEditorStrategy implements IUnknownEditorStrategy {
+public class AskUserViaPopupUnknowEditorStrategy implements IUnknownEditorStrategy {
 
 	@Override
 	public IEditorDescriptor getEditorDescriptor(String fileName, IEditorRegistry editorRegistry) {
