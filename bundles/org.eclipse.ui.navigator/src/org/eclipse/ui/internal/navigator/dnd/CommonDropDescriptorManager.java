@@ -135,7 +135,6 @@ public class CommonDropDescriptorManager {
 		 * 
 		 * @see org.eclipse.ui.internal.navigator.extensions.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
 		 */
-		@Override
 		protected boolean readElement(IConfigurationElement element) {
 
 			if (TAG_NAVIGATOR_CONTENT.equals(element.getName())) {

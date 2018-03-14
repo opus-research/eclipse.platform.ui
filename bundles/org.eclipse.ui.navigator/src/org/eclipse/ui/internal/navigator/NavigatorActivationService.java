@@ -91,7 +91,6 @@ public final class NavigatorActivationService implements
 	 * 
 	 * @return True if the extension is active in the context of the viewer id.
 	 */
-	@Override
 	public boolean isNavigatorExtensionActive(String aNavigatorExtensionId) {
 		Boolean b = activatedExtensionsMap.get(aNavigatorExtensionId);
 		if(b != null)
@@ -190,7 +189,6 @@ public final class NavigatorActivationService implements
 	 * Save the activation state for the given viewer.
 	 * 
 	 */
-	@Override
 	public void persistExtensionActivations() {
 		IEclipsePreferences prefs = NavigatorContentService.getPreferencesRoot();
 		
@@ -222,7 +220,6 @@ public final class NavigatorActivationService implements
 	 * @param aListener
 	 *            An implementation of {@link IExtensionActivationListener}
 	 */
-	@Override
 	public void addExtensionActivationListener(
 			IExtensionActivationListener aListener) {
 		listeners.add(aListener);
@@ -234,7 +231,6 @@ public final class NavigatorActivationService implements
 	 * @param aListener
 	 *            An implementation of {@link IExtensionActivationListener}
 	 */
-	@Override
 	public void removeExtensionActivationListener(
 			IExtensionActivationListener aListener) {
 		listeners.remove(aListener);
@@ -308,7 +304,6 @@ public final class NavigatorActivationService implements
 	}
 
 
-	@Override
 	public INavigatorContentDescriptor[] activateExtensions(
 			String[] extensionIds, boolean toDeactivateAllOthers) {
 
@@ -350,7 +345,6 @@ public final class NavigatorActivationService implements
 						.size()]);
 	}
 
-	@Override
 	public INavigatorContentDescriptor[] deactivateExtensions(
 			String[] extensionIds, boolean toEnableAllOthers) {
 

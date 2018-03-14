@@ -46,7 +46,6 @@ public final class CommonDragAssistantDescriptor implements IViewerExtPtConstant
 		final CommonDragAdapterAssistant[] da = new CommonDragAdapterAssistant[1];
 
 		SafeRunner.run(new NavigatorSafeRunnable(element) {
-			@Override
 			public void run() throws Exception {
 				da[0] = (CommonDragAdapterAssistant) element.createExecutableExtension(ATT_CLASS);
 			}

@@ -294,13 +294,11 @@ public class CommonActionDescriptorManager {
 
 	private class ActionProviderRegistry extends NavigatorContentRegistryReader {
 
-		@Override
 		public void readRegistry() {
 			super.readRegistry();
 			computeOrdering();
 		}
 
-		@Override
 		protected boolean readElement(IConfigurationElement anElement) {
 			if (TAG_ACTION_PROVIDER.equals(anElement.getName())) {
 				addActionDescriptor(new CommonActionProviderDescriptor(
@@ -364,7 +362,6 @@ public class CommonActionDescriptorManager {
 			/* (non-Javadoc)
 			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
 			 */
-			@Override
 			public void run() throws Exception { 
 				addActionDescriptor(new CommonActionProviderDescriptor(
 							actionProvider, defaultEnablement, defaultPriority, parentElement
@@ -374,7 +371,6 @@ public class CommonActionDescriptorManager {
 			/* (non-Javadoc)
 			 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
 			 */
-			@Override
 			public void handleException(Throwable t) {
 				NavigatorPlugin.logError(0, "Recovering from error while parsing actionProviders.", t); //$NON-NLS-1$ 
 			}

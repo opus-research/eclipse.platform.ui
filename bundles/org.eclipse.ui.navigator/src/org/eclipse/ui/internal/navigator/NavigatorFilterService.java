@@ -66,7 +66,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 
 	private synchronized void restoreFilterActivation() {
 		SafeRunner.run(new NavigatorSafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				IEclipsePreferences prefs = NavigatorContentService.getPreferencesRoot();
 
@@ -95,7 +94,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	 * 
 	 * @see org.eclipse.ui.navigator.INavigatorFilterService#persistFilterActivationState()
 	 */
-	@Override
 	public void persistFilterActivationState() {
 
 		synchronized (activeFilters) {
@@ -143,7 +141,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	 * 
 	 * @see org.eclipse.ui.navigator.INavigatorFilterService#getVisibleFilters(boolean)
 	 */
-	@Override
 	public ViewerFilter[] getVisibleFilters(boolean toReturnOnlyActiveFilters) {
 		CommonFilterDescriptor[] descriptors = CommonFilterDescriptorManager
 				.getInstance().findVisibleFilters(contentService);
@@ -176,7 +173,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	 * @return A non-null ViewerFilter from the extension (or
 	 *         {@link SkeletonViewerFilter#INSTANCE}).
 	 */
-	@Override
 	public ViewerFilter getViewerFilter(ICommonFilterDescriptor descriptor) {
 		ViewerFilter filter = null;
 		synchronized (declaredViewerFilters) {
@@ -195,7 +191,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	 * 
 	 * @see org.eclipse.ui.navigator.INavigatorFilterService#getVisibleFilterIds()
 	 */
-	@Override
 	public ICommonFilterDescriptor[] getVisibleFilterDescriptors() {
 		return CommonFilterDescriptorManager.getInstance().findVisibleFilters(
 				contentService);
@@ -214,7 +209,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	 * 
 	 * @see org.eclipse.ui.navigator.INavigatorFilterService#isActive(java.lang.String)
 	 */
-	@Override
 	public boolean isActive(String aFilterId) {
 		synchronized (activeFilters) {
 			return activeFilters.contains(aFilterId);
@@ -226,7 +220,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	 * 
 	 * @see org.eclipse.ui.navigator.INavigatorFilterService#activateFilters(java.lang.String[])
 	 */
-	@Override
 	public void setActiveFilterIds(String[] theFilterIds) {
 		Assert.isNotNull(theFilterIds);
 		synchronized (activeFilters) {
@@ -235,7 +228,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		}
 	}
 	
-	@Override
 	public void activateFilterIdsAndUpdateViewer(String[] filterIdsToActivate) {
 		boolean updateFilterActivation = false;
 

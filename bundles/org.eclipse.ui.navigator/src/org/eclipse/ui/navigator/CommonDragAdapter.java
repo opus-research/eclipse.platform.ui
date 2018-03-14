@@ -114,13 +114,11 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 	 * 
 	 * @see org.eclipse.swt.dnd.DragSourceAdapter#dragStart(org.eclipse.swt.dnd.DragSourceEvent)
 	 */
-	@Override
 	public void dragStart(final DragSourceEvent event) {
 		if (Policy.DEBUG_DND) {
 			System.out.println("CommonDragAdapter.dragStart (begin): " + event); //$NON-NLS-1$
 		}
 		SafeRunner.run(new NavigatorSafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				DragSource dragSource = (DragSource) event.widget;
 				if (Policy.DEBUG_DND) {
@@ -177,7 +175,6 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 	 * 
 	 * @see org.eclipse.swt.dnd.DragSourceAdapter#dragSetData(org.eclipse.swt.dnd.DragSourceEvent)
 	 */
-	@Override
 	public void dragSetData(final DragSourceEvent event) {
 
 		final ISelection selection = LocalSelectionTransfer.getTransfer()
@@ -222,7 +219,6 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 				for (int j = 0; j < supportedTransferTypes.length; j++) {
 					if (supportedTransferTypes[j].isSupportedType(event.dataType)) {
 						SafeRunner.run(new NavigatorSafeRunnable() {
-							@Override
 							public void run() throws Exception {
 								if (Policy.DEBUG_DND) {
 									System.out
@@ -264,7 +260,6 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 	 * 
 	 * @see org.eclipse.swt.dnd.DragSourceAdapter#dragFinished(org.eclipse.swt.dnd.DragSourceEvent)
 	 */
-	@Override
 	public void dragFinished(DragSourceEvent event) {
 
 		if (Policy.DEBUG_DND) {
