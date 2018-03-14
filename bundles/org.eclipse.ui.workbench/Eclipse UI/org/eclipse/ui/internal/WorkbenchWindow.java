@@ -2197,7 +2197,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		try {
 			getShell().setLayoutDeferred(true);
-			eventBroker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
+
+			if (toolBarManagerRenderer != null) {
+				toolBarManagerRenderer.updateEnablement();
+			}
 			getCoolBarManager2().update(false);
 		} finally {
 			getShell().setLayoutDeferred(false);
