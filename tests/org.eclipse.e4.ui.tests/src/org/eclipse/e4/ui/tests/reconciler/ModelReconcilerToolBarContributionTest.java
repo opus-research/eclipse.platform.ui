@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
-
-import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -20,7 +17,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerToolBarContributionTest extends
 		ModelReconcilerTest {
@@ -59,52 +55,42 @@ public abstract class ModelReconcilerToolBarContributionTest extends
 		assertEquals(after, contribution.getPositionInParent());
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_NullNull() {
 		testToolBarContribution_PositionInParent(null, null);
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_NullEmpty() {
 		testToolBarContribution_PositionInParent(null, "");
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_NullString() {
 		testToolBarContribution_PositionInParent(null, "id");
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_EmptyNull() {
 		testToolBarContribution_PositionInParent("", null);
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_EmptyEmpty() {
 		testToolBarContribution_PositionInParent("", "");
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_EmptyString() {
 		testToolBarContribution_PositionInParent("", "id");
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_StringNull() {
 		testToolBarContribution_PositionInParent("id", null);
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_StringEmpty() {
 		testToolBarContribution_PositionInParent("id", "");
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_StringStringUnchanged() {
 		testToolBarContribution_PositionInParent("id", "id");
 	}
 
-	@Test
 	public void testToolBarContribution_PositionInParent_StringStringChanged() {
 		testToolBarContribution_PositionInParent("id", "id2");
 	}
@@ -142,52 +128,42 @@ public abstract class ModelReconcilerToolBarContributionTest extends
 		assertEquals(after, contribution.getParentId());
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_NullNull() {
 		testToolBarContribution_ParentId(null, null);
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_NullEmpty() {
 		testToolBarContribution_ParentId(null, "");
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_NullString() {
 		testToolBarContribution_ParentId(null, "id");
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_EmptyNull() {
 		testToolBarContribution_ParentId("", null);
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_EmptyEmpty() {
 		testToolBarContribution_ParentId("", "");
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_EmptyString() {
 		testToolBarContribution_ParentId("", "id");
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_StringNull() {
 		testToolBarContribution_ParentId("id", null);
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_StringEmpty() {
 		testToolBarContribution_ParentId("id", "");
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_StringStringUnchanged() {
 		testToolBarContribution_ParentId("id", "id");
 	}
 
-	@Test
 	public void testToolBarContribution_ParentId_StringStringChanged() {
 		testToolBarContribution_ParentId("id", "id2");
 	}

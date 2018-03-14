@@ -7,26 +7,20 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.e4.ui.internal.workbench.ExtensionsSort;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -34,7 +28,7 @@ import org.osgi.framework.FrameworkUtil;
 /**
  * Test for the {@link ExtensionsSort} class.
  */
-public class ExtensionsSortTests {
+public class ExtensionsSortTests extends TestCase {
 
 	Bundle root;
 	Bundle intermediate;
@@ -45,8 +39,8 @@ public class ExtensionsSortTests {
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		BundleContext context = FrameworkUtil.getBundle(getClass())
 				.getBundleContext();
 
@@ -71,7 +65,6 @@ public class ExtensionsSortTests {
 		leaf.start(Bundle.START_TRANSIENT);
 	}
 
-	@Test
 	public void testSortOrder() {
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry
@@ -108,8 +101,8 @@ public class ExtensionsSortTests {
 	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		if (root != null) {
 			root.uninstall();
 		}

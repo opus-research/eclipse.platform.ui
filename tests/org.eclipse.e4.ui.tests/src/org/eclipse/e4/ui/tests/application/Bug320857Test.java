@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -32,27 +28,26 @@ import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.emf.common.notify.Notifier;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class Bug320857Test {
+public class Bug320857Test extends TestCase {
 
 	private IEclipseContext applicationContext;
 
 	private IPresentationEngine engine;
 
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		applicationContext = E4Application.createDefaultContext();
+		super.setUp();
 	}
 
 	protected String getEngineURI() {
 		return "bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.application.HeadlessContextPresentationEngine"; //$NON-NLS-1$
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
 		applicationContext.dispose();
 	}
 
@@ -102,8 +97,7 @@ public class Bug320857Test {
 
 	}
 
-	@Test
-	public void testBug320857() {
+	public void testBug320857() throws Exception {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 
@@ -120,7 +114,6 @@ public class Bug320857Test {
 
 		applicationContext.set(Bug320857.class.getName(),
 				new ContextFunction() {
-					@Override
 					public Object compute(IEclipseContext context,
 							String contextKey) {
 						return ContextInjectionFactory.make(Bug320857.class,
