@@ -9,7 +9,6 @@
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - ongoing development
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 458342
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.dom;
 
@@ -63,29 +62,25 @@ public class ViewCSSImpl implements ViewCSS {
 		// Loop for CSS StyleSheet list parsed
 		StyleSheetList styleSheetList = documentCSS.getStyleSheets();
 		int l = styleSheetList.getLength();
-
-		List<CSSRule> combinedRuleList = new ArrayList<CSSRule>();
 		for (int i = 0; i < l; i++) {
 			CSSStyleSheet styleSheet = (CSSStyleSheet) styleSheetList.item(i);
-
-			CSSRuleList styleSheetRules = styleSheet.getCssRules();
-			int rulesSize = styleSheetRules.getLength();
-			for (int j = 0; j < rulesSize; j++) {
-				combinedRuleList.add(styleSheetRules.item(j));
+			CSSStyleDeclaration styleDeclaration = getComputedStyle(styleSheet,
+					elt, pseudoElt);
+			if (styleDeclaration != null) {
+				return styleDeclaration;
 			}
 		}
-
-		CSSStyleDeclaration styleDeclaration = getComputedStyle(combinedRuleList, elt, pseudoElt);
-		return styleDeclaration;
+		return null;
 	}
 
-	public CSSStyleDeclaration getComputedStyle(List<CSSRule> ruleList, Element elt, String pseudoElt) {
+	public CSSStyleDeclaration getComputedStyle(CSSStyleSheet styleSheet, Element elt, String pseudoElt) {
 		List styleDeclarations = null;
 		StyleWrapper firstStyleDeclaration = null;
-		int length = ruleList.size();
+		CSSRuleList ruleList = styleSheet.getCssRules();
+		int length = ruleList.getLength();
 		int position = 0;
 		for (int i = 0; i < length; i++) {
-			CSSRule rule = ruleList.get(i);
+			CSSRule rule = ruleList.item(i);
 			if (rule.getType() == CSSRule.STYLE_RULE) {
 				CSSStyleRule styleRule = (CSSStyleRule) rule;
 				if (rule instanceof ExtendedCSSRule) {
