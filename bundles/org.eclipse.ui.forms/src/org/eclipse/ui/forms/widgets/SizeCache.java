@@ -41,14 +41,15 @@ public class SizeCache {
 
     private Point preferredSize;
 
-	private int cachedWidthQuery;
-	private Point cachedWidth;
+    private int cachedWidthQuery;
+    private int cachedWidthResult;
 
-	private int cachedHeightQuery;
-	private Point cachedHeight;
+    private int cachedHeightQuery;
+    private int cachedHeightResult;
 
-	private int minimumWidth;
-	private int maximumWidth;
+    private int minimumWidth;
+    private int heightAtMinimumWidth = -1;
+    private int maximumWidth;
 
     /**
      * True iff we should recursively flush all children on the next layout
@@ -75,11 +76,14 @@ public class SizeCache {
 
     private int heightAdjustment = 0;
 
-	private int minimumHeight;
+    private int minimumHeight;
 
-	// If the layout is dirty, this is the size of the control at the time its
-	// layout was dirtied. null if the layout is not dirty.
-	private Point dirtySize = null;
+    private int widthAtMinimumHeight = -1;
+
+    // If the layout is dirty, this is the size of the control at the time its
+    // layout was dirtied. null if the layout is not dirty.
+    private Point dirtySize = null;
+
 
     // END OF HACK
 
@@ -139,27 +143,31 @@ public class SizeCache {
 
     public void flush(boolean recursive) {
         preferredSize = null;
-		cachedWidthQuery = -1;
-		cachedHeightQuery = -1;
-		minimumWidth = -1;
-		maximumWidth = -1;
-		minimumHeight = -1;
+        cachedWidthQuery = -1;
+        cachedWidthResult = -1;
+        cachedHeightQuery = -1;
+        cachedHeightResult = -1;
+        minimumWidth = -1;
+        maximumWidth = -1;
+        minimumHeight = -1;
+        heightAtMinimumWidth = -1;
+        widthAtMinimumHeight = -1;
 
-		if (recursive || dirtySize != null) {
-			if (control == null || control.isDisposed()) {
-				dirtySize = new Point(0, 0);
-				control = null;
-			} else {
-				dirtySize = control.getSize();
-			}
-		}
+        if (recursive || dirtySize != null) {
+            if (control == null || control.isDisposed()) {
+                dirtySize = new Point(0,0);
+                control = null;
+            } else {
+                dirtySize = control.getSize();
+            }
+        }
 
-		this.flushChildren = this.flushChildren || recursive;
+        this.flushChildren = this.flushChildren || recursive;
     }
 
     private Point getPreferredSize() {
         if (preferredSize == null) {
-			preferredSize = controlComputeSize(SWT.DEFAULT, SWT.DEFAULT);
+            preferredSize = controlComputeSize(SWT.DEFAULT, SWT.DEFAULT);
         }
 
         return preferredSize;
@@ -172,18 +180,36 @@ public class SizeCache {
      * @param heightHint the known height of the control (pixels) or SWT.DEFAULT if unknown
      * @return the preferred size of the control
      */
-	public Point computeSize(final int widthHint, final int heightHint) {
-		if (control == null || control.isDisposed()) {
+    public Point computeSize(int widthHint, int heightHint) {
+        if (control == null || control.isDisposed()) {
             return new Point(0, 0);
         }
 
-		// If both dimensions were supplied in the input, compute the trivial
-		// result
+        // If we're asking for a result smaller than the minimum width
+        int minWidth = computeMinimumWidth();
+
+        if (widthHint != SWT.DEFAULT && widthHint + widthAdjustment < minWidth) {
+            if (heightHint == SWT.DEFAULT) {
+                return new Point(minWidth, computeHeightAtMinimumWidth());
+            }
+
+            widthHint = minWidth - widthAdjustment;
+        }
+
+        // If we're asking for a result smaller than the minimum height
+        int minHeight = computeMinimumHeight();
+
+        if (heightHint != SWT.DEFAULT && heightHint + heightAdjustment < minHeight) {
+            if (widthHint == SWT.DEFAULT) {
+                return new Point(computeWidthAtMinimumHeight(), minHeight);
+            }
+
+            heightHint = minHeight - heightAdjustment;
+        }
+
+        // If both dimensions were supplied in the input, compute the trivial result
         if (widthHint != SWT.DEFAULT && heightHint != SWT.DEFAULT) {
-			// This may not be what control returns but this means control won't
-			// fit in these dimensions and exactly how much it does not fit it
-			// probably not a concern of layout
-			return new Point(widthHint + widthAdjustment, heightHint + heightAdjustment);
+            return new Point(widthHint + widthAdjustment, heightHint + heightAdjustment);
         }
 
         // No hints given -- find the preferred size
@@ -197,11 +223,11 @@ public class SizeCache {
             Point result = Geometry.copy(getPreferredSize());
 
             if (widthHint != SWT.DEFAULT) {
-				result.x = widthHint + widthAdjustment;
+                result.x = widthHint + widthAdjustment;
             }
 
             if (heightHint != SWT.DEFAULT) {
-				result.y = heightHint + heightAdjustment;
+                result.y = heightHint + heightAdjustment;
             }
 
             return result;
@@ -212,16 +238,16 @@ public class SizeCache {
             // If we know the control's preferred size
             if (preferredSize != null) {
                 // If the given width is the preferred width, then return the preferred size
-				if (widthHint + widthAdjustment == preferredSize.x) {
+                if (widthHint + widthAdjustment == preferredSize.x) {
                     return Geometry.copy(preferredSize);
                 }
             }
 
             // If we have a cached height measurement
-			if (cachedHeightQuery != -1) {
+            if (cachedHeightQuery != -1) {
                 // If this was measured with the same width hint
-				if (cachedHeightQuery == widthHint) {
-					return Geometry.copy(cachedHeight);
+                if (cachedHeightQuery == widthHint) {
+                    return new Point(widthHint + widthAdjustment, cachedHeightResult);
                 }
             }
 
@@ -234,16 +260,19 @@ public class SizeCache {
 
                 // If the width hint is larger than the preferred width, then
                 // we can compute the result from the preferred width
-				if (widthHint + widthAdjustment >= preferredSize.x) {
-					return new Point(widthHint + widthAdjustment, preferredSize.y);
+                if (widthHint + widthAdjustment >= preferredSize.x) {
+                    return new Point(widthHint + widthAdjustment, preferredSize.y);
                 }
             }
 
             // Else we can't find an existing size in the cache, so recompute
             // it from scratch.
-			cachedHeight = controlComputeSize(widthHint, heightHint);
-			cachedHeightQuery = widthHint;
-			return Geometry.copy(cachedHeight);
+            Point newHeight = controlComputeSize(widthHint - widthAdjustment, SWT.DEFAULT);
+
+            cachedHeightQuery = heightHint;
+            cachedHeightResult = newHeight.y;
+
+            return newHeight;
         }
 
         // Computing a width
@@ -251,46 +280,43 @@ public class SizeCache {
             // If we know the control's preferred size
             if (preferredSize != null) {
                 // If the given height is the preferred height, then return the preferred size
-				if (heightHint + heightAdjustment == preferredSize.y) {
+                if (heightHint + heightAdjustment == preferredSize.y) {
                     return Geometry.copy(preferredSize);
                 }
             }
 
-			// If we have a cached width measurement
-			if (cachedWidth != null) {
-				// If this was measured with the same height hint
-				if (cachedWidthQuery == heightHint) {
-					return Geometry.copy(cachedWidth);
-				}
+            // If we have a cached width measurement with the same height hint
+            if (cachedWidthQuery == heightHint) {
+                return new Point(cachedWidthResult, heightHint + heightAdjustment);
             }
 
-			// Recompute and re-cache
-			cachedWidth = controlComputeSize(widthHint, heightHint);
-			cachedWidthQuery = heightHint;
-			return Geometry.copy(cachedWidth);
+            Point widthResult = controlComputeSize(SWT.DEFAULT, heightHint - heightAdjustment);
+
+            cachedWidthQuery = heightHint;
+            cachedWidthResult = widthResult.x;
+
+            return widthResult;
         }
 
-		return controlComputeSize(widthHint, heightHint);
+        return controlComputeSize(widthHint, heightHint);
     }
 
     /**
-	 * Compute the control's size, and ensure that non-default hints are
-	 * returned verbatim (this tries to compensate for SWT's hints, which aren't
-	 * really the outer width of the control).
-	 *
-	 * @param widthHint
-	 *            the horizontal hint
-	 * @param heightHint
-	 *            the vertical hint
-	 * @return the control's size
-	 */
-	public Point computeAdjustedSize(int widthHint, int heightHint) {
+     * Compute the control's size, and ensure that non-default hints are returned verbatim
+     * (this tries to compensate for SWT's hints, which aren't really the outer width of the
+     * control).
+     *
+     * @param widthHint the horizontal hint
+     * @param heightHint the vertical hint
+     * @return the control's size
+     */
+    public Point computeAdjustedSize(int widthHint, int heightHint) {
         int adjustedWidthHint = widthHint == SWT.DEFAULT ? SWT.DEFAULT : Math
                 .max(0, widthHint - widthAdjustment);
         int adjustedHeightHint = heightHint == SWT.DEFAULT ? SWT.DEFAULT : Math
                 .max(0, heightHint - heightAdjustment);
 
-		Point result = computeSize(adjustedWidthHint, adjustedHeightHint);
+        Point result = computeSize(adjustedWidthHint, adjustedHeightHint);
 
         // If the amounts we subtracted off the widthHint and heightHint didn't do the trick, then
         // manually adjust the result to ensure that a non-default hint will return that result verbatim.
@@ -299,24 +325,24 @@ public class SizeCache {
     }
 
     /**
-	 * Returns true if the preferred length of the given control is independent
-	 * of the width and vice versa. If this returns true, then changing the
-	 * widthHint argument to control.computeSize will never change the resulting
-	 * height and changing the heightHint will never change the resulting width.
-	 * Returns false if unknown.
-	 * <p>
-	 * This information can be used to improve caching. Incorrectly returning a
-	 * value of false may decrease performance, but incorrectly returning a
-	 * value of true will generate incorrect layouts... so always return false
-	 * if unsure.
-	 * </p>
-	 *
-	 * @param control
-	 * @return <code>true</code> iff the preferred length of the given control
-	 *         is independent of the width and vice versa
-	 */
+     * Returns true if the preferred length of the given control is
+     * independent of the width and vice versa. If this returns true,
+     * then changing the widthHint argument to control.computeSize will
+     * never change the resulting height and changing the heightHint
+     * will never change the resulting width. Returns false if unknown.
+     * <p>
+     * This information can be used to improve caching. Incorrectly returning
+     * a value of false may decrease performance, but incorrectly returning
+     * a value of true will generate incorrect layouts... so always return
+     * false if unsure.
+     * </p>
+     *
+     * @param control
+     * @return <code>true</code> iff the preferred length of the given control is
+     * independent of the width and vice versa
+     */
     static boolean independentLengthAndWidth(Control control) {
-		if (control == null || control.isDisposed()) {
+        if (control == null || control.isDisposed()) {
             return true;
         }
 
@@ -347,10 +373,10 @@ public class SizeCache {
      * @param control
      */
     private void computeHintOffset(Control control) {
-		if (control instanceof Scrollable) {
-			// For scrollables, subtract off the trim size
-			Scrollable scrollable = (Scrollable) control;
-			Rectangle trim = scrollable.computeTrim(0, 0, 0, 0);
+        if (control instanceof Scrollable) {
+            // For scrollables, subtract off the trim size
+            Scrollable scrollable = (Scrollable) control;
+            Rectangle trim = scrollable.computeTrim(0, 0, 0, 0);
 
             widthAdjustment = trim.width;
             heightAdjustment = trim.height;
@@ -361,124 +387,146 @@ public class SizeCache {
         }
     }
 
-	private Point controlComputeSize(int widthHint, int heightHint) {
-		Point result = control.computeSize(widthHint, heightHint, flushChildren);
-		flushChildren = false;
+    private Point controlComputeSize(int widthHint, int heightHint) {
+        Point result = control.computeSize(widthHint, heightHint, flushChildren);
+        flushChildren = false;
 
-		return result;
-	}
+        return result;
+    }
 
     /**
-	 * Returns true only if the control will return a constant height for any
-	 * width hint larger than the preferred width. Returns false if there is any
-	 * situation in which the control does not have this property.
-	 *
-	 * <p>
-	 * Note: this method is only important for wrapping controls, and it can
-	 * safely return false for anything else. AFAIK, all SWT controls have this
-	 * property, but to be safe they will only be added to the list once the
-	 * property has been confirmed.
-	 * </p>
-	 *
-	 * @param control
-	 * @return value as described above
-	 */
+     * Returns true only if the control will return a constant height for any
+     * width hint larger than the preferred width. Returns false if there is
+     * any situation in which the control does not have this property.
+     *
+     * <p>
+     * Note: this method is only important for wrapping controls, and it can
+     * safely return false for anything else. AFAIK, all SWT controls have this
+     * property, but to be safe they will only be added to the list once the
+     * property has been confirmed.
+     * </p>
+     *
+     * @param control
+     * @return value as described above
+     */
     private static boolean isPreferredWidthMaximum(Control control) {
         return (control instanceof ToolBar
         //|| control instanceof CoolBar
         || control instanceof Label);
     }
 
-	public int computeMinimumWidth() {
-		if (minimumWidth == -1) {
-			if (control instanceof Composite) {
-				Layout layout = ((Composite) control).getLayout();
-				if (layout instanceof ILayoutExtension) {
-					minimumWidth = ((ILayoutExtension) layout).computeMinimumWidth((Composite) control, flushChildren);
-					flushChildren = false;
-				}
-			}
-		}
+    public int computeMinimumWidth() {
+        if (minimumWidth == -1) {
+    		if (control instanceof Composite) {
+    			Layout layout = ((Composite)control).getLayout();
+    			if (layout instanceof ILayoutExtension) {
+    				minimumWidth = ((ILayoutExtension)layout).computeMinimumWidth((Composite)control, flushChildren);
+    				flushChildren = false;
+    			}
+    		}
+        }
 
-		if (minimumWidth == -1) {
-			Point minWidth = controlComputeSize(FormUtil.getWidthHint(5, control), SWT.DEFAULT);
-			minimumWidth = minWidth.x;
-		}
+        if (minimumWidth == -1) {
+            Point minWidth = controlComputeSize(FormUtil.getWidthHint(5, control), SWT.DEFAULT);
+            minimumWidth = minWidth.x;
+            heightAtMinimumWidth = minWidth.y;
+        }
 
 		return minimumWidth;
+    }
+
+    public int computeMaximumWidth() {
+        if (maximumWidth == -1) {
+    		if (control instanceof Composite) {
+    			Layout layout = ((Composite)control).getLayout();
+    			if (layout instanceof ILayoutExtension) {
+    				maximumWidth = ((ILayoutExtension)layout).computeMaximumWidth((Composite)control, flushChildren);
+    				flushChildren = false;
+    			}
+    		}
+        }
+
+        if (maximumWidth == -1) {
+            maximumWidth = getPreferredSize().x;
+        }
+
+        return maximumWidth;
 	}
 
-	public int computeMaximumWidth() {
-		if (maximumWidth == -1) {
-			if (control instanceof Composite) {
-				Layout layout = ((Composite) control).getLayout();
-				if (layout instanceof ILayoutExtension) {
-					maximumWidth = ((ILayoutExtension) layout).computeMaximumWidth((Composite) control, flushChildren);
-					flushChildren = false;
-				}
-			}
-		}
+    private int computeHeightAtMinimumWidth() {
+        int minimumWidth = computeMinimumWidth();
 
-		if (maximumWidth == -1) {
-			maximumWidth = getPreferredSize().x;
-		}
+        if (heightAtMinimumWidth == -1) {
+            heightAtMinimumWidth = controlComputeSize(minimumWidth - widthAdjustment, SWT.DEFAULT).y;
+        }
 
-		return maximumWidth;
-	}
+        return heightAtMinimumWidth;
+    }
 
-	private int computeMinimumHeight() {
-		if (minimumHeight == -1) {
-			Point sizeAtMinHeight = controlComputeSize(SWT.DEFAULT, 0);
+    private int computeWidthAtMinimumHeight() {
+        int minimumHeight = computeMinimumHeight();
 
-			minimumHeight = sizeAtMinHeight.y;
-		}
+        if (widthAtMinimumHeight == -1) {
+            widthAtMinimumHeight = controlComputeSize(SWT.DEFAULT, minimumHeight - heightAdjustment).x;
+        }
 
-		return minimumHeight;
-	}
+        return widthAtMinimumHeight;
+    }
 
-	public Point computeMinimumSize() {
-		return new Point(computeMinimumWidth(), computeMinimumHeight());
-	}
+    private int computeMinimumHeight() {
+        if (minimumHeight == -1) {
+            Point sizeAtMinHeight = controlComputeSize(SWT.DEFAULT, 0);
 
-	public void setSize(Point newSize) {
-		if (control != null) {
-			control.setSize(newSize);
-		}
+            minimumHeight = sizeAtMinHeight.y;
+            widthAtMinimumHeight = sizeAtMinHeight.x;
+        }
 
-		layoutIfNecessary();
-	}
+        return minimumHeight;
+    }
 
-	public void setSize(int width, int height) {
-		if (control != null) {
-			control.setSize(width, height);
-		}
+    public Point computeMinimumSize() {
+        return new Point(computeMinimumWidth(), computeMinimumHeight());
+    }
 
-		layoutIfNecessary();
-	}
+    public void setSize(Point newSize) {
+        if (control != null) {
+            control.setSize(newSize);
+        }
 
-	public void setBounds(int x, int y, int width, int height) {
-		if (control != null) {
-			control.setBounds(x, y, width, height);
-		}
+        layoutIfNecessary();
+    }
 
-		layoutIfNecessary();
-	}
+    public void setSize(int width, int height) {
+        if (control != null) {
+            control.setSize(width, height);
+        }
 
-	public void setBounds(Rectangle bounds) {
-		if (control != null) {
-			control.setBounds(bounds);
-		}
+        layoutIfNecessary();
+    }
 
-		layoutIfNecessary();
-	}
+    public void setBounds(int x, int y, int width, int height) {
+        if (control != null) {
+            control.setBounds(x, y, width, height);
+        }
 
-	public void layoutIfNecessary() {
-		if (dirtySize != null && control != null && control instanceof Composite) {
-			if (control.getSize().equals(dirtySize)) {
-				((Composite) control).layout(flushChildren);
-				flushChildren = false;
-			}
-		}
-		dirtySize = null;
-	}
+        layoutIfNecessary();
+    }
+
+    public void setBounds(Rectangle bounds) {
+        if (control != null) {
+            control.setBounds(bounds);
+        }
+
+        layoutIfNecessary();
+    }
+
+    public void layoutIfNecessary() {
+        if (dirtySize != null && control != null && control instanceof Composite) {
+            if (control.getSize().equals(dirtySize)) {
+	            ((Composite)control).layout(flushChildren);
+	            flushChildren = false;
+            }
+        }
+        dirtySize = null;
+    }
 }
