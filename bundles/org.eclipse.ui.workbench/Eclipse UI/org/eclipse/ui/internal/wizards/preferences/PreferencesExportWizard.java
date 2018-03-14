@@ -46,7 +46,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public class PreferencesExportWizard extends Wizard implements IExportWizard {
 
-	private static final String EVENT_TOPIC_BASE = "org/eclipse/ui/internal/wizards/preferences/export/"; //$NON-NLS-1$
+	private static final String EVENT_TOPIC_BASE = "org/eclipse/ui/workbench/preferences/export/"; //$NON-NLS-1$
 
 	public static final String EVENT_EXPORT_BEGIN = EVENT_TOPIC_BASE + "begin"; //$NON-NLS-1$
 
@@ -79,7 +79,7 @@ public class PreferencesExportWizard extends Wizard implements IExportWizard {
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		eventBroker = workbench.getService(IEventBroker.class);
-        setWindowTitle(PreferencesMessages.PreferencesExportWizard_export);
+		setWindowTitle(PreferencesMessages.PreferencesExportWizard_export);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_EXPORT_PREF_WIZ));
         setNeedsProgressMonitor(true);

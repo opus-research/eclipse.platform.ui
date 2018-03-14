@@ -14,9 +14,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -27,7 +27,6 @@ import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResourceFactory;
-import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -44,10 +43,6 @@ import org.osgi.service.event.EventHandler;
 public class ImportExportPespectiveHandler {
 
 	private static final String PERSPECTIVE_SUFFIX_4X = "_e4persp"; //$NON-NLS-1$
-
-	private static final String ASCII_ENCODING = "ASCII"; //$NON-NLS-1$
-
-	private static final String TRIMS_KEY = "trims"; //$NON-NLS-1$
 
 	@Inject
 	private EModelService modelService;
@@ -74,8 +69,8 @@ public class ImportExportPespectiveHandler {
 	private boolean ignoreEvents;
 
 	private List<MPerspective> exportedPersps = new ArrayList<>();
-	private List<String> importedPersps = new ArrayList<>();
-	private Map<String, String> minMaxPersistedState;
+	private List<String> importedPersps = new ArrayList<String>();
+
 
 	@PostConstruct
 	private void init() {
@@ -95,119 +90,64 @@ public class ImportExportPespectiveHandler {
 	}
 
 	private void importPerspective4x(PreferenceChangeEvent event) {
-		importedPersps.add(event.getKey());
-		MPerspective perspective = null;
+		MPerspective persp = null;
 		try {
-			perspective = perspFromString((String) event.getNewValue());
+			persp = perspFromString((String) event.getNewValue());
 		} catch (IOException e) {
-			logError(event, e);
+			logger.error(e, String.format("Cannot read perspective \"%s\" from preferences", event.getKey())); //$NON-NLS-1$
 		}
-		if (perspective == null) {
+		if (persp == null) {
 			return;
 		}
 
-		addPerspectiveToRegistry(perspective);
-		importToolbarsLocation(perspective);
-	}
-
-	private void addPerspectiveToRegistry(MPerspective perspective) {
-		IPerspectiveDescriptor perspToOverwrite = perspectiveRegistry.findPerspectiveWithLabel(perspective.getLabel());
-
-		// a new perspective
-		if (perspToOverwrite == null) {
-			perspectiveRegistry.addPerspective(perspective);
-			return;
-		}
-
-		String perspToOverwriteId = perspToOverwrite.getId();
-		// a perspective with the same label exists, but has different ID
-		if (!perspective.getElementId().equals(perspToOverwriteId)) {
-			logger.warn(String.format("Cannot import perspective \"%s\" because a perspective" //$NON-NLS-1$
-					+ " with the same label but different ID exists in the workbench", perspective.getElementId())); //$NON-NLS-1$
-		} else {
+		IPerspectiveDescriptor perspToOverwrite = perspectiveRegistry.findPerspectiveWithId(persp.getElementId());
+		if (perspToOverwrite != null) {
 			perspectiveRegistry.deletePerspective(perspToOverwrite);
-			perspectiveRegistry.addPerspective(perspective);
 		}
-	}
-
-	private void logError(PreferenceChangeEvent event, Exception e) {
-		logger.error(e, String.format("Cannot read perspective \"%s\" from preferences", event.getKey())); //$NON-NLS-1$
+		perspectiveRegistry.addPerspective(persp);
+		importedPersps.add(event.getKey());
 	}
 
 	private void copyPerspToPreferences(MPerspective persp) throws IOException {
-		MPerspective perspClone = (MPerspective) modelService.cloneElement(persp, null);
-		exportToolbarsLocation(perspClone);
-		String perspAsString = perspToString(perspClone);
-		preferences.put(perspClone.getLabel() + PERSPECTIVE_SUFFIX_4X, perspAsString);
-	}
-
-	private void exportToolbarsLocation(MPerspective persp) {
-		Map<String, String> minMaxPersState = getMinMaxPersistedState();
-		if (minMaxPersState == null) {
-			return;
-		}
-		String trimsData = minMaxPersState.get(persp.getElementId());
-		persp.getPersistedState().put(TRIMS_KEY, trimsData);
-	}
-
-	private void importToolbarsLocation(MPerspective persp) {
-		String trimsData = persp.getPersistedState().get(TRIMS_KEY);
-		if (trimsData == null || trimsData.trim().isEmpty()) {
-			return;
-		}
-		persp.getPersistedState().remove(TRIMS_KEY);
-		Map<String, String> minMaxPersState = getMinMaxPersistedState();
-		if (minMaxPersState == null) {
-			return;
-		}
-		minMaxPersState.put(persp.getElementId(), trimsData);
-	}
-
-	private Map<String, String> getMinMaxPersistedState() {
-		if (minMaxPersistedState != null) {
-			return minMaxPersistedState;
-		}
-		for (MAddon addon : application.getAddons()) {
-			if ("MinMax Addon".equals(addon.getElementId())) { //$NON-NLS-1$
-				minMaxPersistedState = addon.getPersistedState();
-				break;
-			}
-		}
-		return minMaxPersistedState;
+		String perspAsString = perspToString(persp);
+		preferences.put(persp.getLabel() + PERSPECTIVE_SUFFIX_4X, perspAsString);
 	}
 
 	private String perspToString(MPerspective persp) throws IOException {
 		Resource resource = new E4XMIResourceFactory().createResource(null);
-		resource.getContents().add((EObject) persp);
+		resource.getContents().add((EObject) modelService.cloneElement(persp, null));
+
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
 			resource.save(output, null);
 		} finally {
-			try {
-				output.close();
-			} catch (IOException e) {
-				logger.error(e, "Cannot close output stream"); //$NON-NLS-1$
+			if (output != null) {
+				try {
+					output.close();
+				} catch (IOException e) {
+					logger.error(e, "Cannot close output stream"); //$NON-NLS-1$
+				}
 			}
 		}
-		resource.getContents().clear();
-		return new String(output.toByteArray(), ASCII_ENCODING);
+
+		return new String(output.toByteArray(), StandardCharsets.US_ASCII);
 	}
 
 	private MPerspective perspFromString(String perspAsString) throws IOException {
 		Resource resource = new E4XMIResourceFactory().createResource(null);
-		InputStream input = new ByteArrayInputStream(perspAsString.getBytes(ASCII_ENCODING));
+		InputStream input = new ByteArrayInputStream(perspAsString.getBytes(StandardCharsets.US_ASCII));
 		try {
 			resource.load(input, null);
 		} finally {
-			try {
-				input.close();
-			} catch (IOException e) {
-				logger.error(e, "Cannot close input stream"); //$NON-NLS-1$
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					logger.error(e, "Cannot close input stream"); //$NON-NLS-1$
+				}
 			}
 		}
-		MPerspective perspective = (MPerspective) resource.getContents().get(0);
-		resource.getContents().clear();
-		return perspective;
+		return (MPerspective) resource.getContents().get(0);
 	}
 
 	private void copyPerspsToPreferences() {

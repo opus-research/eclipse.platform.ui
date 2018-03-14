@@ -29,7 +29,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	static final String DEFAULT_ID_BASE = "org.eclipse.ui.defaultBrowser"; //$NON-NLS-1$
 	private static final String HELP_BROWSER_ID = "org.eclipse.help.ui"; //$NON-NLS-1$
 
-	protected HashMap<String, Object> browserIdMap = new HashMap<>();
+	protected HashMap<String, Object> browserIdMap = new HashMap<String, Object>();
 
 	protected static DefaultBrowserSupport instance;
 
@@ -37,7 +37,6 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		// do nothing
 		instance = this;
 		BrowserManager.getInstance().addObserver(new Observer() {
-			@Override
 			public void update(Observable o, Object arg) {
 				// TODO I am not sure what we should do here
 				// The preferences have changed so maybe we should
@@ -79,7 +78,12 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return new Integer(window.hashCode());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
+	 *      java.lang.String, java.lang.String, java.lang.String)
+	 */
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
 		if (browserId == null)
@@ -137,7 +141,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 			@SuppressWarnings("unchecked")
 			HashMap<Integer, IWebBrowser> wmap = (HashMap<Integer, IWebBrowser>) browserIdMap.get(browserId);
 			if (wmap == null) {
-				wmap = new HashMap<>();
+				wmap = new HashMap<Integer, IWebBrowser>();
 				browserIdMap.put(browserId, wmap);
 			}
 			wmap.put(key, webBrowser);
@@ -149,12 +153,20 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return webBrowser;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
+	 */
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return createBrowser(0, browserId, null, null);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
+	 */
 	public boolean isInternalWebBrowserAvailable() {
 		return WebBrowserUtil.canUseInternalWebBrowser();
 	}

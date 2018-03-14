@@ -31,22 +31,18 @@ public class DynamicTestsBlackTabDescriptor extends AbstractTabDescriptor {
 						new DynamicTestsTypeMapper()));
 	}
 
-	@Override
 	public String getAfterTab() {
 		return "ColorTab"; //$NON-NLS-1$
 	}
 
-	@Override
 	public String getCategory() {
 		return "default"; //$NON-NLS-1$
 	}
 
-	@Override
 	public String getId() {
 		return "BlackTab"; //$NON-NLS-1$
 	}
 
-	@Override
 	public Image getImage() {
 		if (image == null) {
 			image = Activator
@@ -55,12 +51,10 @@ public class DynamicTestsBlackTabDescriptor extends AbstractTabDescriptor {
 		return image;
 	}
 
-	@Override
 	public String getLabel() {
 		return "Black"; //$NON-NLS-1$
 	}
 
-	@Override
 	public boolean isIndented() {
 		return true;
 	}

@@ -52,7 +52,11 @@ public class AddTaskAction extends SelectionListenerAction {
 	public AddTaskAction(final Shell shell) {
         super(IDEWorkbenchMessages.AddTaskLabel);
         Assert.isNotNull(shell);
-        this.shellProvider = () -> shell;
+        this.shellProvider = new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return shell;
+			} };
         initAction();
     }
 
