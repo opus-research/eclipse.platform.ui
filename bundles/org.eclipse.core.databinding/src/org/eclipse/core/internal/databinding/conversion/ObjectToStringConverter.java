@@ -33,6 +33,11 @@ public class ObjectToStringConverter implements IConverter {
 		this.fromClass = fromClass;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.binding.converter.IConverter#convert(java.lang.Object)
+	 */
 	@Override
 	public Object convert(Object source) {
 		if (source == null) {
