@@ -96,13 +96,21 @@ public class ViewRegistry implements IViewRegistry {
 				if (element.getName().equals(IWorkbenchRegistryConstants.TAG_VIEW)) {
 					createDescriptor(element, false);
 				}
-				if (element.getName().equals("e4view")) { //$NON-NLS-1$
+				if (element.getName().equals(IWorkbenchRegistryConstants.TAG_E4VIEW)) {
 					createDescriptor(element, true);
 				}
 			}
 		}
 	}
 
+	/**
+	 * Converts IConfigurationElement elements into view descriptors for the
+	 * Eclipse application model
+	 * 
+	 * @param element
+	 * @param e4View
+	 *            - flag to decide if view is based on a POJO
+	 */
 	private void createDescriptor(IConfigurationElement element, boolean e4View) {
 		String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 		MPartDescriptor descriptor = null;
