@@ -23,11 +23,12 @@ package org.eclipse.jface.viewers;
  * applying an update to a previously populated label until the decoration is ready,
  * thereby reducing flicker.
  * </p>
+ * @param <E> Type of an element of the model
  *
  * @see IDelayedLabelDecorator
  * @since 3.0
  */
-public interface IViewerLabelProvider extends IBaseLabelProvider {
+public interface IViewerLabelProvider<E> extends IBaseLabelProvider<E> {
 
     /**
      * Updates the label for the given element.
@@ -35,5 +36,5 @@ public interface IViewerLabelProvider extends IBaseLabelProvider {
      * @param label the label to update
      * @param element the element
      */
-    public void updateLabel(ViewerLabel label, Object element);
+    public void updateLabel(ViewerLabel label, E element);
 }

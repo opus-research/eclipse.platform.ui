@@ -21,16 +21,17 @@ import org.eclipse.swt.graphics.Image;
  * {@link TableViewer}
  *
  * <p><b>This classes is intended to be subclassed</b></p>
+ * @param <E> Type of an element of the model
  *
  * @since 3.3
  *
  */
-public class ColumnLabelProvider extends CellLabelProvider implements
-		IFontProvider, IColorProvider, ILabelProvider {
+public class ColumnLabelProvider<E> extends CellLabelProvider<E> implements
+		IFontProvider<E>, IColorProvider<E>, ILabelProvider<E> {
 
 	@Override
-	public void update(ViewerCell cell) {
-		Object element = cell.getElement();
+	public void update(ViewerCell<E> cell) {
+		E element = cell.getElement();
 		cell.setText(getText(element));
 		Image image = getImage(element);
 		cell.setImage(image);
@@ -41,27 +42,28 @@ public class ColumnLabelProvider extends CellLabelProvider implements
 	}
 
 	@Override
-	public Font getFont(Object element) {
+	public Font getFont(E element) {
 		return null;
 	}
 
 	@Override
-	public Color getBackground(Object element) {
+	public Color getBackground(E element) {
 		return null;
 	}
 
 	@Override
-	public Color getForeground(Object element) {
+	public Color getForeground(E element) {
+		return null;
+	}
+
+
+	@Override
+	public Image getImage(E element) {
 		return null;
 	}
 
 	@Override
-	public Image getImage(Object element) {
-		return null;
-	}
-
-	@Override
-	public String getText(Object element) {
+	public String getText(E element) {
 		return element == null ? "" : element.toString();//$NON-NLS-1$
 	}
 

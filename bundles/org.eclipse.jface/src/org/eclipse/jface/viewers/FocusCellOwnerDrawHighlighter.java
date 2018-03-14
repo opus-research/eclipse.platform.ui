@@ -8,7 +8,7 @@
  * Contributors:
  * 	   IBM Corporation - initial API and implementation
  * 	   Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
- * 												 - fix for bug 183850, 182652, 182800, 215069
+ * 												 - Bug 183850, 182652, 182800, 215069
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -29,11 +29,13 @@ import org.eclipse.swt.widgets.Listener;
  *
  * This class can be subclassed to configure how the coloring of the selected
  * cell.
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
-public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
+public class FocusCellOwnerDrawHighlighter<E,I> extends FocusCellHighlighter<E,I> {
 	/**
 	 * Create a new instance which can be passed to a
 	 * {@link TreeViewerFocusCellManager}
@@ -41,12 +43,12 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 * @param viewer
 	 *            the viewer
 	 */
-	public FocusCellOwnerDrawHighlighter(ColumnViewer viewer) {
+	public FocusCellOwnerDrawHighlighter(ColumnViewer<E,I> viewer) {
 		super(viewer);
 		hookListener(viewer);
 	}
 
-	private void markFocusedCell(Event event, ViewerCell cell) {
+	private void markFocusedCell(Event event, ViewerCell<E> cell) {
 		Color background = (cell.getControl().isFocusControl()) ? getSelectedCellBackgroundColor(cell)
 				: getSelectedCellBackgroundColorNoFocus(cell);
 		Color foreground = (cell.getControl().isFocusControl()) ? getSelectedCellForegroundColor(cell)
@@ -83,7 +85,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 		}
 	}
 
-	private void removeSelectionInformation(Event event, ViewerCell cell) {
+	private void removeSelectionInformation(Event event, ViewerCell<E> cell) {
 		GC gc = event.gc;
 		gc.setBackground(cell.getViewerRow().getBackground(
 				cell.getColumnIndex()));
@@ -93,21 +95,21 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 		event.detail &= ~SWT.SELECTED;
 	}
 
-	private void hookListener(final ColumnViewer viewer) {
+	private void hookListener(final ColumnViewer<E,I> viewer) {
 
 		Listener listener = new Listener() {
 
 			@Override
 			public void handleEvent(Event event) {
 				if ((event.detail & SWT.SELECTED) > 0) {
-					ViewerCell focusCell = getFocusCell();
-					ViewerRow row = viewer.getViewerRowFromItem(event.item);
+					ViewerCell<E> focusCell = getFocusCell();
+					ViewerRow<E> row = viewer.getViewerRowFromItem(event.item);
 
 					Assert
 							.isNotNull(row,
 									"Internal structure invalid. Item without associated row is not possible."); //$NON-NLS-1$
 
-					ViewerCell cell = row.getCell(event.index);
+					ViewerCell<E> cell = row.getCell(event.index);
 
 					if (focusCell == null || !cell.equals(focusCell)) {
 						removeSelectionInformation(event, cell);
@@ -129,7 +131,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the default
 	 */
-	protected Color getSelectedCellBackgroundColor(ViewerCell cell) {
+	protected Color getSelectedCellBackgroundColor(ViewerCell<E> cell) {
 		return null;
 	}
 
@@ -141,7 +143,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the default
 	 */
-	protected Color getSelectedCellForegroundColor(ViewerCell cell) {
+	protected Color getSelectedCellForegroundColor(ViewerCell<E> cell) {
 		return null;
 	}
 
@@ -155,7 +157,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 *         control has focus
 	 * @since 3.4
 	 */
-	protected Color getSelectedCellForegroundColorNoFocus(ViewerCell cell) {
+	protected Color getSelectedCellForegroundColorNoFocus(ViewerCell<E> cell) {
 		return null;
 	}
 
@@ -169,7 +171,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 *         control has focus
 	 * @since 3.4
 	 */
-	protected Color getSelectedCellBackgroundColorNoFocus(ViewerCell cell) {
+	protected Color getSelectedCellBackgroundColorNoFocus(ViewerCell<E> cell) {
 		return null;
 	}
 
@@ -181,12 +183,12 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	 * @return <code>true</code> if only the text area should be highlighted
 	 * @since 3.4
 	 */
-	protected boolean onlyTextHighlighting(ViewerCell cell) {
+	protected boolean onlyTextHighlighting(ViewerCell<E> cell) {
 		return false;
 	}
 
 	@Override
-	protected void focusCellChanged(ViewerCell newCell, ViewerCell oldCell) {
+	protected void focusCellChanged(ViewerCell<E> newCell, ViewerCell<E> oldCell) {
 		super.focusCellChanged(newCell, oldCell);
 
 		// Redraw new area
