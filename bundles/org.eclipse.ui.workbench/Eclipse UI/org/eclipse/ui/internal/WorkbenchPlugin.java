@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -30,7 +30,7 @@ import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.IHelpService;
+import org.eclipse.e4.ui.internal.workbench.EHelpService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -203,7 +203,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     
 	private ServiceTracker testableTracker = null;
 	
-	private IHelpService helpService;
+	private EHelpService helpService;
 
 	private ICommandHelpService commandHelpService;
 
@@ -1463,7 +1463,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 				return editorRegistry;
 			}
 		});
-		context.set(IHelpService.class.getName(), new ContextFunction() {
+		context.set(EHelpService.class.getName(), new ContextFunction() {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (helpService == null) {
