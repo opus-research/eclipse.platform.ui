@@ -32,7 +32,7 @@ public class ReflectedMethod {
      * @param methodName The name of the method.
      * @param paramTypes The method's parameter types.
      */
-	public ReflectedMethod(Object subject, String methodName, Class<?>[] paramTypes) {
+    public ReflectedMethod(Object subject, String methodName, Class[] paramTypes) {
         this.subject = subject;
         method = null;
         try {
@@ -78,7 +78,7 @@ public class ReflectedMethod {
 	 *
 	 * @return The return type or null if none.
 	 */
-	public Class<?> getType() {
+	public Class getType() {
 		return method.getReturnType();
 	}
 }

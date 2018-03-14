@@ -12,7 +12,6 @@
 package org.eclipse.jface.examples.databinding.contentprovider.test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @since 1.0
@@ -25,7 +24,7 @@ public class RenamableItem {
 	}
 
 	private String name;
-	private List<Listener> listeners = new ArrayList<Listener>();
+	private ArrayList listeners = new ArrayList();
 
 	public RenamableItem() {
 		name = "RenamableItem"; //$NON-NLS-1$
@@ -42,7 +41,7 @@ public class RenamableItem {
 	public void setName(String newName) {
 		this.name = newName;
 
-		Listener[] l = listeners.toArray(new Listener[listeners.size()]);
+		Listener[] l = (Listener[]) listeners.toArray(new Listener[listeners.size()]);
 		for (int i = 0; i < l.length; i++) {
 			l[i].handleChanged(this);
 		}

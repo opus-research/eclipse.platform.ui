@@ -26,7 +26,7 @@ public class SimplePerson extends ModelObject {
 	private String state = "";
 	private SimpleCart cart = new SimpleCart();
 
-	private List<SimpleOrder> orders = new LinkedList<SimpleOrder>();
+	private List orders = new LinkedList();
 
 	public SimplePerson(String name, String address, String city, String state) {
 		this.name = name;
@@ -104,7 +104,7 @@ public class SimplePerson extends ModelObject {
 	/**
 	 * @return Returns the orders.
 	 */
-	public List<SimpleOrder> getOrders() {
+	public List getOrders() {
 		return orders;
 	}
 

@@ -61,7 +61,7 @@ public class ReflectedProperty {
 	 *
 	 * @return The property's data type.
 	 */
-	public Class<?> getType() {
+	public Class getType() {
 		return getter.getType();
 	}
 
