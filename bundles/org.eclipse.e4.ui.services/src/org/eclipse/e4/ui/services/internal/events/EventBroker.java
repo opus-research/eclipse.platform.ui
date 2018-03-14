@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Steven Spungin - Bug 441874
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 478889
  *******************************************************************************/
 package org.eclipse.e4.ui.services.internal.events;
 
@@ -104,24 +103,10 @@ public class EventBroker implements IEventBroker {
 	@SuppressWarnings("unchecked")
 	private Event constructEvent(String topic, Object data) {
 		Event event;
-		if (data instanceof Dictionary<?, ?>) {
-			Dictionary<String, Object> d = new Hashtable<>((Map<? extends String, ? extends Object>) data);
-			if (d.get(EventConstants.EVENT_TOPIC) == null) {
-				d.put(EventConstants.EVENT_TOPIC, topic);
-			}
-			if (d.get(IEventBroker.DATA) == null) {
-				d.put(IEventBroker.DATA, data);
-			}
-			event = new Event(topic, d);
-		} else if (data instanceof Map<?, ?>) {
-			Map<String, Object> eventMap = new HashMap<>((Map<String, Object>) data);
-			if (!eventMap.containsKey(EventConstants.EVENT_TOPIC)) {
-				eventMap.put(EventConstants.EVENT_TOPIC, topic);
-			}
-			if (!eventMap.containsKey(IEventBroker.DATA)) {
-				eventMap.put(IEventBroker.DATA, data);
-			}
-			event = new Event(topic, eventMap);
+		if (data instanceof Dictionary<?,?>) {
+			event = new Event(topic, (Dictionary<String,?>)data);
+		} else if (data instanceof Map<?,?>) {
+			event = new Event(topic, (Map<String,?>)data);
 		} else {
 			Dictionary<String, Object> d = new Hashtable<String, Object>(2);
 			d.put(EventConstants.EVENT_TOPIC, topic);
@@ -146,17 +131,19 @@ public class EventBroker implements IEventBroker {
 			}
 			return false;
 		}
-		String[] topics = new String[] { topic };
+		String[] topics = new String[] {topic};
 		Dictionary<String, Object> d = new Hashtable<String, Object>();
 		d.put(EventConstants.EVENT_TOPIC, topics);
 		if (filter != null)
 			d.put(EventConstants.EVENT_FILTER, filter);
 		EventHandler wrappedHandler = new UIEventHandler(eventHandler, headless ? null : uiSync);
-		ServiceRegistration<?> registration = bundleContext.registerService(EventHandler.class.getName(),
-				wrappedHandler, d);
-		Collection<ServiceRegistration<?>> handled = registrations.get(eventHandler);
+		ServiceRegistration<?> registration = bundleContext.registerService(
+				EventHandler.class.getName(), wrappedHandler, d);
+		Collection<ServiceRegistration<?>> handled = registrations
+				.get(eventHandler);
 		if (handled == null) {
-			registrations.put(eventHandler, handled = new ArrayList<ServiceRegistration<?>>());
+			registrations.put(eventHandler,
+					handled = new ArrayList<ServiceRegistration<?>>());
 		}
 		handled.add(registration);
 		return true;
@@ -164,7 +151,8 @@ public class EventBroker implements IEventBroker {
 
 	@Override
 	public boolean unsubscribe(EventHandler eventHandler) {
-		Collection<ServiceRegistration<?>> handled = registrations.remove(eventHandler);
+		Collection<ServiceRegistration<?>> handled = registrations
+				.remove(eventHandler);
 		if (handled == null || handled.isEmpty())
 			return false;
 		for (ServiceRegistration<?> r : handled) {
