@@ -8,6 +8,7 @@
  * Contributors:
  *     Lars Vogel <Lars.Vogel@gmail.com> - initial API and implementation
  *     Andrea Guarinoni - intial color schema definition
+ *     Fabio Zadrozny - Bug 459938
  *******************************************************************************/
 
 /* ############################## Eclipse UI properties ############################## */
@@ -30,7 +31,6 @@ IEclipsePreferences#org-eclipse-ui-editors {
 		'currentLineColor=54,54,54'
 		'deletionIndicationColor=134,60,67'
 		'errorIndicationColor=179,26,64'
-		'errorIndicationHighlighting=true'
 		'filteredSearchResultIndicationColor=110,110,110'
 		'hyperlinkColor=102,175,249'
 		'hyperlinkColor.SystemDefault=false'
@@ -41,15 +41,29 @@ IEclipsePreferences#org-eclipse-ui-editors {
 		'occurrenceIndicationColor=72,72,72'
 		'overrideIndicatorColor=78,120,117'
 		'printMarginColor=98,98,98'
-		'searchResultHighlighting=false'
 		'searchResultIndication=true'
 		'searchResultIndicationColor=94,94,94'
 		'searchResultTextStyle=BOX'
 		'secondaryIPColor=54,54,54'
 		'spellingIndicationColor=253,170,211'
 		'warningIndicationColor=156,114,3'
+		'writeOccurrenceIndicationColor=51,90,114';
+
+	/* Bug 459938
+	 * We have to do those in the default preferences
+	 * because when the user changes the error indication
+	 * from highlight to squiggly the errorIndicationHighlighting
+	 * doesn't really change to false, it becomes null,
+	 * in which case we'd always reapply the settings on each
+	 * restart (with this change we always force the settings
+	 * to be applied to the default preferences -- so, we don't
+	 * override any user preferences already set).
+	 */
+
+	default-preferences:
+		'errorIndicationHighlighting=true'
+		'searchResultHighlighting=true'
 		'warningIndicationHighlighting=true'
-		'writeOccurrenceIndicationColor=51,90,114'
 }
 
 IEclipsePreferences#org-eclipse-ui-workbench {

@@ -568,6 +568,7 @@
           adapter="org.eclipse.e4.ui.css.swt.dom.preference.EclipsePreferencesElement"
           handler="org.eclipse.e4.ui.css.swt.properties.preference.EclipsePreferencesHandler">
           <property-name name="preferences"/>
+          <property-name name="default-preferences"/>
       </handler>
    </extension>
                
