@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,15 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 414565, 470397
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 442343
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
@@ -29,8 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
- * Example usage of none mandatory interfaces of ITableFontProvider and
- * ITableColorProvider
+ * Example how to hide and show columns in an JFace TableViewer
  *
  * @since 3.2
  */
@@ -47,24 +49,11 @@ public class Snippet017TableViewerHideShowColumns {
 
 		@Override
 		public void run() {
-			column.getDisplay().syncExec(new Runnable() {
+			column.getDisplay().syncExec(() -> column.setData("restoredWidth", new Integer(width)));
 
-				@Override
-				public void run() {
-					column.setData("restoredWidth", new Integer(width));
-				}
-			});
-
-			for( int i = width; i >= 0; i-- ) {
+			for (int i = width; i >= 0; i--) {
 				final int index = i;
-				column.getDisplay().syncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						column.setWidth(index);
-					}
-
-				});
+				column.getDisplay().syncExec(() -> column.setWidth(index));
 			}
 		}
 	};
@@ -81,16 +70,9 @@ public class Snippet017TableViewerHideShowColumns {
 
 		@Override
 		public void run() {
-			for( int i = 0; i <= width; i++ ) {
+			for (int i = 0; i <= width; i++) {
 				final int index = i;
-				column.getDisplay().syncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						column.setWidth(index);
-					}
-
-				});
+				column.getDisplay().syncExec(() -> column.setWidth(index));
 			}
 		}
 	}
@@ -108,8 +90,7 @@ public class Snippet017TableViewerHideShowColumns {
 		}
 	}
 
-	public class MyLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	public class MyLabelProvider extends LabelProvider implements ITableLabelProvider {
 
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
@@ -123,8 +104,7 @@ public class Snippet017TableViewerHideShowColumns {
 	}
 
 	public Snippet017TableViewerHideShowColumns(Shell shell) {
-		final TableViewer v = new TableViewer(shell, SWT.BORDER
-				| SWT.FULL_SELECTION);
+		final TableViewer v = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
 		v.setContentProvider(ArrayContentProvider.getInstance());
 
@@ -140,7 +120,7 @@ public class Snippet017TableViewerHideShowColumns {
 		column.setWidth(200);
 		column.setText("Column 3");
 
-		MyModel[] model = createModel();
+		List<MyModel> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
@@ -150,18 +130,16 @@ public class Snippet017TableViewerHideShowColumns {
 	private void addMenu(TableViewer v) {
 		final MenuManager mgr = new MenuManager();
 		Action action;
-
-		for( int i = 0; i < v.getTable().getColumnCount(); i++ ) {
-			final TableColumn column = v.getTable().getColumn(i);
-
-			action = new Action(v.getTable().getColumn(i).getText(),SWT.CHECK) {
+		for (TableColumn column : v.getTable().getColumns()) {
+			action = new Action(column.getText(), SWT.CHECK) {
 				@Override
 				public void runWithEvent(Event event) {
-					if( ! isChecked() ) {
-						ShrinkThread t = new ShrinkThread(column.getWidth(),column);
+					if (!isChecked()) {
+						ShrinkThread t = new ShrinkThread(column.getWidth(), column);
 						t.run();
 					} else {
-						ExpandThread t = new ExpandThread(((Integer)column.getData("restoredWidth")).intValue(),column);
+						ExpandThread t = new ExpandThread(((Integer) column.getData("restoredWidth")).intValue(),
+								column);
 						t.run();
 					}
 				}
@@ -174,15 +152,9 @@ public class Snippet017TableViewerHideShowColumns {
 		v.getControl().setMenu(mgr.createContextMenu(v.getControl()));
 	}
 
-
-
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[10];
-
-		for (int i = 0; i < 10; i++) {
-			elements[i] = new MyModel(i);
-		}
-
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<>();
+		IntStream.range(0, 10).forEach(i -> elements.add(new MyModel(i)));
 		return elements;
 	}
 
@@ -198,8 +170,9 @@ public class Snippet017TableViewerHideShowColumns {
 		shell.open();
 
 		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
+			if (!display.readAndDispatch()) {
 				display.sleep();
+			}
 		}
 
 		display.dispose();
