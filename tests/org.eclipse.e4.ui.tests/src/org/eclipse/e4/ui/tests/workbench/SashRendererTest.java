@@ -37,7 +37,8 @@ public class SashRendererTest {
 	@Before
 	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
-		appContext.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
+		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
+				PartRenderingEngine.engineURI);
 	}
 
 	@After
@@ -82,7 +83,7 @@ public class SashRendererTest {
 		partStackA.setSelectedElement(partB);
 
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
