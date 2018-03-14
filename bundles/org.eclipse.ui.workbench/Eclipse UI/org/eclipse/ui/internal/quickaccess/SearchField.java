@@ -157,11 +157,14 @@ public class SearchField {
 
 			@Override
 			protected void doClose() {
-				text.setText(""); //$NON-NLS-1$
+				if (!text.isDisposed())
+					text.setText(""); //$NON-NLS-1$
 				resetProviders();
-				dialogHeight = shell.getSize().y;
-				dialogWidth = shell.getSize().x;
-				shell.setVisible(false);
+				if (!shell.isDisposed()) {
+					dialogHeight = shell.getSize().y;
+					dialogWidth = shell.getSize().x;
+					shell.setVisible(false);
+				}
 				removeAccessibleListener();
 			}
 
@@ -577,6 +580,8 @@ public class SearchField {
 		dialogSettings.put(ORDERED_PROVIDERS, orderedProviders);
 		dialogSettings.put(TEXT_ENTRIES, textEntries);
 		dialogSettings.put(TEXT_ARRAY, textArray);
+		if (shell.isDisposed())
+			return;
 		dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
 		dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
 	}
