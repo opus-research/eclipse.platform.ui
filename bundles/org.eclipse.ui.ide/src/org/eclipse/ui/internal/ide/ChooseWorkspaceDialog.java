@@ -7,10 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
@@ -30,6 +36,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -38,6 +45,11 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
+import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * A dialog that prompts for a directory to use as a workspace.
@@ -53,6 +65,11 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
     private boolean suppressAskAgain = false;
 
     private boolean centerOnMonitor = false;
+
+	private Map<String, Composite> recentWorkspacesComposites;
+
+	private Form recentWorkspacesForm;
+
     /**
      * Create a modal dialog on the arugment shell, using and updating the
      * argument data object.
@@ -137,9 +154,18 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			getTitleImageLabel().setVisible(false);
 		}
 
+		// Should only create the Recent Workspaces Composite if Recent
+		// workspaces exist
+		boolean createRecentWorkspacesComposite = false;
+		if (launchData.getRecentWorkspaces()[0] != null) {
+			createRecentWorkspacesComposite = true;
+		}
         createWorkspaceBrowseRow(composite);
         if (!suppressAskAgain) {
 			createShowDialogButton(composite);
+		}
+		if (createRecentWorkspacesComposite) {
+			createRecentWorkspacesComposite(composite);
 		}
 
         // look for the eclipse.gcj property.
@@ -199,9 +225,45 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
      */
     @Override
 	protected void okPressed() {
-        launchData.workspaceSelected(TextProcessor.deprocess(getWorkspaceLocation()));
-        super.okPressed();
+		workspaceSelected(getWorkspaceLocation());
     }
+
+	/**
+	 * Set the selected workspace to the given String and close the dialog
+	 *
+	 * @param workspace
+	 */
+	private void workspaceSelected(String workspace) {
+		launchData.workspaceSelected(TextProcessor.deprocess(workspace));
+		super.okPressed();
+	}
+
+	/**
+	 * Removes the workspace from RecentWorkspaces
+	 *
+	 * @param workspace
+	 */
+	private void forgetworkspaceSelected(String workspace) {
+		// Remove Workspace from Properties
+		List<String> recentWorkpaces = new ArrayList<>(Arrays.asList(launchData.getRecentWorkspaces()));
+		recentWorkpaces.remove(workspace);
+		launchData.setRecentWorkspaces(recentWorkpaces.toArray(new String[0]));
+		launchData.writePersistedData();
+		// Remove Workspace Composite
+		recentWorkspacesComposites.get(workspace).dispose();
+		recentWorkspacesComposites.remove(workspace);
+		if (recentWorkspacesComposites.isEmpty()) {
+			recentWorkspacesForm.dispose();
+		}
+		getShell().layout();
+		initializeBounds();
+		// Remove Workspace from combobox
+		text.remove(workspace);
+		if (text.getText().equals(workspace) || text.getText().isEmpty()) {
+			text.setText(TextProcessor
+					.process((text.getItemCount() > 0 ? text.getItem(0) : launchData.getInitialDefault())));
+		}
+	}
 
 	/**
 	 * Get the workspace location from the widget.
@@ -215,6 +277,74 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 	protected void cancelPressed() {
         launchData.workspaceSelected(null);
         super.cancelPressed();
+    }
+
+	/**
+	 * The Recent Workspaces area of the dialog is only shown if Recent
+	 * Workspaces are defined. It provides a faster way to launch a specific
+	 * Workspace
+	 */
+	private void createRecentWorkspacesComposite(final Composite composite) {
+		FormToolkit toolkit = new FormToolkit(composite.getDisplay());
+		composite.addDisposeListener(c -> toolkit.dispose());
+		recentWorkspacesForm = toolkit.createForm(composite);
+		recentWorkspacesForm.setBackground(composite.getBackground());
+		recentWorkspacesForm.getBody().setLayout(new GridLayout());
+		ExpandableComposite expandableComposite = toolkit.createExpandableComposite(recentWorkspacesForm.getBody(),
+				ExpandableComposite.TWISTIE);
+		recentWorkspacesForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		expandableComposite.setBackground(composite.getBackground());
+		expandableComposite.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_recentWorkspaces);
+		expandableComposite.setExpanded(launchData.isOpenRecentWorkspacesComposite());
+		expandableComposite.addExpansionListener(new ExpansionAdapter() {
+			@Override
+			public void expansionStateChanged(ExpansionEvent e) {
+				getShell().layout();
+				initializeBounds();
+				launchData.setOpenRecentWorkspacesComposite(((ExpandableComposite) e.getSource()).isExpanded());
+			}
+		});
+
+		Composite panel = new Composite(expandableComposite, SWT.NONE);
+		expandableComposite.setClient(panel);
+		RowLayout layout = new RowLayout();
+		layout.type = SWT.VERTICAL;
+		panel.setLayout(layout);
+		recentWorkspacesComposites = new HashMap<>(launchData.getRecentWorkspaces().length);
+		for (int i = 0; i < launchData.getRecentWorkspaces().length; i++) {
+			final String recentWorkspace = launchData.getRecentWorkspaces()[i];
+			if (recentWorkspace == null || recentWorkspace.equals(launchData.getSelection())) {
+				continue;
+			}
+
+			Composite recentWorkspacePanel = new Composite(panel, SWT.NONE);
+			recentWorkspacesComposites.put(recentWorkspace, recentWorkspacePanel);
+			GridLayout recentWorkspacePanelLayout = new GridLayout(3, false);
+			recentWorkspacePanel.setLayout(recentWorkspacePanelLayout);
+
+			Label label = new Label(recentWorkspacePanel, SWT.WRAP);
+			label.setLayoutData(new GridData(490, SWT.DEFAULT));
+			label.setText(recentWorkspace);
+
+			Button startWorkspacebutton = new Button(recentWorkspacePanel, SWT.PUSH);
+			startWorkspacebutton.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_launchWorkspace);
+			startWorkspacebutton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					workspaceSelected(recentWorkspace);
+				}
+			});
+
+			Button forgetWorkspacebutton = new Button(recentWorkspacePanel, SWT.PUSH);
+			forgetWorkspacebutton.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_forgetWorkspace);
+			forgetWorkspacebutton.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					forgetworkspaceSelected(recentWorkspace);
+				}
+
+			});
+		}
     }
 
     /**
