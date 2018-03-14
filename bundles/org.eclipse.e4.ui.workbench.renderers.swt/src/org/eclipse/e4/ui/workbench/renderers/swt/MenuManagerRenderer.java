@@ -18,6 +18,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430, 472654, 460886
  *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
+ *     Axel Richard <axel.richard@oebo.fr> - Bug 354538
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -345,6 +346,10 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			rendererFilter = null;
 		}
 		context.remove(MenuManagerRenderer.class);
+		if (isDebugEnabled()) {
+			logger.debug("\nMMR:dispose: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
+					modelToManager.size(), managerToModel.size());
+		}
 	}
 
 	@Override
@@ -874,15 +879,26 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MMenu model, MenuManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
+		if (isDebugEnabled()) {
+			logger.debug("\nMMR:linkModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
+					modelToManager.size(), managerToModel.size());
+		}
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
 		for (MMenuElement element : model.getChildren()) {
+			if (element instanceof MMenu) {
+				clearModelToManager((MMenu) element, getManager((MMenu) element));
+			}
 			IContributionItem ici = getContribution(element);
 			clearModelToContribution(element, ici);
 		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
+		if (isDebugEnabled()) {
+			logger.debug("\nMMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
+					modelToManager.size(), managerToModel.size());
+		}
 	}
 
 	public IContributionItem getContribution(MMenuElement model) {
@@ -896,11 +912,27 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MMenuElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
+		if (isDebugEnabled()) {
+			logger.debug(
+					"\nMMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	public void clearModelToContribution(MMenuElement model, IContributionItem item) {
+		if (model instanceof MMenu) {
+			for (MMenuElement element : ((MMenu) model).getChildren()) {
+				IContributionItem ici = getContribution(element);
+				clearModelToContribution(element, ici);
+			}
+		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
+		if (isDebugEnabled()) {
+			logger.debug(
+					"\nMMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	public ContributionRecord getContributionRecord(MMenuElement element) {
