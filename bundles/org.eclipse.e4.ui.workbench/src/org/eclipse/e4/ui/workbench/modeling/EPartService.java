@@ -344,4 +344,18 @@ public interface EPartService {
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	public void switchPerspective(MPerspective perspective);
+
+	/**
+	 * Indicates whether a part with a certain elementId is currently rendered in a certain
+	 * perspective or not.
+	 * 
+	 * @param elementId
+	 *            the id of the part, which should be checked
+	 * @param perspective
+	 *            the perspective, which may contain the part with the given elementId
+	 * @return <code>true</code> if the part with the given elementId is rendered in the given
+	 *         perspective and <code>false</code> otherwise
+	 * @since 1.3
+	 */
+	public boolean isPartRenderedInPerspective(String elementId, MPerspective perspective);
 }

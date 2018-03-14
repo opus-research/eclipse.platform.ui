@@ -549,6 +549,29 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	@Override
+	public boolean isPartRenderedInPerspective(String elementId, MPerspective perspective) {
+		List<MPart> findElements = modelService.findElements(perspective, elementId, MPart.class, null);
+		if (!findElements.isEmpty()) {
+			MPart part = findElements.get(0);
+
+			// if that is a shared part, check the placeholders
+			if (workbenchWindow.getSharedElements().contains(part)) {
+				List<MPlaceholder> placeholders = modelService.findElements(perspective, elementId,
+						MPlaceholder.class, null);
+				for (MPlaceholder mPlaceholder : placeholders) {
+					if (mPlaceholder.isVisible() && mPlaceholder.isToBeRendered()) {
+						return true;
+					}
+				}
+				return false;
+			}
+			// not a shared part
+			return part.isVisible() && part.isToBeRendered();
+		}
+		return false;
+	}
+
+	@Override
 	public void switchPerspective(MPerspective perspective) {
 		Assert.isNotNull(perspective);
 		MWindow window = getWindow();
