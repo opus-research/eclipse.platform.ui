@@ -70,10 +70,7 @@ public class ModelServiceImpl implements EModelService {
 
 	private IEclipseContext appContext;
 
-	/**
-	 * Factory which is able to create {@link MApplicationElement}s in a generic
-	 * way.
-	 */
+	/** Factory which is able to create {@link MApplicationElement}s in a generic way. */
 	private GenericMApplicationElementFactoryImpl mApplicationElementFactory;
 
 	// Cleans up after a hosted element is disposed
@@ -102,8 +99,7 @@ public class ModelServiceImpl implements EModelService {
 	};
 
 	/**
-	 * This is a singleton service. One instance is used throughout the running
-	 * application
+	 * This is a singleton service. One instance is used throughout the running application
 	 *
 	 * @param appContext
 	 *            The applicationContext to get the eventBroker from
@@ -112,7 +108,8 @@ public class ModelServiceImpl implements EModelService {
 	 *             if the given appContext is <code>null</code>
 	 */
 	public ModelServiceImpl(IEclipseContext appContext) {
-		if (appContext == null) {
+		if (appContext == null)
+		 {
 			throw new NullPointerException("No application context given!"); //$NON-NLS-1$
 		}
 
@@ -120,7 +117,8 @@ public class ModelServiceImpl implements EModelService {
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
 
-		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(appContext.get(IExtensionRegistry.class));
+		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
+				appContext.get(IExtensionRegistry.class));
 	}
 
 	@Override
@@ -135,11 +133,12 @@ public class ModelServiceImpl implements EModelService {
 			return back;
 		}
 
-		throw new IllegalArgumentException("Unsupported model object type: " + elementType.getCanonicalName()); //$NON-NLS-1$
+		throw new IllegalArgumentException(
+				"Unsupported model object type: " + elementType.getCanonicalName()); //$NON-NLS-1$
 	}
 
-	private <T> void findElementsRecursive(MApplicationElement searchRoot, Class<T> clazz, Selector matcher,
-			List<T> elements, int searchFlags) {
+	private <T> void findElementsRecursive(MApplicationElement searchRoot, Class<T> clazz,
+			Selector matcher, List<T> elements, int searchFlags) {
 		Assert.isLegal(searchRoot != null);
 		if (searchFlags == 0) {
 			return;
@@ -210,7 +209,8 @@ public class ModelServiceImpl implements EModelService {
 					}
 				} else if ((searchFlags & IN_SHARED_AREA) != 0 && searchRoot instanceof MUIElement) {
 					// Only recurse through the shared areas
-					List<MArea> areas = findElements((MUIElement) searchRoot, null, MArea.class, null);
+					List<MArea> areas = findElements((MUIElement) searchRoot, null, MArea.class,
+							null);
 					for (MArea area : areas) {
 						findElementsRecursive(area, clazz, matcher, elements, searchFlags);
 					}
@@ -263,7 +263,8 @@ public class ModelServiceImpl implements EModelService {
 			MPlaceholder ph = (MPlaceholder) searchRoot;
 
 			// Don't search in shared areas unless the flag is set
-			if (ph.getRef() != null && (!(ph.getRef() instanceof MArea) || (searchFlags & IN_SHARED_AREA) != 0)) {
+			if (ph.getRef() != null
+					&& (!(ph.getRef() instanceof MArea) || (searchFlags & IN_SHARED_AREA) != 0)) {
 				findElementsRecursive(ph.getRef(), clazz, matcher, elements, searchFlags);
 			}
 		}
@@ -288,26 +289,29 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	@Override
-	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz, List<String> tagsToMatch) {
+	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
+			List<String> tagsToMatch) {
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
 		return findElements(searchRoot, clazz, ANYWHERE, matcher);
 	}
 
 	@Override
-	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz, List<String> tagsToMatch,
-			int searchFlags) {
+	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
+			List<String> tagsToMatch, int searchFlags) {
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
 		return findElements(searchRoot, clazz, searchFlags, matcher);
 	}
 
 	@Override
-	public <T> List<T> findElements(MApplicationElement searchRoot, Class<T> clazz, int searchFlags, Selector matcher) {
+	public <T> List<T> findElements(MApplicationElement searchRoot, Class<T> clazz,
+			int searchFlags, Selector matcher) {
 		List<T> elements = new ArrayList<T>();
 		findElementsRecursive(searchRoot, clazz, matcher, elements, searchFlags);
 		return elements;
 	}
 
-	private <T> List<T> findPerspectiveElements(MUIElement searchRoot, String id, Class<T> clazz,
+	private <T> List<T> findPerspectiveElements(MUIElement searchRoot, String id,
+			Class<T> clazz,
 			List<String> tagsToMatch) {
 		List<T> elements = new ArrayList<T>();
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
@@ -382,7 +386,8 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	@Override
-	public MUIElement cloneSnippet(MSnippetContainer snippetContainer, String snippetId, MWindow refWin) {
+	public MUIElement cloneSnippet(MSnippetContainer snippetContainer, String snippetId,
+			MWindow refWin) {
 		if (snippetContainer == null || snippetId == null || snippetId.length() == 0) {
 			return null;
 		}
@@ -403,8 +408,7 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			// use appContext as MApplication.getContext() is null during the
-			// processing of
+			// use appContext as MApplication.getContext() is null during the processing of
 			// the model processor classes
 			EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
 			// Re-resolve any placeholder references
@@ -506,8 +510,7 @@ public class ModelServiceImpl implements EModelService {
 			return elementRefs.get(0);
 		}
 
-		// If there is more than one placeholder then return the one in the
-		// shared area
+		// If there is more than one placeholder then return the one in the shared area
 		for (MPlaceholder refPh : elementRefs) {
 			int loc = getElementLocation(refPh);
 			if ((loc & IN_SHARED_AREA) != 0) {
@@ -520,22 +523,23 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<T> newParent) {
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent) {
 		move(element, newParent, -1, false);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<T> newParent, boolean leavePlaceholder) {
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent,
+			boolean leavePlaceholder) {
 		move(element, newParent, -1, leavePlaceholder);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<T> newParent, int index) {
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index) {
 		move(element, newParent, index, false);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<T> newParent, int index,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index,
 			boolean leavePlaceholder) {
 		// Cache where we were
 		MElementContainer<MUIElement> curParent = element.getParent();
@@ -543,7 +547,6 @@ public class ModelServiceImpl implements EModelService {
 
 		// Move the model element
 		newParent.getChildren().add(index, element);
-
 
 		if (leavePlaceholder) {
 			MPlaceholder ph = MAdvancedFactory.INSTANCE.createPlaceholder();
@@ -576,7 +579,8 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	@Override
-	public void insert(MPartSashContainerElement toInsert, MPartSashContainerElement relTo, int where, float ratio) {
+	public void insert(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
+			int where, float ratio) {
 		assert (toInsert != null && relTo != null);
 		assert (ratio > 0 && ratio < 100);
 
@@ -623,8 +627,7 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	/**
-	 * Wraps an element in a PartStack if it's a MPart or an MPlaceholder that
-	 * references an MPart
+	 * Wraps an element in a PartStack if it's a MPart or an MPlaceholder that references an MPart
 	 *
 	 * @param element
 	 *            The element to be wrapped
@@ -704,8 +707,7 @@ public class ModelServiceImpl implements EModelService {
 				// climbed to the top and found nothing, return null
 				return null;
 			} else if (container instanceof MPerspectiveStack) {
-				// parent is a perspective stack, we ourselves should be a
-				// perspective
+				// parent is a perspective stack, we ourselves should be a perspective
 				return (MPerspective) element;
 			}
 
@@ -719,7 +721,8 @@ public class ModelServiceImpl implements EModelService {
 		resetPerspectiveModel(persp, window, true);
 	}
 
-	private void resetPerspectiveModel(MPerspective persp, MWindow window, boolean removeSharedPlaceholders) {
+	private void resetPerspectiveModel(MPerspective persp, MWindow window,
+			boolean removeSharedPlaceholders) {
 		if (persp == null) {
 			return;
 		}
@@ -738,8 +741,7 @@ public class ModelServiceImpl implements EModelService {
 					ph.getParent().getChildren().remove(ph);
 				}
 
-				// Prevent shared stacks ids from clashing with the ones in the
-				// perspective
+				// Prevent shared stacks ids from clashing with the ones in the perspective
 				List<MPartStack> stacks = findElements(area, null, MPartStack.class, null);
 				for (MPartStack stack : stacks) {
 					String generatedId = "PartStack@" + Integer.toHexString(stack.hashCode()); //$NON-NLS-1$
@@ -900,8 +902,8 @@ public class ModelServiceImpl implements EModelService {
 
 	@Override
 	public void hideLocalPlaceholders(MWindow window, MPerspective perspective) {
-		List<MPlaceholder> globals = findElements(window, null, MPlaceholder.class, null, OUTSIDE_PERSPECTIVE
-				| IN_SHARED_AREA);
+		List<MPlaceholder> globals = findElements(window, null, MPlaceholder.class, null,
+				OUTSIDE_PERSPECTIVE | IN_SHARED_AREA);
 
 		// Iterate across the perspective(s) removing any 'local' placeholders
 		List<MPerspective> persps = new ArrayList<MPerspective>();
@@ -912,7 +914,8 @@ public class ModelServiceImpl implements EModelService {
 		}
 
 		for (MPerspective persp : persps) {
-			List<MPlaceholder> locals = findElements(persp, null, MPlaceholder.class, null, IN_ANY_PERSPECTIVE);
+			List<MPlaceholder> locals = findElements(persp, null, MPlaceholder.class, null,
+					IN_ANY_PERSPECTIVE);
 			for (MPlaceholder local : locals) {
 				for (MPlaceholder global : globals) {
 					if (global.getRef() == local.getRef()) {
@@ -969,9 +972,9 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	@Override
-	public void hostElement(MUIElement element, MWindow hostWindow, Object uiContainer, IEclipseContext hostContext) {
-		// This is subtle; unless the element is hooked into the model it won't
-		// fire events
+	public void hostElement(MUIElement element, MWindow hostWindow, Object uiContainer,
+			IEclipseContext hostContext) {
+		// This is subtle; unless the element is hooked into the model it won't fire events
 		hostWindow.getSharedElements().add(element);
 		element.getTags().add(HOSTED_ELEMENT);
 
