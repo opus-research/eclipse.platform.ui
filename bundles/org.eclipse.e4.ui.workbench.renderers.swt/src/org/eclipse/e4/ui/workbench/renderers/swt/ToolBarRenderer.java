@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -45,7 +44,7 @@ import org.eclipse.swt.widgets.Widget;
 public class ToolBarRenderer extends SWTPartRenderer {
 	private MApplication application;
 
-	private HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>> pendingCleanup = new HashMap<>();
+	private HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>> pendingCleanup = new HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>>();
 
 	@Override
 	public void init(IEclipseContext context) {
@@ -178,7 +177,7 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		super.processContents(container);
 		IEclipseContext ctx = getContext(container);
 		ExpressionContext eContext = new ExpressionContext(ctx);
-		ArrayList<MToolBarContribution> toContribute = new ArrayList<>();
+		ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
 		MElementContainer<?> toolbarObj = container;
 		MToolBar toolbarModel = (MToolBar) toolbarObj;
 		ContributionsAnalyzer.gatherToolBarContributions(toolbarModel,
@@ -200,7 +199,7 @@ public class ToolBarRenderer extends SWTPartRenderer {
 			IEclipseContext ctx,
 			final ExpressionContext eContext,
 			HashMap<MToolBar, ArrayList<ArrayList<MToolBarElement>>> pendingCleanup) {
-		HashSet<String> existingSeparatorNames = new HashSet<>();
+		HashSet<String> existingSeparatorNames = new HashSet<String>();
 		for (MToolBarElement child : toolbarModel.getChildren()) {
 			String elementId = child.getElementId();
 			if (child instanceof MToolBarSeparator && elementId != null) {
@@ -209,13 +208,13 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		}
 		boolean done = toContribute.size() == 0;
 		while (!done) {
-			ArrayList<MToolBarContribution> curList = new ArrayList<>(
+			ArrayList<MToolBarContribution> curList = new ArrayList<MToolBarContribution>(
 					toContribute);
 			int retryCount = toContribute.size();
 			toContribute.clear();
 
 			for (final MToolBarContribution contribution : curList) {
-				final ArrayList<MToolBarElement> toRemove = new ArrayList<>();
+				final ArrayList<MToolBarElement> toRemove = new ArrayList<MToolBarElement>();
 				if (!ContributionsAnalyzer.processAddition(toolbarModel,
 						contribution, toRemove, existingSeparatorNames)) {
 					toContribute.add(contribution);
@@ -241,7 +240,7 @@ public class ToolBarRenderer extends SWTPartRenderer {
 					ArrayList<ArrayList<MToolBarElement>> lists = pendingCleanup
 							.get(toolbarModel);
 					if (lists == null) {
-						lists = new ArrayList<>();
+						lists = new ArrayList<ArrayList<MToolBarElement>>();
 						pendingCleanup.put(toolbarModel, lists);
 					}
 					lists.add(toRemove);
