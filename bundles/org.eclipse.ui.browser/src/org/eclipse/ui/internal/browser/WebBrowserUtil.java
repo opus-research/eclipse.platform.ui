@@ -86,6 +86,7 @@ public class WebBrowserUtil {
 		if (d == null)
 			d = Display.getDefault();
 		d.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageDialog.openError(null, Messages.errorDialogTitle, message);
 			}
@@ -104,6 +105,7 @@ public class WebBrowserUtil {
 			d = Display.getDefault();
 
 		d.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				MessageDialog.openInformation(null, Messages.searchingTaskName, message);
 			}
@@ -363,6 +365,7 @@ public class WebBrowserUtil {
 	 * @deprecated Please use {@link #createParameterArray(String, String)}
 	 *             instead.
 	 */
+	@Deprecated
 	public static String createParameterString(String parameters, String urlText) {
 		String params = parameters;
 		String url = urlText;

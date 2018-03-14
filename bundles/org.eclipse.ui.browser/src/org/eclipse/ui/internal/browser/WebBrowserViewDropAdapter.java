@@ -65,7 +65,8 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
     * The drop operation has changed, see if the action
     * should still be enabled.
     */
-   public void dragOperationChanged(DropTargetEvent event) {
+   @Override
+public void dragOperationChanged(DropTargetEvent event) {
        doDropValidation(event);
    }
 
@@ -75,7 +76,8 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
     * target item has changed, notify the action and check
     * that it is still enabled.
     */
-   public void dragOver(DropTargetEvent event) {
+   @Override
+public void dragOver(DropTargetEvent event) {
        //set the location feedback
    	 event.feedback = DND.FEEDBACK_SELECT;
 
@@ -87,7 +89,8 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
     * Method declared on DropTargetAdapter.
     * The user has dropped something on the desktop viewer.
     */
-   public void drop(DropTargetEvent event) {
+   @Override
+public void drop(DropTargetEvent event) {
        //perform the drop behaviour
        if (!performDrop(event.data))
            event.detail = DND.DROP_NONE;
@@ -99,11 +102,13 @@ public class WebBrowserViewDropAdapter extends DropTargetAdapter {
     * Method declared on DropTargetAdapter.
     * Last chance for the action to disable itself
     */
-   public void dropAccept(DropTargetEvent event) {
+   @Override
+public void dropAccept(DropTargetEvent event) {
        if (!validateDrop(event.detail, event.currentDataType))
            event.detail = DND.DROP_NONE;
    }
 
+	@Override
 	public void dragEnter(DropTargetEvent event) {
 		if (event.detail == DND.DROP_DEFAULT)
 			event.detail = DND.DROP_COPY;
