@@ -363,9 +363,6 @@ public class PopupMenuExtender implements IMenuListener2,
 					.getWorkbench();
 			if (workbench instanceof Workbench) {
 				final Workbench realWorkbench = (Workbench) workbench;
-				if (Platform.WS_GTK.equals(Platform.getWS())) {
-					cleanupNeeded = true;
-				}
 				runCleanUp(realWorkbench);
 				ISelection input = null;
 				if ((bitSet & INCLUDE_EDITOR_INPUT) != 0) {
