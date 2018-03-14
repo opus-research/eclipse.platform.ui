@@ -88,6 +88,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.testing.TestableObject;
@@ -109,6 +110,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	public static final String ENABLED_THEME_KEY = "themeEnabled";
 
+	public static final String RENDER_PARENT = "renderParent";
+
 	private static boolean enableThemePreference;
 	private String factoryUrl;
 
@@ -123,11 +126,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 	private void subscribeTopicToBeRendered(@EventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
 
 		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
-		MElementContainer<?> parent = changedElement.getParent();
+		MUIElement parent = changedElement.getParent();
 
 		// Handle Detached Windows
 		if (parent == null) {
-			parent = (MElementContainer<?>) ((EObject) changedElement).eContainer();
+			parent = (MUIElement) ((EObject) changedElement).eContainer();
 		}
 
 		// menus are not handled here... ??
@@ -152,8 +155,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 			// Ensure that the element about to be removed is not the
 			// selected element
-			if (parent.getSelectedElement() == changedElement)
-				parent.setSelectedElement(null);
+			if (parent instanceof MElementContainer<?>) {
+				@SuppressWarnings("unchecked")
+				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
+				if (container.getSelectedElement() == changedElement) {
+					container.setSelectedElement(null);
+				}
+			}
 
 			if (okToRender) {
 				// Un-maximize the element before tearing it down
@@ -201,6 +209,20 @@ public class PartRenderingEngine implements IPresentationEngine {
 					@SuppressWarnings("unchecked")
 					MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
 					renderer.childRendered(container, changedElement);
+				} else {
+					Object parentelement = changedElement.getTransientData().get(RENDER_PARENT);
+					if (parentelement != null) {
+						Object widget = changedElement.getWidget();
+						if (widget != null) {
+							if (parentelement instanceof Control) {
+								if (widget instanceof Menu) {
+									if (((Control) parentelement).getMenu() == null) {
+										((Control) parentelement).setMenu((Menu) widget);
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		} else {
@@ -219,6 +241,20 @@ public class PartRenderingEngine implements IPresentationEngine {
 				@SuppressWarnings("unchecked")
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
 				renderer.hideChild(container, changedElement);
+			} else {
+				Object parentelement = changedElement.getTransientData().get(RENDER_PARENT);
+				if (parentelement != null) {
+					Object widget = changedElement.getWidget();
+					if (widget != null) {
+						if (parentelement instanceof Control) {
+							if (widget instanceof Menu) {
+								if (((Menu) widget).equals(((Control) parentelement).getMenu())) {
+									((Control) parentelement).setMenu(null);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -748,6 +784,19 @@ public class PartRenderingEngine implements IPresentationEngine {
 		} else if (parentContext == null && element.getParent() == null) {
 			parentContext = getContext((MUIElement) ((EObject) element)
 					.eContainer());
+		}
+
+		if (parent == null) {
+			parent = element.getTransientData().get(RENDER_PARENT);
+			if (parent != null) {
+				Object widget = safeCreateGui(element, parent, parentContext);
+				if (element.isVisible()) {
+					if (widget instanceof Menu) {
+						((Control) parent).setMenu((Menu) widget);
+					}
+				}
+				return widget;
+			}
 		}
 
 		return safeCreateGui(element, parent, parentContext);
