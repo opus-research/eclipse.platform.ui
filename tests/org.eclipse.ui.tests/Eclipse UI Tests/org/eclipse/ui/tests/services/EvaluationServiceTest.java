@@ -155,6 +155,8 @@ public class EvaluationServiceTest extends UITestCase {
 			assertFalse(listener.currentValue);
 
 			Assume.assumeTrue(forceActive(window.getShell()));
+			processEvents();
+			waitForJobs(500, 3000);
 
 			contextService = window
 					.getService(IContextService.class);
@@ -163,8 +165,8 @@ public class EvaluationServiceTest extends UITestCase {
 			waitForJobs(500, 3000);
 
 			Assume.assumeTrue(window.getShell().isVisible());
-			Assume.assumeTrue(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == window);
 			Assume.assumeTrue(shellIsActive.get());
+			assertEquals(window, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
 
 			assertEquals(2, listener.count);
 			assertTrue(listener.currentValue);
@@ -233,6 +235,8 @@ public class EvaluationServiceTest extends UITestCase {
 			evalRef2.setResult(true);
 
 			Assume.assumeTrue(forceActive(window.getShell()));
+			processEvents();
+			waitForJobs(500, 3000);
 
 			contextService = window
 					.getService(IContextService.class);
@@ -241,8 +245,8 @@ public class EvaluationServiceTest extends UITestCase {
 			waitForJobs(500, 3000);
 
 			Assume.assumeTrue(window.getShell().isVisible());
-			Assume.assumeTrue(PlatformUI.getWorkbench().getActiveWorkbenchWindow() == window);
 			Assume.assumeTrue(shellIsActive.get());
+			assertEquals(window, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
 
 			assertEquals(2, listener1.count);
 			assertTrue(listener1.currentValue);
