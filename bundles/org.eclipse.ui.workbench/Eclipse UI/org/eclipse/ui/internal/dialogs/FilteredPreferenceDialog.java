@@ -221,6 +221,8 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		TreeViewer tree;
 		if (!hasAtMostOnePage()) {
 			filteredTree= new PreferenceFilteredTree(parent, styleBits, new PreferencePatternFilter());
+			GridData gd= new GridData(SWT.FILL, SWT.FILL, true, true);
+			gd.horizontalIndent= IDialogConstants.HORIZONTAL_MARGIN;
 			filteredTree.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 			tree= filteredTree.getViewer();
