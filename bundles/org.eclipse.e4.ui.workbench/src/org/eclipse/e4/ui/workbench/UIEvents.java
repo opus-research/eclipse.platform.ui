@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.osgi.service.event.Event;
@@ -259,6 +260,12 @@ public class UIEvents {
 		 * Sent when application startup is complete
 		 */
 		public static final String APP_STARTUP_COMPLETE = TOPIC + TOPIC_SEP + "appStartupComplete"; //$NON-NLS-1$
+		/**
+		 * Sent when application shutdown is starting
+		 * 
+		 * @since 1.1
+		 */
+		public static final String APP_SHUTDOWN_STARTED = TOPIC + TOPIC_SEP + "appShutdownStarted"; //$NON-NLS-1$
 
 		/**
 		 * Sent when the theme is changed
@@ -314,7 +321,8 @@ public class UIEvents {
 		if (uiElement == null || !(uiElement instanceof MUIElement))
 			return false;
 
-		IEclipseContext context = ModelUtils.getContainingContext((MUIElement) uiElement);
+		IEclipseContext context = uiElement instanceof MApplication ? ((MApplication) uiElement)
+				.getContext() : ModelUtils.getContainingContext((MUIElement) uiElement);
 		if (context == null)
 			return false;
 
@@ -441,9 +449,19 @@ public class UIEvents {
 		public static final String TOPIC_DESCRIPTION = "org/eclipse/e4/ui/model/commands/Category/description/*"; //$NON-NLS-1$
 		public static final String TOPIC_NAME = "org/eclipse/e4/ui/model/commands/Category/name/*"; //$NON-NLS-1$
 
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_NAME = "org/eclipse/e4/ui/model/commands/Category/localizedName/*"; //$NON-NLS-1$
+
 		// Attributes that can be tested in event handlers
 		public static final String DESCRIPTION = "description"; //$NON-NLS-1$
 		public static final String NAME = "name"; //$NON-NLS-1$
+
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_NAME = "localizedName"; //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("javadoc")
@@ -460,11 +478,29 @@ public class UIEvents {
 		public static final String TOPIC_DESCRIPTION = "org/eclipse/e4/ui/model/commands/Command/description/*"; //$NON-NLS-1$
 		public static final String TOPIC_PARAMETERS = "org/eclipse/e4/ui/model/commands/Command/parameters/*"; //$NON-NLS-1$
 
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_COMMANDNAME = "org/eclipse/e4/ui/model/commands/Command/localizedCommandName/*"; //$NON-NLS-1$
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_DESCRIPTION = "org/eclipse/e4/ui/model/commands/Command/localizedDescription/*"; //$NON-NLS-1$
+
 		// Attributes that can be tested in event handlers
 		public static final String CATEGORY = "category"; //$NON-NLS-1$
 		public static final String COMMANDNAME = "commandName"; //$NON-NLS-1$
 		public static final String DESCRIPTION = "description"; //$NON-NLS-1$
 		public static final String PARAMETERS = "parameters"; //$NON-NLS-1$
+
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_COMMANDNAME = "localizedCommandName"; //$NON-NLS-1$
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_DESCRIPTION = "localizedDescription"; //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("javadoc")
@@ -583,6 +619,11 @@ public class UIEvents {
 		public static final String TOPIC_MENUS = "org/eclipse/e4/ui/model/basic/PartDescriptor/menus/*"; //$NON-NLS-1$
 		public static final String TOPIC_TOOLBAR = "org/eclipse/e4/ui/model/basic/PartDescriptor/toolbar/*"; //$NON-NLS-1$
 
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_DESCRIPTION = "org/eclipse/e4/ui/model/basic/PartDescriptor/localizedDescription/*"; //$NON-NLS-1$
+
 		// Attributes that can be tested in event handlers
 		public static final String ALLOWMULTIPLE = "allowMultiple"; //$NON-NLS-1$
 		public static final String CATEGORY = "category"; //$NON-NLS-1$
@@ -592,6 +633,11 @@ public class UIEvents {
 		public static final String DIRTYABLE = "dirtyable"; //$NON-NLS-1$
 		public static final String MENUS = "menus"; //$NON-NLS-1$
 		public static final String TOOLBAR = "toolbar"; //$NON-NLS-1$
+
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_DESCRIPTION = "localizedDescription"; //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("javadoc")
@@ -759,11 +805,21 @@ public class UIEvents {
 		public static final String TOPIC_MENUS = "org/eclipse/e4/ui/model/basic/Part/menus/*"; //$NON-NLS-1$
 		public static final String TOPIC_TOOLBAR = "org/eclipse/e4/ui/model/basic/Part/toolbar/*"; //$NON-NLS-1$
 
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_DESCRIPTION = "org/eclipse/e4/ui/model/basic/Part/localizedDescription/*"; //$NON-NLS-1$
+
 		// Attributes that can be tested in event handlers
 		public static final String CLOSEABLE = "closeable"; //$NON-NLS-1$
 		public static final String DESCRIPTION = "description"; //$NON-NLS-1$
 		public static final String MENUS = "menus"; //$NON-NLS-1$
 		public static final String TOOLBAR = "toolbar"; //$NON-NLS-1$
+
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_DESCRIPTION = "localizedDescription"; //$NON-NLS-1$
 	}
 
 	/**
@@ -974,6 +1030,11 @@ public class UIEvents {
 		public static final String TOPIC_VISIBLEWHEN = "org/eclipse/e4/ui/model/ui/UIElement/visibleWhen/*"; //$NON-NLS-1$
 		public static final String TOPIC_WIDGET = "org/eclipse/e4/ui/model/ui/UIElement/widget/*"; //$NON-NLS-1$
 
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_ACCESSIBILITYPHRASE = "org/eclipse/e4/ui/model/ui/UIElement/localizedAccessibilityPhrase/*"; //$NON-NLS-1$
+
 		// Attributes that can be tested in event handlers
 		public static final String ACCESSIBILITYPHRASE = "accessibilityPhrase"; //$NON-NLS-1$
 		public static final String CONTAINERDATA = "containerData"; //$NON-NLS-1$
@@ -985,6 +1046,11 @@ public class UIEvents {
 		public static final String VISIBLE = "visible"; //$NON-NLS-1$
 		public static final String VISIBLEWHEN = "visibleWhen"; //$NON-NLS-1$
 		public static final String WIDGET = "widget"; //$NON-NLS-1$
+
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_ACCESSIBILITYPHRASE = "localizedAccessibilityPhrase"; //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("javadoc")
@@ -1000,10 +1066,28 @@ public class UIEvents {
 		public static final String TOPIC_LABEL = "org/eclipse/e4/ui/model/ui/UILabel/label/*"; //$NON-NLS-1$
 		public static final String TOPIC_TOOLTIP = "org/eclipse/e4/ui/model/ui/UILabel/tooltip/*"; //$NON-NLS-1$
 
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_LABEL = "org/eclipse/e4/ui/model/ui/UILabel/localizedLabel/*"; //$NON-NLS-1$
+		/**
+		 * @since 1.1
+		 */
+		public static final String TOPIC_LOCALIZED_TOOLTIP = "org/eclipse/e4/ui/model/ui/UILabel/localizedTooltip/*"; //$NON-NLS-1$
+
 		// Attributes that can be tested in event handlers
 		public static final String ICONURI = "iconURI"; //$NON-NLS-1$
 		public static final String LABEL = "label"; //$NON-NLS-1$
 		public static final String TOOLTIP = "tooltip"; //$NON-NLS-1$
+
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_LABEL = "localizedLabel"; //$NON-NLS-1$
+		/**
+		 * @since 1.1
+		 */
+		public static final String LOCALIZED_TOOLTIP = "localizedTooltip"; //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("javadoc")
