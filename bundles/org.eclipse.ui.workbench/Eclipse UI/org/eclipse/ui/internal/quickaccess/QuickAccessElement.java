@@ -61,7 +61,7 @@ public abstract class QuickAccessElement {
 	public abstract void execute();
 
 	/**
-	 * Return the label to be used for sorting elements.
+	 * Return the label to be used for sorting and matching elements.
 	 * 
 	 * @return the sort label
 	 */

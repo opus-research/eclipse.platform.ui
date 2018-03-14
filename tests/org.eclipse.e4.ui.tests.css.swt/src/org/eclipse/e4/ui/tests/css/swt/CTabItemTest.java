@@ -40,16 +40,20 @@ public class CTabItemTest extends CSSSWTTestCase {
 	}
 
 	private void spinEventLoop() {
-		// Workaround for https://bugs.eclipse.org/418101 and https://bugs.eclipse.org/403234 :
-		// Add some delay to allow asynchronous events to come in, but don't get trapped in an endless Display#sleep().
-		Display display = shell.getDisplay();
-		for (int i = 0; i < 3; i++) {
-			while (display.readAndDispatch())
-				;
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
+		final boolean[] done = new boolean[1];
+		Runnable run = new Runnable() {
+			public void run() {
+				done[0] = true;
 			}
+		};
+		Display display = shell.getDisplay();
+		display.timerExec(10, run);
+		while (!done[0]) {
+			 if (display.readAndDispatch()) {
+				 display.timerExec(10, run);
+			 } else {
+				 display.sleep();
+			 }
 		}
 	}
 

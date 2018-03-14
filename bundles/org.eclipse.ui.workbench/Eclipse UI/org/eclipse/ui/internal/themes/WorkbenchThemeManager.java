@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,15 +13,9 @@ package org.eclipse.ui.internal.themes;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
-import org.eclipse.e4.ui.internal.css.swt.definition.IThemeElementDefinitionOverridable;
-import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.services.IStylingEngine;
-import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
@@ -35,14 +29,12 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
-import org.osgi.service.event.EventHandler;
 
 /**
  * Theme manager for the Workbench.
@@ -56,34 +48,12 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private static WorkbenchThemeManager instance;
 
-	private IEclipseContext context;
-
-	private IEventBroker eventBroker;
-
 	/**
 	 * Returns the singelton instance of the WorkbenchThemeManager
 	 * 
 	 * @return singleton instance
 	 */
-	public static WorkbenchThemeManager getInstance() {
-		if (instance == null) {
-			if (PlatformUI.getWorkbench().getDisplay() != null) {
-				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-					public void run() {
-						getInternalInstance();
-					}
-				});
-			}
-		}
-		return instance;
-	}
-
-	/**
-	 * Initialize the singleton theme manager. Must be called in the UI thread.
-	 * 
-	 * @return the theme manager.
-	 */
-	private static synchronized WorkbenchThemeManager getInternalInstance() {
+	public static synchronized WorkbenchThemeManager getInstance() {
 		if (instance == null) {
 			instance = new WorkbenchThemeManager();
 			instance.getCurrentTheme(); // initialize the current theme
@@ -115,8 +85,6 @@ public class WorkbenchThemeManager extends EventManager implements
 
 	private Map themes = new HashMap(7);
 
-	private EventHandler themeChangedHandler = new WorkbenchThemeChangedHandler();
-
 	/*
 	 * Initialize the WorkbenchThemeManager.
 	 * Determine the default theme according to the following rules:
@@ -143,31 +111,41 @@ public class WorkbenchThemeManager extends EventManager implements
 		String themeId = PrefUtil.getAPIPreferenceStore().getDefaultString(IWorkbenchPreferenceConstants.CURRENT_THEME_ID);
 
 		//If not set, use default
-		if (themeId.length() == 0)
+		if(themeId.length() == 0)
 			themeId = IThemeManager.DEFAULT_THEME;
+			
+		// Check if we are in high contrast mode. If so then set the theme to
+		// the system default
+		if (PlatformUI.getWorkbench().getDisplay() != null) {
+			// Determine the high contrast setting before
+			// any access to preferences
+			final boolean[] highContrast = new boolean[] { false };
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 
-		final boolean highContrast = Display.getCurrent().getHighContrast();
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.lang.Runnable#run()
+				 */
+				public void run() {
+					highContrast[0] = Display.getCurrent().getHighContrast();
 
-		Display.getCurrent().addListener(SWT.Settings, new Listener() {
-			public void handleEvent(Event event) {
-				updateThemes();
-			}
-		});
-
-		// If in HC, *always* use the system default.
-		// This ignores any default theme set via plugin_customization.ini
-		if (highContrast)
-			themeId = SYSTEM_DEFAULT_THEME;
+					Display.getCurrent().addListener(SWT.Settings, new Listener() {
+						public void handleEvent(Event event) {
+							updateThemes();
+						}
+					});
+				}
+			});
+			
+			//If in HC, *always* use the system default.
+			//This ignores any default theme set via plugin_customization.ini
+			if (highContrast[0])
+				themeId = SYSTEM_DEFAULT_THEME;
+		}
 
 		PrefUtil.getAPIPreferenceStore().setDefault(
 				IWorkbenchPreferenceConstants.CURRENT_THEME_ID, themeId);
-
-		context = (IEclipseContext) Workbench.getInstance().getService(IEclipseContext.class);
-		eventBroker = (IEventBroker) Workbench.getInstance().getService(IEventBroker.class);
-		if (eventBroker != null) {
-			eventBroker.subscribe(UIEvents.UILifeCycle.THEME_CHANGED, themeChangedHandler);
-			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, themeChangedHandler);
-		}
 	}
 
 	/*
@@ -210,10 +188,6 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * Disposes all ThemeEntries.
 	 */
 	public void dispose() {
-		if (eventBroker != null) {
-			eventBroker.unsubscribe(themeChangedHandler);
-		}
-
 		for (Iterator i = themes.values().iterator(); i.hasNext();) {
 			ITheme theme = (ITheme) i.next();
 			theme.removePropertyChangeListener(currentThemeListener);
@@ -384,114 +358,6 @@ public class WorkbenchThemeManager extends EventManager implements
 					jfaceFonts.put(key, themeFonts.getFontData(key));
 				}
 			}
-			{
-				if (oldTheme != null && eventBroker != null) {
-					eventBroker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
-					eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
-							context.get(MApplication.class.getName()));
-				}
-			}
 		}
 	}
-	
-	public static class WorkbenchThemeChangedHandler implements EventHandler {
-		public void handleEvent(org.osgi.service.event.Event event) {
-			IStylingEngine engine = getStylingEngine();
-			ThemeRegistry themeRegistry = getThemeRegistry();
-			FontRegistry fontRegistry = getFontRegistry();
-			ColorRegistry colorRegistry = getColorRegistry();
-
-			resetThemeRegistries(themeRegistry);
-			overrideAlreadyExistingDefinitions(engine, themeRegistry, fontRegistry, colorRegistry);
-			addNewDefinitions(engine, themeRegistry, fontRegistry, colorRegistry);
-		}
-
-		protected IStylingEngine getStylingEngine() {
-			return (IStylingEngine) getContext().get(IStylingEngine.SERVICE_NAME);
-		}
-
-		protected ThemeRegistry getThemeRegistry() {
-			return (ThemeRegistry) getContext().get(IThemeRegistry.class.getName());
-		}
-
-		protected FontRegistry getFontRegistry() {
-			return getCurrentTheme().getFontRegistry();
-		}
-
-		protected ColorRegistry getColorRegistry() {
-			return getCurrentTheme().getColorRegistry();
-		}
-
-		private ITheme getCurrentTheme() {
-			return WorkbenchThemeManager.getInstance().getCurrentTheme();
-		}
-
-		private IEclipseContext getContext() {
-			return WorkbenchThemeManager.getInstance().context;
-		}
-
-		// At this moment we don't remove the definitions added by CSS since we
-		// don't want to modify the 3.x theme registries api
-		private void resetThemeRegistries(ThemeRegistry themeRegistry) {
-			for (FontDefinition fontDefinition : themeRegistry.getFonts()) {
-				if (fontDefinition.isOverridden()) {
-					fontDefinition.resetToDefaultValue();
-				}
-			}
-			for (ColorDefinition colorDefinition : themeRegistry.getColors()) {
-				if (colorDefinition.isOverridden()) {
-					colorDefinition.resetToDefaultValue();
-				}
-			}
-		}
-
-		private void overrideAlreadyExistingDefinitions(IStylingEngine engine,
-				ThemeRegistry themeRegistry, FontRegistry fontRegistry, ColorRegistry colorRegistry) {
-			for (FontDefinition fontDefinition : themeRegistry.getFonts()) {
-				engine.style(fontDefinition);
-				if (fontDefinition.isOverridden()) {
-					fontRegistry.put(fontDefinition.getId(), fontDefinition.getValue());
-				}
-			}
-			for (ColorDefinition colorDefinition : themeRegistry.getColors()) {
-				engine.style(colorDefinition);
-				if (colorDefinition.isOverridden()) {
-					colorRegistry.put(colorDefinition.getId(), colorDefinition.getValue());
-				}
-			}
-		}
-
-		private void addNewDefinitions(IStylingEngine engine, ThemeRegistry themeRegistry,
-				FontRegistry fontRegistry, ColorRegistry colorRegistry) {
-			ThemesExtension themesExtension = createThemesExtension();
-			engine.style(themesExtension);
-
-			for (IThemeElementDefinitionOverridable<?> definition : themesExtension
-					.getDefinitions()) {
-				engine.style(definition);
-				if (definition.isOverridden() && definition instanceof FontDefinition) {
-					addFontDefinition((FontDefinition) definition, themeRegistry, fontRegistry);
-				} else if (definition.isOverridden() && definition instanceof ColorDefinition) {
-					addColorDefinition((ColorDefinition) definition, themeRegistry, colorRegistry);
-				}
-			}
-		}
-
-		private void addFontDefinition(FontDefinition definition, ThemeRegistry themeRegistry,
-				FontRegistry fontRegistry) {
-			themeRegistry.add(definition);
-			fontRegistry.put(definition.getId(), definition.getValue());
-		}
-
-		private void addColorDefinition(ColorDefinition definition, ThemeRegistry themeRegistry,
-				ColorRegistry colorRegistry) {
-			themeRegistry.add(definition);
-			colorRegistry.put(definition.getId(), definition.getValue());
-		}
-
-		protected ThemesExtension createThemesExtension() {
-			return new ThemesExtension();
-		}
-	}
-
 }
