@@ -16,6 +16,7 @@ package org.eclipse.core.databinding;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -95,6 +96,14 @@ import org.eclipse.core.runtime.Status;
  * {@link #POLICY_UPDATE}).
  * </p>
  *
+ * @param <S>
+ *            the type of the value on the source side (i.e. the model side if
+ *            this is a model-to-target update and the target side if this is a
+ *            target-to-model update)
+ * @param <D>
+ *            the type of the value on the destination side (i.e. the target
+ *            side if this is a model-to-target update and the model side if
+ *            this is a target-to-model update)
  * @see DataBindingContext#bindValue(IObservableValue, IObservableValue,
  *      UpdateValueStrategy, UpdateValueStrategy)
  * @see Binding#getValidationStatus()
@@ -102,7 +111,7 @@ import org.eclipse.core.runtime.Status;
  * @see IConverter
  * @since 1.0
  */
-public class UpdateValueStrategy extends UpdateStrategy {
+public class UpdateValueStrategy<S, D> extends UpdateStrategy {
 
 	/**
 	 * Policy constant denoting that the source observable's state should not be
@@ -147,15 +156,15 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		return i;
 	}
 
-	protected IValidator afterGetValidator;
-	protected IValidator afterConvertValidator;
-	protected IValidator beforeSetValidator;
-	protected IConverter converter;
+	protected IValidator<S> afterGetValidator;
+	protected IValidator<D> afterConvertValidator;
+	protected IValidator<D> beforeSetValidator;
+	protected IConverter<S, D> converter;
 
 	private int updatePolicy;
 
 	private static ValidatorRegistry validatorRegistry = new ValidatorRegistry();
-	private static HashMap validatorsByConverter = new HashMap();
+	private static HashMap<IConverter<?, ?>, IValidator<?>> validatorsByConverter = new HashMap<>();
 
 	protected boolean provideDefaults;
 
@@ -216,8 +225,11 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param value
 	 * @return the converted value
 	 */
-	public Object convert(Object value) {
-		return converter == null ? value : converter.convert(value);
+	@SuppressWarnings("unchecked")
+	public D convert(S value) {
+		// FIXME If converter is null then S must be assignable to T
+		// or an exception will occur here.
+		return converter == null ? (D) value : converter.convert(value);
 	}
 
 	/**
@@ -229,12 +241,12 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param toType
 	 * @return an IValidator, or <code>null</code> if unsuccessful
 	 */
-	protected IValidator createValidator(Object fromType, Object toType) {
+	protected IValidator<S> createValidator(Object fromType, Object toType) {
 		if (fromType == null || toType == null) {
-			return new IValidator() {
+			return new IValidator<S>() {
 
 				@Override
-				public IStatus validate(Object value) {
+				public IStatus validate(S value) {
 					return Status.OK_STATUS;
 				}
 			};
@@ -254,14 +266,15 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param source
 	 * @param destination
 	 */
-	protected void fillDefaults(IObservableValue source,
-			IObservableValue destination) {
+	protected <S2, T2> void fillDefaults(IObservableValue<S2> source,
+			IObservableValue<T2> destination) {
 		Object sourceType = source.getValueType();
 		Object destinationType = destination.getValueType();
 		if (provideDefaults && sourceType != null && destinationType != null) {
 			if (converter == null) {
-				IConverter converter = createConverter(sourceType,
-						destinationType);
+				@SuppressWarnings("unchecked")
+				IConverter<S, D> converter = (IConverter<S, D>) createConverter(
+						sourceType, destinationType);
 				defaultedConverter = (converter != null);
 				setConverter(converter);
 			}
@@ -282,41 +295,42 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		}
 	}
 
-	private IValidator findValidator(Object fromType, Object toType) {
-		IValidator result = null;
+	@SuppressWarnings("unchecked")
+	private IValidator<S> findValidator(Object fromType, Object toType) {
+		IValidator<?> result = null;
 
 		// We only default the validator if we defaulted the converter since the
 		// two are tightly coupled.
 		if (defaultedConverter) {
 			if (String.class.equals(fromType)) {
-				result = (IValidator) validatorsByConverter.get(converter);
+				result = validatorsByConverter.get(converter);
 
 				if (result == null) {
 					// TODO sring based lookup
 					if (Integer.class.equals(toType)
 							|| Integer.TYPE.equals(toType)) {
 						result = new StringToIntegerValidator(
-								(NumberFormatConverter) converter);
+								(NumberFormatConverter<?>) converter);
 					} else if (Long.class.equals(toType)
 							|| Long.TYPE.equals(toType)) {
 						result = new StringToLongValidator(
-								(NumberFormatConverter) converter);
+								(NumberFormatConverter<?>) converter);
 					} else if (Float.class.equals(toType)
 							|| Float.TYPE.equals(toType)) {
 						result = new StringToFloatValidator(
-								(NumberFormatConverter) converter);
+								(NumberFormatConverter<?>) converter);
 					} else if (Double.class.equals(toType)
 							|| Double.TYPE.equals(toType)) {
 						result = new StringToDoubleValidator(
-								(NumberFormatConverter) converter);
+								(NumberFormatConverter<?>) converter);
 					} else if (Byte.class.equals(toType)
 							|| Byte.TYPE.equals(toType)) {
 						result = new StringToByteValidator(
-								(NumberFormatConverter) converter);
+								(NumberFormatConverter<?>) converter);
 					} else if (Short.class.equals(toType)
 							|| Short.TYPE.equals(toType)) {
 						result = new StringToShortValidator(
-								(NumberFormatConverter) converter);
+								(NumberFormatConverter<?>) converter);
 					} else if (Character.class.equals(toType)
 							|| Character.TYPE.equals(toType)
 							&& converter instanceof StringToCharacterConverter) {
@@ -333,7 +347,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 					}
 				}
 			} else if (converter instanceof NumberToNumberConverter) {
-				result = (IValidator) validatorsByConverter.get(converter);
+				result = validatorsByConverter.get(converter);
 
 				if (result == null) {
 					if (converter instanceof NumberToByteConverter) {
@@ -368,7 +382,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 			}
 		}
 
-		return result;
+		return (IValidator<S>) result;
 	}
 
 	/**
@@ -385,7 +399,8 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param validator
 	 * @return the receiver, to enable method call chaining
 	 */
-	public UpdateValueStrategy setAfterConvertValidator(IValidator validator) {
+	public UpdateValueStrategy<S, D> setAfterConvertValidator(
+			IValidator<D> validator) {
 		this.afterConvertValidator = validator;
 		return this;
 	}
@@ -397,7 +412,8 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param validator
 	 * @return the receiver, to enable method call chaining
 	 */
-	public UpdateValueStrategy setAfterGetValidator(IValidator validator) {
+	public UpdateValueStrategy<S, D> setAfterGetValidator(
+			IValidator<S> validator) {
 		this.afterGetValidator = validator;
 		return this;
 	}
@@ -409,7 +425,8 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param validator
 	 * @return the receiver, to enable method call chaining
 	 */
-	public UpdateValueStrategy setBeforeSetValidator(IValidator validator) {
+	public UpdateValueStrategy<S, D> setBeforeSetValidator(
+			IValidator<D> validator) {
 		this.beforeSetValidator = validator;
 		return this;
 	}
@@ -421,7 +438,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param converter
 	 * @return the receiver, to enable method call chaining
 	 */
-	public UpdateValueStrategy setConverter(IConverter converter) {
+	public UpdateValueStrategy<S, D> setConverter(IConverter<S, D> converter) {
 		this.converter = converter;
 		return this;
 	}
@@ -437,7 +454,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param value
 	 * @return an ok status
 	 */
-	public IStatus validateAfterConvert(Object value) {
+	public IStatus validateAfterConvert(D value) {
 		return afterConvertValidator == null ? Status.OK_STATUS
 				: afterConvertValidator.validate(value);
 	}
@@ -453,7 +470,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param value
 	 * @return an ok status
 	 */
-	public IStatus validateAfterGet(Object value) {
+	public IStatus validateAfterGet(S value) {
 		return afterGetValidator == null ? Status.OK_STATUS : afterGetValidator
 				.validate(value);
 	}
@@ -469,7 +486,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param value
 	 * @return an ok status
 	 */
-	public IStatus validateBeforeSet(Object value) {
+	public IStatus validateBeforeSet(D value) {
 		return beforeSetValidator == null ? Status.OK_STATUS
 				: beforeSetValidator.validate(value);
 	}
@@ -482,14 +499,13 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	 * @param value
 	 * @return status
 	 */
-	protected IStatus doSet(IObservableValue observableValue, Object value) {
+	protected <V> IStatus doSet(IObservableValue<V> observableValue, V value) {
 		try {
 			observableValue.setValue(value);
 		} catch (Exception ex) {
 			return ValidationStatus
-					.error(
-							BindingMessages
-									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+					.error(BindingMessages
+							.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
 							ex);
 		}
 		return Status.OK_STATUS;
@@ -497,7 +513,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 
 	private static class ValidatorRegistry {
 
-		private HashMap validators = new HashMap();
+		private Map<Pair, IValidator<?>> validators = new HashMap<Pair, IValidator<?>>();
 
 		/**
 		 * Adds the system-provided validators to the current validator
@@ -549,7 +565,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		 *            The IValidator
 		 */
 		private void associate(Object fromClass, Object toClass,
-				IValidator validator) {
+				IValidator<?> validator) {
 			validators.put(new Pair(fromClass, toClass), validator);
 		}
 
@@ -562,20 +578,19 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		 *            The Class to convert to
 		 * @return An appropriate IValidator
 		 */
-		private IValidator get(Object fromClass, Object toClass) {
-			IValidator result = (IValidator) validators.get(new Pair(fromClass,
-					toClass));
+		private IValidator<?> get(Object fromClass, Object toClass) {
+			IValidator<?> result = validators.get(new Pair(fromClass, toClass));
 			if (result != null)
 				return result;
 			if (fromClass != null && toClass != null && fromClass == toClass) {
-				return new IValidator() {
+				return new IValidator<Object>() {
 					@Override
 					public IStatus validate(Object value) {
 						return Status.OK_STATUS;
 					}
 				};
 			}
-			return new IValidator() {
+			return new IValidator<Object>() {
 				@Override
 				public IStatus validate(Object value) {
 					return Status.OK_STATUS;

@@ -30,35 +30,38 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 
 /**
+ * @param <T>
+ *            the type of the elements in the set on the target side
+ * @param <M>
+ *            the type of the elements in the set on the model side
  * @since 1.1
  *
  */
-public class SetBinding extends Binding {
+public class SetBinding<M, T> extends
+		Binding<IObservableSet<M>, IObservableSet<T>> {
 
-	private UpdateSetStrategy targetToModel;
-	private UpdateSetStrategy modelToTarget;
-	private IObservableValue validationStatusObservable;
+	private UpdateSetStrategy<T, M> targetToModel;
+	private UpdateSetStrategy<M, T> modelToTarget;
+	private IObservableValue<IStatus> validationStatusObservable;
 	private boolean updatingTarget;
 	private boolean updatingModel;
 
-	private ISetChangeListener targetChangeListener = new ISetChangeListener() {
+	private ISetChangeListener<T> targetChangeListener = new ISetChangeListener<T>() {
 		@Override
-		public void handleSetChange(SetChangeEvent event) {
+		public void handleSetChange(SetChangeEvent<T> event) {
 			if (!updatingTarget) {
-				doUpdate((IObservableSet) getTarget(),
-						(IObservableSet) getModel(), event.diff, targetToModel,
+				doUpdate(getTarget(), getModel(), event.diff, targetToModel,
 						false, false);
 			}
 		}
 	};
 
-	private ISetChangeListener modelChangeListener = new ISetChangeListener() {
+	private ISetChangeListener<M> modelChangeListener = new ISetChangeListener<M>() {
 		@Override
-		public void handleSetChange(SetChangeEvent event) {
+		public void handleSetChange(SetChangeEvent<M> event) {
 			if (!updatingModel) {
-				doUpdate((IObservableSet) getModel(),
-						(IObservableSet) getTarget(), event.diff,
-						modelToTarget, false, false);
+				doUpdate(getModel(), getTarget(), event.diff, modelToTarget,
+						false, false);
 			}
 		}
 	};
@@ -69,9 +72,9 @@ public class SetBinding extends Binding {
 	 * @param modelToTargetStrategy
 	 * @param targetToModelStrategy
 	 */
-	public SetBinding(IObservableSet target, IObservableSet model,
-			UpdateSetStrategy targetToModelStrategy,
-			UpdateSetStrategy modelToTargetStrategy) {
+	public SetBinding(IObservableSet<T> target, IObservableSet<M> model,
+			UpdateSetStrategy<T, M> targetToModelStrategy,
+			UpdateSetStrategy<M, T> modelToTargetStrategy) {
 		super(target, model);
 		this.targetToModel = targetToModelStrategy;
 		this.modelToTarget = modelToTargetStrategy;
@@ -88,7 +91,7 @@ public class SetBinding extends Binding {
 	}
 
 	@Override
-	public IObservableValue getValidationStatus() {
+	public IObservableValue<IStatus> getValidationStatus() {
 		return validationStatusObservable;
 	}
 
@@ -96,8 +99,9 @@ public class SetBinding extends Binding {
 	protected void preInit() {
 		ObservableTracker.setIgnore(true);
 		try {
-			validationStatusObservable = new WritableValue(context
-					.getValidationRealm(), Status.OK_STATUS, IStatus.class);
+			validationStatusObservable = new WritableValue<>(
+					context.getValidationRealm(), Status.OK_STATUS,
+					IStatus.class);
 		} finally {
 			ObservableTracker.setIgnore(false);
 		}
@@ -115,28 +119,26 @@ public class SetBinding extends Binding {
 
 	@Override
 	public void updateModelToTarget() {
-		final IObservableSet modelSet = (IObservableSet) getModel();
+		final IObservableSet<M> modelSet = getModel();
 		modelSet.getRealm().exec(new Runnable() {
 			@Override
 			public void run() {
-				SetDiff diff = Diffs.computeSetDiff(Collections.EMPTY_SET,
-						modelSet);
-				doUpdate(modelSet, (IObservableSet) getTarget(), diff,
-						modelToTarget, true, true);
+				SetDiff<M> diff = Diffs.computeSetDiff(
+						Collections.<M> emptySet(), modelSet);
+				doUpdate(modelSet, getTarget(), diff, modelToTarget, true, true);
 			}
 		});
 	}
 
 	@Override
 	public void updateTargetToModel() {
-		final IObservableSet targetSet = (IObservableSet) getTarget();
+		final IObservableSet<T> targetSet = getTarget();
 		targetSet.getRealm().exec(new Runnable() {
 			@Override
 			public void run() {
-				SetDiff diff = Diffs.computeSetDiff(Collections.EMPTY_SET,
-						targetSet);
-				doUpdate(targetSet, (IObservableSet) getModel(), diff,
-						targetToModel, true, true);
+				SetDiff<T> diff = Diffs.computeSetDiff(
+						Collections.<T> emptySet(), targetSet);
+				doUpdate(targetSet, getModel(), diff, targetToModel, true, true);
 			}
 		});
 	}
@@ -155,10 +157,10 @@ public class SetBinding extends Binding {
 	 * This method may be moved to UpdateSetStrategy in the future if clients
 	 * need more control over how the two sets are kept in sync.
 	 */
-	private void doUpdate(final IObservableSet source,
-			final IObservableSet destination, final SetDiff diff,
-			final UpdateSetStrategy updateSetStrategy, final boolean explicit,
-			final boolean clearDestination) {
+	private <S, D> void doUpdate(final IObservableSet<S> source,
+			final IObservableSet<D> destination, final SetDiff<S> diff,
+			final UpdateSetStrategy<S, D> updateSetStrategy,
+			final boolean explicit, final boolean clearDestination) {
 		final int policy = updateSetStrategy.getUpdatePolicy();
 		if (policy == UpdateSetStrategy.POLICY_NEVER)
 			return;
@@ -179,11 +181,11 @@ public class SetBinding extends Binding {
 						destination.clear();
 					}
 
-					for (Iterator iterator = diff.getRemovals().iterator(); iterator
+					for (Iterator<S> iterator = diff.getRemovals().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doRemove(
-								destination, updateSetStrategy.convert(iterator
-										.next()));
+								destination,
+								updateSetStrategy.convert(iterator.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -191,11 +193,11 @@ public class SetBinding extends Binding {
 						// occurred...
 					}
 
-					for (Iterator iterator = diff.getAdditions().iterator(); iterator
+					for (Iterator<S> iterator = diff.getAdditions().iterator(); iterator
 							.hasNext();) {
 						IStatus setterStatus = updateSetStrategy.doAdd(
-								destination, updateSetStrategy.convert(iterator
-										.next()));
+								destination,
+								updateSetStrategy.convert(iterator.next()));
 
 						mergeStatus(multiStatus, setterStatus);
 						// TODO - at this point, the two sets
@@ -231,13 +233,11 @@ public class SetBinding extends Binding {
 	@Override
 	public void dispose() {
 		if (targetChangeListener != null) {
-			((IObservableSet) getTarget())
-					.removeSetChangeListener(targetChangeListener);
+			getTarget().removeSetChangeListener(targetChangeListener);
 			targetChangeListener = null;
 		}
 		if (modelChangeListener != null) {
-			((IObservableSet) getModel())
-					.removeSetChangeListener(modelChangeListener);
+			getModel().removeSetChangeListener(modelChangeListener);
 			modelChangeListener = null;
 		}
 		super.dispose();
