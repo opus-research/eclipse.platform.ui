@@ -411,9 +411,9 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			// use appContext as application context is not initialized when
-			// model processors are used
-			EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
+			EPlaceholderResolver resolver = ((MApplication) appElement).getContext().get(
+					EPlaceholderResolver.class);
+
 			// Re-resolve any placeholder references
 			List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
 			for (MPlaceholder ph : phList) {
