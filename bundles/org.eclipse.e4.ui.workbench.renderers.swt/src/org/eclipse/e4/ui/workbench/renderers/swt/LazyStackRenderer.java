@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 441150
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -29,7 +29,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -68,10 +67,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				lsr.showTab(stack.getSelectedElement());
 		}
 	};
-
-	public LazyStackRenderer() {
-		super();
-	}
 
 	public void init(IEventBroker eventBroker) {
 		// Ensure that there only ever *one* listener. Each subclass
@@ -245,7 +240,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			}
 		}
 
-		Shell layoutShellLater = null;
 		// Show any floating windows
 		if (element instanceof MWindow && element.getWidget() != null) {
 			int visCount = 0;
@@ -253,14 +247,8 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				if (kid.isToBeRendered() && kid.isVisible())
 					visCount++;
 			}
-			if (visCount > 0) {
+			if (visCount > 0)
 				element.setVisible(true);
-				Object widget = element.getWidget();
-				if (widget instanceof Shell) {
-					Shell shell = (Shell) widget;
-					layoutShellLater = shell;
-				}
-			}
 		}
 
 		if (element instanceof MGenericStack<?>) {
@@ -289,13 +277,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 					showElementRecursive(w);
 				}
 			}
-		}
-
-		// i.e.: Bug 436763: after we make items visible, if we made a new
-		// floating shell visible, we have to re-layout it for its contents to
-		// become correct.
-		if (layoutShellLater != null) {
-			layoutShellLater.layout(true, true);
 		}
 	}
 }
