@@ -54,18 +54,11 @@ public class CommandHelpServiceImpl implements ICommandHelpService {
 			return null;
 		}
 
-		IHandler handler = null;
-		Object obj = HandlerServiceImpl.lookUpHandler(context, commandId);
-		if (obj instanceof IHandler) {
-			handler = (IHandler) obj;
-		}
+		IHandler handler = (IHandler) HandlerServiceImpl.lookUpHandler(context, commandId);
 		if (handler instanceof E4HandlerProxy) {
 			handler = ((E4HandlerProxy) handler).getHandler();
 		}
-		String contextId = null;
-		if (handler != null) {
-			contextId = helpContextIdsByHandler.get(handler);
-		}
+		String contextId = helpContextIdsByHandler.get(handler);
 		if (contextId == null) {
 			contextId = Util.getHelpContextId(command);
 		}
