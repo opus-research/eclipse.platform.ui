@@ -15,6 +15,7 @@ import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
 import org.eclipse.e4.ui.css.core.dom.properties.css2.AbstractCSSPropertyBackgroundHandler;
 import org.eclipse.e4.ui.css.core.dom.properties.css2.ICSSPropertyBackgroundHandler;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.e4.ui.css.swt.dom.CompositeElement;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTImageHelper;
@@ -76,17 +77,21 @@ AbstractCSSPropertyBackgroundHandler {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				if ("selected".equals(pseudo)) {
 					// tab folder selection manages gradients
-					folder.setSelectionBackground(newColor);
+					CSSSWTColorHelper.setSelectionBackground(folder, newColor);
 				} else {
-					folder.setBackground(newColor);
+					CSSSWTColorHelper.setBackground(folder, newColor);
 				}
 			} else if (widget instanceof Control) {
 				GradientBackgroundListener.remove((Control) widget);
-				((Control) widget).setBackground(newColor);
+				CSSSWTColorHelper.setBackground((Control) widget, newColor);
+				CompositeElement.setBackgroundOverriddenByCSSMarker(widget);
 			}
 		} else if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Gradient grad = (Gradient) engine.convert(value, Gradient.class,
 					widget.getDisplay());
+			if (grad == null) {
+				return; // warn?
+			}
 			if (widget instanceof CTabItem) {
 				CTabFolder folder = ((CTabItem) widget).getParent();
 				Color[] colors = CSSSWTColorHelper.getSWTColors(grad,
@@ -101,6 +106,7 @@ AbstractCSSPropertyBackgroundHandler {
 
 			} else if (widget instanceof Control) {
 				GradientBackgroundListener.handle((Control) widget, grad);
+				CompositeElement.setBackgroundOverriddenByCSSMarker(widget);
 			}
 		}
 	}
@@ -118,30 +124,19 @@ AbstractCSSPropertyBackgroundHandler {
 	public void applyCSSPropertyBackgroundImage(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		// Widget control = (Widget) element;
-		Widget control = (Widget) ((WidgetElement) element).getNativeWidget();
-		Image image = (Image) engine.convert(value, Image.class, control
-				.getDisplay());
-		if (control instanceof CTabFolder && "selected".equals(pseudo)) {
-			((CTabFolder) control).setSelectionBackground(image);
-		} else if (control instanceof Button) {
-			Button button = ((Button) control);
+		Widget widget = (Widget) ((WidgetElement) element).getNativeWidget();
+		Image image = (Image) engine.convert(value, Image.class,
+				widget.getDisplay());
+		if (widget instanceof CTabFolder && "selected".equals(pseudo)) {
+			((CTabFolder) widget).setSelectionBackground(image);
+		} else if (widget instanceof Button) {
+			Button button = ((Button) widget);
 			// Image oldImage = button.getImage();
 			// if (oldImage != null)
 			// oldImage.dispose();
-			CSSSWTImageHelper.storeDefaultImage(button);
-			button.setImage(image);
-
-		} else {
-			try {
-				if (control instanceof Control) {
-					((Control) control).setBackgroundImage(image);
-				}
-			} catch (Throwable e) {
-				//TODO replace with eclipse logging
-				// if (logger.isWarnEnabled())
-				// logger
-				// .warn("Impossible to manage backround-image, This SWT version doesn't support control.setBackgroundImage(Image image) Method");
-			}
+			CSSSWTImageHelper.setImage(button, image);
+		} else if (widget instanceof Control) {
+			CSSSWTImageHelper.setBackgroundImage((Control) widget, image);
 		}
 	}
 
