@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 118919
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
@@ -47,7 +46,6 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 		 */
 		private Object input;
 
-		@Override
 		public void updateElement(Object parent, int index) {
 			updateElementCallCount++;
 			String parentString = (String) parent;
@@ -60,22 +58,21 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 			}
 		}
 
-		@Override
 		public void dispose() {
 			// do nothing
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			this.input = newInput;
 		}
 
-		@Override
 		public Object getParent(Object element) {
 			return null;
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#updateChildCount(java.lang.Object, int)
+		 */
 		public void updateChildCount(Object element, int currentChildCount) {
 			if (printCallbacks)
 				System.out.println("updateChildCount called for " + element + " with " + currentChildCount);
@@ -103,25 +100,21 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 	 */
 	protected boolean setDataCalled = false;
 
-	@Override
 	public void setUp() {
 		super.setUp();
 		processEvents(); // run events for SetData precondition test
 	}
 	
-	@Override
 	protected void setInput() {
 		String letterR = "R";
 		getTreeViewer().setInput(letterR);
 	}
 
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		Tree tree = new Tree(fShell, SWT.VIRTUAL | SWT.MULTI);
 		TreeViewer treeViewer = new TreeViewer(tree);
 		treeViewer.setContentProvider(new LazyTreeContentProvider());
 		tree.addListener(SWT.SetData, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				setDataCalled = true;
 			}
@@ -132,7 +125,10 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 	public void testCreation() {
 		if (disableTestsBug347491)
 			return;
-		assertTrue("SWT.SetData not received", setDataCalled);
+		if (!setDataCalled) {
+			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
+			return;
+		}
 		processEvents();
 		assertTrue("tree should have items", getTreeViewer().getTree()
 				.getItemCount() > 0);
@@ -189,7 +185,10 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 	public void testRemoveAt() {
 		if (disableTestsBug347491)
 			return;
-		assertTrue("SWT.SetData not received", setDataCalled);
+		if (!setDataCalled) {
+			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
+			return;
+		}
 		TreeViewer treeViewer = (TreeViewer) fViewer;
 		// correct what the content provider is answering with
 		treeViewer.getTree().update();
