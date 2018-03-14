@@ -27,7 +27,6 @@ public class TestsPerspective implements IPerspectiveFactory {
 
 	public static final String TESTS_PERSPECTIVE_ID = "org.eclipse.ui.tests.views.properties.tabbed.views.TestsPerspective"; //$NON-NLS-1$
 
-	@Override
 	public void createInitialLayout(IPageLayout layout) {
 		String editorArea = layout.getEditorArea();
 		IFolderLayout topLeft = layout.createFolder(

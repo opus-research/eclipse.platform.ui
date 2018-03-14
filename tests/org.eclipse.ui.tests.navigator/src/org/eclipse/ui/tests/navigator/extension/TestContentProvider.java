@@ -164,6 +164,11 @@ public class TestContentProvider implements ITreeContentProvider,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+	 */
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 
@@ -176,6 +181,11 @@ public class TestContentProvider implements ITreeContentProvider,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
+	 */
 	@Override
 	public boolean visit(IResourceDelta delta) throws CoreException {
 
