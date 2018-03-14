@@ -60,8 +60,7 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @param marker the marker, or <code>null</code> to create a new marker
      */
-    @Override
-	public void setMarker(IMarker marker) {
+    public void setMarker(IMarker marker) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setMarker(marker);
     }
@@ -73,8 +72,7 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @return the marker
      */
-    @Override
-	public IMarker getMarker() {
+    public IMarker getMarker() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getMarker();
     }
@@ -85,8 +83,7 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @param resource the resource
      */
-    @Override
-	public void setResource(IResource resource) {
+    public void setResource(IResource resource) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setResource(resource);
     }
@@ -98,8 +95,7 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @return the resource
      */
-    @Override
-	public IResource getResource() {
+    public IResource getResource() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getResource();
     }
@@ -110,8 +106,7 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @param initialAttributes the initial attributes
      */
-    @Override
-	public void setInitialAttributes(Map initialAttributes) {
+    public void setInitialAttributes(Map initialAttributes) {
     	// Method is overridden because API is being inherited from an internal class.
         super.setInitialAttributes(initialAttributes);
     }
@@ -123,8 +118,7 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @return the initial attributes
      */
-    @Override
-	public Map getInitialAttributes() {
+    public Map getInitialAttributes() {
     	// Method is overridden because API is being inherited from an internal class.
         return super.getInitialAttributes();
     }
@@ -134,7 +128,6 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @since 3.3
      */
-	@Override
 	protected String getModifyOperationTitle() {
 		return BookmarkMessages.ModifyBookmark_undoText;
 	}
@@ -144,7 +137,6 @@ public class BookmarkPropertiesDialog extends DialogMarkerProperties {
      * 
      * @since 3.3
      */
-	@Override
 	protected String getCreateOperationTitle() {
 		return BookmarkMessages.CreateBookmark_undoText;
 		

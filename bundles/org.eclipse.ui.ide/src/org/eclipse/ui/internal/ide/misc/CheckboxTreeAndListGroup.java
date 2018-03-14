@@ -197,14 +197,12 @@ public class CheckboxTreeAndListGroup extends EventManager implements
      *
      *	@param event CheckStateChangedEvent
      */
-    @Override
-	public void checkStateChanged(final CheckStateChangedEvent event) {
+    public void checkStateChanged(final CheckStateChangedEvent event) {
 
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         if (event.getCheckable().equals(treeViewer)) {
 							treeItemChecked(event.getElement(), event
                                     .getChecked());
@@ -505,8 +503,7 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         for (int i = 0; i < array.length; i++) {
             final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunner.run(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.checkStateChanged(event);
                 }
             });
@@ -546,8 +543,7 @@ public class CheckboxTreeAndListGroup extends EventManager implements
      *
      *	@param event SelectionChangedEvent
      */
-    @Override
-	public void selectionChanged(SelectionChangedEvent event) {
+    public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event
                 .getSelection();
         Object selectedElement = selection.getFirstElement();
@@ -576,8 +572,7 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         setTreeChecked(root, selection);
                         listViewer.setAllChecked(selection);
                     }
@@ -688,16 +683,14 @@ public class CheckboxTreeAndListGroup extends EventManager implements
     /**
      *	Handle the collapsing of an element in a tree viewer
      */
-    @Override
-	public void treeCollapsed(TreeExpansionEvent event) {
+    public void treeCollapsed(TreeExpansionEvent event) {
         // We don't need to do anything with this
     }
 
     /**
      *	Handle the expansionsion of an element in a tree viewer
      */
-    @Override
-	public void treeExpanded(TreeExpansionEvent event) {
+    public void treeExpanded(TreeExpansionEvent event) {
 
         Object item = event.getElement();
 
@@ -779,8 +772,7 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         Iterator keyIterator = items.keySet().iterator();
 
                         //Update the store before the hierarchy to prevent updating parents before all of the children are done

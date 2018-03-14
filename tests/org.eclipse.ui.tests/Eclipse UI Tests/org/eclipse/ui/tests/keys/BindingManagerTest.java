@@ -84,7 +84,6 @@ public final class BindingManagerTest extends UITestCase {
 	 * Creates a new context manager and a binding manager for use in the test
 	 * cases.
 	 */
-	@Override
 	protected final void doSetUp() {
 		commandManager = new CommandManager();
 		contextManager = new ContextManager();
@@ -94,7 +93,6 @@ public final class BindingManagerTest extends UITestCase {
 	/**
 	 * Releases the context manager and binding manager for garbage collection.
 	 */
-	@Override
 	protected final void doTearDown() {
 		bindingManager = null;
 		contextManager = null;
@@ -905,22 +903,18 @@ public final class BindingManagerTest extends UITestCase {
 		Command cmd = commandManager.getCommand(commandId);
 		IParameter[] parms = new IParameter[1];
 		parms[0] = new IParameter() {
-			@Override
 			public String getId() {
 				return "viewId";
 			}
 
-			@Override
 			public String getName() {
 				return "View Id";
 			}
 
-			@Override
 			public IParameterValues getValues() throws ParameterValuesException {
 				return null;
 			}
 
-			@Override
 			public boolean isOptional() {
 				return false;
 			}
