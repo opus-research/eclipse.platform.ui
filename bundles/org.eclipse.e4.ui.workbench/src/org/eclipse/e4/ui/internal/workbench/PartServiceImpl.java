@@ -42,8 +42,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -994,22 +992,16 @@ public class PartServiceImpl implements EPartService {
 		}
 
 		MElementContainer<?> lastContainer = getLastContainer(searchRoot, children);
-		if (lastContainer instanceof MPartStack) {
-			return lastContainer;
+		if (lastContainer == null) {
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
+			searchRoot.getChildren().add(stack);
+			return stack;
+		} else if (!(lastContainer instanceof MPartStack)) {
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
+			((List) lastContainer.getChildren()).add(stack);
+			return stack;
 		}
-
-		// No stacks found make one and add it
-		MPartStack stack = modelService.createModelElement(MPartStack.class);
-		stack.setElementId("CreatedByGetLastContainer"); //$NON-NLS-1$
-		if (children.get(0) instanceof MPartSashContainer) {
-			MPartSashContainer psc = (MPartSashContainer) children.get(0);
-			psc.getChildren().add(stack);
-		} else {
-			// We need a sash so 'insert' the new stack
-			modelService.insert(stack, (MPartSashContainerElement) children.get(0),
-					EModelService.RIGHT_OF, 0.5f);
-		}
-		return stack;
+		return lastContainer;
 	}
 
 	private MElementContainer<?> getLastContainer(MElementContainer<?> container, List<?> children) {
