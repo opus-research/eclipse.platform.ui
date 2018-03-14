@@ -64,6 +64,9 @@ public class ZipFileExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public void addPages() {
         super.addPages();
@@ -71,6 +74,9 @@ public class ZipFileExportWizard extends Wizard implements IExportWizard {
         addPage(mainPage);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.selection = currentSelection;
@@ -84,6 +90,9 @@ public class ZipFileExportWizard extends Wizard implements IExportWizard {
         setNeedsProgressMonitor(true);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public boolean performFinish() {
         return mainPage.finish();
