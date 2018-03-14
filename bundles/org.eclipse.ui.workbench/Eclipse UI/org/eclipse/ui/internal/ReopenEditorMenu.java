@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -22,6 +20,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorDescriptor;
@@ -44,7 +44,7 @@ public class ReopenEditorMenu extends ContributionItem {
     // the maximum length for a file name; must be >= 4
     private static final int MAX_TEXT_LENGTH = 40;
 
-    // only assign mnemonic to the first nine items
+    // only assign mnemonic to the first nine items 
     private static final int MAX_MNEMONIC_SIZE = 9;
 
     /**
@@ -76,11 +76,11 @@ public class ReopenEditorMenu extends ContributionItem {
 		return calcText(index, item.getName(), item.getToolTipText(), Window
 				.getDefaultOrientation() == SWT.RIGHT_TO_LEFT);
 	}
-
+    
     /**
      * Return a string suitable for a file MRU list.  This should not be called
      * outside the framework.
-     *
+     * 
      * @param index the index in the MRU list
      * @param name the file name
      * @param toolTip potentially the path
@@ -106,7 +106,7 @@ public class ReopenEditorMenu extends ContributionItem {
             pathName = ""; //$NON-NLS-1$
         }
         IPath path = new Path(pathName);
-        // if last segment in path is the fileName, remove it
+        // if last segment in path is the fileName, remove it 
         if (path.segmentCount() > 1
                 && path.segment(path.segmentCount() - 1).equals(fileName)) {
             path = path.removeLastSegments(1);
@@ -229,7 +229,12 @@ public class ReopenEditorMenu extends ContributionItem {
                     MenuItem mi = new MenuItem(menu, SWT.PUSH, menuIndex[0]);
                     ++menuIndex[0];
                     mi.setText(text);
-                    mi.addSelectionListener(widgetSelectedAdapter(e -> open(item)));
+                    mi.addSelectionListener(new SelectionAdapter() {
+                        @Override
+						public void widgetSelected(SelectionEvent e) {
+                            open(item);
+                        }
+                    });
                 }
 
                 @Override
@@ -265,7 +270,7 @@ public class ReopenEditorMenu extends ContributionItem {
                 IEditorDescriptor desc = item.getDescriptor();
 				if (input == null || !input.exists() || desc == null) {
                     String title = WorkbenchMessages.OpenRecent_errorTitle;
-                    String msg = NLS.bind(WorkbenchMessages.OpenRecent_unableToOpen,  itemName );
+                    String msg = NLS.bind(WorkbenchMessages.OpenRecent_unableToOpen,  itemName ); 
                     MessageDialog.openWarning(window.getShell(), title, msg);
                     history.remove(item);
                 } else {

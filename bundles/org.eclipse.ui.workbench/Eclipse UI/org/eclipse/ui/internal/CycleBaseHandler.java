@@ -10,7 +10,6 @@
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 276324
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 481416
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -38,6 +37,8 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -97,7 +98,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	protected int getCurrentItemIndex() {
 		return 0;
 	}
-
+	
 	/**
 	 * Get the backward command.
 	 */
@@ -243,7 +244,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 
 	/**
 	 * Sets the dialog's location on the screen.
-	 *
+	 * 
 	 * @param dialog
 	 */
 	protected void setDialogLocation(final Shell dialog, IWorkbenchPart activePart) {
@@ -268,9 +269,9 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 			// Place it in the center of the monitor if it is not visible
 			// when placed in the center of its parent.
 			// Ensure the origin is visible on the screen.
-			dialogBounds.x = Math.max(0,
+			dialogBounds.x = Math.max(0, 
 					monitorBounds.x + (monitorBounds.width - dialogBounds.width) / 2);
-			dialogBounds.y =  Math.max(0,
+			dialogBounds.y =  Math.max(0, 
 					monitorBounds.y + (monitorBounds.height - dialogBounds.height) / 2);
 		}
 
@@ -406,13 +407,24 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 
 	/**
 	 * Adds a listener to the given table that blocks all traversal operations.
-	 *
+	 * 
 	 * @param table
 	 *            The table to which the traversal suppression should be added;
 	 *            must not be <code>null</code>.
 	 */
 	protected final void addTraverseListener(final Table table) {
-		table.addTraverseListener(event -> event.doit = false);
+		table.addTraverseListener(new TraverseListener() {
+			/**
+			 * Blocks all key traversal events.
+			 * 
+			 * @param event
+			 *            The trigger event; must not be <code>null</code>.
+			 */
+			@Override
+			public final void keyTraversed(final TraverseEvent event) {
+				event.doit = false;
+			}
+		});
 	}
 
 	/**
@@ -447,10 +459,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 			if (selectedItem instanceof IPerspectiveDescriptor){
 	            IPerspectiveDescriptor persp = (IPerspectiveDescriptor) selectedItem;
 	            page.setPerspective(persp);
-				IWorkbenchPart activePart = page.getActivePart();
-				if (activePart != null) {
-					activePart.setFocus();
-				}
 			}
 		}
 	}

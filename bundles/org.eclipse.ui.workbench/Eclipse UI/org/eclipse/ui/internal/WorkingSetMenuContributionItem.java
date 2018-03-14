@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,11 @@
 
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ContributionItem;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -24,15 +23,16 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkingSetFilterActionGroup;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * Menu contribution item which shows a working set.
- *
+ * 
  * @since 2.1
  */
 public class WorkingSetMenuContributionItem extends ContributionItem {
     private Image image;
-
+    
     private int id;
 
     private IWorkingSet workingSet;
@@ -41,7 +41,7 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
 
     /**
      * Returns the id of this menu contribution item
-     *
+     * 
      * @param id numerical id
      * @return String string id
      */
@@ -51,7 +51,7 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
 
     /**
      * Creates a new instance of the receiver.
-     *
+     * 
      * @param id sequential id of the new instance
      * @param actionGroup the action group this contribution item is created in
      */
@@ -68,7 +68,7 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
     /**
      * Adds a menu item for the working set.
      * Overrides method from ContributionItem.
-     *
+     * 
      * @see org.eclipse.jface.action.ContributionItem#fill(Menu,int)
      */
     @Override
@@ -76,11 +76,15 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
         MenuItem mi = new MenuItem(menu, SWT.RADIO, index);
         mi.setText("&" + id + " " + workingSet.getLabel()); //$NON-NLS-1$  //$NON-NLS-2$
         mi.setSelection(workingSet.equals(actionGroup.getWorkingSet()));
-        mi.addSelectionListener(widgetSelectedAdapter(e -> {
-			IWorkingSetManager manager = PlatformUI.getWorkbench().getWorkingSetManager();
-		    actionGroup.setWorkingSet(workingSet);
-		    manager.addRecentWorkingSet(workingSet);
-		}));
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                IWorkingSetManager manager = PlatformUI.getWorkbench()
+                        .getWorkingSetManager();
+                actionGroup.setWorkingSet(workingSet);
+                manager.addRecentWorkingSet(workingSet);
+            }
+        });
         if (image == null) {
 			ImageDescriptor imageDescriptor = workingSet.getImageDescriptor();
 			if (imageDescriptor != null)

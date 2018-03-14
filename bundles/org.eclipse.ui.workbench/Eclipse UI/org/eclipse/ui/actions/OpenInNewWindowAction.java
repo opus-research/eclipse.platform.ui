@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,7 @@ public class OpenInNewWindowAction extends Action implements
      * Creates a new <code>OpenInNewWindowAction</code>. Sets
      * the new window page's input to be an application-specific
      * default.
-     *
+     * 
      * @param window the workbench window containing this action
      */
     public OpenInNewWindowAction(IWorkbenchWindow window) {
@@ -56,7 +56,7 @@ public class OpenInNewWindowAction extends Action implements
 
     /**
      * Creates a new <code>OpenInNewWindowAction</code>.
-     *
+     * 
      * @param window the workbench window containing this action
      * @param input the input for the new window's page
      */
@@ -75,7 +75,7 @@ public class OpenInNewWindowAction extends Action implements
 
     /**
      * Set the input to use for the new window's page.
-     *
+     * 
      * @param input the input
      */
     public void setPageInput(IAdaptable input) {
@@ -116,6 +116,10 @@ public class OpenInNewWindowAction extends Action implements
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     * @since 3.0
+     */
     @Override
 	public void dispose() {
         workbenchWindow = null;

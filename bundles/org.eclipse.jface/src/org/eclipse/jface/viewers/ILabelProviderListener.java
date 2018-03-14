@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,23 +7,21 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 503316
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
-/**
+/** 
  * A listener which is notified when a label provider's state changes.
  *
  * @see IBaseLabelProvider#addListener
  * @see IBaseLabelProvider#removeListener
  */
-@FunctionalInterface
 public interface ILabelProviderListener {
     /**
-     * Notifies this listener that the state of the label provider
+     * Notifies this listener that the state of the label provider 
      * has changed in a way that affects the labels it computes.
      * <p>
-     * A typical response would be to refresh all labels by
+     * A typical response would be to refresh all labels by 
      * re-requesting them from the label provider.
      * </p>
      *

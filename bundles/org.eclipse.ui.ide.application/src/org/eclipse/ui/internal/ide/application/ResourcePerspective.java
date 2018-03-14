@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 /**
  */
 public class ResourcePerspective implements IPerspectiveFactory {
-
+	
     /**
      * Constructs a new Default layout engine.
      */
@@ -98,8 +98,8 @@ public class ResourcePerspective implements IPerspectiveFactory {
 		IFolderLayout bottomRight = layout.createFolder(
                 "bottomRight", IPageLayout.BOTTOM, (float) 0.66,//$NON-NLS-1$
                 editorArea);
-
+		
 		bottomRight.addView(IPageLayout.ID_TASK_LIST);
-
+		
     }
 }

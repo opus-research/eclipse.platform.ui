@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 
 package org.eclipse.ui.actions;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -31,6 +30,7 @@ import org.eclipse.ui.internal.PerspectiveTracker;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.NewWizard;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * Invoke the resource creation wizard selection Wizard.
@@ -84,7 +84,7 @@ public class NewWizardAction extends Action implements
      * enabled state.
      */
     private PerspectiveTracker tracker;
-
+    
     /**
      * Create a new instance of this class.
      * @param window
@@ -102,14 +102,14 @@ public class NewWizardAction extends Action implements
                 .getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD));
         setDisabledImageDescriptor(images
                 .getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD_DISABLED));
-        setToolTipText(WorkbenchMessages.NewWizardAction_toolTip);
+        setToolTipText(WorkbenchMessages.NewWizardAction_toolTip); 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 				IWorkbenchHelpContextIds.NEW_ACTION);
     }
 
     /**
      * Create a new instance of this class
-     *
+     * 
      * @deprecated use the constructor <code>NewWizardAction(IWorkbenchWindow)</code>
      */
     @Deprecated
@@ -139,22 +139,25 @@ public class NewWizardAction extends Action implements
 	 * <p>
 	 * Sets the title of the wizard window
 	 * <p>
-	 *
+	 * 
 	 * <p>
 	 * If the title of the wizard window is <code>null</code>, the default
 	 * wizard window title will be used.
 	 * </p>
-	 *
+	 * 
 	 * @param windowTitle
 	 *            The title of the wizard window, otherwise <code>null</code>
 	 *            (default wizard window title).
-	 *
+	 * 
 	 * @since 3.6
 	 */
 	public void setWizardWindowTitle(String windowTitle) {
 		this.windowTitle = windowTitle;
 	}
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void run() {
         if (workbenchWindow == null) {
@@ -179,7 +182,7 @@ public class NewWizardAction extends Action implements
                         .getActivePart();
                 if (part instanceof IEditorPart) {
                     IEditorInput input = ((IEditorPart) part).getEditorInput();
-					Object resource = Adapters.adapt(input, resourceClass);
+                    Object resource = Util.getAdapter(input, resourceClass);
                     if (resource != null) {
                         selectionToPass = new StructuredSelection(resource);
                     }
@@ -210,6 +213,10 @@ public class NewWizardAction extends Action implements
         dialog.open();
     }
 
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     * @since 3.0
+     */
     @Override
 	public void dispose() {
         if (workbenchWindow == null) {

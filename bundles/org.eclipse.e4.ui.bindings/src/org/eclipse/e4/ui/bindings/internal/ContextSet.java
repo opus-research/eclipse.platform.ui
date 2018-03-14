@@ -21,7 +21,7 @@ import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.commands.contexts.ContextManager;
 
 public class ContextSet {
-	public static ContextSet EMPTY = new ContextSet(Collections.<Context> emptyList());
+	public static ContextSet EMPTY = new ContextSet(Collections.EMPTY_LIST);
 
 	public static class CComp implements Comparator<Context> {
 		private ContextManager manager;
@@ -53,7 +53,8 @@ public class ContextSet {
 					parentId = context.getParentId();
 				}
 			} catch (NotDefinedException e) {
-				// ignore
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			return l;
 		}

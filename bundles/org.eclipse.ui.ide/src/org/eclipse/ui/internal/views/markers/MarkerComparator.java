@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.ui.views.markers.MarkerItem;
  * @since 3.4
  *
  */
-class MarkerComparator implements Comparator<MarkerItem> {
+class MarkerComparator implements Comparator {
 
 	private MarkerField category;
 
@@ -45,7 +45,7 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	private static final String DESCENDING_FIELDS = "DESCENDING_FIELDS"; //$NON-NLS-1$
 
 	// The fields with reversed direction
-	HashSet<MarkerField> descendingFields = new HashSet<>();
+	HashSet descendingFields = new HashSet();
 
 	/**
 	 * Create a new instance of the receiver categorised by categoryField
@@ -67,11 +67,10 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	 * @return int
 	 * @see Comparable#compareTo(Object)
 	 */
-	public int compareCategory(MarkerItem object1, MarkerItem object2) {
-		if (category == null) {
+	public int compareCategory(Object object1, Object object2) {
+		if (category == null)
 			return 0;
-		}
-		return category.compare(object1, object2);
+		return category.compare((MarkerItem) object1, (MarkerItem) object2);
 	}
 
 	/**
@@ -80,17 +79,28 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	 *
 	 * @return Comparator
 	 */
-	Comparator<MarkerItem> getCategoryComparator() {
-		return (o1, o2) -> compareCategory(o1, o2);
+	Comparator getCategoryComparator(){
+		return new Comparator(){
+			@Override
+			public int compare(Object o1, Object o2) {
+				return compareCategory(o1, o2);
+			}
+		};
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
 	@Override
-	public int compare(MarkerItem arg0, MarkerItem arg1) {
+	public int compare(Object arg0, Object arg1) {
+
 		// Sort by category first
 		int value = compareCategory(arg0, arg1);
-		if (value == 0) {
+		if (value == 0)
 			value=compareFields(arg0, arg1);
-		}
+
 		return value ;
 	}
 
@@ -101,15 +111,14 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	 * @param item1
 	 * @return int
 	 */
-	public int compareFields(MarkerItem item0, MarkerItem item1) {
-		int value = 0;
-		for (MarkerField field : fields) {
-			if (descendingFields.contains(field)) {
-				value = field.compare(item1, item0);
-			} else {
-				value = field.compare(item0, item1);
-			}
-			if (value != 0) {
+	public int compareFields(Object item0, Object item1) {
+		int value=0;
+		for (int i = 0; i < fields.length; i++) {
+			if (descendingFields.contains(fields[i])){
+				value = fields[i].compare((MarkerItem)item1,(MarkerItem)item0);
+			}else{
+				value = fields[i].compare((MarkerItem)item0,(MarkerItem)item1);
+			}if (value != 0){
 				break;
 			}
 		}
@@ -120,8 +129,13 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	 *
 	 * @return Comparator
 	 */
-	Comparator<MarkerItem> getFieldsComparator() {
-		return (o1, o2) -> compareFields(o1, o2);
+	Comparator getFieldsComparator(){
+		return new Comparator(){
+			@Override
+			public int compare(Object o1, Object o2) {
+				return compareFields(o1, o2);
+			}
+		};
 	}
 
 	/**
@@ -131,10 +145,10 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	 * @param field
 	 */
 	public void reversePriority(MarkerField field) {
-		if (descendingFields.remove(field)) {
+		if (descendingFields.remove(field))
 			return;
-		}
 		descendingFields.add(field);
+
 	}
 
 	/**
@@ -152,13 +166,14 @@ class MarkerComparator implements Comparator<MarkerItem> {
 
 		newFields[0] = field;
 		for (int i = 0; i < newFields.length; i++) {
-			if (fields[i] == field) {
+			if (fields[i] == field)
 				continue;
-			}
 			newFields[insertionIndex] = fields[i];
 			insertionIndex++;
 		}
+
 		fields = newFields;
+
 	}
 
 	/**
@@ -167,30 +182,34 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	 * @param memento
 	 */
 	void restore(IMemento memento) {
-		if (memento == null) {
+		if (memento == null)
 			return;
-		}
 
 		String primaryField = memento.getString(PRIMARY_SORT_FIELD_TAG);
-		if (primaryField == null || primaryField.equals(MarkerSupportInternalUtilities.getId(fields[0]))) {
+		if (primaryField == null
+				|| primaryField.equals(MarkerSupportInternalUtilities
+						.getId(fields[0])))
 			return;
-		}
 		for (int i = 1; i < fields.length; i++) {
-			if (MarkerSupportInternalUtilities.getId(fields[i]).equals(primaryField)) {
+			if (MarkerSupportInternalUtilities.getId(fields[i]).equals(
+					primaryField)) {
 				setPrimarySortField(fields[i]);
 				break;
 			}
 		}
 		IMemento[] descending = memento.getChildren(DESCENDING_FIELDS);
 
-		for (MarkerField field : fields) {
-			for (IMemento currentMemento : descending) {
-				if (currentMemento.getID().equals(MarkerSupportInternalUtilities.getId(field))) {
-					descendingFields.add(field);
+		for (int i = 0; i < fields.length; i++) {
+			for (int j = 0; j < descending.length; j++) {
+				if (descending[j].getID().equals(
+						MarkerSupportInternalUtilities.getId(fields[i]))) {
+					descendingFields.add(fields[i]);
 					continue;
 				}
+
 			}
 		}
+
 	}
 
 	/**
@@ -199,11 +218,15 @@ class MarkerComparator implements Comparator<MarkerItem> {
 	 * @param memento
 	 */
 	void saveState(IMemento memento) {
-		memento.putString(PRIMARY_SORT_FIELD_TAG, MarkerSupportInternalUtilities.getId(fields[0]));
-		Iterator<MarkerField> descendingIterator = descendingFields.iterator();
+		memento.putString(PRIMARY_SORT_FIELD_TAG,
+				MarkerSupportInternalUtilities.getId(fields[0]));
+		Iterator descendingIterator = descendingFields.iterator();
 		while (descendingIterator.hasNext()) {
-			memento.createChild(DESCENDING_FIELDS, (MarkerSupportInternalUtilities.getId(descendingIterator.next())));
+			memento.createChild(DESCENDING_FIELDS,
+					(MarkerSupportInternalUtilities
+							.getId((MarkerField) descendingIterator.next())));
 		}
+
 	}
 
 	/**

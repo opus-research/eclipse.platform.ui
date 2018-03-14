@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -20,7 +20,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Label provider for the title bar for the tabbed property view.
- *
+ * 
  * @author Anthony Hunter
  */
 public class TextTestsLabelProvider extends LabelProvider {
@@ -28,7 +28,6 @@ public class TextTestsLabelProvider extends LabelProvider {
 	/**
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 	 */
-	@Override
 	public Image getImage(Object obj) {
 		return PlatformUI.getWorkbench().getSharedImages().getImage(
 				ISharedImages.IMG_OBJ_FILE);
@@ -37,7 +36,6 @@ public class TextTestsLabelProvider extends LabelProvider {
 	/**
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 */
-	@Override
 	public String getText(Object obj) {
 		if (obj instanceof ITextSelection) {
 			ITextSelection textSelection = (ITextSelection) obj;

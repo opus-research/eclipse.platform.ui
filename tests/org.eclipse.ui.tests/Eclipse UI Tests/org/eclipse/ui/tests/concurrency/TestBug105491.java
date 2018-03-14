@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,21 +11,14 @@
 package org.eclipse.ui.tests.concurrency;
 
 import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
+import junit.framework.*;
+import org.eclipse.core.resources.*;
+import org.eclipse.core.runtime.*;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IThreadListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-
-import junit.framework.TestCase;
 
 /**
  * Tests the following sequence of events:
@@ -45,26 +38,28 @@ public class TestBug105491 extends TestCase {
 		@Override
 		public void execute(final IProgressMonitor pm) {
 			//clients assume this would not deadlock because it runs in an asyncExec
-			Display.getDefault().asyncExec(() -> {
-				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
-				try {
-					dialog.run(true, false, new WorkspaceModifyOperation() {
-						@Override
-						protected void execute(IProgressMonitor monitor) {
-						}
-					});
-				} catch (InvocationTargetException e1) {
-					e1.printStackTrace();
-					fail(e1.getMessage());
-				} catch (InterruptedException e2) {
-					// ignore
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
+					try {
+						dialog.run(true, false, new WorkspaceModifyOperation() {
+							@Override
+							protected void execute(IProgressMonitor monitor) {}
+						});
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+						fail(e.getMessage());
+					} catch (InterruptedException e) {
+						//ignore
+					}
 				}
 			});
 		}
 
 		@Override
 		public void threadChange(Thread thread) {
-			Job.getJobManager().transferRule(workspace.getRoot(), thread);
+			Platform.getJobManager().transferRule(workspace.getRoot(), thread);
 		}
 	}
 
@@ -82,22 +77,19 @@ public class TestBug105491 extends TestCase {
 	 * Performs the test
 	 */
 	public void testBug() throws CoreException {
-		if (Thread.interrupted()) {
-			fail("Thread was interrupted at start of test");
-		}
-		workspace.run((IWorkspaceRunnable) monitor -> {
-			ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
-			try {
-				dialog.run(true, false, new TransferTestOperation());
-			} catch (InvocationTargetException e1) {
-				e1.printStackTrace();
-				fail(e1.getMessage());
-			} catch (InterruptedException e2) {
-				// ignore
+		workspace.run(new IWorkspaceRunnable() {
+			@Override
+			public void run(IProgressMonitor monitor) {
+				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
+				try {
+					dialog.run(true, false, new TransferTestOperation());
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+					fail(e.getMessage());
+				} catch (InterruptedException e) {
+					//ignore
+				}
 			}
 		}, workspace.getRoot(), IResource.NONE, null);
-		if (Thread.interrupted()) {
-			fail("Thread was interrupted at end of test");
-		}
 	}
 }

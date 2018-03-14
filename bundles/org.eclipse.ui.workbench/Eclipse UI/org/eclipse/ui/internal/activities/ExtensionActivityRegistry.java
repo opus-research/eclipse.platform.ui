@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionDelta;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
+import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -37,7 +39,7 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
 	/**
 	 * Prefix for all activity preferences
 	 */
-	private final static String PREFIX = "UIActivities."; //$NON-NLS-1$
+	private final static String PREFIX = "UIActivities."; //$NON-NLS-1$    
 
     private List activityRequirementBindingDefinitions;
 
@@ -61,18 +63,22 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
         this.extensionRegistry = extensionRegistry;
 
         this.extensionRegistry
-                .addRegistryChangeListener(registryChangeEvent -> {
-                  IExtensionDelta[] extensionDeltas = registryChangeEvent
-				    .getExtensionDeltas(Persistence.PACKAGE_PREFIX,
-				            Persistence.PACKAGE_BASE);
+                .addRegistryChangeListener(new IRegistryChangeListener() {
+                    @Override
+					public void registryChanged(
+                            IRegistryChangeEvent registryChangeEvent) {
+                        IExtensionDelta[] extensionDeltas = registryChangeEvent
+                                .getExtensionDeltas(Persistence.PACKAGE_PREFIX,
+                                        Persistence.PACKAGE_BASE);
 
-                  if (extensionDeltas.length != 0) {
-				try {
-				    load();
-				} catch (IOException eIO) {
-				}
-}
-               });
+                        if (extensionDeltas.length != 0) {
+							try {
+                                load();
+                            } catch (IOException eIO) {
+                            }
+						}
+                    }
+                });
 
         try {
             load();
@@ -93,12 +99,12 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
 
         return namespace;
     }
-
+    
     /**
      * Returns the activity definition found at this id.
-     *
+     * 
      * @param id <code>ActivityDefinition</code> id.
-     * @return <code>ActivityDefinition</code> with given id or <code>null</code> if not found.
+     * @return <code>ActivityDefinition</code> with given id or <code>null</code> if not found. 
      */
     private ActivityDefinition getActivityDefinitionById(String id) {
 		int size = activityDefinitions.size();
@@ -152,7 +158,8 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
         IConfigurationElement[] configurationElements = extensionRegistry
                 .getConfigurationElementsFor(Persistence.PACKAGE_FULL);
 
-        for (IConfigurationElement configurationElement : configurationElements) {
+        for (int i = 0; i < configurationElements.length; i++) {
+            IConfigurationElement configurationElement = configurationElements[i];
             String name = configurationElement.getName();
 
             if (Persistence.TAG_ACTIVITY_REQUIREMENT_BINDING.equals(name)) {
@@ -169,7 +176,7 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
 				readDefaultEnablement(configurationElement);
 			}
         }
-
+                
 		// merge enablement overrides from plugin_customization.ini
 		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 		for (Iterator i = activityDefinitions.iterator(); i.hasNext();) {
@@ -236,7 +243,7 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
 										"Expression activity cannot be required (id: " + activityDef.getId() + ")")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-
+		
         boolean activityRegistryChanged = false;
 
         if (!activityRequirementBindingDefinitions
@@ -285,7 +292,7 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
 
 	/**
 	 * Create the preference key for the activity.
-	 *
+	 * 
 	 * @param activityId
 	 *            the activity id.
 	 * @return String a preference key representing the activity.
@@ -325,7 +332,7 @@ final class ExtensionActivityRegistry extends AbstractActivityRegistry {
                 .readActivityDefinition(new ConfigurationElementMemento(
                         configurationElement),
                         getNamespace(configurationElement));
-
+        
         if (activityDefinition != null) {
         	// this is not ideal, but core expressions takes an
         	// IConfigurationElement or a w3c dom Document

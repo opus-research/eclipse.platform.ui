@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - Initial API and implementation
  *******************************************************************************/
@@ -28,21 +28,20 @@ public class InternalBrowserViewTestCase extends TestCase {
 		WebBrowserPreference.setBrowserChoice(WebBrowserPreference.INTERNAL);
 		IWorkbenchBrowserSupport wbs = WebBrowserTestsPlugin.getInstance().getWorkbench().getBrowserSupport();
 		IWebBrowser wb = wbs.createBrowser(IWorkbenchBrowserSupport.AS_VIEW, "test3", "MyBrowser", "A tooltip");
-
+		
 		wb.openURL(new URL("http://www.ibm.com"));
 		runLoopTimer(2);
-
+		
 		wb.openURL(new URL("http://www.eclipse.org"));
 		runLoopTimer(2);
-
+		
 		wb.close();
 		runLoopTimer(2);
 	}
-
+	
 	void runLoopTimer(final int seconds) {
 		final boolean[] exit = {false};
 		new Thread() {
-			@Override
 			public void run() {
 				try {
 					Thread.sleep(seconds * 1000);
@@ -54,9 +53,8 @@ public class InternalBrowserViewTestCase extends TestCase {
 				Display display = Display.getDefault();
 				if (!display.isDisposed()) {
 					display.asyncExec(new Runnable() {
-						@Override
 						public void run() {
-							if (!shell.isDisposed()) shell.redraw();
+							if (!shell.isDisposed()) shell.redraw();						
 						}
 					});
 				}

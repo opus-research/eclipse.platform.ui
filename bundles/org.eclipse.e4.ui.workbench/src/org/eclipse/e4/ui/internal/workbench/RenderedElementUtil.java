@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 IBM Corporation and others.
+ * Copyright (c) 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Axel Richard <axel.richard@obeo.fr> - Bug 392457
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -18,7 +17,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 
 /**
  * Utility class that encapsulates the representation of 'rendered' menu and tool bar elements in
@@ -38,7 +36,7 @@ public class RenderedElementUtil {
 
 	/**
 	 * Create a 'rendered' menu instance
-	 *
+	 * 
 	 * @return the new instance
 	 */
 	public static MMenu createRenderedMenu() {
@@ -50,7 +48,7 @@ public class RenderedElementUtil {
 
 	/**
 	 * Create a 'rendered' menu item instance
-	 *
+	 * 
 	 * @return the new instance
 	 */
 	public static MMenuItem createRenderedMenuItem() {
@@ -61,7 +59,7 @@ public class RenderedElementUtil {
 
 	/**
 	 * Create a 'rendered' tool bar instance
-	 *
+	 * 
 	 * @return the new instance
 	 */
 	public static MToolBar createRenderedToolBar() {
@@ -71,21 +69,8 @@ public class RenderedElementUtil {
 	}
 
 	/**
-	 * Create a 'rendered' tool bar element instance
-	 *
-	 * @return the new instance
-	 *
-	 * @since 1.4
-	 */
-	public static MToolControl createRenderedToolBarElement() {
-		final MToolControl object = MMenuFactory.INSTANCE.createToolControl();
-		object.getTags().add(RENDERED_TAG);
-		return object;
-	}
-
-	/**
 	 * Return the contribution manager value for the 'rendered' element.
-	 *
+	 * 
 	 * @param element
 	 *            a rendered element.
 	 * @return the contribution manager or <code>null</code>
@@ -96,7 +81,7 @@ public class RenderedElementUtil {
 
 	/**
 	 * Test whether the UI element is an 'rendered' menu.
-	 *
+	 * 
 	 * @param element
 	 *            the UI element
 	 * @return <code>true</code> if the element is a 'rendered' menu
@@ -107,7 +92,7 @@ public class RenderedElementUtil {
 
 	/**
 	 * Test whether the UI element is a 'rendered' menu item.
-	 *
+	 * 
 	 * @param element
 	 *            a UI element
 	 * @return <code>true</code> if the element is a 'rendered' menu item
@@ -118,7 +103,7 @@ public class RenderedElementUtil {
 
 	/**
 	 * Set the contribution manager value for a 'rendered' element.
-	 *
+	 * 
 	 * @param element
 	 *            a rendered element
 	 * @param contributionManager

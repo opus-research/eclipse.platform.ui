@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.activities.ITriggerPoint;
@@ -23,7 +26,7 @@ import org.eclipse.ui.wizards.IWizardCategory;
 
 /**
  * Wizard page class from which an import wizard is selected.
- *
+ * 
  * @since 3.2
  *
  */
@@ -32,13 +35,13 @@ public class ImportPage extends ImportExportPage {
     		+ "STORE_SELECTED_IMPORT_WIZARD_ID"; //$NON-NLS-1$
 
     private static final String STORE_EXPANDED_IMPORT_CATEGORIES = DIALOG_SETTING_SECTION_NAME
-			+ "STORE_EXPANDED_IMPORT_CATEGORIES";	//$NON-NLS-1$
+			+ "STORE_EXPANDED_IMPORT_CATEGORIES";	//$NON-NLS-1$    
 
     protected CategorizedWizardSelectionTree importTree;
-
+	
     /**
      * Constructor for import wizard selection page.
-     *
+     * 
      * @param aWorkbench
      * @param currentSelection
      */
@@ -51,7 +54,7 @@ public class ImportPage extends ImportExportPage {
 	protected void initialize() {
         workbench.getHelpSystem().setHelp(
 				getControl(),
-				IWorkbenchHelpContextIds.IMPORT_WIZARD_SELECTION_WIZARD_PAGE);
+				IWorkbenchHelpContextIds.IMPORT_WIZARD_SELECTION_WIZARD_PAGE); 		
 	}
 
 	@Override
@@ -59,21 +62,31 @@ public class ImportPage extends ImportExportPage {
 		IWizardCategory root = WorkbenchPlugin.getDefault()
 			.getImportWizardRegistry().getRootCategory();
 		importTree = new CategorizedWizardSelectionTree(
-				root, WorkbenchMessages.ImportWizard_selectWizard);
+				root, WorkbenchMessages.ImportWizard_selectSource);
 		Composite importComp = importTree.createControl(parent);
-		importTree.getViewer().addSelectionChangedListener(event -> listSelectionChanged(event.getSelection()));
-		importTree.getViewer().addDoubleClickListener(event -> treeDoubleClicked(event));
+		importTree.getViewer().addSelectionChangedListener(new ISelectionChangedListener(){
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				listSelectionChanged(event.getSelection());    	       			
+			}
+		});
+		importTree.getViewer().addDoubleClickListener(new IDoubleClickListener(){
+	    	@Override
+			public void doubleClick(DoubleClickEvent event) {
+	    		treeDoubleClicked(event);
+	    	}
+	    });
 		setTreeViewer(importTree.getViewer());
 		return importComp;
 	}
-
+	
 	@Override
 	public void saveWidgetValues(){
     	storeExpandedCategories(STORE_EXPANDED_IMPORT_CATEGORIES, importTree.getViewer());
-        storeSelectedCategoryAndWizard(STORE_SELECTED_IMPORT_WIZARD_ID, importTree.getViewer());
+        storeSelectedCategoryAndWizard(STORE_SELECTED_IMPORT_WIZARD_ID, importTree.getViewer());   
         super.saveWidgetValues();
 	}
-
+	
 	@Override
 	protected void restoreWidgetValues(){
     	IWizardCategory importRoot = WorkbenchPlugin.getDefault().getImportWizardRegistry().getRootCategory();
@@ -85,12 +98,12 @@ public class ImportPage extends ImportExportPage {
 	@Override
 	protected ITriggerPoint getTriggerPoint(){
 		return getWorkbench().getActivitySupport()
-    		.getTriggerPointManager().getTriggerPoint(WorkbenchTriggerPoints.IMPORT_WIZARDS);
+    		.getTriggerPointManager().getTriggerPoint(WorkbenchTriggerPoints.IMPORT_WIZARDS);		
 	}
-
+	
 	@Override
 	protected void updateMessage(){
-		setMessage(WorkbenchMessages.ImportExportPage_chooseImportWizard);
+		setMessage(WorkbenchMessages.ImportExportPage_chooseImportSource);
 		super.updateMessage();
 	}
 }

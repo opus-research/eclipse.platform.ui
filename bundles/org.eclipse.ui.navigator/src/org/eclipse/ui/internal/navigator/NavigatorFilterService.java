@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +34,7 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class NavigatorFilterService implements INavigatorFilterService {
 
@@ -73,15 +74,15 @@ public class NavigatorFilterService implements INavigatorFilterService {
 					String activatedFiltersPreferenceValue = prefs.get(
 							getFilterActivationPreferenceKey(), null);
 					String[] activeFilterIds = activatedFiltersPreferenceValue.split(DELIM);
-					for (String activeFilterId : activeFilterIds) {
-						activeFilters.add(activeFilterId);
+					for (int i = 0; i < activeFilterIds.length; i++) {
+						activeFilters.add(activeFilterIds[i]);
 					}
 
 				} else {
 					ICommonFilterDescriptor[] visibleFilterDescriptors = getVisibleFilterDescriptors();
-					for (ICommonFilterDescriptor visibleFilterDescriptor : visibleFilterDescriptors) {
-						if (visibleFilterDescriptor.isActiveByDefault()) {
-							activeFilters.add(visibleFilterDescriptor.getId());
+					for (int i = 0; i < visibleFilterDescriptors.length; i++) {
+						if (visibleFilterDescriptors[i].isActiveByDefault()) {
+							activeFilters.add(visibleFilterDescriptors[i].getId());
 						}
 					}
 				}
@@ -102,7 +103,8 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			 */
 			StringBuffer activatedFiltersPreferenceValue = new StringBuffer(DELIM);
 
-			for (String id : activeFilters) {
+			for (Iterator<String> activeItr = activeFilters.iterator(); activeItr.hasNext();) {
+				String id = activeItr.next().toString();
 				if (!dm.getFilterById(id).isVisibleInUi())
 					continue;
 				activatedFiltersPreferenceValue.append(id).append(DELIM);
@@ -113,7 +115,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			NavigatorContentService.flushPreferences(prefs);
 		}
 	}
-
+	
 	/**
 	 * Used for the tests
 	 */
@@ -139,9 +141,9 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		List<ViewerFilter> filters = new ArrayList<ViewerFilter>();
 
 		ViewerFilter instance;
-		for (CommonFilterDescriptor descriptor : descriptors) {
-			if (!toReturnOnlyActiveFilters || isActive(descriptor.getId())) {
-				instance = getViewerFilter(descriptor);
+		for (int i = 0; i < descriptors.length; i++) {
+			if (!toReturnOnlyActiveFilters || isActive(descriptors[i].getId())) {
+				instance = getViewerFilter(descriptors[i]);
 				if (instance != null) {
 					filters.add(instance);
 				}
@@ -207,7 +209,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			activeFilters.addAll(Arrays.asList(theFilterIds));
 		}
 	}
-
+	
 	@Override
 	public void activateFilterIdsAndUpdateViewer(String[] filterIdsToActivate) {
 		boolean updateFilterActivation = false;
@@ -219,7 +221,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		int indexofFilterIdToBeActivated;
 
 		List<String> nonUiVisible = null;
-
+		
 		/* is there a delta? */
 		for (int i = 0; i < visibleFilterDescriptors.length; i++) {
 			indexofFilterIdToBeActivated = Arrays.binarySearch(filterIdsToActivate,
@@ -231,7 +233,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			if (indexofFilterIdToBeActivated >= 0 ^ isActive(visibleFilterDescriptors[i].getId())) {
 				updateFilterActivation = true;
 			}
-
+			
 			// We don't turn of non-UI visible filters here, they have to be manipulated explicitly
 			if (!visibleFilterDescriptors[i].isVisibleInUi()) {
 				if (nonUiVisible == null)
@@ -243,11 +245,11 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		/* If so, update */
 		if (updateFilterActivation) {
 			if (nonUiVisible != null) {
-				for (String filterIdToActivate : filterIdsToActivate)
-					nonUiVisible.add(filterIdToActivate);
+				for (int i = 0; i < filterIdsToActivate.length; i++)
+					nonUiVisible.add(filterIdsToActivate[i]);
 				filterIdsToActivate = nonUiVisible.toArray(new String[]{});
 			}
-
+			
 			setActiveFilterIds(filterIdsToActivate);
 			persistFilterActivationState();
 			updateViewer();
@@ -266,11 +268,11 @@ public class NavigatorFilterService implements INavigatorFilterService {
 
 		ViewerFilter[] visibleFilters =	getVisibleFilters(true);
 		commonViewer.setFilters(visibleFilters);
-	}
-
+	}		
+		
 	/**
 	 * Activate the given array without disabling all other filters.
-	 *
+	 * 
 	 * @param theFilterIds
 	 *            The filter ids to activate.
 	 */
@@ -280,9 +282,9 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			activeFilters.addAll(Arrays.asList(theFilterIds));
 		}
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * @param aFilterId The id of the filter to activate or deactivate
 	 * @param toMakeActive True to make the filter active, false to make the filter inactive
 	 */
@@ -292,13 +294,13 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			boolean isActive = activeFilters.contains(aFilterId);
 			if(isActive ^ toMakeActive) {
 				if(toMakeActive)
-					activeFilters.add(aFilterId);
-				else
 					activeFilters.remove(aFilterId);
-
+				else
+					activeFilters.add(aFilterId);
+					
 			}
-
+				
 		}
 	}
-
+ 
 }

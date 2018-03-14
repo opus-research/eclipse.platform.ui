@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463043
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -37,37 +36,37 @@ import org.eclipse.ui.intro.IntroContentDetector;
 
 /**
  * Workbench implementation of the IIntroManager interface.
- *
+ * 
  * @since 3.0
  */
-public class WorkbenchIntroManager implements IIntroManager {
-
+public class WorkbenchIntroManager implements IIntroManager {	
+	
     private final Workbench workbench;
 
     /**
      * Create a new instance of the receiver.
-     *
+     * 
      * @param workbench the workbench instance
      */
     WorkbenchIntroManager(Workbench workbench) {
         this.workbench = workbench;
         workbench.getExtensionTracker().registerHandler(new IExtensionChangeHandler(){
-
+            
             @Override
 			public void addExtension(IExtensionTracker tracker,IExtension extension) {
                 //Do nothing
             }
-
+            
 			@Override
 			public void removeExtension(IExtension source, Object[] objects) {
-                for (Object object : objects) {
-                    if (object instanceof IIntroPart) {
-                        closeIntro((IIntroPart) object);
+                for (int i = 0; i < objects.length; i++) {
+                    if (objects[i] instanceof IIntroPart) {
+                        closeIntro((IIntroPart) objects[i]);
                     }
                 }
-
+				
 			}}, null);
-
+        
     }
 
     /**
@@ -86,23 +85,19 @@ public class WorkbenchIntroManager implements IIntroManager {
             //assumption is that there is only ever one intro per workbench
             //if we ever support one per window then this will need revisiting
             IWorkbenchPage page = introView.getSite().getPage();
-			if (page == null) {
-				introPart = null;
-				return true;
-			}
             IViewReference reference = page
                     .findViewReference(IIntroConstants.INTRO_VIEW_ID);
             page.hideView(introView);
             if (reference == null || reference.getPart(false) == null) {
-                introPart = null;
+                introPart = null;                
                 return true;
             }
             return false;
         }
-
+        
 		// if there is no part then null our reference
 		introPart = null;
-
+        
         return true;
     }
 
@@ -139,7 +134,7 @@ public class WorkbenchIntroManager implements IIntroManager {
         return introPart;
     }
 
-    /**
+    /**	 
      * @param testWindow the window to test
      * @return whether the intro exists in the given window
      */
@@ -206,12 +201,9 @@ public class WorkbenchIntroManager implements IIntroManager {
 		ViewSite site = (ViewSite) introAdapter.getViewSite();
 
 		MPart introModelPart = site.getModel();
-		if (introModelPart.getCurSharedRef() != null) {
-			MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
-			if (introPartParent instanceof MPartStack) {
-				return (MPartStack) introPartParent;
-			}
-		}
+		MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
+		if (introPartParent instanceof MPartStack)
+			return (MPartStack) introPartParent;
 
 		return null;
 	}
@@ -243,14 +235,17 @@ public class WorkbenchIntroManager implements IIntroManager {
         return introPart;
     }
 
-    /**
-     * @return the <code>ViewIntroAdapterPart</code> for this workbench, <code>null</code> if it
+    /** 
+     * @return the <code>ViewIntroAdapterPart</code> for this workbench, <code>null</code> if it 
      * cannot be found.
      */
     /*package*/ViewIntroAdapterPart getViewIntroAdapterPart() {
-		for (IWorkbenchWindow iWorkbenchWindow : this.workbench.getWorkbenchWindows()) {
-			WorkbenchWindow window = (WorkbenchWindow) iWorkbenchWindow;
-			MUIElement introPart = window.modelService.find(IIntroConstants.INTRO_VIEW_ID, window.getModel());
+		IWorkbenchWindow[] windows = this.workbench.getWorkbenchWindows();
+		for (int i = 0; i < windows.length; i++) {
+			WorkbenchWindow window = (WorkbenchWindow) windows[i];
+			MUIElement introPart = window.modelService
+.find(IIntroConstants.INTRO_VIEW_ID,
+					window.getModel());
 			if (introPart instanceof MPlaceholder) {
 				MPlaceholder introPH = (MPlaceholder) introPart;
 				MPart introModelPart = (MPart) introPH.getRef();
@@ -286,7 +281,7 @@ public class WorkbenchIntroManager implements IIntroManager {
 	public boolean hasIntro() {
         return workbench.getIntroDescriptor() != null;
     }
-
+    
     @Override
 	public boolean isNewContentAvailable() {
 		IntroDescriptor introDescriptor = workbench.getIntroDescriptor();

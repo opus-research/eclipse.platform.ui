@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,8 +62,10 @@ public final class BindingPersistenceTest extends UITestCase {
 	 */
 	public final void testAutoLoad() throws ParseException {
 		// Get the services.
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 		bindingService.readRegistryAndPreferences(commandService);
 
 		// Check the pre-conditions.
@@ -128,8 +130,10 @@ public final class BindingPersistenceTest extends UITestCase {
 
 	public final void testSinglePlatform() throws Exception {
 		// Get the services.
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		ParameterizedCommand about = new ParameterizedCommand(commandService
 				.getCommand("org.eclipse.ui.help.aboutAction"), null);
@@ -168,8 +172,10 @@ public final class BindingPersistenceTest extends UITestCase {
 	}
 
 	public final void TODOtestBindingTransform() throws Exception {
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		ParameterizedCommand addWS = new ParameterizedCommand(commandService
 				.getCommand("org.eclipse.ui.navigate.addToWorkingSet"), null);
@@ -221,8 +227,10 @@ public final class BindingPersistenceTest extends UITestCase {
 
 	public void testModifierWithPlatform() throws Exception {
 
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 		ParameterizedCommand importCmd = new ParameterizedCommand(
 				commandService.getCommand("org.eclipse.ui.file.import"), null);
 		Binding[] bindings = bindingService.getBindings();
@@ -246,8 +254,10 @@ public final class BindingPersistenceTest extends UITestCase {
 
 	public void testModifierNotApplied() throws Exception {
 
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 		ParameterizedCommand exportCmd = new ParameterizedCommand(
 				commandService.getCommand("org.eclipse.ui.file.export"), null);
 		Binding[] bindings = bindingService.getBindings();
@@ -267,8 +277,10 @@ public final class BindingPersistenceTest extends UITestCase {
 
 	public void testDifferentPlatform() throws Exception {
 
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 		ParameterizedCommand backCmd = new ParameterizedCommand(
 				commandService.getCommand("org.eclipse.ui.navigate.back"), null);
 		Binding[] bindings = bindingService.getBindings();
@@ -293,8 +305,10 @@ public final class BindingPersistenceTest extends UITestCase {
 		if (Util.isMac()) {
 			return;
 		}
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		final Scheme activeScheme = bindingService.getActiveScheme();
 		final Binding[] originalBindings = bindingService.getBindings();
@@ -317,7 +331,7 @@ public final class BindingPersistenceTest extends UITestCase {
 
 		EBindingService ebs = fWorkbench
 				.getService(EBindingService.class);
-		HashMap<String, String> attrs = new HashMap<>();
+		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(EBindingService.TYPE_ATTR_TAG, "user");
 		final Binding localAboutBinding = ebs.createBinding(keyF12, aboutCmd,
 				IContextService.CONTEXT_ID_WINDOW, attrs);
@@ -369,8 +383,10 @@ public final class BindingPersistenceTest extends UITestCase {
 			// TODO investigate on Mac
 			return;
 		}
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		final Scheme activeScheme = bindingService.getActiveScheme();
 
@@ -388,8 +404,9 @@ public final class BindingPersistenceTest extends UITestCase {
 		assertNotNull(editorBinding);
 		assertEquals(activateEditorCmd, editorBinding.getParameterizedCommand());
 
-		EBindingService ebs = fWorkbench.getService(EBindingService.class);
-		HashMap<String, String> attrs = new HashMap<>();
+		EBindingService ebs = fWorkbench
+				.getService(EBindingService.class);
+		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(EBindingService.TYPE_ATTR_TAG, "user");
 		final Binding localAboutBinding = ebs.createBinding(keyF12, aboutCmd,
 				IContextService.CONTEXT_ID_WINDOW, attrs);
@@ -413,8 +430,10 @@ public final class BindingPersistenceTest extends UITestCase {
 			return;
 		}
 
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		final Scheme emacsScheme = bindingService.getScheme(EMACS_SCHEME_ID);
 		assertNotNull(emacsScheme);
@@ -441,8 +460,9 @@ public final class BindingPersistenceTest extends UITestCase {
 				findAndReplaceBinding.getParameterizedCommand());
 		assertEquals(EMACS_SCHEME_ID, findAndReplaceBinding.getSchemeId());
 
-		EBindingService ebs = fWorkbench.getService(EBindingService.class);
-		HashMap<String, String> attrs = new HashMap<>();
+		EBindingService ebs = fWorkbench
+				.getService(EBindingService.class);
+		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(EBindingService.TYPE_ATTR_TAG, "user");
 		attrs.put(EBindingService.SCHEME_ID_ATTR_TAG, EMACS_SCHEME_ID);
 		final Binding localAboutBinding = ebs.createBinding(keyAltR, aboutCmd,
@@ -500,8 +520,10 @@ public final class BindingPersistenceTest extends UITestCase {
 			// TODO investigate on Mac
 			return;
 		}
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		final Scheme emacsScheme = bindingService.getScheme(EMACS_SCHEME_ID);
 		assertNotNull(emacsScheme);
@@ -548,8 +570,10 @@ public final class BindingPersistenceTest extends UITestCase {
 	// the 'paste' key binding overrides the 'redo' key binding and can be
 	// put back
 	public void testPasteBindingEmacs() throws Exception {
-		ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		ICommandService commandService = (ICommandService) fWorkbench
+				.getAdapter(ICommandService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		final Scheme emacsScheme = bindingService.getScheme(EMACS_SCHEME_ID);
 		assertNotNull(emacsScheme);
@@ -579,7 +603,8 @@ public final class BindingPersistenceTest extends UITestCase {
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?><org.eclipse.ui.commands><activeKeyConfiguration keyConfigurationId=\""
 								+ IBindingService.DEFAULT_DEFAULT_ACTIVE_SCHEME_ID
 								+ "\"/></org.eclipse.ui.commands>");
-		IBindingService bindingService = fWorkbench.getAdapter(IBindingService.class);
+		IBindingService bindingService = (IBindingService) fWorkbench
+				.getAdapter(IBindingService.class);
 
 		// reset keybindings
 		bindingService.readRegistryAndPreferences(null);

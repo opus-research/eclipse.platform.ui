@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 221704)
  *     Matthew Hall - bug 223114, 226289, 247875, 246782, 249526, 268022,
  *                    251424
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable.masterdetail;
@@ -35,34 +33,28 @@ import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * @param <M>
- *            type of the master observable
- * @param <K>
- *            type of the keys to the inner observable map
- * @param <V>
- *            type of the values in the inner observable map
  * @since 1.1
- *
+ * 
  */
-public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements IObserving {
+public class DetailObservableMap extends ObservableMap implements IObserving {
 	private boolean updating = false;
 
-	private IObservableValue<M> master;
-	private IObservableFactory<? super M, IObservableMap<K, V>> detailFactory;
+	private IObservableValue master;
+	private IObservableFactory detailFactory;
 
-	private IObservableMap<K, V> detailMap;
+	private IObservableMap detailMap;
 
 	private Object detailKeyType;
 	private Object detailValueType;
 
-	private IValueChangeListener<M> masterChangeListener = new IValueChangeListener<M>() {
+	private IValueChangeListener masterChangeListener = new IValueChangeListener() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<? extends M> event) {
+		public void handleValueChange(ValueChangeEvent event) {
 			if (isDisposed())
 				return;
 			ObservableTracker.setIgnore(true);
 			try {
-				Map<K, V> oldMap = new HashMap<K, V>(wrappedMap);
+				Map oldMap = new HashMap(wrappedMap);
 				updateDetailMap();
 				fireMapChange(Diffs.computeMapDiff(oldMap, wrappedMap));
 			} finally {
@@ -71,30 +63,29 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 		}
 	};
 
-	private IMapChangeListener<K, V> detailChangeListener = new IMapChangeListener<K, V>() {
+	private IMapChangeListener detailChangeListener = new IMapChangeListener() {
 		@Override
-		public void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
+		public void handleMapChange(MapChangeEvent event) {
 			if (!updating) {
-				fireMapChange(Diffs.unmodifiableDiff(event.diff));
+				fireMapChange(event.diff);
 			}
 		}
 	};
 
 	/**
 	 * Constructs a new DetailObservableMap
-	 *
+	 * 
 	 * @param detailFactory
 	 *            observable factory that creates IObservableMap instances given
 	 *            the current value of master observable value
 	 * @param master
 	 * @param keyType
 	 * @param valueType
-	 *
+	 * 
 	 */
-	public DetailObservableMap(
-			IObservableFactory<? super M, IObservableMap<K, V>> detailFactory,
-			IObservableValue<M> master, Object keyType, Object valueType) {
-		super(master.getRealm(), Collections.<K, V> emptyMap());
+	public DetailObservableMap(IObservableFactory detailFactory,
+			IObservableValue master, Object keyType, Object valueType) {
+		super(master.getRealm(), Collections.EMPTY_MAP);
 		Assert.isTrue(!master.isDisposed(), "Master observable is disposed"); //$NON-NLS-1$
 
 		this.master = master;
@@ -119,7 +110,7 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 	}
 
 	private void updateDetailMap() {
-		final M masterValue = master.getValue();
+		final Object masterValue = master.getValue();
 		if (detailMap != null) {
 			detailMap.removeMapChangeListener(detailChangeListener);
 			detailMap.dispose();
@@ -127,16 +118,17 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 
 		if (masterValue == null) {
 			detailMap = null;
-			wrappedMap = Collections.emptyMap();
+			wrappedMap = Collections.EMPTY_MAP;
 		} else {
 			ObservableTracker.setIgnore(true);
 			try {
-				detailMap = detailFactory.createObservable(masterValue);
+				detailMap = (IObservableMap) detailFactory
+						.createObservable(masterValue);
 			} finally {
 				ObservableTracker.setIgnore(false);
 			}
-			DetailObservableHelper.warnIfDifferentRealms(getRealm(),
-					detailMap.getRealm());
+			DetailObservableHelper.warnIfDifferentRealms(getRealm(), detailMap
+					.getRealm());
 			wrappedMap = detailMap;
 
 			if (detailKeyType != null) {
@@ -168,7 +160,7 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 	}
 
 	@Override
-	public V put(final K key, final V value) {
+	public Object put(final Object key, final Object value) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return detailMap.put(key, value);
@@ -178,7 +170,7 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 	}
 
 	@Override
-	public void putAll(final Map<? extends K, ? extends V> map) {
+	public void putAll(final Map map) {
 		ObservableTracker.setIgnore(true);
 		try {
 			detailMap.putAll(map);
@@ -188,7 +180,7 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 	}
 
 	@Override
-	public V remove(final Object key) {
+	public Object remove(final Object key) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return detailMap.remove(key);

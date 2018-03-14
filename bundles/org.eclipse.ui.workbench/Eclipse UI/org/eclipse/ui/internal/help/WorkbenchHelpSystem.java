@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,14 +49,14 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 /**
  * This class represents a refactoring of the functionality previously contained
  * in <code>WorkbenchHelp</code>.
- *
+ * 
  * @since 3.1
  */
 public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 	/**
 	 * Key used for stashing help-related data on SWT widgets.
-	 *
+	 * 
 	 * @see org.eclipse.swt.widgets.Widget#getData(java.lang.String)
 	 */
 	public static final String HELP_KEY = "org.eclipse.ui.help";//$NON-NLS-1$
@@ -127,14 +127,14 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 					}
 				}
 			}
-
+			
 			/*
 			 * If can't find it, show the "context is missing" context.
 			 */
 			if (context == null) {
 				context = HelpSystem.getContext(IWorkbenchHelpContextIds.MISSING);
 			}
-
+			
 			if (context != null) {
 				// determine a location in the upper right corner of the
 				// widget
@@ -164,7 +164,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	/**
 	 * Table for tracing registered context ids. This is used only for debugging
 	 * purposes.
-	 *
+	 * 
 	 */
 	private Hashtable registeredIDTable;
 
@@ -182,8 +182,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
-            for (Object object : objects) {
-                if (object == pluggableHelpUI) {
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] == pluggableHelpUI) {
                     isInitialized = false;
                     pluggableHelpUI = null;
                     helpCompatibilityWrapper = null;
@@ -195,7 +195,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
             }
         }
     };
-
+    
 	/**
 	 * Compatibility implementation of old IHelp interface.
 	 * WorkbenchHelp.getHelpSupport and IHelp were deprecated in 3.0.
@@ -307,13 +307,13 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		@Override
 		public boolean isContextHelpDisplayed() {
 			// real method - forward to pluggedhelp UI
-			return WorkbenchHelpSystem.this.isContextHelpDisplayed();
+			return isContextHelpDisplayed();
 		}
 	}
 
 	/**
 	 * A wrapper for action help context that passes the action
-	 * text to be used as a title.
+	 * text to be used as a title. 
 	 * @since 3.1
 	 */
 	private static class ContextWithTitle implements IContext2 {
@@ -362,7 +362,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 			return context.getText();
 		}
 	}
-
+	
 	/**
 	 * Compatibility wrapper, or <code>null</code> if none. Do not access
 	 * directly; see getHelpSupport().
@@ -375,24 +375,24 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	private static HelpListener helpListener;
 
 	/**
-	 * For debug purposes only.
-	 *
+	 * For debug purposes only.  
+	 * 
 	 * @return the desired help system id
 	 */
 	public String getDesiredHelpSystemId() {
 		return desiredHelpSystemId;
 	}
-
+	
 	/**
 	 * For debug purposes only.
-	 *
+	 * 
 	 * @param desiredHelpSystemId the desired help system id
 	 */
 	public void setDesiredHelpSystemId(String desiredHelpSystemId) {
 		dispose(); // prep for a new help system
 		this.desiredHelpSystemId = desiredHelpSystemId;
 	}
-
+	
 	/**
 	 * Singleton Constructor.
 	 */
@@ -401,7 +401,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 	/**
 	 * Return the singleton instance of this class.
-	 *
+	 * 
 	 * @return the singleton instance
 	 */
 	public static WorkbenchHelpSystem getInstance() {
@@ -436,7 +436,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	/**
 	 * Returns the help UI for the platform, if available. This method will
 	 * initialize the help UI if necessary.
-	 *
+	 * 
 	 * @return the help UI, or <code>null</code> if none
 	 */
 	private AbstractHelpUI getHelpUI() {
@@ -485,7 +485,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 			private IConfigurationElement findElement(
 					String desiredHelpSystemId, IExtension[] extensions) {
-				for (IExtension extension : extensions) {
+				for (int i = 0; i < extensions.length; i++) {
+					IExtension extension = extensions[i];
 					if (desiredHelpSystemId.equals(extension.getUniqueIdentifier())) {
 						IConfigurationElement[] elements = extension
 								.getConfigurationElements();
@@ -547,7 +548,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	/**
 	 * Determines the location for the help popup shell given the widget which
 	 * orginated the request for help.
-	 *
+	 * 
 	 * @param display
 	 *            the display where the help will appear
 	 */
@@ -558,7 +559,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 	/**
 	 * Returns the help listener which activates the help support system.
-	 *
+	 * 
 	 * @return the help listener
 	 */
 	private HelpListener getHelpListener() {
@@ -570,7 +571,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 	/**
 	 * Returns the help support system for the platform, if available.
-	 *
+	 * 
 	 * @return the help support system, or <code>null</code> if none
 	 * @deprecated Use the static methods on this class and on
 	 *             {@link org.eclipse.help.HelpSystem HelpSystem}instead of the
@@ -594,7 +595,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param action
 	 *            the action on which to register the computer
 	 * @param contexts
@@ -605,24 +606,27 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(IAction action, final Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
-		action.setHelpListener(event -> {
-			if (contexts != null && contexts.length > 0
-					&& getHelpUI() != null) {
-				// determine the context
-				IContext context = null;
-				if (contexts[0] instanceof String) {
-					context = HelpSystem.getContext((String) contexts[0]);
-				} else if (contexts[0] instanceof IContext) {
-					context = (IContext) contexts[0];
-				}
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (contexts != null && contexts.length > 0
+						&& getHelpUI() != null) {
+					// determine the context
+					IContext context = null;
+					if (contexts[0] instanceof String) {
+						context = HelpSystem.getContext((String) contexts[0]);
+					} else if (contexts[0] instanceof IContext) {
+						context = (IContext) contexts[0];
+					}
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		});
@@ -635,7 +639,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * Help contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param action
 	 *            the action on which to register the computer
 	 * @param computer
@@ -646,22 +650,25 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(IAction action, final IContextComputer computer) {
-		action.setHelpListener(event -> {
-			Object[] helpContexts = computer.computeContexts(event);
-			if (helpContexts != null && helpContexts.length > 0
-					&& getHelpUI() != null) {
-				// determine the context
-				IContext context = null;
-				if (helpContexts[0] instanceof String) {
-					context = HelpSystem
-							.getContext((String) helpContexts[0]);
-				} else if (helpContexts[0] instanceof IContext) {
-					context = (IContext) helpContexts[0];
-				}
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				Object[] helpContexts = computer.computeContexts(event);
+				if (helpContexts != null && helpContexts.length > 0
+						&& getHelpUI() != null) {
+					// determine the context
+					IContext context = null;
+					if (helpContexts[0] instanceof String) {
+						context = HelpSystem
+								.getContext((String) helpContexts[0]);
+					} else if (helpContexts[0] instanceof IContext) {
+						context = (IContext) helpContexts[0];
+					}
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		});
@@ -674,7 +681,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param control
 	 *            the control on which to register the contexts
 	 * @param contexts
@@ -685,9 +692,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(Control control, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 
 		control.setData(HELP_KEY, contexts);
@@ -703,7 +710,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * Help contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param control
 	 *            the control on which to register the computer
 	 * @param computer
@@ -727,7 +734,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param menu
 	 *            the menu on which to register the context
 	 * @param contexts
@@ -738,9 +745,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(Menu menu, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 		menu.setData(HELP_KEY, contexts);
 		// ensure that the listener is only registered once
@@ -755,7 +762,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * Help contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param menu
 	 *            the menu on which to register the computer
 	 * @param computer
@@ -779,7 +786,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param item
 	 *            the menu item on which to register the context
 	 * @param contexts
@@ -790,9 +797,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(MenuItem item, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 		item.setData(HELP_KEY, contexts);
 		// ensure that the listener is only registered once
@@ -807,7 +814,7 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 * Help contexts can either supplied as a static list, or calculated with a
 	 * context computer (but not both).
 	 * </p>
-	 *
+	 * 
 	 * @param item
 	 *            the menu item on which to register the computer
 	 * @param computer
@@ -823,12 +830,12 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		item.removeHelpListener(getHelpListener());
 		item.addHelpListener(getHelpListener());
 	}
-
+	
     /**
      * Creates a new help listener for the given command. This retrieves the
      * help context ID from the command, and creates an appropriate listener
      * based on this.
-     *
+     * 
      * @param command
      *            The command for which the listener should be created; must
      *            not be <code>null</code>.
@@ -838,13 +845,16 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 		// TODO Need a help ID from the context
 		// final String contextId = command.getHelpId();
 		final String contextId = ""; //$NON-NLS-1$
-		return event -> {
-			if (getHelpUI() != null) {
-				IContext context = HelpSystem.getContext(contextId);
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					displayContext(context, point.x, point.y);
+		return new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (getHelpUI() != null) {
+					IContext context = HelpSystem.getContext(contextId);
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						displayContext(context, point.x, point.y);
+					}
 				}
 			}
 		};
@@ -944,14 +954,17 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	public void setHelp(final IAction action, final String contextId) {
 		if (WorkbenchPlugin.DEBUG)
 			setHelpTrace(contextId);
-		action.setHelpListener(event -> {
-			if (getHelpUI() != null) {
-				IContext context = HelpSystem.getContext(contextId);
-				if (context != null) {
-					Point point = computePopUpLocation(event.widget
-							.getDisplay());
-					String title = LegacyActionTools.removeMnemonics(action.getText());
-					displayContext(new ContextWithTitle(context, title), point.x, point.y);
+		action.setHelpListener(new HelpListener() {
+			@Override
+			public void helpRequested(HelpEvent event) {
+				if (getHelpUI() != null) {
+					IContext context = HelpSystem.getContext(contextId);
+					if (context != null) {
+						Point point = computePopUpLocation(event.widget
+								.getDisplay());
+						String title = LegacyActionTools.removeMnemonics(action.getText());
+						displayContext(new ContextWithTitle(context, title), point.x, point.y);
+					}
 				}
 			}
 		});

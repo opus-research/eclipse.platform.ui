@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -29,15 +30,15 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 
 /**
- * The <code>NavigationHistoryAction</code> moves navigation history
+ * The <code>NavigationHistoryAction</code> moves navigation history 
  * back and forward.
  */
 public class NavigationHistoryAction extends PageEventAction {
 
 	private boolean recreateMenu;
-
+	
 	private boolean forward;
-
+    
     private Menu historyMenu;
 
     private int MAX_HISTORY_LENGTH = 9;
@@ -62,13 +63,13 @@ public class NavigationHistoryAction extends PageEventAction {
             initMenu();
             return historyMenu;
         }
-
+        
     }
 
     private void setMenu(Menu menu) {
     	historyMenu = menu;
     }
-
+    
     private void initMenu() {
     	historyMenu.addMenuListener(new MenuAdapter() {
     		@Override
@@ -76,21 +77,21 @@ public class NavigationHistoryAction extends PageEventAction {
     			if (recreateMenu) {
 					Menu m = (Menu) e.widget;
 					MenuItem[] items = m.getItems();
-					for (MenuItem item : items) {
-						item.dispose();
+					for (int i = 0; i < items.length; i++) {
+						items[i].dispose();
 					}
 					fillMenu(m);
 				}
 			}
     	});
     }
-
+    
     private void fillMenu(Menu menu) {
     	IWorkbenchPage page = getWorkbenchWindow().getActivePage();
     	if (page == null) {
     		return;
     	}
-
+    	
     	final NavigationHistory history = (NavigationHistory) getWorkbenchWindow()
     	.getActivePage().getNavigationHistory();
     	NavigationHistoryEntry[] entries;
@@ -113,17 +114,23 @@ public class NavigationHistoryAction extends PageEventAction {
     			MenuItem item = new MenuItem(menu, SWT.NONE);
     			item.setData(entries[i]);
     			if (entriesCount[i] > 1) {
-					text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_locations, text,
-							Integer.valueOf(entriesCount[i]));
+    				text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_locations,text, new Integer(entriesCount[i]));
     			}
     			item.setText(text);
-				item.addSelectionListener(widgetSelectedAdapter(
-						e -> history.shiftCurrentEntry((NavigationHistoryEntry) e.widget.getData(), forward)));
+    			item.addSelectionListener(new SelectionAdapter() {
+    				@Override
+					public void widgetSelected(SelectionEvent e) {
+    					history
+    					.shiftCurrentEntry(
+    							(NavigationHistoryEntry) e.widget
+    							.getData(), forward);
+    				}
+    			});
     		}
     	}
     	recreateMenu = false;
     }
-
+    
     @Override
 	public void dispose() {
     	super.dispose();
@@ -139,7 +146,7 @@ public class NavigationHistoryAction extends PageEventAction {
 
     /**
 	 * Create a new instance of <code>NavigationHistoryAction</code>
-	 *
+	 * 
 	 * @param window
 	 *            the workbench window this action applies to
 	 * @param forward
@@ -160,7 +167,7 @@ public class NavigationHistoryAction extends PageEventAction {
                     .getImageDescriptor(ISharedImages.IMG_TOOL_FORWARD_DISABLED));
             setActionDefinitionId(IWorkbenchCommandConstants.NAVIGATE_FORWARD_HISTORY);
         } else {
-            setText(WorkbenchMessages.NavigationHistoryAction_backward_text);
+            setText(WorkbenchMessages.NavigationHistoryAction_backward_text); 
             setToolTipText(WorkbenchMessages.NavigationHistoryAction_backward_toolTip);
             // @issue missing action id
             window.getWorkbench().getHelpSystem().setHelp(this,
@@ -171,7 +178,7 @@ public class NavigationHistoryAction extends PageEventAction {
                     .getImageDescriptor(ISharedImages.IMG_TOOL_BACK_DISABLED));
             setActionDefinitionId(IWorkbenchCommandConstants.NAVIGATE_BACKWARD_HISTORY);
         }
-        // PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IHelpContextIds.CLOSE_ALL_PAGES_ACTION);
+        // WorkbenchHelp.setHelp(this, IHelpContextIds.CLOSE_ALL_PAGES_ACTION);
         setEnabled(false);
         this.forward = forward;
         setMenuCreator(new MenuCreator());
@@ -253,7 +260,7 @@ public class NavigationHistoryAction extends PageEventAction {
             entries = history.getForwardEntries();
             if (entries.length > 0) {
                 NavigationHistoryEntry entry = entries[0];
-                String text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_forward_toolTipName, entry.getHistoryText() );
+                String text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_forward_toolTipName, entry.getHistoryText() ); 
                 setToolTipText(text);
             } else {
                 setToolTipText(WorkbenchMessages.NavigationHistoryAction_forward_toolTip);
@@ -263,10 +270,10 @@ public class NavigationHistoryAction extends PageEventAction {
             entries = history.getBackwardEntries();
             if (entries.length > 0) {
                 NavigationHistoryEntry entry = entries[0];
-                String text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_backward_toolTipName, entry.getHistoryText() );
+                String text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_backward_toolTipName, entry.getHistoryText() ); 
                 setToolTipText(text);
             } else {
-                setToolTipText(WorkbenchMessages.NavigationHistoryAction_backward_toolTip);
+                setToolTipText(WorkbenchMessages.NavigationHistoryAction_backward_toolTip); 
             }
         }
         recreateMenu = true;

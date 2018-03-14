@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.IWorkbenchWindow;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class LegacyEditorContributionExpression extends
@@ -48,7 +48,7 @@ public final class LegacyEditorContributionExpression extends
 	/**
 	 * Constructs a new instance of
 	 * <code>LegacyEditorContributionExpression</code>
-	 *
+	 * 
 	 * @param activeEditorId
 	 *            The identifier of the editor to match with the active editor;
 	 *            may be <code>null</code>

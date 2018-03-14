@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010,2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,12 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
-import static org.eclipse.e4.ui.internal.workbench.swt.Policy.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Hashtable;
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -28,7 +24,6 @@ import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
-import org.eclipse.osgi.service.debug.DebugOptionsListener;
 import org.eclipse.osgi.service.debug.DebugTrace;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -41,19 +36,21 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListener {
+public class WorkbenchSWTActivator implements BundleActivator { // extends
+																// Plugin {
 	public static final String PI_RENDERERS = "org.eclipse.e4.ui.workbench.swt"; //$NON-NLS-1$
 
 	private BundleContext context;
-	private ServiceTracker<?, PackageAdmin> pkgAdminTracker;
-	private ServiceTracker<?, Location> locationTracker;
+	private ServiceTracker pkgAdminTracker;
+	private ServiceTracker locationTracker;
 	private static WorkbenchSWTActivator activator;
+	private ServiceTracker debugTracker;
 	private DebugTrace trace;
 
 
 	/**
 	 * Get the default activator.
-	 *
+	 * 
 	 * @return a BundleActivator
 	 */
 	public static WorkbenchSWTActivator getDefault() {
@@ -71,9 +68,6 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
-		Hashtable<String, String> props = new Hashtable<>(2);
-		props.put(DebugOptions.LISTENER_SYMBOLICNAME, PI_RENDERERS);
-		context.registerService(DebugOptionsListener.class, this, props);
 	}
 
 	@Override
@@ -86,9 +80,8 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 	}
 
 	public Bundle getBundle() {
-		if (context == null) {
+		if (context == null)
 			return null;
-		}
 		return context.getBundle();
 	}
 
@@ -97,13 +90,13 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 	 */
 	public PackageAdmin getBundleAdmin() {
 		if (pkgAdminTracker == null) {
-			if (context == null) {
+			if (context == null)
 				return null;
-			}
-			pkgAdminTracker = new ServiceTracker<>(context, PackageAdmin.class, null);
+			pkgAdminTracker = new ServiceTracker(context, PackageAdmin.class
+					.getName(), null);
 			pkgAdminTracker.open();
 		}
-		return pkgAdminTracker.getService();
+		return (PackageAdmin) pkgAdminTracker.getService();
 	}
 
 	/**
@@ -118,25 +111,57 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 				// ignore this. It should never happen as we have tested the
 				// above format.
 			}
-			locationTracker = new ServiceTracker<>(context, filter, null);
+			locationTracker = new ServiceTracker(context, filter, null);
 			locationTracker.open();
 		}
-		return locationTracker.getService();
+		return (Location) locationTracker.getService();
+	}
+
+	/**
+	 * @param bundleName
+	 *            the bundle id
+	 * @return A bundle if found, or <code>null</code>
+	 */
+	public Bundle getBundleForName(String bundleName) {
+		Bundle[] bundles = getBundleAdmin().getBundles(bundleName, null);
+		if (bundles == null)
+			return null;
+		// Return the first bundle that is not installed or uninstalled
+		for (int i = 0; i < bundles.length; i++) {
+			if ((bundles[i].getState() & (Bundle.INSTALLED | Bundle.UNINSTALLED)) == 0) {
+				return bundles[i];
+			}
+		}
+		return null;
 	}
 
 	public static void trace(String option, String msg, Throwable error) {
+		final DebugOptions debugOptions = activator.getDebugOptions();
+		if (debugOptions.isDebugEnabled()
+				&& debugOptions.getBooleanOption(PI_RENDERERS + option, false)) {
+			System.out.println(msg);
+			if (error != null) {
+				error.printStackTrace(System.out);
+			}
+		}
 		activator.getTrace().trace(option, msg, error);
 	}
 
-	@Override
-	public void optionsChanged(DebugOptions options) {
-		trace = options.newDebugTrace(PI_RENDERERS);
-		DEBUG = options.getBooleanOption(PI_RENDERERS + DEBUG_FLAG, false);
-		DEBUG_MENUS = options.getBooleanOption(PI_RENDERERS + DEBUG_MENUS_FLAG, false);
-		DEBUG_RENDERER = options.getBooleanOption(PI_RENDERERS + DEBUG_RENDERER_FLAG, false);
+	public DebugOptions getDebugOptions() {
+		if (debugTracker == null) {
+			if (context == null)
+				return null;
+			debugTracker = new ServiceTracker(context, DebugOptions.class
+					.getName(), null);
+			debugTracker.open();
+		}
+		return (DebugOptions) debugTracker.getService();
 	}
 
 	public DebugTrace getTrace() {
+		if (trace == null) {
+			trace = getDebugOptions().newDebugTrace(PI_RENDERERS);
+		}
 		return trace;
 	}
 
@@ -165,7 +190,7 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 	 * <p>
 	 * Subclasses may override this method but are not expected to.
 	 * </p>
-	 *
+	 * 
 	 * @return the dialog settings
 	 */
 	public IDialogSettings getDialogSettings() {
@@ -195,7 +220,8 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 		IPath dataLocation = getStateLocationOrNull();
 		if (dataLocation != null) {
 			// try r/w state area in the local file system
-			String readWritePath = dataLocation.append(FN_DIALOG_SETTINGS).toOSString();
+			String readWritePath = dataLocation.append(FN_DIALOG_SETTINGS)
+					.toOSString();
 			File settingsFile = new File(readWritePath);
 			if (settingsFile.exists()) {
 				try {
@@ -211,7 +237,8 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 
 		// otherwise look for bundle specific dialog settings
 		Bundle bundle = context.getBundle();
-		URL dsURL = FileLocator.find(bundle, new Path(FN_DIALOG_SETTINGS), null);
+		URL dsURL = FileLocator
+				.find(bundle, new Path(FN_DIALOG_SETTINGS), null);
 		if (dsURL == null) {
 			return;
 		}
@@ -219,7 +246,8 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 		InputStream is = null;
 		try {
 			is = dsURL.openStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					is, "utf-8")); //$NON-NLS-1$
 			dialogSettings.load(reader);
 		} catch (IOException e) {
 			// load failed so ensure we have an empty settings
@@ -260,12 +288,12 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 
 	/**
 	 * FOR INTERNAL WORKBENCH USE ONLY.
-	 *
+	 * 
 	 * Returns the path to a location in the file system that can be used to
 	 * persist/restore state between workbench invocations. If the location did
 	 * not exist prior to this call it will be created. Returns
 	 * <code>null</code> if no such location is available.
-	 *
+	 * 
 	 * @return path to a location in the file system where this plug-in can
 	 *         persist data between sessions, or <code>null</code> if no such
 	 *         location is available.
@@ -276,7 +304,8 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 		// However, using it causes problems in the activation order
 		// So, for now, we get it directly.
 		try {
-			return InternalPlatform.getDefault().getStateLocation(context.getBundle(), true);
+			return InternalPlatform.getDefault().getStateLocation(
+					context.getBundle(), true);
 		} catch (IllegalStateException e) {
 			// This occurs if -data=@none is explicitly specified, so ignore
 			// this silently.

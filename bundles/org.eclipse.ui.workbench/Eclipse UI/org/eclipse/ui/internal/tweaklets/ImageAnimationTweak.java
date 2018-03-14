@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,14 +17,17 @@ import org.eclipse.ui.internal.RectangleAnimationImageFeedback;
 
 /**
  * Return an animation feedback that uses images.
- *
+ * 
  * @since 3.3
  *
  */
 public class ImageAnimationTweak extends Animations {
 	/** Default c'tor */
 	public ImageAnimationTweak() {}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.tweaklets.Animations#getFeedback()
+	 */
 	@Override
 	public RectangleAnimationFeedbackBase createFeedback(Shell shell) {
 		return new RectangleAnimationImageFeedback(shell, null, null);

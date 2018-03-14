@@ -28,7 +28,7 @@ public class Activator implements BundleActivator {
 
 	// The shared instance
 	private static Activator plugin;
-
+	
 	private IEclipseContext appContext;
 	private IEclipseContext serviceContext;
 
@@ -41,7 +41,6 @@ public class Activator implements BundleActivator {
 		return plugin;
 	}
 
-	@Override
 	public void start(BundleContext context) throws Exception {
 		plugin = this;
 		serviceContext = EclipseContextFactory.getServiceContext(context);
@@ -52,12 +51,10 @@ public class Activator implements BundleActivator {
 	private void addLogService(IEclipseContext context) {
 		context.set(LogService.class.getName(), new LogService() {
 
-			@Override
 			public void log(int level, String message) {
 				System.out.println(level + ": " + message);
 			}
 
-			@Override
 			public void log(int level, String message, Throwable exception) {
 				System.out.println(level + ": " + message);
 				if (exception != null) {
@@ -65,13 +62,11 @@ public class Activator implements BundleActivator {
 				}
 			}
 
-			@Override
 			public void log(ServiceReference sr, int level, String message) {
 				// TODO Auto-generated method stub
 
 			}
 
-			@Override
 			public void log(ServiceReference sr, int level, String message,
 					Throwable exception) {
 				// TODO Auto-generated method stub
@@ -80,7 +75,6 @@ public class Activator implements BundleActivator {
 		});
 	}
 
-	@Override
 	public void stop(BundleContext context) throws Exception {
 		serviceContext.dispose();
 		plugin = null;

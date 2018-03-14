@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
 package org.eclipse.jface.tests.viewers;
 
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -21,6 +22,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
@@ -124,7 +126,12 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 		Tree tree = new Tree(fShell, SWT.VIRTUAL | SWT.MULTI);
 		TreeViewer treeViewer = new TreeViewer(tree);
 		treeViewer.setContentProvider(new LazyTreeContentProvider());
-		tree.addListener(SWT.SetData, event -> setDataCalled = true);
+		tree.addListener(SWT.SetData, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				setDataCalled = true;
+			}
+		});
 		return treeViewer;
 	}
 
@@ -192,10 +199,6 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 			System.out.println(getName() + " disabled due to Bug 347491");
 			return;
 		}
-		if (disableTestsBug493357) {
-			System.out.println(getName() + " disabled due to Bug 493357");
-			return;
-		}
 		assertTrue("SWT.SetData not received", setDataCalled);
 		TreeViewer treeViewer = (TreeViewer) fViewer;
 		// correct what the content provider is answering with
@@ -205,7 +208,8 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 		assertEquals(NUM_ROOTS - 1, treeViewer.getTree().getItemCount());
 		treeViewer.setSelection(new StructuredSelection(new Object[] { "R-0",
 				"R-1" }));
-		assertEquals(2, treeViewer.getStructuredSelection().size());
+		assertEquals(2,
+				((IStructuredSelection) treeViewer.getSelection()).size());
 		processEvents();
 		assertTrue("expected less than " + (NUM_ROOTS / 2) + " but got "
 				+ updateElementCallCount,
@@ -217,7 +221,8 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 		treeViewer.remove(treeViewer.getInput(), 1);
 		assertEquals(NUM_ROOTS - 2, treeViewer.getTree().getItemCount());
 		processEvents();
-		assertEquals(1, treeViewer.getStructuredSelection().size());
+		assertEquals(1,
+				((IStructuredSelection) treeViewer.getSelection()).size());
 		assertEquals(1, updateElementCallCount);
 		// printCallbacks = false;
 	}

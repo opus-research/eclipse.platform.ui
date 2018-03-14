@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,7 +83,11 @@ public class AddBookmarkAction extends SelectionListenerAction {
 	public AddBookmarkAction(final Shell shell, boolean promptForName) {
 		super(IDEWorkbenchMessages.AddBookmarkLabel);
 		Assert.isNotNull(shell);
-		shellProvider = () -> shell;
+		shellProvider = new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return shell;
+			} };
 
 		initAction(promptForName);
 	}
@@ -121,7 +125,7 @@ public class AddBookmarkAction extends SelectionListenerAction {
 		if (getSelectedResources().isEmpty())
 			return;
 
-		IResource resource= getSelectedResources().get(0);
+		IResource resource= (IResource)getSelectedResources().get(0);
 		if (resource != null) {
 			if (promptForName) {
 				BookmarkPropertiesDialog dialog= new BookmarkPropertiesDialog(shellProvider.getShell());

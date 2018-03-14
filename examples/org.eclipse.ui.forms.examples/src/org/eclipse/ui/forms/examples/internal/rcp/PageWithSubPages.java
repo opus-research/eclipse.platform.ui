@@ -25,7 +25,7 @@ import org.eclipse.ui.forms.widgets.*;
 public class PageWithSubPages extends FormPage {
 	private CTabFolder tabFolder;
 	private Text text;
-
+	
 	class TextSection {
 		String text;
 		public TextSection(String text) {this.text = text;}
@@ -37,7 +37,6 @@ public class PageWithSubPages extends FormPage {
 	public PageWithSubPages(FormEditor editor) {
 		super(editor, "composite", "Composite Page");
 	}
-	@Override
 	protected void createFormContent(IManagedForm managedForm) {
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit toolkit = managedForm.getToolkit();
@@ -60,13 +59,12 @@ public class PageWithSubPages extends FormPage {
 		createTabs(toolkit);
 		createText(toolkit, form.getBody());
 		tabFolder.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateSelection();
 			}
 		});
 		tabFolder.setSelection(0);
-		updateSelection();
+		updateSelection();		
 	}
 	private void createTabs(FormToolkit toolkit) {
 		createTab(toolkit, "Copyright", "Copyright 2004 IBM and others.");

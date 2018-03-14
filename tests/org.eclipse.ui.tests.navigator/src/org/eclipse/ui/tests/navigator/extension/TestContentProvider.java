@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
- * Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator.extension;
 
@@ -78,7 +77,8 @@ public class TestContentProvider implements ITreeContentProvider,
 			if (project != null && project.isAccessible()) {
 				IFile modelFile = project.getFile(MODEL_FILE_PATH);
 				if (rootElements.containsKey(modelFile)) {
-					TestExtensionTreeData model = (TestExtensionTreeData) rootElements.get(modelFile);
+					TestExtensionTreeData model = (TestExtensionTreeData) rootElements
+							.get(modelFile);
 					return model != null ? model.getChildren() : NO_CHILDREN;
 				} else {
 					TestExtensionTreeData model = updateModel(modelFile);
@@ -98,9 +98,9 @@ public class TestContentProvider implements ITreeContentProvider,
 		if(parentElement instanceof IProject)
 			return (IProject) parentElement;
 		else if(parentElement instanceof IAdaptable)
-			return ((IAdaptable) parentElement).getAdapter(IProject.class);
+			return (IProject) ((IAdaptable) parentElement).getAdapter(IProject.class);
 		else
-			return Platform.getAdapterManager().getAdapter(parentElement, IProject.class);
+			return (IProject) Platform.getAdapterManager().getAdapter(parentElement, IProject.class);
 	}
 
 	/**
@@ -109,7 +109,8 @@ public class TestContentProvider implements ITreeContentProvider,
 	private TestExtensionTreeData updateModel(IFile modelFile) {
 		Properties model = new Properties();
 		if (modelFile.exists()) {
-			try (InputStream is = modelFile.getContents()) {
+			try {
+				InputStream is = modelFile.getContents();
 				model.load(is);
 				is.close();
 				TestExtensionTreeData root = new TestExtensionTreeData(null,
@@ -117,7 +118,8 @@ public class TestContentProvider implements ITreeContentProvider,
 				_modelRoot = root;
 				rootElements.put(modelFile, root);
 				return root;
-			} catch (IOException | CoreException e) {
+			} catch (IOException e) {
+			} catch (CoreException e) {
 			}
 		} else {
 			rootElements.remove(modelFile);
@@ -161,6 +163,11 @@ public class TestContentProvider implements ITreeContentProvider,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+	 */
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 
@@ -173,6 +180,11 @@ public class TestContentProvider implements ITreeContentProvider,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
+	 */
 	@Override
 	public boolean visit(IResourceDelta delta) throws CoreException {
 

@@ -1,16 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 Matthew Hall and others.
+ * Copyright (c) 2007, 2008 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 208332)
  *     Brad Reynolds - initial API and implementation
  *         (through UnmodifiableObservableList.java)
  *     Matthew Hall - bug 237718
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -27,19 +26,16 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * ObservableList implementation that prevents modification by consumers. Events
  * in the originating wrapped list are propagated and thrown from this instance
  * when appropriate. All mutators throw an UnsupportedOperationException.
- *
- * @param <E>
- *            the type of the elements in this set
- *
+ * 
  * @since 1.1
  */
-public class UnmodifiableObservableSet<E> extends DecoratingObservableSet<E> {
-	private Set<E> unmodifiableSet;
+public class UnmodifiableObservableSet extends DecoratingObservableSet {
+	private Set unmodifiableSet;
 
 	/**
 	 * @param decorated
 	 */
-	public UnmodifiableObservableSet(IObservableSet<E> decorated) {
+	public UnmodifiableObservableSet(IObservableSet decorated) {
 		super(decorated, false);
 
 		this.unmodifiableSet = Collections.unmodifiableSet(decorated);
@@ -51,7 +47,7 @@ public class UnmodifiableObservableSet<E> extends DecoratingObservableSet<E> {
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends E> c) {
+	public boolean addAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -61,7 +57,7 @@ public class UnmodifiableObservableSet<E> extends DecoratingObservableSet<E> {
 	}
 
 	@Override
-	public Iterator<E> iterator() {
+	public Iterator iterator() {
 		getterCalled();
 		return unmodifiableSet.iterator();
 	}
@@ -72,12 +68,12 @@ public class UnmodifiableObservableSet<E> extends DecoratingObservableSet<E> {
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> c) {
+	public boolean removeAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> c) {
+	public boolean retainAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 

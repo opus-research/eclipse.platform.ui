@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -36,7 +37,7 @@ import org.eclipse.ui.internal.forms.widgets.FormsResources;
  * <dt><b>Styles:</b></dt>
  * <dd>None</dd>
  * </dl>
- *
+ * 
  * @since 3.0
  */
 public abstract class AbstractHyperlink extends Canvas {
@@ -49,7 +50,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	 */
 	private boolean armed;
 
-	private ListenerList<IHyperlinkListener> listeners;
+	private ListenerList listeners;
 
 	/**
 	 * Amount of the margin width around the hyperlink (default is 1).
@@ -63,7 +64,7 @@ public abstract class AbstractHyperlink extends Canvas {
 
 	/**
 	 * Creates a new hyperlink in the provided parent.
-	 *
+	 * 
 	 * @param parent
 	 *            the control parent
 	 * @param style
@@ -71,52 +72,62 @@ public abstract class AbstractHyperlink extends Canvas {
 	 */
 	public AbstractHyperlink(Composite parent, int style) {
 		super(parent, style);
-		addListener(SWT.KeyDown, e -> {
-			if (e.character == '\r') {
-				handleActivate(e);
+		addListener(SWT.KeyDown, new Listener() {
+			public void handleEvent(Event e) {
+				if (e.character == '\r') {
+					handleActivate(e);
+				}
 			}
 		});
-		addPaintListener(e -> paint(e));
-		addListener(SWT.Traverse, e -> {
-			switch (e.detail) {
-			case SWT.TRAVERSE_PAGE_NEXT:
-			case SWT.TRAVERSE_PAGE_PREVIOUS:
-			case SWT.TRAVERSE_ARROW_NEXT:
-			case SWT.TRAVERSE_ARROW_PREVIOUS:
-			case SWT.TRAVERSE_RETURN:
-				e.doit = false;
-				return;
+		addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent e) {
+				paint(e);
 			}
-			e.doit = true;
 		});
-		Listener listener = e -> {
-			switch (e.type) {
-			case SWT.FocusIn:
-				hasFocus = true;
-				handleEnter(e);
-				break;
-			case SWT.FocusOut:
-				hasFocus = false;
-				handleExit(e);
-				break;
-			case SWT.DefaultSelection:
-				handleActivate(e);
-				break;
-			case SWT.MouseEnter:
-				handleEnter(e);
-				break;
-			case SWT.MouseExit:
-				handleExit(e);
-				break;
-			case SWT.MouseDown:
-				handleMouseDown(e);
-				break;
-			case SWT.MouseUp:
-				handleMouseUp(e);
-				break;
-			case SWT.MouseMove:
-				handleMouseMove(e);
-				break;
+		addListener(SWT.Traverse, new Listener() {
+			public void handleEvent(Event e) {
+				switch (e.detail) {
+				case SWT.TRAVERSE_PAGE_NEXT:
+				case SWT.TRAVERSE_PAGE_PREVIOUS:
+				case SWT.TRAVERSE_ARROW_NEXT:
+				case SWT.TRAVERSE_ARROW_PREVIOUS:
+				case SWT.TRAVERSE_RETURN:
+					e.doit = false;
+					return;
+				}
+				e.doit = true;
+			}
+		});
+		Listener listener = new Listener() {
+			public void handleEvent(Event e) {
+				switch (e.type) {
+				case SWT.FocusIn:
+					hasFocus = true;
+					handleEnter(e);
+					break;
+				case SWT.FocusOut:
+					hasFocus = false;
+					handleExit(e);
+					break;
+				case SWT.DefaultSelection:
+					handleActivate(e);
+					break;
+				case SWT.MouseEnter:
+					handleEnter(e);
+					break;
+				case SWT.MouseExit:
+					handleExit(e);
+					break;
+				case SWT.MouseDown:
+					handleMouseDown(e);
+					break;
+				case SWT.MouseUp:
+					handleMouseUp(e);
+					break;
+				case SWT.MouseMove:
+					handleMouseMove(e);
+					break;
+				}
 			}
 		};
 		addListener(SWT.MouseEnter, listener);
@@ -131,19 +142,19 @@ public abstract class AbstractHyperlink extends Canvas {
 
 	/**
 	 * Adds the event listener to this hyperlink.
-	 *
+	 * 
 	 * @param listener
 	 *            the event listener to add
 	 */
 	public void addHyperlinkListener(IHyperlinkListener listener) {
 		if (listeners == null)
-			listeners = new ListenerList<>();
+			listeners = new ListenerList();
 		listeners.add(listener);
 	}
 
 	/**
 	 * Removes the event listener from this hyperlink.
-	 *
+	 * 
 	 * @param listener
 	 *            the event listener to remove
 	 */
@@ -157,7 +168,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	 * Returns the selection state of the control. When focus is gained, the
 	 * state will be <samp>true </samp>; it will switch to <samp>false </samp>
 	 * when the control looses focus.
-	 *
+	 * 
 	 * @return <code>true</code> if the widget has focus, <code>false</code>
 	 *         otherwise.
 	 */
@@ -173,9 +184,12 @@ public abstract class AbstractHyperlink extends Canvas {
 		redraw();
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkEntered(he);
 		}
 	}
@@ -190,9 +204,12 @@ public abstract class AbstractHyperlink extends Canvas {
 		redraw();
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkExited(he);
 		}
 	}
@@ -206,10 +223,13 @@ public abstract class AbstractHyperlink extends Canvas {
 		armed = false;
 		if (listeners == null)
 			return;
+		int size = listeners.size();
 		setCursor(FormsResources.getBusyCursor());
 		HyperlinkEvent he = new HyperlinkEvent(this, getHref(), getText(),
 				e.stateMask);
-		for (IHyperlinkListener listener : listeners) {
+		Object[] listenerList = listeners.getListeners();
+		for (int i = 0; i < size; i++) {
+			IHyperlinkListener listener = (IHyperlinkListener) listenerList[i];
 			listener.linkActivated(he);
 		}
 		if (!isDisposed()) {
@@ -226,7 +246,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	 * Sets the object associated with this hyperlink. Concrete implementation
 	 * of this class can use if to store text, URLs or model objects that need
 	 * to be processed on hyperlink events.
-	 *
+	 * 
 	 * @param href
 	 *            the hyperlink object reference
 	 */
@@ -236,7 +256,7 @@ public abstract class AbstractHyperlink extends Canvas {
 
 	/**
 	 * Returns the object associated with this hyperlink.
-	 *
+	 * 
 	 * @see #setHref
 	 * @return the hyperlink object reference
 	 */
@@ -247,7 +267,7 @@ public abstract class AbstractHyperlink extends Canvas {
 	/**
 	 * Returns the textual representation of this hyperlink suitable for showing
 	 * in tool tips or on the status line.
-	 *
+	 * 
 	 * @return the hyperlink text
 	 */
 	public String getText() {
@@ -256,7 +276,7 @@ public abstract class AbstractHyperlink extends Canvas {
 
 	/**
 	 * Paints the hyperlink as a reaction to the provided paint event.
-	 *
+	 * 
 	 * @param gc
 	 *            graphic context
 	 */
@@ -264,7 +284,7 @@ public abstract class AbstractHyperlink extends Canvas {
 
 	/**
 	 * Paints the control as a reaction to the provided paint event.
-	 *
+	 * 
 	 * @param e
 	 *            the paint event
 	 */
@@ -314,8 +334,12 @@ public abstract class AbstractHyperlink extends Canvas {
 			armed = (e.x >= 0 && e.y >= 0 && e.x < size.x && e.y < size.y);
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
+	 */
 
-	@Override
 	public void setEnabled (boolean enabled) {
 		boolean needsRedraw = enabled != getEnabled();
 		super.setEnabled(enabled);

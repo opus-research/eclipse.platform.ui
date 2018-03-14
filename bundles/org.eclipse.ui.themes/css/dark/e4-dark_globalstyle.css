@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Andrea Guarinoni and others.
+ * Copyright (c) 2010, 2014 Andrea Guarinoni and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189, 430848
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 430848
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 431635
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 465148, 465711, 430278
- *     Lars Vogel <Lars.Vogel@vogella.com> Bug 463652,466275
  *******************************************************************************/
 
 /*******************************************************************************
@@ -19,14 +18,13 @@
  * 2.) Bug 419377 - Setting a property to 'inherit' is not supported
  * 3.) Bug 430051 - Regression for CTabRendering when drawing bottom tabs
  * 4.) Bug 401015 - Add support for styling hyperlinks in Links
- * 5.) Bug 430278 - Add support for styling Scrollbars
  *******************************************************************************/
 
 
 /* ############################## Global Styles ############################## */
 
 Composite, ScrolledComposite, ExpandableComposite, TabFolder, CLabel, Label,
-ToolBar, ToolItem, Sash, Group, Hyperlink, RefactoringLocationControl, Link, FilteredTree,
+ToolItem, Sash, Group, Hyperlink, RefactoringLocationControl, Link, FilteredTree,
 ProxyEntriesComposite, NonProxyHostsComposite, DelayedFilterCheckboxTree,
 Splitter, ScrolledPageContent, ViewForm, LaunchConfigurationFilteredTree,
 ContainerSelectionGroup, BrowseCatalogItem, EncodingSettings,
@@ -43,7 +41,6 @@ ViewForm > ToolBar, /* SWT-BUG: ToolBar do not inherit rules from ViewForm */
    element without a CSS id, a CSS class and a seekable Widget name, cannot be overridden
    by a subsequent more specific rule used to correct the style for seekable elements (<1>): */
 TabFolder > Composite > *, /* Composite > CommitSearchPage$... */
-CTabFolder > Composite > *, /* Composite > CommitSearchPage$... */
 TabFolder > Composite > * > * /* [style~='SWT.NO_BACKGROUND'] <- generate E4 non-sense bugs in apparently not related other rules */, /* Composite > ContentMergeViewer$... > TextMergeViewer$... */
 DocCommentOwnerComposite > Group > *, /* Group > DocCommentOwnerComposite$... */
 TabFolder > Composite > ScrolledComposite > *, /* ScrolledComposite > ControlListViewer$... */
@@ -54,8 +51,7 @@ Shell > Composite > Composite > Composite > *, /* Composite > FilteredPreference
 ScrolledComposite > Composite > Composite > Composite > *, /* Composite > NewKeysPreferencePage$... */
 Shell > Composite > Composite > Composite > Composite > Composite > *, /* Composite > ShowRefactoringHistoryWizardPage$... */
 Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > *, /* Composite > RefactoringWizardDialog$... */
-Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > * > *, /* Composite > RefactoringWizardDialog$... */ 
-Group > StyledText {
+Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > * > * /* Composite > RefactoringWizardDialog$... */ {
     background-color:#515658;
     color:#eeeeee;
 }
@@ -96,14 +92,6 @@ Text {
     background-color: #515658;
     color: #cccccc;
 }
-
-SashForm > StyledText {
-	/*	Fix StyledText inside a SashForm */
-    background-color: #202020;
-    color: #cccccc;
-}
-
-
 Text[style~='SWT.DROP_DOWN'],
 TextSearchControl /* SWT-BUG: background color is hard-coded */,
 TextSearchControl > Label {
@@ -249,10 +237,9 @@ DrillDownComposite > ToolBar {
 }
 
 ProgressInfoItem,
-ProgressInfoItem > *,
 CompareViewerPane,
 CompareViewerPane > * {
-    background-color: #262626;
+    background-color: #333;
     color: #eeeeee;
 }
 
@@ -322,12 +309,10 @@ CTabFolder {
     swt-selected-tab-fill: '#org-eclipse-ui-workbench-ACTIVE_TAB_BG_END'; /* title background for selected tab */
     swt-shadow-visible: false;
     swt-corner-radius: 16px;
-    swt-unselected-hot-tab-color-background: #161616; /* Bug 465711 */
 }
 CTabFolder[style~='SWT.DOWN'][style~='SWT.BOTTOM'] {
     /* Set the styles for the bottom inner tabs (Bug 430051): */
     swt-tab-renderer: url('bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.CTabRendering');
-    swt-unselected-hot-tab-color-background: #161616; /* Bug 465711 */
 }
 
 Form,
@@ -336,23 +321,6 @@ FormHeading {
     background-color: #505F70;
     background-image: #505f70;
     color: #9AC9D8;
-}
-
-Form {
-	/* Bug 465148: Additional styling for the Form */
-    text-background-color: #505F70;
-
-	tb-toggle-hover-color: #313538;
-	tb-toggle-color: #313538;
-	h-hover-full-color: #313538;
-	h-hover-light-color: #313538;
-	h-bottom-keyline-2-color: #313538;
-	h-bottom-keyline-1-color: #313538;
-
-	/* We also have to force the background mode (the
-	 * Label/ToolBar in the heading should inherit it).
-	 */
-    swt-background-mode: 'force';
 }
 
 Section {
@@ -392,17 +360,6 @@ LayoutComposite > Table {
     color: #FFF;
 }
 
-HeapStatus {
-	background-color: #41464a;
- 	color: black;
-}
-
-Table,
-Tree {
-	swt-header-color: #CCC;
-	swt-header-background-color: #383D3F;
-}
-
 Twistie {
     color: #E8E4DF;
 }
@@ -438,11 +395,6 @@ Twistie {
     color: #EEEEEE;
 }
 
-HeapStatus {
-	background-color: #4F5355;
-	color: #EEEEEE;
-}
-
 PageSiteComposite, PageSiteComposite > CImageLabel {
     color: #EEEEEE;
 }
@@ -476,34 +428,4 @@ Label#org-eclipse-ui-buildid-text {
 
 ProgressIndicator#org-eclipse-ui-splash-progressIndicator {
 	background-color: #e1e1e1;
-}
-
-/*
-	 * Default values for using a styled scrollbar to allow a user to set -Dswt.enable.themedScrollBar=true/false to force
-	 * it to true/false regardless of the CSS value.
-	 *
-	 * swt-scrollbar-themed must be present for -Dswt.enable.themedScrollBar to be supported
-	 */
-
-StyledText {
-
-	swt-scrollbar-themed: false;
-
-	swt-scrollbar-background-color: #383838;
-	swt-scrollbar-foreground-color: #494949;
-	swt-scrollbar-width: 4px;
-	swt-scrollbar-border-radius: 4px;
-	swt-scrollbar-mouse-near-scroll-width: 15px;
-}
-
-Link {
-	swt-link-foreground-color: '#org-eclipse-ui-workbench-LINK_COLOR'
-}
-
-ExpandableComposite {
-    swt-titlebar-color: #cccccc;
-}
-
-TabbedPropertyTitle > CLabel{
-	color: #9AC9D8;
 }

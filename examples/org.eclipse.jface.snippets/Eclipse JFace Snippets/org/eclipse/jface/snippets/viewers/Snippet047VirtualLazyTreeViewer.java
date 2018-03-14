@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 Tom Schindl and others.
+ * Copyright (c) 2006, 2007 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 486603
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -22,15 +21,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * A simple TreeViewer example to demonstrate usage of an ILazyContentProvider.
- * Please note that you need to call viewer.setUseHasLoop(true) to enable the
- * lazy lookup in the content provider
- *
+ * A simple TreeViewer to demonstrate usage of an ILazyContentProvider.
+ * 
  */
 public class Snippet047VirtualLazyTreeViewer {
-
 	private class MyContentProvider implements ILazyTreeContentProvider {
-
 		private TreeViewer viewer;
 		private IntermediateNode[] elements;
 
@@ -57,31 +52,31 @@ public class Snippet047VirtualLazyTreeViewer {
 
 		@Override
 		public void updateChildCount(Object element, int currentChildCount) {
-
+			
 			int length = 0;
 			if (element instanceof IntermediateNode) {
 				IntermediateNode node = (IntermediateNode) element;
 				length =  node.children.length;
-			}
+			} 
 			if(element == elements)
 				length = elements.length;
 			viewer.setChildCount(element, length);
-
+			
 
 		}
 
 		@Override
 		public void updateElement(Object parent, int index) {
-
+			
 			Object element;
-			if (parent instanceof IntermediateNode)
+			if (parent instanceof IntermediateNode) 
 				element = ((IntermediateNode) parent).children[index];
-
+			
 			else
 				element =  elements[index];
 			viewer.replace(parent, index, element);
 			updateChildCount(element, -1);
-
+			
 		}
 
 	}
@@ -124,13 +119,13 @@ public class Snippet047VirtualLazyTreeViewer {
 	}
 
 	public Snippet047VirtualLazyTreeViewer(Shell shell) {
-		final TreeViewer viewer = new TreeViewer(shell, SWT.VIRTUAL | SWT.BORDER);
-		viewer.setLabelProvider(new LabelProvider());
-		viewer.setContentProvider(new MyContentProvider(viewer));
-		viewer.setUseHashlookup(true);
+		final TreeViewer v = new TreeViewer(shell, SWT.VIRTUAL | SWT.BORDER);
+		v.setLabelProvider(new LabelProvider());
+		v.setContentProvider(new MyContentProvider(v));
+		v.setUseHashlookup(true);
 		IntermediateNode[] model = createModel();
-		viewer.setInput(model);
-		viewer.getTree().setItemCount(model.length);
+		v.setInput(model);
+		v.getTree().setItemCount(model.length);
 
 	}
 

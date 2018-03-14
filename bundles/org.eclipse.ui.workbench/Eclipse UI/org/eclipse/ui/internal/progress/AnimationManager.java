@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -45,7 +47,7 @@ public class AnimationManager {
 
     /**
      * Get the background color to be used.
-     *
+     * 
      * @param control
      *            The source of the display.
      * @return Color
@@ -60,6 +62,11 @@ public class AnimationManager {
 
         animationUpdateJob = new WorkbenchJob(ProgressMessages.AnimationManager_AnimationStart) {
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+             */
             @Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 
@@ -72,7 +79,7 @@ public class AnimationManager {
             }
         };
         animationUpdateJob.setSystem(true);
-
+        
         listener = getProgressListener();
         ProgressManager.getInstance().addListener(listener);
 
@@ -81,7 +88,7 @@ public class AnimationManager {
 
     /**
      * Add an item to the list
-     *
+     * 
      * @param item
      */
     void addItem(final AnimationItem item) {
@@ -90,7 +97,7 @@ public class AnimationManager {
 
     /**
      * Remove an item from the list
-     *
+     * 
      * @param item
      */
     void removeItem(final AnimationItem item) {
@@ -99,7 +106,7 @@ public class AnimationManager {
 
     /**
      * Return whether or not the current state is animated.
-     *
+     * 
      * @return boolean
      */
     boolean isAnimated() {
@@ -108,7 +115,7 @@ public class AnimationManager {
 
     /**
      * Set whether or not the receiver is animated.
-     *
+     * 
      * @param boolean
      */
     void setAnimated(final boolean bool) {
@@ -126,13 +133,23 @@ public class AnimationManager {
 
     private IJobProgressManagerListener getProgressListener() {
         return new IJobProgressManagerListener() {
-			Set<Job> jobs = new HashSet<>();
+            Set jobs = Collections.synchronizedSet(new HashSet());
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addJob(org.eclipse.ui.internal.progress.JobInfo)
+             */
             @Override
 			public void addJob(JobInfo info) {
                 incrementJobCount(info);
             }
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshJobInfo(org.eclipse.ui.internal.progress.JobInfo)
+             */
             @Override
 			public void refreshJobInfo(JobInfo info) {
                 int state = info.getJob().getState();
@@ -143,21 +160,37 @@ public class AnimationManager {
 				}
             }
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshAll()
+             */
             @Override
 			public void refreshAll() {
                 ProgressManager manager = ProgressManager.getInstance();
                 jobs.clear();
                 setAnimated(false);
-				for (JobInfo currentInfo : manager.getJobInfos(showsDebug())) {
-                    addJob(currentInfo);
+                JobInfo[] currentInfos = manager.getJobInfos(showsDebug());
+                for (int i = 0; i < currentInfos.length; i++) {
+                    addJob(currentInfos[i]);
                 }
             }
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#remove(org.eclipse.ui.internal.progress.JobInfo)
+             */
             @Override
 			public void removeJob(JobInfo info) {
                 decrementJobCount(info.getJob());
             }
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#showsDebug()
+             */
             @Override
 			public boolean showsDebug() {
                 return false;
@@ -194,16 +227,31 @@ public class AnimationManager {
                         || animationProcessor.isProcessorJob(job);
             }
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
             @Override
 			public void addGroup(GroupInfo info) {
                 //Don't care about groups
             }
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
             @Override
 			public void removeGroup(GroupInfo group) {
                 //Don't care about groups
             }
 
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
             @Override
 			public void refreshGroup(GroupInfo info) {
                 //Don't care about groups
@@ -213,7 +261,7 @@ public class AnimationManager {
 
     /**
      * Get the preferred width for widgets displaying the animation.
-     *
+     * 
      * @return int. Return 0 if there is no image data.
      */
     int getPreferredWidth() {

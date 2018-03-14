@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,14 +27,14 @@ import org.eclipse.ui.IWorkbenchWindow;
  * only implementation of this class in PluginActionSet.  So, it may
  * be useful to phase this interface out at some point.  PluginActionSet
  * provides a lazy load strategy, where the actions are declared in
- * XML and represented at runtime by a PluginAction.
+ * XML and represented at runtime by a PluginAction.  
  * </p>
  */
 public interface IActionSet {
     /**
      * Disposes of this action set.
      * <p>
-     * Implementation should remove any references to the window and action bars
+     * Implementation should remove any references to the window and action bars 
      * created in the <code>init</code>.
      * </p>
      * <p>

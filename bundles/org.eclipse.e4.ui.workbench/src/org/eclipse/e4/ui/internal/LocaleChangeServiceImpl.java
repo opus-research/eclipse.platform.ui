@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Dirk Fauth and others.
+ * Copyright (c) 2013, 2014 Dirk Fauth and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.internal.services.ResourceBundleHelper;
+import org.eclipse.e4.core.internal.services.ServicesActivator;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.nls.ILocaleChangeService;
 import org.eclipse.e4.core.services.translation.TranslationService;
@@ -43,14 +43,12 @@ import org.osgi.service.log.LogService;
 @SuppressWarnings("restriction")
 public class LocaleChangeServiceImpl implements ILocaleChangeService {
 
+	private static LogService logService = ServicesActivator.getDefault().getLogService();
+
 	MApplication application;
 
 	@Inject
 	IEventBroker broker;
-
-	@Inject
-	@Optional
-	LogService logService;
 
 	/**
 	 * Create a new {@link LocaleChangeServiceImpl} for the given {@link IEclipseContext}.
@@ -108,7 +106,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 	 * @param children
 	 *            The list of {@link MUIElement}s that should be checked for Locale updates.
 	 */
-	@SuppressWarnings({ "rawtypes" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void updateLocalization(List<? extends MUIElement> children) {
 		for (MUIElement element : children) {
 			if (element instanceof MElementContainer) {

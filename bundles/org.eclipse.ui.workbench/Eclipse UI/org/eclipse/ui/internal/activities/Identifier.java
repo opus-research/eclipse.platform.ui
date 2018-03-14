@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.activities;
@@ -27,7 +26,7 @@ final class Identifier implements IIdentifier {
     private final static int HASH_INITIAL = Identifier.class.getName()
             .hashCode();
 
-	private final static Set<Identifier> strongReferences = new HashSet<>();
+	private final static Set<Identifier> strongReferences = new HashSet<Identifier>();
 
 	private Set<String> activityIds = Collections.emptySet();
 
@@ -39,7 +38,7 @@ final class Identifier implements IIdentifier {
 
     private String id;
 
-	private ListenerList<IIdentifierListener> identifierListeners;
+	private ListenerList identifierListeners;
 
     private transient String string;
 
@@ -58,7 +57,7 @@ final class Identifier implements IIdentifier {
 		}
 
         if (identifierListeners == null) {
-			identifierListeners = new ListenerList<>(ListenerList.IDENTITY);
+			identifierListeners = new ListenerList(ListenerList.IDENTITY);
 		}
 
 		identifierListeners.add(identifierListener);
@@ -92,11 +91,11 @@ final class Identifier implements IIdentifier {
         if (!Util.equals(activityIds, castedObject.activityIds)) {
             return false;
         }
-
+        
         if (!Util.equals(enabled, castedObject.enabled)) {
             return false;
         }
-
+        
         return Util.equals(id, castedObject.id);
     }
 
@@ -106,8 +105,10 @@ final class Identifier implements IIdentifier {
 		}
 
         if (identifierListeners != null) {
-			for (IIdentifierListener listener : identifierListeners) {
-				listener.identifierChanged(identifierEvent);
+			Object[] listeners = identifierListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				Object listener = listeners[i];
+				((IIdentifierListener) listener).identifierChanged(identifierEvent);
 			}
 		}
     }

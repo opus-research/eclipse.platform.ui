@@ -9,12 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *     Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
  *     Denis Zygann <d.zygann@web.de> - Bug 330453
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
@@ -30,6 +27,8 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -74,9 +73,9 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 	private String defaultPerspectiveId;
 
-	private ArrayList<IPerspectiveDescriptor> perspToDelete = new ArrayList<>();
+	private ArrayList<IPerspectiveDescriptor> perspToDelete = new ArrayList<IPerspectiveDescriptor>();
 
-	private ArrayList<IPerspectiveDescriptor> perspToRevert = new ArrayList<>();
+	private ArrayList<IPerspectiveDescriptor> perspToRevert = new ArrayList<IPerspectiveDescriptor>();
 
 	private Table perspectivesTable;
 
@@ -135,7 +134,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * Creates the composite which will contain all the preference controls for
 	 * this page.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @return the composite for this page
@@ -156,7 +155,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * Create a composite that contains buttons for selecting the open
 	 * perspective mode.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent composite
 	 */
@@ -177,21 +176,31 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		openSameWindowButton
 				.setSelection(IPreferenceConstants.OPM_ACTIVE_PAGE == openPerspMode);
 		openSameWindowButton.setFont(font);
-		openSameWindowButton.addSelectionListener(widgetSelectedAdapter(e -> openPerspMode = IPreferenceConstants.OPM_ACTIVE_PAGE));
+		openSameWindowButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openPerspMode = IPreferenceConstants.OPM_ACTIVE_PAGE;
+			}
+		});
 
 		openNewWindowButton = new Button(buttonComposite, SWT.RADIO);
 		openNewWindowButton.setText(OPM_NEW_WINDOW);
 		openNewWindowButton
 				.setSelection(IPreferenceConstants.OPM_NEW_WINDOW == openPerspMode);
 		openNewWindowButton.setFont(font);
-		openNewWindowButton.addSelectionListener(widgetSelectedAdapter(e -> openPerspMode = IPreferenceConstants.OPM_NEW_WINDOW));
+		openNewWindowButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openPerspMode = IPreferenceConstants.OPM_NEW_WINDOW;
+			}
+		});
 
 	}
 
 	/**
 	 * Create a table of 3 buttons to enable the user to manage customized
 	 * perspectives.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent for the button parent
 	 * @return Composite that the buttons are created in.
@@ -213,7 +222,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		// Add the label
 		Label label = new Label(perspectivesComponent, SWT.LEFT);
-		label.setText(WorkbenchMessages.PerspectivesPreference_available);
+		label.setText(WorkbenchMessages.PerspectivesPreference_available); 
 		GridData data = new GridData();
 		data.horizontalSpan = 2;
 		label.setLayoutData(data);
@@ -222,7 +231,12 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		// Add perspectivesTable.
 		perspectivesTable = new Table(perspectivesComponent, SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER);
-	    perspectivesTable.addSelectionListener(widgetSelectedAdapter(e -> updateButtons()));
+	    perspectivesTable.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				updateButtons();
+			}
+		});
         perspectivesTable.setFont(font);
 
 		data = new GridData(GridData.FILL_BOTH);
@@ -232,22 +246,22 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		// Populate the perspectivesTable
 		IPerspectiveDescriptor[] persps = perspectiveRegistry.getPerspectives();
-		perspectives = new ArrayList<>(persps.length);
+		perspectives = new ArrayList<IPerspectiveDescriptor>(persps.length);
 		for (int i = 0; i < persps.length; i++) {
 			perspectives.add(i, persps[i]);
 		}
 		Collections.sort(perspectives, comparator);
 		defaultPerspectiveId = perspectiveRegistry.getDefaultPerspective();
 		updatePerspectivesTable();
-
+		
 		// Create vertical button bar.
 		Composite buttonBar = (Composite) createVerticalButtonBar(perspectivesComponent);
 		data = new GridData(GridData.FILL_VERTICAL);
 		buttonBar.setLayoutData(data);
-
+		
 		//Add note label
 		String NOTE_LABEL = WorkbenchMessages.Preference_note;
-		String REVERT_NOTE = WorkbenchMessages.RevertPerspective_note;
+		String REVERT_NOTE = WorkbenchMessages.RevertPerspective_note; 
 		Composite noteComposite = createNoteComposite(font, parent,
                 NOTE_LABEL, REVERT_NOTE);
         GridData noteData = new GridData();
@@ -264,7 +278,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	 * help requests, and registers default buttons with its shell. The button
 	 * id is stored as the buttons client data.
 	 * </p>
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @param label
@@ -283,7 +297,12 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		GridData data = setButtonLayoutData(button);
 		data.horizontalAlignment = GridData.FILL;
 
-		button.addSelectionListener(widgetSelectedAdapter(event -> verticalButtonPressed(event.widget)));
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				verticalButtonPressed(event.widget);
+			}
+		});
 		button.setToolTipText(label);
 		if (defaultButton) {
 			Shell shell = parent.getShell();
@@ -297,7 +316,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 	/**
 	 * Creates and returns the vertical button bar.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite to contain the button bar
 	 * @return the button bar control
@@ -318,14 +337,14 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		composite.setFont(parent.getFont());
 
 		// Add the buttons to the button bar.
-		setDefaultButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_MakeDefault, false);
-		setDefaultButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_MakeDefaultTip);
+		setDefaultButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_MakeDefault, false); 
+		setDefaultButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_MakeDefaultTip); 
 
-		revertButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Reset, false);
-		revertButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_ResetTip);
+		revertButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Reset, false); 
+		revertButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_ResetTip); 
 
-		deleteButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Delete, false);
-		deleteButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_DeleteTip);
+		deleteButton = createVerticalButton(composite, WorkbenchMessages.PerspectivesPreference_Delete, false); 
+		deleteButton.setToolTipText(WorkbenchMessages.PerspectivesPreference_DeleteTip); 
 		updateButtons();
 
 		return composite;
@@ -368,12 +387,12 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		if (index >= 0){
 			defaultPerspectiveId = currentDefault;
 			updatePerspectivesTable();
-			perspectivesTable.setSelection(index);
+			perspectivesTable.setSelection(index);			
 		}
-
+		
 		String newDefault = PrefUtil.getAPIPreferenceStore().getDefaultString(
                 IWorkbenchPreferenceConstants.DEFAULT_PERSPECTIVE_ID);
-
+		
 		IPerspectiveDescriptor desc = null;
         if (newDefault != null) {
 			desc = workbench.getPerspectiveRegistry().findPerspectiveWithId(newDefault);
@@ -381,7 +400,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
         if (desc == null) {
         	newDefault = workbench.getPerspectiveRegistry().getDefaultPerspective();
         }
-
+        
         defaultPerspectiveId = newDefault;
         updatePerspectivesTable();
 
@@ -412,7 +431,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	 * Return true if there are no open instances of the perspective.  If there are open
 	 * instances of the perspective prompt the user and return true if the user answers "yes"
 	 * to the delete prompt.
-	 *
+	 * 
 	 * @return boolean <code>true</code> if it is OK to delete the perspective
 	 *         either because there are no open instances or the user has
 	 *         confirmed the deletion.
@@ -421,7 +440,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		MApplication application = ((Workbench) workbench).getApplication();
 		EModelService modelService = application.getContext().get(EModelService.class);
-
+		
 		if (modelService.findElements(application, desc.getId(), MPerspective.class, null)
 				.isEmpty())
 			return true;
@@ -445,7 +464,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
 		// Don't bother figuring out which window a perspective may be open in,
 		// the number of windows will be small.
-
+		
 		for (IPerspectiveDescriptor perspective : perspToDelete) {
 			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
 			for (IWorkbenchWindow window : windows) {
@@ -512,23 +531,23 @@ public class PerspectivesPreferencePage extends PreferencePage implements
         	newPerspectivesTableItem(persp, i, false);
         }
     }
-
+	
 	/**
 	 * Create a new tableItem using given perspective, and set image for the new item.
 	 */
 	protected TableItem newPerspectivesTableItem(IPerspectiveDescriptor persp,
             int index, boolean selected) {
-
+        
         ImageDescriptor image = persp.getImageDescriptor();
-
+        
         TableItem item = new TableItem(perspectivesTable, SWT.NULL, index);
         if (image != null) {
             Descriptors.setImage(item, image);
         }
         String label=persp.getLabel();
         if (persp.getId().equals(defaultPerspectiveId)){
-			label = NLS.bind(WorkbenchMessages.PerspectivesPreference_defaultLabel, label );
-
+			label = NLS.bind(WorkbenchMessages.PerspectivesPreference_defaultLabel, label ); 
+    	    
 		}
         item.setText(label);
         item.setData(persp);
@@ -541,7 +560,7 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 
     /**
 	 * Notifies that this page's button with the given id has been pressed.
-	 *
+	 * 
 	 * @param button
 	 *            the button that was pressed
 	 */
@@ -567,10 +586,10 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 				if (canDeletePerspective(desc)) {
 					perspToDelete.add(desc);
 					perspToRevert.remove(desc);
-					perspectives.remove(desc);
+					perspectives.remove(desc);				
 					updatePerspectivesTable();
 				}
-
+					
 			}
 		} else if (button == setDefaultButton) {
 			defaultPerspectiveId = desc.getId();

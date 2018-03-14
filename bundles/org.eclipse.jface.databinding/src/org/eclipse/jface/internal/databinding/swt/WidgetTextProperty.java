@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 264286)
- *     Eugen Neufeld - bug 461560
  *******************************************************************************/
 
 package org.eclipse.jface.internal.databinding.swt;
@@ -18,7 +17,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -27,7 +25,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class WidgetTextProperty extends WidgetDelegatingValueProperty {
 	private IValueProperty button;
@@ -40,10 +38,9 @@ public class WidgetTextProperty extends WidgetDelegatingValueProperty {
 	private IValueProperty shell;
 	private IValueProperty styledText;
 	private IValueProperty text;
-	private IValueProperty group;
 
 	/**
-	 *
+	 * 
 	 */
 	public WidgetTextProperty() {
 		super(String.class);
@@ -100,11 +97,6 @@ public class WidgetTextProperty extends WidgetDelegatingValueProperty {
 			if (text == null)
 				text = new TextTextProperty();
 			return text;
-		}
-		if (source instanceof Group) {
-			if (group == null)
-				group = new GroupTextProperty();
-			return group;
 		}
 		throw notSupported(source);
 	}

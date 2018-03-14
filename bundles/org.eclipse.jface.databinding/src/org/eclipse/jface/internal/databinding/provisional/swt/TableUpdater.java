@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,13 +30,13 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * NON-API - This class can be used to update a table with automatic dependency
  * tracking.
- *
+ * 
  * @since 1.1
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients. (We do
  *           encourage experimentation for non-production code and are
  *           interested in feedback though.)
- *
+ * 
  */
 public abstract class TableUpdater {
 
@@ -107,7 +107,9 @@ public abstract class TableUpdater {
 
 		private void stopListening() {
 			// Stop listening for dependency changes
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(this);
 			}
 		}
@@ -154,7 +156,8 @@ public abstract class TableUpdater {
 		@Override
 		public void handleListChange(ListChangeEvent event) {
 			ListDiffEntry[] differences = event.diff.getDifferences();
-			for (ListDiffEntry entry : differences) {
+			for (int i = 0; i < differences.length; i++) {
+				ListDiffEntry entry = differences[i];
 				if (entry.isAddition()) {
 					TableItem item = new TableItem(table, SWT.NONE, entry
 							.getPosition());
@@ -172,7 +175,7 @@ public abstract class TableUpdater {
 
 	/**
 	 * Creates an updator for the given control.
-	 *
+	 * 
 	 * @param table
 	 *            table to update
 	 * @param list
@@ -209,12 +212,12 @@ public abstract class TableUpdater {
 	 * Updates the control. This method will be invoked once after the updator
 	 * is created, and once before any repaint during which the control is
 	 * visible and dirty.
-	 *
+	 * 
 	 * <p>
 	 * Subclasses should overload this method to provide any code that changes
 	 * the appearance of the widget.
 	 * </p>
-	 *
+	 * 
 	 * @param index
 	 * @param item
 	 *            the item to update

@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Comparator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.Job;
@@ -60,19 +61,24 @@ public class ProgressManagerUtil {
 		public void sort(final Viewer viewer, Object[] elements) {
 			/*
 			 * https://bugs.eclipse.org/371354
-			 *
+			 * 
 			 * This ordering is inherently unstable, since it relies on
 			 * modifiable properties of the elements: E.g. the default
 			 * implementation in JobTreeElement compares getDisplayString(),
 			 * many of whose implementations use getPercentDone().
-			 *
+			 * 
 			 * JavaSE 7+'s TimSort introduced a breaking change: It now throws a
 			 * new IllegalArgumentException for bad comparators. Workaround is
 			 * to retry a few times.
 			 */
 			for (int retries = 3; retries > 0; retries--) {
 				try {
-					Arrays.sort(elements, (a, b) -> ProgressViewerComparator.this.compare(viewer, a, b));
+					Arrays.sort(elements, new Comparator<Object>() {
+						@Override
+						public int compare(Object a, Object b) {
+							return ProgressViewerComparator.this.compare(viewer, a, b);
+						}
+					});
 					return; // success
 				} catch (IllegalArgumentException e) {
 					// retry
@@ -96,11 +102,14 @@ public class ProgressManagerUtil {
 
 	static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
+	static final QualifiedName INFRASTRUCTURE_PROPERTY = new QualifiedName(
+			WorkbenchPlugin.PI_WORKBENCH, "INFRASTRUCTURE_PROPERTY");//$NON-NLS-1$
+
 	private static String ellipsis = ProgressMessages.ProgressFloatingWindow_EllipsisValue;
 
 	/**
 	 * Return a status for the exception.
-	 *
+	 * 
 	 * @param exception
 	 * @return IStatus
 	 */
@@ -112,7 +121,7 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Log the exception for debugging.
-	 *
+	 * 
 	 * @param exception
 	 */
 	static void logException(Throwable exception) {
@@ -129,7 +138,7 @@ public class ProgressManagerUtil {
 	// }
 	/**
 	 * Return a viewer comparator for looking at the jobs.
-	 *
+	 * 
 	 * @return ViewerComparator
 	 */
 	static ViewerComparator getProgressViewerComparator() {
@@ -138,10 +147,10 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Open the progress view in the supplied window.
-	 *
+	 * 
 	 * @param window
 	 */
-	static void openProgressView(IWorkbenchWindow window) {
+	static void openProgressView(WorkbenchWindow window) {
 		IWorkbenchPage page = window.getActivePage();
 		if (page == null) {
 			return;
@@ -165,176 +174,50 @@ public class ProgressManagerUtil {
 	 * the given width. The default implementation replaces characters in the
 	 * center of the original string with an ellipsis ("..."). Override if you
 	 * need a different strategy.
-	 *
+	 * 
 	 * @param textValue
 	 * @param control
 	 * @return String
 	 */
+
 	static String shortenText(String textValue, Control control) {
 		if (textValue == null) {
 			return null;
 		}
-		int maxWidth = control.getBounds().width - 5;
-		String ellipsisString = ellipsis;
 		GC gc = new GC(control);
-		try {
-			return clipToSize(gc, textValue, ellipsisString, maxWidth);
-		} finally {
+		int maxWidth = control.getBounds().width - 5;
+		int maxExtent = gc.textExtent(textValue).x;
+		if (maxExtent < maxWidth) {
 			gc.dispose();
-		}
-	}
-
-	private static String clipToSize(GC gc, String textValue, String ellipsisString, int maxWidth) {
-		int averageCharWidth = gc.getFontMetrics().getAverageCharWidth();
-		int length = textValue.length();
-
-		int secondWord = findSecondWhitespace(textValue, gc, maxWidth);
-		int pivot = ((length - secondWord) / 2) + secondWord;
-
-		int currentLength;
-		int upperBoundWidth;
-		int upperBoundLength = 0;
-
-		// Now use newton's method to search for the correct string size
-		int lowerBoundLength = 0;
-		int lowerBoundWidth = 0;
-
-		// Try to guess the size of the string based on the font's average
-		// character width
-		int estimatedCharactersThatWillFit = maxWidth / averageCharWidth;
-
-		if (estimatedCharactersThatWillFit >= length) {
-			int maxExtent = gc.textExtent(textValue).x;
-			if (maxExtent <= maxWidth) {
-				return textValue;
-			}
-			currentLength = Math.max(0,
-					Math.round(length * ((float) maxWidth / maxExtent)) - ellipsisString.length());
-			upperBoundWidth = maxExtent;
-			upperBoundLength = length;
-		} else {
-			currentLength = Math.min(length, Math.max(0, estimatedCharactersThatWillFit - ellipsisString.length()));
-			for (;;) {
-				String s = clipToLength(textValue, ellipsisString, pivot, currentLength);
-				int currentExtent = gc.textExtent(s).x;
-				if (currentExtent > maxWidth) {
-					upperBoundWidth = currentExtent;
-					upperBoundLength = currentLength;
-					break;
-				}
-				if (currentLength == length) {
-					// No need to clip the string if the whole thing fits.
-					return textValue;
-				}
-				lowerBoundWidth = currentExtent;
-				lowerBoundLength = currentLength;
-				currentLength = Math.min(length, currentLength * 2 + 1);
-			}
-		}
-
-		String s;
-		for (;;) {
-			int oldLength = currentLength;
-			s = clipToLength(textValue, ellipsisString, pivot, currentLength);
-
-			int l = gc.textExtent(s).x;
-			int tooBigBy = l - maxWidth;
-			if (tooBigBy == 0) {
-				// If this was exactly the right size, stop the binary
-				// search
-				break;
-			} else if (tooBigBy > 0) {
-				// The string is too big. Need to clip more.
-				upperBoundLength = currentLength;
-				upperBoundWidth = l;
-				if (currentLength <= lowerBoundLength + 1) {
-					// We're one character away from a value that is known
-					// to clip too much, so opt for clipping slightly too
-					// much
-					currentLength = lowerBoundLength;
-					break;
-				}
-				if (tooBigBy <= averageCharWidth * 2) {
-					currentLength--;
-				} else {
-					int spaceToRightOfLowerBound = maxWidth - lowerBoundWidth;
-					currentLength = lowerBoundLength
-							+ (currentLength - lowerBoundLength) * spaceToRightOfLowerBound / (l - lowerBoundWidth);
-					if (currentLength >= oldLength) {
-						currentLength = oldLength - 1;
-					} else if (currentLength <= lowerBoundLength) {
-						currentLength = lowerBoundLength + 1;
-					}
-				}
-			} else {
-				// The string is too small. Need to clip less.
-				lowerBoundLength = currentLength;
-				lowerBoundWidth = l;
-				if (currentLength >= upperBoundLength - 1) {
-					// We're one character away from a value that is known
-					// to clip too little, so opt for clipping slightly
-					// too much
-					currentLength = upperBoundLength - 1;
-					break;
-				}
-				if (-tooBigBy <= averageCharWidth * 2) {
-					currentLength++;
-				} else {
-					currentLength = currentLength
-							+ (upperBoundLength - currentLength) * (-tooBigBy) / (upperBoundWidth - l);
-					if (currentLength <= oldLength) {
-						currentLength = oldLength + 1;
-					} else if (currentLength >= upperBoundLength) {
-						currentLength = upperBoundLength - 1;
-					}
-				}
-			}
-		}
-
-		s = clipToLength(textValue, ellipsisString, pivot, currentLength);
-		return s;
-	}
-
-	private static String clipToLength(String textValue, String ellipsisString, int pivot, int newLength) {
-		return getClippedString(textValue, ellipsisString, pivot, textValue.length() - newLength);
-	}
-
-	private static String getClippedString(String textValue, String ellipsisString, int pivot, int charsToClip) {
-		int length = textValue.length();
-		if (charsToClip <= 0) {
 			return textValue;
 		}
-		if (charsToClip >= length) {
-			return ""; //$NON-NLS-1$
+		int length = textValue.length();
+		int charsToClip = Math.round(0.95f * length
+				* (1 - ((float) maxWidth / maxExtent)));
+		int secondWord = findSecondWhitespace(textValue, gc, maxWidth);
+		int pivot = ((length - secondWord) / 2) + secondWord;
+		int start = pivot - (charsToClip / 2);
+		int end = pivot + (charsToClip / 2) + 1;
+		while (start >= 0 && end < length) {
+			String s1 = textValue.substring(0, start);
+			String s2 = textValue.substring(end, length);
+			String s = s1 + ellipsis + s2;
+			int l = gc.textExtent(s).x;
+			if (l < maxWidth) {
+				gc.dispose();
+				return s;
+			}
+			start--;
+			end++;
 		}
-		String s;
-		int start = pivot - charsToClip / 2;
-		int end = pivot + (charsToClip + 1) / 2;
-
-		if (start < 0) {
-			end -= start;
-			start = 0;
-		}
-		if (end < 0) {
-			start -= end;
-			end = 0;
-		}
-
-		String s1 = textValue.substring(0, start);
-		String s2;
-		if (end < length) {
-			s2 = textValue.substring(end, length);
-		} else {
-			s2 = ""; //$NON-NLS-1$
-		}
-		s = s1 + ellipsisString + s2;
-		return s;
+		gc.dispose();
+		return textValue;
 	}
 
 	/**
 	 * Find the second index of a whitespace. Return the first index if there
 	 * isn't one or 0 if there is no space at all.
-	 *
+	 * 
 	 * @param textValue
 	 * @param gc
 	 *            The GC to test max length
@@ -381,7 +264,7 @@ public class ProgressManagerUtil {
 	 * If there are any modal shells open reschedule openJob to wait until they
 	 * are closed. Return true if it rescheduled, false if there is nothing
 	 * blocking it.
-	 *
+	 * 
 	 * @param openJob
 	 * @return boolean. true if the job was rescheduled due to modal dialogs.
 	 */
@@ -401,7 +284,7 @@ public class ProgressManagerUtil {
 	 * Return whether or not it is safe to open this dialog. If so then return
 	 * <code>true</code>. If not then set it to open itself when it has had
 	 * ProgressManager#longOperationTime worth of ticks.
-	 *
+	 * 
 	 * @param dialog
 	 *            ProgressMonitorJobsDialog that will be opening
 	 * @param excludedShell
@@ -419,14 +302,14 @@ public class ProgressManagerUtil {
 		dialog.watchTicks();
 		return false;
 	}
-
+	
 	/**
 	 * Return the modal shell that is currently open. If there isn't one then
 	 * return null. If there are stacked modal shells, return the top one.
-	 *
+	 * 
 	 * @param shell
 	 *            A shell to exclude from the search. May be <code>null</code>.
-	 *
+	 * 
 	 * @return Shell or <code>null</code>.
 	 */
 
@@ -441,11 +324,11 @@ public class ProgressManagerUtil {
 		// Start with the shell to exclude and check it's shells
 		return getModalChildExcluding(shell.getShells(), shell);
 	}
-
+	        
 	/**
 	 * Return the modal shell that is currently open. If there isn't one then
 	 * return null.
-	 *
+	 * 
 	 * @param toSearch shells to search for modal children
 	 * @param toExclude shell to ignore
 	 * @return the most specific modal child, or null if none
@@ -463,7 +346,7 @@ public class ProgressManagerUtil {
 			if(shell.equals(toExclude)) {
 				continue;
 			}
-
+			
 			// Check if this shell has a modal child
 			Shell[] children = shell.getShells();
 			Shell modalChild = getModalChildExcluding(children, toExclude);
@@ -479,14 +362,14 @@ public class ProgressManagerUtil {
 
 		return null;
 	}
-
+	 
 	/**
 	 * Utility method to get the best parenting possible for a dialog. If there
 	 * is a modal shell return it so as to avoid two modal dialogs. If not then
 	 * return the shell of the active workbench window. If that shell is
 	 * <code>null</code> or not visible, then return the splash shell if still
 	 * visible. Otherwise return the shell of the active workbench window.
-	 *
+	 * 
 	 * @return the best parent shell or <code>null</code>
 	 */
 	public static Shell getDefaultParent() {
@@ -515,11 +398,12 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Get the active non modal shell. If there isn't one return null.
-	 *
+	 * 
 	 * @return Shell
 	 */
 	public static Shell getNonModalShell() {
-		MApplication application = PlatformUI.getWorkbench().getService(MApplication.class);
+		MApplication application = (MApplication) PlatformUI.getWorkbench().getService(
+				MApplication.class);
 		if (application == null) {
 			// better safe than sorry
 			return null;
@@ -543,7 +427,7 @@ public class ProgressManagerUtil {
 	/**
 	 * Animate the closing of a window given the start position down to the
 	 * progress region.
-	 *
+	 * 
 	 * @param startPosition
 	 *            Rectangle. The position to start drawing from.
 	 */
@@ -572,7 +456,7 @@ public class ProgressManagerUtil {
 	/**
 	 * Animate the opening of a window given the start position down to the
 	 * progress region.
-	 *
+	 * 
 	 * @param endPosition
 	 *            Rectangle. The position to end drawing at.
 	 */
@@ -601,16 +485,27 @@ public class ProgressManagerUtil {
 	 * Get the shell provider to use in the progress support dialogs. This
 	 * provider will try to always parent off of an existing modal shell. If
 	 * there isn't one it will use the current workbench window.
-	 *
+	 * 
 	 * @return IShellProvider
 	 */
 	static IShellProvider getShellProvider() {
-		return () -> getDefaultParent();
+		return new IShellProvider() {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.window.IShellProvider#getShell()
+			 */
+			@Override
+			public Shell getShell() {
+				return getDefaultParent();
+			}
+		};
 	}
 
 	/**
 	 * Get the icons root for the progress support.
-	 *
+	 * 
 	 * @return URL
 	 */
 	public static URL getIconsRoot() {
@@ -620,7 +515,7 @@ public class ProgressManagerUtil {
 
 	/**
 	 * Return the location of the progress spinner.
-	 *
+	 * 
 	 * @return URL or <code>null</code> if it cannot be found
 	 */
 	public static URL getProgressSpinnerLocation() {

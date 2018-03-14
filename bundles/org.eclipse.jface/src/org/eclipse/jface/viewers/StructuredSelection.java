@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mikael Barbero (Eclipse Foundation) - Bug 254570
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.JFaceResources;
@@ -32,12 +30,12 @@ public class StructuredSelection implements IStructuredSelection {
     /**
      * The element that make up this structured selection.
      */
-	private final Object[] elements;
+    private Object[] elements;
 
     /**
      * The element comparer, or <code>null</code>
      */
-	private final IElementComparer comparer;
+	private IElementComparer comparer;
 
     /**
      * The canonical empty selection. This selection should be used instead of
@@ -46,14 +44,12 @@ public class StructuredSelection implements IStructuredSelection {
     public static final StructuredSelection EMPTY = new StructuredSelection();
 
     /**
-     * Creates a new empty selection.
+     * Creates a new empty selection.  
      * See also the static field <code>EMPTY</code> which contains an empty selection singleton.
      *
      * @see #EMPTY
      */
     public StructuredSelection() {
-		this.elements = null;
-		this.comparer = null;
     }
 
     /**
@@ -66,7 +62,6 @@ public class StructuredSelection implements IStructuredSelection {
     	Assert.isNotNull(elements);
         this.elements = new Object[elements.length];
         System.arraycopy(elements, 0, this.elements, 0, elements.length);
-		this.comparer = null;
     }
 
     /**
@@ -77,12 +72,11 @@ public class StructuredSelection implements IStructuredSelection {
      */
     public StructuredSelection(Object element) {
         Assert.isNotNull(element);
-		this.elements = new Object[] { element };
-		this.comparer = null;
+        elements = new Object[] { element };
     }
 
     /**
-     * Creates a structured selection from the given <code>List</code>.
+     * Creates a structured selection from the given <code>List</code>. 
      * @param elements list of selected elements
      */
     public StructuredSelection(List elements) {
@@ -93,8 +87,8 @@ public class StructuredSelection implements IStructuredSelection {
 	 * Creates a structured selection from the given <code>List</code> and
 	 * element comparer. If an element comparer is provided, it will be used to
 	 * determine equality between structured selection objects provided that
-	 * they both are based on the same (identical) comparer. See bug
-	 *
+	 * they both are based on the same (identical) comparer. See bug 
+	 * 
 	 * @param elements
 	 *            list of selected elements
 	 * @param comparer
@@ -135,7 +129,7 @@ public class StructuredSelection implements IStructuredSelection {
         }
 
         boolean useComparer = comparer != null && comparer == s2.comparer;
-
+        
         //size
         int myLen = elements.length;
         if (myLen != s2.elements.length) {
@@ -155,25 +149,6 @@ public class StructuredSelection implements IStructuredSelection {
         }
         return true;
     }
-
-	@Override
-	public int hashCode() {
-		if (isEmpty()) {
-			return 31 + Objects.hashCode(comparer);
-		}
-
-		int r;
-		if (comparer != null) {
-			r = 31 + comparer.hashCode();
-			for (Object e : elements) {
-				r = 31 * r + (e == null ? 0 : comparer.hashCode(e));
-			}
-		} else {
-			r = Arrays.hashCode(elements);
-		}
-
-		return r;
-	}
 
     @Override
 	public Object getFirstElement() {

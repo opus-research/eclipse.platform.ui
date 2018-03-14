@@ -14,19 +14,28 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -35,20 +44,7 @@ import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
-import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
-import org.eclipse.ltk.core.refactoring.Refactoring;
-import org.eclipse.ltk.core.refactoring.RefactoringContribution;
-import org.eclipse.ltk.core.refactoring.RefactoringCore;
-import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.ltk.core.refactoring.resource.MoveResourcesDescriptor;
-import org.eclipse.ltk.ui.refactoring.RefactoringUI;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CopyFilesAndFoldersOperation;
 import org.eclipse.ui.actions.MoveFilesAndFoldersOperation;
@@ -63,19 +59,28 @@ import org.eclipse.ui.navigator.CommonDropAdapter;
 import org.eclipse.ui.navigator.CommonDropAdapterAssistant;
 import org.eclipse.ui.part.ResourceTransfer;
 
+import org.eclipse.ltk.core.refactoring.CheckConditionsOperation;
+import org.eclipse.ltk.core.refactoring.PerformRefactoringOperation;
+import org.eclipse.ltk.core.refactoring.Refactoring;
+import org.eclipse.ltk.core.refactoring.RefactoringContribution;
+import org.eclipse.ltk.core.refactoring.RefactoringCore;
+import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.ltk.core.refactoring.resource.MoveResourcesDescriptor;
+import org.eclipse.ltk.ui.refactoring.RefactoringUI;
+
 
 /**
- *
+ * 
  * Clients may reference this class in the <b>dropAssistant</b> element of a
  * <b>org.eclipse.ui.navigator.navigatorContent</b> extension point.
- *
+ * 
  * <p>
  * Clients may not extend or instantiate this class for any purpose.
  * Clients may have no direct dependencies on the contract of this class.
  * </p>
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 
@@ -83,7 +88,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 
 	private RefactoringStatus refactoringStatus;
 	private IStatus returnStatus;
-
+	
 	@Override
 	public boolean isSupportedType(TransferData aTransferType) {
 		return super.isSupportedType(aTransferType)
@@ -122,9 +127,10 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 		// drag within Eclipse?
 		if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType)) {
 			IResource[] selectedResources = getSelectedResources();
-
+			
 			boolean bProjectDrop = false;
-			for (IResource res : selectedResources) {
+			for (int iRes = 0; iRes < selectedResources.length; iRes++) {
+				IResource res = selectedResources[iRes];
 				if(res instanceof IProject) {
 					bProjectDrop = true;
 				}
@@ -143,7 +149,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 							System.out
 									.println("ResourceDropAdapterAssistant.validateDrop validating COPY."); //$NON-NLS-1$
 						}
-
+	
 						operation = new CopyFilesAndFoldersOperation(getShell());
 					} else {
 						if (Policy.DEBUG_DND) {
@@ -279,13 +285,13 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 		}
 		return Status.OK_STATUS;
 	}
-
+	
 	@Override
 	public IStatus handlePluginTransferDrop(IStructuredSelection aDragSelection, Object aDropTarget) {
 
 		IContainer target = getActualTarget((IResource) aDropTarget);
 		IResource[] resources = getSelectedResources(aDragSelection);
-
+		
 		MoveFilesAndFoldersOperation operation = new MoveFilesAndFoldersOperation(
 				 getShell());
 		operation.copyResources(resources, target);
@@ -317,7 +323,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 
 	/**
 	 * Returns the resource selection from the LocalSelectionTransfer.
-	 *
+	 * 
 	 * @return the resource selection from the LocalSelectionTransfer
 	 */
 	private IResource[] getSelectedResources() {
@@ -332,17 +338,22 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 
 	/**
 	 * Returns the resource selection from the LocalSelectionTransfer.
-	 *
+	 * 
 	 * @return the resource selection from the LocalSelectionTransfer
 	 */
 	private IResource[] getSelectedResources(IStructuredSelection selection) {
-		ArrayList<IResource> selectedResources = new ArrayList<>();
+		ArrayList<IResource> selectedResources = new ArrayList<IResource>();
 
 		for (Iterator<?> i = selection.iterator(); i.hasNext();) {
 			Object o = i.next();
-			IResource resource = Adapters.adapt(o, IResource.class);
-			if (resource != null) {
-				selectedResources.add(resource);
+			if (o instanceof IResource) {
+				selectedResources.add((IResource)o);
+			} else if (o instanceof IAdaptable) {
+				IAdaptable a = (IAdaptable) o;
+				IResource r = a.getAdapter(IResource.class);
+				if (r != null) {
+					selectedResources.add(r);
+				}
 			}
 		}
 		return selectedResources.toArray(new IResource[selectedResources.size()]);
@@ -363,8 +374,8 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 		boolean shouldLinkAutomatically = false;
 		if (target.isVirtual()) {
 			shouldLinkAutomatically = true;
-			for (IResource source : sources) {
-				if ((source.getType() != IResource.FILE) && (source.getLocation() != null)) {
+			for (int i = 0; i < sources.length; i++) {
+				if ((sources[i].getType() != IResource.FILE) && (sources[i].getLocation() != null)) {
 					// If the source is a folder, but the location is null (a
 					// broken link, for example),
 					// we still generate a link automatically (the best option).
@@ -432,8 +443,8 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 		boolean shouldLinkAutomatically = false;
 		if (target.isVirtual()) {
 			shouldLinkAutomatically = true;
-			for (IResource source : sources) {
-				if (source.isVirtual() || source.isLinked()) {
+			for (int i = 0; i < sources.length; i++) {
+				if (sources[i].isVirtual() || sources[i].isLinked()) {
 					shouldLinkAutomatically = false;
 					break;
 				}
@@ -458,7 +469,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 				descriptor.setDestination(target);
 				refactoringStatus = new RefactoringStatus();
 				final Refactoring refactoring = descriptor.createRefactoring(refactoringStatus);
-
+				
 				returnStatus = null;
 				IRunnableWithProgress checkOp = new IRunnableWithProgress() {
 					@Override
@@ -469,7 +480,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 						returnStatus = WorkbenchNavigatorPlugin.createErrorStatus(0, ex.getLocalizedMessage(), ex);
 					}}
 				};
-
+				
 				if (returnStatus != null)
 					return returnStatus;
 
@@ -480,14 +491,14 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 				} catch (InvocationTargetException e) {
 					return WorkbenchNavigatorPlugin.createErrorStatus(0, e.getLocalizedMessage(), e);
 				}
-
+				
 				if (refactoringStatus.hasEntries()) {
 					Dialog dialog= RefactoringUI.createLightWeightStatusDialog(refactoringStatus, getShell(), WorkbenchNavigatorMessages.MoveResourceAction_title);
 					int result = dialog.open();
 					if (result != IStatus.OK)
 						return Status.CANCEL_STATUS;
 				}
-
+				
 				final PerformRefactoringOperation op = new PerformRefactoringOperation(refactoring,
 						CheckConditionsOperation.ALL_CONDITIONS);
 
@@ -509,10 +520,10 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 						}
 					}
 				};
-
+				
 				if (returnStatus != null)
 					return returnStatus;
-
+				
 				try {
 					PlatformUI.getWorkbench().getProgressService().run(false, false, refactorOp);
 				} catch (InterruptedException e) {

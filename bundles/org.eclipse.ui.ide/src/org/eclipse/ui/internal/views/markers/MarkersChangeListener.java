@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,7 +81,7 @@ class MarkersChangeListener implements IResourceChangeListener {
 	 *
 	 */
 	boolean workspaceBuilding() {
-		return preBuildTime > 0;
+			return preBuildTime > 0;
 	}
 
 	/**
@@ -107,6 +107,13 @@ class MarkersChangeListener implements IResourceChangeListener {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org
+	 * .eclipse.core.resources.IResourceChangeEvent)
+	 */
 	@Override
 	public synchronized void resourceChanged(IResourceChangeEvent event) {
 		/* We can now consider removing synchronized for
@@ -190,17 +197,17 @@ class MarkersChangeListener implements IResourceChangeListener {
 		if (markerDeltas.length == 0) {
 			return;
 		}
-		Collection<MarkerEntry> removed = new LinkedList<>(), added = new LinkedList<>(), changed = new LinkedList<>();
+		Collection removed = new LinkedList(), added = new LinkedList(), changed = new LinkedList();
 		String[] types = listeningTypes;
-		for (IMarkerDelta markerDelta : markerDeltas) {
+		for (int i = 0; i < markerDeltas.length; i++) {
 			try {
-				String typeId = markerDelta.getType();
+				String typeId = markerDeltas[i].getType();
 				if (!isApplicableType(types, typeId)) {
 					continue;
 				}
-				IMarker marker = markerDelta.getMarker();
+				IMarker marker = markerDeltas[i].getMarker();
 				MarkerEntry markerEntry = new MarkerEntry(marker);
-				switch (markerDelta.getKind()) {
+				switch (markerDeltas[i].getKind()) {
 				case IResourceDelta.REMOVED: {
 					removed.add(markerEntry);
 					break;
@@ -243,8 +250,8 @@ class MarkersChangeListener implements IResourceChangeListener {
 		if (types.length == 0) {
 			return false;
 		}
-		for (IMarkerDelta markerDelta : markerDeltas) {
-			if (isApplicableType(types, markerDelta.getType())) {
+		for (int i = 0; i < markerDeltas.length; i++) {
+			if (isApplicableType(types, markerDeltas[i].getType())) {
 				return true;
 			}
 		}
@@ -258,8 +265,8 @@ class MarkersChangeListener implements IResourceChangeListener {
 	 * @param typeId
 	 */
 	private boolean isApplicableType(String[] types, String typeId) {
-		for (String type : types) {
-			if (type.equals(typeId)) {
+		for (int i = 0; i < types.length; i++) {
+			if (types[i].equals(typeId)) {
 				return true;
 			}
 		}
@@ -451,11 +458,11 @@ class MarkersChangeListener implements IResourceChangeListener {
  * @since 3.6
  */
 class MarkerUpdate {
-	Collection<MarkerEntry> added;
-	Collection<MarkerEntry> removed;
-	Collection<MarkerEntry> changed;
+	Collection added;
+	Collection removed;
+	Collection changed;
 
-	MarkerUpdate(Collection<MarkerEntry> added, Collection<MarkerEntry> removed, Collection<MarkerEntry> changed) {
+	MarkerUpdate(Collection added, Collection removed, Collection changed) {
 		this.added = added;
 		this.removed = removed;
 		this.changed = changed;
@@ -492,7 +499,8 @@ class MarkerUpdateScheduler {
 	 * @param view
 	 * @param builder
 	 */
-	public MarkerUpdateScheduler(ExtendedMarkersView view, CachedMarkerBuilder builder) {
+	public MarkerUpdateScheduler(ExtendedMarkersView view,
+			CachedMarkerBuilder builder) {
 		this.view = view;
 		this.builder = builder;
 		schedulingLock = new Object();

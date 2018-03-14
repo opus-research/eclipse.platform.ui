@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,22 +50,31 @@ public class TrimPaneLayout extends Layout {
 		this.fixedCorner = barSide;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite, int, int,
+	 * boolean)
+	 */
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
 		return new Point(600, 400);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite, boolean)
+	 */
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		installResize(composite);
 
-		if (composite.getChildren().length != 1) {
+		if (composite.getChildren().length != 1)
 			return;
-		}
 
-		if (fixedCorner == SWT.NONE) {
+		if (fixedCorner == SWT.NONE)
 			return;
-		}
 
 		Rectangle bounds = composite.getBounds();
 
@@ -112,9 +121,8 @@ public class TrimPaneLayout extends Layout {
 	}
 
 	private void installResize(final Composite composite) {
-		if (resizeInstalled) {
+		if (resizeInstalled)
 			return;
-		}
 
 		composite.addMouseMoveListener(new MouseMoveListener() {
 			@Override
@@ -200,17 +208,15 @@ public class TrimPaneLayout extends Layout {
 			composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZENS));
 		} else if (cornerRect.contains(p)) {
 			if (isFixed(SWT.TOP)) {
-				if (isFixed(SWT.RIGHT)) {
+				if (isFixed(SWT.RIGHT))
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESW));
-				} else {
+				else
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESE));
-				}
 			} else if (isFixed(SWT.BOTTOM)) {
-				if (isFixed(SWT.RIGHT)) {
+				if (isFixed(SWT.RIGHT))
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESE));
-				} else {
+				else
 					composite.setCursor(composite.getDisplay().getSystemCursor(SWT.CURSOR_SIZESW));
-				}
 			}
 		} else {
 			composite.setCursor(null);

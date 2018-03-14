@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -104,7 +103,7 @@ class MarkerFieldFilterGroup {
 
 	private IConfigurationElement element;
 
-	private Map<String, String> EMPTY_MAP = new HashMap<>();
+	private Map EMPTY_MAP = new HashMap();
 	private boolean enabled = true;
 	protected MarkerFieldFilter[] fieldFilters;
 	private int scope;
@@ -126,20 +125,22 @@ class MarkerFieldFilterGroup {
 	 * @param configurationElement
 	 * @param markerBuilder
 	 */
-	public MarkerFieldFilterGroup(IConfigurationElement configurationElement, MarkerContentGenerator markerBuilder) {
+	public MarkerFieldFilterGroup(IConfigurationElement configurationElement,
+			MarkerContentGenerator markerBuilder) {
 		element = configurationElement;
 		generator = markerBuilder;
 		initializeWorkingSet();
 		scope = processScope();
 
-		if (configurationElement == null) {
+		if (configurationElement == null)
 			return;
-		}
-		String stringValue = configurationElement.getAttribute(MarkerSupportRegistry.ENABLED);
+		String stringValue = configurationElement
+				.getAttribute(MarkerSupportRegistry.ENABLED);
 		if (MarkerSupportInternalUtilities.FALSE.equals(stringValue)) {
 			enabled = false;
 		}
-		stringValue = configurationElement.getAttribute(MarkerSupportRegistry.FILTER_LIMIT);
+		stringValue = configurationElement
+				.getAttribute(MarkerSupportRegistry.FILTER_LIMIT);
 		if (stringValue == null || stringValue.length() == 0) {
 			limit = -1;
 		}
@@ -150,7 +151,7 @@ class MarkerFieldFilterGroup {
 	 *
 	 * @return Collection of {@link MarkerType}
 	 */
-	Collection<MarkerType> getAllTypes() {
+	Collection getAllTypes() {
 		return generator.getMarkerTypes();
 	}
 
@@ -170,21 +171,22 @@ class MarkerFieldFilterGroup {
 	 * Calculate the filters for the receiver.
 	 */
 	protected void calculateFilters() {
-		Map<String, String> values = getValues();
-		Collection<MarkerFieldFilter> filters = new ArrayList<>();
-		for (MarkerField visibleField : generator.getVisibleFields()) {
-			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities.generateFilter(visibleField);
+		Map values = getValues();
+		Collection filters = new ArrayList();
+		MarkerField[] fields = generator.getVisibleFields();
+		for (int i = 0; i < fields.length; i++) {
+			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities
+					.generateFilter(fields[i]);
 			if (fieldFilter != null) {
 				filters.add(fieldFilter);
 
 				// The type filter needs information from the generator
-				if (fieldFilter instanceof MarkerTypeFieldFilter) {
+				if (fieldFilter instanceof MarkerTypeFieldFilter)
 					// Show everything by default
-					((MarkerTypeFieldFilter) fieldFilter).setContentGenerator(generator);
-				}
-				if (values != null) {
+					((MarkerTypeFieldFilter) fieldFilter)
+							.setContentGenerator(generator);
+				if (values != null)
 					fieldFilter.initialize(values);
-				}
 			}
 		}
 		MarkerFieldFilter[] newFilters = new MarkerFieldFilter[filters.size()];
@@ -200,10 +202,10 @@ class MarkerFieldFilterGroup {
 	 * @return MarkerFieldFilter
 	 */
 	public MarkerFieldFilter getFilter(MarkerField field) {
-		for (MarkerFieldFilter filter : getFieldFilters()) {
-			if (filter.getField().equals(field)) {
-				return filter;
-			}
+		MarkerFieldFilter[] filters = getFieldFilters();
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i].getField().equals(field))
+				return filters[i];
 		}
 		return null;
 	}
@@ -215,11 +217,11 @@ class MarkerFieldFilterGroup {
 	 */
 	public String getID() {
 		if (id == null) {
-			if (element == null) {
+			if (element == null)
 				id = USER + String.valueOf(System.currentTimeMillis());
-			} else {
-				id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
-			}
+			else
+				id = element
+						.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
 		}
 		return id;
 	}
@@ -231,11 +233,11 @@ class MarkerFieldFilterGroup {
 	 */
 	public String getName() {
 		if (name == null) {
-			if (element == null) {
+			if (element == null)
 				name = MarkerSupportInternalUtilities.EMPTY_STRING;
-			} else {
-				name = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
-			}
+			else
+				name = element
+						.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
 		}
 		return name;
 	}
@@ -253,22 +255,23 @@ class MarkerFieldFilterGroup {
 
 		//Return workspace root for aggregates with no containing workingsets,ex. window working set
 		if (workingSet.isAggregateWorkingSet()&&workingSet.isEmpty()){
-			if(((AggregateWorkingSet) workingSet).getComponents().length==0) {
+			if(((AggregateWorkingSet) workingSet).getComponents().length==0)
 				return new IResource[] { ResourcesPlugin.getWorkspace().getRoot()};
-			}
 		}
 
 		IAdaptable[] elements = workingSet.getElements();
-		List<IResource> result = new ArrayList<>(elements.length);
+		List result = new ArrayList(elements.length);
 
-		for (IAdaptable adaptable : elements) {
-			IResource next = Adapters.adapt(adaptable, IResource.class);
+		for (int idx = 0; idx < elements.length; idx++) {
+			IResource next = (IResource) elements[idx]
+					.getAdapter(IResource.class);
+
 			if (next != null) {
 				result.add(next);
 			}
 		}
 
-		return result.toArray(new IResource[result.size()]);
+		return (IResource[]) result.toArray(new IResource[result.size()]);
 	}
 
 	/**
@@ -281,7 +284,6 @@ class MarkerFieldFilterGroup {
 	 * @see #ON_SELECTED_ONLY
 	 * @see #ON_WORKING_SET
 	 */
-	@SuppressWarnings("javadoc")
 	public int getScope() {
 		return scope;
 	}
@@ -291,7 +293,7 @@ class MarkerFieldFilterGroup {
 	 *
 	 * @return Map of values to apply to a {@link MarkerFieldFilter}
 	 */
-	private Map<String, String> getValues() {
+	private Map getValues() {
 
 		try {
 			String className = null;
@@ -308,6 +310,7 @@ class MarkerFieldFilterGroup {
 			return null;
 		}
 		return EMPTY_MAP;
+
 	}
 
 	/**
@@ -330,7 +333,8 @@ class MarkerFieldFilterGroup {
 			 */
 			wSetResources=getResourcesInWorkingSet();
 		}else{
-			wSetResources = new IResource[] { ResourcesPlugin.getWorkspace().getRoot() };
+			wSetResources = new IResource[] { ResourcesPlugin.getWorkspace()
+					.getRoot() };
 		}
 	}
 
@@ -340,32 +344,31 @@ class MarkerFieldFilterGroup {
 	 * @return boolean
 	 */
 	private boolean isInWorkingSet(IResource resource) {
-		if (wSetResources == null) {
-			computeWorkingSetResources();
-		}
-		for (IResource wSetResource : wSetResources) {
-			if(wSetResource.getFullPath().isPrefixOf(resource.getFullPath())){
+		if(wSetResources==null)computeWorkingSetResources();
+		for (int i = 0; i < wSetResources.length; i++) {
+			if(wSetResources[i].getFullPath().isPrefixOf(resource.getFullPath())){
 				return true;
 			}
 		}
 		return false;
 	}
-
 	/**
 	 * Initialise the working set for the receiver. Use the window working set
 	 * for the working set and set the scope to ON_WORKING_SET if they are to be
 	 * used by default.
 	 */
 	private void initializeWorkingSet() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		IWorkbenchWindow window = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
 		if (window != null) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
 				setWorkingSet(page.getAggregateWorkingSet());
 				if ((PlatformUI.getPreferenceStore()
-						.getBoolean(IWorkbenchPreferenceConstants.USE_WINDOW_WORKING_SET_BY_DEFAULT))) {
+						.getBoolean(IWorkbenchPreferenceConstants.USE_WINDOW_WORKING_SET_BY_DEFAULT)))
 					setScope(ON_WORKING_SET);
-				}
+
 			}
 		}
 	}
@@ -396,38 +399,38 @@ class MarkerFieldFilterGroup {
 	void legacyLoadSettings(IMemento memento) {
 
 		String enabledString = memento.getString(TAG_ENABLED);
-		if (enabledString != null && enabledString.length() > 0) {
+		if (enabledString != null && enabledString.length() > 0)
 			enabled = Boolean.valueOf(enabledString).booleanValue();
-		}
 
-		Integer resourceSetting = memento.getInteger(MarkerFilter.TAG_ON_RESOURCE);
+		Integer resourceSetting = memento
+				.getInteger(MarkerFilter.TAG_ON_RESOURCE);
 
-		if (resourceSetting != null) {
+		if (resourceSetting != null)
 			scope = resourceSetting.intValue();
-		}
 
 		String workingSetName = memento.getString(TAG_WORKING_SET);
 
-		if (workingSetName != null) {
-			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(workingSetName));
-		}
+		if (workingSetName != null)
+			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager()
+					.getWorkingSet(workingSetName));
 
 		if (element == null) {
 			String nameString = memento.getID();
-			if (nameString != null && nameString.length() > 0) {
+			if (nameString != null && nameString.length() > 0)
 				name = nameString;
-			}
 			String idString = memento.getString(IMemento.TAG_ID);
-			if (idString != null && idString.length() > 0) {
+			if (idString != null && idString.length() > 0)
 				id = idString;
-			}
+
 		}
 
-		for (MarkerFieldFilter filter : getFieldFilters()) {
-			if (filter instanceof CompatibilityFieldFilter) {
-				((CompatibilityFieldFilter) filter).loadLegacySettings(memento, generator);
-			}
+		MarkerFieldFilter[] filters = getFieldFilters();
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i] instanceof CompatibilityFieldFilter)
+				((CompatibilityFieldFilter) filters[i]).loadLegacySettings(
+						memento, generator);
 		}
+
 	}
 
 	/**
@@ -437,6 +440,7 @@ class MarkerFieldFilterGroup {
 	 *            the memento to load from
 	 */
 	void loadSettings(IMemento memento) {
+
 		String stringValue = memento.getString(TAG_ENABLED);
 		if (stringValue != null && stringValue.length() > 0){
 			enabled = Boolean.valueOf(stringValue).booleanValue();
@@ -445,41 +449,50 @@ class MarkerFieldFilterGroup {
 
 		String workingSetName = memento.getString(TAG_WORKING_SET);
 
-		if (workingSetName != null) {
-			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(workingSetName));
-		}
+		if (workingSetName != null)
+			setWorkingSet(PlatformUI.getWorkbench().getWorkingSetManager()
+					.getWorkingSet(workingSetName));
 
 		stringValue = memento.getString(TAG_LIMIT);
 		if (stringValue != null && stringValue.length() > 0) {
 			setLimit(Integer.parseInt(stringValue));
 		}
 
-		Map<String, MarkerFieldFilter> filterMap = new HashMap<>();
-		for (MarkerFieldFilter filter : getFieldFilters()) {
-			filterMap.put(MarkerSupportInternalUtilities.getId(filter.getField()), filter);
+		Map filterMap = new HashMap();
+		MarkerFieldFilter[] filters = getFieldFilters();
+		for (int i = 0; i < filters.length; i++) {
+			filterMap.put(MarkerSupportInternalUtilities.getId(filters[i]
+					.getField()), filters[i]);
+
 		}
 
-		for (IMemento childMemento : memento.getChildren(TAG_FIELD_FILTER_ENTRY)) {
-			String filterId = childMemento.getID();
-			if (filterMap.containsKey(filterId)) {
-				MarkerFieldFilter filter = filterMap.get(filterId);
+		IMemento[] children = memento.getChildren(TAG_FIELD_FILTER_ENTRY);
+		for (int i = 0; i < children.length; i++) {
+			IMemento childMemento = children[i];
+			String id = childMemento.getID();
+			if (filterMap.containsKey(id)) {
+				MarkerFieldFilter filter = (MarkerFieldFilter) filterMap
+						.get(id);
 				if (filter instanceof MarkerTypeFieldFilter) {
-					((MarkerTypeFieldFilter) filter).setContentGenerator(generator);
+					((MarkerTypeFieldFilter) filter)
+							.setContentGenerator(generator);
 				}
 				filter.loadSettings(childMemento);
 			}
+
 		}
 
 		if (element == null) {
-			String nameString = memento	.getString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
-			if (nameString != null && nameString.length() > 0) {
+			String nameString = memento
+					.getString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME);
+			if (nameString != null && nameString.length() > 0)
 				name = nameString;
-			}
 			String idString = memento.getString(IMemento.TAG_ID);
-			if (idString != null && idString.length() > 0) {
+			if (idString != null && idString.length() > 0)
 				id = idString;
-			}
+
 		}
+
 	}
 
 	/**
@@ -488,11 +501,12 @@ class MarkerFieldFilterGroup {
 	 * @return MarkerFieldFilterGroup or <code> null</code> if it failed.
 	 */
 	MarkerFieldFilterGroup makeWorkingCopy() {
-		MarkerFieldFilterGroup clone = new MarkerFieldFilterGroup(this.element, this.generator);
-		if (populateClone(clone)) {
+		MarkerFieldFilterGroup clone = new MarkerFieldFilterGroup(this.element,
+				this.generator);
+		if (populateClone(clone))
 			return clone;
-		}
 		return null;
+
 	}
 
 	/**
@@ -510,7 +524,8 @@ class MarkerFieldFilterGroup {
 		clone.id = id;
 		for (int i = 0; i < fieldFilters.length; i++) {
 			try {
-				clone.fieldFilters[i] = fieldFilters[i].getClass().newInstance();
+				clone.fieldFilters[i] = (MarkerFieldFilter) fieldFilters[i]
+						.getClass().newInstance();
 				fieldFilters[i].populateWorkingCopy(clone.fieldFilters[i]);
 			} catch (InstantiationException e) {
 				StatusManager.getManager().handle(
@@ -523,6 +538,7 @@ class MarkerFieldFilterGroup {
 								.getLocalizedMessage(), e), StatusManager.SHOW);
 				return false;
 			}
+
 		}
 		return true;
 	}
@@ -533,19 +549,21 @@ class MarkerFieldFilterGroup {
 	 * @return int
 	 */
 	private int processScope() {
-		if (element == null) {
+
+		if (element == null)
 			return ON_ANY;
-		}
+
 		String scopeValue = element.getAttribute(ATTRIBUTE_SCOPE);
-		if (ATTRIBUTE_ON_SELECTED_ONLY.equals(scopeValue)) {
+
+		if (ATTRIBUTE_ON_SELECTED_ONLY.equals(scopeValue))
 			return ON_SELECTED_ONLY;
-		}
-		if (ATTRIBUTE_ON_SELECTED_AND_CHILDREN.equals(scopeValue)) {
+
+		if (ATTRIBUTE_ON_SELECTED_AND_CHILDREN.equals(scopeValue))
 			return ON_SELECTED_AND_CHILDREN;
-		}
-		if (ATTRIBUTE_ON_ANY_IN_SAME_CONTAINER.equals(scopeValue)) {
+
+		if (ATTRIBUTE_ON_ANY_IN_SAME_CONTAINER.equals(scopeValue))
 			return ON_ANY_IN_SAME_CONTAINER;
-		}
+
 		return ON_ANY;
 	}
 
@@ -564,15 +582,21 @@ class MarkerFieldFilterGroup {
 		}
 
 		if (element == null) {
-			memento.putString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME, getName());
+			memento.putString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME,
+					getName());
 			memento.putString(IMemento.TAG_ID, getID());
 		}
+		MarkerFieldFilter[] filters = getFieldFilters();
 
-		for (MarkerFieldFilter filter : getFieldFilters()) {
-			IMemento child = memento.createChild(TAG_FIELD_FILTER_ENTRY,
-					MarkerSupportInternalUtilities.getId(filter.getField()));
-			filter.saveSettings(child);
+		for (int i = 0; i < filters.length; i++) {
+			IMemento child = memento
+					.createChild(TAG_FIELD_FILTER_ENTRY,
+							MarkerSupportInternalUtilities.getId(filters[i]
+									.getField()));
+			filters[i].saveSettings(child);
+
 		}
+
 	}
 
 	/**
@@ -588,31 +612,29 @@ class MarkerFieldFilterGroup {
 
 	/**
 	 * Return whether or not this MarkerEntry can be shown.
-	 *
-	 * @param entry
+	 * @param testEntry
 	 *
 	 * @return <code>true</code> if it can be shown
 	 */
-	public boolean select(MarkerEntry entry) {
+	public boolean select(MarkerEntry testEntry) {
 		MarkerFieldFilter[] filters = getFieldFilters();
 		if (scope == ON_WORKING_SET && workingSet != null) {
 			if (!workingSet.isAggregateWorkingSet()){
-				if (!isInWorkingSet(entry.getMarker().getResource())) {
-					return false;
-				}
+					if(!isInWorkingSet(testEntry.getMarker().getResource())){
+						return false;
+					}
 			}
 			//skip this for aggregates with no containing workingsets, ex. window working set
 			else if(((AggregateWorkingSet) workingSet).getComponents().length!=0){
-				if (!isInWorkingSet(entry.getMarker().getResource())) {
-					return false;
-				}
+					if(!isInWorkingSet(testEntry.getMarker().getResource())){
+						return false;
+					}
 			}
 		}
 
-		for (MarkerFieldFilter filter : filters) {
-			if (filter.select(entry)) {
+		for (int i = 0; i < filters.length; i++) {
+			if (filters[i].select(testEntry))
 				continue;
-			}
 			return false;
 		}
 		return true;
@@ -692,8 +714,8 @@ class MarkerFieldFilterGroup {
 		}
 		case MarkerFieldFilterGroup.ON_SELECTED_ONLY: {
 			IPath  markerPath=entry.getMarker().getResource().getFullPath();
-			for (IResource resource : resources) {
-				if(markerPath.equals(resource.getFullPath())){
+			for (int i = 0; i < resources.length; i++) {
+				if(markerPath.equals(resources[i].getFullPath())){
 					return true;
 				}
 			}
@@ -701,8 +723,8 @@ class MarkerFieldFilterGroup {
 		}
 		case MarkerFieldFilterGroup.ON_SELECTED_AND_CHILDREN: {
 			IPath  markerPath=entry.getMarker().getResource().getFullPath();
-			for (IResource resource : resources) {
-				if(resource.getFullPath().isPrefixOf(markerPath)){
+			for (int i = 0; i < resources.length; i++) {
+				if(resources[i].getFullPath().isPrefixOf(markerPath)){
 					return true;
 				}
 			}
@@ -711,8 +733,8 @@ class MarkerFieldFilterGroup {
 		case MarkerFieldFilterGroup.ON_ANY_IN_SAME_CONTAINER: {
 			IPath  markerProjectPath=entry.getMarker().getResource().getFullPath();
 			IProject[] projects=MarkerResourceUtil.getProjects(resources);
-			for (IProject project : projects) {
-				if(project.getFullPath().isPrefixOf(markerProjectPath)){
+			for (int i = 0; i < projects.length; i++) {
+				if(projects[i].getFullPath().isPrefixOf(markerProjectPath)){
 					return true;
 				}
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Composite;
  * life cycle is the same as for the IFormPart. The page is
  * a part selection listener since selections in the master
  * part will be passed to the currently visible page.
- *
+ * 
  * @see DetailsPart
  * @see MasterDetailsBlock
  * @since 3.0

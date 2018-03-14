@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IEditorDescriptor;
@@ -55,7 +56,7 @@ public class EditorHistory {
      * Adds an item to the history.
      */
     private void add(EditorHistoryItem newItem, int index) {
-        // Remove the item if it already exists so that it will be put
+        // Remove the item if it already exists so that it will be put 
         // at the top of the list.
         if (newItem.isRestored()) {
             remove(newItem.getInput());
@@ -123,12 +124,13 @@ public class EditorHistory {
 
     /**
      * Restore the most-recently-used history from the given memento.
-     *
+     * 
      * @param memento the memento to restore the mru history from
      */
     public IStatus restoreState(IMemento memento) {
-		for (IMemento childMemento : memento.getChildren(IWorkbenchConstants.TAG_FILE)) {
-			EditorHistoryItem item = new EditorHistoryItem(childMemento);
+        IMemento[] mementos = memento.getChildren(IWorkbenchConstants.TAG_FILE);
+        for (int i = 0; i < mementos.length; i++) {
+            EditorHistoryItem item = new EditorHistoryItem(mementos[i]);
             if (!"".equals(item.getName()) || !"".equals(item.getToolTipText())) { //$NON-NLS-1$ //$NON-NLS-2$
                 add(item, fifoList.size());
             }
@@ -138,7 +140,7 @@ public class EditorHistory {
 
     /**
      * Save the most-recently-used history in the given memento.
-     *
+     * 
      * @param memento the memento to save the mru history in
      */
     public IStatus saveState(IMemento memento) {

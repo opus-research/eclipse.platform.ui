@@ -31,74 +31,92 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 public class PerformanceEditorPart extends EditorPart {
 
     private static final String PARAM_OUTLINE = "outline";
-
+    
     private boolean dirty;
     private Label control;
     private boolean useOutline = false;
 
     /**
-     *
+     * 
      */
     public PerformanceEditorPart() {
         super();
     }
 
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    public void doSave(IProgressMonitor monitor) {
     }
 
-    @Override
-	public void doSaveAs() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+     */
+    public void doSaveAs() {
     }
 
-    @Override
-	public void init(IEditorSite site, IEditorInput input)
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IEditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
+     */
+    public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         super.setSite(site);
         super.setInput(input);
     }
 
-    @Override
-	public boolean isDirty() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#isDirty()
+     */
+    public boolean isDirty() {
         return dirty;
     }
-
+    
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
     }
 
-    @Override
-	public boolean isSaveAsAllowed() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+     */
+    public boolean isSaveAsAllowed() {        
         return false;
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    public void createPartControl(Composite parent) {
         control = new Label(parent, SWT.NONE);
 
     }
 
-    @Override
-	public void setFocus() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+     */
+    public void setFocus() {
         control.setFocus();
     }
 
-    @Override
-	public void setInitializationData(IConfigurationElement cfig,
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+     */
+    public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
         super.setInitializationData(cfig, propertyName, data);
-
+        
         if (data instanceof String) {
            for (StringTokenizer toker = new StringTokenizer((String) data, ","); toker.hasMoreTokens(); ) {
                String token = toker.nextToken();
                if (token.equals(PARAM_OUTLINE))
                    useOutline = true;
            }
-
-        }
+           
+        }        
     }
-    @Override
-	public Object getAdapter(Class adapter) {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    public Object getAdapter(Class adapter) {
         Object object = null;
         if (useOutline && adapter.equals(IContentOutlinePage.class)) {
             object = new ContentOutlinePage() {

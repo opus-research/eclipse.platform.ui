@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.jface.util.Util;
  * A key formatter providing the Emacs-style accelerators using single letters
  * to represent the modifier keys.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class EmacsKeyFormatter extends AbstractKeyFormatter {
@@ -39,7 +39,7 @@ public final class EmacsKeyFormatter extends AbstractKeyFormatter {
 	/**
 	 * Formats an individual key into a human readable format. This converts the
 	 * key into a format similar to Xemacs.
-	 *
+	 * 
 	 * @param key
 	 *            The key to format; must not be <code>null</code>.
 	 * @return The key formatted as a string; should not be <code>null</code>.

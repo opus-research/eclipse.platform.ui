@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,15 +11,18 @@
 
 package org.eclipse.ui.tests.harness.util;
 
+import junit.framework.Assert;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.Assert;
 
 /**
  * @since 3.1
@@ -119,7 +122,6 @@ public class SWTEventHelper {
 	private static void postEvent(final Display display, final Event event,
 			boolean runEventQueue) {
 		DisplayHelper helper = new DisplayHelper() {
-			@Override
 			public boolean condition() {
 				return display.post(event);
 			}
@@ -186,7 +188,11 @@ public class SWTEventHelper {
 					((Control)dropItem).getBounds());
 		}
 
-		startControl.addDragDetectListener(e -> _dragDetected = true);
+		startControl.addDragDetectListener(new DragDetectListener() {
+			public void dragDetected(DragDetectEvent e) {
+				_dragDetected = true;
+			}
+		});
 
 
 		int count = 0;

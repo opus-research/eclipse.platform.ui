@@ -1,21 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal.views.properties.tabbed.view;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
+
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
@@ -35,7 +36,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * This implementation allows the section to override the list of what tabs are
  * displayed, rather than using the default list of tabs from the tabbed
  * property registry.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -44,7 +45,7 @@ class OverridableTabListContentProvider extends TabListContentProvider
 
 	/**
 	 * Constructor for OverrideTabListContentProvider.
-	 *
+	 * 
 	 * @param registry
 	 *            the tabbed property registry.
 	 */
@@ -74,7 +75,7 @@ class OverridableTabListContentProvider extends TabListContentProvider
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.properties.tabbed.view.TabListContentProvider#dispose()
 	 */
 	public void dispose() {
@@ -86,7 +87,7 @@ class OverridableTabListContentProvider extends TabListContentProvider
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.properties.tabbed.view.TabListContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 	 *      java.lang.Object, java.lang.Object)
 	 */
@@ -99,30 +100,28 @@ class OverridableTabListContentProvider extends TabListContentProvider
 
 	/**
 	 * Initialize the content provider for a tabbed property viewer.
-	 *
+	 * 
 	 * @param newTabbedPropertyViewer
 	 *            a tabbed property viewer.
 	 */
 	private void init(TabbedPropertyViewer newTabbedPropertyViewer) {
 		this.tabbedPropertyViewer = newTabbedPropertyViewer;
 		currentPart = tabbedPropertyViewer.getWorkbenchPart();
-		IPropertySheetPage page = (IPropertySheetPage) Adapters.adapt(currentPart, IPropertySheetPage.class);
-		if (page instanceof TabbedPropertySheetPage) {
-			tabbedPropertySheetPage = (TabbedPropertySheetPage) page;
+		if (currentPart.getAdapter(IPropertySheetPage.class) != null) {
+			tabbedPropertySheetPage = (TabbedPropertySheetPage) currentPart
+					.getAdapter(IPropertySheetPage.class);
 		} else {
 			/*
 			 * Is the part is a IContributedContentsView for the contributor,
 			 * for example, outline view.
 			 */
-			IContributedContentsView view = (IContributedContentsView) Adapters.adapt(currentPart,
-					IContributedContentsView.class);
+			IContributedContentsView view = (IContributedContentsView) currentPart
+					.getAdapter(IContributedContentsView.class);
 			if (view != null) {
 				IWorkbenchPart part = view.getContributingPart();
 				if (part != null) {
-					page = (IPropertySheetPage) Adapters.adapt(part, IPropertySheetPage.class);
-					if (page instanceof TabbedPropertySheetPage) {
-						tabbedPropertySheetPage = (TabbedPropertySheetPage) page;
-					}
+					tabbedPropertySheetPage = (TabbedPropertySheetPage) part
+							.getAdapter(IPropertySheetPage.class);
 				}
 			}
 		}
@@ -149,7 +148,7 @@ class OverridableTabListContentProvider extends TabListContentProvider
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.views.properties.tabbed.ITabSelectionListener#tabSelected(org.eclipse.ui.views.properties.tabbed.ITabDescriptor)
 	 */
 	public void tabSelected(ITabDescriptor tabDescriptor) {
@@ -210,7 +209,7 @@ class OverridableTabListContentProvider extends TabListContentProvider
 
 	/**
 	 * Get the list of tabs to display in the tabbed property sheet page.
-	 *
+	 * 
 	 * @param inputElement
 	 *            The current input element.
 	 * @return the list of tabs.
@@ -256,7 +255,7 @@ class OverridableTabListContentProvider extends TabListContentProvider
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabListContentProvider#overrideTabs()
 	 */
 	public void overrideTabs() {
@@ -271,7 +270,7 @@ class OverridableTabListContentProvider extends TabListContentProvider
 	 * Get the section implementation that provides the list of tabs. In our
 	 * implementation, all the sections provide the list of tabs, so we select
 	 * the first section from the tab descriptor.
-	 *
+	 * 
 	 * @return the section.
 	 */
 	private AbstractOverridableTabListPropertySection getOverridableTabListPropertySection() {

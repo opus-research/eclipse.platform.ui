@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,10 +44,10 @@ import org.osgi.util.tracker.ServiceTracker;
  * {@link org.eclipse.core.runtime.IAdaptable} interface should be consulted.</dd>
  * </dl>
  * </p>
- *
+ * 
  * Please see the {@link #adaptElements(IWorkingSet, IAdaptable[])} method for
  * details on behavior of this implementation.
- *
+ * 
  * @since 3.3
  */
 public final class BasicWorkingSetElementAdapter implements
@@ -80,7 +80,7 @@ public final class BasicWorkingSetElementAdapter implements
 	 * return differing results based on the state of bundles loaded within the
 	 * system.
 	 * </p>
-	 *
+	 * 
 	 * @see org.eclipse.ui.IWorkingSetElementAdapter#adaptElements(org.eclipse.ui.IWorkingSet,
 	 *      org.eclipse.core.runtime.IAdaptable[])
 	 * @see org.eclipse.core.runtime.IAdapterManager#getAdapter(Object, String)
@@ -89,8 +89,8 @@ public final class BasicWorkingSetElementAdapter implements
 	@Override
 	public IAdaptable[] adaptElements(IWorkingSet ws, IAdaptable[] elements) {
 		List adaptedElements = new ArrayList();
-		for (IAdaptable element : elements) {
-			IAdaptable adaptable = adapt(element);
+		for (int i = 0; i < elements.length; i++) {
+			IAdaptable adaptable = adapt(elements[i]);
 			if (adaptable != null)
 				adaptedElements.add(adaptable);
 		}
@@ -102,15 +102,15 @@ public final class BasicWorkingSetElementAdapter implements
 	/**
 	 * Adapt the given adaptable. Compares the given adaptable against the list
 	 * of desired types and returns the first type that generates a match.
-	 *
+	 * 
 	 * @param adaptable
 	 *            the adaptable to adapt
 	 * @return the resultant adaptable. May be the same adaptable, a new
 	 *         adaptable, or <code>null</code>.
 	 */
 	private IAdaptable adapt(IAdaptable adaptable) {
-		for (Type preferredType : preferredTypes) {
-			IAdaptable adaptedAdaptable = adapt(preferredType, adaptable);
+		for (int i = 0; i < preferredTypes.length; i++) {
+			IAdaptable adaptedAdaptable = adapt(preferredTypes[i], adaptable);
 			if (adaptedAdaptable != null)
 				return adaptedAdaptable;
 		}
@@ -119,7 +119,7 @@ public final class BasicWorkingSetElementAdapter implements
 
 	/**
 	 * Adapt the given adaptable given the reference type.
-	 *
+	 * 
 	 * @param type
 	 *            the reference type
 	 * @param adaptable
@@ -131,7 +131,8 @@ public final class BasicWorkingSetElementAdapter implements
 		IAdapterManager adapterManager = Platform.getAdapterManager();
 		Class[] directClasses = adapterManager.computeClassOrder(adaptable
 				.getClass());
-		for (Class clazz : directClasses) {
+		for (int i = 0; i < directClasses.length; i++) {
+			Class clazz = directClasses[i];
 			if (clazz.getName().equals(type.className))
 				return adaptable;
 		}
@@ -201,7 +202,7 @@ public final class BasicWorkingSetElementAdapter implements
 	/**
 	 * Parse classname/option strings in the form:<br/>
 	 * <code>some.package.Class[:option1=value1][:option2=value2]...
-	 *
+	 * 
 	 * @param classNameAndOptions the class name and possibly options to parse
 	 * @param record the record to fill
 	 */
@@ -228,7 +229,7 @@ public final class BasicWorkingSetElementAdapter implements
 	/**
 	 * Prime the PackageAdmin service tracker and return the service (if
 	 * available).
-	 *
+	 * 
 	 * @return the PackageAdmin service or null if it is not available
 	 */
 	private PackageAdmin getPackageAdmin() {

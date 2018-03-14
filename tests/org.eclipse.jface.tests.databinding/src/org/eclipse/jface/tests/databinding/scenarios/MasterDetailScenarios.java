@@ -155,13 +155,13 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 				.observeSingleSelection(listViewer);
 
 		selectedLodgingObservable.setValue(null);
-		assertTrue(listViewer.getStructuredSelection().isEmpty());
+		assertTrue(listViewer.getSelection().isEmpty());
 
 		ComputedValue selectionExistsObservable = new ComputedValue(
 				boolean.class) {
 			@Override
 			protected Object calculate() {
-				return Boolean.valueOf(selectedLodgingObservable.getValue() != null);
+				return new Boolean(selectedLodgingObservable.getValue() != null);
 			}
 		};
 
@@ -293,7 +293,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 		ComputedValue categorySelectionExistsObservable = new ComputedValue() {
 			@Override
 			protected Object calculate() {
-				return Boolean.valueOf(
+				return new Boolean(
 						selectedCategoryObservable.getValue() != null);
 			}
 		};
@@ -308,7 +308,7 @@ public class MasterDetailScenarios extends ScenariosTestCase {
 		ComputedValue adventureSelectionExistsObservable = new ComputedValue() {
 			@Override
 			protected Object calculate() {
-				return Boolean.valueOf(
+				return new Boolean(
 						selectedAdventureObservable.getValue() != null);
 			}
 		};

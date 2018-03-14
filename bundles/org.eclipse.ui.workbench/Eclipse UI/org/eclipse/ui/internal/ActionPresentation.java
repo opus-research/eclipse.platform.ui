@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.ui.SubActionBars;
@@ -95,8 +96,10 @@ public class ActionPresentation {
     public void setActionSets(IActionSetDescriptor[] newArray) {
         // Convert array to list.
         HashSet newList = new HashSet();
-
-        for (IActionSetDescriptor descriptor : newArray) {
+        
+        for (int i = 0; i < newArray.length; i++) {
+            IActionSetDescriptor descriptor = newArray[i];
+            
             newList.add(descriptor);
         }
         List oldList = new ArrayList(mapDescToRec.keySet());
@@ -122,8 +125,10 @@ public class ActionPresentation {
 
         // Add new actions.
         ArrayList sets = new ArrayList();
+        
+        for (int i = 0; i < newArray.length; i++) {
+            IActionSetDescriptor desc = newArray[i];
 
-		for (IActionSetDescriptor desc : newArray) {
             if (!mapDescToRec.containsKey(desc)) {
                 try {
                     SetRec rec;
@@ -187,15 +192,15 @@ public class ActionPresentation {
 
     /**
      * Return whether the array contains the given action set.
-     *
+     * 
      * @param existingRegistrations the array to check
      * @param set the set to look for
      * @return whether the set is in the array
      * @since 3.1
      */
     private boolean containsRegistration(Object[] existingRegistrations, IActionSetDescriptor set) {
-        for (Object existingRegistration : existingRegistrations) {
-            if (existingRegistration == set) {
+        for (int i = 0; i < existingRegistrations.length; i++) {
+            if (existingRegistrations[i] == set) {
 				return true;
 			}
         }

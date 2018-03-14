@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Brock Janicyak - brockj@tpg.com.au
+ *     Brock Janicyak - brockj@tpg.com.au 
  *     		- Fix for Bug 11142 [HeapStatus] Heap status is updated too frequently
  *          - Fix for Bug 192996 [Workbench] Reduce amount of garbage created by HeapStatus
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422040, 372517, 463652, 466275
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -18,11 +18,13 @@ package org.eclipse.ui.internal;
 import java.lang.reflect.Method;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -33,13 +35,14 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 
 /**
  * The Heap Status control, which shows the heap usage statistics in the window trim.
- *
+ * 
  * @since 3.1
  */
 public class HeapStatus extends Composite {
@@ -47,7 +50,7 @@ public class HeapStatus extends Composite {
 	private boolean armed;
 	private Image gcImage;
 	private Image disabledGcImage;
-	private Color bgCol, usedMemCol, lowMemCol, freeMemCol, topLeftCol, bottomRightCol, sepCol, textCol, markCol, armCol;
+	private Color bgCol, usedMemCol, lowMemCol, freeMemCol, topLeftCol, bottomRightCol, sepCol, textCol, markCol, armCol;  
     private Canvas button;
 	private IPreferenceStore prefStore;
 	private int updateInterval;
@@ -84,13 +87,16 @@ public class HeapStatus extends Composite {
             }
         }
     };
-
-    private final IPropertyChangeListener prefListener = event -> {
-		if (IHeapStatusConstants.PREF_UPDATE_INTERVAL.equals(event.getProperty())) {
-			setUpdateIntervalInMS(prefStore.getInt(IHeapStatusConstants.PREF_UPDATE_INTERVAL));
-		}
-		else if (IHeapStatusConstants.PREF_SHOW_MAX.equals(event.getProperty())) {
-			showMax = prefStore.getBoolean(IHeapStatusConstants.PREF_SHOW_MAX);
+    
+    private final IPropertyChangeListener prefListener = new IPropertyChangeListener() {
+		@Override
+		public void propertyChange(PropertyChangeEvent event) {
+			if (IHeapStatusConstants.PREF_UPDATE_INTERVAL.equals(event.getProperty())) {
+				setUpdateIntervalInMS(prefStore.getInt(IHeapStatusConstants.PREF_UPDATE_INTERVAL));
+			}
+			else if (IHeapStatusConstants.PREF_SHOW_MAX.equals(event.getProperty())) {
+				showMax = prefStore.getBoolean(IHeapStatusConstants.PREF_SHOW_MAX);
+			}
 		}
 	};
 
@@ -98,7 +104,7 @@ public class HeapStatus extends Composite {
      * Creates a new heap status control with the given parent, and using
      * the given preference store to obtain settings such as the refresh
      * interval.
-     *
+     * 
      * @param parent the parent composite
      * @param prefStore the preference store
      */
@@ -110,13 +116,13 @@ public class HeapStatus extends Composite {
 
         this.prefStore = prefStore;
         prefStore.addPropertyChangeListener(prefListener);
-
+        
         setUpdateIntervalInMS(prefStore.getInt(IHeapStatusConstants.PREF_UPDATE_INTERVAL));
         showMax = prefStore.getBoolean(IHeapStatusConstants.PREF_SHOW_MAX);
-
+		
         button = new Canvas(this, SWT.NONE);
         button.setToolTipText(WorkbenchMessages.HeapStatus_buttonToolTip);
-
+        
 		ImageDescriptor imageDesc = WorkbenchImages.getWorkbenchImageDescriptor("elcl16/trash.png"); //$NON-NLS-1$
 		Display display = getDisplay();
 		gcImage = imageDesc.createImage();
@@ -124,64 +130,69 @@ public class HeapStatus extends Composite {
 			imgBounds = gcImage.getBounds();
 			disabledGcImage = new Image(display, gcImage, SWT.IMAGE_DISABLE);
 		}
-		usedMemCol = display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
-		lowMemCol = new Color(display, 255, 70, 70);  // medium red
+		usedMemCol = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+		lowMemCol = new Color(display, 255, 70, 70);  // medium red 
 		freeMemCol = new Color(display, 255, 190, 125);  // light orange
 		bgCol = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 		sepCol = topLeftCol = armCol = display.getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
 		bottomRightCol = display.getSystemColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW);
-		markCol = textCol = display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
-
+		markCol = textCol = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+		
 		createContextMenu();
+		
+        Listener listener = new Listener() {
 
-        Listener listener = event -> {
-		    switch (event.type) {
-		    case SWT.Dispose:
-		    	doDispose();
-		        break;
-		    case SWT.Resize:
-		        Rectangle rect = getClientArea();
-		        button.setBounds(rect.width - imgBounds.width - 1, 1, imgBounds.width, rect.height - 2);
-		        break;
-		    case SWT.Paint:
-		        if (event.widget == HeapStatus.this) {
-		        	paintComposite(event.gc);
-		        }
-		        else if (event.widget == button) {
-		            paintButton(event.gc);
-		        }
-		        break;
-		    case SWT.MouseUp:
-		        if (event.button == 1) {
-					if (!isInGC) {
-						arm(false);
-						gc();
-					}
-		        }
-		        break;
-		    case SWT.MouseDown:
-		        if (event.button == 1) {
-		            if (event.widget == HeapStatus.this) {
-						setMark();
+            @Override
+			public void handleEvent(Event event) {
+                switch (event.type) {
+                case SWT.Dispose:
+                	doDispose();
+                    break;
+                case SWT.Resize:
+                    Rectangle rect = getClientArea();
+                    button.setBounds(rect.width - imgBounds.width - 1, 1, imgBounds.width, rect.height - 2);
+                    break;
+                case SWT.Paint:
+                    if (event.widget == HeapStatus.this) {
+                    	paintComposite(event.gc);
+                    }
+                    else if (event.widget == button) {
+                        paintButton(event.gc);
+                    }
+                    break;
+                case SWT.MouseUp:
+                    if (event.button == 1) {
+						if (!isInGC) {
+							arm(false);
+							gc(); 
+						}
+                    }
+                    break;
+                case SWT.MouseDown:
+                    if (event.button == 1) {
+	                    if (event.widget == HeapStatus.this) {
+							setMark();
+						} else if (event.widget == button) {
+							if (!isInGC)
+								arm(true);
+						}
+                    }
+                    break;
+                case SWT.MouseEnter:
+                	HeapStatus.this.updateTooltip = true;
+                	updateToolTip();
+                	break;
+                case SWT.MouseExit:
+                    if (event.widget == HeapStatus.this) {
+                    	HeapStatus.this.updateTooltip = false;
 					} else if (event.widget == button) {
-						if (!isInGC)
-							arm(true);
+						arm(false);
 					}
-		        }
-		        break;
-		    case SWT.MouseEnter:
-		    	HeapStatus.this.updateTooltip = true;
-		    	updateToolTip();
-		    	break;
-		    case SWT.MouseExit:
-		        if (event.widget == HeapStatus.this) {
-		        	HeapStatus.this.updateTooltip = false;
-				} else if (event.widget == button) {
-					arm(false);
-				}
-		        break;
-		    }
-		};
+                    break;
+                }
+            }
+
+        };
         addListener(SWT.Dispose, listener);
         addListener(SWT.MouseDown, listener);
         addListener(SWT.Paint, listener);
@@ -196,37 +207,15 @@ public class HeapStatus extends Composite {
 		// make sure stats are updated before first paint
 		updateStats();
 
-        getDisplay().asyncExec(() -> {
-			if (!isDisposed()) {
-				getDisplay().timerExec(updateInterval, timer);
+        getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (!isDisposed()) {
+					getDisplay().timerExec(updateInterval, timer);
+				}
 			}
 		});
    	}
-
-	@Override
-	public void setBackground(Color color) {
-		bgCol = color;
-		button.redraw();
-	}
-
-	@Override
-	public void setForeground(Color color) {
-		if (color == null) {
-			markCol = textCol = getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-		} else {
-			markCol = textCol = color;
-		}
-
-		button.redraw();
-	}
-
-	@Override
-	public Color getForeground() {
-		if (usedMemCol != null) {
-			return usedMemCol;
-		}
-		return getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-	}
 
 	/**
 	 * Returns the maximum memory limit, or Long.MAX_VALUE if the max is not known.
@@ -246,7 +235,7 @@ public class HeapStatus extends Composite {
 		}
 		return max;
 	}
-
+	
 	private void setUpdateIntervalInMS(int interval) {
 		updateInterval = Math.max(100, interval);
 	}
@@ -259,7 +248,7 @@ public class HeapStatus extends Composite {
 		if (disabledGcImage != null) {
 			disabledGcImage.dispose();
 		}
-
+       
         if (lowMemCol != null) {
 			lowMemCol.dispose();
 		}
@@ -273,22 +262,23 @@ public class HeapStatus extends Composite {
         GC gc = new GC(this);
         Point p = gc.textExtent(WorkbenchMessages.HeapStatus_widthStr);
         int height = imgBounds.height;
-        // choose the largest of
+        // choose the largest of 
         // 	- Text height + margins
         //	- Image height + margins
-        //	- Default Trim heightin
+        //	- Default Trim heightin 
         height = Math.max(height, p.y) + 4;
         height = Math.max(TrimUtil.TRIM_DEFAULT_HEIGHT, height);
         gc.dispose();
 		return new Point(p.x + 15, height);
 	}
-
+	
     private void arm(boolean armed) {
         if (this.armed == armed) {
 			return;
 		}
         this.armed = armed;
         button.redraw();
+        button.update();
     }
 
 	private void gcRunning(boolean isInGC) {
@@ -297,6 +287,7 @@ public class HeapStatus extends Composite {
 		}
 		this.isInGC = isInGC;
 		 button.redraw();
+		 button.update();
 	}
 
     /**
@@ -305,11 +296,16 @@ public class HeapStatus extends Composite {
     private void createContextMenu() {
         MenuManager menuMgr = new MenuManager();
         menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(menuMgr1 -> fillMenu(menuMgr1));
+        menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(IMenuManager menuMgr) {
+				fillMenu(menuMgr);
+			}
+		});
         Menu menu = menuMgr.createContextMenu(this);
         setMenu(menu);
     }
-
+    
     private void fillMenu(IMenuManager menuMgr) {
         menuMgr.add(new SetMarkAction());
         menuMgr.add(new ClearMarkAction());
@@ -321,7 +317,7 @@ public class HeapStatus extends Composite {
     }
 
     /**
-     * Sets the mark to the current usedMem level.
+     * Sets the mark to the current usedMem level. 
      */
     private void setMark() {
     	updateStats();  // get up-to-date stats before taking the mark
@@ -331,23 +327,26 @@ public class HeapStatus extends Composite {
     }
 
     /**
-     * Clears the mark.
+     * Clears the mark. 
      */
     private void clearMark() {
         mark = -1;
         hasChanged = true;
         redraw();
     }
-
+    
     private void gc() {
 		gcRunning(true);
 		Thread t = new Thread() {
 			@Override
 			public void run() {
 				busyGC();
-				getDisplay().asyncExec(() -> {
-					if (!isDisposed()) {
-						gcRunning(false);
+				getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						if (!isDisposed()) {
+							gcRunning(false);
+						}
 					}
 				});
 			}
@@ -361,7 +360,7 @@ public class HeapStatus extends Composite {
 	        System.runFinalization();
         }
     }
-
+    
     private void paintButton(GC gc) {
         Rectangle rect = button.getClientArea();
 		if (isInGC) {
@@ -388,7 +387,7 @@ public class HeapStatus extends Composite {
 			paintCompositeMaxUnknown(gc);
 		}
     }
-
+    
     private void paintCompositeMaxUnknown(GC gc) {
         Rectangle rect = getClientArea();
         int x = rect.x;
@@ -397,12 +396,11 @@ public class HeapStatus extends Composite {
         int h = rect.height;
         int bw = imgBounds.width; // button width
         int dx = x + w - bw - 2; // divider x
-        int sw = w - bw - 3; // status width
+        int sw = w - bw - 3; // status width 
         int uw = (int) (sw * usedMem / totalMem); // used mem width
         int ux = x + 1 + uw; // used mem right edge
-        if (bgCol != null) {
-			gc.setBackground(bgCol);
-		}
+        
+        gc.setBackground(bgCol);
         gc.fillRectangle(rect);
         gc.setForeground(sepCol);
 		gc.drawLine(dx, y, dx, y + h);
@@ -413,17 +411,17 @@ public class HeapStatus extends Composite {
 		gc.setForeground(bottomRightCol);
         gc.drawLine(x+w-1, y, x+w-1, y+h);
 		gc.drawLine(x, y+h-1, x+w, y+h-1);
-
+		
 		gc.setBackground(usedMemCol);
         gc.fillRectangle(x + 1, y + 1, uw, h - 2);
-
+        
         String s = NLS.bind(WorkbenchMessages.HeapStatus_status, convertToMegString(usedMem), convertToMegString(totalMem));
         Point p = gc.textExtent(s);
         int sx = (rect.width - 15 - p.x) / 2 + rect.x + 1;
         int sy = (rect.height - 2 - p.y) / 2 + rect.y + 1;
         gc.setForeground(textCol);
         gc.drawString(s, sx, sy, true);
-
+        
         // draw an I-shaped bar in the foreground colour for the mark (if present)
         if (mark != -1) {
             int ssx = (int) (sw * mark / totalMem) + x + 1;
@@ -439,15 +437,13 @@ public class HeapStatus extends Composite {
         int h = rect.height;
         int bw = imgBounds.width; // button width
         int dx = x + w - bw - 2; // divider x
-        int sw = w - bw - 3; // status width
+        int sw = w - bw - 3; // status width 
         int uw = (int) (sw * usedMem / maxMem); // used mem width
         int ux = x + 1 + uw; // used mem right edge
         int tw = (int) (sw * totalMem / maxMem); // current total mem width
         int tx = x + 1 + tw; // current total mem right edge
-
-		if (bgCol != null) {
-			gc.setBackground(bgCol);
-		}
+        
+        gc.setBackground(bgCol);
         gc.fillRectangle(rect);
         gc.setForeground(sepCol);
 		gc.drawLine(dx, y, dx, y + h);
@@ -459,14 +455,14 @@ public class HeapStatus extends Composite {
 		gc.setForeground(bottomRightCol);
         gc.drawLine(x+w-1, y, x+w-1, y+h);
 		gc.drawLine(x, y+h-1, x+w, y+h-1);
-
+		
         if (lowMemThreshold != 0 && ((double)(maxMem - usedMem) / (double)maxMem < lowMemThreshold)) {
             gc.setBackground(lowMemCol);
         } else {
             gc.setBackground(usedMemCol);
         }
         gc.fillRectangle(x + 1, y + 1, uw, h - 2);
-
+        
         gc.setBackground(freeMemCol);
         gc.fillRectangle(ux + 1, y + 1, tx - (ux + 1), h - 2);
 
@@ -477,14 +473,14 @@ public class HeapStatus extends Composite {
             gc.drawLine(thresholdX, y + 1, thresholdX, y + h - 2);
         }
 
-        String s = NLS.bind(WorkbenchMessages.HeapStatus_status,
+        String s = NLS.bind(WorkbenchMessages.HeapStatus_status, 
 				convertToMegString(usedMem), convertToMegString(totalMem));
         Point p = gc.textExtent(s);
         int sx = (rect.width - 15 - p.x) / 2 + rect.x + 1;
         int sy = (rect.height - 2 - p.y) / 2 + rect.y + 1;
         gc.setForeground(textCol);
         gc.drawString(s, sx, sy, true);
-
+        
         // draw an I-shaped bar in the foreground colour for the mark (if present)
         if (mark != -1) {
             int ssx = (int) (sw * mark / maxMem) + x + 1;
@@ -509,7 +505,7 @@ public class HeapStatus extends Composite {
             prevUsedMem = usedMem;
             this.hasChanged = true;
         }
-
+        
         if (prevTotalMem != totalMem) {
             prevTotalMem = totalMem;
             this.hasChanged = true;
@@ -526,7 +522,7 @@ public class HeapStatus extends Composite {
             setToolTipText(toolTip);
         }
     }
-
+	
     /**
      * Converts the given number of bytes to a printable number of megabytes (rounded up).
      */
@@ -546,18 +542,18 @@ public class HeapStatus extends Composite {
         SetMarkAction() {
             super(WorkbenchMessages.SetMarkAction_text);
         }
-
+        
         @Override
 		public void run() {
             setMark();
         }
     }
-
+    
     class ClearMarkAction extends Action {
         ClearMarkAction() {
             super(WorkbenchMessages.ClearMarkAction_text);
         }
-
+        
         @Override
 		public void run() {
             clearMark();
@@ -570,7 +566,7 @@ public class HeapStatus extends Composite {
             setEnabled(maxMemKnown);
             setChecked(showMax);
         }
-
+        
         @Override
 		public void run() {
             prefStore.setValue(IHeapStatusConstants.PREF_SHOW_MAX, isChecked());
@@ -579,11 +575,11 @@ public class HeapStatus extends Composite {
     }
 
     class CloseHeapStatusAction extends Action{
-
+    	
     	CloseHeapStatusAction(){
     		super(WorkbenchMessages.WorkbenchWindow_close );
     	}
-
+    	
     	@Override
 		public void run(){
 			WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()

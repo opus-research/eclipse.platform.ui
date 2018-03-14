@@ -18,9 +18,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -55,8 +55,8 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionContext;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
@@ -132,7 +132,15 @@ public class AdaptedResourceNavigator extends ViewPart {
             IStructuredSelection ssel = (IStructuredSelection) selection;
             for (Iterator i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
-				IResource resource = Adapters.adapt(o, IResource.class);
+                IResource resource = null;
+                if (o instanceof IResource) {
+                    resource = (IResource) o;
+                } else {
+                    if (o instanceof IAdaptable) {
+                        resource = (IResource) ((IAdaptable) o)
+                                .getAdapter(IResource.class);
+                    }
+                }
                 if (resource != null) {
                     list.add(resource);
                 }
@@ -256,7 +264,12 @@ public class AdaptedResourceNavigator extends ViewPart {
      */
     IContainer getInitialInput() {
         IAdaptable input = getSite().getPage().getInput();
-		IResource resource = Adapters.adapt(input, IResource.class);
+        IResource resource = null;
+        if (input instanceof IResource) {
+            resource = (IResource) input;
+        } else {
+            resource = (IResource) input.getAdapter(IResource.class);
+        }
         if (resource != null) {
             switch (resource.getType()) {
             case IResource.FILE:
@@ -277,7 +290,7 @@ public class AdaptedResourceNavigator extends ViewPart {
      * Returns the navigator's plugin.
      */
     public AbstractUIPlugin getPlugin() {
-		return WorkbenchPlugin.getDefault();
+        return (AbstractUIPlugin) Platform.getPlugin(PlatformUI.PLUGIN_ID);
     }
 
     /**
@@ -319,7 +332,7 @@ public class AdaptedResourceNavigator extends ViewPart {
 			return ResourceNavigatorMessages.ResourceNavigator_oneItemSelected;
         }
         if (selection.size() > 1) {
-            return NLS.bind(ResourceNavigatorMessages.ResourceNavigator_statusLine, Integer.valueOf(selection.size()));
+            return NLS.bind(ResourceNavigatorMessages.ResourceNavigator_statusLine, new Integer(selection.size()));
         }
         return ""; //$NON-NLS-1$
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Mucke - fix for Bug 156456
+ *     Stefan Mucke - fix for Bug 156456 
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -19,7 +19,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -31,20 +34,20 @@ import org.osgi.framework.Bundle;
 
 public final class BusyIndicator extends Canvas {
 
-	private static final int MARGIN = 0;
+	private static final int MARGIN = 0;	
 	private static final int IMAGE_COUNT = 8;
-	private static final int MILLISECONDS_OF_DELAY = 180;
+	private static final int MILLISECONDS_OF_DELAY = 180; 
 	private Image[] imageCache;
 	private Image image;
-
+	
 	private Display dpy;
 	private Runnable timer;
 	private boolean busy;
 	private int imageIndex;
-
+	
 	/**
 	 * BusyWidget constructor comment.
-	 *
+	 * 
 	 * @param parent
 	 *            org.eclipse.swt.widgets.Composite
 	 * @param style
@@ -52,10 +55,9 @@ public final class BusyIndicator extends Canvas {
 	 */
 	public BusyIndicator(Composite parent, int style) {
 		super(parent, style | SWT.DOUBLE_BUFFERED);
-
+		
 		dpy = getDisplay();
 		timer = new Runnable() {
-			@Override
 			public void run () {
 				if (isDisposed()) return;
 				redraw();
@@ -67,12 +69,19 @@ public final class BusyIndicator extends Canvas {
 			}
 		};
 
-		addPaintListener(event -> onPaint(event));
-
-		addDisposeListener(e -> clearImages());
+		addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent event) {
+				onPaint(event);
+			}
+		});
+		
+		addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				clearImages();
+			}
+		});
 	}
 
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 //		checkWidget();
 		Point size = new Point(0, 0);
@@ -91,7 +100,9 @@ public final class BusyIndicator extends Canvas {
 		return size;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#forceFocus()
+	 */
 	public boolean forceFocus() {
 		return false;
 	}
@@ -105,7 +116,7 @@ public final class BusyIndicator extends Canvas {
 
 	/**
 	 * Returns true if it is currently busy.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public boolean isBusy() {
@@ -138,7 +149,7 @@ public final class BusyIndicator extends Canvas {
 
 	/**
 	 * Sets the indicators busy count up (true) or down (false) one.
-	 *
+	 * 
 	 * @param busy
 	 *            boolean
 	 */
@@ -158,7 +169,7 @@ public final class BusyIndicator extends Canvas {
 			redraw();
 		}
 	}
-
+	
 	private ImageDescriptor createImageDescriptor(String relativePath) {
 		Bundle bundle = Platform.getBundle("org.eclipse.ui.forms"); //$NON-NLS-1$
 		URL url = FileLocator.find(bundle, new Path(relativePath),null);
@@ -181,7 +192,7 @@ public final class BusyIndicator extends Canvas {
 		}
 		return imageCache[index];
 	}
-
+	
 	private void clearImages() {
 		if (imageCache != null) {
 			for (int index = 0; index < IMAGE_COUNT; index++) {

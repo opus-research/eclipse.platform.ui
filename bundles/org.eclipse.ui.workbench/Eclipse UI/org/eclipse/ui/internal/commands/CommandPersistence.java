@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,28 +36,28 @@ import org.eclipse.ui.internal.util.PrefUtil;
  * <p>
  * A static class for accessing the registry and the preference store.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class CommandPersistence extends RegistryPersistence {
 
 	/**
 	 * The index of the category elements in the indexed array.
-	 *
+	 * 
 	 * @see CommandPersistence#read()
 	 */
 	private static final int INDEX_CATEGORY_DEFINITIONS = 0;
 
 	/**
 	 * The index of the command elements in the indexed array.
-	 *
+	 * 
 	 * @see CommandPersistence#read()
 	 */
 	private static final int INDEX_COMMAND_DEFINITIONS = 1;
 
 	/**
 	 * The index of the commandParameterType elements in the indexed array.
-	 *
+	 * 
 	 * @see CommandPersistence#read()
 	 * @since 3.2
 	 */
@@ -65,7 +65,7 @@ public final class CommandPersistence extends RegistryPersistence {
 
 	/**
 	 * Reads all of the category definitions from the commands extension point.
-	 *
+	 * 
 	 * @param configurationElements
 	 *            The configuration elements in the commands extension point;
 	 *            must not be <code>null</code>, but may be empty.
@@ -126,7 +126,7 @@ public final class CommandPersistence extends RegistryPersistence {
 
 	/**
 	 * Reads all of the command definitions from the commands extension point.
-	 *
+	 * 
 	 * @param configurationElements
 	 *            The configuration elements in the commands extension point;
 	 *            must not be <code>null</code>, but may be empty.
@@ -223,7 +223,7 @@ public final class CommandPersistence extends RegistryPersistence {
 	 * read the parameter sub-elements from a command element. Each parameter is
 	 * guaranteed to be valid. If invalid parameters are found, then a warning
 	 * status will be appended to the <code>warningsToLog</code> list.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which the parameters should be
 	 *            read; must not be <code>null</code>.
@@ -248,7 +248,8 @@ public final class CommandPersistence extends RegistryPersistence {
 
 		int insertionIndex = 0;
 		Parameter[] parameters = new Parameter[parameterElements.length];
-		for (final IConfigurationElement parameterElement : parameterElements) {
+		for (int i = 0; i < parameterElements.length; i++) {
+			final IConfigurationElement parameterElement = parameterElements[i];
 			// Read out the id
 			final String id = readRequired(parameterElement, ATT_ID,
 					warningsToLog, "Parameters need an id"); //$NON-NLS-1$
@@ -300,7 +301,7 @@ public final class CommandPersistence extends RegistryPersistence {
 	/**
 	 * Reads all of the commandParameterType definitions from the commands
 	 * extension point.
-	 *
+	 * 
 	 * @param configurationElements
 	 *            The configuration elements in the commands extension point;
 	 *            must not be <code>null</code>, but may be empty.
@@ -362,7 +363,7 @@ public final class CommandPersistence extends RegistryPersistence {
 	 * read the state sub-elements from a command element. Each state is
 	 * guaranteed to be valid. If invalid states are found, then a warning
 	 * status will be appended to the <code>warningsToLog</code> list.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            The configuration element from which the states should be
 	 *            read; must not be <code>null</code>.
@@ -383,7 +384,9 @@ public final class CommandPersistence extends RegistryPersistence {
 			return;
 		}
 
-		for (final IConfigurationElement stateElement : stateElements) {
+		for (int i = 0; i < stateElements.length; i++) {
+			final IConfigurationElement stateElement = stateElements[i];
+
 			final String id = readRequired(stateElement, ATT_ID, warningsToLog, "State needs an id"); //$NON-NLS-1$
 			if (id == null) {
 				continue;
@@ -408,7 +411,7 @@ public final class CommandPersistence extends RegistryPersistence {
 
 	/**
 	 * Constructs a new instance of <code>CommandPersistence</code>.
-	 *
+	 * 
 	 * @param commandService
 	 *            The command service which should be populated with the values
 	 *            from the registry; must not be <code>null</code>.
@@ -439,10 +442,10 @@ public final class CommandPersistence extends RegistryPersistence {
 
 		return true;
 	}
-
+	
 	/**
 	 * Reads all of the commands and categories from the registry,
-	 *
+	 * 
 	 * @param commandManager
 	 *            The command service which should be populated with the values
 	 *            from the registry; must not be <code>null</code>.
@@ -452,7 +455,7 @@ public final class CommandPersistence extends RegistryPersistence {
 		super.read();
 		reRead();
 	}
-
+	
 	public void reRead() {
 		// Create the extension registry mementos.
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -464,7 +467,8 @@ public final class CommandPersistence extends RegistryPersistence {
 		// Sort the commands extension point based on element name.
 		final IConfigurationElement[] commandsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_COMMANDS);
-		for (final IConfigurationElement configurationElement : commandsExtensionPoint) {
+		for (int i = 0; i < commandsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = commandsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -486,7 +490,8 @@ public final class CommandPersistence extends RegistryPersistence {
 
 		final IConfigurationElement[] actionDefinitionsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_ACTION_DEFINITIONS);
-		for (final IConfigurationElement configurationElement : actionDefinitionsExtensionPoint) {
+		for (int i = 0; i < actionDefinitionsExtensionPoint.length; i++) {
+			final IConfigurationElement configurationElement = actionDefinitionsExtensionPoint[i];
 			final String name = configurationElement.getName();
 
 			if (TAG_ACTION_DEFINITION.equals(name)) {

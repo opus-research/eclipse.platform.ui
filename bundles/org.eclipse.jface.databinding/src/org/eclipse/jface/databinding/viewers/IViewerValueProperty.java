@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 /**
  * {@link IValueProperty} for observing a JFace viewer
- *
+ * 
  * @since 1.3
  * @noimplement This interface is not intended to be implemented by clients.
  */
@@ -24,7 +24,7 @@ public interface IViewerValueProperty extends IValueProperty {
 	/**
 	 * Returns an {@link IViewerObservableValue} observing this value property
 	 * on the given viewer
-	 *
+	 * 
 	 * @param viewer
 	 *            the source viewer
 	 * @return an observable value observing this value property on the given
@@ -41,7 +41,7 @@ public interface IViewerValueProperty extends IValueProperty {
 	 * <p>
 	 * This method is equivalent to
 	 * <code>ViewersObservables.observeDelayedValue(delay, observe(viewer))</code>.
-	 *
+	 * 
 	 * @param delay
 	 *            the delay in milliseconds.
 	 * @param viewer

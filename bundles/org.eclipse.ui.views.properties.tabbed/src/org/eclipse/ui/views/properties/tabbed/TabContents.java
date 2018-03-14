@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbenchPart;
 /**
  * A property tab is composed by one or more property sections and is used to
  * categorize sections.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -34,7 +34,7 @@ public final class TabContents {
     private boolean controlsCreated;
 
     /**
-     *
+     * 
      */
     public TabContents() {
         controlsCreated = false;
@@ -68,7 +68,7 @@ public final class TabContents {
 
     /**
      * Retrieve the sections on the tab.
-     *
+     * 
      * @return the sections on the tab.
      */
     public ISection[] getSections() {
@@ -77,7 +77,7 @@ public final class TabContents {
 
     /**
      * Creates page's sections controls.
-     *
+     * 
      * @param parent
      * @param page
      */
@@ -91,7 +91,8 @@ public final class TabContents {
         layout.verticalSpacing = 0;
         pageComposite.setLayout(layout);
 
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             final Composite sectionComposite = page.getWidgetFactory()
                 .createComposite(pageComposite, SWT.NO_FOCUS);
             sectionComposite.setLayout(new FillLayout());
@@ -117,7 +118,8 @@ public final class TabContents {
      * Dispose of page's sections controls.
      */
     public void dispose() {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
                 public void run()
@@ -133,7 +135,8 @@ public final class TabContents {
      * Sends the lifecycle event to the page's sections.
      */
     public void aboutToBeShown() {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
                 public void run()
@@ -149,7 +152,8 @@ public final class TabContents {
      * Sends the lifecycle event to the page's sections.
      */
     public void aboutToBeHidden() {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
                 public void run()
@@ -163,12 +167,13 @@ public final class TabContents {
 
     /**
      * Sets page's sections input objects.
-     *
+     * 
      * @param part
      * @param selection
      */
     public void setInput(final IWorkbenchPart part, final ISelection selection) {
-        for (final ISection section : sections) {
+        for (int i = 0; i < sections.length; i++) {
+            final ISection section = sections[i];
             ISafeRunnable runnable = new SafeRunnable() {
 
                 public void run()
@@ -182,7 +187,7 @@ public final class TabContents {
 
     /**
      * Set the sections for the tab.
-     *
+     * 
      * @param sections the sections for the tab.
      */
     public void setSections(ISection[] sections) {
@@ -191,7 +196,7 @@ public final class TabContents {
 
     /**
      * Determine if the controls have been created.
-     *
+     * 
      * @return <code>true</code> if controls have been created.
      */
     public boolean controlsHaveBeenCreated() {
@@ -203,7 +208,8 @@ public final class TabContents {
      */
     public void refresh() {
         if (controlsCreated) {
-            for (final ISection section : sections) {
+            for (int i = 0; i < sections.length; i++) {
+                final ISection section = sections[i];
                 ISafeRunnable runnable = new SafeRunnable() {
 
                     public void run()

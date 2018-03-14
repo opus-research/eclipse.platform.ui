@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 210115, 146397, 249526, 262269, 251424
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable;
 
@@ -23,20 +22,20 @@ import org.eclipse.core.runtime.Status;
 /**
  * This class makes it possible to monitor whenever an IObservable is read from.
  * This can be used to automatically attach and remove listeners. How to use it:
- *
+ * 
  * <p>
  * If you are implementing an IObservable, invoke getterCalled(this) whenever a
  * getter is called - that is, whenever your observable is read from. You only
  * need to do this once per method call. If one getter delegates to another, the
  * outer getter doesn't need to call the method since the inner one will.
  * </p>
- *
+ * 
  * <p>
  * If you want to determine what observables were used in a particular block of
  * code, call runAndMonitor(Runnable). This will execute the given runnable and
  * return the set of observables that were read from.
  * </p>
- *
+ * 
  * <p>
  * This can be used to automatically attach listeners. For example, imagine you
  * have a block of code that updates some widget by reading from a bunch of
@@ -47,7 +46,7 @@ import org.eclipse.core.runtime.Status;
  * code is repetitive and requires updating the listener code whenever you
  * refactor the widget updating code.
  * </p>
- *
+ * 
  * <p>
  * Alternatively, you could use a utility class that runs the code in a
  * runAndMonitor block and automatically attach listeners to any observable used
@@ -55,7 +54,7 @@ import org.eclipse.core.runtime.Status;
  * eliminates the code for attaching and detaching listeners and will always
  * stay in synch with changes to the widget update logic.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public class ObservableTracker {
@@ -66,22 +65,22 @@ public class ObservableTracker {
 	 * changes the current value, it remembers the old value as a local variable
 	 * and restores the old value when the method exits.
 	 */
-	private static ThreadLocal<IChangeListener> currentChangeListener = new ThreadLocal<>();
+	private static ThreadLocal currentChangeListener = new ThreadLocal();
 
-	private static ThreadLocal<IStaleListener> currentStaleListener = new ThreadLocal<>();
+	private static ThreadLocal currentStaleListener = new ThreadLocal();
 
-	private static ThreadLocal<Set<IObservable>> currentGetterCalledSet = new ThreadLocal<>();
+	private static ThreadLocal currentGetterCalledSet = new ThreadLocal();
 
-	private static ThreadLocal<Set<IObservable>> currentObservableCreatedSet = new ThreadLocal<>();
+	private static ThreadLocal currentObservableCreatedSet = new ThreadLocal();
 
-	private static ThreadLocal<Integer> currentIgnoreCount = new ThreadLocal<>();
+	private static ThreadLocal currentIgnoreCount = new ThreadLocal();
 
 	/**
 	 * Invokes the given runnable, and returns the set of IObservables that were
 	 * read by the runnable. If the runnable calls this method recursively, the
 	 * result will not contain IObservables that were used within the inner
 	 * runnable.
-	 *
+	 * 
 	 * @param runnable
 	 *            runnable to execute
 	 * @param changeListener
@@ -94,12 +93,14 @@ public class ObservableTracker {
 	public static IObservable[] runAndMonitor(Runnable runnable,
 			IChangeListener changeListener, IStaleListener staleListener) {
 		// Remember the previous value in the listener stack
-		Set<IObservable> lastObservableSet = currentGetterCalledSet.get();
-		IChangeListener lastChangeListener = currentChangeListener.get();
-		IStaleListener lastStaleListener = currentStaleListener.get();
-		Integer lastIgnore = currentIgnoreCount.get();
+		Set lastObservableSet = (Set) currentGetterCalledSet.get();
+		IChangeListener lastChangeListener = (IChangeListener) currentChangeListener
+				.get();
+		IStaleListener lastStaleListener = (IStaleListener) currentStaleListener
+				.get();
+		Integer lastIgnore = (Integer) currentIgnoreCount.get();
 
-		Set<IObservable> observableSet = new IdentitySet<>();
+		Set observableSet = new IdentitySet();
 		// Push the new listeners to the top of the stack
 		currentGetterCalledSet.set(observableSet);
 		currentChangeListener.set(changeListener);
@@ -117,7 +118,8 @@ public class ObservableTracker {
 			currentIgnoreCount.set(lastIgnore);
 		}
 
-		return observableSet.toArray(new IObservable[observableSet.size()]);
+		return (IObservable[]) observableSet
+				.toArray(new IObservable[observableSet.size()]);
 	}
 
 	/**
@@ -130,17 +132,17 @@ public class ObservableTracker {
 	 * <a href="https://bugs.eclipse.org/278550">bug 278550</a>. If we cannot
 	 * find a way to make this API work, it will be deprecated as of 3.6.</em>
 	 * </p>
-	 *
+	 * 
 	 * @param runnable
 	 *            runnable to execute
 	 * @return an array of unique observable objects
 	 * @since 1.2
 	 */
 	public static IObservable[] runAndCollect(Runnable runnable) {
-		Set<IObservable> lastObservableCreatedSet = currentObservableCreatedSet.get();
-		Integer lastIgnore = currentIgnoreCount.get();
+		Set lastObservableCreatedSet = (Set) currentObservableCreatedSet.get();
+		Integer lastIgnore = (Integer) currentIgnoreCount.get();
 
-		Set<IObservable> observableSet = new IdentitySet<>();
+		Set observableSet = new IdentitySet();
 		// Push the new listeners to the top of the stack
 		currentObservableCreatedSet.set(observableSet);
 		currentIgnoreCount.set(null);
@@ -154,19 +156,22 @@ public class ObservableTracker {
 			currentIgnoreCount.set(lastIgnore);
 		}
 
-		return observableSet.toArray(new IObservable[observableSet.size()]);
+		return (IObservable[]) observableSet
+				.toArray(new IObservable[observableSet.size()]);
 	}
 
 	private static void checkUnmatchedIgnore(Runnable runnable) {
 		if (isIgnore()) {
-			Policy.getLog()
-					.log(new Status(
-							IStatus.ERROR,
-							Policy.JFACE_DATABINDING,
-							"There were " //$NON-NLS-1$
-									+ currentIgnoreCount.get()
-									+ " unmatched setIgnore(true) invocations in runnable " //$NON-NLS-1$
-									+ runnable));
+			Policy
+					.getLog()
+					.log(
+							new Status(
+									IStatus.ERROR,
+									Policy.JFACE_DATABINDING,
+									"There were " //$NON-NLS-1$
+											+ currentIgnoreCount.get()
+											+ " unmatched setIgnore(true) invocations in runnable " //$NON-NLS-1$
+											+ runnable));
 		}
 	}
 
@@ -178,20 +183,20 @@ public class ObservableTracker {
 	 * {@link #getterCalled(IObservable)} and
 	 * {@link #observableCreated(IObservable)} will resume gathering
 	 * observables. Nested calls to this method are stacked.
-	 *
+	 * 
 	 * @param ignore
 	 *            the new ignore state
-	 *
+	 * 
 	 * @exception IllegalStateException
 	 *                if
 	 *                <code>ignore<code> is false and the ignore count is already zero.
-	 *
+	 * 
 	 * @see #getterCalled(IObservable)
 	 * @see #observableCreated(IObservable)
 	 * @since 1.3
 	 */
 	public static void setIgnore(boolean ignore) {
-		Integer lastCount = currentIgnoreCount.get();
+		Integer lastCount = (Integer) currentIgnoreCount.get();
 
 		int newCount = (lastCount == null ? 0 : lastCount.intValue())
 				+ (ignore ? 1 : -1);
@@ -199,14 +204,14 @@ public class ObservableTracker {
 		if (newCount < 0)
 			throw new IllegalStateException("Ignore count is already zero"); //$NON-NLS-1$
 
-		currentIgnoreCount.set(newCount == 0 ? null : Integer.valueOf(newCount));
+		currentIgnoreCount.set(newCount == 0 ? null : new Integer(newCount));
 	}
 
 	/**
 	 * Runs the given runnable without tracking dependencies.
-	 *
+	 * 
 	 * @param runnable
-	 *
+	 * 
 	 * @since 1.1
 	 */
 	public static void runAndIgnore(Runnable runnable) {
@@ -239,7 +244,7 @@ public class ObservableTracker {
 	 * receiver has been read from". This lets callers know that they can rely
 	 * on automatic updates from the object without explicitly attaching a
 	 * listener.
-	 *
+	 * 
 	 * @param observable
 	 */
 	public static void getterCalled(IObservable observable) {
@@ -254,13 +259,15 @@ public class ObservableTracker {
 		if (isIgnore())
 			return;
 
-		Set<IObservable> getterCalledSet = currentGetterCalledSet.get();
+		Set getterCalledSet = (Set) currentGetterCalledSet.get();
 		if (getterCalledSet != null && getterCalledSet.add(observable)) {
 			// If anyone is listening for observable usage...
-			IChangeListener changeListener = currentChangeListener.get();
+			IChangeListener changeListener = (IChangeListener) currentChangeListener
+					.get();
 			if (changeListener != null)
 				observable.addChangeListener(changeListener);
-			IStaleListener staleListener = currentStaleListener.get();
+			IStaleListener staleListener = (IStaleListener) currentStaleListener
+					.get();
 			if (staleListener != null)
 				observable.addStaleListener(staleListener);
 		}
@@ -268,7 +275,7 @@ public class ObservableTracker {
 
 	/**
 	 * Notifies the ObservableTracker that an observable was created.
-	 *
+	 * 
 	 * @param observable
 	 *            the observable that was created
 	 * @since 1.2
@@ -276,7 +283,7 @@ public class ObservableTracker {
 	public static void observableCreated(IObservable observable) {
 		if (isIgnore())
 			return;
-		Set<IObservable> observableCreatedSet = currentObservableCreatedSet.get();
+		Set observableCreatedSet = (Set) currentObservableCreatedSet.get();
 		if (observableCreatedSet != null) {
 			observableCreatedSet.add(observable);
 		}

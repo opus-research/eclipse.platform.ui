@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -71,7 +71,6 @@ public class UiFactoryImpl extends EFactoryImpl implements MUiFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case UiPackageImpl.CORE_EXPRESSION: return (EObject)createCoreExpression();
-			case UiPackageImpl.IMPERATIVE_EXPRESSION: return (EObject)createImperativeExpression();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -115,16 +114,6 @@ public class UiFactoryImpl extends EFactoryImpl implements MUiFactory {
 	public MCoreExpression createCoreExpression() {
 		CoreExpressionImpl coreExpression = new CoreExpressionImpl();
 		return coreExpression;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MImperativeExpression createImperativeExpression() {
-		ImperativeExpressionImpl imperativeExpression = new ImperativeExpressionImpl();
-		return imperativeExpression;
 	}
 
 	/**

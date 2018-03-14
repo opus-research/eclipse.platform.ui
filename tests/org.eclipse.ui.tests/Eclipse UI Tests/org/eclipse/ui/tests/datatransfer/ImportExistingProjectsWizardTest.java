@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,13 +19,13 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.zip.ZipFile;
+
+import junit.framework.TestSuite;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -33,11 +33,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.tests.harness.FileSystemHelper;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -60,8 +60,6 @@ import org.eclipse.ui.tests.harness.util.FileTool;
 import org.eclipse.ui.tests.harness.util.FileUtil;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 import org.eclipse.ui.wizards.datatransfer.ExternalProjectImportWizard;
-
-import junit.framework.TestSuite;
 
 public class ImportExistingProjectsWizardTest extends UITestCase {
 	private static final String DATA_PATH_PREFIX = "data/org.eclipse.datatransferArchives/";
@@ -179,8 +177,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testFindSingleZip() {
 		try {
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -209,8 +208,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testFindSingleTar() {
 		try {
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".tar"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".tar")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -294,8 +294,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -352,8 +353,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("A");
@@ -408,8 +410,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".tar"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".tar")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -465,8 +468,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".tar"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".tar")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("A");
@@ -736,8 +740,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -789,8 +794,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject element : workspaceProjects2) {
 				FileUtil.deleteProject(element);
 			}
-			URL archiveFile2 = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile2 = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip2 = getNewWizard();
 			HashSet projects2 = new HashSet();
 			projects2.add("HelloWorld");
@@ -1064,16 +1070,16 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 					"TestPlugin default reference is null");
 		}
 
-		URL fullPathString = plugin.getBundle().getResource("/" + WS_DATA_PREFIX + "/" + dataLocation + ".zip");
+		URL fullPathString = plugin.getDescriptor().find(
+				new Path(WS_DATA_PREFIX).append(dataLocation + ".zip"));
 
-		URI fileURI = null;
-		try {
-			fileURI = FileLocator.resolve(fullPathString).toURI();
-		} catch (URISyntaxException e) {
+		if (fullPathString == null) {
 			throw new IllegalArgumentException();
 		}
 
-		File origin = new File(fileURI);
+		IPath path = new Path(fullPathString.getPath());
+
+		File origin = path.toFile();
 		if (!origin.exists()) {
 			throw new IllegalArgumentException();
 		}
@@ -1093,16 +1099,16 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 					"TestPlugin default reference is null");
 		}
 
-		URL fullPathString = plugin.getBundle().getResource(WS_DATA_PREFIX + "/" + zipLocation + ".zip");
+		URL fullPathString = plugin.getDescriptor().find(
+				new Path(WS_DATA_PREFIX).append(zipLocation + ".zip"));
 
-		URI fileURI = null;
-		try {
-			fileURI = FileLocator.resolve(fullPathString).toURI();
-		} catch (URISyntaxException e) {
+		if (fullPathString == null) {
 			throw new IllegalArgumentException();
 		}
 
-		File origin = new File(fileURI);
+		IPath path = new Path(fullPathString.getPath());
+
+		File origin = path.toFile();
 		if (!origin.exists()) {
 			throw new IllegalArgumentException();
 		}
@@ -1154,8 +1160,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		expectedNames.add("Project4");
 		expectedNames.add("Project5");
 
-		URL projectsArchive = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-				new Path(DATA_PATH_PREFIX + PROJECTS_ARCHIVE + ".zip"), null));
+		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin
+				.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+				+ PROJECTS_ARCHIVE + ".zip")));
 
 		List projectNames = getNonConflictingProjectsFromArchive(projectsArchive);
 
@@ -1186,8 +1193,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testGetProjectRecordsShouldHandleCorruptProjects() throws Exception {
 
-		URL projectsArchive = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-				new Path(DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip"), null));
+		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin.getDefault().getBundle(), new Path(
+				DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip")));
 
 		WizardProjectsImportPage newWizard = spy(getNewWizard());
 		ProjectRecord[] projectRecords = getProjectsFromArchive(newWizard, projectsArchive);
@@ -1208,8 +1215,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testGetProjectRecordsShouldHandleCorruptAndConflictingProjects() throws Exception {
 
-		URL projectsArchive = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-				new Path(DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip"), null));
+		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin.getDefault().getBundle(), new Path(
+				DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip")));
 
 		WizardProjectsImportPage newWizard = spy(getNewWizard());
 		FileUtil.createProject("Project1");
@@ -1239,7 +1246,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private List<String> getValidProjects(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<>();
+		List<String> projectNames = new ArrayList<String>();
 		for (int i = 0; i < projectRecords.length; i++) {
 			if (!projectRecords[i].isInvalidProject()) {
 				projectNames.add(projectRecords[i].getProjectName());
@@ -1249,7 +1256,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private List<String> getInvalidProjects(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<>();
+		List<String> projectNames = new ArrayList<String>();
 		for (ProjectRecord projectRecord : projectRecords) {
 			if (projectRecord.isInvalidProject()) {
 				projectNames.add(projectRecord.getProjectName());
@@ -1259,7 +1266,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private List<String> getProjectsWithConflicts(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<>();
+		List<String> projectNames = new ArrayList<String>();
 		for (ProjectRecord projectRecord : projectRecords) {
 			if (projectRecord.hasConflicts()) {
 				projectNames.add(projectRecord.getProjectName());

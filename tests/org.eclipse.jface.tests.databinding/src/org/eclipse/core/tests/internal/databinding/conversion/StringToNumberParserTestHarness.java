@@ -58,16 +58,16 @@ public abstract class StringToNumberParserTestHarness extends TestCase {
 		}
 
 		// test integers
-		assertTrue("valid Integer", assertValid(Integer.valueOf(1)));
+		assertTrue("valid Integer", assertValid(new Integer(1)));
 
-		result = assertValid(Integer.valueOf(Integer.MIN_VALUE));
+		result = assertValid(new Integer(Integer.MIN_VALUE));
 		if (minDouble > Integer.MIN_VALUE) {
 			assertFalse("invalid Integer min", result);
 		} else {
 			assertTrue("valid integer min", result);
 		}
 
-		result = assertValid(Integer.valueOf(Integer.MAX_VALUE));
+		result = assertValid(new Integer(Integer.MAX_VALUE));
 		if (maxDouble < Integer.MAX_VALUE) {
 			assertFalse("valid Integer max", result);
 		} else {
@@ -169,22 +169,42 @@ public abstract class StringToNumberParserTestHarness extends TestCase {
 
 			private static final long serialVersionUID = 1L;
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see java.lang.Number#doubleValue()
+			 */
 			@Override
 			public double doubleValue() {
 				count++;
 				return value;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see java.lang.Number#floatValue()
+			 */
 			@Override
 			public float floatValue() {
 				return 0;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see java.lang.Number#intValue()
+			 */
 			@Override
 			public int intValue() {
 				return 0;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see java.lang.Number#longValue()
+			 */
 			@Override
 			public long longValue() {
 				return 0;

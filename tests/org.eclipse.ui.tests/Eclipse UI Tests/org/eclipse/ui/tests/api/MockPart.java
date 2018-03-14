@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,7 +83,7 @@ public class MockPart extends EventManager implements IExecutableExtension {
         String strIcon = config.getAttribute("icon");//$NON-NLS-1$
         if (strIcon != null) {
             try {
-				Bundle plugin = Platform.getBundle(config.getNamespaceIdentifier());
+            	Bundle plugin = Platform.getBundle(config.getNamespace());
                 URL installURL = plugin.getEntry("/"); //$NON-NLS-1$
                 URL fullPathString = new URL(installURL, strIcon);
                 ImageDescriptor imageDesc = ImageDescriptor
@@ -153,11 +153,10 @@ public class MockPart extends EventManager implements IExecutableExtension {
         callTrace.add("setFocus");
     }
 
-	/**
-	 * @param adapter
-	 * @see IAdaptable#getAdapter(Class)
-	 */
-	public <T> T getAdapter(Class<T> adapter) {
+    /**
+     * @see IAdaptable#getAdapter(Class)
+     */
+    public Object getAdapter(Class arg0) {
         return null;
     }
 

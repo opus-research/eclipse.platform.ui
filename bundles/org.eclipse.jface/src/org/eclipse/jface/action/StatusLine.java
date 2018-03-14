@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 
 package org.eclipse.jface.action;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressIndicator;
@@ -29,6 +25,10 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -115,7 +115,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/** stop image descriptor */
 	protected static ImageDescriptor fgStopImage = ImageDescriptor
-			.createFromFile(StatusLine.class, "images/stop.png");//$NON-NLS-1$
+			.createFromFile(StatusLine.class, "images/stop.gif");//$NON-NLS-1$
 
 	private MenuItem copyMenuItem;
 	static {
@@ -141,8 +141,9 @@ import org.eclipse.swt.widgets.ToolItem;
 			int totalWidth = 0;
 			int maxHeight = 0;
 			int totalCnt = 0;
-			for (Control w : children) {
+			for (int i = 0; i < children.length; i++) {
 				boolean useWidth = true;
+				Control w = children[i];
 				if (w == fProgressBarComposite && !fProgressIsVisible) {
 					useWidth = false;
 				} else if (w == fToolBar && !fCancelButtonIsVisible) {
@@ -240,7 +241,7 @@ import org.eclipse.swt.widgets.ToolItem;
 				 * Workaround for Linux Motif: Even if the progress bar and
 				 * cancel button are not set to be visible ad of width 0, they
 				 * still draw over the first pixel of the editor contributions.
-				 *
+				 * 
 				 * The fix here is to draw the progress bar and cancel button
 				 * off screen if they are not visible.
 				 */
@@ -259,7 +260,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Create a new StatusLine as a child of the given parent.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent for this Composite
 	 * @param style
@@ -267,7 +268,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	 */
 	public StatusLine(Composite parent, int style) {
 		super(parent, style);
-
+		
 		getAccessible().addAccessibleControlListener(new AccessibleControlAdapter() {
 			@Override
 			public void getRole(AccessibleControlEvent e) {
@@ -275,7 +276,12 @@ import org.eclipse.swt.widgets.ToolItem;
 			}
 		});
 
-		addDisposeListener(e -> handleDispose());
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				handleDispose();
+			}
+		});
 
 		// StatusLineManager skips over the standard status line widgets
 		// in its update method. There is thus a dependency
@@ -285,24 +291,27 @@ import org.eclipse.swt.widgets.ToolItem;
 		setLayout(new StatusLineLayout());
 
 		fMessageLabel = new CLabel(this, SWT.NONE);// SWT.SHADOW_IN);
-
+		
 		// this would need extra work to make this accessible
 		// from the workbench command framework.
 		Menu menu = new Menu(fMessageLabel);
 		fMessageLabel.setMenu(menu);
 		copyMenuItem = new MenuItem(menu, SWT.PUSH);
 		copyMenuItem.setText(JFaceResources.getString("copy")); //$NON-NLS-1$
-		copyMenuItem.addSelectionListener(widgetSelectedAdapter(e -> {
-			String text = fMessageLabel.getText();
-			if (text != null && text.length() > 0) {
-				text = LegacyActionTools.removeMnemonics(text);
-				Clipboard cp = new Clipboard(e.display);
-				cp.setContents(new Object[] { text },
-						new Transfer[] { TextTransfer.getInstance() });
-				cp.dispose();
+		copyMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String text = fMessageLabel.getText();
+				if (text != null && text.length() > 0) {
+					text = LegacyActionTools.removeMnemonics(text);
+					Clipboard cp = new Clipboard(e.display);
+					cp.setContents(new Object[] { text },
+							new Transfer[] { TextTransfer.getInstance() });
+					cp.dispose();
+				}
 			}
-		}));
-
+		});
+		
 		fProgressIsVisible = false;
 		fCancelEnabled = false;
 
@@ -311,11 +320,19 @@ import org.eclipse.swt.widgets.ToolItem;
 		fCancelButton.setImage(fgStopImage.createImage());
 		fCancelButton.setToolTipText(JFaceResources
 				.getString("Cancel_Current_Operation")); //$NON-NLS-1$
-		fCancelButton.addSelectionListener(widgetSelectedAdapter(e -> setCanceled(true)));
-		fCancelButton.addDisposeListener(e -> {
-			Image i = fCancelButton.getImage();
-			if ((i != null) && (!i.isDisposed())) {
-				i.dispose();
+		fCancelButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				setCanceled(true);
+			}
+		});
+		fCancelButton.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Image i = fCancelButton.getImage();
+				if ((i != null) && (!i.isDisposed())) {
+					i.dispose();
+				}
 			}
 		});
 
@@ -337,7 +354,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Notifies that the main task is beginning.
-	 *
+	 * 
 	 * @param name
 	 *            the name (or description) of the main task
 	 * @param totalWork
@@ -355,7 +372,12 @@ import org.eclipse.swt.widgets.ToolItem;
 		final boolean animated = (totalWork == UNKNOWN || totalWork == 0);
 		// make sure the progress bar is made visible while
 		// the task is running. Fixes bug 32198 for the non-animated case.
-		Runnable timer = () -> StatusLine.this.startTask(timestamp, animated);
+		Runnable timer = new Runnable() {
+			@Override
+			public void run() {
+				StatusLine.this.startTask(timestamp, animated);
+			}
+		};
 		if (fProgressBar == null) {
 			return;
 		}
@@ -393,7 +415,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Returns the status line's progress monitor
-	 *
+	 * 
 	 * @return {@link IProgressMonitor} the progress monitor
 	 */
 	public IProgressMonitor getProgressMonitor() {
@@ -416,7 +438,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Hides the Cancel button and ProgressIndicator.
-	 *
+	 * 
 	 */
 	protected void hideProgress() {
 
@@ -488,7 +510,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	 * running operation. If the ProgressIndication is currently visible calling
 	 * this method may have a direct effect on the layout because it will make a
 	 * cancel button visible.
-	 *
+	 * 
 	 * @param enabled
 	 *            <code>true</true> if cancel should be enabled
 	 */
@@ -506,7 +528,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	/**
 	 * Sets the error message text to be displayed on the status line. The image
 	 * on the status line is cleared.
-	 *
+	 * 
 	 * @param message
 	 *            the error message, or <code>null</code> for no error message
 	 */
@@ -516,7 +538,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Sets an image and error message text to be displayed on the status line.
-	 *
+	 * 
 	 * @param image
 	 *            the image to use, or <code>null</code> for no image
 	 * @param message
@@ -535,15 +557,15 @@ import org.eclipse.swt.widgets.ToolItem;
 	public void setFont(Font font) {
 		super.setFont(font);
 		Control[] children = getChildren();
-		for (Control element : children) {
-			element.setFont(font);
+		for (int i = 0; i < children.length; i++) {
+			children[i].setFont(font);
 		}
 	}
 
 	/**
 	 * Sets the message text to be displayed on the status line. The image on
 	 * the status line is cleared.
-	 *
+	 * 
 	 * @param message
 	 *            the error message, or <code>null</code> for no error message
 	 */
@@ -553,7 +575,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Sets an image and a message text to be displayed on the status line.
-	 *
+	 * 
 	 * @param image
 	 *            the image to use, or <code>null</code> for no image
 	 * @param message
@@ -578,7 +600,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Makes the Cancel button visible.
-	 *
+	 * 
 	 */
 	protected void showButton() {
 		if (fToolBar != null && !fToolBar.isDisposed()) {
@@ -591,7 +613,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/**
 	 * Shows the Cancel button and ProgressIndicator.
-	 *
+	 * 
 	 */
 	protected void showProgress() {
 		if (!fProgressIsVisible && !isDisposed()) {
@@ -624,7 +646,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	/**
 	 * Notifies that a subtask of the main task is beginning. Subtasks are
 	 * optional; the main task might not have subtasks.
-	 *
+	 * 
 	 * @param name
 	 *            the name (or description) of the subtask
 	 * @see IProgressMonitor#subTask(String)
@@ -642,7 +664,8 @@ import org.eclipse.swt.widgets.ToolItem;
 		if (fTaskName == null || fTaskName.length() == 0) {
 			text = newName;
 		} else {
-			text = JFaceResources.format("Set_SubTask", fTaskName, newName);//$NON-NLS-1$
+			text = JFaceResources.format(
+					"Set_SubTask", new Object[] { fTaskName, newName });//$NON-NLS-1$
 		}
 		setMessage(text);
 	}

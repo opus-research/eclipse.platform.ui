@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,6 +57,7 @@ import org.eclipse.ui.internal.testing.WorkbenchPartTestable;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
+import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceScopes;
 import org.eclipse.ui.testing.IWorkbenchPartTestable;
 
@@ -66,9 +67,9 @@ import org.eclipse.ui.testing.IWorkbenchPartTestable;
  * including the part, its pane, active contributions, selection provider, etc.
  * Together, these components make up the complete behavior for a part as if it
  * was implemented by one person.
- *
+ * 
  * The <code>PartSite</code> lifecycle is as follows ..
- *
+ * 
  * <ol>
  * <li>a site is constructed </li>
  * <li>a part is constructed and stored in the part </li>
@@ -87,7 +88,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * is provided so that different implementations of the
 	 * <code>IWorkbenchPartSite</code> interface don't have to worry about how
 	 * context menus should work.
-	 *
+	 * 
 	 * @param menuId
 	 *            the menu id
 	 * @param menuManager
@@ -169,7 +170,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Build the part site.
-	 *
+	 * 
 	 * @param ref
 	 *            the part reference
 	 * @param part
@@ -196,8 +197,11 @@ public abstract class PartSite implements IWorkbenchPartSite {
 				.get(IServiceLocatorCreator.class);
 		IWorkbenchWindow workbenchWindow = getWorkbenchWindow();
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(workbenchWindow, null,
-				() -> {
-					// not sure what to do here
+				new IDisposable() {
+					@Override
+					public void dispose() {
+						// not sure what to do here
+					}
 				}, e4Context);
 		initializeDefaultServices();
 	}
@@ -397,7 +401,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Returns the page containing this workbench site's part.
-	 *
+	 * 
 	 * @return the page containing this part
 	 */
 	@Override
@@ -431,7 +435,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Returns the shell containing this part.
-	 *
+	 * 
 	 * @return the shell containing this part
 	 */
 	@Override
@@ -478,7 +482,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Returns the workbench window containing this part.
-	 *
+	 * 
 	 * @return the workbench window containing this part
 	 */
 	@Override
@@ -562,19 +566,19 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Get an adapter for this type.
-	 *
+	 * 
 	 * @param adapter
 	 * @return
 	 */
 	@Override
-	public final <T> T getAdapter(Class<T> adapter) {
+	public final Object getAdapter(Class adapter) {
 
 		if (IWorkbenchSiteProgressService.class == adapter) {
-			return adapter.cast(getService(adapter));
+			return getService(adapter);
 		}
-
+		
 		if (IWorkbenchPartTestable.class == adapter) {
-			return adapter.cast(new WorkbenchPartTestable(this));
+			return new WorkbenchPartTestable(this);
 		}
 
 		return Platform.getAdapterManager().getAdapter(this, adapter);
@@ -601,7 +605,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 	/**
 	 * Get a progress service for the receiver.
-	 *
+	 * 
 	 * @return WorkbenchSiteProgressService
 	 */
 	WorkbenchSiteProgressService getSiteProgressService() {
@@ -610,19 +614,19 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	}
 
 	@Override
-	public final <T> T getService(final Class<T> key) {
+	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
 
 	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 
 	/**
 	 * Prints out the identifier, the plug-in identifier and the registered
 	 * name. This is for debugging purposes only.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	@Override

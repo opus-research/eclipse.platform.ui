@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -21,7 +21,7 @@ import org.eclipse.ui.tests.views.properties.tabbed.model.Element;
 
 /**
  * The selection provider for the override tests view.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -33,7 +33,7 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 
 	/**
 	 * Constructor for OverrideTestsSelectionProvider
-	 *
+	 * 
 	 * @param aViewer
 	 *            the viewer in the OverrideTestsView.
 	 */
@@ -41,14 +41,23 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 		this.viewer = aViewer;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		selectionChangedListeners.add(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
 	public ISelection getSelection() {
-		IStructuredSelection structuredSelection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
+		IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 		if (structuredSelection.isEmpty()) {
 			return new OverrideTestsSelection(null);
 		}
@@ -56,7 +65,11 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 		return new OverrideTestsSelection(element);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
 	public void removeSelectionChangedListener(
 			ISelectionChangedListener listener) {
 		selectionChangedListeners.remove(listener);
@@ -65,7 +78,7 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 	/**
 	 * Notify the selection changed listeners that a selection change has
 	 * occurred.
-	 *
+	 * 
 	 * @param event
 	 *            the selection change event.
 	 */
@@ -78,7 +91,11 @@ public class OverrideTestsSelectionProvider implements ISelectionProvider {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+	 */
 	public void setSelection(ISelection selection) {
 		viewer.setSelection(selection);
 	}

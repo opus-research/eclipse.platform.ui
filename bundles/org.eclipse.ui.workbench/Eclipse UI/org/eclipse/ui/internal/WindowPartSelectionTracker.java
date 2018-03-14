@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.INullSelectionListener;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 
 /**
@@ -32,16 +33,26 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
     /**
      * Part selection listener.
      */
-    private final INullSelectionListener selListener = (part, selection) -> fireSelection(part, selection);
+    private final INullSelectionListener selListener = new INullSelectionListener() {
+        @Override
+		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            fireSelection(part, selection);
+        }
+    };
 
     /**
      * Part post selection listener
      */
-    private final INullSelectionListener postSelListener = (part, selection) -> firePostSelection(part, selection);
+    private final INullSelectionListener postSelListener = new INullSelectionListener() {
+        @Override
+		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            firePostSelection(part, selection);
+        }
+    };
 
     /**
      * Constructs a new selection tracker for the given window and part id.
-     *
+     * 
      * @param window workbench window
      * @param partId part identifier
      */
@@ -49,8 +60,9 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
         super(partId);
         setWindow(window);
         window.addPageListener(this);
-		for (IWorkbenchPage page : window.getPages()) {
-            pageOpened(page);
+        IWorkbenchPage[] pages = window.getPages();
+        for (int i = 0; i < pages.length; i++) {
+            pageOpened(pages[i]);
         }
     }
 
@@ -81,7 +93,7 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
 
     /**
      * Sets the window this tracker is working in.
-     *
+     * 
      * @param window workbench window
      */
     private void setWindow(IWorkbenchWindow window) {
@@ -90,7 +102,7 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
 
     /**
      * Returns the window this tracker is working in.
-     *
+     * 
      * @return workbench window
      */
     protected IWorkbenchWindow getWindow() {

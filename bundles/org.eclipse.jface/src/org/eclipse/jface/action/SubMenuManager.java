@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * A <code>SubMenuManager</code> is used to define a set of contribution
- * items within a parent manager.  Once defined, the visibility of the entire set can
+ * items within a parent manager.  Once defined, the visibility of the entire set can 
  * be changed as a unit.
  * <p>
  * A client may ask for and make additions to a submenu.  The visibility of these items
@@ -43,7 +43,7 @@ public class SubMenuManager extends SubContributionManager implements
     /**
      * List of registered menu listeners (element type: <code>IMenuListener</code>).
      */
-	private ListenerList<IMenuListener> menuListeners = new ListenerList<>();
+    private ListenerList menuListeners = new ListenerList();
 
     /**
      * The menu listener added to the parent.  Lazily initialized
@@ -54,7 +54,7 @@ public class SubMenuManager extends SubContributionManager implements
     /**
      * Constructs a new manager.
      *
-     * @param mgr the parent manager.  All contributions made to the
+     * @param mgr the parent manager.  All contributions made to the 
      *      <code>SubMenuManager</code> are forwarded and appear in the
      *      parent manager.
      */
@@ -66,11 +66,16 @@ public class SubMenuManager extends SubContributionManager implements
 	public void addMenuListener(IMenuListener listener) {
         menuListeners.add(listener);
         if (menuListener == null) {
-            menuListener = manager -> {
-				for (IMenuListener localListener : menuListeners) {
-					localListener.menuAboutToShow(SubMenuManager.this);
-			    }
-			};
+            menuListener = new IMenuListener() {
+                @Override
+				public void menuAboutToShow(IMenuManager manager) {
+                    Object[] listeners = menuListeners.getListeners();
+                    for (int i = 0; i < listeners.length; ++i) {
+                        ((IMenuListener) listeners[i])
+                                .menuAboutToShow(SubMenuManager.this);
+                    }
+                }
+            };
         }
         getParentMenuManager().addMenuListener(menuListener);
     }
@@ -211,7 +216,7 @@ public class SubMenuManager extends SubContributionManager implements
     }
 
     /**
-     * @return the parent menu manager that this sub-manager contributes to.
+     * @return the parent menu manager that this sub-manager contributes to. 
      */
     protected final IMenuManager getParentMenuManager() {
         // Cast is ok because that's the only
@@ -237,7 +242,7 @@ public class SubMenuManager extends SubContributionManager implements
      */
     protected IMenuManager getWrapper(IMenuManager mgr) {
         if (mapMenuToWrapper == null) {
-            mapMenuToWrapper = new HashMap<>(4);
+            mapMenuToWrapper = new HashMap<IMenuManager, SubMenuManager>(4);
         }
         SubMenuManager wrapper = mapMenuToWrapper.get(mgr);
         if (wrapper == null) {
@@ -296,7 +301,7 @@ public class SubMenuManager extends SubContributionManager implements
 
     @Override
 	public void setParent(IContributionManager parent) {
-        // do nothing, our "parent manager's" parent
+        // do nothing, our "parent manager's" parent 
         // is set when it is added to a manager
     }
 

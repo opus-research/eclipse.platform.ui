@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ import org.eclipse.ui.internal.dialogs.SelectPerspectiveDialog;
 /**
  * Shows the given perspective. If no perspective is specified in the
  * parameters, then this opens the perspective selection dialog.
- *
+ * 
  * @since 3.1
  */
 public final class ShowPerspectiveHandler extends AbstractHandler {
@@ -69,7 +69,7 @@ public final class ShowPerspectiveHandler extends AbstractHandler {
 
 	/**
 	 * Opens the specified perspective in a new window.
-	 *
+	 * 
 	 * @param perspectiveId
 	 *            The perspective to open; must not be <code>null</code>
 	 * @throws ExecutionException
@@ -90,7 +90,7 @@ public final class ShowPerspectiveHandler extends AbstractHandler {
 
 	/**
 	 * Opens a view selection dialog, allowing the user to chose a view.
-	 *
+	 * 
 	 * @throws ExecutionException
 	 *             If the perspective could not be opened.
 	 */
@@ -123,7 +123,7 @@ public final class ShowPerspectiveHandler extends AbstractHandler {
 
 	/**
 	 * Opens the perspective with the given identifier.
-	 *
+	 * 
 	 * @param perspectiveId
 	 *            The perspective to open; must not be <code>null</code>
 	 * @throws ExecutionException

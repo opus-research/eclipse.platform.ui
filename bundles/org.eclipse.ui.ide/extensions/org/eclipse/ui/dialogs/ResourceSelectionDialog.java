@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -32,7 +33,6 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.misc.CheckboxTreeAndListGroup;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.views.navigator.ResourceComparator;
 
 /**
  * A standard resource selection dialog which solicits a list of resources from
@@ -139,10 +139,8 @@ public class ResourceSelectionDialog extends SelectionDialog {
                 getResourceProvider(IResource.FOLDER | IResource.PROJECT
                         | IResource.ROOT), WorkbenchLabelProvider
                         .getDecoratingWorkbenchLabelProvider(),
-                        new ResourceComparator(ResourceComparator.NAME),
                 getResourceProvider(IResource.FILE), WorkbenchLabelProvider
-                        .getDecoratingWorkbenchLabelProvider(),
-                        new ResourceComparator(ResourceComparator.NAME),SWT.NONE,
+                        .getDecoratingWorkbenchLabelProvider(), SWT.NONE,
                 // since this page has no other significantly-sized
                 // widgets we need to hardcode the combined widget's
                 // size, otherwise it will open too small
@@ -158,8 +156,8 @@ public class ResourceSelectionDialog extends SelectionDialog {
                 //Also try and reset the size of the columns as appropriate
                 TableColumn[] columns = selectionGroup.getListTable()
                         .getColumns();
-                for (TableColumn column : columns) {
-                    column.pack();
+                for (int i = 0; i < columns.length; i++) {
+                    columns[i].pack();
                 }
             }
         });
@@ -186,10 +184,10 @@ public class ResourceSelectionDialog extends SelectionDialog {
 
                     //filter out the desired resource types
                     ArrayList results = new ArrayList();
-                    for (IResource member : members) {
+                    for (int i = 0; i < members.length; i++) {
                         //And the test bits with the resource types to see if they are what we want
-                        if ((member.getType() & resourceType) > 0) {
-                            results.add(member);
+                        if ((members[i].getType() & resourceType) > 0) {
+                            results.add(members[i]);
                         }
                     }
                     return results.toArray();
@@ -207,8 +205,13 @@ public class ResourceSelectionDialog extends SelectionDialog {
      * Initializes this dialog's controls.
      */
     private void initializeDialog() {
-        selectionGroup.addCheckStateListener(event -> getOkButton().setEnabled(
-		        selectionGroup.getCheckedElementCount() > 0));
+        selectionGroup.addCheckStateListener(new ICheckStateListener() {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+                getOkButton().setEnabled(
+                        selectionGroup.getCheckedElementCount() > 0);
+            }
+        });
 
         if (getInitialElementSelections().isEmpty()) {
 			getOkButton().setEnabled(false);

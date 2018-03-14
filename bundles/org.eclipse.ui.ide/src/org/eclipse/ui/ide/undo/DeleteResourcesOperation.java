@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,15 +77,17 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 			IResourceChangeDescriptionFactory factory, int operation) {
 		boolean modified = false;
 		if (operation == UNDO) {
-			for (ResourceDescription resourceDescription : resourceDescriptions) {
-				if (resourceDescription != null) {
-					IResource resource = resourceDescription.createResourceHandle();
+			for (int i = 0; i < resourceDescriptions.length; i++) {
+				if (resourceDescriptions[i] != null) {
+					IResource resource = resourceDescriptions[i]
+							.createResourceHandle();
 					factory.create(resource);
 					modified = true;
 				}
 			}
 		} else {
-			for (IResource resource : resources) {
+			for (int i = 0; i < resources.length; i++) {
+				IResource resource = resources[i];
 				factory.delete(resource);
 				modified = true;
 			}
@@ -166,9 +168,9 @@ public class DeleteResourcesOperation extends AbstractResourcesOperation {
 		// in the API, so assume that there could be mixes.
 		if (!deleteContent) {
 			ArrayList nonProjectResourcesToCheck = new ArrayList();
-			for (IResource resource : resourcesToCheck) {
-				if (resource.getType() != IResource.PROJECT) {
-					nonProjectResourcesToCheck.add(resource);
+			for (int i = 0; i < resourcesToCheck.length; i++) {
+				if (resourcesToCheck[i].getType() != IResource.PROJECT) {
+					nonProjectResourcesToCheck.add(resourcesToCheck[i]);
 				}
 			}
 			if (nonProjectResourcesToCheck.isEmpty()) {

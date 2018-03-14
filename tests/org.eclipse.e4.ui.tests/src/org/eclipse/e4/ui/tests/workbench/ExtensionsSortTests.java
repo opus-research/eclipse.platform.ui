@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,21 +11,16 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.e4.ui.internal.workbench.ExtensionsSort;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -33,14 +28,19 @@ import org.osgi.framework.FrameworkUtil;
 /**
  * Test for the {@link ExtensionsSort} class.
  */
-public class ExtensionsSortTests {
+public class ExtensionsSortTests extends TestCase {
 
 	Bundle root;
 	Bundle intermediate;
 	Bundle leaf;
 
-	@Before
-	public void setUp() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
 		BundleContext context = FrameworkUtil.getBundle(getClass())
 				.getBundleContext();
 
@@ -65,7 +65,6 @@ public class ExtensionsSortTests {
 		leaf.start(Bundle.START_TRANSIENT);
 	}
 
-	@Test
 	public void testSortOrder() {
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry
@@ -97,8 +96,13 @@ public class ExtensionsSortTests {
 		return Integer.MIN_VALUE; // keep JDT happy
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception {
 		if (root != null) {
 			root.uninstall();
 		}

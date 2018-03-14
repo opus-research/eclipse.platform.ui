@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import org.eclipse.jface.window.Window;
 /**
  * This handler will pass along to the workbench advisor exceptions
  * and errors thrown while running the event loop. However, the
- * <code>ThreadDeath</code> error is simply thrown again, and is not
+ * <code>ThreadDeath</code> error is simply thrown again, and is not 
  * passed along.
  */
 public final class ExceptionHandler implements Window.IExceptionHandler {
@@ -24,7 +24,7 @@ public final class ExceptionHandler implements Window.IExceptionHandler {
 
     /**
      * Returns the singleton exception handler.
-     *
+     * 
      * @return the singleton exception handler
      */
     public static ExceptionHandler getInstance() {
@@ -37,6 +37,9 @@ public final class ExceptionHandler implements Window.IExceptionHandler {
         // prevents instantiation
     }
 
+    /* (non-javadoc)
+     * @see org.eclipse.jface.window.Window.IExceptionHandler#handleException
+     */
     @Override
 	public void handleException(Throwable t) {
         try {

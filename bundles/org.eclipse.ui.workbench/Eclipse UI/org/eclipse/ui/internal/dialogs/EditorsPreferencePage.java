@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,9 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids <sdavids@gmx.de> - bug 97667 [Preferences] Pref Page General/Editors - problems
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 489891
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -21,13 +18,17 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -60,14 +61,22 @@ public class EditorsPreferencePage extends PreferencePage implements
 
     private IntegerFieldEditor reuseEditorsThreshold;
 
+    private Group dirtyEditorReuseGroup;
+
+    private Button openNewEditor;
+
+    private Button promptToReuseEditor;
 
     private IntegerFieldEditor recentFilesEditor;
 
-    private IPropertyChangeListener validityChangeListener = event -> {
-	    if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-			updateValidState();
-		}
-	};
+    private IPropertyChangeListener validityChangeListener = new IPropertyChangeListener() {
+        @Override
+		public void propertyChange(PropertyChangeEvent event) {
+            if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				updateValidState();
+			}
+        }
+    };
 
 	private Button promptWhenStillOpenEditor;
 
@@ -91,7 +100,7 @@ public class EditorsPreferencePage extends PreferencePage implements
         updateValidState();
 
         applyDialogFont(composite);
-
+        
         setHelpContext(parent);
 
         return composite;
@@ -122,7 +131,7 @@ public class EditorsPreferencePage extends PreferencePage implements
     			IWorkbenchPreferenceConstants.DISABLE_OPEN_EDITOR_IN_PLACE));
     	setButtonLayoutData(allowInplaceEditor);
     }
-
+    
     protected void createUseIPersistablePref(Composite composite) {
         useIPersistableEditor = new Button(composite, SWT.CHECK);
         useIPersistableEditor.setText(WorkbenchMessages.WorkbenchPreference_useIPersistableEditorButton);
@@ -130,7 +139,7 @@ public class EditorsPreferencePage extends PreferencePage implements
                 IPreferenceConstants.USE_IPERSISTABLE_EDITORS));
         setButtonLayoutData(useIPersistableEditor);
     }
-
+    
     protected void createPromptWhenStillOpenPref(Composite composite) {
     	promptWhenStillOpenEditor = new Button(composite, SWT.CHECK);
     	promptWhenStillOpenEditor.setText(WorkbenchMessages.WorkbenchPreference_promptWhenStillOpenButton);
@@ -138,7 +147,7 @@ public class EditorsPreferencePage extends PreferencePage implements
     			IWorkbenchPreferenceConstants.PROMPT_WHEN_SAVEABLE_STILL_OPEN));
     	setButtonLayoutData(promptWhenStillOpenEditor);
     }
-
+    
     protected Composite createComposite(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
         GridLayout layout = new GridLayout();
@@ -171,6 +180,13 @@ public class EditorsPreferencePage extends PreferencePage implements
 						.getDefaultBoolean(IWorkbenchPreferenceConstants.PROMPT_WHEN_SAVEABLE_STILL_OPEN));
         reuseEditors.setSelection(store
                 .getDefaultBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN));
+        dirtyEditorReuseGroup.setEnabled(reuseEditors.getSelection());
+        openNewEditor.setSelection(!store
+                .getDefaultBoolean(IPreferenceConstants.REUSE_DIRTY_EDITORS));
+        openNewEditor.setEnabled(reuseEditors.getSelection());
+        promptToReuseEditor.setSelection(store
+                .getDefaultBoolean(IPreferenceConstants.REUSE_DIRTY_EDITORS));
+        promptToReuseEditor.setEnabled(reuseEditors.getSelection());
         reuseEditorsThreshold.loadDefault();
         reuseEditorsThreshold.getLabelControl(editorReuseThresholdGroup)
                 .setEnabled(reuseEditors.getSelection());
@@ -190,15 +206,17 @@ public class EditorsPreferencePage extends PreferencePage implements
                 useIPersistableEditor.getSelection());
         getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.PROMPT_WHEN_SAVEABLE_STILL_OPEN,
         		promptWhenStillOpenEditor.getSelection());
-
+        
         // store the reuse editors setting
         store.setValue(IPreferenceConstants.REUSE_EDITORS_BOOLEAN, reuseEditors
                 .getSelection());
+        store.setValue(IPreferenceConstants.REUSE_DIRTY_EDITORS,
+                promptToReuseEditor.getSelection());
         reuseEditorsThreshold.store();
 
         // store the recent files setting
         recentFilesEditor.store();
-
+        
         PrefUtil.savePrefs();
         return super.performOk();
     }
@@ -216,7 +234,7 @@ public class EditorsPreferencePage extends PreferencePage implements
     protected IPreferenceStore getAPIPreferenceStore() {
     	return PrefUtil.getAPIPreferenceStore();
     }
-
+    
     protected void updateValidState() {
         if (!recentFilesEditor.isValid()) {
             setErrorMessage(recentFilesEditor.getErrorMessage());
@@ -251,10 +269,19 @@ public class EditorsPreferencePage extends PreferencePage implements
                 .getPreferenceStore();
         reuseEditors.setSelection(store
                 .getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN));
-        reuseEditors.addSelectionListener(widgetSelectedAdapter(e -> {
-			reuseEditorsThreshold.getLabelControl(editorReuseThresholdGroup).setEnabled(reuseEditors.getSelection());
-			reuseEditorsThreshold.getTextControl(editorReuseThresholdGroup).setEnabled(reuseEditors.getSelection());
-		}));
+        reuseEditors.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                reuseEditorsThreshold
+                        .getLabelControl(editorReuseThresholdGroup).setEnabled(
+                                reuseEditors.getSelection());
+                reuseEditorsThreshold.getTextControl(editorReuseThresholdGroup)
+                        .setEnabled(reuseEditors.getSelection());
+                dirtyEditorReuseGroup.setEnabled(reuseEditors.getSelection());
+                openNewEditor.setEnabled(reuseEditors.getSelection());
+                promptToReuseEditor.setEnabled(reuseEditors.getSelection());
+            }
+        });
 
         editorReuseIndentGroup = new Composite(editorReuseGroup, SWT.LEFT);
         GridLayout indentLayout = new GridLayout();
@@ -272,13 +299,13 @@ public class EditorsPreferencePage extends PreferencePage implements
 
         reuseEditorsThreshold = new IntegerFieldEditor(
                 IPreferenceConstants.REUSE_EDITORS,
-                WorkbenchMessages.WorkbenchPreference_reuseEditorsThreshold, editorReuseThresholdGroup);
+                WorkbenchMessages.WorkbenchPreference_reuseEditorsThreshold, editorReuseThresholdGroup); 
 
         reuseEditorsThreshold.setPreferenceStore(WorkbenchPlugin.getDefault()
                 .getPreferenceStore());
         reuseEditorsThreshold.setPage(this);
         reuseEditorsThreshold.setTextLimit(2);
-        reuseEditorsThreshold.setErrorMessage(WorkbenchMessages.WorkbenchPreference_reuseEditorsThresholdError);
+        reuseEditorsThreshold.setErrorMessage(WorkbenchMessages.WorkbenchPreference_reuseEditorsThresholdError); 
         reuseEditorsThreshold
                 .setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
         reuseEditorsThreshold.setValidRange(1, 99);
@@ -289,6 +316,25 @@ public class EditorsPreferencePage extends PreferencePage implements
                 .setEnabled(reuseEditors.getSelection());
         reuseEditorsThreshold.setPropertyChangeListener(validityChangeListener);
 
+        dirtyEditorReuseGroup = new Group(editorReuseIndentGroup, SWT.NONE);
+        layout = new GridLayout();
+        layout.marginWidth = 0;
+        dirtyEditorReuseGroup.setLayout(layout);
+        dirtyEditorReuseGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        dirtyEditorReuseGroup.setText(WorkbenchMessages.WorkbenchPreference_reuseDirtyEditorGroupTitle); 
+        dirtyEditorReuseGroup.setEnabled(reuseEditors.getSelection());
+
+        promptToReuseEditor = new Button(dirtyEditorReuseGroup, SWT.RADIO);
+        promptToReuseEditor.setText(WorkbenchMessages.WorkbenchPreference_promptToReuseEditor); 
+        promptToReuseEditor.setSelection(store
+                .getBoolean(IPreferenceConstants.REUSE_DIRTY_EDITORS));
+        promptToReuseEditor.setEnabled(reuseEditors.getSelection());
+
+        openNewEditor = new Button(dirtyEditorReuseGroup, SWT.RADIO);
+        openNewEditor.setText(WorkbenchMessages.WorkbenchPreference_openNewEditor); 
+        openNewEditor.setSelection(!store
+                .getBoolean(IPreferenceConstants.REUSE_DIRTY_EDITORS));
+        openNewEditor.setEnabled(reuseEditors.getSelection());
     }
 
     /**
@@ -303,10 +349,10 @@ public class EditorsPreferencePage extends PreferencePage implements
         gd.horizontalAlignment = GridData.FILL;
         gd.grabExcessHorizontalSpace = true;
         groupComposite.setLayoutData(gd);
-
+        
         recentFilesEditor = new IntegerFieldEditor(
                 IPreferenceConstants.RECENT_FILES,
-                WorkbenchMessages.WorkbenchPreference_recentFiles, groupComposite);
+                WorkbenchMessages.WorkbenchPreference_recentFiles, groupComposite); 
 
         recentFilesEditor.setPreferenceStore(WorkbenchPlugin.getDefault()
                 .getPreferenceStore());
@@ -314,8 +360,7 @@ public class EditorsPreferencePage extends PreferencePage implements
         recentFilesEditor.setTextLimit(Integer.toString(EditorHistory.MAX_SIZE)
                 .length());
         recentFilesEditor
-				.setErrorMessage(NLS.bind(WorkbenchMessages.WorkbenchPreference_recentFilesError,
-						Integer.valueOf(EditorHistory.MAX_SIZE)));
+                .setErrorMessage(NLS.bind(WorkbenchMessages.WorkbenchPreference_recentFilesError, new Integer(EditorHistory.MAX_SIZE) )); 
         recentFilesEditor
                 .setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
         recentFilesEditor.setValidRange(0, EditorHistory.MAX_SIZE);

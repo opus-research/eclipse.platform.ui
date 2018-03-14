@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,7 +60,7 @@ import org.eclipse.jface.util.Util;
  * though it might get faster. Where possible, we have also tried to be memory
  * efficient.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class BindingManager extends HandleObjectManager implements
@@ -93,7 +93,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * If no such entry exists, then a collection is created, and the value
 	 * added to the collection.
 	 * </p>
-	 *
+	 * 
 	 * @param map
 	 *            The map to modify; if this value is <code>null</code>, then
 	 *            this method simply returns.
@@ -128,7 +128,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method runs in linear time (O(n)) over the length of the string.
 	 * </p>
-	 *
+	 * 
 	 * @param string
 	 *            The string to break apart into its less specific components;
 	 *            should not be <code>null</code>.
@@ -145,7 +145,7 @@ public final class BindingManager extends HandleObjectManager implements
 			return new String[0];
 		}
 
-		final List<String> strings = new ArrayList<>();
+		final List strings = new ArrayList();
 		final StringBuffer stringBuffer = new StringBuffer();
 		string = string.trim(); // remove whitespace
 		if (string.length() > 0) {
@@ -163,7 +163,7 @@ public final class BindingManager extends HandleObjectManager implements
 		Collections.reverse(strings);
 		strings.add(Util.ZERO_LENGTH_STRING);
 		strings.add(null);
-		return strings.toArray(new String[strings.size()]);
+		return (String[]) strings.toArray(new String[strings.size()]);
 	}
 
 	/**
@@ -182,7 +182,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * Otherwise, this value may be empty.
 	 */
 	private Map activeBindingsByParameterizedCommand = null;
-
+	
 	private Set triggerConflicts = new HashSet();
 
 	/**
@@ -273,7 +273,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * to bindings (<code>Binding</code>). This value may be
 	 * <code>null</code> if there is no existing solution.
 	 */
-	private Map prefixTable;
+	private Map prefixTable = null;
 
 	/**
 	 * <p>
@@ -282,7 +282,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in amortized constant time (O(1)).
 	 * </p>
-	 *
+	 * 
 	 * @param contextManager
 	 *            The context manager that will support this binding manager.
 	 *            This value must not be <code>null</code>.
@@ -316,7 +316,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in amortized <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param binding
 	 *            The binding to be added; must not be <code>null</code>.
 	 */
@@ -345,7 +345,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in amortized constant time (<code>O(1)</code>).
 	 * </p>
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to attach; must not be <code>null</code>.
 	 */
@@ -363,7 +363,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * length of the trigger sequences and <code>n</code> is the number of
 	 * bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param activeBindings
 	 *            The map of triggers (<code>TriggerSequence</code>) to
 	 *            command ids (<code>String</code>) which are currently
@@ -446,7 +446,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * Compares the identifier of two schemes, and decides which scheme is the
 	 * youngest (i.e., the child) of the two. Both schemes should be active
 	 * schemes.
-	 *
+	 * 
 	 * @param schemeId1
 	 *            The identifier of the first scheme; must not be
 	 *            <code>null</code>.
@@ -462,7 +462,8 @@ public final class BindingManager extends HandleObjectManager implements
 	private final int compareSchemes(final String schemeId1,
 			final String schemeId2) {
 		if (!schemeId2.equals(schemeId1)) {
-			for (final String schemePointer : activeSchemeIds) {
+			for (int i = 0; i < activeSchemeIds.length; i++) {
+				final String schemePointer = activeSchemeIds[i];
 				if (schemeId2.equals(schemePointer)) {
 					return 1;
 
@@ -489,7 +490,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param activeContextTree
 	 *            The map representing the tree of active contexts. The map is
 	 *            one of child to parent, each being a context id (
@@ -511,7 +512,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 *            computed).
 	 */
 	private final void computeBindings(final Map activeContextTree,
-			final Map bindingsByTrigger, final Map triggersByCommandId,
+			final Map bindingsByTrigger, final Map triggersByCommandId, 
 			final Map conflictsByTrigger) {
 		/*
 		 * FIRST PASS: Remove all of the bindings that are marking deletions.
@@ -549,8 +550,8 @@ public final class BindingManager extends HandleObjectManager implements
 			final String schemeId = binding.getSchemeId();
 			found = false;
 			if (activeSchemeIds != null) {
-				for (String activeSchemeId : activeSchemeIds) {
-					if (Util.equals(schemeId, activeSchemeId)) {
+				for (int j = 0; j < activeSchemeIds.length; j++) {
+					if (Util.equals(schemeId, activeSchemeIds[j])) {
 						found = true;
 						break;
 					}
@@ -695,7 +696,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * there is one natural key per trigger. The strokes are counted based on
 	 * the type of key. Natural keys are worth one; ctrl is worth two; shift is
 	 * worth four; and alt is worth eight.
-	 *
+	 * 
 	 * @param triggers
 	 *            The triggers on which to count strokes; must not be
 	 *            <code>null</code>.
@@ -704,7 +705,8 @@ public final class BindingManager extends HandleObjectManager implements
 	 */
 	private final int countStrokes(final Trigger[] triggers) {
 		int strokeCount = triggers.length;
-		for (final Trigger trigger : triggers) {
+		for (int i = 0; i < triggers.length; i++) {
+			final Trigger trigger = triggers[i];
 			if (trigger instanceof KeyStroke) {
 				final KeyStroke keyStroke = (KeyStroke) trigger;
 				final int modifierKeys = keyStroke.getModifierKeys();
@@ -739,7 +741,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the height of the context tree.
 	 * </p>
-	 *
+	 * 
 	 * @param contextIds
 	 *            The set of context identifiers to be converted into a tree;
 	 *            must not be <code>null</code>.
@@ -787,7 +789,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n^2)</code>, where <code>n</code>
 	 * is the height of the context tree.
 	 * </p>
-	 *
+	 * 
 	 * @param contextIds
 	 *            The set of context identifiers to be converted into a tree;
 	 *            must not be <code>null</code>.
@@ -883,7 +885,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * The time this method takes to complete is dependent on external
 	 * listeners.
 	 * </p>
-	 *
+	 * 
 	 * @param event
 	 *            The event to send to all of the listeners; must not be
 	 *            <code>null</code>.
@@ -894,8 +896,8 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object l : listeners) {
-			final IBindingManagerListener listener = (IBindingManagerListener) l;
+		for (int i = 0; i < listeners.length; i++) {
+			final IBindingManagerListener listener = (IBindingManagerListener) listeners[i];
 			listener.bindingManagerChanged(event);
 		}
 	}
@@ -909,7 +911,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * not yet computed, then this completes in <code>O(nn)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @return The map of triggers (<code>TriggerSequence</code>) to
 	 *         bindings (<code>Binding</code>) which are currently active.
 	 *         This value may be <code>null</code> if there are no active
@@ -933,7 +935,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * not yet computed, then this completes in <code>O(nn)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @return The map of fully-parameterized commands (<code>ParameterizedCommand</code>)
 	 *         to triggers (<code>TriggerSequence</code>) which are
 	 *         currently active. This value may be <code>null</code> if there
@@ -957,7 +959,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @return A map of trigger (<code>TriggerSequence</code>) to bindings (
 	 *         <code>Collection</code> containing <code>Binding</code>).
 	 *         This map may be empty, but it is never <code>null</code>.
@@ -1018,7 +1020,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @return A map of trigger (<code>TriggerSequence</code>) to bindings (
 	 *         <code>Collection</code> containing <code>Binding</code>).
 	 *         This map may be empty, but it is never <code>null</code>.
@@ -1082,7 +1084,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @return All of the active bindings (<code>Binding</code>), not sorted
 	 *         in any fashion. This collection may be empty, but it is never
 	 *         <code>null</code>.
@@ -1114,7 +1116,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * not yet computed, then this completes in <code>O(nn)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param parameterizedCommand
 	 *            The fully-parameterized command whose bindings are requested.
 	 *            This argument may be <code>null</code>.
@@ -1146,7 +1148,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * not yet computed, then this completes in <code>O(nn)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param parameterizedCommand
 	 *            The fully-parameterized command whose bindings are requested.
 	 *            This argument may be <code>null</code>.
@@ -1177,7 +1179,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * not yet computed, then this completes in <code>O(nn)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param commandId
 	 *            The identifier of the command whose bindings are requested.
 	 *            This argument may be <code>null</code>. It is assumed that
@@ -1196,7 +1198,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * A variation on {@link BindingManager#getActiveBindingsFor(String)} that
 	 * returns an array of bindings, rather than trigger sequences. This method
 	 * is needed for doing "best" calculations on the active bindings.
-	 *
+	 * 
 	 * @param commandId
 	 *            The identifier of the command for which the active bindings
 	 *            should be retrieved; must not be <code>null</code>.
@@ -1232,7 +1234,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return The active scheme; may be <code>null</code> if there is no
 	 *         active scheme. If a scheme is returned, it is guaranteed to be
 	 *         defined.
@@ -1250,7 +1252,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * most on various concepts of "length", as well as giving some modifier
 	 * keys preference (e.g., <code>Alt</code> is less likely to appear than
 	 * <code>Ctrl</code>).
-	 *
+	 * 
 	 * @param commandId
 	 *            The identifier of the command for which the best active
 	 *            binding should be retrieved; must not be <code>null</code>.
@@ -1262,7 +1264,7 @@ public final class BindingManager extends HandleObjectManager implements
 	public final TriggerSequence getBestActiveBindingFor(final String commandId) {
 		return getBestActiveBindingFor(new ParameterizedCommand(commandManager.getCommand(commandId), null));
 	}
-
+	
 	/**
 	 * @param command
 	 * @return
@@ -1369,7 +1371,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * based most on various concepts of "length", as well as giving some
 	 * modifier keys preference (e.g., <code>Alt</code> is less likely to
 	 * appear than <code>Ctrl</code>).
-	 *
+	 * 
 	 * @param commandId
 	 *            The identifier of the command for which the best active
 	 *            binding should be retrieved; must not be <code>null</code>.
@@ -1393,7 +1395,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return The array of all bindings. This value may be <code>null</code>
 	 *         and it may be empty.
 	 */
@@ -1414,7 +1416,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return The array of defined schemes; this value may be empty or
 	 *         <code>null</code>.
 	 */
@@ -1431,7 +1433,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return The active locale; never <code>null</code>.
 	 */
 	public final String getLocale() {
@@ -1448,7 +1450,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * currently computed, then this completes in <code>O(n)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param trigger
 	 *            The prefix to look for; must not be <code>null</code>.
 	 * @return A map of triggers (<code>TriggerSequence</code>) to bindings (<code>Binding</code>).
@@ -1473,7 +1475,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * currently computed, then this completes in <code>O(n)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param trigger
 	 *            The trigger to match; may be <code>null</code>.
 	 * @return The binding that matches, if any; <code>null</code> otherwise.
@@ -1490,7 +1492,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return The active platform; never <code>null</code>.
 	 */
 	public final String getPlatform() {
@@ -1506,7 +1508,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * not yet computed, then this completes in <code>O(n)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @return A map of prefixes (<code>TriggerSequence</code>) to a map of
 	 *         available completions (possibly <code>null</code>, which means
 	 *         there is an exact match). The available completions is a map of
@@ -1530,7 +1532,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in amortized <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param schemeId
 	 *            The identifier for the scheme to retrieve; must not be
 	 *            <code>null</code>.
@@ -1557,7 +1559,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the height of the context tree.
 	 * </p>
-	 *
+	 * 
 	 * @param schemeId
 	 *            The id of the scheme for which the parents should be found;
 	 *            may be <code>null</code>.
@@ -1592,7 +1594,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * currently computed, then this completes in <code>O(n)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param trigger
 	 *            The sequence which should be the prefix for some binding;
 	 *            should not be <code>null</code>.
@@ -1613,7 +1615,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * currently computed, then this completes in <code>O(n)</code>, where
 	 * <code>n</code> is the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param trigger
 	 *            The sequence which should match exactly; should not be
 	 *            <code>null</code>.
@@ -1633,7 +1635,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of active locales.
 	 * </p>
-	 *
+	 * 
 	 * @param binding
 	 *            The binding with which to test; must not be <code>null</code>.
 	 * @return <code>true</code> if the binding's locale matches;
@@ -1647,8 +1649,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String localString : locales) {
-			if (Util.equals(localString, locale)) {
+		for (int i = 0; i < locales.length; i++) {
+			if (Util.equals(locales[i], locale)) {
 				matches = true;
 				break;
 			}
@@ -1666,7 +1668,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of active platforms.
 	 * </p>
-	 *
+	 * 
 	 * @param binding
 	 *            The binding with which to test; must not be <code>null</code>.
 	 * @return <code>true</code> if the binding's platform matches;
@@ -1680,8 +1682,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String platformString : platforms) {
-			if (Util.equals(platformString, platform)) {
+		for (int i = 0; i < platforms.length; i++) {
+			if (Util.equals(platforms[i], platform)) {
 				matches = true;
 				break;
 			}
@@ -1733,12 +1735,13 @@ public final class BindingManager extends HandleObjectManager implements
 			existingCache = bindingCache;
 			cachedBindings.put(existingCache, existingCache);
 		}
-		if (existingCache.isInitialized()) {
+		Map commandIdsByTrigger = existingCache.getBindingsByTrigger();
+		if (commandIdsByTrigger != null) {
 			if (DEBUG) {
 				Tracing.printTrace("BINDINGS", "Cache hit"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			setActiveBindings(existingCache.getBindingsByTrigger(), existingCache.getTriggersByCommandId(),
-					existingCache.getPrefixTable(),
+			setActiveBindings(commandIdsByTrigger, existingCache
+					.getTriggersByCommandId(), existingCache.getPrefixTable(),
 					existingCache.getConflictsByTrigger());
 			return;
 		}
@@ -1749,22 +1752,18 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		// Compute the active bindings.
-		final Map commandIdsByTrigger = new HashMap();
+		commandIdsByTrigger = new HashMap();
 		final Map triggersByParameterizedCommand = new HashMap();
 		final Map conflictsByTrigger = new HashMap();
 		computeBindings(activeContextTree, commandIdsByTrigger,
 				triggersByParameterizedCommand, conflictsByTrigger);
-		final Map newPrefixTable = buildPrefixTable(commandIdsByTrigger);
-
-		// init cache
 		existingCache.setBindingsByTrigger(commandIdsByTrigger);
 		existingCache.setTriggersByCommandId(triggersByParameterizedCommand);
 		existingCache.setConflictsByTrigger(conflictsByTrigger);
-		existingCache.setPrefixTable(newPrefixTable);
-
 		setActiveBindings(commandIdsByTrigger, triggersByParameterizedCommand,
-				newPrefixTable,
+				buildPrefixTable(commandIdsByTrigger),
 				conflictsByTrigger);
+		existingCache.setPrefixTable(prefixTable);
 	}
 
 	/**
@@ -1776,7 +1775,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param binding
 	 *            The binding to be removed; must not be <code>null</code>.
 	 * @since 3.2
@@ -1812,7 +1811,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in amortized <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */
@@ -1830,7 +1829,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param sequence
 	 *            The sequence to match; may be <code>null</code>.
 	 * @param schemeId
@@ -1846,7 +1845,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 *            Currently ignored.
 	 * @param type
 	 *            The type to look for.
-	 *
+	 * 
 	 */
 	public final void removeBindings(final TriggerSequence sequence,
 			final String schemeId, final String contextId, final String locale,
@@ -1889,7 +1888,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param bindings
 	 *            The bindings from which the deleted items should be removed.
 	 *            This array should not be <code>null</code>, but may be
@@ -1983,7 +1982,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param bindings
 	 *            The bindings which all match the same trigger sequence; must
 	 *            not be <code>null</code>, and should contain at least two
@@ -2111,7 +2110,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method calls out to listeners, and so the time it takes to complete
 	 * is dependent on third-party code.
 	 * </p>
-	 *
+	 * 
 	 * @param schemeEvent
 	 *            An event describing the change in the scheme.
 	 */
@@ -2148,7 +2147,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * Sets the active bindings and the prefix table. This ensures that the two
 	 * values change at the same time, and that any listeners are notified
 	 * appropriately.
-	 *
+	 * 
 	 * @param activeBindings
 	 *            This is a map of triggers ( <code>TriggerSequence</code>)
 	 *            to bindings (<code>Binding</code>). This value will only
@@ -2185,7 +2184,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * Provides the current conflicts in the bindings as a Map The key will
 	 * be {@link TriggerSequence} and the value will be the {@link Collection} of
 	 * {@link Binding}
-	 *
+	 * 
 	 * @return Read-only {@link Map} of the current conflicts. If no conflicts,
 	 *         then return an empty map. Never <code>null</code>
 	 * @since 3.5
@@ -2195,13 +2194,13 @@ public final class BindingManager extends HandleObjectManager implements
 			return Collections.EMPTY_MAP;
 		return Collections.unmodifiableMap(currentConflicts);
 	}
-
+	
 	/**
-	 * Provides the current conflicts in the keybindings for the given
+	 * Provides the current conflicts in the keybindings for the given 
 	 * TriggerSequence as a {@link Collection} of {@link Binding}
-	 *
+	 * 
 	 * @param sequence The sequence for which conflict info is required
-	 *
+	 * 
 	 * @return Collection of KeyBinding. If no conflicts,
 	 *         then returns a <code>null</code>
 	 * @since 3.5
@@ -2220,7 +2219,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the height of the context tree.
 	 * </p>
-	 *
+	 * 
 	 * @param scheme
 	 *            The scheme to become active; must not be <code>null</code>.
 	 * @throws NotDefinedException
@@ -2261,7 +2260,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(n)</code>, where <code>n</code> is
 	 * the number of bindings.
 	 * </p>
-	 *
+	 * 
 	 * @param bindings
 	 *            The new array of bindings; may be <code>null</code>. This
 	 *            set is copied into a local data structure.
@@ -2270,7 +2269,8 @@ public final class BindingManager extends HandleObjectManager implements
 		if (bindings != null) {
 			// discard bindings not applicable for this platform
 			List newList = new ArrayList();
-			for (Binding binding : bindings) {
+			for (int i = 0; i < bindings.length; i++) {
+				Binding binding = bindings[i];
 				String p = binding.getPlatform();
 				if (p == null) {
 					newList.add(binding);
@@ -2305,7 +2305,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param locale
 	 *            The new locale; must not be <code>null</code>.
 	 * @see Locale#getDefault()
@@ -2335,7 +2335,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * <p>
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param platform
 	 *            The new platform; must not be <code>null</code>.
 	 * @see org.eclipse.swt.SWT#getPlatform()

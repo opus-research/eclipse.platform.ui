@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ package org.eclipse.ui.commands;
  * <p>
  * This interface may be implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see CategoryEvent
  * @see org.eclipse.ui.commands.ICategory#addCategoryListener(ICategoryListener)
@@ -36,7 +36,7 @@ public interface ICategoryListener {
      * Notifies that one or more attributes of an instance of
      * <code>ICategory</code> have changed. Specific details are described in
      * the <code>CategoryEvent</code>.
-     *
+     * 
      * @param categoryEvent
      *            the category event. Guaranteed not to be <code>null</code>.
      */

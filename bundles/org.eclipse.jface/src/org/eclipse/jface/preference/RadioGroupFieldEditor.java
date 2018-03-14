@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -66,13 +68,13 @@ public class RadioGroupFieldEditor extends FieldEditor {
     private boolean useGroup;
 
     /**
-     * Creates a new radio group field editor
+     * Creates a new radio group field editor 
      */
     protected RadioGroupFieldEditor() {
     }
 
     /**
-     * Creates a radio group field editor.
+     * Creates a radio group field editor.  
      * This constructor does not use a <code>Group</code> to contain the radio buttons.
      * It is equivalent to using the following constructor with <code>false</code>
      * for the <code>useGroup</code> argument.
@@ -85,10 +87,10 @@ public class RadioGroupFieldEditor extends FieldEditor {
      *				{"Open Browser", "open"},
      *				{"Expand Tree", "expand"}
      *			},
-     *          parent);
+     *          parent);	
      * </pre>
      * </p>
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param numColumns the number of columns for the radio button presentation
@@ -113,10 +115,10 @@ public class RadioGroupFieldEditor extends FieldEditor {
      *				{"Expand Tree", "expand"}
      *			},
      *          parent,
-     *          true);
+     *          true);	
      * </pre>
      * </p>
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param numColumns the number of columns for the radio button presentation
@@ -145,7 +147,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
     }
 
     /**
-     * Checks whether given <code>String[][]</code> is of "type"
+     * Checks whether given <code>String[][]</code> is of "type" 
      * <code>String[][2]</code>.
      * @param table
      *
@@ -155,7 +157,8 @@ public class RadioGroupFieldEditor extends FieldEditor {
         if (table == null) {
 			return false;
 		}
-        for (String[] array : table) {
+        for (int i = 0; i < table.length; i++) {
+            String[] array = table[i];
             if (array == null || array.length != 2) {
 				return false;
 			}
@@ -249,17 +252,23 @@ public class RadioGroupFieldEditor extends FieldEditor {
                 radio.setText(labelAndValue[0]);
                 radio.setData(labelAndValue[1]);
                 radio.setFont(font);
-                radio.addSelectionListener(widgetSelectedAdapter(event -> {
-				    String oldValue = value;
-				    value = (String) event.widget.getData();
-				    setPresentsDefaultValue(false);
-				    fireValueChanged(VALUE, oldValue, value);
-				}));
+                radio.addSelectionListener(new SelectionAdapter() {
+                    @Override
+					public void widgetSelected(SelectionEvent event) {
+                        String oldValue = value;
+                        value = (String) event.widget.getData();
+                        setPresentsDefaultValue(false);
+                        fireValueChanged(VALUE, oldValue, value);
+                    }
+                });
             }
-            radioBox.addDisposeListener(event -> {
-			    radioBox = null;
-			    radioButtons = null;
-			});
+            radioBox.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    radioBox = null;
+                    radioButtons = null;
+                }
+            });
         } else {
             checkParent(radioBox, parent);
         }
@@ -292,7 +301,8 @@ public class RadioGroupFieldEditor extends FieldEditor {
 
         if (this.value != null) {
             boolean found = false;
-            for (Button radio : radioButtons) {
+            for (int i = 0; i < radioButtons.length; i++) {
+                Button radio = radioButtons[i];
                 boolean selection = false;
                 if (((String) radio.getData()).equals(this.value)) {
                     selection = true;
@@ -322,8 +332,8 @@ public class RadioGroupFieldEditor extends FieldEditor {
         if (!useGroup) {
 			super.setEnabled(enabled, parent);
 		}
-        for (Button radioButton : radioButtons) {
-            radioButton.setEnabled(enabled);
+        for (int i = 0; i < radioButtons.length; i++) {
+            radioButtons[i].setEnabled(enabled);
         }
 
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Benjamin Cabe (benjamin.cabe@anyware-tech.com) - patch (see Bugzilla #255466)
+ *     Benjamin Cabe (benjamin.cabe@anyware-tech.com) - patch (see Bugzilla #255466) 
  ******************************************************************************/
 
 package org.eclipse.ui.internal.forms;
@@ -24,7 +24,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Composite;
@@ -43,10 +42,10 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 public class MessageManager implements IMessageManager {
 	private static final DefaultPrefixProvider DEFAULT_PREFIX_PROVIDER = new DefaultPrefixProvider();
-	private ArrayList<Message> messages = new ArrayList<>();
-	private ArrayList<Message> oldMessages;
-	private Hashtable<Control, ControlDecorator> decorators = new Hashtable<>();
-	private Hashtable<Object, ControlDecorator> oldDecorators;
+	private ArrayList messages = new ArrayList();
+	private ArrayList oldMessages;
+	private Hashtable decorators = new Hashtable();
+	private Hashtable oldDecorators;
 	private boolean autoUpdate = true;
 	private Form form;
 	private IMessagePrefixProvider prefixProvider = DEFAULT_PREFIX_PROVIDER;
@@ -84,7 +83,7 @@ public class MessageManager implements IMessageManager {
 			this.type = type;
 			this.data = data;
 		}
-
+		
 		private Message(Message message) {
 			this.key = message.key;
 			this.message = message.message;
@@ -94,37 +93,60 @@ public class MessageManager implements IMessageManager {
 			this.control = message.control;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.dialogs.IMessage#getKey()
+		 */
 		public Object getKey() {
 			return key;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
+		 */
 		public String getMessage() {
 			return message;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
+		 */
 		public int getMessageType() {
 			return type;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.forms.messages.IMessage#getControl()
+		 */
 		public Control getControl() {
 			return control;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.forms.messages.IMessage#getData()
+		 */
 		public Object getData() {
 			return data;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.forms.messages.IMessage#getPrefix()
+		 */
 		public String getPrefix() {
 			return prefix;
 		}
-
-		@Override
+		
 		public boolean equals(Object obj) {
 			if (!(obj instanceof Message))
 				return false;
@@ -139,7 +161,6 @@ public class MessageManager implements IMessageManager {
 
 	static class DefaultPrefixProvider implements IMessagePrefixProvider {
 
-		@Override
 		public String getPrefix(Control c) {
 			Composite parent = c.getParent();
 			Control[] siblings = parent.getChildren();
@@ -172,19 +193,18 @@ public class MessageManager implements IMessageManager {
 
 	class ControlDecorator {
 		private ControlDecoration decoration;
-		private ArrayList<Message> controlMessages = new ArrayList<>();
+		private ArrayList controlMessages = new ArrayList();
 		private String prefix;
 
 		ControlDecorator(Control control) {
 			this.decoration = new ControlDecoration(control, decorationPosition, form.getBody());
 		}
-
+		
 		private ControlDecorator (ControlDecorator cd) {
 			this.decoration = cd.decoration;
 			this.prefix = cd.prefix;
-			for (Message message : cd.controlMessages) {
-				this.controlMessages.add(new Message(message));
-			}
+			for (Iterator i = cd.controlMessages.iterator(); i.hasNext();)
+				this.controlMessages.add(new Message((Message)i.next()));
 		}
 
 		public boolean isDisposed() {
@@ -219,7 +239,7 @@ public class MessageManager implements IMessageManager {
 				prefix = ""; //$NON-NLS-1$
 		}
 
-		void addAll(ArrayList<Message> target) {
+		void addAll(ArrayList target) {
 			target.addAll(controlMessages);
 		}
 
@@ -255,8 +275,8 @@ public class MessageManager implements IMessageManager {
 				decoration.setDescriptionText(null);
 				decoration.hide();
 			} else {
-				ArrayList<Message> peers = createPeers(controlMessages);
-				int type = peers.get(0).getMessageType();
+				ArrayList peers = createPeers(controlMessages);
+				int type = ((IMessage) peers.get(0)).getMessageType();
 				String description = createDetails(createPeers(peers), true);
 				if (type == IMessageProvider.ERROR)
 					decoration.setImage(standardError.getImage());
@@ -268,8 +288,7 @@ public class MessageManager implements IMessageManager {
 				decoration.show();
 			}
 		}
-
-		@Override
+		
 		public boolean equals(Object obj) {
 			if (!(obj instanceof ControlDecorator))
 				return false;
@@ -278,7 +297,7 @@ public class MessageManager implements IMessageManager {
 				return false;
 			return cd.getPrefix().equals(getPrefix());
 		}
-
+		
 		boolean hasSameMessages(ControlDecorator cd) {
 			if (cd.controlMessages.size() != controlMessages.size())
 				return false;
@@ -291,7 +310,7 @@ public class MessageManager implements IMessageManager {
 	/**
 	 * Creates a new instance of the message manager that will work with the
 	 * provided form.
-	 *
+	 * 
 	 * @param scrolledForm
 	 *            the form to control
 	 */
@@ -302,7 +321,7 @@ public class MessageManager implements IMessageManager {
 	/**
 	 * Creates a new instance of the message manager that will work with the
 	 * provided form.
-	 *
+	 * 
 	 * @param form
 	 *            the form to control
 	 * @since org.eclipse.ui.forms 3.4
@@ -311,17 +330,27 @@ public class MessageManager implements IMessageManager {
 		this.form = form;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object,
+	 *      java.lang.String, int)
+	 */
 	public void addMessage(Object key, String messageText, Object data, int type) {
 		addMessage(null, key, messageText, data, type, messages);
 		if (isAutoUpdate())
 			updateForm();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object,
+	 *      java.lang.String, int, org.eclipse.swt.widgets.Control)
+	 */
 	public void addMessage(Object key, String messageText, Object data,
 			int type, Control control) {
-		ControlDecorator dec = decorators.get(control);
+		ControlDecorator dec = (ControlDecorator) decorators.get(control);
 
 		if (dec == null) {
 			dec = new ControlDecorator(control);
@@ -332,7 +361,11 @@ public class MessageManager implements IMessageManager {
 			updateForm();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object)
+	 */
 	public void removeMessage(Object key) {
 		Message message = findMessage(key, messages);
 		if (message != null) {
@@ -342,7 +375,11 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#removeMessages()
+	 */
 	public void removeMessages() {
 		if (!messages.isEmpty()) {
 			messages.clear();
@@ -351,9 +388,14 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object,
+	 *      org.eclipse.swt.widgets.Control)
+	 */
 	public void removeMessage(Object key, Control control) {
-		ControlDecorator dec = decorators.get(control);
+		ControlDecorator dec = (ControlDecorator) decorators.get(control);
 		if (dec == null)
 			return;
 		if (dec.removeMessage(key))
@@ -361,9 +403,13 @@ public class MessageManager implements IMessageManager {
 				updateForm();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#removeMessages(org.eclipse.swt.widgets.Control)
+	 */
 	public void removeMessages(Control control) {
-		ControlDecorator dec = decorators.get(control);
+		ControlDecorator dec = (ControlDecorator) decorators.get(control);
 		if (dec != null) {
 			if (dec.removeMessages()) {
 				if (isAutoUpdate())
@@ -372,11 +418,15 @@ public class MessageManager implements IMessageManager {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#removeAllMessages()
+	 */
 	public void removeAllMessages() {
 		boolean needsUpdate = false;
-		for (Enumeration<ControlDecorator> enm = decorators.elements(); enm.hasMoreElements();) {
-			ControlDecorator control = enm.nextElement();
+		for (Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
+			ControlDecorator control = (ControlDecorator) enm.nextElement();
 			if (control.removeMessages())
 				needsUpdate = true;
 		}
@@ -391,8 +441,9 @@ public class MessageManager implements IMessageManager {
 	/*
 	 * Adds the message if it does not already exist in the provided list.
 	 */
+
 	private Message addMessage(String prefix, Object key, String messageText,
-			Object data, int type, ArrayList<Message> list) {
+			Object data, int type, ArrayList list) {
 		Message message = findMessage(key, list);
 		if (message == null) {
 			message = new Message(key, messageText, type, data);
@@ -409,19 +460,25 @@ public class MessageManager implements IMessageManager {
 	/*
 	 * Finds the message with the provided key in the provided list.
 	 */
-	private Message findMessage(Object key, ArrayList<Message> list) {
+
+	private Message findMessage(Object key, ArrayList list) {
 		for (int i = 0; i < list.size(); i++) {
-			Message message = list.get(i);
+			Message message = (Message) list.get(i);
 			if (message.getKey().equals(key))
 				return message;
 		}
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#update()
+	 */
 	public void update() {
 		// Update decorations
-		for (ControlDecorator dec : decorators.values()) {
+		for (Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+			ControlDecorator dec = (ControlDecorator) iter.next();
 			dec.update();
 		}
 		// Update the form
@@ -431,36 +488,38 @@ public class MessageManager implements IMessageManager {
 	/*
 	 * Updates the container by rolling the messages up from the controls.
 	 */
+
 	private void updateForm() {
-		ArrayList<Message> mergedList = new ArrayList<>();
+		ArrayList mergedList = new ArrayList();
 		mergedList.addAll(messages);
-		for (Enumeration<ControlDecorator> enm = decorators.elements(); enm.hasMoreElements();) {
-			ControlDecorator dec = enm.nextElement();
+		for (Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
+			ControlDecorator dec = (ControlDecorator) enm.nextElement();
 			dec.addAll(mergedList);
 		}
 		update(mergedList);
 	}
 
-	private void update(ArrayList<Message> mergedList) {
+	private void update(ArrayList mergedList) {
 		pruneControlDecorators();
 		if (form.getHead().getBounds().height == 0 || mergedList.isEmpty() || mergedList == null) {
 			form.setMessage(null, IMessageProvider.NONE);
 			return;
 		}
-		ArrayList<Message> peers = createPeers(mergedList);
-		int maxType = peers.get(0).getMessageType();
+		ArrayList peers = createPeers(mergedList);
+		int maxType = ((IMessage) peers.get(0)).getMessageType();
 		String messageText;
-		IMessage[] array = peers.toArray(new IMessage[peers.size()]);
-		if (peers.size() == 1 && peers.get(0).prefix == null) {
+		IMessage[] array = (IMessage[]) peers
+				.toArray(new IMessage[peers.size()]);
+		if (peers.size() == 1 && ((Message) peers.get(0)).prefix == null) {
 			// a single message
-			IMessage message = peers.get(0);
+			IMessage message = (IMessage) peers.get(0);
 			messageText = message.getMessage();
 			form.setMessage(messageText, maxType, array);
 		} else {
 			// show a summary message for the message
 			// and list of errors for the details
 			if (peers.size() > 1)
-				messageText = NLS.bind(
+				messageText = Messages.bind(
 						MULTIPLE_MESSAGE_SUMMARY_KEYS[maxType],
 						new String[] { peers.size() + "" }); //$NON-NLS-1$
 			else
@@ -475,11 +534,11 @@ public class MessageManager implements IMessageManager {
 		return message.getPrefix() + message.getMessage();
 	}
 
-	private ArrayList<Message> createPeers(ArrayList<Message> messages) {
-		ArrayList<Message> peers = new ArrayList<>();
+	private ArrayList createPeers(ArrayList messages) {
+		ArrayList peers = new ArrayList();
 		int maxType = 0;
 		for (int i = 0; i < messages.size(); i++) {
-			Message message = messages.get(i);
+			Message message = (Message) messages.get(i);
 			if (message.type > maxType) {
 				peers.clear();
 				maxType = message.type;
@@ -490,14 +549,14 @@ public class MessageManager implements IMessageManager {
 		return peers;
 	}
 
-	private String createDetails(ArrayList<Message> messages, boolean excludePrefix) {
+	private String createDetails(ArrayList messages, boolean excludePrefix) {
 		StringWriter sw = new StringWriter();
 		PrintWriter out = new PrintWriter(sw);
 
 		for (int i = 0; i < messages.size(); i++) {
 			if (i > 0)
 				out.println();
-			IMessage m = messages.get(i);
+			IMessage m = (IMessage) messages.get(i);
 			out.print(excludePrefix ? m.getMessage() : getFullMessage(m));
 		}
 		out.flush();
@@ -519,51 +578,81 @@ public class MessageManager implements IMessageManager {
 		return sw.toString();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#createSummary(org.eclipse.ui.forms.IMessage[])
+	 */
 	public String createSummary(IMessage[] messages) {
 		return createDetails(messages);
 	}
 
 	private void pruneControlDecorators() {
-		for (Iterator<ControlDecorator> iter = decorators.values().iterator(); iter.hasNext();) {
-			ControlDecorator dec = iter.next();
+		for (Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+			ControlDecorator dec = (ControlDecorator) iter.next();
 			if (dec.isDisposed())
 				iter.remove();
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#getMessagePrefixProvider()
+	 */
 	public IMessagePrefixProvider getMessagePrefixProvider() {
 		return prefixProvider;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#setMessagePrefixProvider(org.eclipse.ui.forms.IMessagePrefixProvider)
+	 */
 	public void setMessagePrefixProvider(IMessagePrefixProvider provider) {
 		this.prefixProvider = provider;
-		for (ControlDecorator dec : decorators.values()) {
+		for (Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+			ControlDecorator dec = (ControlDecorator) iter.next();
 			dec.updatePrefix();
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#getDecorationPosition()
+	 */
 	public int getDecorationPosition() {
 		return decorationPosition;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#setDecorationPosition(int)
+	 */
 	public void setDecorationPosition(int position) {
 		this.decorationPosition = position;
-		for (ControlDecorator dec : decorators.values()) {
+		for (Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+			ControlDecorator dec = (ControlDecorator) iter.next();
 			dec.updatePosition();
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#isAutoUpdate()
+	 */
 	public boolean isAutoUpdate() {
 		return autoUpdate;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.IMessageManager#setAutoUpdate(boolean)
+	 */
 	public void setAutoUpdate(boolean autoUpdate) {
 		boolean needsCaching = this.autoUpdate && !autoUpdate;
 		boolean needsUpdate = !this.autoUpdate && autoUpdate;
@@ -571,17 +660,17 @@ public class MessageManager implements IMessageManager {
 		if (needsUpdate && isCacheChanged())
 			update();
 		if (needsCaching) {
-			oldMessages = new ArrayList<>();
-			for (Message message : messages)
-				oldMessages.add(new Message(message));
-			oldDecorators = new Hashtable<>();
-			for (Enumeration<Control> e = decorators.keys(); e.hasMoreElements();) {
+			oldMessages = new ArrayList();
+			for (Iterator i = messages.iterator(); i.hasNext();)
+				oldMessages.add(new Message((Message)i.next()));
+			oldDecorators = new Hashtable();
+			for (Enumeration e = decorators.keys(); e.hasMoreElements();) {
 				Object key = e.nextElement();
-				oldDecorators.put(key, new ControlDecorator(decorators.get(key)));
+				oldDecorators.put(key, new ControlDecorator((ControlDecorator)decorators.get(key)));
 			}
 		}
 	}
-
+	
 	private boolean isCacheChanged() {
 		boolean result = false;
 		result = checkMessageCache() || checkDecoratorCache();
@@ -591,7 +680,7 @@ public class MessageManager implements IMessageManager {
 		oldDecorators = null;
 		return result;
 	}
-
+	
 	private boolean checkMessageCache() {
 		if (oldMessages == null)
 			return false;
@@ -601,13 +690,14 @@ public class MessageManager implements IMessageManager {
 			return true;
 		return false;
 	}
-
+	
 	private boolean checkDecoratorCache() {
 		if (oldDecorators == null)
 			return false;
-		for (Entry<Control, ControlDecorator> next : decorators.entrySet()) {
-			ControlDecorator cd = next.getValue();
-			ControlDecorator oldCd = oldDecorators.get(cd.decoration.getControl());
+		for (Iterator i = decorators.entrySet().iterator(); i.hasNext();) {
+			Entry next = (Entry)i.next();
+			ControlDecorator cd = (ControlDecorator)next.getValue();
+			ControlDecorator oldCd = (ControlDecorator) oldDecorators.get(cd.decoration.getControl());
 			if ((oldCd == null && cd.controlMessages.size() > 0) || (oldCd != null && !cd.hasSameMessages(oldCd)))
 				return true;
 		}

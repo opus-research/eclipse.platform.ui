@@ -28,9 +28,8 @@ public class CleanupProcessor {
 		// prevent multiple copies
 		for (MAddon addon : addons) {
 			if (addon.getContributionURI()
-					.contains("ui.workbench.addons.cleanupaddon.CleanupAddon")) {
+					.contains("ui.workbench.addons.cleanupaddon.CleanupAddon")) //$NON-NLS-1$
 				return;
-			}
 		}
 
 		// adds the add-on to the application model

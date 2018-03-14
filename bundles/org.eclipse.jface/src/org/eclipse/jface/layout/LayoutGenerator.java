@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474061
  *******************************************************************************/
 package org.eclipse.jface.layout;
 import org.eclipse.jface.util.Geometry;
@@ -20,7 +19,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Scrollable;
 
 /* package */class LayoutGenerator {
@@ -45,14 +43,16 @@ import org.eclipse.swt.widgets.Scrollable;
      * Generates a GridLayout for the given composite by examining its child
      * controls and attaching layout data to any immediate children that do not
      * already have layout data.
-     *
+     * 
      * @param toGenerate
      *            composite to generate a layout for
      */
     public static void generateLayout(Composite toGenerate) {
         Control[] children = toGenerate.getChildren();
 
-        for (Control control : children) {
+        for (int i = 0; i < children.length; i++) {
+            Control control = children[i];
+
             // Skip any children that already have layout data
             if (control.getLayoutData() != null) {
                 continue;
@@ -65,7 +65,7 @@ import org.eclipse.swt.widgets.Scrollable;
     private static void applyLayoutDataTo(Control control) {
     	defaultsFor(control).applyTo(control);
     }
-
+    
     /**
      * Creates default factory for this control types:
      * <ul>
@@ -98,7 +98,9 @@ import org.eclipse.swt.widgets.Scrollable;
                     boolean growsVertically = false;
 
                     Control[] children = composite.getChildren();
-                    for (Control child : children) {
+                    for (int i = 0; i < children.length; i++) {
+                        Control child = children[i];
+
                         GridData data = (GridData) child.getLayoutData();
 
                         if (data != null) {
@@ -117,12 +119,6 @@ import org.eclipse.swt.widgets.Scrollable;
         }
 
         boolean wrapping = hasStyle(control, SWT.WRAP);
-
-		// Links are always wrapping, even though they don't use the SWT.WRAP
-		// flag
-		if (control instanceof Link) {
-			wrapping = true;
-		}
 
         // Assume any control with the H_SCROLL or V_SCROLL flags are
         // horizontally or vertically

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ public interface IWorkingCopyManager {
 	 * Return a working copy instance based on the given preference node. If a
 	 * working copy already exists then return it, otherwise create one and keep
 	 * track of it for other clients who are looking for it.
-	 *
+	 * 
 	 * @param original
 	 *            the original node
 	 * @return the working copy node
@@ -36,7 +36,7 @@ public interface IWorkingCopyManager {
 	 * preference nodes. Alternatively, if a client wishes to apply the changes
 	 * for a single working copy they can call <code>#flush</code> on that
 	 * working copy node.
-	 *
+	 * 
 	 * @throws BackingStoreException
 	 *             if there were problems accessing the backing store
 	 */

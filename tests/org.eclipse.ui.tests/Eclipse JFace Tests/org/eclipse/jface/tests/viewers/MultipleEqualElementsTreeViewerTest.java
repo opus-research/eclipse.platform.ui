@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
@@ -155,7 +156,9 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		getTreeViewer().expandToLevel(element_1, AbstractTreeViewer.ALL_LEVELS);
 		getTreeViewer().expandToLevel(element_2, AbstractTreeViewer.ALL_LEVELS);
 		getTreeViewer().setSelection(new StructuredSelection(element_1_3));
-		ITreeSelection treeSelection = getTreeViewer().getStructuredSelection();
+		ISelection selection = getTreeViewer().getSelection();
+		assertTrue(selection instanceof ITreeSelection);
+		ITreeSelection treeSelection = (ITreeSelection) selection;
 		assertEquals(new TreeSelection(new TreePath(new Object[] { element_1,
 				element_1_3 }), null), treeSelection);
 		Widget[] items = getTreeViewer().testFindItems(element_2_1_2);
@@ -166,7 +169,7 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 			assertNotNull(treeItem);
 		}
 		getTreeViewer().getTree().setSelection(treeItems);
-		treeSelection = getTreeViewer().getStructuredSelection();
+		treeSelection = (ITreeSelection) getTreeViewer().getSelection();
 		List paths = Arrays.asList(treeSelection.getPaths());
 		assertEquals(4, paths.size());
 		assertTrue(paths.contains(treePath_1_2_21_212));

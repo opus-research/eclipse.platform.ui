@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,14 +44,14 @@ public class PerspectiveExtensionReader extends RegistryReader {
 
     private static final String VAL_STACK = "stack";//$NON-NLS-1$
 
-	private static final String VAL_FAST = "fast";//$NON-NLS-1$
+    private static final String VAL_FAST = "fast";//$NON-NLS-1$
 
-	private static final String VAL_TRUE = "true";//$NON-NLS-1$
+    private static final String VAL_TRUE = "true";//$NON-NLS-1$	
 
-    // VAL_FALSE added by dan_rubel@instantiations.com
+    // VAL_FALSE added by dan_rubel@instantiations.com  
     // TODO: this logic is backwards... we should be checking for true, but
     // technically this is API now...
-    private static final String VAL_FALSE = "false";//$NON-NLS-1$
+    private static final String VAL_FALSE = "false";//$NON-NLS-1$	
 
 	private IExtensionTracker tracker;
 
@@ -64,9 +64,9 @@ public class PerspectiveExtensionReader extends RegistryReader {
 
     /**
      * Read the view extensions within a registry.
-     *
-     * @param extensionTracker the tracker
-     * @param id the id
+     * 
+     * @param extensionTracker the tracker 
+     * @param id the id 
      * @param out the layout
      */
 	public void extendLayout(IExtensionTracker extensionTracker, String id, ModeledPageLayout out) {
@@ -101,7 +101,8 @@ public class PerspectiveExtensionReader extends RegistryReader {
      */
     private boolean processExtension(IConfigurationElement element) {
         IConfigurationElement[] children = element.getChildren();
-        for (IConfigurationElement child : children) {
+        for (int nX = 0; nX < children.length; nX++) {
+            IConfigurationElement child = children[nX];
             String type = child.getName();
             if (includeTag(type)) {
                 boolean result = false;
@@ -193,7 +194,7 @@ public class PerspectiveExtensionReader extends RegistryReader {
         String moveable = element.getAttribute(IWorkbenchRegistryConstants.ATT_MOVEABLE);
         String standalone = element.getAttribute(IWorkbenchRegistryConstants.ATT_STANDALONE);
         String showTitle = element.getAttribute(IWorkbenchRegistryConstants.ATT_SHOW_TITLE);
-
+        
         // Default to 'false'
         String minVal = element.getAttribute(IWorkbenchRegistryConstants.ATT_MINIMIZED);
         boolean minimized = minVal != null && VAL_TRUE.equals(minVal);
@@ -208,13 +209,13 @@ public class PerspectiveExtensionReader extends RegistryReader {
             logMissingAttribute(element, IWorkbenchRegistryConstants.ATT_RELATIONSHIP);
             return false;
         }
-		if (!VAL_FAST.equals(relationship) && relative == null) {
-			logError(element,
-					"Attribute '" + IWorkbenchRegistryConstants.ATT_RELATIVE //$NON-NLS-1$
-							+ "' not defined.  This attribute is required when " //$NON-NLS-1$
-							+ IWorkbenchRegistryConstants.ATT_RELATIONSHIP + "=\"" + relationship + "\"."); //$NON-NLS-1$ //$NON-NLS-2$
+        if (!VAL_FAST.equals(relationship) && relative == null) {
+            logError(
+					element,
+					"Attribute '" + IWorkbenchRegistryConstants.ATT_RELATIVE + "' not defined.  This attribute is required when " + IWorkbenchRegistryConstants.ATT_RELATIONSHIP + "=\"" + relationship + "\"."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			return false;
-		}
+        }
+
         // Get the ratio.
         if (ratioString == null) {
             // The ratio has not been specified.
@@ -233,8 +234,8 @@ public class PerspectiveExtensionReader extends RegistryReader {
 
         // Get relationship details.
         boolean stack = false;
+        boolean fast = false;
         int intRelation = 0;
-		boolean fast = false;
         if (relationship.equals(VAL_LEFT)) {
 			intRelation = IPageLayout.LEFT;
 		} else if (relationship.equals(VAL_RIGHT)) {
@@ -256,7 +257,7 @@ public class PerspectiveExtensionReader extends RegistryReader {
         	// See bug 85948 [Perspectives] Adding register & expressions view by default to debug perspective fails
         	pageLayout.removePlaceholder(id);
         }
-
+        
         // If stack ..
         if (stack) {
             if (visible) {
@@ -264,16 +265,17 @@ public class PerspectiveExtensionReader extends RegistryReader {
 			} else {
 				pageLayout.stackView(id, relative, false);
 			}
-		}
-		// If the view is a fast view...
-		else if (fast) {
-			if (ratio == IPageLayout.NULL_RATIO) {
-				// The ratio has not been specified.
-				pageLayout.addFastView(id);
-			} else {
-				pageLayout.addFastView(id, ratio);
-			}
-		} else {
+        }
+
+        // If the view is a fast view...
+        else if (fast) {
+            if (ratio == IPageLayout.NULL_RATIO) {
+                // The ratio has not been specified.
+                pageLayout.addFastView(id);
+            } else {
+                pageLayout.addFastView(id, ratio);
+            }
+        } else {
 
             // The view is a regular view.
             // If the ratio is not specified or is invalid, use the default ratio.
@@ -354,13 +356,13 @@ public class PerspectiveExtensionReader extends RegistryReader {
 
     /**
      * Sets the tags to include.  All others are ignored.
-     *
+     * 
      * @param tags the tags to include
      */
     public void setIncludeOnlyTags(String[] tags) {
         includeOnlyTags = new HashSet();
-        for (String tag : tags) {
-            includeOnlyTags.add(tag);
+        for (int i = 0; i < tags.length; i++) {
+            includeOnlyTags.add(tags[i]);
         }
     }
 }

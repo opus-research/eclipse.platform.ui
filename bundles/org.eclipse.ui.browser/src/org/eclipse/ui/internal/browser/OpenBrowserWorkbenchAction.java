@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,6 @@ public class OpenBrowserWorkbenchAction implements IWorkbenchWindowActionDelegat
 	 * Disposes this action delegate.  The implementor should unhook any references
 	 * to itself so that garbage collection can occur.
 	 */
-	@Override
 	public void dispose() {
 		// do nothing
 	}
@@ -40,7 +39,6 @@ public class OpenBrowserWorkbenchAction implements IWorkbenchWindowActionDelegat
 	 *
 	 * @param window the window that provides the context for this delegate
 	 */
-	@Override
 	public void init(IWorkbenchWindow window) {
 		// do nothing
 	}
@@ -55,7 +53,6 @@ public class OpenBrowserWorkbenchAction implements IWorkbenchWindowActionDelegat
 	 * @param action the action proxy that handles the presentation portion of the
 	 *   action
 	 */
-	@Override
 	public void run(IAction action) {
 		try {
 			IWorkbenchBrowserSupport browserSupport = WebBrowserUIPlugin.getInstance().getWorkbench().getBrowserSupport();
@@ -76,7 +73,6 @@ public class OpenBrowserWorkbenchAction implements IWorkbenchWindowActionDelegat
 	 * @param action the action proxy that handles presentation portion of the action
 	 * @param selection the current selection in the workbench
 	 */
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		// do nothing
 	}

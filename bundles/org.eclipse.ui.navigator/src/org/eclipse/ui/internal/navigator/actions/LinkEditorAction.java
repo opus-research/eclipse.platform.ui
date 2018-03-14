@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,11 +14,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -40,7 +42,7 @@ import org.eclipse.ui.progress.UIJob;
 
 /**
  * This action links the activate editor with the Navigator selection.
- *
+ * 
  * @since 3.2
  */
 public class LinkEditorAction extends Action implements
@@ -56,14 +58,14 @@ public class LinkEditorAction extends Action implements
 
 	private boolean ignoreSelectionChanged;
 	private boolean ignoreEditorActivation;
-
+	
 	private UIJob activateEditorJob = new UIJob(
 			CommonNavigatorMessages.Link_With_Editor_Job_) {
 		@Override
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 
 			if (!commonViewer.getControl().isDisposed()) {
-				ISelection selection = commonViewer.getStructuredSelection();
+				ISelection selection = commonViewer.getSelection();
 				if (selection != null && !selection.isEmpty()
 						&& selection instanceof IStructuredSelection) {
 
@@ -123,7 +125,7 @@ public class LinkEditorAction extends Action implements
 
 	/**
 	 * Create a LinkEditorAction for the given navigator and viewer.
-	 *
+	 * 
 	 * @param aNavigator
 	 *            The navigator which defines whether linking is enabled and
 	 *            implements {@link ISetSelectionTarget}.
@@ -188,7 +190,7 @@ public class LinkEditorAction extends Action implements
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public void dispose() {
 		commonNavigator.removePropertyListener(this);
@@ -219,7 +221,7 @@ public class LinkEditorAction extends Action implements
 	 * Update the active editor based on the current selection in the Navigator.
 	 */
 	protected void activateEditor() {
-		ISelection selection = commonViewer.getStructuredSelection();
+		ISelection selection = commonViewer.getSelection();
 		if (selection != null && !selection.isEmpty()
 				&& selection instanceof IStructuredSelection) {
 			/*

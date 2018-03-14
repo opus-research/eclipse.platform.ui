@@ -18,7 +18,7 @@ import org.eclipse.ui.forms.events.*;
 import org.eclipse.ui.forms.widgets.*;
 /**
  * @author dejan
- *
+ * 
  * To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Generation - Code and Comments
  */
@@ -30,7 +30,6 @@ public class ThirdPage extends FormPage {
 	public ThirdPage(FormEditor editor) {
 		super(editor, "third", "Flow Page");
 	}
-	@Override
 	protected void createFormContent(IManagedForm managedForm) {
 		ScrolledForm form = managedForm.getForm();
 		//FormToolkit toolkit = managedForm.getToolkit();
@@ -132,7 +131,6 @@ public class ThirdPage extends FormPage {
 		client.setLayout(layout);
 		section.setClient(client);
 		section.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(false);
 			}

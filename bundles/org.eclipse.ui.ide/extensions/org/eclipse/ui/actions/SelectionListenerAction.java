@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431
  *******************************************************************************/
 
 package org.eclipse.ui.actions;
@@ -21,10 +21,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
 import org.eclipse.core.resources.mapping.ResourceMappingContext;
 import org.eclipse.core.resources.mapping.ResourceTraversal;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
@@ -54,7 +55,8 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * </ul>
  * </p>
  */
-public abstract class SelectionListenerAction extends BaseSelectionListenerAction {
+public abstract class SelectionListenerAction extends
+		BaseSelectionListenerAction {
 
 	/**
 	 * Indicates whether the selection has changes since <code>resources</code>
@@ -109,54 +111,85 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 		resources = null;
 		nonResources = null;
 
-		IStructuredSelection structuredSelection = getStructuredSelection();
-		// assume selection contains mostly resources most times
-		List<IResource> resourcesTmp = new ArrayList<>(structuredSelection.size());
-		List<Object> nonResourcesTmp = new ArrayList<>();
-
-		for (Iterator<?> e = structuredSelection.iterator(); e.hasNext();) {
+		for (Iterator<?> e = getStructuredSelection().iterator(); e.hasNext();) {
 			Object next = e.next();
-
-			IResource resource = Adapters.adapt(next, IResource.class);
-
-			if (resource != null) {
-				resourcesTmp.add(resource);
-				continue;
-			}
-
-			boolean resourcesFoundForThisSelection = false;
-			ResourceMapping mapping = Adapters.adapt(next, ResourceMapping.class);
-
-			if (mapping != null) {
-				ResourceTraversal[] traversals = null;
-				try {
-					traversals = mapping.getTraversals(ResourceMappingContext.LOCAL_CONTEXT, new NullProgressMonitor());
-				} catch (CoreException exception) {
-					IDEWorkbenchPlugin.log(exception.getLocalizedMessage(), exception.getStatus());
+			if (next instanceof IResource) {
+				if (resources == null) {
+					// assume selection contains mostly resources most times
+					resources = new ArrayList<IResource>(getStructuredSelection().size());
 				}
-
-				if (traversals != null) {
-					for (ResourceTraversal traversal : traversals) {
-						IResource[] traversalResources = traversal.getResources();
-						if (traversalResources != null) {
-							resourcesFoundForThisSelection = true;
-							for (IResource traversalResource : traversalResources) {
-								resourcesTmp.add(traversalResource);
-							}
-						}
+				resources.add((IResource) next);
+				continue;
+			} else if (next instanceof IAdaptable) {
+				IResource resource = ((IAdaptable) next).getAdapter(IResource.class);
+				if (resource != null) {
+					if (resources == null) {
+						// assume selection contains mostly resources most times
+						resources = new ArrayList<IResource>(getStructuredSelection()
+								.size());
 					}
+					resources.add(resource);
+					continue;
+				}
+			} else {
+
+				boolean resourcesFoundForThisSelection = false;
+
+				IAdapterManager adapterManager = Platform.getAdapterManager();
+				ResourceMapping mapping = adapterManager
+						.getAdapter(next, ResourceMapping.class);
+
+				if (mapping != null) {
+
+					ResourceTraversal[] traversals = null;
+					try {
+						traversals = mapping.getTraversals(
+								ResourceMappingContext.LOCAL_CONTEXT,
+								new NullProgressMonitor());
+					} catch (CoreException exception) {
+						IDEWorkbenchPlugin.log(exception.getLocalizedMessage(),
+								exception.getStatus());
+					}
+
+					if (traversals != null) {
+
+						for (int i = 0; i < traversals.length; i++) {
+
+							IResource[] traversalResources = traversals[i]
+									.getResources();
+
+							if (traversalResources != null) {
+
+								resourcesFoundForThisSelection = true;
+
+								if (resources == null) {
+									resources = new ArrayList<IResource>(
+											getStructuredSelection().size());
+								}
+
+								for (int j = 0; j < traversalResources.length; j++) {
+									resources.add(traversalResources[j]);
+								}// for
+
+							}// if
+
+						}// for
+
+					}// if
+
+				}// if
+
+				if (resourcesFoundForThisSelection) {
+					continue;
 				}
 			}
 
-			if (resourcesFoundForThisSelection) {
-				continue;
+			if (nonResources == null) {
+				// assume selection contains mostly resources most times
+				nonResources = new ArrayList<Object>(1);
 			}
-
-			nonResourcesTmp.add(next);
+			nonResources.add(next);
 		}
-
-		resources = resourcesTmp.isEmpty() ? null : resourcesTmp;
-		nonResources = nonResourcesTmp.isEmpty() ? null : nonResourcesTmp;
 	}
 
 	/**
@@ -165,19 +198,18 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 	 *
 	 * @return list of elements (element type: <code>Object</code>)
 	 */
-	protected List<?> getSelectedNonResources() {
+	protected List<Object> getSelectedNonResources() {
 		// recompute if selection has changed.
 		if (selectionDirty) {
 			computeResources();
 			selectionDirty = false;
 		}
 
-		List<Object> list = nonResources;
-		if (list == null) {
+		if (nonResources == null) {
 			return Collections.emptyList();
 		}
 
-		return list;
+		return nonResources;
 	}
 
 	/**
@@ -186,18 +218,17 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 	 *
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
-	protected List<? extends IResource> getSelectedResources() {
+	protected List<IResource> getSelectedResources() {
 		// recompute if selection has changed.
 		if (selectionDirty) {
 			computeResources();
 			selectionDirty = false;
 		}
 
-		List<IResource> list = resources;
-		if (list == null) {
+		if (resources == null) {
 			return Collections.emptyList();
 		}
-		return list;
+		return resources;
 	}
 
 	/**
@@ -237,7 +268,8 @@ public abstract class SelectionListenerAction extends BaseSelectionListenerActio
 			return false;
 		}
 
-		for (IResource next : getSelectedResources()) {
+		for (Iterator<?> e = getSelectedResources().iterator(); e.hasNext();) {
+			IResource next = (IResource) e.next();
 			if (!resourceIsType(next, resourceMask)) {
 				return false;
 			}

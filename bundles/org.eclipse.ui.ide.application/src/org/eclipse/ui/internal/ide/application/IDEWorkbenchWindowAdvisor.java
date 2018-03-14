@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,16 +9,14 @@
  *     IBM Corporation - initial API and implementation
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     Christian Georgi (SAP)             -  bug 432480
- *     Denis Zygann <d.zygann@web.de>      - bug 457390
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 502050
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.StringJoiner;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
@@ -30,7 +28,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
@@ -130,7 +127,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	/**
 	 * Crates a new IDE workbench window advisor.
-	 *
+	 * 
 	 * @param wbAdvisor
 	 *            the workbench advisor
 	 * @param configurer
@@ -151,7 +148,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	/**
 	 * Returns the workbench.
-	 *
+	 * 
 	 * @return the workbench
 	 */
 	private IWorkbench getWorkbench() {
@@ -171,7 +168,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	/**
 	 * Asks the user whether the workbench should really be closed. Only asks if
 	 * the preference is enabled.
-	 *
+	 * 
 	 * @param parentShell
 	 *            the parent shell to use for the confirmation dialog
 	 * @return <code>true</code> if OK to exit, <code>false</code> if the user
@@ -195,7 +192,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				parentShell.setMinimized(false);
 				parentShell.forceActive();
 			}
-
+			
 			String message;
 
 			String productName = null;
@@ -211,17 +208,12 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 						productName);
 			}
 
-			// use of LinkedHashMap to preserve insertion order
-			LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
-			buttonLabelToIdMap.put(IDEWorkbenchMessages.PromptOnExitDialog_button_label_exit, IDialogConstants.OK_ID);
-			buttonLabelToIdMap.put(IDialogConstants.CANCEL_LABEL, IDialogConstants.CANCEL_ID);
-			MessageDialogWithToggle dlg =
-					new MessageDialogWithToggle(
-							parentShell,
+			MessageDialogWithToggle dlg = MessageDialogWithToggle
+					.openOkCancelConfirm(parentShell,
 							IDEWorkbenchMessages.PromptOnExitDialog_shellTitle,
-							null,
-							message, MessageDialog.CONFIRM, buttonLabelToIdMap, 0, null, false);
-			dlg.open();
+							message,
+							IDEWorkbenchMessages.PromptOnExitDialog_choice,
+							false, null, null);
 			if (dlg.getReturnCode() != IDialogConstants.OK_ID) {
 				return false;
 			}
@@ -244,6 +236,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		// show the shortcut bar and progress indicator, which are hidden by
 		// default
 		configurer.setShowPerspectiveBar(true);
+		configurer.setShowFastViewBars(true);
 		configurer.setShowProgressIndicator(true);
 
 		// add the drag and drop support for the editor area
@@ -256,10 +249,10 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		hookTitleUpdateListeners(configurer);
 	}
-
+	
 	/**
 	 * Hooks the listeners needed on the window
-	 *
+	 * 
 	 * @param configurer
 	 */
 	private void hookTitleUpdateListeners(IWorkbenchWindowConfigurer configurer) {
@@ -352,17 +345,14 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 						// do nothing
 					}
 				});
-
+		
 		// Listen for changes of the workspace name.
 		propertyChangeListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				String property = event.getProperty();
 				if (IDEInternalPreferences.WORKSPACE_NAME.equals(property)
-						|| IDEInternalPreferences.SHOW_LOCATION.equals(property)
-						|| IDEInternalPreferences.SHOW_LOCATION_NAME.equals(property)
-						|| IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE.equals(property)
-						|| IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE.equals(property)) {
+						|| IDEInternalPreferences.SHOW_LOCATION.equals(property)) {
 					// Make sure the title is actually updated by
 					// setting last active page.
 					lastActivePage = null;
@@ -375,10 +365,6 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	private String computeTitle() {
-		StringJoiner sj = new StringJoiner(" - "); //$NON-NLS-1$
-
-		IPreferenceStore ps = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		IWorkbenchPage currentPage = configurer.getWindow().getActivePage();
 		IEditorPart activeEditor = null;
@@ -386,45 +372,54 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			activeEditor = lastActiveEditor;
 		}
 
-		// show workspace name
-		if (ps.getBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME)) {
-			String workspaceName = ps.getString(IDEInternalPreferences.WORKSPACE_NAME);
-			if (workspaceName != null && workspaceName.length() > 0) {
-				sj.add(workspaceName);
-			}
+		String title = null;
+		IProduct product = Platform.getProduct();
+		if (product != null) {
+			title = product.getName();
+		}
+		if (title == null) {
+			title = ""; //$NON-NLS-1$
 		}
 
-		// perspective name
-		if (ps.getBoolean(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE)) {
-			IPerspectiveDescriptor persp = currentPage.getPerspective();
-			if (persp != null) {
-				sj.add(persp.getLabel());
-			}
-		}
-
-		// active editor
 		if (currentPage != null) {
 			if (activeEditor != null) {
-				sj.add(activeEditor.getTitleToolTip());
+				lastEditorTitleTooltip = activeEditor.getTitleToolTip();
+				title = NLS.bind(
+						IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
+						lastEditorTitleTooltip, title);
+			}
+			IPerspectiveDescriptor persp = currentPage.getPerspective();
+			String label = ""; //$NON-NLS-1$
+			if (persp != null) {
+				label = persp.getLabel();
+			}
+			IAdaptable input = currentPage.getInput();
+			if (input != null && !input.equals(wbAdvisor.getDefaultPageInput())) {
+				label = currentPage.getLabel();
+			}
+			if (label != null && !label.equals("")) { //$NON-NLS-1$
+				title = NLS.bind(
+						IDEWorkbenchMessages.WorkbenchWindow_shellTitle, label,
+						title);
 			}
 		}
 
-		// workspace location is non null either when SHOW_LOCATION is true or
-		// when forcing -showlocation via command line
 		String workspaceLocation = wbAdvisor.getWorkspaceLocation();
 		if (workspaceLocation != null) {
-			sj.add(workspaceLocation);
+			title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
+					title, workspaceLocation);
+		}
+		
+		// Bug 284447: Prepend workspace name to the title
+		String workspaceName = IDEWorkbenchPlugin.getDefault()
+				.getPreferenceStore().getString(
+						IDEInternalPreferences.WORKSPACE_NAME);
+		if (workspaceName != null && workspaceName.length() > 0) {
+			title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
+					workspaceName, title);
 		}
 
-		// Application (product) name
-		if (ps.getBoolean(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE)) {
-			IProduct product = Platform.getProduct();
-			if (product != null) {
-				sj.add(product.getName());
-			}
-		}
-
-		return sj.toString();
+		return title;
 	}
 
 	private void recomputeTitle() {
@@ -482,7 +477,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			persp = currentPage.getPerspective();
 			input = currentPage.getInput();
 		}
-
+		
 		if (editorHidden) {
 			activeEditor = null;
 		}
@@ -556,7 +551,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	/**
 	 * Tries to open the intro, if one exists and otherwise will open the legacy
 	 * Welcome pages.
-	 *
+	 * 
 	 * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#openIntro()
 	 */
 	@Override
@@ -603,8 +598,12 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			openWelcomeEditor(window, new WelcomeEditorInput(productInfo), null);
 		} else {
 			// Show the welcome page for any newly installed features
-			List<AboutInfo> welcomeFeatures = new ArrayList<>();
-			for (AboutInfo info : wbAdvisor.getNewlyAddedBundleGroups().values()) {
+			List<AboutInfo> welcomeFeatures = new ArrayList<AboutInfo>();
+			for (Iterator it = wbAdvisor.getNewlyAddedBundleGroups().entrySet()
+					.iterator(); it.hasNext();) {
+				Map.Entry entry = (Map.Entry) it.next();
+				AboutInfo info = (AboutInfo) entry.getValue();
+
 				if (info != null && info.getWelcomePageURL() != null) {
 					welcomeFeatures.add(info);
 					// activate the feature plug-in so it can run some install
@@ -617,8 +616,13 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 							try {
 								bundle.start(Bundle.START_TRANSIENT);
 							} catch (BundleException exception) {
-								StatusManager.getManager().handle(new Status(IStatus.ERROR, IDEApplication.PLUGIN_ID,
-										"Failed to load feature", exception));//$NON-NLS-1$
+								StatusManager
+										.getManager()
+										.handle(
+												new Status(
+														IStatus.ERROR,
+														IDEApplication.PLUGIN_ID,
+														"Failed to load feature", exception));//$NON-NLS-1$
 							}
 						}
 					}

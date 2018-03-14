@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,20 +14,20 @@ import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * A perspective descriptor describes a perspective in an
- * <code>IPerspectiveRegistry</code>.
+ * <code>IPerspectiveRegistry</code>.  
  * <p>
  * A perspective is a template for view visibility, layout, and action visibility
- * within a workbench page. There are two types of perspective: a predefined
- * perspective and a custom perspective.
+ * within a workbench page. There are two types of perspective: a predefined 
+ * perspective and a custom perspective.  
  * <ul>
- *   <li>A predefined perspective is defined by an extension to the workbench's
+ *   <li>A predefined perspective is defined by an extension to the workbench's 
  *     perspective extension point (<code>"org.eclipse.ui.perspectives"</code>).
  *     The extension defines a id, label, and <code>IPerspectiveFactory</code>.
  *     A perspective factory is used to define the initial layout for a page.
  *     </li>
  *   <li>A custom perspective is defined by the user.  In this case a predefined
  *     perspective is modified to suit a particular task and saved as a new
- *     perspective.  The attributes for the perspective are stored in a separate file
+ *     perspective.  The attributes for the perspective are stored in a separate file 
  *     in the workbench's metadata directory.
  *     </li>
  * </ul>

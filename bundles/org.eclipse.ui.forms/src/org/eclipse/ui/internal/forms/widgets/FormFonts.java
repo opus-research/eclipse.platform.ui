@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,24 +29,23 @@ public class FormFonts {
 			instance = new FormFonts();
 		return instance;
 	}
-
+	
 	private ResourceManagerManger manager = new ResourceManagerManger();
-	private HashMap<Font, BoldFontDescriptor> descriptors;
-
+	private HashMap descriptors;
+	
 	private FormFonts() {
 	}
-
+	
 	private class BoldFontDescriptor extends FontDescriptor {
 		private FontData[] fFontData;
-
+		
 		BoldFontDescriptor (Font font) {
 			fFontData = font.getFontData();
-			for (FontData element : fFontData) {
-				element.setStyle(element.getStyle() | SWT.BOLD);
+			for (int i = 0; i < fFontData.length; i++) {
+				fFontData[i].setStyle(fFontData[i].getStyle() | SWT.BOLD);
 			}
 		}
-
-		@Override
+		
 		public boolean equals(Object obj) {
 			if (obj instanceof BoldFontDescriptor) {
 				BoldFontDescriptor desc = (BoldFontDescriptor)obj;
@@ -59,26 +58,23 @@ public class FormFonts {
 			}
 			return false;
 		}
-
-		@Override
+		
 		public int hashCode() {
 			int hash = 0;
-			for (FontData element : fFontData)
-				hash = hash * 7 + element.hashCode();
+			for (int i = 0; i < fFontData.length; i++)
+				hash = hash * 7 + fFontData[i].hashCode();
 			return hash;
 		}
 
-		@Override
 		public Font createFont(Device device) throws DeviceResourceException {
 			return new Font(device, fFontData);
 		}
 
-		@Override
 		public void destroyFont(Font previouslyCreatedFont) {
 			previouslyCreatedFont.dispose();
 		}
 	}
-
+	
 	public Font getBoldFont(Display display, Font font) {
 		checkHashMaps();
 		BoldFontDescriptor desc = new BoldFontDescriptor(font);
@@ -86,10 +82,10 @@ public class FormFonts {
 		descriptors.put(result, desc);
 		return result;
 	}
-
+	
 	public boolean markFinished(Font boldFont, Display display) {
 		checkHashMaps();
-		BoldFontDescriptor desc = descriptors.get(boldFont);
+		BoldFontDescriptor desc = (BoldFontDescriptor)descriptors.get(boldFont);
 		if (desc != null) {
 			LocalResourceManager resourceManager = manager.getResourceManager(display);
 			resourceManager.destroyFont(desc);
@@ -98,7 +94,7 @@ public class FormFonts {
 				validateHashMaps();
 			}
 			return true;
-
+			
 		}
 		// if the image was not found, dispose of it for the caller
 		boldFont.dispose();
@@ -107,9 +103,9 @@ public class FormFonts {
 
 	private void checkHashMaps() {
 		if (descriptors == null)
-			descriptors = new HashMap<>();
+			descriptors = new HashMap();
 	}
-
+	
 	private void validateHashMaps() {
 		if (descriptors.size() == 0)
 			descriptors = null;

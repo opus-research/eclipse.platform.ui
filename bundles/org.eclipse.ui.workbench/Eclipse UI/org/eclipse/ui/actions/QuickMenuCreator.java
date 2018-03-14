@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -33,7 +35,7 @@ import org.eclipse.swt.widgets.TreeItem;
  * Abstract class that is capable of creating a context menu. It will try and
  * open the menu close to the current selection, or under the mouse pointer if
  * that's not possible.
- *
+ * 
  * @since 3.3
  */
 public abstract class QuickMenuCreator {
@@ -61,13 +63,19 @@ public abstract class QuickMenuCreator {
 			return;
 		}
 		quickMenu.setLocation(location);
-		quickMenu.addListener(SWT.Hide, event -> {
-			if (!display.isDisposed()) {
-				display.asyncExec(() -> {
-					if (!quickMenu.isDisposed()) {
-						quickMenu.dispose();
-					}
-				});
+		quickMenu.addListener(SWT.Hide, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (!display.isDisposed()) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (!quickMenu.isDisposed()) {
+								quickMenu.dispose();
+							}
+						}
+					});
+				}
 			}
 		});
 		quickMenu.setVisible(true);
@@ -75,7 +83,7 @@ public abstract class QuickMenuCreator {
 
 	/**
 	 * Create the contents of the context menu.
-	 *
+	 * 
 	 * @param menu
 	 *            the menu to fill
 	 */
@@ -83,7 +91,7 @@ public abstract class QuickMenuCreator {
 
 	/**
 	 * Determine the optimal point for this menu to appear.
-	 *
+	 * 
 	 * @param focus
 	 *            the focus control
 	 * @return the optimal placement
@@ -125,10 +133,10 @@ public abstract class QuickMenuCreator {
 	/**
 	 * Hook to compute the menu location if the focus widget is a styled text
 	 * widget.
-	 *
+	 * 
 	 * @param text
 	 *            the styled text widget that has the focus
-	 *
+	 * 
 	 * @return a widget relative position of the menu to pop up or
 	 *         <code>null</code> if now position inside the widget can be
 	 *         computed
@@ -145,10 +153,10 @@ public abstract class QuickMenuCreator {
 
 	/**
 	 * Hook to compute the menu location if the focus widget is a tree widget.
-	 *
+	 * 
 	 * @param tree
 	 *            the tree widget that has the focus
-	 *
+	 * 
 	 * @return a widget relative position of the menu to pop up or
 	 *         <code>null</code> if now position inside the widget can be
 	 *         computed
@@ -187,10 +195,10 @@ public abstract class QuickMenuCreator {
 
 	/**
 	 * Hook to compute the menu location if the focus widget is a table widget.
-	 *
+	 * 
 	 * @param table
 	 *            the table widget that has the focus
-	 *
+	 * 
 	 * @return a widget relative position of the menu to pop up or
 	 *         <code>null</code> if now position inside the widget can be
 	 *         computed
@@ -236,7 +244,8 @@ public abstract class QuickMenuCreator {
 	private Point[] getIncludedPositions(Rectangle[] rectangles,
 			Rectangle widgetBounds) {
 		List result = new ArrayList();
-		for (Rectangle rectangle : rectangles) {
+		for (int i = 0; i < rectangles.length; i++) {
+			Rectangle rectangle = rectangles[i];
 			Rectangle intersect = widgetBounds.intersection(rectangle);
 			if (intersect != null && intersect.height == rectangle.height) {
 				result.add(new Point(intersect.x, intersect.y
@@ -249,7 +258,8 @@ public abstract class QuickMenuCreator {
 	private Point findBestLocation(Point[] points, Point relativeCursor) {
 		Point result = null;
 		double bestDist = Double.MAX_VALUE;
-		for (Point point : points) {
+		for (int i = 0; i < points.length; i++) {
+			Point point = points[i];
 			int a = 0;
 			int b = 0;
 			if (point.x > relativeCursor.x) {
@@ -286,7 +296,7 @@ public abstract class QuickMenuCreator {
 	/**
 	 * Dispose of this quick menu creator. Subclasses should ensure that they
 	 * call this method.
-	 *
+	 * 
 	 * @deprecated As of 3.5 this is not necessary as the SWT Menu created in
 	 *             {@link #createMenu()} will be disposed shortly after the
 	 *             SWT.Hide event.

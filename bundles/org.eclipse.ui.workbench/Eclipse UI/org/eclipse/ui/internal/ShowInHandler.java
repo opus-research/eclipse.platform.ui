@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.Map;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -30,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.menus.UIElement;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
@@ -39,7 +39,7 @@ import org.eclipse.ui.views.IViewRegistry;
 
 /**
  * The show in command, which only needs a target id.
- *
+ * 
  * @since 3.4
  */
 public class ShowInHandler extends AbstractHandler implements IElementUpdater {
@@ -97,7 +97,7 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 	 * This implementation obtains the context from global variables provide.
 	 * showInSelection and showInInput should be available.
 	 * <p>
-	 *
+	 * 
 	 * @return the <code>ShowInContext</code> to show or <code>null</code>
 	 */
 	private ShowInContext getContext(ISelection showInSelection, Object input) {
@@ -110,13 +110,13 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 	/**
 	 * Returns the <code>IShowInTarget</code> for the given part, or
 	 * <code>null</code> if it does not provide one.
-	 *
+	 * 
 	 * @param targetPart
 	 *            the target part
 	 * @return the <code>IShowInTarget</code> or <code>null</code>
 	 */
 	private IShowInTarget getShowInTarget(IWorkbenchPart targetPart) {
-		return Adapters.adapt(targetPart, IShowInTarget.class);
+		return (IShowInTarget) Util.getAdapter(targetPart, IShowInTarget.class);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007,2017 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510241
  *******************************************************************************/
 
 package org.eclipse.ui.tests.forms.performance;
@@ -39,15 +38,13 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
-import org.junit.Test;
 
 public class FormsPerformanceTest extends PerformanceTestCase {
-
-	@Test
+	
 	public void test_createForm() {
 		tagAsSummary("Create Form", Dimension.ELAPSED_PROCESS);
 	    Performance.getDefault();
-
+		
 		// Warm up.
 
 		Display display = PlatformUI.getWorkbench().getDisplay();
@@ -64,7 +61,7 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 				Composite c = new Composite(shell, SWT.H_SCROLL + SWT.V_SCROLL);
 				c.setLayout(new FillLayout());
                 createPartControl(c, toolkit);
-                shell.layout(true);
+                shell.layout(true); 
                 while(display.readAndDispatch()){/*empty*/}
 				c.dispose();
 			}
@@ -86,15 +83,15 @@ public class FormsPerformanceTest extends PerformanceTestCase {
                 while(display.readAndDispatch()){/*empty*/}
 				c.dispose();
 			}
-			stopMeasuring();
+			stopMeasuring(); 
 			shell.dispose();
 			while(display.readAndDispatch()){/*empty*/}
-		}
+		}	
 		toolkit.dispose();
 		commitMeasurements();
 		assertPerformance();
 	}
-
+	
 	public void createPartControl(Composite parent, FormToolkit toolkit) {
 		//Label l = new Label(parent, SWT.NULL);
 		//l.setText ("a label");
@@ -103,11 +100,10 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		form.setText("Hello, Eclipse Forms");
 		TableWrapLayout layout = new TableWrapLayout();
 		form.getBody().setLayout(layout);
-
+		
 		Hyperlink link = toolkit.createHyperlink(form.getBody(), "Click here.",
 				SWT.WRAP);
 		link.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				System.out.println("Link activated!");
 			}
@@ -126,13 +122,13 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		td = new TableWrapData();
 		td.colspan = 2;
 		button.setLayoutData(td);
-
+		
 		ImageHyperlink ih = toolkit.createImageHyperlink(form.getBody(), SWT.NULL);
 		ih.setText("Image link with no image");
 		ih = toolkit.createImageHyperlink(form.getBody(), SWT.NULL);
 		//ih.setImage(ExamplesPlugin.getDefault().getImageRegistry().get(ExamplesPlugin.IMG_SAMPLE));
 		ih.setText("Link with image and text");
-
+		
 		ExpandableComposite ec = toolkit.createExpandableComposite(form.getBody(), ExpandableComposite.TREE_NODE|ExpandableComposite.CLIENT_INDENT);
 		ImageHyperlink eci = toolkit.createImageHyperlink(ec, SWT.NULL);
 		//eci.setImage(ExamplesPlugin.getDefault().getImageRegistry().get(ExamplesPlugin.IMG_SAMPLE));
@@ -148,7 +144,6 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		td.colspan = 2;
 		ec.setLayoutData(td);
 		ec.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				//form.reflow(true);
 			}
@@ -158,7 +153,6 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		td.colspan = 2;
 		section.setLayoutData(td);
 		section.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				//form.reflow(true);
 			}
@@ -204,7 +198,6 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		rtext.setFont("code", JFaceResources.getTextFont());
 		rtext.setText(buf.toString(), true, false);
 		rtext.addHyperlinkListener(new HyperlinkAdapter() {
-			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				System.out.println("Link active: "+e.getHref());
 			}
@@ -212,7 +205,7 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 /*		layout.numColumns = 3;
 		Label label;
 		TableWrapData td;
-
+		
 		label = toolkit.createLabel(form.getBody(), "Some text to put in the first column", SWT.WRAP);
 		label = toolkit.createLabel(form.getBody() ,"Some text to put in the second column and make it a bit longer so that we can see what happens with column distribution. This text must be the longest so that it can get more space allocated to the columns it belongs to.", SWT.WRAP);
 		td = new TableWrapData();
@@ -231,7 +224,7 @@ public class FormsPerformanceTest extends PerformanceTestCase {
 		label = toolkit.createLabel(form.getBody(), "This text goes into column 3 and consumes only one cell too", SWT.WRAP);
 		label.setLayoutData(new TableWrapData(TableWrapData.FILL));
 		form.getBody().setBackground(form.getBody().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));*/
-
+		
 		toolkit.paintBordersFor(form.getBody());
 	}
 

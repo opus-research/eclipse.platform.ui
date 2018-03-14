@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
@@ -252,14 +253,19 @@ public class TableComparator extends ViewerComparator implements Comparator {
 	}
 
 	private boolean verifyDirections(int[] directions) {
-		for (int direction : directions) {
-			if (direction != ASCENDING && direction != DESCENDING) {
+		for (int i = 0; i < directions.length; i++) {
+			if (directions[i] != ASCENDING && directions[i] != DESCENDING) {
 				return false;
 			}
 		}
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
 	@Override
 	public int compare(Object o1, Object o2) {
 		return compare(null, o1, o2);
@@ -338,6 +344,17 @@ public class TableComparator extends ViewerComparator implements Comparator {
 	}
 
 	/**
+	 * Sort the array of markers in lastMarkers in place.
+	 *
+	 * @param viewer
+	 * @param lastMarkers
+	 */
+	public void sort(TreeViewer viewer, MarkerList lastMarkers) {
+		sort(viewer, lastMarkers.getArray());
+
+	}
+
+	/**
 	 * Sorts the given elements in-place, modifying the given array from index
 	 * start to index end. <
 	 *
@@ -347,7 +364,12 @@ public class TableComparator extends ViewerComparator implements Comparator {
 	 * @param end
 	 */
 	public void sort(final Viewer viewer, Object[] elements, int start, int end) {
-		Arrays.sort(elements, start, end, (a, b) -> TableComparator.this.compare(viewer, a, b));
+		Arrays.sort(elements, start, end, new Comparator() {
+			@Override
+			public int compare(Object a, Object b) {
+				return TableComparator.this.compare(viewer, a, b);
+			}
+		});
 	}
 
 }

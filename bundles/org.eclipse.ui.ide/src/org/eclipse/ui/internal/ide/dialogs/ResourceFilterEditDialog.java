@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.ide.dialogs.UIResourceFilterDescription;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 
 /**
@@ -116,7 +115,7 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 			if (resourceFilterGroup.performOk())
 				super.okPressed();
 		} catch (Throwable t) {
-			IDEWorkbenchPlugin.log(t.getMessage(), t);
+			t.printStackTrace();
 		}
 	}
 }

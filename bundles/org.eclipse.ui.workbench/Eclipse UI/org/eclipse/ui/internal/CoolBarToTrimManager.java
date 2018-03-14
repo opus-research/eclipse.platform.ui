@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2017 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237, 472654
- *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601, 445538
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 409633
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237
+ *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -48,6 +47,7 @@ import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.internal.provisional.action.ICoolBarManager2;
 import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
@@ -287,7 +287,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	@Override
 	public void dispose() {
-		ArrayList<MToolBarElement> toRemove = new ArrayList<>();
+		ArrayList<MToolBarElement> toRemove = new ArrayList<MToolBarElement>();
 		for (MTrimElement child : topTrim.getChildren()) {
 			if (child instanceof MToolBar) {
 				MToolBar toolbar = (MToolBar) child;
@@ -343,7 +343,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	@Override
 	public IContributionItem[] getItems() {
-		ArrayList<IContributionItem> items = new ArrayList<>();
+		ArrayList<IContributionItem> items = new ArrayList<IContributionItem>();
 
 		List<MToolBar> toolBars = modelService.findElements(window, null, MToolBar.class, null);
 		for (final MToolBar tb : toolBars) {
@@ -526,7 +526,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	@Override
 	public void setLockLayout(boolean value) {
-		// 409633 Not implemented, see LockToolBarHandler
 	}
 
 	@Override
@@ -554,9 +553,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 					manager.update(true);
 				}
 				// TODO: Hack to work around Bug 370961
-				ToolBar toolbar = manager.getControl();
-				if (toolbar != null && !toolbar.isDisposed()) {
-					toolbar.requestLayout();
+				ToolBar tb = manager.getControl();
+				if (tb != null && !tb.isDisposed()) {
+					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 				}
 			}
 		}
@@ -579,18 +578,18 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	 */
 	public void updateAll(boolean force) {
 		final List<MToolBar> children = modelService.findElements(window, null, MToolBar.class, null);
-		for (MToolBar mToolbar : children) {
-			if (mToolbar == null) {
+		for (MToolBar toolbar : children) {
+			if (toolbar == null) {
 				continue;
 			}
-			ToolBarManagerRenderer renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(mToolbar, null);
-			final ToolBarManager manager = renderer.getManager(mToolbar);
+			ToolBarManagerRenderer renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(toolbar, null);
+			final ToolBarManager manager = renderer.getManager(toolbar);
 			if (manager != null) {
 				manager.update(true);
 				// TODO: Hack to work around Bug 370961
-				ToolBar toolbar = manager.getControl();
-				if (toolbar != null && !toolbar.isDisposed()) {
-					toolbar.requestLayout();
+				ToolBar tb = manager.getControl();
+				if (tb != null && !tb.isDisposed()) {
+					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 				}
 			}
 		}
@@ -648,21 +647,13 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				toolItem.setRenderer(renderer);
 				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
 						window.getContext());
-
 				if (manager instanceof ContributionManager) {
-					// set basic attributes to the item before adding to the manager
-					ci.setId(toolItem.getElementId());
-					ci.setVisible(toolItem.isVisible());
-
 					ContributionManager cm = (ContributionManager) manager;
 					cm.insert(index, ci);
 					cm.remove(item);
-
-					// explicitly dispose contribution since it is now
-					// disconnected from manager
-					item.dispose();
 				}
 				ci.setModel(toolItem);
+				ci.setVisible(toolItem.isVisible());
 				renderer.linkModelToContribution(toolItem, ci);
 				container.getChildren().add(toolItem);
 			} else {
@@ -692,12 +683,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 		if (overridenVisibility != null) {
 			if (prevChildVisible == null) {
-				boolean modelVisible = modelItem.isVisible();
-				boolean itemVisible = item.isVisible();
-				if (modelVisible != overridenVisibility || itemVisible != overridenVisibility) {
+				boolean oldVisible = modelItem.isVisible();
+				if (oldVisible != overridenVisibility) {
 					needUpdate = true;
 				}
-				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, itemVisible);
+				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
 				modelItem.setVisible(overridenVisibility);
 			} else {
 				return needUpdate;

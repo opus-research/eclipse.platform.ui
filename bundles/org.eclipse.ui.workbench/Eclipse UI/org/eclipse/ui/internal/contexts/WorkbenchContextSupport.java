@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.ui.keys.IBindingService;
 /**
  * Provides support for contexts within the workbench -- including key bindings,
  * and some default contexts for shell types.
- *
+ * 
  * @since 3.0
  */
 public class WorkbenchContextSupport implements IWorkbenchContextSupport {
@@ -67,7 +67,7 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 	 * Constructs a new instance of <code>WorkbenchCommandSupport</code>.
 	 * This attaches the key binding support, and adds a global shell activation
 	 * filter.
-	 *
+	 * 
 	 * @param workbenchToSupport
 	 *            The workbench that needs to be supported by this instance;
 	 *            must not be <code>null</code>.
@@ -78,8 +78,8 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 	public WorkbenchContextSupport(final Workbench workbenchToSupport,
 			final ContextManager contextManager) {
 		workbench = workbenchToSupport;
-		contextService = workbench.getService(IContextService.class);
-		bindingService = workbench.getService(IBindingService.class);
+		contextService = (IContextService) workbench.getService(IContextService.class);
+		bindingService = (IBindingService) workbench.getService(IBindingService.class);
 		contextManagerWrapper = ContextManagerFactory
 				.getContextManagerWrapper(contextManager);
 	}

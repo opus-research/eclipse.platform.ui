@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,10 +32,10 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 		AbstractCSSPropertyHandlerProvider {
 
 	// List of package names containing handlers class for properties
-	private List<String> packageNames = new ArrayList<>();
+	private List<String> packageNames = new ArrayList<String>();
 
 	// Map used as a cache for properties handlers found
-	private Map<String, List<ICSSPropertyHandler>> propertyToHandlersMap = new HashMap<>();
+	private Map<String, List<ICSSPropertyHandler>> propertyToHandlersMap = new HashMap<String, List<ICSSPropertyHandler>>();
 
 	/**
 	 * Return the list of PropertiesHandler corresponding to the property name
@@ -65,7 +65,7 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 //								+ ", with class=" + packageName + "."
 //								+ handlerClassName);
 					if (handlers == null)
-						handlers = new ArrayList<>();
+						handlers = new ArrayList<ICSSPropertyHandler>();
 					handlers.add(handler);
 				}
 			}
@@ -94,7 +94,7 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 
 	protected Map<String, List<ICSSPropertyHandler>> getPropertyToHandlersMap() {
 		if (propertyToHandlersMap == null)
-			propertyToHandlersMap = new HashMap<>();
+			propertyToHandlersMap = new HashMap<String, List<ICSSPropertyHandler>>();
 		return propertyToHandlersMap;
 	}
 
@@ -135,7 +135,8 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 	protected String getHandlerClassName(String property) {
 		StringBuilder handlerClassName = new StringBuilder("CSSProperty"); //$NON-NLS-1$
 		String[] s = StringUtils.split(property, "-"); //$NON-NLS-1$
-		for (String p : s) {
+		for (int i = 0; i < s.length; i++) {
+			String p = s[i];
 			handlerClassName.append(p.substring(0, 1).toUpperCase());
 			handlerClassName.append(p.substring(1));
 		}
@@ -143,6 +144,12 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 		return handlerClassName.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.e4.ui.css.core.dom.properties.providers.AbstractCSSPropertyHandlerProvider#getDefaultCSSStyleDeclaration(org.eclipse.e4.ui.css.core.engine.CSSEngine,
+	 *      org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
+     *      org.w3c.dom.css.CSSStyleDeclaration)
+	 */
 	@Override
 	protected CSSStyleDeclaration getDefaultCSSStyleDeclaration(
 			CSSEngine engine, CSSStylableElement stylableElement,
@@ -157,8 +164,8 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 				String[] compositePropertiesNames = engine
 						.getCSSCompositePropertiesNames(propertyName);
 				if (compositePropertiesNames != null) {
-					for (String compositePropertyName : compositePropertiesNames) {
-						propertyName = compositePropertyName;
+					for (int j = 0; j < compositePropertiesNames.length; j++) {
+						propertyName = compositePropertiesNames[j];
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {

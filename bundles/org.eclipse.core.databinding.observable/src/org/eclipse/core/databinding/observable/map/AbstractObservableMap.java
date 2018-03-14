@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Brad Reynolds - bug 164653
  *     Matthew Hall - bugs 118516, 146397, 226289, 246103, 249526, 264307,
  *                    349038
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -31,21 +29,17 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.AssertionFailedException;
 
 /**
- *
+ * 
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
+ * 
  * @since 1.0
  */
-public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
-		implements IObservableMap<K, V> {
+public abstract class AbstractObservableMap extends AbstractMap implements
+		IObservableMap {
 
 	private final class PrivateChangeSupport extends ChangeSupport {
 		private PrivateChangeSupport(Realm realm) {
@@ -81,13 +75,13 @@ public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected void lastListenerRemoved() {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	protected void firstListenerAdded() {
 	}
@@ -103,14 +97,14 @@ public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		if (!disposed) {
 			changeSupport.addListener(MapChangeEvent.TYPE, listener);
 		}
 	}
 
 	@Override
-	public synchronized void removeMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void removeMapChangeListener(IMapChangeListener listener) {
 		if (!disposed) {
 			changeSupport.removeListener(MapChangeEvent.TYPE, listener);
 		}
@@ -219,7 +213,7 @@ public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
 
 	/**
 	 * Sets the stale state. Must be invoked from the current realm.
-	 *
+	 * 
 	 * @param stale
 	 */
 	public void setStale(boolean stale) {
@@ -248,18 +242,18 @@ public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
 
 	/**
 	 * Fires map change events. Must be invoked from current realm.
-	 *
+	 * 
 	 * @param diff
 	 */
-	protected void fireMapChange(MapDiff<K, V> diff) {
+	protected void fireMapChange(MapDiff diff) {
 		checkRealm();
 		fireChange();
-		changeSupport.fireEvent(new MapChangeEvent<>(this, diff));
+		changeSupport.fireEvent(new MapChangeEvent(this, diff));
 	}
 
 	/**
 	 * Asserts that the realm is the current realm.
-	 *
+	 * 
 	 * @see Realm#isCurrent()
 	 * @throws AssertionFailedException
 	 *             if the realm is not the current realm

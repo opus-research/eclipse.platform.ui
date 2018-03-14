@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dnd.IDragAndDropService;
@@ -45,7 +47,7 @@ import org.eclipse.ui.services.IDisposable;
 public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, IDisposable {
 	// Key used to store/retrieve the MergedDropTarget instance from the real DropTarget
 	private static String MDT_KEY = "MDT"; //$NON-NLS-1$
-
+	
 	/**
 	 * Implementation of a DropTarget wrapper that will either delegate to the
 	 * <code>primaryListener</code> if the event's <code>currentDataType</code>
@@ -59,42 +61,42 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 	 */
 	private static class MergedDropTarget {
 		private DropTarget realDropTarget;
-
+		
 		private Transfer[] secondaryTransfers;
 		private DropTargetListener secondaryListener;
 		private int secondaryOps;
-
+		
 		private Transfer[] primaryTransfers;
 		private DropTargetListener primaryListener;
 		private int primaryOps;
-
+		
 		public MergedDropTarget(Control control,
 				int priOps, Transfer[] priTransfers, DropTargetListener priListener,
 				int secOps, Transfer[] secTransfers, DropTargetListener secListener) {
 			realDropTarget = new DropTarget(control, priOps | secOps);
 			realDropTarget.setData(MDT_KEY, this);
-
+			
 			// Cache the editor's transfers and listener
 			primaryTransfers = priTransfers;
 			primaryListener = priListener;
 			primaryOps = priOps;
-
+			
 			// Cache the editor area's current transfers & listener
 	        secondaryTransfers = secTransfers;
 	        secondaryListener = secListener;
 	        secondaryOps = secOps;
-
+			
 			// Combine the two sets of transfers into one array
 			Transfer[] allTransfers = new Transfer[secondaryTransfers.length+primaryTransfers.length];
 			int curTransfer = 0;
-			for (Transfer primaryTransfer : primaryTransfers) {
-				allTransfers[curTransfer++] = primaryTransfer;
+			for (int i = 0; i < primaryTransfers.length; i++) {
+				allTransfers[curTransfer++] = primaryTransfers[i];
 			}
-			for (Transfer secondaryTransfer : secondaryTransfers) {
-				allTransfers[curTransfer++] = secondaryTransfer;
+			for (int i = 0; i < secondaryTransfers.length; i++) {
+				allTransfers[curTransfer++] = secondaryTransfers[i];
 			}
 			realDropTarget.setTransfer(allTransfers);
-
+			
 			// Create a listener that will delegate to the appropriate listener
 			// NOTE: the -editor- wins (i.e. it can over-ride WB behaviour if it wants
 			realDropTarget.addDropListener(new DropTargetListener() {
@@ -137,20 +139,20 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 			}
 			return secondaryListener;
 		}
-
+		
 		private boolean isSupportedType(Transfer[] transfers, TransferData transferType) {
-			for (Transfer transfer : transfers) {
-				if (transfer.isSupportedType(transferType))
+			for (int i = 0; i < transfers.length; i++) {
+				if (transfers[i].isSupportedType(transferType))
 					return true;
 			}
 			return false;
 		}
-
+		
 		private boolean isSupportedOperation(int dropOps, int eventDetail) {
 				return ((dropOps | DND.DROP_DEFAULT) & eventDetail) != 0;
 		}
 	}
-
+	
 	// Cache any listeners for cleanup
 	List addedListeners = new ArrayList();
 
@@ -159,7 +161,7 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 			DropTargetListener listener) {
 		 // First we have to remove any existing drop target from the control
 		removeMergedDropTarget(control);
-
+		
 		// Capture the editor area's current ops, transfers & listener
 		int editorSiteOps = DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_LINK;
 
@@ -167,16 +169,19 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
         WorkbenchWindowConfigurer winConfigurer = ww.getWindowConfigurer();
         Transfer[] editorSiteTransfers = winConfigurer.getTransfers();
         DropTargetListener editorSiteListener = winConfigurer.getDropTargetListener();
-
+        
         // Create a new 'merged' drop Listener using combination of the desired
         // transfers and the ones used by the EditorArea
 		MergedDropTarget newTarget = new MergedDropTarget(control, ops, transfers, listener,
 				editorSiteOps, editorSiteTransfers, editorSiteListener);
 		addedListeners.add(newTarget);
 
-		newTarget.realDropTarget.addDisposeListener(e -> {
-			Object mdt = e.widget.getData(MDT_KEY);
-			addedListeners.remove(mdt);
+		newTarget.realDropTarget.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Object mdt = e.widget.getData(MDT_KEY);
+				addedListeners.remove(mdt);
+			}
 		});
 	}
 
@@ -190,11 +195,11 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 	private DropTarget getCurrentDropTarget(Control control) {
 		if (control == null)
 			return null;
-
+		
 		Object curDT = control.getData(DND.DROP_TARGET_KEY);
 		return (DropTarget)curDT;
 	}
-
+	
 	@Override
 	public void removeMergedDropTarget(Control control) {
 		DropTarget targetForControl = getCurrentDropTarget(control);

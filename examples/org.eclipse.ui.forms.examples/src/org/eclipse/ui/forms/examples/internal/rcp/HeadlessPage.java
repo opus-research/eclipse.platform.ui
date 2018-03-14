@@ -28,8 +28,7 @@ public class HeadlessPage extends FormPage {
 		super(editor, "page"+count, "Page "+count);
 		this.count = count;
 	}
-
-	@Override
+	
 	protected void createFormContent(IManagedForm managedForm) {
 		FormToolkit toolkit = managedForm.getToolkit();
 		Composite body = managedForm.getForm().getBody();

@@ -19,7 +19,7 @@ import org.eclipse.ui.tests.performance.TestRunnable;
 
 /**
  * The ListViewerRefreshTest is a test of refreshing the list viewer.
- *
+ * 
  */
 public class ListViewerRefreshTest extends ViewerTest {
 
@@ -37,7 +37,11 @@ public class ListViewerRefreshTest extends ViewerTest {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.performance.ViewerTest#createViewer(org.eclipse.swt.widgets.Shell)
+	 */
 	protected StructuredViewer createViewer(Shell shell) {
 		viewer = new ListViewer(shell);
 		contentProvider = new RefreshTestContentProvider(
@@ -49,7 +53,7 @@ public class ListViewerRefreshTest extends ViewerTest {
 
 	/**
 	 * Test the time for doing a refresh.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testRefresh() throws Throwable {
@@ -60,7 +64,6 @@ public class ListViewerRefreshTest extends ViewerTest {
 		openBrowser();
 
 		exercise(new TestRunnable() {
-			@Override
 			public void run() {
 				startMeasuring();
 				viewer.refresh();

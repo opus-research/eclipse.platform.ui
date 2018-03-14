@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.DeviceResourceException;
@@ -75,7 +76,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients.
  * @since 3.3
  */
@@ -104,7 +105,7 @@ public class CommandContributionItem extends ContributionItem {
 	 * Mode bit: Show text on tool items or buttons, even if an image is
 	 * present. If this mode bit is not set, text is only shown on tool items if
 	 * there is no image present.
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	public static int MODE_FORCE_TEXT = 1;
@@ -176,7 +177,7 @@ public class CommandContributionItem extends ContributionItem {
 
 	/**
 	 * Create a CommandContributionItem to place in a ContributionManager.
-	 *
+	 * 
 	 * @param contributionParameters
 	 * 		parameters necessary to render this contribution item.
 	 * @since 3.4
@@ -214,7 +215,7 @@ public class CommandContributionItem extends ContributionItem {
 				.getService(IBindingService.class);
 		IWorkbenchLocationService workbenchLocationService = contributionParameters.serviceLocator.getService(IWorkbenchLocationService.class);
 		display = workbenchLocationService.getWorkbench().getDisplay();
-
+		
 		createCommand(contributionParameters.commandId,
 				contributionParameters.parameters);
 
@@ -242,7 +243,7 @@ public class CommandContributionItem extends ContributionItem {
 
 	/**
 	 * Create a CommandContributionItem to place in a ContributionManager.
-	 *
+	 * 
 	 * @param serviceLocator
 	 * 		a service locator that is most appropriate for this contribution.
 	 * 		Typically the local {@link IWorkbenchWindow} or {@link
@@ -306,11 +307,14 @@ public class CommandContributionItem extends ContributionItem {
 
 	private ICommandListener getCommandListener() {
 		if (commandListener == null) {
-			commandListener = commandEvent -> {
-				if (commandEvent.isHandledChanged()
-						|| commandEvent.isEnabledChanged()
-						|| commandEvent.isDefinedChanged()) {
-					updateCommandProperties(commandEvent);
+			commandListener = new ICommandListener() {
+				@Override
+				public void commandChanged(CommandEvent commandEvent) {
+					if (commandEvent.isHandledChanged()
+							|| commandEvent.isEnabledChanged()
+							|| commandEvent.isDefinedChanged()) {
+						updateCommandProperties(commandEvent);
+					}
 				}
 			};
 		}
@@ -321,26 +325,29 @@ public class CommandContributionItem extends ContributionItem {
 		if (commandEvent.isHandledChanged()) {
 			dropDownMenuOverride = null;
 		}
-		Runnable update = () -> {
-			if (commandEvent.isEnabledChanged()
-					|| commandEvent.isHandledChanged()) {
-				if (visibleEnabled) {
-					IContributionManager parent = getParent();
-					if (parent != null) {
-						parent.update(true);
+		Runnable update = new Runnable() {
+			@Override
+			public void run() {
+				if (commandEvent.isEnabledChanged()
+						|| commandEvent.isHandledChanged()) {
+					if (visibleEnabled) {
+						IContributionManager parent = getParent();
+						if (parent != null) {
+							parent.update(true);
+						}
+					}
+					IHandler handler = commandEvent.getCommand().getHandler();
+					if (shouldRestoreAppearance(handler)) {
+						label = contributedLabel;
+						tooltip = contributedTooltip;
+						icon = contributedIcon;
+						disabledIcon = contributedDisabledIcon;
+						hoverIcon = contributedHoverIcon;
 					}
 				}
-				IHandler handler = commandEvent.getCommand().getHandler();
-				if (shouldRestoreAppearance(handler)) {
-					label = contributedLabel;
-					tooltip = contributedTooltip;
-					icon = contributedIcon;
-					disabledIcon = contributedDisabledIcon;
-					hoverIcon = contributedHoverIcon;
+				if (commandEvent.getCommand().isDefined()) {
+					update(null);
 				}
-			}
-			if (commandEvent.getCommand().isDefined()) {
-				update(null);
 			}
 		};
 		if (display.getThread() == Thread.currentThread()) {
@@ -376,9 +383,9 @@ public class CommandContributionItem extends ContributionItem {
 	 * 'read-only', do <b>not</b> execute this instance or attempt to modify its
 	 * state.
 	 * </p>
-	 *
+	 * 
 	 * @return The parameterized command for this contribution.
-	 *
+	 * 
 	 * @since 3.5
 	 */
 	public ParameterizedCommand getCommand() {
@@ -696,37 +703,37 @@ public class CommandContributionItem extends ContributionItem {
 	private void establishReferences() {
 		if (command != null) {
 			UIElement callback = new UIElement(serviceLocator) {
-
+	
 				@Override
 				public void setChecked(boolean checked) {
 					CommandContributionItem.this.setChecked(checked);
 				}
-
+	
 				@Override
 				public void setDisabledIcon(ImageDescriptor desc) {
 					CommandContributionItem.this.setDisabledIcon(desc);
 				}
-
+	
 				@Override
 				public void setHoverIcon(ImageDescriptor desc) {
 					CommandContributionItem.this.setHoverIcon(desc);
 				}
-
+	
 				@Override
 				public void setIcon(ImageDescriptor desc) {
 					CommandContributionItem.this.setIcon(desc);
 				}
-
+	
 				@Override
 				public void setText(String text) {
 					CommandContributionItem.this.setText(text);
 				}
-
+	
 				@Override
 				public void setTooltip(String text) {
 					CommandContributionItem.this.setTooltip(text);
 				}
-
+	
 				@Override
 				public void setDropDownId(String id) {
 					dropDownMenuOverride = id;
@@ -787,16 +794,19 @@ public class CommandContributionItem extends ContributionItem {
 
 	private Listener getItemListener() {
 		if (menuItemListener == null) {
-			menuItemListener = event -> {
-				switch (event.type) {
-				case SWT.Dispose:
-					handleWidgetDispose(event);
-					break;
-				case SWT.Selection:
-					if (event.widget != null) {
-						handleWidgetSelection(event);
+			menuItemListener = new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Dispose:
+						handleWidgetDispose(event);
+						break;
+					case SWT.Selection:
+						if (event.widget != null) {
+							handleWidgetSelection(event);
+						}
+						break;
 					}
-					break;
 				}
 			};
 		}
@@ -844,10 +854,10 @@ public class CommandContributionItem extends ContributionItem {
 	/**
 	 * Determines if the selection was on the dropdown affordance and, if so,
 	 * opens the drop down menu (populated using the same id as this item...
-	 *
+	 * 
 	 * @param event
 	 * 		The <code>SWT.Selection</code> event to be tested
-	 *
+	 * 
 	 * @return <code>true</code> iff a drop down menu was opened
 	 */
 	private boolean openDropDownMenu(Event event) {
@@ -875,9 +885,12 @@ public class CommandContributionItem extends ContributionItem {
 						}
 						@Override
 						public void menuAboutToHide(IMenuManager manager) {
-							display.asyncExec(() -> {
-								menuService.releaseContributions(menuManager);
-								menuManager.dispose();
+							display.asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									menuService.releaseContributions(menuManager);
+									menuManager.dispose();
+								}
 							});
 						}
 					});
@@ -986,17 +999,22 @@ public class CommandContributionItem extends ContributionItem {
 		return super.isVisible();
 	}
 
-	private IBindingManagerListener bindingManagerListener = event -> {
-		if (event.isActiveBindingsChanged()
-				&& event.isActiveBindingsChangedFor(getCommand())) {
-			update();
+	private IBindingManagerListener bindingManagerListener = new IBindingManagerListener() {
+
+		@Override
+		public void bindingManagerChanged(BindingManagerEvent event) {
+			if (event.isActiveBindingsChanged()
+					&& event.isActiveBindingsChangedFor(getCommand())) {
+				update();
+			}
+
 		}
 
 	};
 
 	/**
 	 * Provide info on the rendering data contained in this item.
-	 *
+	 * 
 	 * @return a {@link CommandContributionItemParameter}. Valid fields are
 	 *         serviceLocator, id, style, icon, disabledIcon, hoverIcon, label,
 	 *         helpContextId, mnemonic, tooltip. The Object will never be

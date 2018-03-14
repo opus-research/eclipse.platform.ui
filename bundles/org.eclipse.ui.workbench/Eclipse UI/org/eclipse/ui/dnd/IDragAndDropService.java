@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.Control;
  * is provided only to allow access to the service's methods.
  * </p>
  * <p>
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public interface IDragAndDropService {
 	/**
@@ -54,7 +54,7 @@ public interface IDragAndDropService {
 	 * support internal DnD).
 	 * </p>
 	 * <p>
-	 *
+	 * 
 	 * @param control
 	 *            The control to add the drop behaviour to
 	 * @param ops
@@ -65,10 +65,10 @@ public interface IDragAndDropService {
 	 *            The listener controlling the target's behaviour
 	 */
 	public void addMergedDropTarget(Control control, int ops, Transfer[] transfers, DropTargetListener listener);
-
+	
 	/**
 	 * Remove any previously 'merged' drop target for this Control
-	 *
+	 * 
 	 * @param control The control to remove the drop target for
 	 */
 	public void removeMergedDropTarget(Control control);

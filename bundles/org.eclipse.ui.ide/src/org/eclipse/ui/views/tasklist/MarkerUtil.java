@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.tasklist;
 
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,9 +27,6 @@ import org.eclipse.jface.viewers.IBasicPropertyConstants;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.views.tasklist.TaskListMessages;
-
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.MessageFormat;
 
 /**
  * Utility class for accessing marker attributes.
@@ -157,8 +155,9 @@ class MarkerUtil implements IMarkerConstants {
         if (isMarkerType(marker, IMarker.TASK)) {
             if (isComplete(marker)) {
 				return TaskListMessages.TaskList_completed;
+			} else {
+				return TaskListMessages.TaskList_notCompleted;
 			}
-			return TaskListMessages.TaskList_notCompleted;
         }
         return ""; //$NON-NLS-1$
     }
@@ -274,13 +273,18 @@ class MarkerUtil implements IMarkerConstants {
         if (lineNumber == -1) {
             if (location.equals("")) {//$NON-NLS-1$
                 return "";//$NON-NLS-1$
+            } else {
+                return location;
             }
-			return location;
+        } else {
+            if (location.equals("")) {//$NON-NLS-1$
+                return line
+                        .format(new Object[] { Integer.toString(lineNumber) });
+            } else {
+                return lineAndLocation.format(new Object[] {
+                        Integer.toString(lineNumber), location });
+            }
         }
-		if (location.equals("")) {//$NON-NLS-1$
-			return line.format(new Object[] { Integer.toString(lineNumber) });
-		}
-		return lineAndLocation.format(new Object[] { Integer.toString(lineNumber), location });
     }
 
     /**
@@ -417,7 +421,7 @@ class MarkerUtil implements IMarkerConstants {
         }
         if (IMarker.PRIORITY == key) {
             // this property is used only by cell editor, where order is High, Normal, Low
-			return IMarker.PRIORITY_HIGH - getPriority(marker);
+            return new Integer(IMarker.PRIORITY_HIGH - getPriority(marker));
         }
         if (IMarker.DONE == key) {
             return isComplete(marker) ? Boolean.TRUE : Boolean.FALSE;

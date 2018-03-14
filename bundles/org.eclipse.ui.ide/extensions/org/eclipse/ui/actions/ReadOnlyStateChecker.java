@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -112,8 +110,13 @@ public class ReadOnlyStateChecker {
         try {
             result = checkReadOnlyResources(itemsToCheck, selections);
         } catch (final CoreException exception) {
-            shell.getDisplay().syncExec(() -> ErrorDialog.openError(shell, READ_ONLY_EXCEPTION_MESSAGE,
-			        null, exception.getStatus()));
+            shell.getDisplay().syncExec(new Runnable() {
+                @Override
+				public void run() {
+                    ErrorDialog.openError(shell, READ_ONLY_EXCEPTION_MESSAGE,
+                            null, exception.getStatus());
+                }
+            });
         }
 
         if (result == IDialogConstants.CANCEL_ID) {
@@ -151,7 +154,8 @@ public class ReadOnlyStateChecker {
         boolean noneSkipped = true;
         List selectedChildren = new ArrayList();
 
-        for (IResource resourceToCheck : itemsToCheck) {
+        for (int i = 0; i < itemsToCheck.length; i++) {
+            IResource resourceToCheck = itemsToCheck[i];
             ResourceAttributes checkAttributes = resourceToCheck.getResourceAttributes();
             if (!yesToAllSelected && shouldCheck(resourceToCheck)
             		&& checkAttributes!=null
@@ -227,18 +231,23 @@ public class ReadOnlyStateChecker {
 
         final MessageDialog dialog = new MessageDialog(this.shell,
                 this.titleMessage, null, MessageFormat.format(this.mainMessage,
-						resource.getName()),
-                		MessageDialog.QUESTION, 0,
+                        new Object[] { resource.getName() }),
+                MessageDialog.QUESTION, new String[] {
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
-                        IDialogConstants.CANCEL_LABEL) {
+                        IDialogConstants.CANCEL_LABEL }, 0) {
         	@Override
 			protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
         	}
         };
-        shell.getDisplay().syncExec(() -> dialog.open());
+        shell.getDisplay().syncExec(new Runnable() {
+            @Override
+			public void run() {
+                dialog.open();
+            }
+        });
         int result = dialog.getReturnCode();
         if (result == 0) {
 			return IDialogConstants.YES_ID;

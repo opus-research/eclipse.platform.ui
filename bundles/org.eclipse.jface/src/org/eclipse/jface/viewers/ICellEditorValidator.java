@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ public interface ICellEditorValidator {
      * It is the responsibility of the implementor to fully format the
      * message before returning it.
      * </p>
-     *
+     * 
      * @param value the value to be validated
      * @return the error message, or <code>null</code> indicating
      *	that the value is valid

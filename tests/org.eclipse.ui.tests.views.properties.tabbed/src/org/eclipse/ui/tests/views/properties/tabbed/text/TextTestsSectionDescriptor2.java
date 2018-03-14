@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.IFilter;
 /**
  * A section descriptor for the text test view that should be filtered and not
  * shown.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -31,11 +31,9 @@ public class TextTestsSectionDescriptor2 extends TextTestsSectionDescriptor {
 	 * org.eclipse.ui.views.properties.tabbed.AbstractSectionDescriptor#getFilter
 	 * ()
 	 */
-	@Override
 	public IFilter getFilter() {
 		return new IFilter() {
 
-			@Override
 			public boolean select(Object toTest) {
 				return false;
 			}

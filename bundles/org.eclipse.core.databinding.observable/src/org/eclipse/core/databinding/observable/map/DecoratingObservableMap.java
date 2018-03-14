@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626, 226289
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -20,45 +18,39 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.DecoratingObservable;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable map which decorates another observable map.
- *
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
- *
+ * 
  * @since 1.2
  */
-public class DecoratingObservableMap<K, V> extends DecoratingObservable
-		implements IObservableMap<K, V> {
-	private IObservableMap<K, V> decorated;
+public class DecoratingObservableMap extends DecoratingObservable implements
+		IObservableMap {
+	private IObservableMap decorated;
 
-	private IMapChangeListener<K, V> mapChangeListener;
+	private IMapChangeListener mapChangeListener;
 
 	/**
 	 * Constructs a DecoratingObservableMap which decorates the given
 	 * observable.
-	 *
+	 * 
 	 * @param decorated
 	 *            the observable map being decorated
 	 * @param disposeDecoratedOnDispose
 	 */
-	public DecoratingObservableMap(IObservableMap<K, V> decorated,
+	public DecoratingObservableMap(IObservableMap decorated,
 			boolean disposeDecoratedOnDispose) {
 		super(decorated, disposeDecoratedOnDispose);
 		this.decorated = decorated;
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		addListener(MapChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void removeMapChangeListener(IMapChangeListener listener) {
 		removeListener(MapChangeEvent.TYPE, listener);
 	}
 
@@ -72,10 +64,10 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		return decorated.getValueType();
 	}
 
-	protected void fireMapChange(MapDiff<K, V> diff) {
+	protected void fireMapChange(MapDiff diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new MapChangeEvent<>(this, diff));
+		fireEvent(new MapChangeEvent(this, diff));
 	}
 
 	@Override
@@ -87,9 +79,9 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	@Override
 	protected void firstListenerAdded() {
 		if (mapChangeListener == null) {
-			mapChangeListener = new IMapChangeListener<K, V>() {
+			mapChangeListener = new IMapChangeListener() {
 				@Override
-				public void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
+				public void handleMapChange(MapChangeEvent event) {
 					DecoratingObservableMap.this.handleMapChange(event);
 				}
 			};
@@ -112,12 +104,12 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	 * observable. By default, this method fires the map change event again,
 	 * with the decorating observable as the event source. Subclasses may
 	 * override to provide different behavior.
-	 *
+	 * 
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleMapChange(final MapChangeEvent<? extends K, ? extends V> event) {
-		fireMapChange(Diffs.unmodifiableDiff(event.diff));
+	protected void handleMapChange(final MapChangeEvent event) {
+		fireMapChange(event.diff);
 	}
 
 	@Override
@@ -138,20 +130,20 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		return decorated.containsValue(value);
 	}
 
-	private class BackedCollection<E> implements Collection<E> {
-		private Collection<E> collection;
+	private class BackedCollection implements Collection {
+		private Collection collection;
 
-		BackedCollection(Collection<E> set) {
+		BackedCollection(Collection set) {
 			this.collection = set;
 		}
 
 		@Override
-		public boolean add(E o) {
+		public boolean add(Object o) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public boolean addAll(Collection<? extends E> arg0) {
+		public boolean addAll(Collection arg0) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -168,7 +160,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		}
 
 		@Override
-		public boolean containsAll(Collection<?> c) {
+		public boolean containsAll(Collection c) {
 			getterCalled();
 			return collection.containsAll(c);
 		}
@@ -180,9 +172,9 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		}
 
 		@Override
-		public Iterator<E> iterator() {
-			final Iterator<E> iterator = collection.iterator();
-			return new Iterator<E>() {
+		public Iterator iterator() {
+			final Iterator iterator = collection.iterator();
+			return new Iterator() {
 				@Override
 				public boolean hasNext() {
 					getterCalled();
@@ -190,7 +182,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 				}
 
 				@Override
-				public E next() {
+				public Object next() {
 					getterCalled();
 					return iterator.next();
 				}
@@ -210,13 +202,13 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		}
 
 		@Override
-		public boolean removeAll(Collection<?> c) {
+		public boolean removeAll(Collection c) {
 			getterCalled();
 			return collection.removeAll(c);
 		}
 
 		@Override
-		public boolean retainAll(Collection<?> c) {
+		public boolean retainAll(Collection c) {
 			getterCalled();
 			return collection.retainAll(c);
 		}
@@ -234,7 +226,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		}
 
 		@Override
-		public <T> T[] toArray(T[] array) {
+		public Object[] toArray(Object[] array) {
 			getterCalled();
 			return collection.toArray(array);
 		}
@@ -258,25 +250,25 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		}
 	}
 
-	private class BackedSet<E> extends BackedCollection<E> implements Set<E> {
-		BackedSet(Set<E> set) {
+	private class BackedSet extends BackedCollection implements Set {
+		BackedSet(Set set) {
 			super(set);
 		}
 	}
 
-	Set<Entry<K, V>> entrySet = null;
+	Set entrySet = null;
 
 	@Override
-	public Set<Entry<K, V>> entrySet() {
+	public Set entrySet() {
 		getterCalled();
 		if (entrySet == null) {
-			entrySet = new BackedSet<>(decorated.entrySet());
+			entrySet = new BackedSet(decorated.entrySet());
 		}
 		return entrySet;
 	}
 
 	@Override
-	public V get(Object key) {
+	public Object get(Object key) {
 		getterCalled();
 		return decorated.get(key);
 	}
@@ -287,31 +279,31 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		return decorated.isEmpty();
 	}
 
-	Set<K> keySet = null;
+	Set keySet = null;
 
 	@Override
-	public Set<K> keySet() {
+	public Set keySet() {
 		getterCalled();
 		if (keySet == null) {
-			keySet = new BackedSet<>(decorated.keySet());
+			keySet = new BackedSet(decorated.keySet());
 		}
 		return keySet;
 	}
 
 	@Override
-	public V put(K key, V value) {
+	public Object put(Object key, Object value) {
 		checkRealm();
 		return decorated.put(key, value);
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends V> m) {
+	public void putAll(Map m) {
 		checkRealm();
 		decorated.putAll(m);
 	}
 
 	@Override
-	public V remove(Object key) {
+	public Object remove(Object key) {
 		checkRealm();
 		return decorated.remove(key);
 	}
@@ -322,13 +314,13 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		return decorated.size();
 	}
 
-	Collection<V> values;
+	Collection values;
 
 	@Override
-	public Collection<V> values() {
+	public Collection values() {
 		getterCalled();
 		if (values == null) {
-			values = new BackedCollection<>(decorated.values());
+			values = new BackedCollection(decorated.values());
 		}
 		return values;
 	}

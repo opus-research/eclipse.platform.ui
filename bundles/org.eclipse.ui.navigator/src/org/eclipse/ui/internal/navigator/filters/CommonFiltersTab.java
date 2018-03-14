@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,17 +11,16 @@
 
 package org.eclipse.ui.internal.navigator.filters;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Deque;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
@@ -48,10 +47,10 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
 
 /**
  * @since 3.2
- *
+ * 
  */
-public class CommonFiltersTab extends CustomizationTab {
-
+public class CommonFiltersTab extends CustomizationTab { 
+ 
 	private static final String ALL = "*"; //$NON-NLS-1$
 
 	private String initialFilterTextValue = CommonNavigatorMessages.CommonFilterSelectionDialog_enter_name_of_filte_;
@@ -64,48 +63,34 @@ public class CommonFiltersTab extends CustomizationTab {
 
 	private TablePatternFilter patternFilter = new TablePatternFilter();
 
-	private Deque<ICommonFilterDescriptor> filterDescriptorChangeHistory = new ArrayDeque<>();
-
 	protected CommonFiltersTab(Composite parent,
 			INavigatorContentService aContentService) {
 		super(parent, aContentService);
 		createControl();
-	}
-
-	@Override
-	protected void checkStateChanged(CheckStateChangedEvent event) {
-		super.checkStateChanged(event);
-		ICommonFilterDescriptor filterDescriptor = (ICommonFilterDescriptor) event.getElement();
-		filterDescriptorChangeHistory.remove(filterDescriptor);
-		filterDescriptorChangeHistory.push(filterDescriptor);
-	}
-
-	protected ICommonFilterDescriptor[] getFilterDescriptorChangeHistory() {
-		return filterDescriptorChangeHistory.toArray(new ICommonFilterDescriptor[filterDescriptorChangeHistory.size()]);
-	}
-
-	private void createControl() {
+	} 
+	  
+	private void createControl() {  
 
 		createInstructionsLabel(CommonNavigatorMessages.CommonFilterSelectionDialog_Select_the_filters_to_apply);
-
+		
 		createPatternFilterText(this);
-
-		createTable();
+		
+		createTable(); 
 
 		getTableViewer().setContentProvider(filterContentProvider);
 		getTableViewer().setLabelProvider(filterLabelProvider);
-		getTableViewer().setComparator(new CommonFilterComparator());
+		getTableViewer().setSorter(new CommonFilterSorter());
 		getTableViewer().setInput(getContentService());
-
+		
 		getTableViewer().addFilter(patternFilter);
-
+		
 		updateFiltersCheckState();
 
 	}
 
 	private void createPatternFilterText(Composite composite) {
 		filterText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData filterTextGridData = new GridData(GridData.FILL_HORIZONTAL);
+		GridData filterTextGridData = new GridData(GridData.FILL_HORIZONTAL); 
 		filterText.setLayoutData(filterTextGridData);
 		filterText.setText(initialFilterTextValue);
 		filterText.setFont(composite.getFont());
@@ -186,9 +171,9 @@ public class CommonFiltersTab extends CustomizationTab {
 			}
 
 			private TableItem getFirstHighlightedItem(TableItem[] items) {
-				for (TableItem item : items) {
-					if (patternFilter.match(item.getText())) {
-						return item;
+				for (int i = 0; i < items.length; i++) {
+					if (patternFilter.match(items[i].getText())) {
+						return items[i];
 					}
 				}
 				return null;
@@ -206,27 +191,30 @@ public class CommonFiltersTab extends CustomizationTab {
 	void setInitialFocus() {
 		filterText.forceFocus();
 	}
-
+	
 	private void textChanged() {
 		patternFilter.setPattern(filterText.getText());
 		getTableViewer().refresh();
-
-		for (Object checkedItem : getCheckedItems()) {
-			getTableViewer().setChecked(checkedItem, true);
+		
+		Set<Object> checkedItems = getCheckedItems();
+		for (Iterator<Object> iterator = checkedItems.iterator(); iterator.hasNext();) {  
+			getTableViewer().setChecked(iterator.next(), true);
 		}
-	}
+	} 
 
 	private void updateFiltersCheckState() {
+		Object[] children = filterContentProvider
+				.getElements(getContentService());
 		ICommonFilterDescriptor filterDescriptor;
 		INavigatorFilterService filterService = getContentService()
 				.getFilterService();
-		for (Object child : filterContentProvider.getElements(getContentService())) {
-			filterDescriptor = (ICommonFilterDescriptor) child;
+		for (int i = 0; i < children.length; i++) {
+			filterDescriptor = (ICommonFilterDescriptor) children[i];
 			if(filterService.isActive(filterDescriptor.getId())) {
-				getTableViewer().setChecked(child, true);
-				getCheckedItems().add(child);
+				getTableViewer().setChecked(children[i], true);
+				getCheckedItems().add(children[i]);
 			} else {
-				getTableViewer().setChecked(child, false);
+				getTableViewer().setChecked(children[i], false);
 			}
 		}
 	}
@@ -243,20 +231,20 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		protected void setPattern(String newPattern) {
 			if (newPattern == null || newPattern.trim().length() == 0) {
-				matcher = new StringMatcher(ALL, true, false);
+				matcher = new StringMatcher(ALL, true, false);  
 			} else {
-				String patternString = ALL + newPattern + ALL;
+				String patternString = ALL + newPattern + ALL; 
 				matcher = new StringMatcher(patternString, true, false);
 			}
 
-		}
+		} 
 
 		/**
 		 * Answers whether the given String matches the pattern.
-		 *
+		 * 
 		 * @param input
 		 *            the String to test
-		 *
+		 * 
 		 * @return whether the string matches the pattern
 		 */
 		protected boolean match(String input) {
@@ -266,21 +254,21 @@ public class CommonFiltersTab extends CustomizationTab {
 			return matcher == null || matcher.match(input);
 		}
 	}
-
-	private class CommonFilterComparator extends ViewerComparator {
-
+ 
+	private class CommonFilterSorter extends ViewerSorter {
+		
 		@Override
 		public void sort(Viewer viewer, Object[] elements) {
 			Arrays.sort(elements, new Comparator() {
 				@Override
-				public int compare(Object o1, Object o2) {
+				public int compare(Object o1, Object o2) { 
 					ICommonFilterDescriptor lvalue = (ICommonFilterDescriptor) o1;
 					ICommonFilterDescriptor rvalue = (ICommonFilterDescriptor) o2;
-
+					
 					return lvalue.getName().compareTo(rvalue.getName());
 				}
 			});
-
+		
 		}
 
 	}

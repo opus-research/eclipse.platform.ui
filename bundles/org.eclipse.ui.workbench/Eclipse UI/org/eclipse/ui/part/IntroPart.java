@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,18 +106,19 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Fires a property changed event.
-     *
+     * 
      * @param propertyId
      *            the id of the property that changed
      */
     protected void firePropertyChange(final int propertyId) {
-		for (Object listener : getListeners()) {
-			final IPropertyListener propertyListener = (IPropertyListener) listener;
+        Object[] array = getListeners();
+        for (int nX = 0; nX < array.length; nX++) {
+            final IPropertyListener l = (IPropertyListener) array[nX];
             SafeRunner.run(new SafeRunnable() {
 
                 @Override
 				public void run() {
-					propertyListener.propertyChanged(this, propertyId);
+                    l.propertyChanged(this, propertyId);
                 }
             });
         }
@@ -132,7 +133,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * adapter manager is consulted).
      */
     @Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
         return Platform.getAdapterManager().getAdapter(this, adapter);
     }
 
@@ -140,7 +141,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * Returns the configuration element for this part. The configuration
      * element comes from the plug-in registry entry for the extension defining
      * this part.
-     *
+     * 
      * @return the configuration element for this part
      */
     protected IConfigurationElement getConfigurationElement() {
@@ -149,7 +150,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Returns the default title image.
-     *
+     * 
      * @return the default image
      */
     protected Image getDefaultImage() {
@@ -169,7 +170,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         }
         return getDefaultImage();
     }
-
+    
     @Override
 	public String getTitle() {
     	if (titleLabel != null) {
@@ -180,7 +181,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Return the default title string.
-     *
+     * 
 	 * @return the default title string
 	 */
 	private String getDefaultTitle() {
@@ -191,7 +192,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart}method ignores the
      * memento and initializes the part in a fresh state. Subclasses may extend
      * to perform any state restoration, but must call the super method.
-     *
+     * 
      * @param site
      *            the intro site
      * @param memento
@@ -226,7 +227,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
     /**
      * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart} method does nothing.
      * Subclasses may override.
-     *
+     * 
      * @param memento
      *            a memento to receive the object state
      */
@@ -244,7 +245,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * and internal state variable (accessible via <code>getConfigElement</code>).
      * It also loads the title image, if one is specified in the configuration
      * element. Subclasses may extend.
-     *
+     * 
      * Should not be called by clients. It is called by the core plugin when
      * creating this executable extension.
      */
@@ -256,7 +257,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         configElement = cfig;
 
         titleLabel = cfig.getAttribute(IWorkbenchRegistryConstants.ATT_LABEL);
-
+        
         // Icon.
         String strIcon = cfig.getAttribute(IWorkbenchRegistryConstants.ATT_ICON);
         if (strIcon == null) {
@@ -276,7 +277,7 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
 
     /**
      * Sets or clears the title image of this part.
-     *
+     * 
      * @param titleImage
      *            the title image, or <code>null</code> to clear
      */
@@ -289,10 +290,10 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         this.titleImage = titleImage;
         firePropertyChange(IIntroPart.PROP_TITLE);
     }
-
+    
     /**
      * Set the title string for this part.
-     *
+     * 
      * @param titleLabel the title string.  Must not be <code>null</code>.
      * @since 3.2
      */

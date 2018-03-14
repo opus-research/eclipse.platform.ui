@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,6 @@
 package org.eclipse.ui.internal.dialogs;
 
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.preference.FieldEditor;
@@ -23,9 +21,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -109,7 +111,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 
     /**
      * Create the widget for the user dialog preference.
-     *
+     * 
      * @param composite
      */
     protected void createShowUserDialogPref(Composite composite) {
@@ -120,17 +122,17 @@ public class WorkbenchPreferencePage extends PreferencePage implements
                 .getPreferenceStore().getBoolean(
                         IPreferenceConstants.RUN_IN_BACKGROUND));
     }
-
+    
     /**
      * Create the widget for the heap status preference.
-     *
+     * 
      * @param composite
      */
     protected void createHeapStatusPref(Composite composite) {
         showHeapStatusButton = new Button(composite, SWT.CHECK);
         showHeapStatusButton.setText(WorkbenchMessages.WorkbenchPreference_HeapStatusButton);
         showHeapStatusButton.setToolTipText(WorkbenchMessages.WorkbenchPreference_HeapStatusButtonToolTip);
-
+        
         showHeapStatusButton.setSelection(PrefUtil.getAPIPreferenceStore().getBoolean(
                         IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR));
     }
@@ -138,7 +140,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
     /**
      * Creates the composite which will contain all the preference controls for
      * this page.
-     *
+     * 
      * @param parent
      *            the parent composite
      * @return the composite for this page
@@ -156,7 +158,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 
     protected void createStickyCyclePref(Composite composite) {
         stickyCycleButton = new Button(composite, SWT.CHECK);
-        stickyCycleButton.setText(WorkbenchMessages.WorkbenchPreference_stickyCycleButton);
+        stickyCycleButton.setText(WorkbenchMessages.WorkbenchPreference_stickyCycleButton); 
         stickyCycleButton.setSelection(getPreferenceStore().getBoolean(
                 IPreferenceConstants.STICKY_CYCLE));
     }
@@ -164,7 +166,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 	/**
 	 * Create a composite that contains entry fields specifying save interval
 	 * preference.
-	 *
+	 * 
 	 * @param composite
 	 *            the Composite the group is created in.
 	 */
@@ -188,15 +190,20 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 		saveInterval.setPage(this);
 		saveInterval.setTextLimit(Integer.toString(MAX_SAVE_INTERVAL).length());
 		saveInterval.setErrorMessage(NLS.bind(
-				WorkbenchMessages.WorkbenchPreference_workbenchSaveIntervalError, Integer.valueOf(MAX_SAVE_INTERVAL)));
+				WorkbenchMessages.WorkbenchPreference_workbenchSaveIntervalError, new Integer(
+						MAX_SAVE_INTERVAL)));
 		saveInterval.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		saveInterval.setValidRange(0, MAX_SAVE_INTERVAL);
 
 		saveInterval.load();
 
-		saveInterval.setPropertyChangeListener(event -> {
-			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-				setValid(saveInterval.isValid());
+		saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+					setValid(saveInterval.isValid());
+				}
 			}
 		});
 
@@ -212,39 +219,63 @@ public class WorkbenchPreferencePage extends PreferencePage implements
         GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL
                 | GridData.GRAB_HORIZONTAL);
         buttonComposite.setLayoutData(data);
-        buttonComposite.setText(WorkbenchMessages.WorkbenchPreference_openMode);
+        buttonComposite.setText(WorkbenchMessages.WorkbenchPreference_openMode); 
 
         String label = WorkbenchMessages.WorkbenchPreference_doubleClick;
         doubleClickButton = createRadioButton(buttonComposite, label);
-        doubleClickButton.addSelectionListener(widgetSelectedAdapter(e -> selectClickMode(singleClickButton.getSelection())));
+        doubleClickButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                selectClickMode(singleClickButton.getSelection());
+            }
+        });
         doubleClickButton.setSelection(!openOnSingleClick);
 
         label = WorkbenchMessages.WorkbenchPreference_singleClick;
         singleClickButton = createRadioButton(buttonComposite, label);
-        singleClickButton.addSelectionListener(widgetSelectedAdapter(e -> selectClickMode(singleClickButton.getSelection())));
+        singleClickButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                selectClickMode(singleClickButton.getSelection());
+            }
+        });
         singleClickButton.setSelection(openOnSingleClick);
 
-        label = WorkbenchMessages.WorkbenchPreference_singleClick_SelectOnHover;
+        label = WorkbenchMessages.WorkbenchPreference_singleClick_SelectOnHover; 		
         selectOnHoverButton = new Button(buttonComposite, SWT.CHECK | SWT.LEFT);
         selectOnHoverButton.setText(label);
         selectOnHoverButton.setEnabled(openOnSingleClick);
         selectOnHoverButton.setSelection(selectOnHover);
-        selectOnHoverButton.addSelectionListener(widgetSelectedAdapter(e -> selectOnHover = selectOnHoverButton.getSelection()));
+        selectOnHoverButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                selectOnHover = selectOnHoverButton.getSelection();
+            }
+        });
         data = new GridData();
 		data.horizontalIndent = LayoutConstants.getIndent();
         selectOnHoverButton.setLayoutData(data);
 
-        label = WorkbenchMessages.WorkbenchPreference_singleClick_OpenAfterDelay;
+        label = WorkbenchMessages.WorkbenchPreference_singleClick_OpenAfterDelay;		
         openAfterDelayButton = new Button(buttonComposite, SWT.CHECK | SWT.LEFT);
         openAfterDelayButton.setText(label);
         openAfterDelayButton.setEnabled(openOnSingleClick);
         openAfterDelayButton.setSelection(openAfterDelay);
-        openAfterDelayButton.addSelectionListener(widgetSelectedAdapter(e -> openAfterDelay = openAfterDelayButton.getSelection()));
+        openAfterDelayButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                openAfterDelay = openAfterDelayButton.getSelection();
+            }
+        });
         data = new GridData();
 		data.horizontalIndent = LayoutConstants.getIndent();
         openAfterDelayButton.setLayoutData(data);
 
-        createNoteComposite(font, buttonComposite, WorkbenchMessages.Preference_note,
+        createNoteComposite(font, buttonComposite, WorkbenchMessages.Preference_note, 
                 WorkbenchMessages.WorkbenchPreference_noEffectOnAllViews);
     }
 
@@ -257,7 +288,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
     /**
      * Utility method that creates a radio button instance and sets the default
      * layout data.
-     *
+     * 
      * @param parent
      *            the parent for the new button
      * @param label
@@ -272,7 +303,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 
     /**
      * Utility method that creates a combo box
-     *
+     * 
      * @param parent
      *            the parent for the new label
      * @return the new widget
@@ -288,7 +319,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
     /**
      * Utility method that creates a label instance and sets the default layout
      * data.
-     *
+     * 
      * @param parent
      *            the parent for the new label
      * @param text
@@ -307,7 +338,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 
     /**
      * Creates a tab of one horizontal spans.
-     *
+     * 
      * @param parent
      *            the parent in which the tab should be created
      */
@@ -324,7 +355,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 
     /**
      * Returns preference store that belongs to the our plugin.
-     *
+     * 
      * @return the preference store for this plugin
      */
     @Override
@@ -372,7 +403,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
                 IPreferenceConstants.RUN_IN_BACKGROUND));
         showHeapStatusButton.setSelection(PrefUtil.getAPIPreferenceStore().getDefaultBoolean(
                 IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR));
-
+		
         super.performDefaults();
     }
 
@@ -395,7 +426,7 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 		store.setValue(IPreferenceConstants.WORKBENCH_SAVE_INTERVAL, saveInterval.getIntValue());
         PrefUtil.getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, showHeapStatusButton.getSelection());
         updateHeapStatus(showHeapStatusButton.getSelection());
-
+        
         int singleClickMethod = openOnSingleClick ? OpenStrategy.SINGLE_CLICK
                 : OpenStrategy.DOUBLE_CLICK;
         if (openOnSingleClick) {
@@ -418,11 +449,12 @@ public class WorkbenchPreferencePage extends PreferencePage implements
 	 */
 	private void updateHeapStatus(boolean selection) {
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		for (IWorkbenchWindow window : windows) {
+		for (int i = 0; i < windows.length; i++) {
+			IWorkbenchWindow window = windows[i];
 			if(window instanceof WorkbenchWindow){
 				((WorkbenchWindow) window).showHeapStatus(selection);
 			}
 		}
-
+		
 	}
 }

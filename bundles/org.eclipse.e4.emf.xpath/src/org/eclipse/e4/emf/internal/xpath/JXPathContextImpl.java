@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 BestSolution.at and others.
+ * Copyright (c) 2010, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,14 +46,14 @@ public final class JXPathContextImpl implements XPathContext {
 					return eClassName(((Pointer) o).getValue());
 				}
 			}
-
+			
 			return null;
 		}
 	}
-
+	
 	/**
 	 * Create a new context
-	 *
+	 * 
 	 * @param contextBean
 	 *            the context bean (=root of the xpath expression)
 	 */
@@ -64,7 +64,7 @@ public final class JXPathContextImpl implements XPathContext {
 
 	/**
 	 * Create a new child context
-	 *
+	 * 
 	 * @param parentContext
 	 *            the parent
 	 * @param contextBean

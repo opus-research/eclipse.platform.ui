@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,7 +62,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 /**
  * The DecoratorManager is the class that handles all of the decorators defined
  * in the image.
- *
+ * 
  * @since 2.0
  */
 public class DecoratorManager implements ILabelProviderListener,
@@ -81,7 +81,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	private LightweightDecoratorManager lightweightManager;
 
 	// Hold onto the list of listeners to be told if a change has occured
-	private ListenerList<ILabelProviderListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	// The full definitions read from the registry.
 	// Initalize to an empty collection as this is rarely used now.
@@ -103,7 +103,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	private LocalResourceManager resourceManager;
 
-
+	
 	/**
 	 * ManagedWorkbenchLabelDecorator is the internal LabelDecorator
 	 * passed as result of calls to {@link IDecoratorManager#getLabelDecorator()}
@@ -127,7 +127,7 @@ public class DecoratorManager implements ILabelProviderListener,
 		}
 
 		/**
-		 * Return a resource manager local to the receiver.
+		 * Return a resource manager local to the receiver. 
 		 * @return {@link LocalResourceManager}
 		 */
 		private LocalResourceManager getResourceManager() {
@@ -138,6 +138,12 @@ public class DecoratorManager implements ILabelProviderListener,
 			return resourceManager;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelDecorator#decorateImage(org.eclipse.swt.graphics.Image,
+		 *      java.lang.Object, org.eclipse.jface.viewers.IDecorationContext)
+		 */
 		@Override
 		public Image decorateImage(Image image, Object element,
 				IDecorationContext context) {
@@ -145,12 +151,24 @@ public class DecoratorManager implements ILabelProviderListener,
 					getResourceManager());
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelDecorator#decorateText(java.lang.String,
+		 *      java.lang.Object, org.eclipse.jface.viewers.IDecorationContext)
+		 */
 		@Override
 		public String decorateText(String text, Object element,
 				IDecorationContext context) {
 			return decoratorManager.decorateText(text, element, context);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelDecorator#prepareDecoration(java.lang.Object,
+		 *      java.lang.String, org.eclipse.jface.viewers.IDecorationContext)
+		 */
 		@Override
 		public boolean prepareDecoration(Object element, String originalText,
 				IDecorationContext context) {
@@ -158,44 +176,87 @@ public class DecoratorManager implements ILabelProviderListener,
 					context);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IDelayedLabelDecorator#prepareDecoration(java.lang.Object,
+		 *      java.lang.String)
+		 */
 		@Override
 		public boolean prepareDecoration(Object element, String originalText) {
 			return prepareDecoration(element, originalText,
 					DecorationContext.DEFAULT_CONTEXT);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IFontDecorator#decorateFont(java.lang.Object)
+		 */
 		@Override
 		public Font decorateFont(Object element) {
 			return decoratorManager.decorateFont(element);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateBackground(java.lang.Object)
+		 */
 		@Override
 		public Color decorateBackground(Object element) {
 			return decoratorManager.decorateBackground(element);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateForeground(java.lang.Object)
+		 */
 		@Override
 		public Color decorateForeground(Object element) {
 			return decoratorManager.decorateForeground(element);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateImage(org.eclipse.swt.graphics.Image,
+		 *      java.lang.Object)
+		 */
 		@Override
 		public Image decorateImage(Image image, Object element) {
 			return decorateImage(image, element,
 					DecorationContext.DEFAULT_CONTEXT);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateText(java.lang.String,
+		 *      java.lang.Object)
+		 */
 		@Override
 		public String decorateText(String text, Object element) {
 			return decorateText(text, element,
 					DecorationContext.DEFAULT_CONTEXT);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void addListener(ILabelProviderListener listener) {
 			decoratorManager.addListener(listener);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 			if (resourceManager != null) {
@@ -204,11 +265,22 @@ public class DecoratorManager implements ILabelProviderListener,
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
+		 *      java.lang.String)
+		 */
 		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return decoratorManager.isLabelProperty(element, property);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			decoratorManager.removeListener(listener);
@@ -273,7 +345,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * For dynamic UI
-	 *
+	 * 
 	 * @param definition
 	 *            the definition to add
 	 * @since 3.0
@@ -307,7 +379,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	/**
 	 * See if the supplied decorator cache has a value for the element. If not
 	 * calculate it from the enabledDefinitions and update the cache.
-	 *
+	 * 
 	 * @return Collection of DecoratorDefinition.
 	 * @param element
 	 *            The element being tested.
@@ -319,9 +391,9 @@ public class DecoratorManager implements ILabelProviderListener,
 
 		ArrayList decorators = new ArrayList();
 
-		for (DecoratorDefinition enabledDefinition : enabledDefinitions) {
-			if (enabledDefinition.isEnabledFor(element)) {
-				decorators.add(enabledDefinition);
+		for (int i = 0; i < enabledDefinitions.length; i++) {
+			if (enabledDefinitions[i].isEnabledFor(element)) {
+				decorators.add(enabledDefinitions[i]);
 			}
 		}
 
@@ -348,7 +420,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Get the list of elements listening to the receiver.
-	 *
+	 * 
 	 * @return ILabelProviderListener []
 	 */
 	ILabelProviderListener[] getListeners() {
@@ -360,7 +432,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Inform all of the listeners that require an update
-	 *
+	 * 
 	 * @param listener
 	 *            The listener we are updating.
 	 * @param event
@@ -379,12 +451,14 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Inform all of the listeners that require an update
-	 *
+	 * 
 	 * @param event
 	 *            the event with the update details
 	 */
 	void fireListeners(final LabelProviderChangedEvent event) {
-		for (final ILabelProviderListener l : listeners) {
+		Object[] array = listeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final ILabelProviderListener l = (ILabelProviderListener) array[i];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -397,7 +471,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	/**
 	 * Fire any listeners from the UIThread. Used for cases where this may be
 	 * invoked outside of the UI by the public API.
-	 *
+	 * 
 	 * @param event
 	 *            the event with the update details
 	 */
@@ -417,12 +491,22 @@ public class DecoratorManager implements ILabelProviderListener,
 
 		WorkbenchJob updateJob = new WorkbenchJob(
 				WorkbenchMessages.DecorationScheduler_UpdateJobName) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				fireListeners(event);
 				return Status.OK_STATUS;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
+			 */
 			@Override
 			public boolean belongsTo(Object family) {
 				return FAMILY_DECORATE == family;
@@ -433,7 +517,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	}
 
-
+	
 	/**
 	 * Decorate the text in the reciever using the context.
 	 * @param text
@@ -448,10 +532,11 @@ public class DecoratorManager implements ILabelProviderListener,
 		Object adapted = getResourceAdapter(element);
 		String result = scheduler.decorateWithText(text, element, adapted,
 				context);
-		for (FullDecoratorDefinition decorator : getDecoratorsFor(element)) {
-			if (decorator.isEnabledFor(element)) {
+		FullDecoratorDefinition[] decorators = getDecoratorsFor(element);
+		for (int i = 0; i < decorators.length; i++) {
+			if (decorators[i].isEnabledFor(element)) {
 				String newResult = safeDecorateText(element, result,
-						decorator);
+						decorators[i]);
 				if (newResult != null) {
 					result = newResult;
 				}
@@ -459,11 +544,12 @@ public class DecoratorManager implements ILabelProviderListener,
 		}
 
 		if (adapted != null) {
-			for (FullDecoratorDefinition decorator : getDecoratorsFor(adapted)) {
-				if (decorator.isAdaptable()
-						&& decorator.isEnabledFor(adapted)) {
+			decorators = getDecoratorsFor(adapted);
+			for (int i = 0; i < decorators.length; i++) {
+				if (decorators[i].isAdaptable()
+						&& decorators[i].isEnabledFor(adapted)) {
 					String newResult = safeDecorateText(adapted, result,
-							decorator);
+							decorators[i]);
 					if (newResult != null) {
 						result = newResult;
 					}
@@ -474,7 +560,10 @@ public class DecoratorManager implements ILabelProviderListener,
 		return result;
 	}
 
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateText(java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public String decorateText(String text, Object element) {
 		return decorateText(text, element, DecorationContext.DEFAULT_CONTEXT);
@@ -482,7 +571,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Decorate the text in a SafeRunnable.
-	 *
+	 * 
 	 * @param element
 	 *            The element we are decorating
 	 * @param start
@@ -514,11 +603,12 @@ public class DecoratorManager implements ILabelProviderListener,
 		Object adapted = getResourceAdapter(element);
 		Image result = scheduler.decorateWithOverlays(image, element, adapted,
 				context, localResourceManager);
+		FullDecoratorDefinition[] decorators = getDecoratorsFor(element);
 
-		for (FullDecoratorDefinition decorator : getDecoratorsFor(element)) {
-			if (decorator.isEnabledFor(element)) {
+		for (int i = 0; i < decorators.length; i++) {
+			if (decorators[i].isEnabledFor(element)) {
 				Image newResult = safeDecorateImage(element, result,
-						decorator);
+						decorators[i]);
 				if (newResult != null) {
 					result = newResult;
 				}
@@ -528,11 +618,12 @@ public class DecoratorManager implements ILabelProviderListener,
 		// Get any adaptations to IResource
 
 		if (adapted != null) {
-			for (FullDecoratorDefinition decorator : getDecoratorsFor(adapted)) {
-				if (decorator.isAdaptable()
-						&& decorator.isEnabledFor(adapted)) {
+			decorators = getDecoratorsFor(adapted);
+			for (int i = 0; i < decorators.length; i++) {
+				if (decorators[i].isAdaptable()
+						&& decorators[i].isEnabledFor(adapted)) {
 					Image newResult = safeDecorateImage(adapted, result,
-							decorator);
+							decorators[i]);
 					if (newResult != null) {
 						result = newResult;
 					}
@@ -543,6 +634,12 @@ public class DecoratorManager implements ILabelProviderListener,
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateImage(org.eclipse.swt.graphics.Image,
+	 *      java.lang.Object)
+	 */
 	@Override
 	public Image decorateImage(Image image, Object element) {
 		return decorateImage(image, element, DecorationContext.DEFAULT_CONTEXT,
@@ -551,7 +648,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Decorate the image in a SafeRunnable.
-	 *
+	 * 
 	 * @param element
 	 *            The element we are decorating
 	 * @param start
@@ -571,7 +668,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	/**
 	 * Get the resource adapted object for the supplied element. Return
 	 * <code>null</code>. if there isn't one.
-	 *
+	 * 
 	 * @param element
 	 * @return Object or <code>null</code>.
 	 */
@@ -597,7 +694,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	 * Return whether or not the decorator registered for element has a label
 	 * property called property name. Check for an adapted resource if
 	 * checkAdapted is true.
-	 *
+	 * 
 	 * @param element
 	 * @param property
 	 * @param checkAdapted
@@ -641,9 +738,9 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	private boolean isLabelProperty(Object element, String property,
 			DecoratorDefinition[] decorators) {
-		for (DecoratorDefinition decorator : decorators) {
-			if (decorator.isEnabledFor(element)
-					&& decorator.isLabelProperty(element, property)) {
+		for (int i = 0; i < decorators.length; i++) {
+			if (decorators[i].isEnabledFor(element)
+					&& decorators[i].isLabelProperty(element, property)) {
 				return true;
 			}
 		}
@@ -653,21 +750,21 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Return the enabled full decorator definitions.
-	 *
+	 * 
 	 * @return FullDecoratorDefinition[]
 	 */
 	private FullDecoratorDefinition[] enabledFullDefinitions() {
 
-		FullDecoratorDefinition[] fullDefinitions = getFullDefinitions();
+		FullDecoratorDefinition[] full = getFullDefinitions();
 		// As this are a deprecated data type optimize for
 		// the undefined case.
-		if (fullDefinitions.length == 0) {
-			return fullDefinitions;
+		if (full.length == 0) {
+			return full;
 		}
 		ArrayList result = new ArrayList();
-		for (FullDecoratorDefinition element : fullDefinitions) {
-			if (element.isEnabled()) {
-				result.add(element);
+		for (int i = 0; i < full.length; i++) {
+			if (full[i].isEnabled()) {
+				result.add(full[i]);
 			}
 		}
 		FullDecoratorDefinition[] returnArray = new FullDecoratorDefinition[result
@@ -706,7 +803,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Get the DecoratorDefinitions defined on the receiver.
-	 *
+	 * 
 	 * @return DecoratorDefinition[]
 	 */
 	public DecoratorDefinition[] getAllDecoratorDefinitions() {
@@ -734,11 +831,11 @@ public class DecoratorManager implements ILabelProviderListener,
 		} else {
 			// Assume that someone is going to care about the
 			// decoration result and just start it right away
-			for (Object element : elements) {
-				Object adapted = getResourceAdapter(element);
+			for (int i = 0; i < elements.length; i++) {
+				Object adapted = getResourceAdapter(elements[i]);
 				// Force an update in case full decorators are the only ones
 				// enabled
-				scheduler.queueForDecoration(element, adapted, true, null,
+				scheduler.queueForDecoration(elements[i], adapted, true, null,
 						DecorationContext.DEFAULT_CONTEXT);
 			}
 		}
@@ -760,10 +857,10 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	private void writeDecoratorsPreference(StringBuffer enabledIds,
 			DecoratorDefinition[] definitions) {
-		for (DecoratorDefinition definition : definitions) {
-			enabledIds.append(definition.getId());
+		for (int i = 0; i < definitions.length; i++) {
+			enabledIds.append(definitions[i].getId());
 			enabledIds.append(VALUE_SEPARATOR);
-			if (definition.isEnabled()) {
+			if (definitions[i].isEnabled()) {
 				enabledIds.append(P_TRUE);
 			} else {
 				enabledIds.append(P_FALSE);
@@ -800,26 +897,27 @@ public class DecoratorManager implements ILabelProviderListener,
 			}
 		}
 
-		for (FullDecoratorDefinition element : getFullDefinitions()) {
-			String id = element.getId();
+		FullDecoratorDefinition[] full = getFullDefinitions();
+		for (int i = 0; i < full.length; i++) {
+			String id = full[i].getId();
 			if (enabledIds.contains(id)) {
-				element.setEnabled(true);
+				full[i].setEnabled(true);
 			} else {
 				if (disabledIds.contains(id)) {
-					element.setEnabled(false);
+					full[i].setEnabled(false);
 				}
 			}
 		}
 
 		LightweightDecoratorDefinition[] lightweightDefinitions = getLightweightManager()
 				.getDefinitions();
-		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
-			String id = lightweightDefinition.getId();
+		for (int i = 0; i < lightweightDefinitions.length; i++) {
+			String id = lightweightDefinitions[i].getId();
 			if (enabledIds.contains(id)) {
-				lightweightDefinition.setEnabled(true);
+				lightweightDefinitions[i].setEnabled(true);
 			} else {
 				if (disabledIds.contains(id)) {
-					lightweightDefinition.setEnabled(false);
+					lightweightDefinitions[i].setEnabled(false);
 				}
 			}
 		}
@@ -834,9 +932,9 @@ public class DecoratorManager implements ILabelProviderListener,
 		// Disable all of the enabled decorators
 		// so as to force a dispose of thier decorators
 		FullDecoratorDefinition[] full = getFullDefinitions();
-		for (FullDecoratorDefinition element : full) {
-			if (element.isEnabled()) {
-				element.setEnabled(false);
+		for (int i = 0; i < full.length; i++) {
+			if (full[i].isEnabled()) {
+				full[i].setEnabled(false);
 			}
 		}
 		if (lightweightManager != null) {
@@ -846,6 +944,11 @@ public class DecoratorManager implements ILabelProviderListener,
 		dispose();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IDecoratorManager#getEnabled(java.lang.String)
+	 */
 	@Override
 	public boolean getEnabled(String decoratorId) {
 		DecoratorDefinition definition = getDecoratorDefinition(decoratorId);
@@ -866,7 +969,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	/**
 	 * Returns the resource manager used to created images for the light weight
 	 * decorator.
-	 *
+	 * 
 	 * @return the resource manager
 	 */
 	public ResourceManager getResourceManager() {
@@ -941,7 +1044,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Get the DecoratorDefinition with the supplied id
-	 *
+	 * 
 	 * @return DecoratorDefinition or <code>null</code> if it is not found
 	 * @param decoratorId
 	 *            String
@@ -956,7 +1059,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Get the FullDecoratorDefinition with the supplied id
-	 *
+	 * 
 	 * @return FullDecoratorDefinition or <code>null</code> if it is not found
 	 * @param decoratorId
 	 *            the id
@@ -972,7 +1075,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Return the index of the definition in the array.
-	 *
+	 * 
 	 * @param decoratorId
 	 *            the id
 	 * @return the index of the definition in the array or <code>-1</code>
@@ -990,7 +1093,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Get the full decorator definitions registered for elements of this type.
-	 *
+	 * 
 	 * @param element
 	 *            The element to look up
 	 * @return FullDecoratorDefinition[]
@@ -1015,7 +1118,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	/**
 	 * Returns the lightweightManager. This method is public for use by test
 	 * cases. No other classes outside of this package should use this method.
-	 *
+	 * 
 	 * @return LightweightDecoratorManager
 	 */
 	public LightweightDecoratorManager getLightweightManager() {
@@ -1039,6 +1142,12 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.LabelDecorator#prepareDecoration(java.lang.Object,
+	 *      java.lang.String, org.eclipse.jface.viewers.IDecorationContext)
+	 */
 	public boolean prepareDecoration(Object element, String originalText,
 			IDecorationContext context) {
 		// Check if there is a decoration ready or if there is no lightweight
@@ -1063,21 +1172,42 @@ public class DecoratorManager implements ILabelProviderListener,
 		return !force;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IDelayedLabelDecorator#prepareDecoration(java.lang.Object,
+	 *      java.lang.String)
+	 */
 	@Override
 	public boolean prepareDecoration(Object element, String originalText) {
 		return prepareDecoration(element, originalText,
 				DecorationContext.DEFAULT_CONTEXT);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IFontDecorator#decorateFont(java.lang.Object)
+	 */
 	public Font decorateFont(Object element) {
 		return scheduler.getFont(element, getResourceAdapter(element));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IColorDecorator#decorateBackground(java.lang.Object)
+	 */
 	public Color decorateBackground(Object element) {
 		return scheduler.getBackgroundColor(element,
 				getResourceAdapter(element));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IColorDecorator#decorateForeground(java.lang.Object)
+	 */
 	public Color decorateForeground(Object element) {
 		return scheduler.getForegroundColor(element,
 				getResourceAdapter(element));
@@ -1085,7 +1215,7 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	/**
 	 * Get all of the defined fullDefinitions. Initalize if required
-	 *
+	 * 
 	 * @return FullDecoratorDefinition[]
 	 */
 	private FullDecoratorDefinition[] getFullDefinitions() {
@@ -1100,25 +1230,39 @@ public class DecoratorManager implements ILabelProviderListener,
 				EXTENSIONPOINT_UNIQUE_ID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
+	 *      org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker,
 			IExtension addedExtension) {
-		for (IConfigurationElement addedElement : addedExtension.getConfigurationElements()) {
+		IConfigurationElement addedElements[] = addedExtension
+				.getConfigurationElements();
+		for (int i = 0; i < addedElements.length; i++) {
 			DecoratorRegistryReader reader = new DecoratorRegistryReader();
-			reader.readElement(addedElement);
+			reader.readElement(addedElements[i]);
 			for (Iterator j = reader.getValues().iterator(); j.hasNext();) {
 				addDecorator((DecoratorDefinition) j.next());
 			}
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension,
+	 *      java.lang.Object[])
+	 */
 	@Override
 	public void removeExtension(IExtension source, Object[] objects) {
 
 		boolean shouldClear = false;
-		for (Object object : objects) {
-			if (object instanceof DecoratorDefinition) {
-				DecoratorDefinition definition = (DecoratorDefinition) object;
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] instanceof DecoratorDefinition) {
+				DecoratorDefinition definition = (DecoratorDefinition) objects[i];
 				if (definition.isFull()) {
 					int idx = getFullDecoratorDefinitionIdx(definition.getId());
 					if (idx != -1) {

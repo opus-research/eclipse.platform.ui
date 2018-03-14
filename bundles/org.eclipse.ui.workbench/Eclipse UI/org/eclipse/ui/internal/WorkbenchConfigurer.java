@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
@@ -33,7 +34,7 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
  * <p>
  * This class is not intended to be instantiated or subclassed by clients.
  * </p>
- *
+ * 
  * @since 3.0
  */
 public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
@@ -43,10 +44,10 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
      * value type: <code>Object</code>).
      * @see #setData
      */
-	private Map<String, Object> extraData = new HashMap<String, Object>();
+    private Map extraData = new HashMap();
 
     /**
-     * Indicates whether workbench state should be saved on close and
+     * Indicates whether workbench state should be saved on close and 
      * restored on subsequent open.
      */
     private boolean saveAndRestore = false;
@@ -59,10 +60,10 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
 
     /**
      * Indicates the behaviour when the last window is closed.
-     * If <code>true</code>, the workbench will exit (saving the last window's state,
+     * If <code>true</code>, the workbench will exit (saving the last window's state, 
      * if configured to do so).
      * If <code>false</code> the window will be closed, leaving the workbench running.
-     *
+     * 
      * @since 3.1
      */
 	private boolean exitOnLastWindowClose = true;
@@ -78,17 +79,26 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         super();
     }
 
+    /* (non-javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbench
+     */
     @Override
 	public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
+    /* (non-javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbenchWindowManager
+     */
     @Override
 	public WindowManager getWorkbenchWindowManager() {
         // return the global workbench window manager
 		return null;
     }
 
+    /* (non-javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#declareImage
+     */
     @Override
 	public void declareImage(String symbolicName, ImageDescriptor descriptor,
             boolean shared) {
@@ -98,6 +108,9 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         WorkbenchImages.declareImage(symbolicName, descriptor, shared);
     }
 
+    /* (non-javadoc)
+     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWindowConfigurer
+     */
     @Override
 	public IWorkbenchWindowConfigurer getWindowConfigurer(
             IWorkbenchWindow window) {
@@ -166,7 +179,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     }
 
 	@Override
-	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) {
+	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) throws WorkbenchException {
 		return getWindowConfigurer(null);
 	}
 

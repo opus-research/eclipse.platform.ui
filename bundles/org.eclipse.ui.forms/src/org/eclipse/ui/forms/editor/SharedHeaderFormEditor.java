@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.forms.editor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.forms.IFormPart;
@@ -25,12 +26,12 @@ import org.eclipse.ui.internal.forms.widgets.FormUtil;
  * A variation of {@link FormEditor}, this editor has a stable header that does
  * not change when pages are switched. Pages that are added to this editor
  * should not have the title or image set.
- *
+ * 
  * @since 3.3
  */
 public abstract class SharedHeaderFormEditor extends FormEditor {
 	private HeaderForm headerForm;
-
+	
 	private boolean wasHeaderActive= true;
 	private Listener activationListener= null;
 
@@ -46,12 +47,10 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 			return (FormEditor) getContainer();
 		}
 
-		@Override
 		public void dirtyStateChanged() {
 			getEditor().editorDirtyStateChanged();
 		}
 
-		@Override
 		public void staleStateChanged() {
 			refresh();
 		}
@@ -66,16 +65,15 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 
 	/**
 	 * Overrides <code>super</code> to create a form in which to host the tab
-	 * folder. This form will be responsible for creating a common form header.
+	 * folder. This form will be responsible for creating a common form header. 
 	 * Child pages should not have a header of their own.
-	 *
+	 * 
 	 * @param parent
 	 *            the page container parent
-	 *
+	 * 
 	 * @see org.eclipse.ui.part.MultiPageEditorPart#createPageContainer(org.eclipse.swt.widgets.Composite)
 	 */
 
-	@Override
 	protected Composite createPageContainer(Composite parent) {
 		parent = super.createPageContainer(parent);
 		parent.setLayout(new FillLayout());
@@ -88,33 +86,30 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 
 	/**
 	 * Returns the form that owns the shared header.
-	 *
+	 * 
 	 * @return the shared header
 	 */
 
 	public IManagedForm getHeaderForm() {
 		return headerForm;
 	}
-
-	@Override
+	
 	protected void createPages() {
 		super.createPages();
-
+		
 		// preempt MultiPageEditorPart#createPartControl(Composite)
 		if (getActivePage() == -1) {
 			// create page control and initialize page, keep focus on header by calling super implementation
 			super.setActivePage(0);
 		}
 	}
-
-	@Override
+	
 	protected void setActivePage(int pageIndex) {
 		// programmatic focus change
 		wasHeaderActive= false;
 		super.setActivePage(pageIndex);
 	}
-
-	@Override
+	
 	public void setFocus() {
 		installActivationListener();
 		if (wasHeaderActive)
@@ -127,31 +122,36 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 				super.setFocus();
 		}
 	}
-
+	
 	private void installActivationListener() {
 		if (activationListener == null) {
-			activationListener = event -> {
-				boolean wasHeaderActive = event.widget != getContainer();
-
-				int activePage = getActivePage();
-				if (SharedHeaderFormEditor.this.wasHeaderActive != wasHeaderActive && activePage != -1
-						&& pages.get(activePage) instanceof IEditorPart) {
-
-					if (wasHeaderActive) {
-						deactivateSite(true, true);
-					} else {
-						activateSite();
+			activationListener = new Listener() {
+				public void handleEvent(Event event) {
+					boolean wasHeaderActive = event.widget != getContainer();
+					
+					int activePage = getActivePage();
+					if (SharedHeaderFormEditor.this.wasHeaderActive != wasHeaderActive && activePage != -1 && pages.get(activePage) instanceof IEditorPart) {
+						
+						if (wasHeaderActive) {
+							deactivateSite(true, true);
+						} else {
+							activateSite();
+						}
 					}
+					
+					SharedHeaderFormEditor.this.wasHeaderActive = wasHeaderActive;
 				}
-
-				SharedHeaderFormEditor.this.wasHeaderActive = wasHeaderActive;
 			};
 			getContainer().addListener(SWT.Activate, activationListener);
 			getHeaderForm().getForm().getForm().getHead().addListener(SWT.Activate, activationListener);
 		}
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.editor.FormEditor#dispose()
+	 */
 	public void dispose() {
 		if (headerForm != null) {
 			headerForm.dispose();
@@ -160,7 +160,11 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		super.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.editor.FormEditor#isDirty()
+	 */
 	public boolean isDirty() {
 		if (headerForm != null && headerForm.isDirty()) {
 			return true;
@@ -168,7 +172,11 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 		return super.isDirty();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.editor.FormEditor#commitPages(boolean)
+	 */
 	protected void commitPages(boolean onSave) {
 		if (headerForm != null && headerForm.isDirty())
 			headerForm.commit(onSave);
@@ -180,7 +188,7 @@ public abstract class SharedHeaderFormEditor extends FormEditor {
 	 * shared header. If the header form will contain controls that can change
 	 * the state of the editor, they should be wrapped in an IFormPart so that
 	 * they can participate in the life cycle event management.
-	 *
+	 * 
 	 * @param headerForm
 	 *            the form that owns the shared header
 	 * @see IFormPart

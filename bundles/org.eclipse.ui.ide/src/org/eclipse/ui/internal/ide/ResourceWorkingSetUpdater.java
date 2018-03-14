@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -157,8 +157,9 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 			workingSets = (IWorkingSet[]) fWorkingSets
 					.toArray(new IWorkingSet[fWorkingSets.size()]);
 		}
-		for (IWorkingSet workingSet : workingSets) {
-			WorkingSetDelta workingSetDelta = new WorkingSetDelta(workingSet);
+		for (int w = 0; w < workingSets.length; w++) {
+			WorkingSetDelta workingSetDelta = new WorkingSetDelta(
+					workingSets[w]);
 			processResourceDelta(workingSetDelta, delta);
 			workingSetDelta.process();
 		}
@@ -191,8 +192,9 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 			return;
 		}
 
-		for (IResourceDelta child : delta.getAffectedChildren()) {
-			processResourceDelta(result, child);
+		IResourceDelta[] children = delta.getAffectedChildren();
+		for (int i = 0; i < children.length; i++) {
+			processResourceDelta(result, children[i]);
 		}
 	}
 

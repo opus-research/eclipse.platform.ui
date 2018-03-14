@@ -15,7 +15,6 @@ package org.eclipse.ui.views.properties;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewReference;
@@ -44,7 +43,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 	/**
 	 * First tries to find a suitable instance to reuse for the given context,
 	 * then creates a new instance if necessary.
-	 *
+	 * 
 	 * @param event
 	 * @return an instance for the given context
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -85,7 +84,8 @@ public class NewPropertySheetHandler extends AbstractHandler {
 			PropertySheet sheet = (PropertySheet) activePart;
 			return (PropertyShowInContext) sheet.getShowInContext();
 		}
-		IShowInSource adapter = Adapters.adapt(activePart, IShowInSource.class);
+		IShowInSource adapter = activePart
+				.getAdapter(IShowInSource.class);
 		if (adapter != null) {
 			ShowInContext showInContext = adapter.getShowInContext();
 			return new PropertyShowInContext(activePart, showInContext);
@@ -96,7 +96,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 
 	/**
 	 * Returns a PropertySheet instance
-	 *
+	 * 
 	 * @param event
 	 * @param context
 	 *            a {@link ShowInContext} to handle
@@ -114,7 +114,8 @@ public class NewPropertySheetHandler extends AbstractHandler {
 			secondaryId = Long.toString(System.currentTimeMillis());
 		} else {
 			IViewReference[] refs = page.getViewReferences();
-			for (IViewReference viewReference : refs) {
+			for (int i = 0; i < refs.length; i++) {
+				IViewReference viewReference = refs[i];
 				if (IPageLayout.ID_PROP_SHEET.equals(viewReference.getId())) {
 					secondaryId = Long.toString(System.currentTimeMillis());
 					PropertySheet sheet = (PropertySheet) viewReference

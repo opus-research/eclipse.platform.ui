@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.ui.internal.ExceptionHandler;
  * all to work even in some cases where the "selectAll" method does not exist.
  * This handler attempts to use "getTextLimit" and "setSelection" to do select
  * all. If this doesn't work, then it finally fails.
- *
+ * 
  * @since 3.0
  */
 public class SelectAllHandler extends WidgetMethodHandler {
@@ -47,12 +47,12 @@ public class SelectAllHandler extends WidgetMethodHandler {
 			try {
 				final Control focusControl = Display.getCurrent()
 						.getFocusControl();
-
+				
 				final int numParams = methodToExecute.getParameterTypes().length;
 
 				if ((focusControl instanceof Composite)
                         && ((((Composite) focusControl).getStyle() & SWT.EMBEDDED) != 0)) {
-
+					
 					// we only support selectAll for swing components
 					if (numParams != 0) {
 						return null;
@@ -74,41 +74,52 @@ public class SelectAllHandler extends WidgetMethodHandler {
 					try {
 						final Object focusComponent = getFocusComponent();
 						if (focusComponent != null) {
-							Runnable methodRunnable = () -> {
-								try {
-									methodToExecute.invoke(focusComponent);
-									// and back to the UI thread :-)
-									focusControl.getDisplay().asyncExec(
-											() -> {
-												if (!focusControl
-														.isDisposed()) {
-													focusControl
-															.notifyListeners(
-																	SWT.Selection,
-																	null);
-												}
-											});
-								} catch (final IllegalAccessException e1) {
-									// The method is protected, so do
-									// nothing.
-								} catch (final InvocationTargetException e2) {
-									/*
-									 * I would like to log this exception --
-									 * and possibly show a dialog to the
-									 * user -- but I have to go back to the
-									 * SWT event loop to do this. So, back
-									 * we go....
-									 */
-									focusControl.getDisplay().asyncExec(
-											() -> ExceptionHandler
-													.getInstance()
-													.handleException(
-															new ExecutionException(
-																	"An exception occurred while executing " //$NON-NLS-1$
-																			+ methodToExecute
-																					.getName(),
-																	e2
-																			.getTargetException())));
+							Runnable methodRunnable = new Runnable() {
+								@Override
+								public void run() {
+									try {
+										methodToExecute.invoke(focusComponent);
+										// and back to the UI thread :-)
+										focusControl.getDisplay().asyncExec(
+												new Runnable() {
+													@Override
+													public void run() {
+														if (!focusControl
+																.isDisposed()) {
+															focusControl
+																	.notifyListeners(
+																			SWT.Selection,
+																			null);
+														}
+													}
+												});
+									} catch (final IllegalAccessException e) {
+										// The method is protected, so do
+										// nothing.
+									} catch (final InvocationTargetException e) {
+										/*
+										 * I would like to log this exception --
+										 * and possibly show a dialog to the
+										 * user -- but I have to go back to the
+										 * SWT event loop to do this. So, back
+										 * we go....
+										 */
+										focusControl.getDisplay().asyncExec(
+												new Runnable() {
+													@Override
+													public void run() {
+														ExceptionHandler
+																.getInstance()
+																.handleException(
+																		new ExecutionException(
+																				"An exception occurred while executing " //$NON-NLS-1$
+																						+ methodToExecute
+																								.getName(),
+																				e
+																						.getTargetException()));
+													}
+												});
+									}
 								}
 							};
 
@@ -168,7 +179,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 
 	/**
 	 * Looks up the select all method on the given focus control.
-	 *
+	 * 
 	 * @return The method on the focus control; <code>null</code> if none.
 	 */
 	@Override

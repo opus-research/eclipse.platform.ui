@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc) - [507295] orderExtensions
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.e4.ui.internal.workbench.ExtensionsSort;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
@@ -33,7 +35,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * done by default.
  */
 public abstract class RegistryReader {
-
+	
     // for dynamic UI - remove this cache to avoid inconsistency
     //protected static Hashtable extensionPoints = new Hashtable();
     /**
@@ -50,8 +52,7 @@ public abstract class RegistryReader {
         IExtension extension = element.getDeclaringExtension();
         StringBuffer buf = new StringBuffer();
         buf
-				.append("Plugin " + extension.getNamespace() + ", extension " //$NON-NLS-1$//$NON-NLS-2$
-						+ extension.getExtensionPointUniqueIdentifier());
+                .append("Plugin " + extension.getNamespace() + ", extension " + extension.getExtensionPointUniqueIdentifier());//$NON-NLS-2$//$NON-NLS-1$
         // look for an ID if available - this should help debugging
         String id = element.getAttribute("id"); //$NON-NLS-1$
         if (id != null) {
@@ -95,14 +96,29 @@ public abstract class RegistryReader {
      * @return ordered extensions
      */
     public static IExtension[] orderExtensions(IExtension[] extensions) {
-		return new ExtensionsSort().sort(extensions);
+        // By default, the order is based on plugin id sorted
+        // in ascending order. The order for a plugin providing
+        // more than one extension for an extension point is
+        // dependent in the order listed in the XML file.
+        IExtension[] sortedExtension = new IExtension[extensions.length];
+        System.arraycopy(extensions, 0, sortedExtension, 0, extensions.length);
+        Comparator comparer = new Comparator() {
+            @Override
+			public int compare(Object arg0, Object arg1) {
+                String s1 = ((IExtension) arg0).getNamespace();
+                String s2 = ((IExtension) arg1).getNamespace();
+                return s1.compareToIgnoreCase(s2);
+            }
+        };
+        Collections.sort(Arrays.asList(sortedExtension), comparer);
+        return sortedExtension;
     }
 
     /**
      * Implement this method to read element's attributes.
      * If children should also be read, then implementor
      * is responsible for calling <code>readElementChildren</code>.
-     * Implementor is also responsible for logging missing
+     * Implementor is also responsible for logging missing 
      * attributes.
      *
      * @return true if element was recognized, false if not.
@@ -143,7 +159,7 @@ public abstract class RegistryReader {
     /**
      *	Start the registry reading process using the
      * supplied plugin ID and extension point.
-     *
+     * 
      * @param registry the registry to read from
      * @param pluginId the plugin id of the extenion point
      * @param extensionPoint the extension point id
@@ -157,14 +173,14 @@ public abstract class RegistryReader {
 		}
         IExtension[] extensions = point.getExtensions();
         extensions = orderExtensions(extensions);
-        for (IExtension extension : extensions) {
-			readExtension(extension);
+        for (int i = 0; i < extensions.length; i++) {
+			readExtension(extensions[i]);
 		}
     }
-
+    
     /**
      * Utility for extracting the description child of an element.
-     *
+     * 
      * @param configElement the element
      * @return the description
      * @since 3.1
@@ -176,12 +192,12 @@ public abstract class RegistryReader {
 	    }
 	    return "";//$NON-NLS-1$
     }
-
+    
     /**
 	 * Utility for extracting the value of a class attribute or a nested class
 	 * element that follows the pattern set forth by
 	 * {@link org.eclipse.core.runtime.IExecutableExtension}.
-	 *
+	 * 
 	 * @param configElement
 	 *            the element
 	 * @param classAttributeName
@@ -198,7 +214,7 @@ public abstract class RegistryReader {
 		if (candidateChildren.length == 0) {
 			return null;
 		}
-
+	
 		return candidateChildren[0].getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
     }
 }

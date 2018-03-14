@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,10 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
-import java.util.Objects;
-import java.util.function.Supplier;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.ElementAdapter;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
@@ -195,72 +193,49 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		return SWTStyleHelpers.getSWTWidgetStyleAsString(getWidget());
 	}
 
-	@Override
-	public final String getAttribute(String attr) {
-		Supplier<String> attribute = internalGetAttribute(attr);
-		if (attribute != null) {
-			String attributeValue = attribute.get();
-			Assert.isNotNull(attributeValue);
-			return attributeValue;
-		}
-		return "";
-	}
-
-	@Override
-	public final boolean hasAttribute(String attr) {
-		return internalGetAttribute(attr) != null;
-	}
-
-	/**
+	/*
+	 * (non-Javadoc)
 	 *
-	 * The goal for {@link #internalGetAttribute(String)} is to share the code
-	 * of {@link #hasAttribute(String)} and {@link #getAttribute(String)} and to
-	 * keep the performance footprint for {@link #hasAttribute(String)} small.
-	 * This shall be accomplished by:
-	 * <ul>
-	 * <li>The method shall only be a lookup for a supplier, no actual
-	 * computation shall be made.
-	 * <li>The result of the supplier must hold the requirements of the result
-	 * of {@link #getAttribute(String)}. Especially it <strong>must not</strong>
-	 * return {@code null}.
-	 * <li>If the attribute isn't set on the widget, the method must return
-	 * {@code null}.
-	 * </ul>
-	 *
-	 *
-	 * @param attr
-	 *            the name of the attribute to look for.
-	 * @return a supplier which will return the actual attribute value or
-	 *         {@code null} if the attribute isn't set for the widget.
+	 * @see
+	 * org.eclipse.e4.ui.css.core.dom.ElementAdapter#getAttribute(java.lang.
+	 * String)
 	 */
-	protected Supplier<String> internalGetAttribute(String attr) {
+	@Override
+	public String getAttribute(String attr) {
 		Widget widget = getWidget();
-		switch(attr){
-		case "style":
-			return () -> swtStyles != null ? swtStyles : "";
-		case "class":
-			return () -> Objects.toString(getCSSClass(widget), "");
-		case "swt-data-class":
-			return () -> {
-				Object data = widget.getData();
-				if (data == null) {
-					return "";
-				}
-				StringBuilder sb = new StringBuilder();
-				for (Class<?> clazz = data.getClass(); clazz != Object.class; sb.append(' ')) {
-					sb.append(clazz.getName());
-					clazz = clazz.getSuperclass();
-				}
-				return sb.toString();
-			};
-		default:
-			Object o = widget.getData(attr.toLowerCase());
-			if (o != null) {
-				return () -> o.toString();
+		if (attr.equals("style")) {
+			return swtStyles;
+		} else if (attr.equals("class")) {
+			String result = getCSSClass(widget);
+			return result != null ? result : "";
+		} else if ("swt-data-class".equals(attr)) {
+			Object data = widget.getData();
+			if (data == null) {
+				return "";
 			}
+			StringBuilder sb = new StringBuilder();
+			for (Class<?> clazz = data.getClass(); clazz != Object.class; sb
+					.append(' ')) {
+				sb.append(clazz.getName());
+				clazz = clazz.getSuperclass();
+			}
+			return sb.toString();
+		}
+		Object o = widget.getData(attr.toLowerCase());
+		if (o != null) {
+			return o.toString();
 		}
 
-		return null;
+		// FIXME: Commented out dead code. Filed https://bugs.eclipse.org/415442 to review this part of the code.
+		//		try {
+		//			//o = PropertyUtils.getProperty(widget, attr);
+		//			if (o != null)
+		//				return o.toString();
+		//		} catch (Exception e) {
+		//			// e.printStackTrace();
+		//		}
+
+		return "";
 	}
 
 	@Override
@@ -307,6 +282,11 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.CSSStylableElement#getCSSClass()
+	 */
 	@Override
 	public String getCSSClass() {
 		Widget widget = getWidget();
@@ -317,6 +297,11 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.CSSStylableElement#getCSSStyle()
+	 */
 	@Override
 	public String getCSSStyle() {
 		Widget widget = getWidget();
@@ -327,12 +312,6 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		}
 		return null;
 	}
-
-	/**
-	 * Called by the CSS engine upon a CSS theme switch. Implementations
-	 * should restore the default value so that the new theme can be applied to
-	 * the application without restart
-	 */
 
 	public void reset() {
 	}

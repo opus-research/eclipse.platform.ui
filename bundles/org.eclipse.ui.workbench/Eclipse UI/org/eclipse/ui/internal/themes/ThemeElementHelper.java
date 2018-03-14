@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,8 +44,8 @@ public final class ThemeElementHelper {
 
     public static void populateRegistry(ITheme theme,
             FontDefinition[] definitions, IPreferenceStore store) {
-        // sort the definitions by dependant ordering so that we process
-        // ancestors before children.
+        // sort the definitions by dependant ordering so that we process 
+        // ancestors before children.		
         FontDefinition[] copyOfDefinitions = null;
 
         // the colors to set a default value for, but not a registry value
@@ -64,13 +64,14 @@ public final class ThemeElementHelper {
         Arrays.sort(copyOfDefinitions, new IThemeRegistry.HierarchyComparator(
                 definitions));
 
-        for (FontDefinition definition : copyOfDefinitions) {
+        for (int i = 0; i < copyOfDefinitions.length; i++) {
+            FontDefinition definition = copyOfDefinitions[i];
             installFont(definition, theme, store, true);
         }
 
         if (defaults != null) {
-            for (FontDefinition fontDef : defaults) {
-                installFont(fontDef, theme, store, false);
+            for (int i = 0; i < defaults.length; i++) {
+                installFont(defaults[i], theme, store, false);
             }
         }
     }
@@ -89,9 +90,9 @@ public final class ThemeElementHelper {
     }
 
     /**
-     * Installs the given font in the preference store and optionally the font
+     * Installs the given font in the preference store and optionally the font 
      * registry.
-     *
+     * 
      * @param definition
      *            the font definition
      * @param registry
@@ -120,16 +121,19 @@ public final class ThemeElementHelper {
 			defaultFont = registry.filterData(defaultFontData, display);
 		} else {
             // values pushed in from jface property files.  Very ugly.
-
+			
 			//If in high contrast, ignore the defaults in jface and use the default (system) font.
 			//This is a hack to address bug #205474. See bug #228207 for a future fix.
-			FontData[] fontData = JFaceResources.getFontRegistry()
-					.getFontData(display.getHighContrast() ? JFaceResources.DEFAULT_FONT : id);
+			FontData[] fontData = JFaceResources.getFontRegistry().getFontData(
+				display.getHighContrast()
+					? JFaceResources.DEFAULT_FONT
+					: id
+			);
 			defaultFont = registry.bestDataArray(fontData, display);
         }
 
         if (setInRegistry) {
-			if (prefFont == null || prefFont == PreferenceConverter.getFontDataArrayDefaultDefault()) {
+			if (prefFont == null || prefFont == PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT) {
 				if (definition.getValue() != null) {
 					prefFont = definition.getValue();
 				} else if (definition.getDefaultsTo() != null) {
@@ -163,8 +167,8 @@ public final class ThemeElementHelper {
 
     public static void populateRegistry(ITheme theme,
             ColorDefinition[] definitions, IPreferenceStore store) {
-        // sort the definitions by dependant ordering so that we process
-        // ancestors before children.
+        // sort the definitions by dependant ordering so that we process 
+        // ancestors before children.		
 
         ColorDefinition[] copyOfDefinitions = null;
 
@@ -184,13 +188,14 @@ public final class ThemeElementHelper {
         Arrays.sort(copyOfDefinitions, new IThemeRegistry.HierarchyComparator(
                 definitions));
 
-        for (ColorDefinition definition : copyOfDefinitions) {
+        for (int i = 0; i < copyOfDefinitions.length; i++) {
+            ColorDefinition definition = copyOfDefinitions[i];
             installColor(definition, theme, store, true);
         }
 
         if (defaults != null) {
-			for (ColorDefinition colorDef : defaults) {
-				installColor(colorDef, theme, store, false);
+            for (int i = 0; i < defaults.length; i++) {
+                installColor(defaults[i], theme, store, false);
             }
         }
     }
@@ -198,7 +203,7 @@ public final class ThemeElementHelper {
     /**
      * Return the definitions that should have their default preference value
      * set but nothing else.
-     *
+     * 
      * @param definitions the definitions that will be fully handled
      * @return the remaining definitions that should be defaulted
      */
@@ -216,7 +221,7 @@ public final class ThemeElementHelper {
     /**
      * Return the definitions that should have their default preference value
      * set but nothing else.
-     *
+     * 
      * @param definitions the definitions that will be fully handled
      * @return the remaining definitions that should be defaulted
      */
@@ -254,12 +259,13 @@ public final class ThemeElementHelper {
             IHierarchalThemeElementDefinition[] allDefs) {
         SortedSet set = new TreeSet(IThemeRegistry.ID_COMPARATOR);
         set.addAll(Arrays.asList(definitions));
-
+        
         IHierarchalThemeElementDefinition copy [] = new IHierarchalThemeElementDefinition[allDefs.length];
 		System.arraycopy(allDefs, 0, copy, 0, allDefs.length);
-
+		
         Arrays.sort(allDefs, new IThemeRegistry.HierarchyComparator(copy));
-        for (IHierarchalThemeElementDefinition def : allDefs) {
+        for (int i = 0; i < allDefs.length; i++) {
+            IHierarchalThemeElementDefinition def = allDefs[i];
             if (def.getDefaultsTo() != null) {
                 if (set.contains(def.getDefaultsTo())) {
 					set.add(def);
@@ -270,9 +276,9 @@ public final class ThemeElementHelper {
     }
 
     /**
-     * Installs the given color in the preference store and optionally the color
+     * Installs the given color in the preference store and optionally the color 
      * registry.
-     *
+     * 
      * @param definition
      *            the color definition
      * @param theme
@@ -282,18 +288,18 @@ public final class ThemeElementHelper {
      * @param setInRegistry
      * 			  whether the color should be put into the registry
      */
-
+    
     private static void installColor(ColorDefinition definition, ITheme theme,
             IPreferenceStore store, boolean setInRegistry) {
 
         //TODO: store shouldn't be null, should assert instead of checking null all over
-
+    	
     	ColorRegistry registry = theme.getColorRegistry();
 
         String id = definition.getId();
         String key = createPreferenceKey(theme, id);
-        RGB prefColor = store != null
-        	? PreferenceConverter.getColor(store, key)
+        RGB prefColor = store != null 
+        	? PreferenceConverter.getColor(store, key) 
         	: null;
 		RGB defaultColor;
 		if (definition.getValue() != null) {
@@ -304,25 +310,23 @@ public final class ThemeElementHelper {
 		} else {
 			defaultColor = null;
 		}
-
+     
         if (defaultColor == null) {
 			// default is null, likely because we have a bad definition - the
 			// defaultsTo color doesn't exist. We still need a sensible default,
 			// however.
 			defaultColor = PreferenceConverter.COLOR_DEFAULT_DEFAULT;
 		}
-
+        	
 		if (prefColor == null || prefColor == PreferenceConverter.COLOR_DEFAULT_DEFAULT) {
 			if (definition.getValue() != null) {
 				prefColor = definition.getValue();
 			} else if (definition.getDefaultsTo() != null) {
 				prefColor = registry.getRGB(definition.getDefaultsTo());
+			} else {
+				prefColor = defaultColor;
 			}
-		}
-
-		if (prefColor == null) {
-			prefColor = defaultColor;
-		}
+        }
 
         if (setInRegistry) {
         	registry.put(id, prefColor);
@@ -361,7 +365,8 @@ public final class ThemeElementHelper {
     public static String[] splitPropertyName(Theme theme, String property) {
     	IThemeDescriptor[] descriptors = WorkbenchPlugin.getDefault()
 				.getThemeRegistry().getThemes();
-		for (IThemeDescriptor themeDescriptor : descriptors) {
+		for (int i = 0; i < descriptors.length; i++) {
+			IThemeDescriptor themeDescriptor = descriptors[i];
 			String id = themeDescriptor.getId();
 			if (property.startsWith(id + '.')) { // the property starts with
 													// a known theme ID -

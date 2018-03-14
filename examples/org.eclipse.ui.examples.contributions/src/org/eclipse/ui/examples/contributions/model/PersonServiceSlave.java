@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public class PersonServiceSlave implements IPersonService, IDisposable {
 
 	private IServiceLocator serviceLocator;
 	private IPersonService parentService;
-	private ListenerList<IPropertyChangeListener> localListeners = new ListenerList<>(
+	private ListenerList localListeners = new ListenerList(
 			ListenerList.IDENTITY);
 
 	public PersonServiceSlave(IServiceLocator locator, IPersonService parent) {
@@ -39,39 +39,67 @@ public class PersonServiceSlave implements IPersonService, IDisposable {
 		serviceLocator.hasService(IHandlerService.class);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#addPersonChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+	 */
 	public void addPersonChangeListener(IPropertyChangeListener listener) {
 		localListeners.add(listener);
 		parentService.addPersonChangeListener(listener);
 	}
 
-	@Override
-	public Collection<Person> getPeople() {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#getPeople()
+	 */
+	public Collection getPeople() {
 		return parentService.getPeople();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#getPerson(int)
+	 */
 	public Person getPerson(int id) {
 		return parentService.getPerson(id);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#removePersonChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
+	 */
 	public void removePersonChangeListener(IPropertyChangeListener listener) {
 		localListeners.remove(listener);
 		parentService.removePersonChangeListener(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#updatePerson(org.eclipse.ui.examples.contributions.model.Person)
+	 */
 	public void updatePerson(Person person) {
 		parentService.updatePerson(person);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#createPerson(int)
+	 */
 	public Person createPerson(int id) {
 		return parentService.createPerson(id);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	public void dispose() {
 		Object[] array = localListeners.getListeners();
 		localListeners.clear();
@@ -83,7 +111,9 @@ public class PersonServiceSlave implements IPersonService, IDisposable {
 		parentService = null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.examples.contributions.model.IPersonService#login(org.eclipse.ui.examples.contributions.model.Person)
+	 */
 	public void login(Person person) {
 		parentService.login(person);
 	}

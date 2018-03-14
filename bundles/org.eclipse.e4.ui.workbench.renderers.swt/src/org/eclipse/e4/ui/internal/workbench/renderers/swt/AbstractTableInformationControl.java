@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,11 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
 
-import org.eclipse.e4.ui.workbench.swt.internal.copy.SearchPattern;
+import org.eclipse.e4.ui.workbench.swt.internal.copy.StringMatcher;
 import org.eclipse.e4.ui.workbench.swt.internal.copy.WorkbenchSWTMessages;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -21,12 +22,16 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
@@ -60,7 +65,7 @@ public abstract class AbstractTableInformationControl {
 		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
-			SearchPattern matcher = getMatcher();
+			StringMatcher matcher = getMatcher();
 			if (matcher == null || !(viewer instanceof TableViewer)) {
 				return true;
 			}
@@ -77,7 +82,7 @@ public abstract class AbstractTableInformationControl {
 			if (matchName.startsWith("*")) { //$NON-NLS-1$
 				matchName = matchName.substring(1);
 			}
-			return matcher.matches(matchName);
+			return matcher.match(matchName);
 		}
 	}
 
@@ -93,8 +98,8 @@ public abstract class AbstractTableInformationControl {
 	/** The control's table widget */
 	private TableViewer fTableViewer;
 
-	/** The current search pattern */
-	private SearchPattern fSearchPattern;
+	/** The current string matcher */
+	private StringMatcher fStringMatcher;
 
 	/**
 	 * Creates an information control with the given shell as parent. The given
@@ -129,7 +134,7 @@ public abstract class AbstractTableInformationControl {
 					dispose();
 					break;
 				case SWT.DEL:
-					removeSelectedItem(null);
+					removeSelectedItems();
 					e.character = SWT.NONE;
 					e.doit = false;
 					break;
@@ -256,7 +261,7 @@ public abstract class AbstractTableInformationControl {
 							@Override
 							public void widgetSelected(
 									SelectionEvent selectionEvent) {
-								removeSelectedItem(tItem.getData());
+								removeSelectedItems();
 							}
 						});
 						menu.setVisible(true);
@@ -265,37 +270,40 @@ public abstract class AbstractTableInformationControl {
 			}
 		});
 
-		fShell.addTraverseListener(e -> {
-			switch (e.detail) {
-			case SWT.TRAVERSE_PAGE_NEXT:
-				e.detail = SWT.TRAVERSE_NONE;
-				e.doit = true;
-				{
-					int n1 = table.getItemCount();
-					if (n1 == 0)
-						return;
+		fShell.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				switch (e.detail) {
+				case SWT.TRAVERSE_PAGE_NEXT:
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = true;
+					{
+						int n = table.getItemCount();
+						if (n == 0)
+							return;
 
-					int i1 = table.getSelectionIndex() + 1;
-					if (i1 >= n1)
-						i1 = 0;
-					table.setSelection(i1);
+						int i = table.getSelectionIndex() + 1;
+						if (i >= n)
+							i = 0;
+						table.setSelection(i);
+					}
+					break;
+
+				case SWT.TRAVERSE_PAGE_PREVIOUS:
+					e.detail = SWT.TRAVERSE_NONE;
+					e.doit = true;
+					{
+						int n = table.getItemCount();
+						if (n == 0)
+							return;
+
+						int i = table.getSelectionIndex() - 1;
+						if (i < 0)
+							i = n - 1;
+						table.setSelection(i);
+					}
+					break;
 				}
-				break;
-
-			case SWT.TRAVERSE_PAGE_PREVIOUS:
-				e.detail = SWT.TRAVERSE_NONE;
-				e.doit = true;
-				{
-					int n2 = table.getItemCount();
-					if (n2 == 0)
-						return;
-
-					int i2 = table.getSelectionIndex() - 1;
-					if (i2 < 0)
-						i2 = n2 - 1;
-					table.setSelection(i2);
-				}
-				break;
 			}
 		});
 
@@ -304,16 +312,13 @@ public abstract class AbstractTableInformationControl {
 	}
 
 	/**
-	 * Removes the given selected item from the list and closes corresponding tab.
-	 * Selects the next item in the list or disposes it if its presentation is
-	 * disposed.
-	 *
-	 * @param selected
-	 *            can be {@code null} in this case current selection should be used
+	 * Removes the selected items from the list and closes their corresponding
+	 * tabs Selects the next item in the list or disposes it if its presentation
+	 * is disposed
 	 */
-	protected void removeSelectedItem(Object selected) {
+	protected void removeSelectedItems() {
 		int selInd = fTableViewer.getTable().getSelectionIndex();
-		if (deleteSelectedElement(selected)) {
+		if (deleteSelectedElements()) {
 			return;
 		}
 		fTableViewer.refresh();
@@ -392,15 +397,22 @@ public abstract class AbstractTableInformationControl {
 		fFilterText.setMessage(WorkbenchSWTMessages.FilteredTree_FilterMessage);
 		fFilterText.setText(""); //$NON-NLS-1$
 
-		fFilterText.addModifyListener(e -> {
-			String text = ((Text) e.widget).getText();
-			setMatcherString(text);
+		fFilterText.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				String text = ((Text) e.widget).getText();
+				int length = text.length();
+				if (length > 0 && text.charAt(length - 1) != '*') {
+					text = text + '*';
+				}
+				setMatcherString(text);
+			}
 		});
 	}
 
 	/**
 	 * The string matcher has been modified. The default implementation
-	 * refreshes the view and selects the first matched element
+	 * refreshes the view and selects the first macthed element
 	 */
 	private void stringMatcherUpdated() {
 		// refresh viewer to refilter
@@ -419,37 +431,34 @@ public abstract class AbstractTableInformationControl {
 	 */
 	private void setMatcherString(String pattern) {
 		if (pattern.length() == 0) {
-			fSearchPattern = null;
+			fStringMatcher = null;
 		} else {
-			SearchPattern patternMatcher = new SearchPattern();
-			patternMatcher.setPattern(pattern);
-			fSearchPattern = patternMatcher;
+			boolean ignoreCase = pattern.toLowerCase().equals(pattern);
+			fStringMatcher = new StringMatcher(pattern, ignoreCase, false);
 		}
 		stringMatcherUpdated();
 	}
 
-	private SearchPattern getMatcher() {
-		return fSearchPattern;
+	private StringMatcher getMatcher() {
+		return fStringMatcher;
 	}
 
 	/**
 	 * Implementers can modify
 	 */
 	protected Object getSelectedElement() {
-		return fTableViewer.getStructuredSelection().getFirstElement();
+		return ((IStructuredSelection) fTableViewer.getSelection())
+				.getFirstElement();
 	}
 
 	protected abstract void gotoSelectedElement();
 
 	/**
-	 * Delete given selected element.
-	 *
-	 * @param element
-	 *            can be {@code null} in this case current selection should be used
+	 * Delete all selected elements.
 	 *
 	 * @return <code>true</code> if there are no elements left after deletion.
 	 */
-	protected abstract boolean deleteSelectedElement(Object element);
+	protected abstract boolean deleteSelectedElements();
 
 	/**
 	 * Selects the first element in the table which matches the current filter
@@ -466,10 +475,11 @@ public abstract class AbstractTableInformationControl {
 	}
 
 	private Object findElement(TableItem[] items) {
-		ILabelProvider labelProvider = (ILabelProvider) fTableViewer.getLabelProvider();
-		for (TableItem item : items) {
-			Object element = item.getData();
-			if (fSearchPattern == null) {
+		ILabelProvider labelProvider = (ILabelProvider) fTableViewer
+				.getLabelProvider();
+		for (int i = 0; i < items.length; i++) {
+			Object element = items[i].getData();
+			if (fStringMatcher == null) {
 				return element;
 			}
 
@@ -482,7 +492,7 @@ public abstract class AbstractTableInformationControl {
 				if (label.startsWith("*")) { //$NON-NLS-1$
 					label = label.substring(1);
 				}
-				if (fSearchPattern.matches(label)) {
+				if (fStringMatcher.match(label)) {
 					return element;
 				}
 			}

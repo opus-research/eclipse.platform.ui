@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,10 +19,10 @@ package org.eclipse.ui.views.properties;
  * </p>
  */
 public interface IPropertySourceProvider {
-
+	
 	/**
 	 * Returns a property source for the given object.
-	 *
+	 * 
 	 * @param object
 	 *            the object
 	 * @return the property source for the object passed in (maybe

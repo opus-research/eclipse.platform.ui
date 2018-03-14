@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,31 +23,31 @@ import org.eclipse.swt.graphics.TextStyle;
  * A mutable string with styled ranges. All ranges mark substrings of the string
  * and do not overlap. Styles are applied using instances of {@link Styler} to
  * compute the result of {@link #getStyleRanges()}.
- *
+ * 
  * The styled string can be built in the following two ways:
  * <ul>
  * <li>new strings with stylers can be appended</li>
  * <li>stylers can by applied to ranges of the existing string</li>
  * </ul>
- *
+ * 
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @since 3.4
  */
-public class StyledString implements CharSequence {
+public class StyledString {
 
 	/**
 	 * A styler will be asked to apply its styles to one ore more ranges in the
 	 * {@link StyledString}.
-	 *
+	 * 
 	 */
 	public static abstract class Styler {
 
 		/**
 		 * Applies the styles represented by this object to the given textStyle.
-		 *
+		 * 
 		 * @param textStyle
 		 *            the {@link TextStyle} to modify
 		 */
@@ -81,12 +81,12 @@ public class StyledString implements CharSequence {
 	/**
 	 * Creates a styler that takes the given foreground and background colors
 	 * from the JFace color registry.
-	 *
+	 * 
 	 * @param foregroundColorName
 	 *            the color name for the foreground color
 	 * @param backgroundColorName
 	 *            the color name for the background color
-	 *
+	 * 
 	 * @return the created style
 	 */
 	public static Styler createColorRegistryStyler(String foregroundColorName,
@@ -109,7 +109,7 @@ public class StyledString implements CharSequence {
 	/**
 	 * Creates an {@link StyledString} initialized with a string without
 	 * a style associated.
-	 *
+	 * 
 	 * @param string
 	 *            the string
 	 */
@@ -120,7 +120,7 @@ public class StyledString implements CharSequence {
 	/**
 	 * Creates an {@link StyledString} initialized with a string and a
 	 * style.
-	 *
+	 * 
 	 * @param string
 	 *            the string
 	 * @param styler
@@ -134,7 +134,7 @@ public class StyledString implements CharSequence {
 
 	/**
 	 * Returns the string of this {@link StyledString}.
-	 *
+	 * 
 	 * @return the current string of this {@link StyledString}.
 	 */
 	public String getString() {
@@ -153,34 +153,17 @@ public class StyledString implements CharSequence {
 
 	/**
 	 * Returns the length of the string of this {@link StyledString}.
-	 *
+	 * 
 	 * @return the length of the current string
 	 */
-	@Override
 	public int length() {
 		return fBuffer.length();
 	}
 
 	/**
-	 * @since 3.12
-	 */
-	@Override
-	public CharSequence subSequence(int start, int end) {
-		return fBuffer.subSequence(start, end);
-	}
-
-	/**
-	 * @since 3.12
-	 */
-	@Override
-	public char charAt(int index) {
-		return fBuffer.charAt(index);
-	}
-
-	/**
 	 * Appends a string to the {@link StyledString}. The appended string
 	 * will have no associated styler.
-	 *
+	 * 
 	 * @param string
 	 *            the string to append
 	 * @return returns a reference to this object
@@ -188,12 +171,12 @@ public class StyledString implements CharSequence {
 	public StyledString append(String string) {
 		return append(string, null);
 	}
-
+	
 	/**
 	 * Appends the string representation of the given character array
 	 * to the {@link StyledString}. The appended
 	 * character array will have no associated styler.
-	 *
+	 * 
 	 * @param chars
 	 *            the character array to append
 	 * @return returns a reference to this object
@@ -206,7 +189,7 @@ public class StyledString implements CharSequence {
 	 * Appends the string representation of the given character
 	 * to the {@link StyledString}. The appended
 	 * character will have no associated styler.
-	 *
+	 * 
 	 * @param ch
 	 *            the character to append
 	 * @return returns a reference to this object
@@ -217,7 +200,7 @@ public class StyledString implements CharSequence {
 
 	/**
 	 * Appends a string with styles to the {@link StyledString}.
-	 *
+	 * 
 	 * @param string
 	 *            the string to append
 	 * @return returns a reference to this object
@@ -230,10 +213,10 @@ public class StyledString implements CharSequence {
 		int offset = fBuffer.length();
 		fBuffer.append(string.toString());
 
-		List<StyleRun> otherRuns = string.fStyleRuns;
+		List otherRuns = string.fStyleRuns;
 		if (otherRuns != null && !otherRuns.isEmpty()) {
 			for (int i = 0; i < otherRuns.size(); i++) {
-				StyleRun curr = otherRuns.get(i);
+				StyleRun curr = (StyleRun) otherRuns.get(i);
 				if (i == 0 && curr.offset != 0) {
 					appendStyleRun(null, offset); // appended string will
 					// start with the default
@@ -252,7 +235,7 @@ public class StyledString implements CharSequence {
 	 * Appends the string representation of the given character
 	 * with a style to the {@link StyledString}. The
 	 * appended character will have the given style associated.
-	 *
+	 * 
 	 * @param ch
 	 *            the character to append
 	 * @param styler
@@ -268,7 +251,7 @@ public class StyledString implements CharSequence {
 	/**
 	 * Appends a string with a style to the {@link StyledString}. The
 	 * appended string will be styled using the given styler.
-	 *
+	 * 
 	 * @param string
 	 *            the string to append
 	 * @param styler
@@ -286,12 +269,12 @@ public class StyledString implements CharSequence {
 		appendStyleRun(styler, offset);
 		return this;
 	}
-
+	
 	/**
 	 * Appends the string representation of the given character array
 	 * with a style to the {@link StyledString}. The
 	 * appended character array will be styled using the given styler.
-	 *
+	 * 
 	 * @param chars
 	 *            the character array to append
 	 * @param styler
@@ -313,7 +296,7 @@ public class StyledString implements CharSequence {
 	/**
 	 * Inserts the character at the given offset. The inserted character will
 	 * get the styler that is already at the given offset.
-	 *
+	 * 
 	 * @param ch
 	 *            the character to insert
 	 * @param offset
@@ -336,10 +319,10 @@ public class StyledString implements CharSequence {
 			} else {
 				runIndex = runIndex + 1;
 			}
-			List<StyleRun> styleRuns = getStyleRuns();
+			StyleRunList styleRuns = getStyleRuns();
 			final int size = styleRuns.size();
 			for (int i = runIndex; i < size; i++) {
-				StyleRun run = styleRuns.get(i);
+				StyleRun run = styleRuns.getRun(i);
 				run.offset++;
 			}
 		}
@@ -351,14 +334,14 @@ public class StyledString implements CharSequence {
 	 * Sets a styler to use for the given source range. The range must be
 	 * subrange of actual string of this {@link StyledString}. Stylers
 	 * previously set for that range will be overwritten.
-	 *
+	 * 
 	 * @param offset
 	 *            the start offset of the range
 	 * @param length
 	 *            the length of the range
 	 * @param styler
 	 *            the styler to set
-	 *
+	 * 
 	 * @throws StringIndexOutOfBoundsException
 	 *             if <code>start</code> is less than zero, or if offset plus
 	 *             length is greater than the length of this object.
@@ -387,7 +370,7 @@ public class StyledString implements CharSequence {
 		} else {
 			endRun = -(endRun + 1);
 			if (offset + length < fBuffer.length()) {
-				Styler prevStyle = endRun > 0 ? fStyleRuns.get(endRun - 1).style
+				Styler prevStyle = endRun > 0 ? fStyleRuns.getRun(endRun - 1).style
 						: null;
 				fStyleRuns
 						.add(endRun, new StyleRun(offset + length, prevStyle));
@@ -397,12 +380,12 @@ public class StyledString implements CharSequence {
 		int startRun = findRun(offset);
 		if (startRun >= 0) {
 			// run with the same start index
-			StyleRun styleRun = fStyleRuns.get(startRun);
+			StyleRun styleRun = fStyleRuns.getRun(startRun);
 			styleRun.style = styler;
 		} else {
 			startRun = -(startRun + 1);
 
-			Styler prevStyle = startRun > 0 ? fStyleRuns.get(startRun - 1).style
+			Styler prevStyle = startRun > 0 ? fStyleRuns.getRun(startRun - 1).style
 					: null;
 			if (isDifferentStyle(prevStyle, styler)
 					|| (startRun == 0 && styler != null)) {
@@ -420,19 +403,19 @@ public class StyledString implements CharSequence {
 	/**
 	 * Returns an array of {@link StyleRange} resulting from applying all
 	 * associated stylers for this string builder.
-	 *
+	 * 
 	 * @return an array of all {@link StyleRange} resulting from applying the
 	 *         stored stylers to this string.
 	 */
 	public StyleRange[] getStyleRanges() {
 		if (hasRuns()) {
-			ArrayList<StyleRange> res = new ArrayList<>();
+			ArrayList res = new ArrayList();
 
-			List<StyleRun> styleRuns = getStyleRuns();
+			List styleRuns = getStyleRuns();
 			int offset = 0;
 			Styler style = null;
 			for (int i = 0; i < styleRuns.size(); i++) {
-				StyleRun curr = styleRuns.get(i);
+				StyleRun curr = (StyleRun) styleRuns.get(i);
 				if (isDifferentStyle(curr.style, style)) {
 					if (curr.offset > offset && style != null) {
 						res.add(createStyleRange(offset, curr.offset, style));
@@ -444,7 +427,7 @@ public class StyledString implements CharSequence {
 			if (fBuffer.length() > offset && style != null) {
 				res.add(createStyleRange(offset, fBuffer.length(), style));
 			}
-			return res.toArray(new StyleRange[res.size()]);
+			return (StyleRange[]) res.toArray(new StyleRange[res.size()]);
 		}
 		return EMPTY;
 	}
@@ -455,7 +438,7 @@ public class StyledString implements CharSequence {
 		int high = fStyleRuns.size() - 1;
 		while (low <= high) {
 			int mid = (low + high) / 2;
-			StyleRun styleRun = fStyleRuns.get(mid);
+			StyleRun styleRun = fStyleRuns.getRun(mid);
 			if (styleRun.offset < offset) {
 				low = mid + 1;
 			} else if (styleRun.offset > offset) {
@@ -503,10 +486,10 @@ public class StyledString implements CharSequence {
 		if (fStyleRuns == null || fStyleRuns.isEmpty()) {
 			return null;
 		}
-		return fStyleRuns.get(fStyleRuns.size() - 1);
+		return fStyleRuns.getRun(fStyleRuns.size() - 1);
 	}
 
-	private List<StyleRun> getStyleRuns() {
+	private StyleRunList getStyleRuns() {
 		if (fStyleRuns == null)
 			fStyleRuns = new StyleRunList();
 		return fStyleRuns;
@@ -527,11 +510,15 @@ public class StyledString implements CharSequence {
 		}
 	}
 
-	private static class StyleRunList extends ArrayList<StyleRun> {
+	private static class StyleRunList extends ArrayList {
 		private static final long serialVersionUID = 123L;
 
 		public StyleRunList() {
 			super(3);
+		}
+
+		public StyleRun getRun(int index) {
+			return (StyleRun) get(index);
 		}
 
 		@Override

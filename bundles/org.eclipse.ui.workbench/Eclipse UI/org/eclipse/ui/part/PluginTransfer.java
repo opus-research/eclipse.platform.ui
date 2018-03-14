@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,27 +15,27 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
  * This class can be used to transfer an instance of <code>PluginTransferData</code>
  * between two parts in a workbench in a drag and drop operation.
  * <p>
- * In every drag and drop operation there is a <code>DragSource</code> and
- * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is
- * used to marshall the drag data from the source into a byte array.  If a drop
+ * In every drag and drop operation there is a <code>DragSource</code> and 
+ * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is 
+ * used to marshall the drag data from the source into a byte array.  If a drop 
  * occurs another <code>Transfer</code> is used to marshall the byte array into
  * drop data for the target.
  * </p><p>
- * A <code>PluginTransferData</code> contains the id of a drop action extension.
- * If a drop occurs the extension is invoked to perform a drop action.  As a benefit,
- * the destination viewer doesn't need to have any knowledge of the items being
- * dropped into it.
+ * A <code>PluginTransferData</code> contains the id of a drop action extension.  
+ * If a drop occurs the extension is invoked to perform a drop action.  As a benefit, 
+ * the destination viewer doesn't need to have any knowledge of the items being 
+ * dropped into it.  
  * </p><p>
  * This class can be used for a <code>Viewer<code> or an SWT component directly.
- * A singleton is provided which may be serially reused (see <code>getInstance</code>).
+ * A singleton is provided which may be serially reused (see <code>getInstance</code>).  
  * It is not intended to be subclassed.
  * </p>
  *
@@ -95,7 +95,7 @@ public class PluginTransfer extends ByteArrayTransfer {
             dataOut.close();
             super.javaToNative(out.toByteArray(), transferData);
         } catch (IOException e) {
-			WorkbenchPlugin.log(e);
+            e.printStackTrace();
         }
     }
 
@@ -111,7 +111,7 @@ public class PluginTransfer extends ByteArrayTransfer {
             dataIn.readFully(pluginData);
             return new PluginTransferData(extensionName, pluginData);
         } catch (IOException e) {
-			WorkbenchPlugin.log(e);
+            e.printStackTrace();
         }
         //can't get here
         return null;
