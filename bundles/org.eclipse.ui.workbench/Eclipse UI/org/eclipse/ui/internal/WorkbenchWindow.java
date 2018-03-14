@@ -757,17 +757,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 	}
 
-	public MMenu linkMenuManagerToMMenu(MenuManager mm) {
-		final MMenu mainMenu = modelService.createModelElement(MMenu.class);
-		mainMenu.setElementId("org.eclipse.ui.main.menu"); //$NON-NLS-1$
-
-		final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory.getRenderer(
-				mainMenu, null);
-		renderer.linkModelToManager(mainMenu, mm);
-		fill(renderer, mainMenu, mm);
-		return mainMenu;
-	}
-
 	private void configureShell(Shell shell, IEclipseContext context) {
 		String title = getWindowConfigurer().basicGetTitle();
 		if (title != null) {
@@ -1188,7 +1177,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return null;
 	}
 
-	public void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
+	private void fill(MenuManagerRenderer renderer, MMenu menu, IMenuManager manager) {
 		for (IContributionItem item : manager.getItems()) {
 			if (item instanceof MenuManager) {
 				MenuManager menuManager = (MenuManager) item;
