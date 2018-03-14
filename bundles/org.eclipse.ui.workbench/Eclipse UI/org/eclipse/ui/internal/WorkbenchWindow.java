@@ -17,8 +17,6 @@
 
 package org.eclipse.ui.internal;
 
-import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,6 +160,7 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.internal.commands.SlaveCommandService;
 import org.eclipse.ui.internal.contexts.ContextService;
+import org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
@@ -737,18 +736,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				page.updatePerspectiveActionSets();
 			}
 			updateActionSets();
-
-			// synchronize the main menu with the e4 model
-			IMenuManager menuBarManager = getMenuBarManager();
-			if (menuBarManager instanceof MenuManager) {
-				// TODO: remove this hack to retrieve the MenuManagerRenderer
-				MenuManagerRenderer mr = (MenuManagerRenderer) rendererFactory.getRenderer(
-						modelService.createModelElement(MMenu.class), null);
-				MMenu parent = mr.getMenuModel((MenuManager) menuBarManager);
-				if (parent != null) {
-					mr.reconcileManagerToModel((MenuManager) menuBarManager, parent);
-				}
-			}
 
 			IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
 			boolean enableAnimations = preferenceStore
