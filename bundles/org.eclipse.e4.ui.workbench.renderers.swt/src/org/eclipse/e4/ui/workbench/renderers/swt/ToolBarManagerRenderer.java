@@ -40,7 +40,6 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
@@ -653,8 +652,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	private void modelProcessSwitch(ToolBarManager parentManager,
 			MToolBarElement childME) {
-		if (childME instanceof MOpaqueToolItem) {
-			MOpaqueToolItem itemModel = (MOpaqueToolItem) childME;
+		if (childME instanceof MDirectToolItem
+				&& childME.getTags().contains("Rendered")) { //$NON-NLS-1$
+			MDirectToolItem itemModel = (MDirectToolItem) childME;
 			processOpaqueItem(parentManager, itemModel);
 		} else if (childME instanceof MHandledToolItem) {
 			MHandledToolItem itemModel = (MHandledToolItem) childME;
@@ -760,13 +760,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	}
 
 	void processOpaqueItem(ToolBarManager parentManager,
-			MOpaqueToolItem itemModel) {
+			MDirectToolItem itemModel) {
 		IContributionItem ici = getContribution(itemModel);
 		if (ici != null) {
 			return;
 		}
+
 		itemModel.setRenderer(this);
-		Object obj = itemModel.getOpaqueItem();
+		Object obj = itemModel.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
 		if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
 		} else {
@@ -860,10 +861,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void reconcileManagerToModel(IToolBarManager menuManager,
 			MToolBar toolBar) {
 		List<MToolBarElement> modelChildren = toolBar.getChildren();
-		HashSet<MOpaqueToolItem> oldModelItems = new HashSet<MOpaqueToolItem>();
+		HashSet<MDirectToolItem> oldModelItems = new HashSet<MDirectToolItem>();
 		for (MToolBarElement itemModel : modelChildren) {
-			if (itemModel instanceof MOpaqueToolItem) {
-				oldModelItems.add((MOpaqueToolItem) itemModel);
+			if (itemModel instanceof MDirectToolItem
+					&& itemModel.getTags().contains("Opaque")) { //$NON-NLS-1$
+				oldModelItems.add((MDirectToolItem) itemModel);
 			}
 		}
 
@@ -872,15 +874,17 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IContributionItem item = items[src];
 			MToolBarElement element = getToolElement(item);
 			if (element == null) {
-				MOpaqueToolItem legacyItem = MenuFactoryImpl.eINSTANCE
-						.createOpaqueToolItem();
+				MDirectToolItem legacyItem = MenuFactoryImpl.eINSTANCE
+						.createDirectToolItem();
+				legacyItem.getTags().add("Opaque"); //$NON-NLS-1$
 				legacyItem.setElementId(item.getId());
 				legacyItem.setVisible(item.isVisible());
-				legacyItem.setOpaqueItem(item);
+				legacyItem.getTransientData().put("OpaqueItem", item); //$NON-NLS-1$
 				linkModelToContribution(legacyItem, item);
 				modelChildren.add(dest, legacyItem);
-			} else if (element instanceof MOpaqueToolItem) {
-				MOpaqueToolItem legacyItem = (MOpaqueToolItem) element;
+			} else if (element instanceof MDirectToolItem
+					&& element.getTags().contains("Opaque")) { //$NON-NLS-1$
+				MDirectToolItem legacyItem = (MDirectToolItem) element;
 				oldModelItems.remove(legacyItem);
 				if (modelChildren.size() > dest) {
 					if (modelChildren.get(dest) != legacyItem) {
@@ -895,9 +899,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 		if (!oldModelItems.isEmpty()) {
 			modelChildren.removeAll(oldModelItems);
-			for (MOpaqueToolItem model : oldModelItems) {
-				clearModelToContribution(model,
-						(IContributionItem) model.getOpaqueItem());
+			for (MDirectToolItem model : oldModelItems) {
+				Object obj = model.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
+				clearModelToContribution(model, (IContributionItem) obj);
 			}
 		}
 	}

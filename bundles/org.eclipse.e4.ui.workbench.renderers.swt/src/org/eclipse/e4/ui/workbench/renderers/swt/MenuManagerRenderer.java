@@ -46,12 +46,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
@@ -654,11 +649,13 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		if (!childME.isToBeRendered()) {
 			return;
 		}
-		if (childME instanceof MRenderedMenuItem) {
-			MRenderedMenuItem itemModel = (MRenderedMenuItem) childME;
+		if (childME instanceof MDirectMenuItem
+				&& childME.getTags().contains("Rendered")) { //$NON-NLS-1$
+			MDirectMenuItem itemModel = (MDirectMenuItem) childME;
 			processRenderedItem(menuManager, itemModel);
-		} else if (childME instanceof MOpaqueMenuItem) {
-			MOpaqueMenuItem itemModel = (MOpaqueMenuItem) childME;
+		} else if (childME instanceof MDirectMenuItem
+				&& childME.getTags().contains("Opaque")) { //$NON-NLS-1$
+			MDirectMenuItem itemModel = (MDirectMenuItem) childME;
 			processOpaqueItem(menuManager, itemModel);
 		} else if (childME instanceof MHandledMenuItem) {
 			MHandledMenuItem itemModel = (MHandledMenuItem) childME;
@@ -686,18 +683,18 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	 * @param itemModel
 	 */
 	void processRenderedItem(MenuManager parentManager,
-			MRenderedMenuItem itemModel) {
+			MDirectMenuItem itemModel) {
 		IContributionItem ici = getContribution(itemModel);
 		if (ici != null) {
 			return;
 		}
 		itemModel.setRenderer(this);
-		Object obj = itemModel.getContributionItem();
+		Object obj = itemModel.getTransientData().get("ContributionItem"); //$NON-NLS-1$
 		if (obj instanceof IContextFunction) {
 			final IEclipseContext lclContext = getContext(itemModel);
 			ici = (IContributionItem) ((IContextFunction) obj).compute(
 					lclContext, null);
-			itemModel.setContributionItem(ici);
+			itemModel.getTransientData().put("ContributionItem", ici); //$NON-NLS-1$
 		} else if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
 		} else {
@@ -710,13 +707,13 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		linkModelToContribution(itemModel, ici);
 	}
 
-	void processOpaqueItem(MenuManager parentManager, MOpaqueMenuItem itemModel) {
+	void processOpaqueItem(MenuManager parentManager, MMenuItem itemModel) {
 		IContributionItem ici = getContribution(itemModel);
 		if (ici != null) {
 			return;
 		}
 		itemModel.setRenderer(this);
-		Object obj = itemModel.getOpaqueItem();
+		Object obj = itemModel.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
 		if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
 		} else {
@@ -901,16 +898,19 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void reconcileManagerToModel(MenuManager menuManager, MMenu menuModel) {
 		List<MMenuElement> modelChildren = menuModel.getChildren();
 
-		HashSet<MOpaqueMenuItem> oldModelItems = new HashSet<MOpaqueMenuItem>();
-		HashSet<MOpaqueMenu> oldMenus = new HashSet<MOpaqueMenu>();
-		HashSet<MOpaqueMenuSeparator> oldSeps = new HashSet<MOpaqueMenuSeparator>();
+		HashSet<MMenuItem> oldModelItems = new HashSet<MMenuItem>();
+		HashSet<MMenu> oldMenus = new HashSet<MMenu>();
+		HashSet<MMenuSeparator> oldSeps = new HashSet<MMenuSeparator>();
 		for (MMenuElement itemModel : modelChildren) {
-			if (itemModel instanceof MOpaqueMenuSeparator) {
-				oldSeps.add((MOpaqueMenuSeparator) itemModel);
-			} else if (itemModel instanceof MOpaqueMenuItem) {
-				oldModelItems.add((MOpaqueMenuItem) itemModel);
-			} else if (itemModel instanceof MOpaqueMenu) {
-				oldMenus.add((MOpaqueMenu) itemModel);
+			if (itemModel instanceof MMenuSeparator
+					&& itemModel.getTags().contains("Opaque")) { //$NON-NLS-1$
+				oldSeps.add((MMenuSeparator) itemModel);
+			} else if (itemModel instanceof MDirectMenuItem
+					&& itemModel.getTags().contains("Opaque")) { //$NON-NLS-1$
+				oldModelItems.add((MDirectMenuItem) itemModel);
+			} else if (itemModel instanceof MMenu
+					&& itemModel.getTags().contains("Opaque")) { //$NON-NLS-1$
+				oldMenus.add((MMenu) itemModel);
 			}
 		}
 
@@ -921,8 +921,9 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				MenuManager childManager = (MenuManager) item;
 				MMenu childModel = getMenuModel(childManager);
 				if (childModel == null) {
-					MMenu legacyModel = MenuFactoryImpl.eINSTANCE
-							.createOpaqueMenu();
+					MMenu legacyModel = modelService
+							.createModelElement(MMenu.class);
+					legacyModel.getTags().add("Opaque"); //$NON-NLS-1$
 					legacyModel.setElementId(childManager.getId());
 					legacyModel.setVisible(childManager.isVisible());
 					linkModelToManager(legacyModel, childManager);
@@ -933,7 +934,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					}
 					reconcileManagerToModel(childManager, legacyModel);
 				} else {
-					if (childModel instanceof MOpaqueMenu) {
+					if (childModel.getTags().contains("Opaque")) { //$NON-NLS-1$
 						oldMenus.remove(childModel);
 					}
 					if (modelChildren.size() > dest) {
@@ -959,19 +960,21 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			} else if (item.isSeparator() || item.isGroupMarker()) {
 				MMenuElement menuElement = getMenuElement(item);
 				if (menuElement == null) {
-					MOpaqueMenuSeparator legacySep = MenuFactoryImpl.eINSTANCE
-							.createOpaqueMenuSeparator();
+					MMenuSeparator legacySep = modelService
+							.createModelElement(MMenuSeparator.class);
+					legacySep.getTags().add("Opaque"); //$NON-NLS-1$
 					legacySep.setElementId(item.getId());
 					legacySep.setVisible(item.isVisible());
-					legacySep.setOpaqueItem(item);
+					legacySep.getTransientData().put("OpaqueItem", item); //$NON-NLS-1$
 					linkModelToContribution(legacySep, item);
 					if (modelChildren.size() > dest) {
 						modelChildren.add(dest, legacySep);
 					} else {
 						modelChildren.add(legacySep);
 					}
-				} else if (menuElement instanceof MOpaqueMenuSeparator) {
-					MOpaqueMenuSeparator legacySep = (MOpaqueMenuSeparator) menuElement;
+				} else if (menuElement instanceof MMenuSeparator
+						&& menuElement.getTags().contains("Opaque")) { //$NON-NLS-1$
+					MMenuSeparator legacySep = (MMenuSeparator) menuElement;
 					oldSeps.remove(legacySep);
 					if (modelChildren.size() > dest) {
 						if (modelChildren.get(dest) != legacySep) {
@@ -985,19 +988,21 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			} else {
 				MMenuElement menuElement = getMenuElement(item);
 				if (menuElement == null) {
-					MOpaqueMenuItem legacyItem = MenuFactoryImpl.eINSTANCE
-							.createOpaqueMenuItem();
+					MDirectMenuItem legacyItem = modelService
+							.createModelElement(MDirectMenuItem.class);
+					legacyItem.getTags().add("Opaque"); //$NON-NLS-1$
 					legacyItem.setElementId(item.getId());
 					legacyItem.setVisible(item.isVisible());
-					legacyItem.setOpaqueItem(item);
+					legacyItem.getTransientData().put("OpaqueItem", item); //$NON-NLS-1$
 					linkModelToContribution(legacyItem, item);
 					if (modelChildren.size() > dest) {
 						modelChildren.add(dest, legacyItem);
 					} else {
 						modelChildren.add(legacyItem);
 					}
-				} else if (menuElement instanceof MOpaqueMenuItem) {
-					MOpaqueMenuItem legacyItem = (MOpaqueMenuItem) menuElement;
+				} else if (menuElement instanceof MDirectMenuItem
+						&& menuElement.getTags().contains("Opaque")) { //$NON-NLS-1$
+					MDirectMenuItem legacyItem = (MDirectMenuItem) menuElement;
 					oldModelItems.remove(legacyItem);
 					if (modelChildren.size() > dest) {
 						if (modelChildren.get(dest) != legacyItem) {
@@ -1012,23 +1017,25 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 		if (!oldModelItems.isEmpty()) {
 			modelChildren.removeAll(oldModelItems);
-			for (MOpaqueMenuItem model : oldModelItems) {
-				clearModelToContribution(model,
-						(IContributionItem) model.getOpaqueItem());
+			for (MMenuItem model : oldModelItems) {
+				IContributionItem ici = (IContributionItem) model
+						.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
+				clearModelToContribution(model, ici);
 			}
 		}
 		if (!oldMenus.isEmpty()) {
 			modelChildren.removeAll(oldMenus);
-			for (MOpaqueMenu oldMenu : oldMenus) {
+			for (MMenu oldMenu : oldMenus) {
 				MenuManager oldManager = getManager(oldMenu);
 				clearModelToManager(oldMenu, oldManager);
 			}
 		}
 		if (!oldSeps.isEmpty()) {
 			modelChildren.removeAll(oldSeps);
-			for (MOpaqueMenuSeparator model : oldSeps) {
-				clearModelToContribution(model,
-						(IContributionItem) model.getOpaqueItem());
+			for (MMenuSeparator model : oldSeps) {
+				IContributionItem item = (IContributionItem) model
+						.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
+				clearModelToContribution(model, item);
 			}
 		}
 	}

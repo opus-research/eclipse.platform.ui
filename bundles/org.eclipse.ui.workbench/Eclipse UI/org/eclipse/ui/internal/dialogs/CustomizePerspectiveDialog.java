@@ -36,13 +36,13 @@ import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
@@ -3075,7 +3075,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 					dynamicEntry.setCheckState(getMenuItemIsVisible(dynamicEntry));
 					parent.addChild(dynamicEntry);
 				}
-			} else if (menuItem instanceof MOpaqueMenuItem) {
+			} else if (menuItem instanceof MDirectMenuItem && menuItem.getTags().contains("Opaque")) { //$NON-NLS-1$
 				IContributionItem contributionItem = menuMngrRenderer.getContribution(menuItem);
 				if (contributionItem instanceof ActionContributionItem) {
 					final IAction action = ((ActionContributionItem) contributionItem).getAction();
@@ -3176,7 +3176,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				continue;
 			}
 
-			if (element instanceof MOpaqueToolItem) {
+			if (element instanceof MDirectToolItem && element.getTags().contains("Opaque")) { //$NON-NLS-1$
 				if (contributionItem instanceof ActionContributionItem) {
 					final IAction action = ((ActionContributionItem) contributionItem).getAction();
 					DisplayItem toolbarEntry = new DisplayItem(action.getText(), contributionItem);
@@ -3272,13 +3272,13 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				text = text + " (" + sequence.format() + ')'; //$NON-NLS-1$
 			}
 			return text;
-		} else if (item instanceof MOpaqueMenuItem) {
-			Object opaque = ((MOpaqueMenuItem) item).getOpaqueItem();
+		} else if (item instanceof MDirectMenuItem && item.getTags().contains("Opaque")) { //$NON-NLS-1$
+			Object opaque = item.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
 			if (opaque instanceof ActionContributionItem) {
 				return ((ActionContributionItem) opaque).getAction().getText();
 			}
-		} else if (item instanceof MOpaqueToolItem) {
-			Object opaque = ((MOpaqueToolItem) item).getOpaqueItem();
+		} else if (item instanceof MDirectToolItem && item.getTags().contains("Opaque")) { //$NON-NLS-1$
+			Object opaque = item.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
 			if (opaque instanceof ActionContributionItem) {
 				return ((ActionContributionItem) opaque).getAction().getToolTipText();
 			}
