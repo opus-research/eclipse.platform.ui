@@ -66,9 +66,10 @@ public class MenuImpl extends MenuElementImpl implements Menu {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EList<MenuElement> getChildren() {
 		if (children == null) {
-			children = new EObjectContainmentEList<MenuElement>(MenuElement.class, this, XpathtestPackage.MENU__CHILDREN);
+			children = new EObjectContainmentEList<>(MenuElement.class, this, XpathtestPackage.MENU__CHILDREN);
 		}
 		return children;
 	}
