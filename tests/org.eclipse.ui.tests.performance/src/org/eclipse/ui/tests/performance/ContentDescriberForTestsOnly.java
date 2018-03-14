@@ -21,25 +21,24 @@ import org.eclipse.core.runtime.content.ITextContentDescriber;
 
 /**
  * This test ContentDescriber added specifically for OpenNavigatorFolderTest.
- *
+ * 
  */
 
 public final class ContentDescriberForTestsOnly implements ITextContentDescriber {
 
 	/*
 	 * this "simulated time" represents how long a content describer might
-	 * take parsing a file. Offhand (i.e. just guessing) 2000 msecs would be "bad case" examples.
+	 * take parsing a file. Offhand (i.e. just guessing) 2000 msecs would be "bad case" examples. 
 	 * 20 msecs would be near a good, optimistic case.
-	 * I've picked 75 msecs for this test, to represent "normal" case
-	 * (such as the HTML parser that gave rise to the original bug :)
-	 *
+	 * I've picked 75 msecs for this test, to represent "normal" case 
+	 * (such as the HTML parser that gave rise to the original bug :)  
+	 * 
 	 * Note: unlike a "real" ContentDescriber, this one only effects "elapsed
 	 * time", not "CPU Time", since all it is doing is sleeping.
 	 */
 	private static final int SIMULATED_CALCULATION_TIME = 75;
 	private static final QualifiedName[] SUPPORTED_OPTIONS = {IContentDescription.CHARSET, IContentDescription.BYTE_ORDER_MARK};
 
-	@Override
 	public int describe(InputStream contents, IContentDescription description) throws IOException {
 		int result = IContentDescriber.INDETERMINATE;
 
@@ -58,7 +57,6 @@ public final class ContentDescriberForTestsOnly implements ITextContentDescriber
 		return result;
 	}
 
-	@Override
 	public int describe(Reader contents, IContentDescription description) throws IOException {
 		int result = IContentDescriber.INDETERMINATE;
 
@@ -77,7 +75,6 @@ public final class ContentDescriberForTestsOnly implements ITextContentDescriber
 		return result;
 	}
 
-	@Override
 	public QualifiedName[] getSupportedOptions() {
 
 		return SUPPORTED_OPTIONS;

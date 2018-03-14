@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,26 +19,22 @@ import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public final class ValidationStatusProviderValidationStatusProperty extends
 		SimpleValueProperty {
-	@Override
 	public Object getValueType() {
 		return IObservableValue.class;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return ((ValidationStatusProvider) source).getValidationStatus();
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		// no setter API
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		// no listener API
@@ -52,7 +48,6 @@ public final class ValidationStatusProviderValidationStatusProperty extends
 			INativePropertyListener listener) {
 	}
 
-	@Override
 	public String toString() {
 		return "ValidationStatusProvider#validationStatus <IObservableValue>"; //$NON-NLS-1$
 	}

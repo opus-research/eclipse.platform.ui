@@ -18,25 +18,33 @@ import org.eclipse.ui.help.AbstractHelpUI;
  */
 public class DynamicHelpSupport extends AbstractHelpUI {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.help.AbstractHelpUI#displayHelp()
+	 */
 	public void displayHelp() {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.help.AbstractHelpUI#displayContext(org.eclipse.help.IContext, int, int)
+	 */
 	public void displayContext(IContext context, int x, int y) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.help.AbstractHelpUI#displayHelpResource(java.lang.String)
+	 */
 	public void displayHelpResource(String href) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.help.AbstractHelpUI#isContextHelpDisplayed()
+	 */
 	public boolean isContextHelpDisplayed() {
 		// TODO Auto-generated method stub
 		return false;

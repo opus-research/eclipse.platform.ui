@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
@@ -39,7 +38,7 @@ import org.eclipse.ui.internal.ide.dialogs.IDEResourceInfoUtils;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
@@ -55,7 +54,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Get the instance of the registry.
-	 *
+	 * 
 	 * @return MarkerSupportRegistry
 	 */
 	public static FileSystemSupportRegistry getInstance() {
@@ -69,7 +68,12 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	FileSystemConfiguration defaultConfiguration = new FileSystemConfiguration(
 			FileSystemMessages.DefaultFileSystem_name, new FileSystemContributor() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.ui.ide.fileSystem.FileSystemContributor#browseFileSystem(java.lang.String,
+				 *      org.eclipse.swt.widgets.Shell)
+				 */
 				public URI browseFileSystem(String initialPath, Shell shell) {
 
 					DirectoryDialog dialog = new DirectoryDialog(shell, SWT.SHEET);
@@ -119,13 +123,23 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
+	 *      org.eclipse.core.runtime.IExtension)
+	 */
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		processExtension(tracker, extension);
 		allConfigurations = null;//Clear the cache
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension,
+	 *      java.lang.Object[])
+	 */
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
 			registeredContributions.remove(objects[i]);
@@ -136,7 +150,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Process the extension and register the result with the tracker.
-	 *
+	 * 
 	 * @param tracker
 	 * @param extension
 	 */
@@ -155,7 +169,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return a new FileSystemContribution.
-	 *
+	 * 
 	 * @param element
 	 * @return FileSystemContribution or <code>null</code> if there is an
 	 *         exception.
@@ -166,8 +180,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 		final FileSystemContributor[] contributors = new FileSystemContributor[1];
 		final CoreException[] exceptions = new CoreException[1];
 
-		SafeRunner.run(new ISafeRunnable() {
-			@Override
+		Platform.run(new ISafeRunnable() {
 			public void run() {
 				try {
 					contributors[0] = (FileSystemContributor) IDEWorkbenchPlugin
@@ -178,7 +191,9 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 				}
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc) Method declared on ISafeRunnable.
+			 */
 			public void handleException(Throwable e) {
 				// Do nothing as Core will handle the logging
 			}
@@ -198,7 +213,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the FileSystemConfiguration defined in the receiver.
-	 *
+	 * 
 	 * @return FileSystemConfiguration[]
 	 */
 	public FileSystemConfiguration[] getConfigurations() {
@@ -220,7 +235,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 	/**
 	 * Return the default file system configuration (the local file system
 	 * extension in the ide plug-in).
-	 *
+	 * 
 	 * @return FileSystemConfiguration
 	 */
 	public FileSystemConfiguration getDefaultConfiguration() {
@@ -229,7 +244,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return whether or not there is only one file system registered.
-	 *
+	 * 
 	 * @return <code>true</code> if there is only one file system.
 	 */
 	public boolean hasOneFileSystem() {

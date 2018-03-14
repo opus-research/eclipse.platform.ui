@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Tests for SelectionProviderMultiSelectionObservableList.
- *
+ * 
  * @since 1.2
  */
 public class SelectionProviderMultiSelectionObservableListTest extends TestCase {
@@ -45,7 +45,6 @@ public class SelectionProviderMultiSelectionObservableListTest extends TestCase 
 	private static String[] model = new String[] { "element0", "element1",
 			"element2", "element3" };
 
-	@Override
 	protected void setUp() throws Exception {
 		Shell shell = new Shell();
 		viewer = new TableViewer(shell, SWT.MULTI);
@@ -54,7 +53,6 @@ public class SelectionProviderMultiSelectionObservableListTest extends TestCase 
 		selectionProvider = viewer;
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		Shell shell = viewer.getTable().getShell();
 		if (!shell.isDisposed())
@@ -83,7 +81,7 @@ public class SelectionProviderMultiSelectionObservableListTest extends TestCase 
 	 * <li>the selection is available in the observable</li>
 	 * <li>Value change events are fired with appropriate diff values</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param postSelection
 	 *            <code>true</code> for observing the post selection,
 	 *            <code>false</code> for observing the normal selection.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -154,7 +154,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		// for inner classes, the hyphen is used, e.g., for Outer$Inner,
 		// the selector is Outer-Inner {background-color:red;}
 		Widget widget = getWidget();
-		Class<?> clazz = widget.getClass();
+		Class clazz = widget.getClass();
 		return ClassUtils.getSimpleName(clazz);
 	}
 
@@ -172,7 +172,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		// @namespace eclipse org.eclipse.swt.widgets.Label
 		// ex : eclipse|Label {background-color:red;}
 		Widget widget = getWidget();
-		Class<?> clazz = widget.getClass();
+		Class clazz = widget.getClass();
 		return ClassUtils.getPackageName(clazz);
 	}
 
@@ -193,6 +193,13 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		return SWTStyleHelpers.getSWTWidgetStyleAsString(getWidget());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.e4.ui.css.core.dom.ElementAdapter#getAttribute(java.lang.
+	 * String)
+	 */
 	@Override
 	public String getAttribute(String attr) {
 		Widget widget = getWidget();
@@ -275,6 +282,11 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.CSSStylableElement#getCSSClass()
+	 */
 	@Override
 	public String getCSSClass() {
 		Widget widget = getWidget();
@@ -285,6 +297,11 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.CSSStylableElement#getCSSStyle()
+	 */
 	@Override
 	public String getCSSStyle() {
 		Widget widget = getWidget();
@@ -297,10 +314,5 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 	}
 
 	public void reset() {
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + ": " + getWidget();
 	}
 }

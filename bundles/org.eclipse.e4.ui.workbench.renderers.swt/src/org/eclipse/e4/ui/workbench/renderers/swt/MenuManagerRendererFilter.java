@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -67,7 +66,7 @@ public class MenuManagerRendererFilter implements Listener {
 	@Inject
 	private MenuManagerRenderer renderer;
 
-	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<>();
+	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
 	private class SafeWrapper implements ISafeRunnable {
 		Event event;
@@ -152,7 +151,7 @@ public class MenuManagerRendererFilter implements Listener {
 	public static void collectInfo(ExpressionInfo info, final MMenu menuModel,
 			final MenuManagerRenderer renderer,
 			final IEclipseContext evalContext, boolean recurse) {
-		HashSet<ContributionRecord> records = new HashSet<>();
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>();
 		for (MMenuElement element : menuModel.getChildren()) {
 			ContributionRecord record = renderer.getContributionRecord(element);
 			if (record != null) {
@@ -181,7 +180,7 @@ public class MenuManagerRendererFilter implements Listener {
 			final IEclipseContext evalContext, final int recurseLevel,
 			boolean updateEnablement) {
 		final ExpressionContext exprContext = new ExpressionContext(evalContext);
-		HashSet<ContributionRecord> records = new HashSet<>();
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>();
 		for (MMenuElement element : menuModel.getChildren()) {
 			ContributionRecord record = renderer.getContributionRecord(element);
 			if (record != null) {

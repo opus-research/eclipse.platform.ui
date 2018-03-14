@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -32,7 +32,7 @@ import org.eclipse.ui.tests.views.properties.tabbed.model.Information;
 /**
  * An item for when the Information element is the selected element in the
  * override tests view.
- *
+ * 
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -40,7 +40,11 @@ public class InformationItem implements IOverrideTestsItem {
 
 	private Composite composite;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#createControls(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControls(Composite parent) {
 		FormToolkit toolkit = new FormToolkit(parent.getDisplay());
 		composite = toolkit.createComposite(parent);
@@ -114,7 +118,11 @@ public class InformationItem implements IOverrideTestsItem {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#dispose()
+	 */
 	public void dispose() {
 		if (composite != null && !composite.isDisposed()) {
 			composite.dispose();
@@ -122,23 +130,34 @@ public class InformationItem implements IOverrideTestsItem {
 		}
 	}
 
-	@Override
 	public Composite getComposite() {
 		return composite;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#getElement()
+	 */
 	public Class getElement() {
 		return Information.class;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#getImage()
+	 */
 	public Image getImage() {
 		return PlatformUI.getWorkbench().getSharedImages().getImage(
 				ISharedImages.IMG_OBJS_INFO_TSK);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.views.properties.tabbed.override.items.IOverrideTestsItem#getText()
+	 */
 	public String getText() {
 		return "Information"; //$NON-NLS-1$
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
  * cases, clients are provided information, such as RGB values, in order to
  * create their own color resources. In these cases, the client should manage
  * the lifecycle of any created resource.
- *
+ * 
  * @since 3.2
  * @deprecated As of 3.3, this class is no longer necessary.
  */
@@ -49,13 +49,13 @@ public class FieldAssistColors {
 	 * Keys are background colors, values are the color with the alpha value
 	 * applied
 	 */
-	private static Map<Color, Color> requiredFieldColorMap = new HashMap<>();
+	private static Map<Color, Color> requiredFieldColorMap = new HashMap<Color, Color>();
 
 	/*
 	 * Keys are colors we have created, values are the displays on which they
 	 * were created.
 	 */
-	private static Map<Color, Display> displays = new HashMap<>();
+	private static Map<Color, Display> displays = new HashMap<Color, Display>();
 
 	/**
 	 * Compute the RGB of the color that should be used for the background of a
@@ -68,7 +68,7 @@ public class FieldAssistColors {
 	 * This color is computed dynamically each time that it is queried. Clients
 	 * should typically call this method once, create a color from the RGB
 	 * provided, and dispose of the color when finished using it.
-	 *
+	 * 
 	 * @param control
 	 *            the control for which the background color should be computed.
 	 * @return the RGB value indicating a background color appropriate for
@@ -101,7 +101,7 @@ public class FieldAssistColors {
 	 * <p>
 	 * This color is managed by FieldAssistResources and should never be
 	 * disposed by clients.
-	 *
+	 * 
 	 * @param control
 	 *            the control on which the background color will be used.
 	 * @return the color used to indicate that a field is required.
@@ -142,7 +142,12 @@ public class FieldAssistColors {
 		// If we have never created a color on this display before, install
 		// a dispose exec on the display.
 		if (!displays.containsValue(display)) {
-			display.disposeExec(() -> disposeColors(display));
+			display.disposeExec(new Runnable() {
+				@Override
+				public void run() {
+					disposeColors(display);
+				}
+			});
 		}
 		// Record the color and its display in a map for later disposal.
 		displays.put(color, display);
@@ -153,7 +158,7 @@ public class FieldAssistColors {
 	 * Dispose any colors that were allocated for the given display.
 	 */
 	private static void disposeColors(Display display) {
-		List<Color> toBeRemoved = new ArrayList<>(1);
+		List<Color> toBeRemoved = new ArrayList<Color>(1);
 
 		if (DEBUG) {
 			System.out.println("Display map is " + displays.toString()); //$NON-NLS-1$
@@ -170,7 +175,7 @@ public class FieldAssistColors {
 
 				// Now look for any references to it in the required field color
 				// map
-				List<Color> toBeRemovedFromRequiredMap = new ArrayList<>(1);
+				List<Color> toBeRemovedFromRequiredMap = new ArrayList<Color>(1);
 				for (Iterator<Color> iter = requiredFieldColorMap.keySet().iterator(); iter
 						.hasNext();) {
 					Color bgColor = iter.next();

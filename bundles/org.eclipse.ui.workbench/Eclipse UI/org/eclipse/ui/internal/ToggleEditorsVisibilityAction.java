@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,16 +22,22 @@ import org.eclipse.ui.IWorkbenchWindow;
 public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
         IPerspectiveListener {
 
+    /* (non-Javadoc)
+     * Method declared on IPerspectiveListener
+     */
     @Override
 	public void perspectiveActivated(IWorkbenchPage page,
             IPerspectiveDescriptor perspective) {
         if (page.isEditorAreaVisible()) {
-            setText(WorkbenchMessages.ToggleEditor_hideEditors);
+            setText(WorkbenchMessages.ToggleEditor_hideEditors); 
         } else {
             setText(WorkbenchMessages.ToggleEditor_showEditors);
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPerspectiveListener
+     */
     @Override
 	public void perspectiveChanged(IWorkbenchPage page,
             IPerspectiveDescriptor perspective, String changeId) {
@@ -39,16 +45,16 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
                 || changeId == IWorkbenchPage.CHANGE_EDITOR_AREA_HIDE
                 || changeId == IWorkbenchPage.CHANGE_EDITOR_AREA_SHOW) {
             if (page.isEditorAreaVisible()) {
-                setText(WorkbenchMessages.ToggleEditor_hideEditors);
+                setText(WorkbenchMessages.ToggleEditor_hideEditors); 
             } else {
-                setText(WorkbenchMessages.ToggleEditor_showEditors);
+                setText(WorkbenchMessages.ToggleEditor_showEditors); 
             }
         }
     }
 
     /**
      * Creates a new <code>ToggleEditorsVisibilityAction</code>
-     *
+     * 
      * @param window the window
      */
     public ToggleEditorsVisibilityAction(IWorkbenchWindow window) {
@@ -62,18 +68,24 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
         window.addPerspectiveListener(this);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PerspectiveAction.
+     */
     @Override
 	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         boolean visible = page.isEditorAreaVisible();
         if (visible) {
             page.setEditorAreaVisible(false);
-            setText(WorkbenchMessages.ToggleEditor_showEditors);
+            setText(WorkbenchMessages.ToggleEditor_showEditors); 
         } else {
             page.setEditorAreaVisible(true);
             setText(WorkbenchMessages.ToggleEditor_hideEditors);
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     */
     @Override
 	public void dispose() {
         if (getWindow() != null) {

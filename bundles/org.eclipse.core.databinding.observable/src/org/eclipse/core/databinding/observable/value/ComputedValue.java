@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bugs 116920, 147515
  *     Matthew Hall - bug 274081
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.value;
 
@@ -36,13 +35,13 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  * Example: compute the sum of all elements in an {@link IObservableList} &lt;
  * {@link Integer} &gt;.
  * </p>
- *
+ * 
  * <pre>
  * final IObservableList addends = WritableValue.withValueType(Integer.TYPE);
  * addends.add(new Integer(0));
  * addends.add(new Integer(1));
  * addends.add(new Integer(2));
- *
+ * 
  * IObservableValue sum = new ComputedValue() {
  * 	protected Object calculate() {
  * 		int sum = 0;
@@ -53,25 +52,22 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  * 		return sum;
  * 	}
  * };
- *
+ * 
  * System.out.println(sum.getValue()); // =&gt; 3
- *
+ * 
  * addends.add(new Integer(10));
  * System.out.println(sum.getValue()); // =&gt; 13
  * </pre>
- *
- * @param <T>
- *            the type of value being observed
- *
+ * 
  * @since 1.0
  */
-public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
+public abstract class ComputedValue extends AbstractObservableValue {
 
 	private boolean dirty = true;
 
 	private boolean stale = false;
 
-	private T cachedValue = null;
+	private Object cachedValue = null;
 
 	/**
 	 * Array of observables this computed value depends on. This field has a
@@ -80,7 +76,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	private IObservable[] dependencies = null;
 
 	/**
-	 *
+	 * 
 	 */
 	public ComputedValue() {
 		this(Realm.getDefault(), null);
@@ -96,7 +92,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 
 	/**
 	 * @param realm
-	 *
+	 * 
 	 */
 	public ComputedValue(Realm realm) {
 		this(realm, null);
@@ -116,30 +112,28 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	 * public API. Each interface could have been implemented using a separate
 	 * anonymous class, but we combine them here to reduce the memory overhead
 	 * and number of classes.
-	 *
+	 * 
 	 * <p>
 	 * The Runnable calls computeValue and stores the result in cachedValue.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * The IChangeListener stores each observable in the dependencies list. This
 	 * is registered as the listener when calling ObservableTracker, to detect
 	 * every observable that is used by computeValue.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * The IChangeListener is attached to every dependency.
 	 * </p>
-	 *
+	 * 
 	 */
 	private class PrivateInterface implements Runnable, IChangeListener,
 			IStaleListener {
-		@Override
 		public void run() {
 			cachedValue = calculate();
 		}
 
-		@Override
 		public void handleStale(StaleEvent event) {
 			if (!dirty && !stale) {
 				stale = true;
@@ -147,7 +141,6 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 			}
 		}
 
-		@Override
 		public void handleChange(ChangeEvent event) {
 			makeDirty();
 		}
@@ -157,8 +150,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 
 	private Object valueType;
 
-	@Override
-	protected final T doGetValue() {
+	protected final Object doGetValue() {
 		if (dirty) {
 			// This line will do the following:
 			// - Run the calculate method
@@ -191,10 +183,10 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	 * dependencies used to calculate the value must be {@link IObservable}, and
 	 * implementers must use one of the interface methods tagged TrackedGetter
 	 * for ComputedValue to recognize it as a dependency.
-	 *
+	 * 
 	 * @return the object's value
 	 */
-	protected abstract T calculate();
+	protected abstract Object calculate();
 
 	protected final void makeDirty() {
 		if (!dirty) {
@@ -203,18 +195,16 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 			stopListening();
 
 			// copy the old value
-			final T oldValue = cachedValue;
+			final Object oldValue = cachedValue;
 			// Fire the "dirty" event. This implementation recomputes the new
 			// value lazily.
-			fireValueChange(new ValueDiff<T>() {
+			fireValueChange(new ValueDiff() {
 
-				@Override
-				public T getOldValue() {
+				public Object getOldValue() {
 					return oldValue;
 				}
 
-				@Override
-				public T getNewValue() {
+				public Object getNewValue() {
 					return getValue();
 				}
 			});
@@ -222,7 +212,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void stopListening() {
 		// Stop listening for dependency changes.
@@ -237,14 +227,12 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 		}
 	}
 
-	@Override
 	public boolean isStale() {
 		// we need to recompute, otherwise staleness wouldn't mean anything
 		getValue();
 		return stale;
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
@@ -253,12 +241,10 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	/**
 	 * @since 1.1
 	 */
-	@Override
 	protected boolean hasListeners() {
 		return super.hasListeners();
 	}
 
-	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		super.addChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
@@ -277,7 +263,6 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	 */
 	private void computeValueForListeners() {
 		getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				if (dependencies == null) {
 					// We are not currently listening.
@@ -292,16 +277,14 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 		});
 	}
 
-	@Override
 	public synchronized void addValueChangeListener(
-			IValueChangeListener<? super T> listener) {
+			IValueChangeListener listener) {
 		super.addValueChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners
 		computeValueForListeners();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 		stopListening();

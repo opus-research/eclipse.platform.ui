@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,14 +27,10 @@ public class MarkerType {
     private String[] supertypeIds;
 
     /**
-	 * Creates a new marker type.
-	 *
-	 * @param model
-	 * @param id
-	 * @param label
-	 * @param supertypeIds
-	 */
-	public MarkerType(MarkerTypesModel model, String id, String label, String[] supertypeIds) {
+     * Creates a new marker type.
+     */
+    public MarkerType(MarkerTypesModel model, String id, String label,
+            String[] supertypeIds) {
         this.model = model;
         this.id = id;
         this.label = label;
@@ -42,20 +38,18 @@ public class MarkerType {
     }
 
     /**
-	 * Returns all this type's supertypes.
-	 *
-	 * @return never null
-	 */
+     * Returns all this type's supertypes.
+     */
     public MarkerType[] getAllSupertypes() {
-        ArrayList<MarkerType> result = new ArrayList<>();
+        ArrayList result = new ArrayList();
         getAllSupertypes(result);
-        return result.toArray(new MarkerType[result.size()]);
+        return (MarkerType[]) result.toArray(new MarkerType[result.size()]);
     }
 
     /**
      * Appends all this type's supertypes to the given list.
      */
-    private void getAllSupertypes(ArrayList<MarkerType> result) {
+    private void getAllSupertypes(ArrayList result) {
         MarkerType[] supers = getSupertypes();
         for (int i = 0; i < supers.length; ++i) {
             MarkerType sup = supers[i];
@@ -67,15 +61,15 @@ public class MarkerType {
     }
 
     /**
-	 * @return the marker type id.
-	 */
+     * Returns the marker type id.
+     */
     public String getId() {
         return id;
     }
 
     /**
-	 * @return the human-readable label for this marker type.
-	 */
+     * Returns the human-readable label for this marker type.
+     */
     public String getLabel() {
         return label;
     }
@@ -87,7 +81,7 @@ public class MarkerType {
      */
     public MarkerType[] getSubtypes() {
         MarkerType[] types = model.getTypes();
-        ArrayList<MarkerType> result = new ArrayList<>();
+        ArrayList result = new ArrayList();
         for (int i = 0; i < types.length; ++i) {
             MarkerType type = types[i];
             String[] supers = type.getSupertypeIds();
@@ -97,21 +91,18 @@ public class MarkerType {
                 }
             }
         }
-        return result.toArray(new MarkerType[result.size()]);
+        return (MarkerType[]) result.toArray(new MarkerType[result.size()]);
     }
 
-	/**
-	 * @return never null
-	 */
     public MarkerType[] getAllSubTypes() {
-        List<MarkerType> subTypes = new ArrayList<>();
+        List subTypes = new ArrayList();
         addSubTypes(subTypes, this);
         MarkerType[] subs = new MarkerType[subTypes.size()];
         subTypes.toArray(subs);
         return subs;
     }
 
-    private void addSubTypes(List<MarkerType> list, MarkerType superType) {
+    private void addSubTypes(List list, MarkerType superType) {
         MarkerType[] subTypes = superType.getSubtypes();
         for (int i = 0; i < subTypes.length; i++) {
             MarkerType subType = subTypes[i];
@@ -123,35 +114,32 @@ public class MarkerType {
     }
 
     /**
-	 * @return the marker type ids for this type's supertypes.
-	 */
+     * Returns the marker type ids for this type's supertypes.
+     */
     public String[] getSupertypeIds() {
         return supertypeIds;
     }
 
     /**
-	 * @return this type's direct supertypes, never null.
-	 */
+     * Returns this type's direct supertypes.
+     */
     public MarkerType[] getSupertypes() {
-        ArrayList<MarkerType> result = new ArrayList<>();
+        ArrayList result = new ArrayList();
         for (int i = 0; i < supertypeIds.length; ++i) {
             MarkerType sup = model.getType(supertypeIds[i]);
             if (sup != null) {
                 result.add(sup);
             }
         }
-        return result.toArray(new MarkerType[result.size()]);
+        return (MarkerType[]) result.toArray(new MarkerType[result.size()]);
     }
 
     /**
-	 * Returns whether this marker type is considered to be a subtype of the
-	 * given marker type.
-	 *
-	 * @param superType
-	 *
-	 * @return boolean <code>true</code>if this type is the same as (or a
-	 *         subtype of) the given type
-	 */
+     * Returns whether this marker type is considered to be a subtype of
+     * the given marker type. 
+     *
+     * @return boolean <code>true</code>if this type is the same as (or a subtype of) the given type
+     */
     public boolean isSubtypeOf(MarkerType superType) {
         if (id.equals(superType.getId())) {
             return true;
@@ -165,8 +153,7 @@ public class MarkerType {
         return false;
     }
 
-    @Override
-	public boolean equals(Object other) {
+    public boolean equals(Object other) {
         if (!(other instanceof MarkerType)) {
             return false;
         }

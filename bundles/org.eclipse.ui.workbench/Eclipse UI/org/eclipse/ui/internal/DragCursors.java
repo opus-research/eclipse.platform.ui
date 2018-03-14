@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,7 +60,7 @@ public class DragCursors {
     /**
      * Converts a drag cursor (LEFT, RIGHT, TOP, BOTTOM, CENTER) into an SWT constant
      * (SWT.LEFT, SWT.RIGHT, SWT.TOP, SWT.BOTTOM, SWT.CENTER)
-     *
+     * 
      * @param dragCursorId
      * @return an SWT.* constant
      */
@@ -84,7 +84,7 @@ public class DragCursors {
 	/**
      * Return the cursor for a drop scenario, as identified by code. Code must be one of INVALID,
      * LEFT, RIGHT, TOP, etc. If the code is not found default to INVALID.
-     *
+     * 
      * @param code the code
      * @return the cursor
 	 */

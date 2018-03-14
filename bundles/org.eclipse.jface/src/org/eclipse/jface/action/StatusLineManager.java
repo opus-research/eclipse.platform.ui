@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ public class StatusLineManager extends ContributionManager implements
     /**
      * Identifier of group marker used to position contributions at the beginning
      * of the status line.
-     *
+     * 
      * @since 3.0
      */
     public static final String BEGIN_GROUP = "BEGIN_GROUP"; //$NON-NLS-1$
@@ -41,7 +41,7 @@ public class StatusLineManager extends ContributionManager implements
     /**
      * Identifier of group marker used to position contributions in the middle
      * of the status line.
-     *
+     * 
      * @since 3.0
      */
     public static final String MIDDLE_GROUP = "MIDDLE_GROUP"; //$NON-NLS-1$
@@ -49,7 +49,7 @@ public class StatusLineManager extends ContributionManager implements
     /**
      * Identifier of group marker used to position contributions at the end
      * of the status line.
-     *
+     * 
      * @since 3.0
      */
     public static final String END_GROUP = "END_GROUP"; //$NON-NLS-1$
@@ -62,7 +62,7 @@ public class StatusLineManager extends ContributionManager implements
 
     /**
      * Creates a new status line manager.
-     * Use the <code>createControl</code> method to create the
+     * Use the <code>createControl</code> method to create the 
      * status line control.
      */
     public StatusLineManager() {
@@ -72,10 +72,10 @@ public class StatusLineManager extends ContributionManager implements
     }
 
     /**
-     * Creates and returns this manager's status line control.
+     * Creates and returns this manager's status line control. 
      * Does not create a new control if one already exists.
      * <p>
-     * Note: Since 3.0 the return type is <code>Control</code>.  Before 3.0, the return type was
+     * Note: Since 3.0 the return type is <code>Control</code>.  Before 3.0, the return type was 
      *   the package-private class <code>StatusLine</code>.
      * </p>
      *
@@ -87,7 +87,7 @@ public class StatusLineManager extends ContributionManager implements
     }
 
     /**
-     * Creates and returns this manager's status line control.
+     * Creates and returns this manager's status line control. 
      * Does not create a new control if one already exists.
      *
      * @param parent the parent control
@@ -123,7 +123,7 @@ public class StatusLineManager extends ContributionManager implements
 
     /**
      * Returns the control used by this StatusLineManager.
-     *
+     * 
      * @return the control used by this manager
      */
     public Control getControl() {
@@ -133,7 +133,7 @@ public class StatusLineManager extends ContributionManager implements
     /**
      * Returns the progress monitor delegate. Override this method
      * to provide your own object used to handle progress.
-     *
+     * 
      * @return the IProgressMonitor delegate
      * @since 3.0
      */
@@ -141,6 +141,10 @@ public class StatusLineManager extends ContributionManager implements
         return (IProgressMonitor) getControl();
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on IStatusLineManager
+     */
     @Override
 	public IProgressMonitor getProgressMonitor() {
 		final IProgressMonitor progressDelegate = statusLineExist() ? getProgressMonitorDelegate()
@@ -148,28 +152,43 @@ public class StatusLineManager extends ContributionManager implements
 
         return new IProgressMonitorWithBlocking() {
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#beginTask(java.lang.String, int)
+             */
             @Override
 			public void beginTask(String name, int totalWork) {
                 progressDelegate.beginTask(name, totalWork);
 
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#done()
+             */
             @Override
 			public void done() {
                 progressDelegate.done();
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#internalWorked(double)
+             */
             @Override
 			public void internalWorked(double work) {
                 progressDelegate.internalWorked(work);
 
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#isCanceled()
+             */
             @Override
 			public boolean isCanceled() {
                 return progressDelegate.isCanceled();
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#setCanceled(boolean)
+             */
             @Override
 			public void setCanceled(boolean value) {
                 //Don't bother updating for disposed status
@@ -178,28 +197,43 @@ public class StatusLineManager extends ContributionManager implements
 				}
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+             */
             @Override
 			public void setTaskName(String name) {
                 progressDelegate.setTaskName(name);
 
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+             */
             @Override
 			public void subTask(String name) {
                 progressDelegate.subTask(name);
 
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitor#worked(int)
+             */
             @Override
 			public void worked(int work) {
                 progressDelegate.worked(work);
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+             */
             @Override
 			public void clearBlocked() {
                 //Do nothing here as we let the modal context handle it
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+             */
             @Override
 			public void setBlocked(IStatus reason) {
                 //			Do nothing here as we let the modal context handle it
@@ -207,11 +241,17 @@ public class StatusLineManager extends ContributionManager implements
         };
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStatueLineManager
+     */
     @Override
 	public boolean isCancelEnabled() {
         return statusLineExist() && ((StatusLine) statusLine).isCancelEnabled();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStatueLineManager
+     */
     @Override
 	public void setCancelEnabled(boolean enabled) {
         if (statusLineExist()) {
@@ -219,6 +259,9 @@ public class StatusLineManager extends ContributionManager implements
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStatusLineManager.
+     */
     @Override
 	public void setErrorMessage(String message) {
         if (statusLineExist()) {
@@ -226,6 +269,9 @@ public class StatusLineManager extends ContributionManager implements
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStatusLineManager.
+     */
     @Override
 	public void setErrorMessage(Image image, String message) {
         if (statusLineExist()) {
@@ -233,6 +279,9 @@ public class StatusLineManager extends ContributionManager implements
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStatusLineManager.
+     */
     @Override
 	public void setMessage(String message) {
         if (statusLineExist()) {
@@ -240,6 +289,9 @@ public class StatusLineManager extends ContributionManager implements
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStatusLineManager.
+     */
     @Override
 	public void setMessage(Image image, String message) {
         if (statusLineExist()) {
@@ -250,7 +302,7 @@ public class StatusLineManager extends ContributionManager implements
     /**
      * Returns whether the status line control is created
      * and not disposed.
-     *
+     * 
      * @return <code>true</code> if the control is created
      *	and not disposed, <code>false</code> otherwise
      */
@@ -258,6 +310,9 @@ public class StatusLineManager extends ContributionManager implements
         return statusLine != null && !statusLine.isDisposed();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
     @Override
 	public void update(boolean force) {
 

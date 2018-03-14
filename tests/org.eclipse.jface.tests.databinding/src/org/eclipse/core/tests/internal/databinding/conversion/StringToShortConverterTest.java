@@ -23,8 +23,12 @@ import com.ibm.icu.text.NumberFormat;
 public class StringToShortConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private StringToShortConverter converter;
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		numberFormat = NumberFormat.getIntegerInstance();
@@ -34,7 +38,7 @@ public class StringToShortConverterTest extends TestCase {
 	public void testConvertsToShort() throws Exception {
 		Short value = new Short((short) 1);
 		Short result = (Short) converter.convert(numberFormat.format(value));
-
+		
 		assertEquals(value, result);
 	}
 
@@ -52,12 +56,12 @@ public class StringToShortConverterTest extends TestCase {
 	public void testToTypeIsShort() throws Exception {
 		assertEquals(Short.class, converter.getToType());
 	}
-
+	
 	public void testToTypeIsShortPrimitive() throws Exception {
 		converter = StringToShortConverter.toShort(true);
 		assertEquals(Short.TYPE, converter.getToType());
 	}
-
+	
 	public void testReturnsNullBoxedTypeForEmptyString() throws Exception {
 		assertNull(converter.convert(""));
 	}

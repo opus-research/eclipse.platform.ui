@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <code>CallHistory</code> is used to record the invocation
@@ -30,24 +28,24 @@ import java.util.List;
  * 	complete.</li>
  * </ol>
  * </p><p>
- * Each <code>CallHistory</code> has a target which is used to
- * verify the method names passed to the history.  If an invalid
- * name is passed an <code>IllegalArgumentException</code> will
+ * Each <code>CallHistory</code> has a target which is used to 
+ * verify the method names passed to the history.  If an invalid 
+ * name is passed an <code>IllegalArgumentException</code> will 
  * be thrown.
  * </p>
  */
 public class CallHistory {
-	private List<String> methodList;
+    private ArrayList methodList;
 
-    private Class<? extends Object> classType;
+    private Class classType;
 
     /**
-     * Creates a new call history for an object.
-     *
-     * @param target the call history target.
+     * Creates a new call history for an object.  
+     * 
+     * @param target the call history target. 
      */
     public CallHistory(Object target) {
-        methodList = new ArrayList<String>();
+        methodList = new ArrayList();
         classType = target.getClass();
     }
 
@@ -57,8 +55,8 @@ public class CallHistory {
      */
     private void testMethodName(String methodName) {
         Method[] methods = classType.getMethods();
-		for (Method method : methods)
-			if (method.getName().equals(methodName))
+        for (int i = 0; i < methods.length; i++)
+            if (methods[i].getName().equals(methodName))
                 return;
         throw new IllegalArgumentException("Target class ("
                 + classType.getName() + ") does not contain method: "
@@ -66,8 +64,8 @@ public class CallHistory {
     }
 
     /**
-     * Adds a method name to the call history.
-     *
+     * Adds a method name to the call history.  
+     * 
      * @param methodName the name of a method
      */
     public void add(String methodName) {
@@ -84,8 +82,8 @@ public class CallHistory {
 
     /**
      * Returns whether a list of methods have been called in
-     * order.
-     *
+     * order.  
+     * 
      * @param testNames an array of the method names in the order they are expected
      * @return <code>true</code> if the methods were called in order
      */
@@ -95,7 +93,8 @@ public class CallHistory {
         int testLength = testNames.length;
         if (testLength == 0)
             return true;
-		for (String methodName : methodList) {
+        for (int nX = 0; nX < methodList.size(); nX++) {
+            String methodName = (String) methodList.get(nX);
             String testName = testNames[testIndex];
             testMethodName(testName);
             if (testName.equals(methodName))
@@ -108,7 +107,7 @@ public class CallHistory {
 
     /**
      * Returns whether a method has been called.
-     *
+     * 
      * @param methodName a method name
      * @return <code>true</code> if the method was called
      */
@@ -119,14 +118,14 @@ public class CallHistory {
 
     /**
      * Returns whether a list of methods were called.
-     *
+     * 
      * @param methodNames a list of methods
      * @return <code>true</code> if the methods were called
      */
     public boolean contains(String[] methodNames) {
-		for (String methodName : methodNames) {
-			testMethodName(methodName);
-			if (!methodList.contains(methodNames))
+        for (int i = 0; i < methodNames.length; i++) {
+            testMethodName(methodNames[i]);
+            if (!methodList.contains(methodNames[i]))
                 return false;
         }
         return true;
@@ -134,7 +133,7 @@ public class CallHistory {
 
     /**
      * Returns whether the list of methods called is empty.
-     *
+     * 
      * @return <code>true</code> iff the list of methods is empty
      */
     public boolean isEmpty() {
@@ -145,7 +144,7 @@ public class CallHistory {
      * Prints the call history to the console.
      */
     public void printToConsole() {
-		for (String methodName : methodList)
-			System.out.println(methodName);
+        for (int i = 0; i < methodList.size(); i++)
+            System.out.println(methodList.get(i));
     }
 }

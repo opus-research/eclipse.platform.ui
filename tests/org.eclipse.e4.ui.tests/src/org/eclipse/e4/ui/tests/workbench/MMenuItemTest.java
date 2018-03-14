@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,13 +11,8 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import javax.inject.Named;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -61,16 +56,13 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class MMenuItemTest {
+public class MMenuItemTest extends TestCase {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		ContextInjectionFactory.make(ContextServiceAddon.class, appContext);
@@ -79,8 +71,8 @@ public class MMenuItemTest {
 				PartRenderingEngine.engineURI);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
@@ -102,7 +94,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -122,57 +114,46 @@ public class MMenuItemTest {
 		assertEquals(afterExpected, menuItemWidget.getText());
 	}
 
-	@Test
 	public void testMMenuItem_Text_NullNull() {
 		testMMenuItem_Text(null, "", null, "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_NullEmpty() {
 		testMMenuItem_Text(null, "", "", "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_NullString() {
 		testMMenuItem_Text(null, "", "label", "label");
 	}
 
-	@Test
 	public void testMMenuItem_Text_EmptyNull() {
 		testMMenuItem_Text("", "", null, "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_EmptyEmpty() {
 		testMMenuItem_Text("", "", "", "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_EmptyString() {
 		testMMenuItem_Text("", "", "label", "label");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringNull() {
 		testMMenuItem_Text("label", "label", null, "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringEmpty() {
 		testMMenuItem_Text("label", "label", "", "");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringStringUnchanged() {
 		testMMenuItem_Text("label", "label", "label", "label");
 	}
 
-	@Test
 	public void testMMenuItem_Text_StringStringChanged() {
 		testMMenuItem_Text("label", "label", "label2", "label2");
 	}
 
-	@Test
 	public void testMMenuItem_RadioItems() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -190,7 +171,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -232,7 +213,6 @@ public class MMenuItemTest {
 		assertTrue(menuItemWidget2.getSelection());
 	}
 
-	@Test
 	public void testMDirectMenuItem_Check_Bug316752() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -248,7 +228,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -263,7 +243,6 @@ public class MMenuItemTest {
 		assertTrue(menuItemWidget.getSelection());
 	}
 
-	@Test
 	public void testMHandledMenuItem_Check_Bug316752() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -284,7 +263,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -301,44 +280,6 @@ public class MMenuItemTest {
 		assertTrue(menuItemWidget.getSelection());
 	}
 
-	@Test
-	public void testMHandledMenuItem_Check_Bug463280() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
-		MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
-		MHandledMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createHandledMenuItem();
-		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
-
-		command.setElementId("commandId");
-
-		menuItem.setCommand(command);
-		menuItem.setType(ItemType.CHECK);
-		menuItem.setSelected(true);
-		menuItem.setLabel("&Test Xxx");
-		menuItem.setMnemonics("");
-
-		menu.getChildren().add(menuItem);
-		window.setMainMenu(menu);
-
-		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
-		application.getChildren().add(window);
-		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
-
-		wb = new E4Workbench(window, appContext);
-		wb.createAndRunUI(window);
-
-		MenuManager barManager = (MenuManager) ((Menu) menu.getWidget()).getData();
-		barManager.updateAll(true);
-
-		Object widget1 = menuItem.getWidget();
-		assertNotNull(widget1);
-		assertTrue(widget1 instanceof MenuItem);
-
-		MenuItem menuItemWidget = (MenuItem) widget1;
-		assertFalse(menuItemWidget.getText().startsWith("&&"));
-	}
-
-	@Test
 	public void testSubMenuCreation() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -368,7 +309,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -386,7 +327,6 @@ public class MMenuItemTest {
 		assertEquals(3, fileManager.getSize());
 	}
 
-	@Test
 	public void testTbrItem() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -417,7 +357,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -435,7 +375,6 @@ public class MMenuItemTest {
 		assertEquals(2, fileManager.getSize());
 	}
 
-	@Test
 	public void testInvisibleItem() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -466,7 +405,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -486,7 +425,6 @@ public class MMenuItemTest {
 		assertEquals(false, fileManager.getItems()[2].isVisible());
 	}
 
-	@Test
 	public void testMenuContribution() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -516,7 +454,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 		application.getMenuContributions().add(createContribution(false));
 
 		wb = new E4Workbench(window, appContext);
@@ -532,7 +470,6 @@ public class MMenuItemTest {
 		assertEquals("mmc.item1", fileManager.getItems()[3].getId());
 	}
 
-	@Test
 	public void testWithVisible() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -562,7 +499,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 		application.getMenuContributions().add(createContribution(true));
 
 		wb = new E4Workbench(window, appContext);
@@ -620,7 +557,6 @@ public class MMenuItemTest {
 		fileWidget.notifyListeners(SWT.Hide, hide);
 	}
 
-	@Test
 	public void testMenuBarVisibility() throws Exception {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MMenu menuBar = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -650,7 +586,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 		createMenuContribution(application);
 
 		wb = new E4Workbench(window, appContext);
@@ -688,7 +624,6 @@ public class MMenuItemTest {
 		assertFalse(vanishManager.getMenu().isDisposed());
 	}
 
-	@Test
 	public void testElementHierarchyInContext_DirectItem() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
@@ -729,7 +664,7 @@ public class MMenuItemTest {
 				.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		wb = new E4Workbench(window, appContext);
 		wb.createAndRunUI(window);
@@ -753,7 +688,6 @@ public class MMenuItemTest {
 		assertTrue(executed[0]);
 	}
 
-	@Test
 	public void testElementHierarchyInContext_HandledItem() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
@@ -804,7 +738,7 @@ public class MMenuItemTest {
 		application.getCommands().add(command);
 		application.getChildren().add(window);
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 		// The handler processing addon cannot run until the context
 		// contains the MApplication
 		ContextInjectionFactory.make(CommandProcessingAddon.class, appContext);

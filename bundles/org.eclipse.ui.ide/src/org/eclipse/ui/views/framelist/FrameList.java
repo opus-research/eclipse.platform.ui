@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
  * Supports a web-browser style of navigation by maintaining a list
- * of frames.  Each frame holds a snapshot of a view at some point
+ * of frames.  Each frame holds a snapshot of a view at some point 
  * in time.
  * <p>
  * The frame list obtains a snapshot of the current frame from a frame source
@@ -209,7 +209,7 @@ public class FrameList extends EventManager {
     }
 
     /**
-     * Replaces the current frame in this list with the current frame
+     * Replaces the current frame in this list with the current frame 
      * from the frame source.  No event is fired.
      */
     public void updateCurrentFrame() {

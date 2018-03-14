@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.jface.preference.IPreferencePage;
  * Interface for workbench preference pages.
  * <p>
  * Clients should implement this interface and include the name of their class
- * in an extension contributed to the workbench's preference extension point
+ * in an extension contributed to the workbench's preference extension point 
  * (named <code>"org.eclipse.ui.preferencePages"</code>).
  * For example, the plug-in's XML markup might contain:
  * <pre>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,9 +30,9 @@ import org.eclipse.ui.statushandlers.StatusManager;
 /**
  * MarkerViewHandler is the abstract class of the handlers for the
  * {@link MarkerSupportView}
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public abstract class MarkerViewHandler extends AbstractHandler {
 
@@ -40,7 +40,7 @@ public abstract class MarkerViewHandler extends AbstractHandler {
 
 	/**
 	 * Get the view this event occurred on.
-	 *
+	 * 
 	 * @param event
 	 * @return {@link MarkerSupportView} or <code>null</code>
 	 */
@@ -53,7 +53,7 @@ public abstract class MarkerViewHandler extends AbstractHandler {
 
 	/**
 	 * Execute the specified undoable operation
-	 *
+	 * 
 	 * @param operation
 	 * @param title
 	 * @param monitor
@@ -81,10 +81,10 @@ public abstract class MarkerViewHandler extends AbstractHandler {
 	/**
 	 * Get the selected markers for the receiver in the view from event. If the
 	 * view cannot be found then return an empty array.
-	 *
-	 * This is run using {@link Display#syncExec(Runnable)} so that it can be called
+	 * 
+	 * This is run using {@link Display#syncExec(Runnable)} so that it can be called 
 	 * outside of the UI {@link Thread}.
-	 *
+	 * 
 	 * @param event
 	 * @return {@link IMarker}[]
 	 */
@@ -94,7 +94,16 @@ public abstract class MarkerViewHandler extends AbstractHandler {
 			return EMPTY_MARKER_ARRAY;
 
 		final IMarker[][] result = new IMarker[1][];
-		view.getSite().getShell().getDisplay().syncExec(() -> result[0] = view.getSelectedMarkers());
+		view.getSite().getShell().getDisplay().syncExec(new Runnable() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Runnable#run()
+			 */
+			public void run() {
+				result[0] = view.getSelectedMarkers();
+			}
+		});
 		return result[0];
 	}
 }

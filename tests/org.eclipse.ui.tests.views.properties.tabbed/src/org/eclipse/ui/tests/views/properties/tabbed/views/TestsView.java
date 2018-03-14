@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -35,14 +35,12 @@ public class TestsView
     class ViewLabelProvider
         extends LabelProvider {
 
-        @Override
-		public String getText(Object obj) {
+        public String getText(Object obj) {
             Element element = (Element) ((TreeNode) obj).getValue();
             return element.getName();
         }
 
-        @Override
-		public Image getImage(Object obj) {
+        public Image getImage(Object obj) {
             Element element = (Element) ((TreeNode) obj).getValue();
             return element.getImage();
         }
@@ -59,8 +57,7 @@ public class TestsView
      * This is a callback that will allow us to create the viewer and initialize
      * it.
      */
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         viewer.setContentProvider(new TestsViewContentProvider(this));
         viewer.setLabelProvider(new ViewLabelProvider());
@@ -71,13 +68,11 @@ public class TestsView
     /**
      * Passing the focus request to the viewer's control.
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         viewer.getControl().setFocus();
     }
 
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IPropertySheetPage.class) {
             if (tabbedPropertySheetPage == null) {
                 tabbedPropertySheetPage = new TabbedPropertySheetPage(this);
@@ -87,8 +82,7 @@ public class TestsView
         return super.getAdapter(adapter);
     }
 
-    @Override
-	public String getContributorId() {
+    public String getContributorId() {
         return TESTS_VIEW_ID;
     }
 

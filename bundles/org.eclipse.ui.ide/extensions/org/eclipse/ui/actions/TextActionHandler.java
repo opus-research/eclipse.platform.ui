@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -91,22 +91,19 @@ public class TextActionHandler {
 	private IActionBars actionBars;
 
     private MouseAdapter mouseAdapter = new MouseAdapter() {
-        @Override
-		public void mouseUp(MouseEvent e) {
+        public void mouseUp(MouseEvent e) {
             updateActionsEnableState();
         }
     };
 
     private KeyAdapter keyAdapter = new KeyAdapter() {
-        @Override
-		public void keyReleased(KeyEvent e) {
+        public void keyReleased(KeyEvent e) {
             updateActionsEnableState();
         }
     };
 
     private class TextControlListener implements Listener {
-        @Override
-		public void handleEvent(Event event) {
+        public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.Activate:
                 activeTextControl = (Text) event.widget;
@@ -130,8 +127,7 @@ public class TextActionHandler {
             this.actionHandler = actionHandler;
         }
 
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             if (activeTextControl != null) {
 				return;
 			}
@@ -151,8 +147,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_DELETE_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
 			if (activeTextControl != null && !activeTextControl.isDisposed()) {
 				Point selection = activeTextControl.getSelection();
 				if (selection.y == selection.x
@@ -199,8 +194,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_CUT_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.cut();
                 updateActionsEnableState();
@@ -237,8 +231,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_COPY_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.copy();
                 updateActionsEnableState();
@@ -275,8 +268,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_PASTE_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.paste();
                 updateActionsEnableState();
@@ -303,10 +295,10 @@ public class TextActionHandler {
             				break;
             			}
             		}
-
+            		
             		clipboard.dispose();
             	}
-
+            	
                 setEnabled(canPaste);
                 return;
             }
@@ -327,8 +319,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_SELECT_ALL_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.selectAll();
                 updateActionsEnableState();
@@ -358,11 +349,11 @@ public class TextActionHandler {
 
     /**
      * Creates a <code>Text</code> control action handler
-     * for the global Cut, Copy, Paste, Delete, and Select All
+     * for the global Cut, Copy, Paste, Delete, and Select All 
      * of the action bar.
      *
      * @param actionBar the action bar to register global
-     *    action handlers for Cut, Copy, Paste, Delete,
+     *    action handlers for Cut, Copy, Paste, Delete, 
      * 	  and Select All
      */
     public TextActionHandler(IActionBars actionBar) {
@@ -373,8 +364,8 @@ public class TextActionHandler {
 
     /**
      * Updates the actions bars.
-     *
-	 * @since 3.6
+     * 
+	 * @since 3.6 
 	 */
 	public void updateActionBars() {
 		actionBars.setGlobalActionHandler(ActionFactory.CUT.getId(),
@@ -389,10 +380,10 @@ public class TextActionHandler {
                 textDeleteAction);
 	}
 
-
+    
     /**
      * Add a <code>Text</code> control to the handler
-     * so that the Cut, Copy, Paste, Delete, and Select All
+     * so that the Cut, Copy, Paste, Delete, and Select All 
      * actions are redirected to it when active.
      *
      * @param textControl the inline <code>Text</code> control
@@ -430,7 +421,7 @@ public class TextActionHandler {
 
     /**
      * Removes a <code>Text</code> control from the handler
-     * so that the Cut, Copy, Paste, Delete, and Select All
+     * so that the Cut, Copy, Paste, Delete, and Select All 
      * actions are no longer redirected to it when active.
      *
      * @param textControl the inline <code>Text</code> control

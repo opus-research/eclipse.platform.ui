@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 - 2015 Tom Schindl and others.
+ * Copyright (c) 2006 - 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 414565, 442278, 475361
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -74,7 +74,7 @@ public class Snippet005TreeCustomMenu {
 	public class MyModel {
 		public MyModel parent;
 
-		public List<MyModel> child = new ArrayList<>();
+		public List<MyModel> child = new ArrayList<MyModel>();
 
 		public int counter;
 
@@ -111,7 +111,8 @@ public class Snippet005TreeCustomMenu {
 
 			@Override
 			public void menuAboutToShow(IMenuManager manager) {
-				IStructuredSelection selection = v.getStructuredSelection();
+				IStructuredSelection selection = (IStructuredSelection) v
+						.getSelection();
 				if (!selection.isEmpty()) {
 					a.setText("Action for "
 							+ ((MyModel) selection.getFirstElement())

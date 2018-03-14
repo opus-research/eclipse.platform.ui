@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,7 +54,7 @@ public class WWinPluginAction extends PluginAction implements
 
     /**
      * Constructs a new <code>WWinPluginAction</code> object.
-     *
+     * 
      * @param actionElement the configuration element
      * @param window the window to contribute to
      * @param id the identifier
@@ -170,17 +170,23 @@ public class WWinPluginAction extends PluginAction implements
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
         if (obj instanceof IWorkbenchWindowActionDelegate) {
 			return (IWorkbenchWindowActionDelegate) obj;
 		}
-
+        
         throw new WorkbenchException(
                 "Action must implement IWorkbenchWindowActionDelegate"); //$NON-NLS-1$
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected void initDelegate() {
         super.initDelegate();
@@ -211,7 +217,7 @@ public class WWinPluginAction extends PluginAction implements
     }
 
     /**
-     * Returns true if the window has been set.
+     * Returns true if the window has been set.  
      * The window may be null after the constructor is called and
      * before the window is stored.  We cannot create the delegate
      * at that time.
@@ -222,6 +228,9 @@ public class WWinPluginAction extends PluginAction implements
                 && retargetAction == null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IActionDelegate2.
+     */
     @Override
 	public void runWithEvent(Event event) {
         if (retargetAction == null) {
@@ -244,7 +253,7 @@ public class WWinPluginAction extends PluginAction implements
         actionSetId = newActionSetId;
     }
 
-    /**
+    /** 
      * The <code>WWinPluginAction</code> implementation of this method
      * declared on <code>IAction</code> stores the help listener in
      * a local field. The supplied listener is only used if there is
@@ -255,6 +264,9 @@ public class WWinPluginAction extends PluginAction implements
         localHelpListener = listener;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void setChecked(boolean checked) {
         super.setChecked(checked);
@@ -273,13 +285,4 @@ public class WWinPluginAction extends PluginAction implements
         ISelection selection = window.getSelectionService().getSelection();
         selectionChanged(selection);
     }
-
-	@Override
-	public String toString() {
-		return "WWinPluginAction [" //$NON-NLS-1$
-				+ "id=" + getId() //$NON-NLS-1$
-				+ ", enabled=" + isEnabled() + //$NON-NLS-1$
-				(actionSetId != null ? ", actionSet=" + actionSetId : "") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "]"; //$NON-NLS-1$
-	}
 }

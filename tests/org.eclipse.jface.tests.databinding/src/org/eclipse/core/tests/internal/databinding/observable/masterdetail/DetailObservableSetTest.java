@@ -41,13 +41,13 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 	/**
 	 * Asserts the use case of specifying null on construction for the detail
 	 * type of the detail set.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNull() throws Exception {
@@ -74,7 +74,7 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 
 	/**
 	 * Asserts that you can't change the type across multiple inner observables.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNotNull() throws Exception {
@@ -103,7 +103,6 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 		class OuterObservable extends WritableValue {
 			boolean disposed = false;
 
-			@Override
 			public synchronized void dispose() {
 				disposed = true;
 				super.dispose();
@@ -145,7 +144,6 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 		final IObservableSet[] detailObservable = new IObservableSet[1];
 
 		master.addValueChangeListener(new IValueChangeListener() {
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				detailObservable[0].dispose();
 			}
@@ -160,7 +158,6 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 	private static class WritableSetFactory implements IObservableFactory {
 		Object type = Object.class;
 
-		@Override
 		public IObservable createObservable(Object target) {
 			return new WritableSet(new HashSet(), type);
 		}
@@ -176,7 +173,6 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 	static class Delegate extends AbstractObservableCollectionContractDelegate {
 		Object elementType = Object.class;
 
-		@Override
 		public IObservableCollection createObservableCollection(
 				final Realm realm, final int elementCount) {
 
@@ -186,17 +182,14 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 			return new DetailObservableSetStub(factory, master, elementType);
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return elementType;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			final IObservableValue master = ((DetailObservableSetStub) observable).master;
 			master.setValue(new Integer(((Integer) master.getValue())
@@ -215,7 +208,6 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 
 		Object type = Object.class;
 
-		@Override
 		public IObservable createObservable(Object target) {
 			int elementCount = ((Integer) target).intValue();
 			final Set wrappedSet = new HashSet();

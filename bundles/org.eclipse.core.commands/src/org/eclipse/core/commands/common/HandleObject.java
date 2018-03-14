@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.core.internal.commands.util.Util;
  * example, there should only ever be one instance of <code>Command</code>
  * with a given identifier.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public abstract class HandleObject extends EventManager implements
@@ -44,7 +44,7 @@ public abstract class HandleObject extends EventManager implements
 	 * been computed.
 	 */
 	private static final int HASH_CODE_NOT_COMPUTED = -1;
-
+	
     /**
      * A factor for computing the hash code for all schemes.
      */
@@ -85,7 +85,7 @@ public abstract class HandleObject extends EventManager implements
 
     /**
      * Constructs a new instance of <code>HandleObject</code>.
-     *
+     * 
      * @param id
      *            The id of this handle; must not be <code>null</code>.
      */
@@ -101,13 +101,12 @@ public abstract class HandleObject extends EventManager implements
     /**
      * Tests whether this object is equal to another object. A handle object is
      * only equal to another handle object with the same id and the same class.
-     *
+     * 
      * @param object
      *            The object with which to compare; may be <code>null</code>.
      * @return <code>true</code> if the objects are equal; <code>false</code>
      *         otherwise.
      */
-	@Override
 	public boolean equals(final Object object) {
 		// Check if they're the same.
 		if (object == this) {
@@ -124,19 +123,17 @@ public abstract class HandleObject extends EventManager implements
 		return Util.equals(id, handle.id)
 				&& (this.getClass() == handle.getClass());
 	}
-
-    @Override
-	public final String getId() {
+	
+    public final String getId() {
         return id;
     }
 
     /**
      * Computes the hash code for this object based on the id.
-     *
+     * 
      * @return The hash code for this object.
      */
-    @Override
-	public final int hashCode() {
+    public final int hashCode() {
         if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(id);
 			if (hashCode == HASH_CODE_NOT_COMPUTED) {
@@ -150,7 +147,7 @@ public abstract class HandleObject extends EventManager implements
      * Whether this instance is defined. A defined instance is one that has been
      * fully initialized. This allows objects to effectively disappear even
      * though other objects may still have references to them.
-     *
+     * 
      * @return <code>true</code> if this object is defined; <code>false</code>
      *         otherwise.
      */
@@ -161,11 +158,10 @@ public abstract class HandleObject extends EventManager implements
     /**
      * The string representation of this object -- for debugging purposes only.
      * This string should not be shown to an end user.
-     *
+     * 
      * @return The string representation; never <code>null</code>.
      */
-    @Override
-	public abstract String toString();
+    public abstract String toString();
 
     /**
      * Makes this object becomes undefined. This method should make any defined

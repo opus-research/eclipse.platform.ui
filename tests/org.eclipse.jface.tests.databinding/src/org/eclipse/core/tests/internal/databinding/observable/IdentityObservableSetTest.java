@@ -37,7 +37,6 @@ public class IdentityObservableSetTest extends TestCase {
 	private static class Delegate extends
 			AbstractObservableCollectionContractDelegate {
 
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			IdentityObservableSet set = new IdentityObservableSet(realm,
@@ -47,18 +46,15 @@ public class IdentityObservableSetTest extends TestCase {
 			return set;
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableSet set = (IObservableSet) observable;
 			set.add(createElement(set));
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return Object.class;
 		}

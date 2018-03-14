@@ -30,32 +30,42 @@ public class NullImageDecorator implements ILightweightLabelDecorator {
     public NullImageDecorator() {
     }
 
-    @Override
-	public void addListener(ILabelProviderListener listener) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+     */
+    public void addListener(ILabelProviderListener listener) {
         // XXX Auto-generated method stub
     }
 
-    @Override
-	public void decorate(Object element, IDecoration decoration) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object, org.eclipse.jface.viewers.IDecoration)
+     */
+    public void decorate(Object element, IDecoration decoration) {
         if (fail) {
             fail = false;
             throw new ForcedException("Lighweight decorator boom");
         }
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+     */
+    public void dispose() {
         // XXX Auto-generated method stub
     }
 
-    @Override
-	public boolean isLabelProperty(Object element, String property) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
+     */
+    public boolean isLabelProperty(Object element, String property) {
         // XXX Auto-generated method stub
         return false;
     }
 
-    @Override
-	public void removeListener(ILabelProviderListener listener) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+     */
+    public void removeListener(ILabelProviderListener listener) {
         // XXX Auto-generated method stub
     }
 }

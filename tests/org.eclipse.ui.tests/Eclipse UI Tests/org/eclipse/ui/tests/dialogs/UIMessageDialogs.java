@@ -12,6 +12,8 @@ package org.eclipse.ui.tests.dialogs;
 
 import java.text.MessageFormat;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -21,8 +23,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
-
-import junit.framework.TestCase;
 
 public class UIMessageDialogs extends TestCase {
     private static final String DUMMY_RESOURCE = "Dummy.resource";
@@ -43,7 +43,7 @@ public class UIMessageDialogs extends TestCase {
     }
 
     /*
-     * Convenience method similar to org.eclipse.jface.dialogs.MessageDialog::openInformation.
+     * Convenience method simliar to org.eclipse.jface.dialogs.MessageDialog::openInformation.
      * The method will return the dialog instead of opening.
      * @param title the dialog's title, or <code>null</code> if none.
      * @param message the message.
@@ -51,12 +51,12 @@ public class UIMessageDialogs extends TestCase {
      */
     private MessageDialog getInformationDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-                MessageDialog.INFORMATION, 0,
-                IDialogConstants.OK_LABEL);
+                MessageDialog.INFORMATION,
+                new String[] { IDialogConstants.OK_LABEL }, 0);
     }
 
     /*
-     * Convenience method similar to org.eclipse.jface.dialogs.MessageDialog::openQuestion.
+     * Convenience method simliar to org.eclipse.jface.dialogs.MessageDialog::openQuestion.
      * The method will return the dialog instead of opening.
      * @param title the dialog's title, or <code>null</code> if none.
      * @param message the message.
@@ -64,12 +64,13 @@ public class UIMessageDialogs extends TestCase {
      */
     private MessageDialog getQuestionDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-                MessageDialog.QUESTION, 0,
-                IDialogConstants.YES_LABEL,IDialogConstants.NO_LABEL );
+                MessageDialog.QUESTION,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL }, 0);
     }
 
     /*
-     * Convenience method similar to org.eclipse.jface.dialogs.MessageDialog::getWarningDialog.
+     * Convenience method simliar to org.eclipse.jface.dialogs.MessageDialog::getWarningDialog.
      * The method will return the dialog instead of opening.
      * @param title the dialog's title, or <code>null</code> if none.
      * @param message the message.
@@ -77,8 +78,8 @@ public class UIMessageDialogs extends TestCase {
      */
     private MessageDialog getWarningDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-                MessageDialog.WARNING, 0,
-                IDialogConstants.OK_LABEL);
+                MessageDialog.WARNING,
+                new String[] { IDialogConstants.OK_LABEL }, 0);
     }
 
     public void testAbortPageFlipping() {
@@ -88,7 +89,7 @@ public class UIMessageDialogs extends TestCase {
         DialogCheck.assertDialog(dialog, this);
     }
 
-
+  
     public void testCopyOverwrite() {
         Dialog dialog = getQuestionDialog("Exists","Overwrite?");
         DialogCheck.assertDialog(dialog, this);
@@ -99,19 +100,20 @@ public class UIMessageDialogs extends TestCase {
         String msg = NLS.bind("Delete", (new Object[] {
 		DUMMY_PROJECT, DUMMY_ABSOLUTE_PATH }));
         Dialog dialog = new MessageDialog(getShell(), title, null, // accept the default window icon
-                msg, MessageDialog.QUESTION, 0,
-                IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL);
+                msg, MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 
     public void testDeleteReadOnlyCheck() {
         Dialog dialog = new MessageDialog(getShell(),"Delete?", null,
                "This?",
-                MessageDialog.QUESTION, 0,
+                MessageDialog.QUESTION, new String[] {
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
-                        IDialogConstants.CANCEL_LABEL);
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 
@@ -129,13 +131,13 @@ public class UIMessageDialogs extends TestCase {
         Dialog dialog = new MessageDialog(
                 getShell(),
                 ResourceNavigatorMessages.DropAdapter_question,
-                null, MessageFormat.format(ResourceNavigatorMessages.DropAdapter_overwriteQuery,
+                null, MessageFormat.format(ResourceNavigatorMessages.DropAdapter_overwriteQuery, 
                         new Object[] { DUMMY_RELATIVE_PATH }),
-                MessageDialog.QUESTION, 0,
+                MessageDialog.QUESTION, new String[] {
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
-                        IDialogConstants.CANCEL_LABEL);
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 
@@ -175,11 +177,11 @@ public class UIMessageDialogs extends TestCase {
 
     public void testMoveReadOnlyCheck() {
         Dialog dialog = new MessageDialog(getShell(), "Move", null, "OK to move",
-                MessageDialog.QUESTION, 0,
+                MessageDialog.QUESTION, new String[] {
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
-                        IDialogConstants.CANCEL_LABEL);
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 
@@ -223,7 +225,9 @@ public class UIMessageDialogs extends TestCase {
                 NLS.bind("deleted location", (new Object[] {
 				DUMMY_PROJECT,
 				"c:\\dummypath\\" + DUMMY_PROJECT })),
-				MessageDialog.QUESTION, 0, IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL);
+                MessageDialog.QUESTION,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
         DialogCheck.assertDialog(dialog, this);
     }
@@ -235,21 +239,25 @@ public class UIMessageDialogs extends TestCase {
 
     public void testResetPerspective() {
         Dialog dialog = new MessageDialog(getShell(), WorkbenchMessages.ResetPerspective_title, null, NLS.bind(WorkbenchMessages.ResetPerspective_message, (new Object[] { "Dummy Perspective" })),
-                MessageDialog.QUESTION, 0,
+                MessageDialog.QUESTION, new String[] {
                         IDialogConstants.OK_LABEL,
-                        IDialogConstants.CANCEL_LABEL);
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 
     public void testSaveAsOverwrite() {
-		Dialog dialog = new MessageDialog(getShell(), "OK?", null, "Overwrite?", MessageDialog.QUESTION, 0,
-				IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL);
+        Dialog dialog = new MessageDialog(getShell(), "OK?", null, "Overwrite?", MessageDialog.QUESTION,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 
     public void testSaveChanges() {
         Dialog dialog = new MessageDialog(getShell(), WorkbenchMessages.Save_Resource, null, NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion, (new Object[] { DUMMY_RESOURCE })), MessageDialog.QUESTION,
-                0,IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL);
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 
@@ -257,8 +265,8 @@ public class UIMessageDialogs extends TestCase {
         Dialog dialog = new MessageDialog(getShell(), JFaceResources
                 .getString("WizardClosingDialog.title"), null, JFaceResources
                 .getString("WizardClosingDialog.message"),
-                MessageDialog.QUESTION, 0,
-				IDialogConstants.OK_LABEL);
+                MessageDialog.QUESTION,
+                new String[] { IDialogConstants.OK_LABEL }, 0);
         DialogCheck.assertDialog(dialog, this);
     }
 

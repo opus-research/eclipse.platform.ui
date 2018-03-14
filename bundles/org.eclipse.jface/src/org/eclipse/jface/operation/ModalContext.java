@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -86,14 +86,14 @@ public class ModalContext {
 
 		/**
 		 * The thread that forked this modal context thread.
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		private Thread callingThread;
 
 		/**
 		 * Creates a new modal context.
-		 *
+		 * 
 		 * @param operation
 		 *            the runnable to run
 		 * @param monitor
@@ -112,6 +112,9 @@ public class ModalContext {
 			this.callingThread = Thread.currentThread();
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on Thread.
+		 */
 		@Override
 		public void run() {
 			try {
@@ -133,9 +136,9 @@ public class ModalContext {
 			} finally {
 				// notify the operation of change of thread of control
 				if (runnable instanceof IThreadListener) {
-					Throwable exception =
+					Throwable exception = 
 						invokeThreadListener(((IThreadListener) runnable), callingThread);
-
+					
 					//Forward it if we don't already have one
 					if(exception != null && throwable == null)
 						throwable = exception;
@@ -143,8 +146,11 @@ public class ModalContext {
 
 				// Make sure that all events in the asynchronous event queue
 				// are dispatched.
-				display.syncExec(() -> {
-					// do nothing
+				display.syncExec(new Runnable() {
+					@Override
+					public void run() {
+						// do nothing
+					}
 				});
 
 				// Stop event dispatching
@@ -218,7 +224,7 @@ public class ModalContext {
 	/**
 	 * Returns whether the first progress monitor is the same as, or a wrapper
 	 * around, the second progress monitor.
-	 *
+	 * 
 	 * @param monitor1
 	 *            the first progress monitor
 	 * @param monitor2
@@ -252,14 +258,14 @@ public class ModalContext {
 	 * </p>
 	 * <p>
 	 * Convenience for:
-	 *
+	 * 
 	 * <pre>
 	 * if (monitor.isCanceled())
 	 * 	throw new InterruptedException();
 	 * </pre>
-	 *
+	 * 
 	 * </p>
-	 *
+	 * 
 	 * @param monitor
 	 *            the progress monitor
 	 * @exception InterruptedException
@@ -292,7 +298,7 @@ public class ModalContext {
 	 * <code>ModalContext.run</code> method is called within the dynamic scope
 	 * of another call to <code>ModalContext.run</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return the modal nesting level, or <code>0</code> if this method is
 	 *         called outside the dynamic scope of any invocation of
 	 *         <code>ModalContext.run</code>
@@ -303,7 +309,7 @@ public class ModalContext {
 
 	/**
 	 * Returns whether the given thread is running a modal context.
-	 *
+	 * 
 	 * @param thread
 	 *            The thread to be checked
 	 * @return <code>true</code> if the given thread is running a modal
@@ -330,7 +336,7 @@ public class ModalContext {
 	 * an opportunity to transfer any thread-local state to the execution thread
 	 * before control is transferred to the new thread.
 	 * </p>
-	 *
+	 * 
 	 * @param operation
 	 *            the runnable to run
 	 * @param fork
@@ -378,7 +384,7 @@ public class ModalContext {
 					if (operation instanceof IThreadListener) {
 						listenerException = invokeThreadListener((IThreadListener) operation, t);
 					}
-
+					
 					if(listenerException == null){
 						t.start();
 						t.block();
@@ -427,7 +433,7 @@ public class ModalContext {
 	/**
 	 * Invoke the ThreadListener if there are any errors or RuntimeExceptions
 	 * return them.
-	 *
+	 * 
 	 * @param listener
 	 * @param switchingThread
 	 *            the {@link Thread} being switched to
@@ -478,7 +484,7 @@ public class ModalContext {
 
 	/**
 	 * Sets whether ModalContext is running in debug mode.
-	 *
+	 * 
 	 * @param debugMode
 	 *            <code>true</code> for debug mode, and <code>false</code>
 	 *            for normal mode (the default)
@@ -492,7 +498,7 @@ public class ModalContext {
 	 * <code>Display.readAndDispatch()</code>) while running operations. By
 	 * default, ModalContext will process events while running operations. Use
 	 * this method to disallow event processing temporarily.
-	 *
+	 * 
 	 * @param allowReadAndDispatch
 	 *            <code>true</code> (the default) if events may be processed
 	 *            while running an operation, <code>false</code> if

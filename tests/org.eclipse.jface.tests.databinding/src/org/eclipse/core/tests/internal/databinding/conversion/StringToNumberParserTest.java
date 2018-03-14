@@ -24,7 +24,11 @@ import com.ibm.icu.text.NumberFormat;
 public class StringToNumberParserTest extends TestCase {
 	private NumberFormat integerFormat;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 

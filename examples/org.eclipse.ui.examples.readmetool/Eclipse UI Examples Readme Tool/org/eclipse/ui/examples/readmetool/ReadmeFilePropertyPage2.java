@@ -31,14 +31,14 @@ import org.eclipse.ui.dialogs.PropertyPage;
 /**
  * This page will be added to the property page dialog
  * when "Properties..." popup menu item is selected
- * for Readme files.
+ * for Readme files. 
  *
  * This page demonstrates conditional property pages which look
  * different depending on the state of the element. In this example,
  * the arbitrary condition chosen is whether the Readme file is
  * greater than 256 bytes in length. If it is smaller than 256 bytes
- * in length, this will be a placeholder page containing
- * a simple message. If it is 256 bytes or larger, additional
+ * in length, this will be a placeholder page containing 
+ * a simple message. If it is 256 bytes or larger, additional 
  * information will be provided. This information is determined at
  * runtime.
  *
@@ -69,8 +69,10 @@ public class ReadmeFilePropertyPage2 extends PropertyPage {
         return composite;
     }
 
-    @Override
-	public Control createContents(Composite parent) {
+    /** (non-Javadoc)
+     * Method declared on PreferencePage
+     */
+    public Control createContents(Composite parent) {
         // ensure the page has no special buttons
         noDefaultAndApplyButton();
         Composite panel = createComposite(parent, 2);
@@ -230,8 +232,7 @@ public class ReadmeFilePropertyPage2 extends PropertyPage {
     /** (non-Javadoc)
      * Method declared on PreferencePage
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         // nothing to do - read-only page
         return true;
     }

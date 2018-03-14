@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -167,12 +167,6 @@ class DnDInfo {
 	public void update() {
 		final Display display = Display.getCurrent();
 		if (display == null)
-			return;
-
-		// If we're in the same location presume the info is OK
-		Point cPoint = display.getCursorLocation();
-		if (cPoint != null && cursorPos != null && cPoint.x == cursorPos.x
-				&& cPoint.y == cursorPos.y)
 			return;
 
 		reset();

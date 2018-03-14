@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475689
  *******************************************************************************/
 package org.eclipse.jface.commands;
 
@@ -18,13 +17,14 @@ import org.eclipse.core.commands.HandlerEvent;
 import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Event;
 
 /**
  * <p>
  * This class adapts instances of <code>IAction</code> to <code>IHandler</code>.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class ActionHandler extends AbstractHandler {
@@ -44,7 +44,7 @@ public final class ActionHandler extends AbstractHandler {
 	/**
 	 * Creates a new instance of this class given an instance of
 	 * <code>IAction</code>.
-	 *
+	 * 
 	 * @param action
 	 *            the action. Must not be <code>null</code>.
 	 */
@@ -68,16 +68,20 @@ public final class ActionHandler extends AbstractHandler {
 	/**
 	 * When a listener is attached to this handler, then this registers a
 	 * listener with the underlying action.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private final void attachListener() {
 		if (propertyChangeListener == null) {
-			propertyChangeListener = propertyChangeEvent -> {
-				final String property = propertyChangeEvent.getProperty();
-				fireHandlerChanged(new HandlerEvent(ActionHandler.this,
-						IAction.ENABLED.equals(property),
-						IAction.HANDLED.equals(property)));
+			propertyChangeListener = new IPropertyChangeListener() {
+				@Override
+				public final void propertyChange(
+						final PropertyChangeEvent propertyChangeEvent) {
+					final String property = propertyChangeEvent.getProperty();
+					fireHandlerChanged(new HandlerEvent(ActionHandler.this,
+							IAction.ENABLED.equals(property),
+							IAction.HANDLED.equals(property)));
+				}
 			};
 		}
 
@@ -95,7 +99,7 @@ public final class ActionHandler extends AbstractHandler {
 
 	/**
 	 * Removes the property change listener from the action.
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.IHandler#dispose()
 	 */
 	@Override
@@ -128,7 +132,7 @@ public final class ActionHandler extends AbstractHandler {
 
 	/**
 	 * Returns the action associated with this handler
-	 *
+	 * 
 	 * @return the action associated with this handler (not null)
 	 * @since 3.1
 	 */
@@ -147,7 +151,8 @@ public final class ActionHandler extends AbstractHandler {
 	}
 
 	@Override
-	public final void removeHandlerListener(final IHandlerListener handlerListener) {
+	public final void removeHandlerListener(
+			final IHandlerListener handlerListener) {
 		super.removeHandlerListener(handlerListener);
 
 		if (!hasListeners()) {

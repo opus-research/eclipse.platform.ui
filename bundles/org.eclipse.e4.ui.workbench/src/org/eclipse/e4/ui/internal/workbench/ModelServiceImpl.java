@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,29 +7,25 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 434611, 472654
- *     Manumitting Technologies Inc - Bug 380609
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
-import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
+import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
@@ -62,7 +58,6 @@ import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -71,10 +66,6 @@ import org.osgi.service.event.EventHandler;
  */
 public class ModelServiceImpl implements EModelService {
 	private static String HOSTED_ELEMENT = "HostedElement"; //$NON-NLS-1$
-
-	private static final String COMPATIBILITY_VIEW_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView"; //$NON-NLS-1$
-
-	private static final String TAG_LABEL = "label"; //$NON-NLS-1$
 
 	private IEclipseContext appContext;
 
@@ -153,18 +144,16 @@ public class ModelServiceImpl implements EModelService {
 		}
 
 		// are *we* a match ?
-		boolean classMatch = clazz == null ? true : clazz.isInstance(searchRoot);
-		if (classMatch && matcher.select(searchRoot)) {
+		if (matcher.select(searchRoot)) {
 			if (!elements.contains(searchRoot)) {
-				@SuppressWarnings("unchecked")
-				T element = (T) searchRoot;
-				elements.add(element);
+				elements.add((T) searchRoot);
 			}
 		}
+
 		if (searchRoot instanceof MApplication && (searchFlags == ANYWHERE)) {
 			MApplication app = (MApplication) searchRoot;
 
-			List<MApplicationElement> children = new ArrayList<>();
+			List<MApplicationElement> children = new ArrayList<MApplicationElement>();
 			if (clazz != null) {
 				if (clazz.equals(MHandler.class)) {
 					children.addAll(app.getHandlers());
@@ -172,16 +161,16 @@ public class ModelServiceImpl implements EModelService {
 					children.addAll(app.getCommands());
 				} else if (clazz.equals(MBindingContext.class)) {
 					children.addAll(app.getBindingContexts());
-				} else if (clazz.equals(MBindingTable.class) || clazz.equals(MKeyBinding.class)) {
+				} else if (clazz.equals(MBindingTable.class)) {
 					children.addAll(app.getBindingTables());
 				}
-				// } else { only look for these if specifically asked.
-				// children.addAll(app.getHandlers());
-				// children.addAll(app.getCommands());
-				// children.addAll(app.getBindingContexts());
-				// children.addAll(app.getBindingTables());
+			} else {
+				children.addAll(app.getHandlers());
+				children.addAll(app.getCommands());
+				children.addAll(app.getBindingContexts());
+				children.addAll(app.getBindingTables());
 			}
-
+			
 			for (MApplicationElement child : children) {
 				findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 			}
@@ -194,55 +183,38 @@ public class ModelServiceImpl implements EModelService {
 			}
 		}
 
-		if (searchRoot instanceof MBindingTable) {
-			MBindingTable bindingTable = (MBindingTable) searchRoot;
-			for (MKeyBinding child : bindingTable.getBindings()) {
-				findElementsRecursive(child, clazz, matcher, elements, searchFlags);
-			}
-		}
-
 		// Check regular containers
 		if (searchRoot instanceof MElementContainer<?>) {
-			/*
-			 * Bug 455281: If given a window with a primary perspective stack,
-			 * and we're not told to look outside of the perspectives (i.e.,
-			 * searchFlags is missing OUTSIDE_PERSPECTIVE), then just search the
-			 * primary perspective stack instead. This ignores special areas
-			 * like the compat layer's stack holding the Help, CheatSheets, and
-			 * Intro.
-			 */
-			MElementContainer<?> searchContainer = (MElementContainer<?>) searchRoot;
-			MPerspectiveStack primaryStack = null;
-			if (searchRoot instanceof MWindow && (searchFlags & OUTSIDE_PERSPECTIVE) == 0
-					&& (primaryStack = getPrimaryPerspectiveStack((MWindow) searchRoot)) != null) {
-				searchContainer = primaryStack;
-			}
-			if (searchContainer instanceof MPerspectiveStack) {
-				if ((searchFlags & IN_ANY_PERSPECTIVE) != 0) {
+			if (searchRoot instanceof MPerspectiveStack) {
+				if ((searchFlags & IN_ANY_PERSPECTIVE ) != 0) {
 					// Search *all* the perspectives
-					MElementContainer<? extends MUIElement> container = searchContainer;
-					List<? extends MUIElement> children = container.getChildren();
-					for (MUIElement child : children) {
+					MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
+					for (MUIElement child : container.getChildren()) {
 						findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 					}
 				} else if ((searchFlags & IN_ACTIVE_PERSPECTIVE) != 0) {
 					// Only search the currently active perspective, if any
-					MPerspective active = ((MPerspectiveStack) searchContainer).getSelectedElement();
+					MPerspective active = ((MPerspectiveStack) searchRoot).getSelectedElement();
 					if (active != null) {
 						findElementsRecursive(active, clazz, matcher, elements, searchFlags);
 					}
-				} else if ((searchFlags & IN_SHARED_AREA) != 0) {
+				} else if ((searchFlags & IN_SHARED_AREA) != 0 && searchRoot instanceof MUIElement) {
 					// Only recurse through the shared areas
-					List<MArea> areas = findElements(searchContainer, null, MArea.class, null);
+					List<MArea> areas = findElements((MUIElement) searchRoot, null, MArea.class,null);
 					for (MArea area : areas) {
 						findElementsRecursive(area, clazz, matcher, elements, searchFlags);
 					}
-				}
+				} else if ((searchFlags & IN_PART) != 0) {
+					 List<MPart> parts = findElements((MUIElement) searchRoot, null, MPart.class, null);
+					 for (MPart part : parts) {
+						for (MHandler handler : part.getHandlers()) {
+							findElementsRecursive(handler, clazz, matcher, elements, searchFlags);
+						}
+					 }
+				 }
 			} else {
-				@SuppressWarnings("unchecked")
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
-				List<MUIElement> children = container.getChildren();
-				for (MUIElement child : children) {
+				for (MUIElement child : container.getChildren()) {
 					findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 				}
 			}
@@ -258,7 +230,7 @@ public class ModelServiceImpl implements EModelService {
 		}
 
 		// Search Detached Windows
-		if (searchRoot instanceof MWindow) {
+		if (searchRoot instanceof MWindow && searchFlags != IN_PART) {
 			MWindow window = (MWindow) searchRoot;
 			for (MWindow dw : window.getWindows()) {
 				findElementsRecursive(dw, clazz, matcher, elements, searchFlags);
@@ -268,8 +240,14 @@ public class ModelServiceImpl implements EModelService {
 			if (menu != null && (searchFlags & IN_MAIN_MENU) != 0) {
 				findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
 			}
+
 			// Check for Handlers
-			if (searchFlags == ANYWHERE && MHandler.class.equals(clazz)) {
+			if (searchFlags == ANYWHERE) {
+
+				if (menu != null) {
+					findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
+				}
+				
 				for (MHandler child : window.getHandlers()) {
 					findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 				}
@@ -293,89 +271,24 @@ public class ModelServiceImpl implements EModelService {
 			}
 		}
 
-		if (searchRoot instanceof MPart && (searchFlags & IN_PART) != 0) {
+		if (searchRoot instanceof MPart) {
 			MPart part = (MPart) searchRoot;
 
-			for (MMenu menu : part.getMenus()) {
-				findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
+			if (searchFlags != IN_MAIN_MENU) {
+				for (MMenu menu : part.getMenus()) {
+					findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
+				}
 			}
 
 			MToolBar toolBar = part.getToolbar();
 			if (toolBar != null) {
 				findElementsRecursive(toolBar, clazz, matcher, elements, searchFlags);
 			}
-			if (MHandler.class.equals(clazz)) {
-				for (MHandler child : part.getHandlers()) {
-					findElementsRecursive(child, clazz, matcher, elements, searchFlags);
-				}
-			}
-		}
-	}
 
-	/**
-	 * If this window has a primary perspective stack, return it. Otherwise
-	 * return null. A primary stack is a single MPerspectiveStack found either
-	 * as the window's immediate children or the child under a single
-	 * MPartSashContainer.
-	 *
-	 * @param window
-	 *            the window
-	 * @return the stack or {@code null}
-	 */
-	private MPerspectiveStack getPrimaryPerspectiveStack(MWindow window) {
-		List<MWindowElement> winKids = window.getChildren();
-		if (winKids.isEmpty()) {
-			return null;
-		}
-		// Check if we have a MPerspectiveStack in window's children
-		if (instanceCount(winKids, MPerspectiveStack.class) == 1) {
-			return firstInstance(winKids, MPerspectiveStack.class);
-		}
-		// Traditional shape of IWorkbenchWindow:
-		// MWindow{ MPartSashContainer{ MPerspectiveStack, MPartStack (intro
-		// + cheatsheets + help)}}
-		if (winKids.size() == 1 && winKids.get(0) instanceof MPartSashContainer) {
-			MPartSashContainer topLevelPSC = (MPartSashContainer) winKids.get(0);
-			if (instanceCount(topLevelPSC.getChildren(), MPerspectiveStack.class) == 1) {
-				return firstInstance(topLevelPSC.getChildren(), MPerspectiveStack.class);
+			for (MHandler child : part.getHandlers()) {
+				findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 			}
 		}
-		return null;
-	}
-
-	/**
-	 * Return the first element that is an instance of {@code clazz}
-	 *
-	 * @param elements
-	 * @param clazz
-	 * @return the first element that is an instanceof {@code clazz} or null
-	 */
-	private <T> T firstInstance(Collection<? super T> elements, Class<T> clazz) {
-		for (Object o : elements) {
-			if (clazz.isInstance(o)) {
-				return clazz.cast(o);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Return the number of elements that are an instance of {@code clazz}.
-	 *
-	 * @param elements
-	 *            the elements
-	 * @param clazz
-	 *            the class
-	 * @return the number of elements that are an instance of {@code clazz}
-	 */
-	private int instanceCount(Collection<?> elements, Class<?> clazz) {
-		int count = 0;
-		for (Object o : elements) {
-			if (clazz.isInstance(o)) {
-				count++;
-			}
-		}
-		return count;
 	}
 
 	@Override
@@ -395,7 +308,7 @@ public class ModelServiceImpl implements EModelService {
 	@Override
 	public <T> List<T> findElements(MApplicationElement searchRoot, Class<T> clazz,
 			int searchFlags, Selector matcher) {
-		List<T> elements = new ArrayList<>();
+		List<T> elements = new ArrayList<T>();
 		findElementsRecursive(searchRoot, clazz, matcher, elements, searchFlags);
 		return elements;
 	}
@@ -403,7 +316,7 @@ public class ModelServiceImpl implements EModelService {
 	private <T> List<T> findPerspectiveElements(MUIElement searchRoot, String id,
 			Class<T> clazz,
 			List<String> tagsToMatch) {
-		List<T> elements = new ArrayList<>();
+		List<T> elements = new ArrayList<T>();
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
 		findElementsRecursive(searchRoot, clazz, matcher, elements, PRESENTATION);
 		return elements;
@@ -428,22 +341,12 @@ public class ModelServiceImpl implements EModelService {
 			return 0;
 		}
 
-		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
 		int count = 0;
 		List<MUIElement> kids = container.getChildren();
 		for (MUIElement kid : kids) {
 			if (kid.isToBeRendered()) {
 				count++;
-			}
-		}
-
-		if (element instanceof MPerspective) {
-			MPerspective perspective = (MPerspective) element;
-			for (MWindow window : perspective.getWindows()) {
-				if (window.isToBeRendered()) {
-					count++;
-				}
 			}
 		}
 		return count;
@@ -508,90 +411,17 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			handleNullRefPlaceHolders(element, refWin, true);
+			EPlaceholderResolver resolver = ((MApplication) appElement).getContext().get(
+					EPlaceholderResolver.class);
+
+			// Re-resolve any placeholder references
+			List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
+			for (MPlaceholder ph : phList) {
+				resolver.resolvePlaceholderRef(ph, refWin);
+			}
 		}
 
 		return element;
-	}
-
-	private void handleNullRefPlaceHolders(MUIElement element, MWindow refWin, boolean resolveAlways) {
-		// use appContext as MApplication.getContext() is null during the processing of
-		// the model processor classes
-		EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
-		// Re-resolve any placeholder references
-		List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
-		List<MPlaceholder> nullRefList = new ArrayList<>();
-		for (MPlaceholder ph : phList) {
-			if (resolveAlways) {
-				resolver.resolvePlaceholderRef(ph, refWin);
-			} else if ((!resolveAlways) && (ph.getRef() == null)) {
-				resolver.resolvePlaceholderRef(ph, refWin);
-				MUIElement partElement = ph.getRef();
-				if (partElement instanceof MPart) {
-					MPart part = (MPart) partElement;
-					if (part.getIconURI() == null) {
-						MPartDescriptor desc = getPartDescriptor(part.getElementId());
-						if (desc != null) {
-							part.setIconURI(desc.getIconURI());
-						}
-					}
-				}
-			}
-			if (ph.getRef() == null) {
-				nullRefList.add(ph);
-			}
-		}
-		if (!resolveAlways) {
-			List<MPart> partList = findElements(element, null, MPart.class, null);
-			for (MPart part : partList) {
-				if (COMPATIBILITY_VIEW_URI.equals(part.getContributionURI()) && part.getIconURI() == null) {
-					part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-							ImageDescriptor.getMissingImageDescriptor().createImage());
-				}
-			}
-		}
-		for (MPlaceholder ph : nullRefList) {
-			replacePlaceholder(ph);
-		}
-
-		return;
-	}
-
-	/**
-	 * @param element
-	 * @param refWin
-	 */
-	public void handleNullRefPlaceHolders(MUIElement element, MWindow refWin) {
-		handleNullRefPlaceHolders(element, refWin, false);
-	}
-
-	private void replacePlaceholder(MPlaceholder ph) {
-		MPart part = createModelElement(MPart.class);
-		part.setElementId(ph.getElementId());
-		part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-				ImageDescriptor.getMissingImageDescriptor().createImage());
-		String label = (String) ph.getTransientData().get(TAG_LABEL);
-		if (label != null) {
-			part.setLabel(label);
-		} else {
-			part.setLabel(getLabel(ph.getElementId()));
-		}
-		part.setContributionURI(COMPATIBILITY_VIEW_URI);
-		part.setCloseable(true);
-		MElementContainer<MUIElement> curParent = ph.getParent();
-		int curIndex = curParent.getChildren().indexOf(ph);
-		curParent.getChildren().remove(curIndex);
-		curParent.getChildren().add(curIndex, part);
-		if (curParent.getSelectedElement() == ph) {
-			curParent.setSelectedElement(part);
-		}
-	}
-
-	private String getLabel(String str) {
-		int index = str.lastIndexOf('.');
-		if (index == -1)
-			return str;
-		return str.substring(index + 1);
 	}
 
 	@Override
@@ -658,9 +488,7 @@ public class ModelServiceImpl implements EModelService {
 				element.setToBeRendered(true);
 			}
 
-			@SuppressWarnings("unchecked")
-			MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
-			container.setSelectedElement(element);
+			((MElementContainer<MUIElement>) parent).setSelectedElement(element);
 			if (window != parent) {
 				showElementInWindow(window, parent);
 			}
@@ -670,7 +498,7 @@ public class ModelServiceImpl implements EModelService {
 	@Override
 	public MPlaceholder findPlaceholderFor(MWindow window, MUIElement element) {
 		List<MPlaceholder> phList = findPerspectiveElements(window, null, MPlaceholder.class, null);
-		List<MPlaceholder> elementRefs = new ArrayList<>();
+		List<MPlaceholder> elementRefs = new ArrayList<MPlaceholder>();
 		for (MPlaceholder ph : phList) {
 			if (ph.getRef() == element) {
 				elementRefs.add(ph);
@@ -698,34 +526,30 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent) {
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent) {
 		move(element, newParent, -1, false);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent,
 			boolean leavePlaceholder) {
 		move(element, newParent, -1, leavePlaceholder);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index) {
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index) {
 		move(element, newParent, index, false);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index,
 			boolean leavePlaceholder) {
 		// Cache where we were
 		MElementContainer<MUIElement> curParent = element.getParent();
 		int curIndex = curParent.getChildren().indexOf(element);
 
 		// Move the model element
-		if (index == -1) {
-			newParent.getChildren().add(element);
-		} else {
-			newParent.getChildren().add(index, element);
-		}
+		newParent.getChildren().add(index, element);
 
 		if (leavePlaceholder) {
 			MPlaceholder ph = MAdvancedFactory.INSTANCE.createPlaceholder();
@@ -737,13 +561,6 @@ public class ModelServiceImpl implements EModelService {
 	private void combine(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			MPartSashContainer newSash, boolean newFirst, float ratio) {
 		MElementContainer<MUIElement> curParent = relTo.getParent();
-		if (curParent == null) {
-			// if relTo is a shared element, use its current placeholder
-			MWindow win = getTopLevelWindowFor(relTo);
-			relTo = findPlaceholderFor(win, relTo);
-			curParent = relTo.getParent();
-		}
-		Assert.isLegal(relTo != null && curParent != null);
 		int index = curParent.getChildren().indexOf(relTo);
 		curParent.getChildren().remove(relTo);
 		if (newFirst) {
@@ -768,23 +585,141 @@ public class ModelServiceImpl implements EModelService {
 	public void insert(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			int where, float ratio) {
 		assert (toInsert != null && relTo != null);
-		if (ratio >= 1) {
-			warn("EModelService#insert() expects the ratio to be between (0,100)"); //$NON-NLS-1$
-			ratio = ratio / 100; // reduce it
-		}
-		assert(ratio > 0 && ratio < 1);
+		assert (ratio > 0 && ratio < 100);
+
+		MUIElement relToParent = relTo.getParent();
 
 		// determine insertion order
 		boolean insertBefore = where == ABOVE || where == LEFT_OF;
 		boolean horizontal = where == LEFT_OF || where == RIGHT_OF;
 
-		MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
-		newSash.setHorizontal(horizontal);
+		// Case 1: 'relTo' is already an MPSC, can we just add to it ?
+		// Case 2: relTo's parent is an MPSC, can we just add to it ?
+		// Case 3: We need to make a new Sash and replace relTo with it after 'combining' toInsert
+		// and relTo
+		if (relTo instanceof MPartSashContainer
+				&& directionsMatch((MPartSashContainer) relTo, horizontal)) {
+			MPartSashContainer psc = (MPartSashContainer) relTo;
+			int totalVisWeight = 0;
+			for (MUIElement child : psc.getChildren()) {
+				if (child.isToBeRendered()) {
+					totalVisWeight += getWeight(child);
+				}
+			}
+			int insertWeight = (int) ((totalVisWeight * ratio) / (1 - ratio));
+			toInsert.setContainerData(Integer.toString(insertWeight));
+			if (insertBefore) {
+				psc.getChildren().add(0, toInsert);
+			} else {
+				psc.getChildren().add(toInsert);
+			}
+		} else if (relToParent instanceof MPartSashContainer && !(relToParent instanceof MArea)
+				&& directionsMatch((MPartSashContainer) relToParent, horizontal)) {
+			MPartSashContainer psc = (MPartSashContainer) relToParent;
+			int relToIndex = psc.getChildren().indexOf(relTo);
 
-		// Maintain the existing weight in the new sash
-		newSash.setContainerData(relTo.getContainerData());
+			int relToWeight = getWeight(relTo);
+			int insertWeight = (int) (relToWeight * ratio);
+			toInsert.setContainerData(Integer.toString(insertWeight));
+			relTo.setContainerData(Integer.toString(relToWeight - insertWeight));
 
-		combine(toInsert, relTo, newSash, insertBefore, ratio);
+			if (insertBefore) {
+				psc.getChildren().add(relToIndex, toInsert);
+			} else {
+				int insertIndex = relToIndex + 1;
+				if (insertIndex < psc.getChildren().size()) {
+					psc.getChildren().add(insertIndex, toInsert);
+				} else {
+					psc.getChildren().add(toInsert);
+				}
+			}
+		} else {
+			MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
+			newSash.setHorizontal(horizontal);
+
+			// Maintain the existing weight in the new sash
+			newSash.setContainerData(relTo.getContainerData());
+
+			combine(toInsert, relTo, newSash, insertBefore, ratio);
+		}
+
+		if (relToParent != null) {
+			return;
+		}
+
+		// We're either relative to an MPSC or to some
+		// The only thing we can add sashes to is an MPartSashContainer, an MWindow or an
+		// MPerspective find the correct place to start the insertion
+		MUIElement insertRoot = relTo.getParent();
+		if (insertRoot instanceof MPerspective) {
+			insertRoot = relTo;
+		}
+		while (insertRoot != null && !(insertRoot instanceof MWindow)
+				&& !(insertRoot instanceof MPerspective)
+				&& !(insertRoot instanceof MPartSashContainer)) {
+			relTo = (MPartSashContainerElement) insertRoot;
+			insertRoot = insertRoot.getParent();
+		}
+
+		if (insertRoot instanceof MWindow || insertRoot instanceof MArea
+				|| insertRoot instanceof MPerspective) {
+			// OK, we're certainly going to need a new sash
+			MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
+			newSash.setHorizontal(where == LEFT_OF || where == RIGHT_OF);
+			combine(toInsert, relTo, newSash, insertBefore, ratio);
+		} else if (insertRoot instanceof MGenericTile<?>) {
+			MGenericTile<MUIElement> curTile = (MGenericTile<MUIElement>) insertRoot;
+
+			// do we need a new sash or can we extend the existing one?
+			if (curTile.isHorizontal() && (where == ABOVE || where == BELOW)) {
+				MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
+				newSash.setHorizontal(false);
+				newSash.setContainerData(relTo.getContainerData());
+				combine(toInsert, relTo, newSash, insertBefore, ratio);
+			} else if (!curTile.isHorizontal() && (where == LEFT_OF || where == RIGHT_OF)) {
+				MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
+				newSash.setHorizontal(true);
+				newSash.setContainerData(relTo.getContainerData());
+				combine(toInsert, relTo, newSash, insertBefore, ratio);
+			} else {
+				// We just need to add to the existing sash
+				int relToIndex = relTo.getParent().getChildren().indexOf(relTo);
+				if (insertBefore) {
+					curTile.getChildren().add(relToIndex, toInsert);
+				} else {
+					curTile.getChildren().add(relToIndex + 1, toInsert);
+				}
+
+				// Adjust the sash weights by taking the ratio
+				int relToWeight = 10000;
+				if (relTo.getContainerData() != null) {
+					try {
+						relToWeight = Integer.parseInt(relTo.getContainerData());
+					} catch (NumberFormatException e) {
+					}
+				}
+				int toInsertWeight = (int) ((ratio / 100.0) * relToWeight + 0.5);
+				relToWeight = relToWeight - toInsertWeight;
+				relTo.setContainerData(Integer.toString(relToWeight));
+				toInsert.setContainerData(Integer.toString(toInsertWeight));
+			}
+		}
+	}
+
+	private int getWeight(MUIElement element) {
+		int relToWeight = 10000;
+		if (element.getContainerData() != null) {
+			try {
+				relToWeight = Integer.parseInt(element.getContainerData());
+			} catch (NumberFormatException e) {
+			}
+		}
+		return relToWeight;
+	}
+
+	private boolean directionsMatch(MPartSashContainer psc, boolean horizontal) {
+		boolean pscHorizontal = psc.isHorizontal();
+		return (pscHorizontal && horizontal) || (!pscHorizontal && !horizontal);
 	}
 
 	@Override
@@ -952,7 +887,7 @@ public class ModelServiceImpl implements EModelService {
 
 		// Remove any minimized stacks for this perspective
 		List<MTrimBar> bars = findElements(window, null, MTrimBar.class, null);
-		List<MToolControl> toRemove = new ArrayList<>();
+		List<MToolControl> toRemove = new ArrayList<MToolControl>();
 		for (MTrimBar bar : bars) {
 			for (MUIElement barKid : bar.getChildren()) {
 				if (!(barKid instanceof MToolControl)) {
@@ -1004,8 +939,7 @@ public class ModelServiceImpl implements EModelService {
 	public MPerspective getActivePerspective(MWindow window) {
 		List<MPerspectiveStack> pStacks = findElements(window, null, MPerspectiveStack.class, null);
 		if (pStacks.size() == 1) {
-			MPerspective perspective = pStacks.get(0).getSelectedElement();
-			return perspective;
+			return pStacks.get(0).getSelectedElement();
 		}
 
 		return null;
@@ -1097,7 +1031,7 @@ public class ModelServiceImpl implements EModelService {
 				OUTSIDE_PERSPECTIVE | IN_SHARED_AREA);
 
 		// Iterate across the perspective(s) removing any 'local' placeholders
-		List<MPerspective> persps = new ArrayList<>();
+		List<MPerspective> persps = new ArrayList<MPerspective>();
 		if (perspective != null) {
 			persps.add(perspective);
 		} else {
@@ -1189,12 +1123,5 @@ public class ModelServiceImpl implements EModelService {
 		}
 
 		return hostWindow.getSharedElements().contains(curElement);
-	}
-
-	private void warn(String message) {
-		Logger logger = appContext.get(Logger.class);
-		if (logger != null) {
-			logger.warn(message);
-		}
 	}
 }

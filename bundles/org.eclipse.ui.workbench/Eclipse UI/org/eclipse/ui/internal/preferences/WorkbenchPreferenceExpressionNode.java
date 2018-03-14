@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Bredex GmbH and others.
+ * Copyright (c) 2008 Bredex GmbH and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,10 +24,10 @@ import org.eclipse.ui.activities.WorkbenchActivityHelper;
  * @since 3.4
  * @author Jan Diederich
  */
-public class WorkbenchPreferenceExpressionNode extends PreferenceNode
+public class WorkbenchPreferenceExpressionNode extends PreferenceNode 
 	implements IPluginContribution {
-
-
+	
+	
 	/**
 	 * @param id The id.
 	 * @see PreferenceNode#PreferenceNode(String)
@@ -35,12 +35,22 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
 	public WorkbenchPreferenceExpressionNode(String id) {
 		super(id);
 	}
-
+	
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.PreferenceNode#findSubNode(java.lang.String)
+     */
     @Override
 	public IPreferenceNode findSubNode(String id) {
         return getNodeExpression(super.findSubNode(id));
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.PreferenceNode#getSubNodes()
+     */
     @Override
 	public IPreferenceNode[] getSubNodes() {
     	IPreferenceNode[] prefNodes = super.getSubNodes();
@@ -58,7 +68,7 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
     /**
      * Returns the given <code>prefNode</code>, but only if it's no
      * WorkbenchPreferenceExtensionNode which fails the Expression check.
-     *
+     * 
      * @param prefNode
      *            The preference node which will be checked. Can be <code>null
      *            </code>.
@@ -70,7 +80,7 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
     	if (prefNode == null)
     		return null;
         if (prefNode instanceof WorkbenchPreferenceExtensionNode) {
-        	WorkbenchPreferenceExpressionNode node =
+        	WorkbenchPreferenceExpressionNode node = 
         		(WorkbenchPreferenceExtensionNode)prefNode;
             if (WorkbenchActivityHelper.restrictUseOf(node)) {
                 return null;
@@ -79,11 +89,17 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
         return prefNode;
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+	 */
 	@Override
 	public String getLocalId() {
 		return getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+	 */
 	@Override
 	public String getPluginId() {
 		return ""; //$NON-NLS-1$

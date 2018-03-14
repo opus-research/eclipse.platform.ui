@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.IWorkbenchWindow;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
@@ -47,7 +47,7 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 
 	/**
 	 * Constructs a new instance of {@link LegacyActionSetExpression}.
-	 *
+	 * 
 	 * @param actionSetId
 	 *            The identifier of the action set that must be active for this
 	 *            expression to evaluate to <code>true</code>; must not be

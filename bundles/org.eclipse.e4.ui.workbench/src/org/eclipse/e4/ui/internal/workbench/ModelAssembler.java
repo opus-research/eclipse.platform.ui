@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 BestSolution.at and others.
+ * Copyright (c) 2010, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,21 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430075, 430080, 431464, 433336, 472654
- *     René Brandstetter - Bug 419749
- *     Brian de Alwis (MTI) - Bug 433053
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080, 431464
+ *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
@@ -36,7 +40,6 @@ import org.eclipse.e4.ui.model.fragment.MModelFragment;
 import org.eclipse.e4.ui.model.fragment.MModelFragments;
 import org.eclipse.e4.ui.model.fragment.impl.FragmentPackageImpl;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
-import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -44,9 +47,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.util.Diagnostician;
 import org.eclipse.emf.ecore.util.EContentsEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.namespace.BundleNamespace;
+import org.osgi.framework.wiring.BundleWire;
+import org.osgi.framework.wiring.BundleWiring;
 
 /**
  *
@@ -67,18 +73,18 @@ public class ModelAssembler {
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
 	//	private static final String ALWAYS = "always"; //$NON-NLS-1$
-	private static final String INITIAL = "initial"; //$NON-NLS-1$
-	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$
+	private static final String INITIAL = "initial"; //$NON-NLS-1$ 
+	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$ 
 
 	/**
 	 * Process the model
 	 */
 	public void processModel(boolean initial) {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
-		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
+		IExtension[] extensions = topoSort(extPoint.getExtensions());
 
-		List<MApplicationElement> imports = new ArrayList<>();
-		List<MApplicationElement> addedElements = new ArrayList<>();
+		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
+		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
 
 		// run processors which are marked to run before fragments
 		runProcessors(extensions, initial, false);
@@ -101,7 +107,7 @@ public class ModelAssembler {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if ("fragment".equals(ce.getName())) { //$NON-NLS-1$
-					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$
+					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
 						processFragment(ce, imports, addedElements, initial);
 					}
 				}
@@ -115,23 +121,25 @@ public class ModelAssembler {
 		ResourceSet resourceSet = applicationResource.getResourceSet();
 		IContributor contributor = ce.getContributor();
 		String attrURI = ce.getAttribute("uri"); //$NON-NLS-1$
-		String bundleName = contributor.getName();
 		if (attrURI == null) {
-			logger.warn("Unable to find location for the model extension \"{0}\"", bundleName); //$NON-NLS-1$
+			logger.warn("Unable to find location for the model extension \"{0}\"", //$NON-NLS-1$
+					contributor.getName());
 			return;
 		}
 
 		URI uri;
+
 		try {
 			// check if the attrURI is already a platform URI
 			if (URIHelper.isPlatformURI(attrURI)) {
 				uri = URI.createURI(attrURI);
 			} else {
+				String bundleName = contributor.getName();
 				String path = bundleName + '/' + attrURI;
 				uri = URI.createPlatformPluginURI(path, false);
 			}
 		} catch (RuntimeException e) {
-			logger.warn(e, "Invalid location \"" + attrURI + "\" of model extension \"" + bundleName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			logger.warn(e, "Model extension has invalid location"); //$NON-NLS-1$
 			return;
 		}
 
@@ -140,7 +148,7 @@ public class ModelAssembler {
 		try {
 			resource = resourceSet.getResource(uri, true);
 		} catch (RuntimeException e) {
-			logger.warn(e, "Unable to read model extension from \"" + uri.toString() +"\" of \"" + bundleName + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			logger.warn(e, "Unable to read model extension from " + uri.toString()); //$NON-NLS-1$
 			return;
 		}
 
@@ -152,23 +160,16 @@ public class ModelAssembler {
 		Object extensionRoot = contents.get(0);
 
 		if (!(extensionRoot instanceof MModelFragments)) {
-			logger.warn("Unable to create model extension \"{0}\"", bundleName); //$NON-NLS-1$
+			logger.warn("Unable to create model extension \"{0}\"", //$NON-NLS-1$
+					contributor.getName());
 			return;
 		}
-		boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$
+		boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$ 
 
 		MModelFragments fragmentsContainer = (MModelFragments) extensionRoot;
 		List<MModelFragment> fragments = fragmentsContainer.getFragments();
 		boolean evalImports = false;
 		for (MModelFragment fragment : fragments) {
-			Diagnostic validationResult = Diagnostician.INSTANCE.validate((EObject) fragment);
-			int severity = validationResult.getSeverity();
-			if (severity == Diagnostic.ERROR) {
-				logger.error("Fragment from \"" + uri.toString() + "\" of \"" + bundleName // $NON-NLS-1$ //$NON-NLS-1$ //$NON-NLS-2$
-																							// //$NON-NLS-2$
-						+ "\" could not be validated and will not be merged \"{0}\"", fragment); // $NON-NLS-1$ //$NON-NLS-1$
-				continue;
-			}
 			List<MApplicationElement> elements = fragment.getElements();
 			if (elements.size() == 0) {
 				continue;
@@ -205,7 +206,7 @@ public class ModelAssembler {
 				evalImports = true;
 				addedElements.addAll(merged);
 			} else {
-				logger.debug("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
+				logger.info("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
 			}
 		}
 
@@ -221,13 +222,13 @@ public class ModelAssembler {
 	 * @param extensions
 	 * @param afterFragments
 	 */
-	private void runProcessors(IExtension[] extensions, boolean initial, boolean afterFragments) {
+	private void runProcessors(IExtension[] extensions, boolean initial, Boolean afterFragments) {
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				boolean parseBoolean = Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
-				if ("processor".equals(ce.getName()) && afterFragments != parseBoolean) { //$NON-NLS-1$
-					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$
+				if ("processor".equals(ce.getName()) && !afterFragments.equals(parseBoolean)) { //$NON-NLS-1$
+					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
 						runProcessor(ce);
 					}
 				}
@@ -278,7 +279,7 @@ public class ModelAssembler {
 		if (imports.isEmpty())
 			return;
 		// now that we have all components loaded, resolve imports
-		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<>();
+		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<MApplicationElement, MApplicationElement>();
 		for (MApplicationElement importedElement : imports) {
 			MApplicationElement realElement = ModelUtils.findElementById(application,
 					importedElement.getElementId());
@@ -290,7 +291,7 @@ public class ModelAssembler {
 		}
 
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(addedElements);
-		List<Runnable> commands = new ArrayList<>();
+		List<Runnable> commands = new ArrayList<Runnable>();
 
 		// TODO Probably use EcoreUtil.UsageCrossReferencer
 		while (it.hasNext()) {
@@ -318,7 +319,7 @@ public class ModelAssembler {
 						@Override
 						public void run() {
 							if (internalFeature.isMany()) {
-								logger.error("Replacing"); //$NON-NLS-1$
+								System.err.println("Replacing"); //$NON-NLS-1$
 								@SuppressWarnings("unchecked")
 								List<Object> l = (List<Object>) interalTarget.eGet(internalFeature);
 								int index = l.indexOf(internalImportObject);
@@ -338,4 +339,177 @@ public class ModelAssembler {
 			cmd.run();
 		}
 	}
+
+	/**
+	 * Sort the provided extensions by the dependencies of their contributors. Note that sorting is
+	 * done in-place.
+	 * 
+	 * @param extensions
+	 *            the list of extensions to be sorted
+	 * @return the same list of extensions in a topologically-sorted order
+	 */
+	private IExtension[] topoSort(IExtension[] extensions) {
+		if (extensions.length == 0) {
+			return extensions;
+		}
+
+		final Map<String, Collection<IExtension>> mappedExtensions = new HashMap<String, Collection<IExtension>>();
+		// Captures the bundles that are listed as requirements for a particular bundle.
+		final Map<String, Collection<String>> requires = new HashMap<String, Collection<String>>();
+		// Captures the bundles that list a particular bundle as a requirement
+		final Map<String, Collection<String>> depends = new HashMap<String, Collection<String>>();
+
+		// {@code requires} and {@code depends} define a graph where the vertices are
+		// bundleIds and the edges are the requires-relation. {@code requires} defines
+		// the out-edges for a vertex, and {@code depends} defines the in-edges for a vertex.
+		//
+		// Description of the algorithm:
+		// (1) build up the graph: we only record the bundles actually being considered
+		// (i.e., those that are contributors of {@code extensions})
+		// (2) sort the list of bundles by their out-degree: the bundles with the least
+		// out-edges are those that are depend on the fewest. If there is no bundles
+		// with 0 out-edges, then we must have a cycle; oh well, can't win them all.
+		// (3) take the bundle with lowest out-degree and add its extensions to the list.
+		// Remove the bundle from the list, and remove it from all of its dependents'
+		// required lists. This may require that the bundle list be resorted.
+		//
+		// Note this implementation assumes direct dependencies: if any of the bundles
+		// are dependent through a third bundle, then the ordering will fail. To prevent
+		// this would require recording the entire dependency subgraph for all contributors
+		// of the {@code extensions}.
+
+		// first build up the list of bundles actually being considered
+		for (IExtension extension : extensions) {
+			IContributor contributor = extension.getContributor();
+			Collection<IExtension> exts = mappedExtensions.get(contributor.getName());
+			if (exts == null) {
+				mappedExtensions.put(contributor.getName(), exts = new ArrayList<IExtension>());
+			}
+			exts.add(extension);
+			requires.put(contributor.getName(), new HashSet<String>());
+			depends.put(contributor.getName(), new HashSet<String>());
+		}
+
+		// now populate the dependency graph
+		for (String bundleId : mappedExtensions.keySet()) {
+			assert requires.containsKey(bundleId) && depends.containsKey(bundleId);
+
+			// can only be one, because ExtensionPoints require the singleton setting
+			// on a bundle
+			Bundle requiredBundle = Activator.getDefault().getBundleForName(bundleId);
+			if (requiredBundle != null) {
+				assert requiredBundle.getSymbolicName().equals(bundleId);
+				for (Bundle dependentBundle : resolveRequiringBundle(requiredBundle)) {
+					if (!mappedExtensions.containsKey(dependentBundle.getSymbolicName())) {
+						// not a contributor of an extension
+						continue;
+					}
+					String depBundleId = dependentBundle.getSymbolicName();
+					Collection<String> depBundleReqs = requires.get(depBundleId);
+					depBundleReqs.add(bundleId);
+					Collection<String> bundleDeps = depends.get(bundleId);
+					assert bundleDeps != null;
+					bundleDeps.add(depBundleId);
+				}
+			}
+		}
+
+		int resultIndex = 0;
+
+		// sort by out-degree ({@code depends})
+		// I suppose we could make {@code depends} a SortedMap, but we'd still need
+		// to explicitly resort anyways
+		List<String> sortedByOutdegree = new ArrayList<String>(requires.keySet());
+		Comparator<String> outdegreeSorter = new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				assert requires.containsKey(o1) && requires.containsKey(o2);
+				return requires.get(o1).size() - requires.get(o2).size();
+			}
+		};
+		Collections.sort(sortedByOutdegree, outdegreeSorter);
+		if (!requires.get(sortedByOutdegree.get(0)).isEmpty()) {
+			logger.warn("Extensions have a cycle"); //$NON-NLS-1$
+		}
+
+		while (!sortedByOutdegree.isEmpty()) {
+			// don't sort unnecessarily: the current ordering is fine providing
+			// item #0 still has no dependencies
+			if (!requires.get(sortedByOutdegree.get(0)).isEmpty()) {
+				Collections.sort(sortedByOutdegree, outdegreeSorter);
+			}
+			String bundleId = sortedByOutdegree.remove(0);
+			assert depends.containsKey(bundleId) && requires.containsKey(bundleId);
+			for (IExtension ext : mappedExtensions.get(bundleId)) {
+				extensions[resultIndex++] = ext;
+			}
+			assert requires.get(bundleId).isEmpty();
+			requires.remove(bundleId);
+			for (String depId : depends.get(bundleId)) {
+				requires.get(depId).remove(bundleId);
+			}
+			depends.remove(bundleId);
+		}
+		assert resultIndex == extensions.length;
+		return extensions;
+	}
+
+	/**
+	 * Returns the bundles that currently require the given bundle.
+	 * <p>
+	 * If this required bundle is required and then re-exported by another bundle then all the
+	 * requiring bundles of the re-exporting bundle are included in the returned array.
+	 * </p>
+	 * @return An unmodifiable {@link Iterable} set of bundles currently requiring this required
+	 *         bundle. An empty {@link Iterable} will be returned if the given {@code Bundle} object
+	 *         has become stale or no bundles require the given bundle.
+	 * @throws NullPointerException
+	 *             if the given bundle is <code>null</code>
+	 */
+	private static Iterable<Bundle> resolveRequiringBundle(Bundle bundle) {
+		BundleWiring providerWiring = bundle.adapt(BundleWiring.class);
+		if (!providerWiring.isInUse()) {
+			return Collections.emptySet();
+		}
+
+		Set<Bundle> requiring = new HashSet<Bundle>();
+
+		addRequirers(requiring, providerWiring);
+		return Collections.unmodifiableSet(requiring);
+	}
+
+	/**
+	 * Recursively collects all bundles which depend-on/require the given {@link BundleWiring}.
+	 * <p>
+	 * All re-exports will be followed and also be contained in the result.
+	 * </p>
+	 * @param requiring
+	 *            the result which will contain all the bundles which require the given
+	 *            {@link BundleWiring}
+	 * @param providerWiring
+	 *            the {@link BundleWiring} for which the requirers should be resolved
+	 * @throws NullPointerException
+	 *             if either the requiring or the providerWiring is <code>null</code>
+	 */
+	private static void addRequirers(Set<Bundle> requiring, BundleWiring providerWiring) {
+		List<BundleWire> requirerWires = providerWiring
+				.getProvidedWires(BundleNamespace.BUNDLE_NAMESPACE);
+		if (requirerWires == null) {
+			// we don't hold locks while checking the graph, just return if no longer isInUse
+			return;
+		}
+		for (BundleWire requireBundleWire : requirerWires) {
+			Bundle requirer = requireBundleWire.getRequirer().getBundle();
+			if (requiring.contains(requirer)) {
+				continue;
+			}
+			requiring.add(requirer);
+			String reExport = requireBundleWire.getRequirement().getDirectives()
+					.get(BundleNamespace.REQUIREMENT_VISIBILITY_DIRECTIVE);
+			if (BundleNamespace.VISIBILITY_REEXPORT.equals(reExport)) {
+				addRequirers(requiring, requireBundleWire.getRequirerWiring());
+			}
+		}
+	}
+
 }

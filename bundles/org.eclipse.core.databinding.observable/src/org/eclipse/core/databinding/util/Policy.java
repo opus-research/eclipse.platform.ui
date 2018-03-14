@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 /**
  * The Policy class handles settings for behaviour, debug flags and logging
  * within JFace Data Binding.
- *
+ * 
  * @since 1.1
  */
 public class Policy {
@@ -41,7 +41,6 @@ public class Policy {
 	 */
 	private static ILogger getDummyLog() {
 		return new ILogger() {
-			@Override
 			public void log(IStatus status) {
 				System.err.println(status.toString());
 				if( status.getException() != null ) {
@@ -53,7 +52,7 @@ public class Policy {
 
 	/**
 	 * Sets the logger used by JFace Data Binding to log errors.
-	 *
+	 * 
 	 * @param logger
 	 *            the logger to use, or <code>null</code> to use the default
 	 *            logger
@@ -67,7 +66,7 @@ public class Policy {
 	 * <p>
 	 * The default logger prints the status to <code>System.err</code>.
 	 * </p>
-	 *
+	 * 
 	 * @return the logger
 	 */
 	public static synchronized ILogger getLog() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,17 +35,17 @@ abstract class DragAgent {
 
 	/**
 	 * Return the element that your agent would start to drag given the current cursor info.
-	 *
+	 * 
 	 * @param info
 	 *            Information about which model element the cursor is over
-	 *
+	 * 
 	 * @return The element that this agent would drag or null if the agent is not appropriate for
 	 *         the given info
 	 */
 	public abstract MUIElement getElementToDrag(DnDInfo info);
 
 	/**
-	 *
+	 * 
 	 */
 	public DragAgent(DnDManager manager) {
 		dndManager = manager;
@@ -61,13 +61,13 @@ abstract class DragAgent {
 	/**
 	 * Determine if a drag can be started on the given info. This allows a subclass to restrict the
 	 * ability of an agent to initiate a drag operation (i.e. in a 'fixed' perspective...).
-	 *
+	 * 
 	 * The default implementation is to allow dragging if the agent can determine an element to
 	 * drag.
-	 *
+	 * 
 	 * @param info
 	 *            Information about which model element the cursor is over
-	 *
+	 * 
 	 * @return true iff there is an element to drag
 	 */
 	public boolean canDrag(DnDInfo info) {
@@ -77,7 +77,7 @@ abstract class DragAgent {
 
 	/**
 	 * Start a drag operation on the given element.
-	 *
+	 * 
 	 * @param element
 	 *            The element to drag
 	 */
@@ -148,7 +148,7 @@ abstract class DragAgent {
 
 	/**
 	 * Restore the DragAgent to a state where it will be ready to start a new drag
-	 *
+	 * 
 	 * @param performDrop
 	 *            determines if a drop operation should be performed if possible
 	 */
@@ -173,11 +173,5 @@ abstract class DragAgent {
 		}
 
 		dragElement = null;
-	}
-
-	/**
-	 * This agent is being disposed
-	 */
-	public void dispose() {
 	}
 }

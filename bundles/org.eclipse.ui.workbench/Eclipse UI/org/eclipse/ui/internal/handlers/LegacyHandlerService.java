@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -42,7 +41,6 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.commands.internal.HandlerServiceHandler;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -66,7 +64,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class LegacyHandlerService implements IHandlerService {
 
@@ -82,7 +80,7 @@ public class LegacyHandlerService implements IHandlerService {
 		private final String commandId;
 
 		/**
-		 *
+		 * 
 		 */
 		public HandlerSelectionFunction(String commandId) {
 			this.commandId = commandId;
@@ -91,7 +89,7 @@ public class LegacyHandlerService implements IHandlerService {
 		@Override
 		public Object compute(IEclipseContext context, String contextKey) {
 
-			HashSet<HandlerActivation> activationSet = new HashSet<>();
+			HashSet<HandlerActivation> activationSet = new HashSet<HandlerActivation>();
 			IEclipseContext current = context;
 			while (current != null) {
 				List<HandlerActivation> handlerActivations = (List<HandlerActivation>) current
@@ -149,19 +147,12 @@ public class LegacyHandlerService implements IHandlerService {
 
 	public static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
 			String id, final String cmdId, IHandler handler, Expression activeWhen) {
-		return registerLegacyHandler(context, id, cmdId, handler, activeWhen, null);
-	}
 
-	private static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
-			String id, final String cmdId, IHandler handler, Expression activeWhen, String helpContextId) {
 		ECommandService cs = (ECommandService) context.get(ECommandService.class.getName());
 		Command command = cs.getCommand(cmdId);
 		boolean handled = command.isHandled();
 		boolean enabled = command.isEnabled();
 		E4HandlerProxy handlerProxy = new E4HandlerProxy(command, handler);
-		if (helpContextId != null) {
-			setHelpContextId(handler, helpContextId, context);
-		}
 		HandlerActivation activation = new HandlerActivation(context, cmdId, handler, handlerProxy,
 				activeWhen);
 		addHandlerActivation(activation);
@@ -602,8 +593,7 @@ public class LegacyHandlerService implements IHandlerService {
 					commandId,
 					new org.eclipse.ui.internal.handlers.HandlerProxy(commandId, configElement,
 							IWorkbenchRegistryConstants.ATT_CLASS, enabledWhen, eclipseContext
-									.get(IEvaluationService.class)), activeWhen,
-					configElement.getAttribute(IWorkbenchRegistryConstants.ATT_HELP_CONTEXT_ID));
+									.get(IEvaluationService.class)), activeWhen);
 		}
 	}
 
@@ -633,13 +623,7 @@ public class LegacyHandlerService implements IHandlerService {
 
 	@Override
 	public void setHelpContextId(IHandler handler, String helpContextId) {
-		setHelpContextId(handler, helpContextId, eclipseContext);
-	}
+		// TODO Auto-generated method stub
 
-	private static void setHelpContextId(IHandler handler, String helpContextId,
-			IEclipseContext eclipseContext) {
-		ICommandHelpService commandHelpService = (ICommandHelpService) eclipseContext
-				.get(ICommandHelpService.class.getName());
-		commandHelpService.setHelpContextId(handler, helpContextId);
 	}
 }

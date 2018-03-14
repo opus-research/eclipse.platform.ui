@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -35,10 +34,10 @@ import org.eclipse.swt.widgets.Control;
 public class ElementReferenceRenderer extends SWTPartRenderer {
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
-	private Map<MUIElement, Set<MPlaceholder>> renderedMap;
+	Map<MUIElement, Set<MPlaceholder>> renderedMap;
 
 	@Inject
-	private IPresentationEngine renderingEngine;
+	IPresentationEngine renderingEngine;
 
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
@@ -48,7 +47,7 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 
 		Set<MPlaceholder> renderedRefs = renderedMap.get(ref);
 		if (renderedRefs == null) {
-			renderedRefs = new HashSet<>();
+			renderedRefs = new HashSet<MPlaceholder>();
 			renderedMap.put(ref, renderedRefs);
 		}
 
@@ -61,9 +60,9 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 		// if the placeholder is *not* in the currently active perspective
 		// then don't re-parent the current view
 		int phLoc = modelService.getElementLocation(ph);
-		if (phLoc == EModelService.IN_ACTIVE_PERSPECTIVE
-				|| phLoc == EModelService.IN_SHARED_AREA
-				|| phLoc == EModelService.OUTSIDE_PERSPECTIVE) {
+		boolean isOutsidePerspective = (phLoc & EModelService.OUTSIDE_PERSPECTIVE) != 0;
+		boolean isInActivePerspective = (phLoc & EModelService.IN_ACTIVE_PERSPECTIVE) != 0;
+		if (isOutsidePerspective || isInActivePerspective) {
 			Control refWidget = (Control) ref.getWidget();
 			if (refWidget == null) {
 				ref.setToBeRendered(true);
@@ -87,6 +86,13 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 		return newComp;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#disposeWidget
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
 	public void disposeWidget(MUIElement element) {
 		MPlaceholder ph = (MPlaceholder) element;

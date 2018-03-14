@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -18,30 +17,38 @@ import org.eclipse.ui.dialogs.PatternFilter;
 /**
  * A class that handles filtering wizard node items based on a supplied matching
  * string and keywords
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class WizardPatternFilter extends PatternFilter {
 	/**
-	 * Create a new instance of a WizardPatternFilter
+	 * Create a new instance of a WizardPatternFilter 
 	 * @param isMatchItem
 	 */
 	public WizardPatternFilter() {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.internal.dialogs.PatternFilter#isElementSelectable(java.lang.Object)
+	 */
 	@Override
 	public boolean isElementSelectable(Object element) {
 		return element instanceof WorkbenchWizardElement;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.internal.dialogs.PatternFilter#isElementMatch(org.eclipse.jface.viewers.Viewer, java.lang.Object)
+	 */
 	@Override
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
 		if (element instanceof WizardCollectionElement) {
 			return false;
 		}
-
+		
 		if (element instanceof WorkbenchWizardElement) {
 			WorkbenchWizardElement desc = (WorkbenchWizardElement) element;
 			String text = desc.getLabel();
@@ -60,7 +67,7 @@ public class WizardPatternFilter extends PatternFilter {
 
 	@Override
 	public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
-		ArrayList<Object> result = new ArrayList<>();
+		ArrayList<Object> result = new ArrayList<Object>();
 
 		for (Object elem : super.filter(viewer, parent, elements)) {
 			if (elem instanceof WizardCollectionElement) {

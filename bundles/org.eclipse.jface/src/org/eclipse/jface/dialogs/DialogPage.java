@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,28 +35,28 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Optional title; <code>null</code> if none.
-     *
+     * 
      * @see #setTitle
      */
     private String title = null;
 
     /**
      * Optional description; <code>null</code> if none.
-     *
+     * 
      * @see #setDescription
      */
     private String description = null;
 
     /**
      * Cached image; <code>null</code> if none.
-     *
+     * 
      * @see #setImageDescriptor(ImageDescriptor)
      */
     private Image image = null;
 
     /**
      * Optional image; <code>null</code> if none.
-     *
+     * 
      * @see #setImageDescriptor(ImageDescriptor)
      */
     private ImageDescriptor imageDescriptor = null;
@@ -90,7 +90,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Creates a new dialog page with the given title.
-     *
+     * 
      * @param title
      *            the title of this dialog page, or <code>null</code> if none
      */
@@ -100,7 +100,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Creates a new dialog page with the given title and image.
-     *
+     * 
      * @param title
      *            the title of this dialog page, or <code>null</code> if none
      * @param image
@@ -121,7 +121,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * <p>
      * Clients may call this framework method, but should not override it.
      * </p>
-     *
+     * 
      * @param chars
      *            the number of characters
      * @return the number of pixels
@@ -144,7 +144,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * <p>
      * Clients may call this framework method, but should not override it.
      * </p>
-     *
+     * 
      * @param dlus
      *            the number of horizontal dialog units
      * @return the number of pixels
@@ -167,7 +167,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * <p>
      * Clients may call this framework method, but should not override it.
      * </p>
-     *
+     * 
      * @param dlus
      *            the number of vertical dialog units
      * @return the number of pixels
@@ -190,7 +190,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * <p>
      * Clients may call this framework method, but should not override it.
      * </p>
-     *
+     * 
      * @param chars
      *            the number of characters
      * @return the number of pixels
@@ -206,7 +206,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
     /**
      * The <code>DialogPage</code> implementation of this
      * <code>IDialogPage</code> method disposes of the page
-     * image if it has one.
+     * image if it has one. 
      * Subclasses may extend.
      */
     @Override
@@ -220,7 +220,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Returns the top level control for this dialog page.
-     *
+     * 
      * @return the top level control
      */
     @Override
@@ -228,6 +228,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         return control;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getDescription() {
         return description;
@@ -235,13 +238,16 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Returns the symbolic font name used by dialog pages.
-     *
+     * 
      * @return the symbolic font name
      */
     protected String getDialogFontName() {
         return JFaceResources.DIALOG_FONT;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getErrorMessage() {
         return errorMessage;
@@ -249,13 +255,16 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Returns the default font to use for this dialog page.
-     *
+     * 
      * @return the font
      */
     protected Font getFont() {
         return JFaceResources.getFontRegistry().get(getDialogFontName());
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public Image getImage() {
         if (image == null) {
@@ -266,11 +275,17 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         return image;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getMessage() {
         return message;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IMessageProvider.
+     */
     @Override
 	public int getMessageType() {
         return messageType;
@@ -280,13 +295,16 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * Returns this dialog page's shell. Convenience method for
      * <code>getControl().getShell()</code>. This method may only be called
      * after the page's control has been created.
-     *
+     * 
      * @return the shell
      */
     public Shell getShell() {
         return getControl().getShell();
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getTitle() {
         return title;
@@ -298,11 +316,11 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * The default implementation of this framework method does nothing and
      * returns <code>null</code>. Subclasses may override.
      * </p>
-     *
+     * 
      * @param widgetId
      *            the id of the widget for which hover help is requested
      * @return the tool tip text, or <code>null</code> if none
-     * @deprecated
+     * @deprecated 
      */
     @Deprecated
 	protected final String getToolTipText(int widgetId) {
@@ -317,7 +335,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * This method must be called before any of the dialog unit based conversion
      * methods are called.
      * </p>
-     *
+     * 
      * @param testControl
      *            a control from which to obtain the current font
      */
@@ -334,7 +352,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * is spaced for the current dialog page units. The method
      * <code>initializeDialogUnits</code> must be called once before calling
      * this method for the first time.
-     *
+     * 
      * @param button
      *            the button to set the <code>GridData</code>
      * @return the <code>GridData</code> set on the specified button
@@ -350,7 +368,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Tests whether this page's UI content has already been created.
-     *
+     * 
      * @return <code>true</code> if the control has been created, and
      *         <code>false</code> if not
      */
@@ -376,6 +394,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         control = newControl;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public void setDescription(String description) {
         this.description = description;
@@ -383,7 +404,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
 
     /**
      * Sets or clears the error message for this page.
-     *
+     * 
      * @param newMessage
      *            the message, or <code>null</code> to clear the error message
      */
@@ -391,6 +412,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         errorMessage = newMessage;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public void setImageDescriptor(ImageDescriptor desc) {
         imageDescriptor = desc;
@@ -405,7 +429,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * <p>
      * This is a shortcut for <code>setMessage(newMesasge, NONE)</code>
      * </p>
-     *
+     * 
      * @param newMessage
      *            the message, or <code>null</code> to clear the message
      */
@@ -428,7 +452,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * message until the error message is cleared. This method replaces the
      * current message and does not affect the error message.
      * </p>
-     *
+     * 
      * @param newMessage
      *            the message, or <code>null</code> to clear the message
      * @param newType

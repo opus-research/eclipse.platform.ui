@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.core.commands.Category;
@@ -31,13 +31,13 @@ import org.eclipse.ui.internal.commands.CommandPersistence;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class CommandToModelProcessor {
 
-	private Map<String, MCategory> categories = new HashMap<>();
+	private Map<String, MCategory> categories = new HashMap<String, MCategory>();
 
-	private Map<String, MCommand> commands = new HashMap<>();
+	private Map<String, MCommand> commands = new HashMap<String, MCommand>();
 
 	private EModelService modelService;
 
@@ -54,6 +54,13 @@ public class CommandToModelProcessor {
 		CommandManager commandManager = context.get(CommandManager.class);
 		if (commandManager == null) {
 			HandlerServiceImpl.handlerGenerator = new ContextFunction() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.e4.core.contexts.ContextFunction#compute(org.
+				 * eclipse.e4.core.contexts.IEclipseContext, java.lang.String)
+				 */
 				@Override
 				public Object compute(IEclipseContext context, String contextKey) {
 					return new WorkbenchHandlerServiceHandler(contextKey);
@@ -83,11 +90,13 @@ public class CommandToModelProcessor {
 			try {
 				final MCategory categoryModel = categories.get(cmd.getCategory().getId());
 
-				MCommand command = CommandProcessingAddon.createCommand(cmd, modelService, categoryModel);
+				MCommand command = CommandProcessingAddon.createCommand(cmd, modelService,
+						categoryModel);
 
 				application.getCommands().add(command);
 				commands.put(command.getElementId(), command);
 			} catch (NotDefinedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -115,6 +124,26 @@ public class CommandToModelProcessor {
 				// issue
 				e.printStackTrace();
 			}
+		}
+	}
+
+	void setCommandFireEvents(CommandManager manager, boolean b) {
+		try {
+			Field f = CommandManager.class.getDeclaredField("shouldCommandFireEvents"); //$NON-NLS-1$
+			f.setAccessible(true);
+			f.set(manager, Boolean.valueOf(b));
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,16 +25,16 @@ package org.eclipse.jface.util;
  * that no garbage is created if no listeners are registered. The recommended
  * code sequence for notifying all registered listeners of say,
  * <code>FooListener.eventHappened</code>, is:
- *
+ * 
  * <pre>
  * Object[] listeners = myListenerList.getListeners();
  * for (int i = 0; i &lt; listeners.length; ++i) {
  * 	((FooListener) listeners[i]).eventHappened(event);
  * }
  * </pre>
- *
+ * 
  * </p>
- *
+ * 
  * @deprecated Please use {@link org.eclipse.core.runtime.ListenerList} instead.
  *             Please note that the {@link #ListenerList(int)} and
  *             {@link org.eclipse.core.runtime.ListenerList#ListenerList(int)}
@@ -57,7 +57,7 @@ public class ListenerList extends org.eclipse.core.runtime.ListenerList {
 
 	/**
 	 * Creates a listener list with the given initial capacity.
-	 *
+	 * 
 	 * @param capacity
 	 *            the number of listeners which this list can initially accept
 	 *            without growing its internal representation; must be at least

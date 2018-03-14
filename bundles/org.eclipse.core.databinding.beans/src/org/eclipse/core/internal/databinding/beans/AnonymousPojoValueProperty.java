@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class AnonymousPojoValueProperty extends DelegatingValueProperty {
 	private final String propertyName;
@@ -40,7 +40,6 @@ public class AnonymousPojoValueProperty extends DelegatingValueProperty {
 		this.delegates = new HashMap();
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		return getClassDelegate(source.getClass());
 	}
@@ -60,7 +59,6 @@ public class AnonymousPojoValueProperty extends DelegatingValueProperty {
 		return delegate;
 	}
 
-	@Override
 	public IObservableValue observeDetail(IObservableValue master) {
 		Object valueType = getValueType();
 		if (valueType == null)
@@ -77,7 +75,6 @@ public class AnonymousPojoValueProperty extends DelegatingValueProperty {
 		return null;
 	}
 
-	@Override
 	public String toString() {
 		String s = "?." + propertyName; //$NON-NLS-1$
 		Class valueType = (Class) getValueType();

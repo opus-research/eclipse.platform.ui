@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,7 @@ package org.eclipse.ui.internal.forms.widgets;
 
 import java.util.Hashtable;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.ui.forms.HyperlinkSettings;
 
 /**
@@ -40,7 +38,6 @@ public class TextHyperlinkSegment extends TextSegment implements
 	/*
 	 * @see IObjectReference#getObjectId()
 	 */
-	@Override
 	public String getHref() {
 		return href;
 	}
@@ -57,25 +54,22 @@ public class TextHyperlinkSegment extends TextSegment implements
 	 * selected, selData); }
 	 */
 
-	@Override
-	public void paint(GC gc, boolean hover, Hashtable<String, Object> resourceTable,
+	public void paint(GC gc, boolean hover, Hashtable resourceTable,
 			boolean selected, SelectionData selData, Rectangle repaintRegion) {
 		boolean rolloverMode = settings.getHyperlinkUnderlineMode() == HyperlinkSettings.UNDERLINE_HOVER;
 		underline = settings.getHyperlinkUnderlineMode() == HyperlinkSettings.UNDERLINE_ALWAYS;
 		Color savedFg = gc.getForeground();
 		Color newFg = hover ? settings.getActiveForeground() : settings.getForeground();
 		if (newFg!=null)
-			gc.setForeground(newFg);
+			gc.setForeground(newFg); 
 		super.paint(gc, hover, resourceTable, selected, rolloverMode, selData, repaintRegion);
 		gc.setForeground(savedFg);
 	}
-
-	@Override
+	
 	protected void drawText(GC gc, String s, int clipX, int clipY) {
 		gc.drawText(s, clipX, clipY, false);
 	}
 
-	@Override
 	public String getTooltipText() {
 		return tooltipText;
 	}
@@ -83,19 +77,16 @@ public class TextHyperlinkSegment extends TextSegment implements
 	public void setTooltipText(String tooltip) {
 		this.tooltipText = tooltip;
 	}
-
-	@Override
+	
 	public boolean isSelectable() {
 		return true;
 	}
 
-	@Override
-	public boolean isFocusSelectable(Hashtable<String, Object> resourceTable) {
+	public boolean isFocusSelectable(Hashtable resourceTable) {
 		return true;
 	}
 
-	@Override
-	public boolean setFocus(Hashtable<String, Object> resourceTable, boolean direction) {
+	public boolean setFocus(Hashtable resourceTable, boolean direction) {
 		return true;
 	}
 }

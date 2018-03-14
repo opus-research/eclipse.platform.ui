@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,9 @@ import org.eclipse.ui.views.markers.internal.ProblemFilter;
 /**
  * CompatibilityMarkerFieldFilterGroup is a filter group that uses a
  * {@link ProblemFilter}.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup {
 
@@ -26,7 +26,7 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 
 	/**
 	 * Create a new instance of the receiver based on the ProblemFilter.
-	 *
+	 * 
 	 * @param filter
 	 * @param cachedMarkerBuilder
 	 */
@@ -38,22 +38,38 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 		setScope(filter.getOnResource());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#getID()
+	 */
 	public String getID() {
 		return problemFilter.getId();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#getName()
+	 */
 	public String getName() {
 		return problemFilter.getName();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#isSystem()
+	 */
 	public boolean isSystem() {
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#makeWorkingCopy()
+	 */
 	MarkerFieldFilterGroup makeWorkingCopy() {
 
 		CompatibilityMarkerFieldFilterGroup clone = new CompatibilityMarkerFieldFilterGroup(
@@ -64,7 +80,11 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#calculateFilters()
+	 */
 	protected void calculateFilters() {
 		super.calculateFilters();
 		// Now initialize with the ProblemFilter

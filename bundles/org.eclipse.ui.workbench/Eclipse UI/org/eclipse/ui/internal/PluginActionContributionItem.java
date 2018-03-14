@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public class PluginActionContributionItem extends ActionContributionItem
     /**
      * Creates a new contribution item from the given action. The id of the
      * action is used as the id of the item.
-     *
+     * 
      * @param action
      *            the action
      */
@@ -47,7 +47,7 @@ public class PluginActionContributionItem extends ActionContributionItem
 
     /**
      * Hook the activity and identifier listener (if necessary);
-     *
+     * 
      * @since 3.1
      */
     private void hookListeners() {
@@ -59,10 +59,10 @@ public class PluginActionContributionItem extends ActionContributionItem
 			id.addIdentifierListener(this);
 		}
     }
-
+    
     /**
      * Unhook the activity and identifier listener (if necessary);
-     *
+     * 
      * @since 3.1
      */
     private void unhookListeners() {
@@ -74,7 +74,10 @@ public class PluginActionContributionItem extends ActionContributionItem
 			id.removeIdentifierListener(this);
 		}
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
+     */
     @Override
 	public void setParent(IContributionManager parent) {
         IContributionManager oldParent = getParent();
@@ -82,14 +85,14 @@ public class PluginActionContributionItem extends ActionContributionItem
         if (oldParent == parent) {
 			return;
 		}
-
+        
         if (parent == null) {
 			unhookListeners();
 		} else {
 			hookListeners();
 		}
     }
-
+    
     /**
      * Create the IIdentifier reference for this item.
      *
@@ -99,7 +102,7 @@ public class PluginActionContributionItem extends ActionContributionItem
         if (!WorkbenchActivityHelper.isFiltering()) {
 			return null;
 		}
-
+        
         if (identifier == null) {
             IWorkbenchActivitySupport workbenchActivitySupport = PlatformUI
                     .getWorkbench().getActivitySupport();
@@ -116,7 +119,7 @@ public class PluginActionContributionItem extends ActionContributionItem
 
     /**
      * Dispose of the IIdentifier if necessary.
-     *
+     * 
      * @since 3.0
      */
     private void disposeIdentifier() {
@@ -134,6 +137,11 @@ public class PluginActionContributionItem extends ActionContributionItem
         disposeIdentifier();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.ActionContributionItem#isVisible()
+     */
     @Override
 	public boolean isVisible() {
         if (identifier != null && !identifier.isEnabled()) {
@@ -142,6 +150,9 @@ public class PluginActionContributionItem extends ActionContributionItem
         return super.isVisible();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IIdentifierListener#identifierChanged(org.eclipse.ui.activities.IdentifierEvent)
+     */
     @Override
 	public void identifierChanged(IdentifierEvent identifierEvent) {
         invalidateParent();
@@ -149,7 +160,7 @@ public class PluginActionContributionItem extends ActionContributionItem
 
     /**
      * Mark the parent dirty if we have a parent.
-     *
+     * 
      * @since 3.1
      */
 	protected void invalidateParent() {
@@ -159,6 +170,9 @@ public class PluginActionContributionItem extends ActionContributionItem
 		}
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
+     */
     @Override
 	public void activityManagerChanged(ActivityManagerEvent activityManagerEvent) {
         // ensure that if we're going from a non-filtering state that we get an identifier
@@ -172,7 +186,7 @@ public class PluginActionContributionItem extends ActionContributionItem
             invalidateParent();
         }
     }
-
+    
     /*
      * For testing purposes only
      */

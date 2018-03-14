@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ public interface ILabelDecorator extends IBaseLabelProvider {
      * Returns an image that is based on the given image,
      * but decorated with additional information relating to the state
      * of the provided element.
-     *
+     * 
      * Text and image decoration updates can occur as a result of other updates
      * within the workbench including deferred decoration by background processes.
      * Clients should handle labelProviderChangedEvents for the given element to get
@@ -44,7 +44,7 @@ public interface ILabelDecorator extends IBaseLabelProvider {
      * Returns a text label that is based on the given text label,
      * but decorated with additional information relating to the state
      * of the provided element.
-     *
+     * 
      * Text and image decoration updates can occur as a result of other updates
      * within the workbench including deferred decoration by background processes.
      * Clients should handle labelProviderChangedEvents for the given element to get

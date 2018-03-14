@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,8 @@ import org.osgi.service.event.Event;
 /**
  * Listens for the IPresentationEngine's SPLIT_HORIZONTAL and SPLIT_VERTICAL tags being applied to
  * an MPart and takes the appropriate steps to split / unsplit the part
+ * 
+ * @since 1.1
  */
 public class SplitterAddon {
 	@Inject
@@ -39,7 +41,7 @@ public class SplitterAddon {
 
 	/**
 	 * Handles changes in tags
-	 *
+	 * 
 	 * @param event
 	 */
 	@Inject
@@ -75,7 +77,7 @@ public class SplitterAddon {
 
 	/**
 	 * Finds the CompositePart containing the given part (if any)
-	 *
+	 * 
 	 * @param part
 	 * @return The MCompositePart or 'null' if none is found
 	 */
@@ -95,14 +97,10 @@ public class SplitterAddon {
 			return;
 
 		List<MPart> innerElements = ms.findElements(compositePart, null, MPart.class, null);
-		if (innerElements.size() < 3)
+		if (innerElements.size() < 2)
 			return;
 
 		MPart originalEditor = innerElements.get(1); // '0' is the composite part
-
-		// Close the cloned editor *before* removing it from the model
-		MPart clonedEditor = innerElements.get(2);
-		clonedEditor.setToBeRendered(false);
 
 		MElementContainer<MUIElement> compParent = compositePart.getParent();
 		int index = compParent.getChildren().indexOf(compositePart);

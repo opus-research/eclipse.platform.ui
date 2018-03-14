@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.jface.internal.databinding.viewers;
 
 import org.eclipse.core.databinding.property.set.DelegatingSetProperty;
 import org.eclipse.core.databinding.property.set.ISetProperty;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.IViewerObservableSet;
 import org.eclipse.jface.databinding.viewers.IViewerSetProperty;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -22,7 +22,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ViewerCheckedElementsProperty extends DelegatingSetProperty
 		implements IViewerSetProperty {
@@ -42,7 +42,6 @@ public class ViewerCheckedElementsProperty extends DelegatingSetProperty
 				elementType);
 	}
 
-	@Override
 	protected ISetProperty doGetDelegate(Object source) {
 		if (source instanceof CheckboxTableViewer)
 			return checkboxTableViewer;
@@ -51,9 +50,8 @@ public class ViewerCheckedElementsProperty extends DelegatingSetProperty
 		return checkable;
 	}
 
-	@Override
 	public IViewerObservableSet observe(Viewer viewer) {
-		return (IViewerObservableSet) observe(DisplayRealm.getRealm(viewer
+		return (IViewerObservableSet) observe(SWTObservables.getRealm(viewer
 				.getControl().getDisplay()), viewer);
 	}
 }

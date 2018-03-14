@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * Utility class for setting up JFace for use by Eclipse.
- *
+ * 
  * @since 3.1
  */
 final class JFaceUtil {
@@ -64,7 +64,7 @@ final class JFaceUtil {
 				}
 			}
 		});
-
+		
 		Policy.setStatusHandler(new StatusHandler() {
 			@Override
 			public void show(IStatus status, String title) {
@@ -81,12 +81,6 @@ final class JFaceUtil {
 			Policy.TRACE_TOOLBAR = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/trace/toolbarDisposal")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOG_REENTRANT_VIEWER_CALLS = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/viewers/reentrantViewerCalls")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOG_EQUAL_VIEWER_ELEMENTS = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/viewers/equalElements")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_BIDI_UTILS = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/bidiUtils")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_TRACE_URL_IMAGE_DESCRIPTOR = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/trace/URLImageDescriptor")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/logURLImageDescriptorMissing2x")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptorDirectly")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2x")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x_PNG_FOR_GIF = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2xPngForGif")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -97,8 +91,13 @@ final class JFaceUtil {
 	public static void initializeJFacePreferences() {
 		IEclipsePreferences rootNode = (IEclipsePreferences) Platform.getPreferencesService().getRootNode().node(InstanceScope.SCOPE);
 		final String workbenchName = WorkbenchPlugin.getDefault().getBundle().getSymbolicName();
-
+		
 		rootNode.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener#added(org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent)
+			 */
 			@Override
 			public void added(NodeChangeEvent event) {
 				if (!event.getChild().name().equals(workbenchName)) {
@@ -107,13 +106,18 @@ final class JFaceUtil {
 				((IEclipsePreferences) event.getChild()).addPreferenceChangeListener(PlatformUIPreferenceListener.getSingleton());
 
 			}
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener#removed(org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent)
+			 */
 			@Override
 			public void removed(NodeChangeEvent event) {
 				// Nothing to do here
 
 			}
 		});
-
+		
 		JFacePreferences.setPreferenceStore(WorkbenchPlugin.getDefault().getPreferenceStore());
 	}
 }
