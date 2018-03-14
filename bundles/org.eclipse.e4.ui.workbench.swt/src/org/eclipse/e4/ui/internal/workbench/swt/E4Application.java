@@ -229,7 +229,7 @@ public class E4Application implements IApplication {
 
 		// Install the life-cycle manager for this session if there's one
 		// defined
-		String lifeCycleURI = getArgValue(IWorkbench.LIFE_CYCLE_URI_ARG, applicationContext, false, false, false);
+		String lifeCycleURI = getArgValue(IWorkbench.LIFE_CYCLE_URI_ARG, applicationContext, false);
 		if (lifeCycleURI != null) {
 			lcManager = factory.create(lifeCycleURI, appContext);
 			if (lcManager != null) {
@@ -239,15 +239,9 @@ public class E4Application implements IApplication {
 			}
 		}
 
-		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME, applicationContext, false, false, false);
+		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME, applicationContext, false);
 		if (forcedPerspectiveId != null) {
 			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID, forcedPerspectiveId);
-		}
-
-		String showLocation = getArgValue(E4Workbench.SHOW_LOCATION, applicationContext, false, true, true);
-		if (showLocation != null) {
-			// also write value if it's empty since the UI needs this info
-			appContext.set(E4Workbench.SHOW_LOCATION, showLocation);
 		}
 
 		// Create the app model and its context
@@ -288,16 +282,16 @@ public class E4Application implements IApplication {
 		// Parse out parameters from both the command line and/or the product
 		// definition (if any) and put them in the context
 		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
-				false, false, false);
+				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
 
 		setCSSContextVariables(applicationContext, appContext);
 
-		String rendererFactoryURI = getArgValue(E4Workbench.RENDERER_FACTORY_URI, applicationContext, false, false, false);
+		String rendererFactoryURI = getArgValue(E4Workbench.RENDERER_FACTORY_URI, applicationContext, false);
 		appContext.set(E4Workbench.RENDERER_FACTORY_URI, rendererFactoryURI);
 
 		// This is a default arg, if missing we use the default rendering engine
-		String presentationURI = getArgValue(IWorkbench.PRESENTATION_URI_ARG, applicationContext, false, false, false);
+		String presentationURI = getArgValue(IWorkbench.PRESENTATION_URI_ARG, applicationContext, false);
 		if (presentationURI == null) {
 			presentationURI = PartRenderingEngine.engineURI;
 		}
@@ -313,14 +307,14 @@ public class E4Application implements IApplication {
 		boolean highContrastMode = getApplicationDisplay().getHighContrast();
 
 		String cssURI = highContrastMode ? null : getArgValue(
-				IWorkbench.CSS_URI_ARG, applicationContext, false, false, false);
+				IWorkbench.CSS_URI_ARG, applicationContext, false);
 
 		if (cssURI != null) {
 			context.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
 
 		String themeId = highContrastMode ? HIGH_CONTRAST_THEME_ID
-				: getArgValue(E4Application.THEME_ID, applicationContext, false, false, false);
+				: getArgValue(E4Application.THEME_ID, applicationContext, false);
 
 		if (themeId == null && cssURI == null) {
 			themeId = DEFAULT_THEME_ID;
@@ -337,7 +331,7 @@ public class E4Application implements IApplication {
 		}
 
 		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
-				applicationContext, false, false, false);
+				applicationContext, false);
 		context.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 	}
 
@@ -354,7 +348,7 @@ public class E4Application implements IApplication {
 
 		// Save and restore
 		boolean saveAndRestore;
-		String value = getArgValue(IWorkbench.PERSIST_STATE, appContext, false, false, false);
+		String value = getArgValue(IWorkbench.PERSIST_STATE, appContext, false);
 
 		saveAndRestore = value == null || Boolean.parseBoolean(value);
 
@@ -370,20 +364,20 @@ public class E4Application implements IApplication {
 
 		// Persisted state
 		boolean clearPersistedState;
-		value = getArgValue(IWorkbench.CLEAR_PERSISTED_STATE, appContext, true, false, false);
+		value = getArgValue(IWorkbench.CLEAR_PERSISTED_STATE, appContext, true);
 		clearPersistedState = value != null && Boolean.parseBoolean(value);
 		eclipseContext.set(IWorkbench.CLEAR_PERSISTED_STATE,
 				Boolean.valueOf(clearPersistedState));
 
 		// Delta save and restore
 		boolean deltaRestore;
-		value = getArgValue(E4Workbench.DELTA_RESTORE, appContext, false, false, false);
+		value = getArgValue(E4Workbench.DELTA_RESTORE, appContext, false);
 		deltaRestore = value == null || Boolean.parseBoolean(value);
 		eclipseContext.set(E4Workbench.DELTA_RESTORE,
 				Boolean.valueOf(deltaRestore));
 
 		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER,
-				appContext, false, false, false);
+				appContext, false);
 
 		if (resourceHandler == null) {
 			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
@@ -408,7 +402,7 @@ public class E4Application implements IApplication {
 	 * @return
 	 */
 	private URI determineApplicationModelURI(IApplicationContext appContext) {
-		String appModelPath = getArgValue(IWorkbench.XMI_URI_ARG, appContext, false, false, false);
+		String appModelPath = getArgValue(IWorkbench.XMI_URI_ARG, appContext, false);
 		if (appModelPath == null || appModelPath.length() == 0) {
 			Bundle brandingBundle = appContext.getBrandingBundle();
 			if (brandingBundle != null)
@@ -432,47 +426,21 @@ public class E4Application implements IApplication {
 
 	}
 
-	/**
-	 * Finds an argument's value in the app's command line arguments, branding,
-	 * and system properties
-	 *
-	 * @param argName
-	 *            the argument name
-	 * @param appContext
-	 *            the application context
-	 * @param singledCmdArgValue
-	 *            whether it's a single-valued argument
-	 * @param optionalSecondArg
-	 *            for multi args whether the second value is optional
-	 * @param ignoreCase
-	 *            whether case is to be ignored for the name
-	 * @return the value, an empty string if an optional value is absent, or
-	 *         <code>null</code>
-	 */
 	private String getArgValue(String argName, IApplicationContext appContext,
-			boolean singledCmdArgValue, boolean optionalSecondArg, boolean ignoreCase) {
-		if (singledCmdArgValue && optionalSecondArg)
-			throw new IllegalArgumentException("Single argument value cannot be optional");
+			boolean singledCmdArgValue) {
+		// Is it in the arg list ?
 		if (argName == null || argName.length() == 0)
 			return null;
 
-		final String fullArgName = "-" + argName;
 		if (singledCmdArgValue) {
 			for (int i = 0; i < args.length; i++) {
-				boolean match = ignoreCase ? fullArgName.equalsIgnoreCase(args[i]) : fullArgName.equals(args[i]);
-				if (match) {
+				if (("-" + argName).equals(args[i]))
 					return "true";
-				}
 			}
 		} else {
 			for (int i = 0; i < args.length; i++) {
-				boolean match = ignoreCase ? fullArgName.equalsIgnoreCase(args[i]) : fullArgName.equals(args[i]);
-				if (match) {
-					if (i + 1 < args.length) {
-						return args[i + 1];
-					}
-					return optionalSecondArg ? "" : null;
-				}
+				if (("-" + argName).equals(args[i]) && i + 1 < args.length)
+					return args[i + 1];
 			}
 		}
 
