@@ -169,9 +169,9 @@ public class PathVariablesGroup {
         pathVariableManager = ResourcesPlugin.getWorkspace()
                 .getPathVariableManager();
         removedVariableNames = new HashSet();
-		Collator ignoreCaseComparator = Collator.getInstance();
-		ignoreCaseComparator.setStrength(Collator.TERTIARY);
-		tempPathVariables = new TreeMap(ignoreCaseComparator);
+        Collator ignoreCaseComparator = Collator.getInstance();
+        ignoreCaseComparator.setStrength(Collator.TERTIARY);
+        tempPathVariables = new TreeMap(ignoreCaseComparator);
         // initialize internal model
         initTemporaryState();
     }
