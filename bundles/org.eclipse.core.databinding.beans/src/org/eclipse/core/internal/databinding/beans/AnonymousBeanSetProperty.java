@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.property.set.ISetProperty;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class AnonymousBeanSetProperty extends DelegatingSetProperty {
 	private final String propertyName;
@@ -38,6 +38,7 @@ public class AnonymousBeanSetProperty extends DelegatingSetProperty {
 		this.delegates = new HashMap();
 	}
 
+	@Override
 	protected ISetProperty doGetDelegate(Object source) {
 		Class beanClass = source.getClass();
 		if (delegates.containsKey(beanClass))
@@ -54,6 +55,7 @@ public class AnonymousBeanSetProperty extends DelegatingSetProperty {
 		return delegate;
 	}
 
+	@Override
 	public String toString() {
 		String s = "?." + propertyName + "{}"; //$NON-NLS-1$ //$NON-NLS-2$
 		Class elementType = (Class) getElementType();

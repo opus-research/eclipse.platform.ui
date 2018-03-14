@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -83,7 +84,7 @@ public class WelcomeEditor extends EditorPart {
 
     private final static int VERT_SCROLL_INCREMENT = 20;
 
-    // width at which wrapping will stop and a horizontal scroll bar will be 
+    // width at which wrapping will stop and a horizontal scroll bar will be
     // introduced
     private final static int WRAP_MIN_WIDTH = 150;
 
@@ -139,41 +140,37 @@ public class WelcomeEditor extends EditorPart {
     }
 
     /**
-     * Finds the next text 
+     * Finds the next text
      */
     private StyledText nextText(StyledText text) {
         int index = 0;
         if (text == null) {
 			return (StyledText) texts.get(0);
-		} else {
-			index = texts.indexOf(text);
 		}
+		index = texts.indexOf(text);
 
         //If we are not at the end....
         if (index < texts.size() - 1) {
 			return (StyledText) texts.get(index + 1);
-		} else {
-			return (StyledText) texts.get(0);
 		}
+		return (StyledText) texts.get(0);
     }
 
     /**
-     * Finds the previous text 
+     * Finds the previous text
      */
     private StyledText previousText(StyledText text) {
         int index = 0;
         if (text == null) {
 			return (StyledText) texts.get(0);
-		} else {
-			index = texts.indexOf(text);
 		}
+		index = texts.indexOf(text);
 
         //If we are at the beginning....
         if (index == 0) {
 			return (StyledText) texts.get(texts.size() - 1);
-		} else {
-			return (StyledText) texts.get(index - 1);
 		}
+		return (StyledText) texts.get(index - 1);
     }
 
     /**
@@ -184,7 +181,7 @@ public class WelcomeEditor extends EditorPart {
     }
 
     /**
-     * Returns the copy action. 
+     * Returns the copy action.
      */
     protected WelcomeEditorCopyAction getCopyAction() {
         return copyAction;
@@ -256,14 +253,16 @@ public class WelcomeEditor extends EditorPart {
      */
     private void addListeners(StyledText styledText) {
         styledText.addMouseListener(new MouseAdapter() {
-            public void mouseDown(MouseEvent e) {
+            @Override
+			public void mouseDown(MouseEvent e) {
                 if (e.button != 1) {
                     return;
                 }
                 mouseDown = true;
             }
 
-            public void mouseUp(MouseEvent e) {
+            @Override
+			public void mouseUp(MouseEvent e) {
                 mouseDown = false;
                 StyledText text = (StyledText) e.widget;
                 WelcomeItem item = (WelcomeItem) e.widget.getData();
@@ -287,7 +286,8 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addMouseMoveListener(new MouseMoveListener() {
-            public void mouseMove(MouseEvent e) {
+            @Override
+			public void mouseMove(MouseEvent e) {
                 // Do not change cursor on drag events
                 if (mouseDown) {
                     if (!dragEvent) {
@@ -316,7 +316,8 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addTraverseListener(new TraverseListener() {
-            public void keyTraversed(TraverseEvent e) {
+            @Override
+			public void keyTraversed(TraverseEvent e) {
                 StyledText text = (StyledText) e.widget;
 
                 switch (e.detail) {
@@ -328,12 +329,11 @@ public class WelcomeEditor extends EditorPart {
                     if ((e.stateMask & SWT.CTRL) != 0) {
                         if (e.widget == lastText) {
 							return;
-						} else {
-                            e.doit = false;
-                            nextTabAbortTraversal = true;
-                            lastText.traverse(SWT.TRAVERSE_TAB_NEXT);
-                            return;
-                        }
+						}
+						e.doit = false;
+						nextTabAbortTraversal = true;
+						lastText.traverse(SWT.TRAVERSE_TAB_NEXT);
+						return;
                     }
                     if (nextTabAbortTraversal) {
                         nextTabAbortTraversal = false;
@@ -360,12 +360,11 @@ public class WelcomeEditor extends EditorPart {
                     if ((e.stateMask & SWT.CTRL) != 0) {
                         if (e.widget == firstText) {
 							return;
-						} else {
-                            e.doit = false;
-                            previousTabAbortTraversal = true;
-                            firstText.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
-                            return;
-                        }
+						}
+						e.doit = false;
+						previousTabAbortTraversal = true;
+						firstText.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
+						return;
                     }
                     if (previousTabAbortTraversal) {
                         previousTabAbortTraversal = false;
@@ -410,11 +409,13 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addKeyListener(new KeyListener() {
-            public void keyReleased(KeyEvent e) {
+            @Override
+			public void keyReleased(KeyEvent e) {
                 //Ignore a key release
             }
 
-            public void keyPressed(KeyEvent event) {
+            @Override
+			public void keyPressed(KeyEvent event) {
                 StyledText text = (StyledText) event.widget;
                 if (event.character == ' ' || event.character == SWT.CR) {
                     if (text != null) {
@@ -435,7 +436,7 @@ public class WelcomeEditor extends EditorPart {
                     return;
                 }
 
-                // When page down is pressed, move the cursor to the next item in the 
+                // When page down is pressed, move the cursor to the next item in the
                 // welcome page.   Note that this operation wraps (pages to the top item
                 // when the last item is reached).
                 if (event.keyCode == SWT.PAGE_DOWN) {
@@ -443,7 +444,7 @@ public class WelcomeEditor extends EditorPart {
                     return;
                 }
 
-                // When page up is pressed, move the cursor to the previous item in the 
+                // When page up is pressed, move the cursor to the previous item in the
                 // welcome page.  Note that this operation wraps (pages to the bottom item
                 // when the first item is reached).
                 if (event.keyCode == SWT.PAGE_UP) {
@@ -454,12 +455,14 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addFocusListener(new FocusAdapter() {
-            public void focusLost(FocusEvent e) {
+            @Override
+			public void focusLost(FocusEvent e) {
                 // Remember current text widget
                 lastNavigatedText = (StyledText) e.widget;
             }
 
-            public void focusGained(FocusEvent e) {
+            @Override
+			public void focusGained(FocusEvent e) {
                 currentText = (StyledText) e.widget;
 
                 // Remove highlighted selection if text widget has changed
@@ -475,8 +478,9 @@ public class WelcomeEditor extends EditorPart {
         });
 
         styledText.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                // enable/disable copy action			
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                // enable/disable copy action
                 StyledText text = (StyledText) e.widget;
 				copyAction.setEnabled(text.isTextSelected());
             }
@@ -617,7 +621,8 @@ public class WelcomeEditor extends EditorPart {
                     + (layout.marginWidth * 2);
             final int adjustFirst = HINDENT + (layout.marginWidth * 2);
             infoArea.addListener(SWT.Resize, new Listener() {
-                public void handleEvent(Event event) {
+                @Override
+				public void handleEvent(Event event) {
                     int w = scrolledComposite.getClientArea().width;
                     // if the horizontal scroll bar exists, we want to wrap to the
                     // minimum wrap width
@@ -635,7 +640,7 @@ public class WelcomeEditor extends EditorPart {
                         Point p = text.computeSize(extent, SWT.DEFAULT, false);
                         ((GridData) text.getLayoutData()).widthHint = p.x;
                     }
-                    // reset the scrolled composite height since the height of the 
+                    // reset the scrolled composite height since the height of the
                     // styled text widgets have changed
                     Point p = infoArea.computeSize(SWT.DEFAULT, SWT.DEFAULT,
                             true);
@@ -681,7 +686,8 @@ public class WelcomeEditor extends EditorPart {
      *
      * @param parent the parent control
      */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         // read our contents
         readFile();
         if (parser == null) {
@@ -712,7 +718,8 @@ public class WelcomeEditor extends EditorPart {
 				editorComposite, IIDEHelpContextIds.WELCOME_EDITOR);
 
         this.colorListener = new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty()
                         .equals(JFacePreferences.HYPERLINK_COLOR)) {
                     Color fg = JFaceColors.getHyperlinkText(editorComposite
@@ -758,7 +765,8 @@ public class WelcomeEditor extends EditorPart {
 
         // Message label
         final CLabel messageLabel = new CLabel(titleArea, SWT.LEFT) {
-            protected String shortenText(GC gc, String text, int width) {
+            @Override
+			protected String shortenText(GC gc, String text, int width) {
                 if (gc.textExtent(text, SWT.DRAW_MNEMONIC).x <= width) {
 					return text;
 				}
@@ -782,7 +790,8 @@ public class WelcomeEditor extends EditorPart {
         messageLabel.setFont(JFaceResources.getHeaderFont());
 
         final IPropertyChangeListener fontListener = new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
                 if (JFaceResources.HEADER_FONT.equals(event.getProperty())) {
                     messageLabel.setFont(JFaceResources.getHeaderFont());
                 }
@@ -790,7 +799,8 @@ public class WelcomeEditor extends EditorPart {
         };
 
         messageLabel.addDisposeListener(new DisposeListener() {
-            public void widgetDisposed(DisposeEvent event) {
+            @Override
+			public void widgetDisposed(DisposeEvent event) {
                 JFaceResources.getFontRegistry().removeListener(fontListener);
             }
         });
@@ -813,11 +823,12 @@ public class WelcomeEditor extends EditorPart {
     }
 
     /**
-     * The <code>WorkbenchPart</code> implementation of this 
+     * The <code>WorkbenchPart</code> implementation of this
      * <code>IWorkbenchPart</code> method disposes the title image
      * loaded by <code>setInitializationData</code>. Subclasses may extend.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         if (busyCursor != null) {
 			busyCursor.dispose();
@@ -831,7 +842,7 @@ public class WelcomeEditor extends EditorPart {
         }
     }
 
-    /* (non-Javadoc)
+    /**
      * Saves the contents of this editor.
      * <p>
      * Subclasses must override this method to implement the open-save-close lifecycle
@@ -840,11 +851,12 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    public void doSave(IProgressMonitor monitor) {
+    @Override
+	public void doSave(IProgressMonitor monitor) {
         // do nothing
     }
 
-    /* (non-Javadoc)
+    /**
      * Saves the contents of this editor to another object.
      * <p>
      * Subclasses must override this method to implement the open-save-close lifecycle
@@ -853,8 +865,9 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    public void doSaveAs() {
-        // do nothing	
+    @Override
+	public void doSaveAs() {
+        // do nothing
     }
 
     /**
@@ -881,7 +894,7 @@ public class WelcomeEditor extends EditorPart {
         return parser.getItems();
     }
 
-    /* (non-Javadoc)
+    /**
      * Sets the cursor and selection state for this editor to the passage defined
      * by the given marker.
      * <p>
@@ -894,7 +907,7 @@ public class WelcomeEditor extends EditorPart {
         // do nothing
     }
 
-    /* (non-Javadoc)
+    /**
      * Initializes the editor part with a site and input.
      * <p>
      * Subclasses of <code>EditorPart</code> must implement this method.  Within
@@ -908,7 +921,8 @@ public class WelcomeEditor extends EditorPart {
      *		setInput(editorInput);
      * </pre>
      */
-    public void init(IEditorSite site, IEditorInput input)
+    @Override
+	public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         if (!(input instanceof WelcomeEditorInput)) {
 			throw new PartInitException(
@@ -918,7 +932,7 @@ public class WelcomeEditor extends EditorPart {
         setInput(input);
     }
 
-    /* (non-Javadoc)
+    /**
      * Returns whether the contents of this editor have changed since the last save
      * operation.
      * <p>
@@ -928,11 +942,12 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    public boolean isDirty() {
+    @Override
+	public boolean isDirty() {
         return false;
     }
 
-    /* (non-Javadoc)
+    /**
      * Returns whether the "save as" operation is supported by this editor.
      * <p>
      * Subclasses must override this method to implement the open-save-close lifecycle
@@ -941,13 +956,14 @@ public class WelcomeEditor extends EditorPart {
      *
      * @see IEditorPart
      */
-    public boolean isSaveAsAllowed() {
+    @Override
+	public boolean isSaveAsAllowed() {
         return false;
     }
 
     /**
      * Read the contents of the welcome page
-     * 
+     *
      * @param is the <code>InputStream</code> to parse
      * @throws IOException if there is a problem parsing the stream.
      */
@@ -970,7 +986,7 @@ public class WelcomeEditor extends EditorPart {
                 .getWelcomePageURL();
 
         if (url == null) {
-			// should not happen 
+			// should not happen
             return;
 		}
 
@@ -1010,7 +1026,8 @@ public class WelcomeEditor extends EditorPart {
      * appropriate times).
      * </p>
      */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         if ((editorComposite != null) && (lastNavigatedText == null)
                 && (currentText == null)) {
 			editorComposite.setFocus();

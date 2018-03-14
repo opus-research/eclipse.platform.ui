@@ -16,7 +16,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
- * The BooleanPropertyAction is an action that set the values of a 
+ * The BooleanPropertyAction is an action that set the values of a
  * boolean property in the preference store.
  */
 
@@ -60,10 +60,6 @@ public class BooleanPropertyAction extends Action {
         setChecked(preferenceStore.getBoolean(property));
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.action.IAction#run()
-     */
     @Override
 	public void run() {
         preferenceStore.setValue(property, isChecked());

@@ -77,7 +77,7 @@ public class AdaptedResourceNavigator extends ViewPart {
 
     /**
      * Preference name constant for linking editor switching to navigator selection.
-     * 
+     *
      * [Issue: We're cheating here, by referencing a preference which is actually defined
      * on the Workbench's preference page.  The Navigator should eventually have its own
      * preference page with this preference on it, instead of on the Workbench's.
@@ -86,21 +86,27 @@ public class AdaptedResourceNavigator extends ViewPart {
     private static final String LINK_NAVIGATOR_TO_EDITOR = "LINK_NAVIGATOR_TO_EDITOR"; //$NON-NLS-1$
 
     private IPartListener partListener = new IPartListener() {
-        public void partActivated(IWorkbenchPart part) {
-            if (part instanceof IEditorPart)
-                editorActivated((IEditorPart) part);
+        @Override
+		public void partActivated(IWorkbenchPart part) {
+            if (part instanceof IEditorPart) {
+				editorActivated((IEditorPart) part);
+			}
         }
 
-        public void partBroughtToTop(IWorkbenchPart part) {
+        @Override
+		public void partBroughtToTop(IWorkbenchPart part) {
         }
 
-        public void partClosed(IWorkbenchPart part) {
+        @Override
+		public void partClosed(IWorkbenchPart part) {
         }
 
-        public void partDeactivated(IWorkbenchPart part) {
+        @Override
+		public void partDeactivated(IWorkbenchPart part) {
         }
 
-        public void partOpened(IWorkbenchPart part) {
+        @Override
+		public void partOpened(IWorkbenchPart part) {
         }
     };
 
@@ -111,7 +117,9 @@ public class AdaptedResourceNavigator extends ViewPart {
         IDialogSettings workbenchSettings = getPlugin().getDialogSettings();
         settings = workbenchSettings.getSection("ResourceNavigator"); //$NON-NLS-1$
         if (settings == null)
-            settings = workbenchSettings.addNewSection("ResourceNavigator"); //$NON-NLS-1$
+		 {
+			settings = workbenchSettings.addNewSection("ResourceNavigator"); //$NON-NLS-1$
+		}
     }
 
     /**
@@ -129,8 +137,7 @@ public class AdaptedResourceNavigator extends ViewPart {
                     resource = (IResource) o;
                 } else {
                     if (o instanceof IAdaptable) {
-                        resource = (IResource) ((IAdaptable) o)
-                                .getAdapter(IResource.class);
+						resource = ((IAdaptable) o).getAdapter(IResource.class);
                     }
                 }
                 if (resource != null) {
@@ -141,10 +148,8 @@ public class AdaptedResourceNavigator extends ViewPart {
         return new StructuredSelection(list);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart.
-     */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         //	initDrillDownAdapter(viewer);
         viewer.setUseHashlookup(true);
@@ -161,7 +166,8 @@ public class AdaptedResourceNavigator extends ViewPart {
         MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
+            @Override
+			public void menuAboutToShow(IMenuManager manager) {
                 AdaptedResourceNavigator.this.fillContextMenu(manager);
             }
         });
@@ -178,21 +184,25 @@ public class AdaptedResourceNavigator extends ViewPart {
         actionGroup.updateGlobalActions(selection);
 
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            public void selectionChanged(SelectionChangedEvent event) {
+            @Override
+			public void selectionChanged(SelectionChangedEvent event) {
                 handleSelectionChanged(event);
             }
         });
         viewer.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
+            @Override
+			public void doubleClick(DoubleClickEvent event) {
                 handleDoubleClick(event);
             }
         });
         viewer.getControl().addKeyListener(new KeyListener() {
-            public void keyPressed(KeyEvent event) {
+            @Override
+			public void keyPressed(KeyEvent event) {
                 handleKeyPressed(event);
             }
 
-            public void keyReleased(KeyEvent event) {
+            @Override
+			public void keyReleased(KeyEvent event) {
                 handleKeyReleased(event);
             }
         });
@@ -203,15 +213,14 @@ public class AdaptedResourceNavigator extends ViewPart {
 
         getSite().getPage().addPartListener(partListener);
 
-        if (memento != null)
-            restoreState(memento);
+        if (memento != null) {
+			restoreState(memento);
+		}
         memento = null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         getSite().getPage().removePartListener(partListener);
         super.dispose();
     }
@@ -221,8 +230,9 @@ public class AdaptedResourceNavigator extends ViewPart {
      * to be the editor's input, if linking is enabled.
      */
     void editorActivated(IEditorPart editor) {
-        if (!isLinkingEnabled())
-            return;
+        if (!isLinkingEnabled()) {
+			return;
+		}
 
         IEditorInput input = editor.getEditorInput();
         if (input instanceof IFileEditorInput) {
@@ -244,7 +254,7 @@ public class AdaptedResourceNavigator extends ViewPart {
         actionGroup.fillContextMenu(menu);
     }
 
-    /** 
+    /**
      * Returns the initial input for the viewer.
      * Tries to convert the input to a resource, either directly or via IAdaptable.
      * If the resource is a container, it uses that.
@@ -257,7 +267,7 @@ public class AdaptedResourceNavigator extends ViewPart {
         if (input instanceof IResource) {
             resource = (IResource) input;
         } else {
-            resource = (IResource) input.getAdapter(IResource.class);
+			resource = input.getAdapter(IResource.class);
         }
         if (resource != null) {
             switch (resource.getType()) {
@@ -386,10 +396,8 @@ public class AdaptedResourceNavigator extends ViewPart {
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on IViewPart.
-     */
-    public void init(IViewSite site, IMemento memento) throws PartInitException {
+    @Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -401,7 +409,8 @@ public class AdaptedResourceNavigator extends ViewPart {
         DrillDownAdapter drillDownAdapter = new DrillDownAdapter(viewer) {
             // need to update title whenever input changes;
             // updateNavigationButtons is called whenever any of the drill down buttons are used
-            protected void updateNavigationButtons() {
+            @Override
+			protected void updateNavigationButtons() {
                 super.updateNavigationButtons();
                 updateTitle();
             }
@@ -424,16 +433,17 @@ public class AdaptedResourceNavigator extends ViewPart {
      * @since 2.0
      */
     protected void linkToEditor(IStructuredSelection selection) {
-        if (!isLinkingEnabled())
-            return;
+        if (!isLinkingEnabled()) {
+			return;
+		}
 
         Object obj = selection.getFirstElement();
         if (obj instanceof IFile && selection.size() == 1) {
             IFile file = (IFile) obj;
             IWorkbenchPage page = getSite().getPage();
             IEditorReference editorArray[] = page.getEditorReferences();
-            for (int i = 0; i < editorArray.length; ++i) {
-                IEditorPart editor = editorArray[i].getEditor(true);
+            for (IEditorReference element : editorArray) {
+                IEditorPart editor = element.getEditor(true);
                 IEditorInput input = editor.getEditorInput();
                 if (input instanceof IFileEditorInput
                         && file.equals(((IFileEditorInput) input).getFile())) {
@@ -460,7 +470,8 @@ public class AdaptedResourceNavigator extends ViewPart {
     protected void restoreState(IMemento memento) {
     }
 
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
     }
 
     /**
@@ -476,7 +487,8 @@ public class AdaptedResourceNavigator extends ViewPart {
     /**
      * @see IWorkbenchPart#setFocus()
      */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         getViewer().getTree().setFocus();
     }
 

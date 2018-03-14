@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.services;
@@ -78,7 +79,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.AbstractSourceProvider#initialize(org.eclipse.ui.services
 	 * .IServiceLocator)
@@ -87,7 +88,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	public void initialize(IServiceLocator locator) {
 //		this.locator = locator;
 		super.initialize(locator);
-		IWorkbenchLocationService wls = (IWorkbenchLocationService) locator
+		IWorkbenchLocationService wls = locator
 				.getService(IWorkbenchLocationService.class);
 		workbench = wls.getWorkbench();
 		workbench.addWindowListener(windowListener);
@@ -98,7 +99,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISourceProvider#dispose()
 	 */
 	@Override
@@ -116,7 +117,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
 	 */
 	@Override
@@ -126,7 +127,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
 	 */
 	@Override
@@ -293,7 +294,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	};
 
 	private IEditorInput lastEditorInput;
-	
+
 	public void handleCheck(Shell s) {
 		if (s != lastActiveShell) {
 			lastActiveShell = s;
@@ -423,7 +424,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return (IShowInSource) Util.getAdapter(sourcePart, IShowInSource.class);
+		return Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {
@@ -444,7 +445,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 
 	private IWorkbenchWindow getActiveWindow() {
 		final Shell newActiveShell = workbench.getDisplay().getActiveShell();
-		final IContextService contextService = (IContextService) workbench
+		final IContextService contextService = workbench
 				.getService(IContextService.class);
 		if (contextService != null) {
 			final int shellType = contextService.getShellType(newActiveShell);
@@ -559,7 +560,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	 * be null if the last call to
 	 * <code>workbench.getActiveWorkbenchWindow()</code> returned
 	 * <code>null</code>.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private WorkbenchWindow lastActiveWorkbenchWindow = null;
@@ -567,7 +568,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	/**
 	 * The result of the last visibility check on the coolbar of the last active
 	 * workbench window.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private Boolean lastCoolbarVisibility = Boolean.FALSE;
@@ -575,7 +576,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	/**
 	 * The result of the last visibility check on the perspective bar of the
 	 * last active workbench window.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private Boolean lastPerspectiveBarVisibility = Boolean.FALSE;
@@ -583,21 +584,21 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 	/**
 	 * The result of the last visibility check on the status line for the last
 	 * workbench window.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	private Boolean lastStatusLineVisibility = Boolean.FALSE;
 
 	/**
 	 * The last perspective id that was provided by this source.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	private String lastPerspectiveId = null;
 
 	/**
 	 * The listener to individual window properties.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	private final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
@@ -669,7 +670,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 				IPerspectiveDescriptor perspective, String changeId) {
 		}
 	};
-	
+
 	private IPropertyListener editorListener = new IPropertyListener() {
 		@Override
 		public void propertyChanged(Object source, int propId) {
@@ -909,7 +910,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 					.addPerspectiveListener(perspectiveListener);
 		}
 	}
-	
+
 	private void hookListener(IEditorPart lastActiveEditor,
 			IEditorPart newActiveEditor) {
 		if (lastActiveEditor!=null) {
@@ -929,7 +930,7 @@ public class WorkbenchSourceProvider extends AbstractSourceProvider implements
 		 * We will fallback to the workbench window, but only if a dialog is not
 		 * open.
 		 */
-		final IContextService contextService = (IContextService) workbench
+		final IContextService contextService = workbench
 				.getService(IContextService.class);
 		if (contextService == null) {
 			return;

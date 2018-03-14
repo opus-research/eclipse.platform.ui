@@ -46,10 +46,8 @@ public class ViewDragSource extends TestDragSource {
         return getPage().findView(targetPart);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDragSource#getName()
-     */
-    public String toString() {
+    @Override
+	public String toString() {
         IViewDescriptor desc = WorkbenchPlugin.getDefault().getViewRegistry()
                 .find(targetPart);
         String title = desc.getLabel();
@@ -65,20 +63,18 @@ public class ViewDragSource extends TestDragSource {
         return title;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDragSource#drag(org.eclipse.swt.graphics.Point)
-     */
-    public void drag(TestDropLocation target) {
+    @Override
+	public void drag(TestDropLocation target) {
         IViewPart part = getPart();
 
         WorkbenchPage page = getPage();
         if (maximized) {
             page.toggleZoom(page.getReference(part));
         }
-        
+
         DragUtil.forceDropLocation(target);
 //        ViewStack parent = ((ViewStack) (pane.getContainer()));
-//        
+//
 //        PartPane presentablePart = wholeFolder ? null : pane;
 //        parent.paneDragStart(presentablePart, Display.getDefault()
 //                .getCursorLocation(), false);
