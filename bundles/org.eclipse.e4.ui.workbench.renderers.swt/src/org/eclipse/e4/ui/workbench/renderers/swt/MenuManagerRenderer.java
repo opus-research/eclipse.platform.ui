@@ -78,8 +78,6 @@ import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.internal.MenuManagerEventHelper;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Display;
@@ -114,163 +112,148 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	@Inject
 	IEventBroker eventBroker;
-	private EventHandler itemUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MMenuItem
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
-				return;
+	private EventHandler itemUpdater = event -> {
+		// Ensure that this event is for a MMenuItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
+			return;
 
-			MMenuItem itemModel = (MMenuItem) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
+		MMenuItem itemModel = (MMenuItem) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
 
-			IContributionItem ici = getContribution(itemModel);
-			if (ici == null) {
-				return;
-			}
+		IContributionItem ici = getContribution(itemModel);
+		if (ici == null) {
+			return;
+		}
 
-			String attName = (String) event
-					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
-				ici.update();
-			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				ici.update();
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
-				ici.update();
-			}
+		String attName = (String) event
+				.getProperty(UIEvents.EventTags.ATTNAME);
+		if (UIEvents.UILabel.LABEL.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			ici.update();
+		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
+			ici.update();
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName) || UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+			ici.update();
 		}
 	};
 
-	private EventHandler labelUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MMenu
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu))
-				return;
+	private EventHandler labelUpdater = event -> {
+		// Ensure that this event is for a MMenu
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu))
+			return;
 
-			String attName = (String) event
-					.getProperty(UIEvents.EventTags.ATTNAME);
-			MMenu model = (MMenu) event.getProperty(UIEvents.EventTags.ELEMENT);
-			MenuManager manager = getManager(model);
-			if ((manager == null))
-				return;
-			if (UIEvents.UILabel.LABEL.equals(attName)
-					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
-				manager.setMenuText(getText(model));
-				manager.update(IAction.TEXT);
-			}
-			if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				manager.setImageDescriptor(getImageDescriptor(model));
-				manager.update(IAction.IMAGE);
-			}
+		String attName = (String) event
+				.getProperty(UIEvents.EventTags.ATTNAME);
+		MMenu model = (MMenu) event.getProperty(UIEvents.EventTags.ELEMENT);
+		MenuManager manager = getManager(model);
+		if ((manager == null))
+			return;
+		if (UIEvents.UILabel.LABEL.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+			manager.setMenuText(getText(model));
+			manager.update(IAction.TEXT);
+		}
+		if (UIEvents.UILabel.ICONURI.equals(attName)) {
+			manager.setImageDescriptor(getImageDescriptor(model));
+			manager.update(IAction.IMAGE);
 		}
 	};
 
-	private EventHandler toBeRenderedUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-			String attName = (String) event
-					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (element instanceof MMenuItem) {
-				MMenuItem itemModel = (MMenuItem) element;
-				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
-					Object obj = itemModel.getParent();
-					if (!(obj instanceof MMenu)) {
-						return;
+	private EventHandler toBeRenderedUpdater = event -> {
+		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+		String attName = (String) event
+				.getProperty(UIEvents.EventTags.ATTNAME);
+		if (element instanceof MMenuItem) {
+			MMenuItem itemModel1 = (MMenuItem) element;
+			if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
+				Object obj1 = itemModel1.getParent();
+				if (!(obj1 instanceof MMenu)) {
+					return;
+				}
+				MenuManager parent = getManager((MMenu) obj1);
+				if (itemModel1.isToBeRendered()) {
+					if (parent != null) {
+						modelProcessSwitch(parent, itemModel1);
 					}
-					MenuManager parent = getManager((MMenu) obj);
-					if (itemModel.isToBeRendered()) {
-						if (parent != null) {
-							modelProcessSwitch(parent, itemModel);
-						}
-					} else {
-						IContributionItem ici = getContribution(itemModel);
-						clearModelToContribution(itemModel, ici);
-						if (ici != null && parent != null) {
-							parent.remove(ici);
-						}
-						if (ici != null) {
-							ici.dispose();
-						}
+				} else {
+					IContributionItem ici = getContribution(itemModel1);
+					clearModelToContribution(itemModel1, ici);
+					if (ici != null && parent != null) {
+						parent.remove(ici);
+					}
+					if (ici != null) {
+						ici.dispose();
 					}
 				}
 			}
+		}
 
-			if (element instanceof MPart) {
-				MPart part = (MPart) element;
-				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
-					boolean tbr = (Boolean) event
-							.getProperty(UIEvents.EventTags.NEW_VALUE);
-					if (!tbr) {
-						List<MMenu> menus = part.getMenus();
-						for (MMenu menu : menus) {
-							if (menu instanceof MPopupMenu)
-								unlinkMenu(menu);
-						}
+		if (element instanceof MPart) {
+			MPart part = (MPart) element;
+			if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
+				boolean tbr = (Boolean) event
+						.getProperty(UIEvents.EventTags.NEW_VALUE);
+				if (!tbr) {
+					List<MMenu> menus = part.getMenus();
+					for (MMenu menu : menus) {
+						if (menu instanceof MPopupMenu)
+							unlinkMenu(menu);
 					}
 				}
 			}
+		}
 
-			if (UIEvents.UIElement.VISIBLE.equals(attName)) {
-				if (element instanceof MMenu) {
-					MMenu menuModel = (MMenu) element;
-					MenuManager manager = getManager(menuModel);
-					if (manager == null) {
-						return;
-					}
-					manager.setVisible(menuModel.isVisible());
-					if (manager.getParent() != null) {
-						manager.getParent().markDirty();
-						scheduleManagerUpdate(manager.getParent());
-					}
-				} else if (element instanceof MMenuElement) {
-					MMenuElement itemModel = (MMenuElement) element;
-					Object obj = getContribution(itemModel);
-					if (!(obj instanceof ContributionItem)) {
-						return;
-					}
-					ContributionItem item = (ContributionItem) obj;
-					item.setVisible(itemModel.isVisible());
-					if (item.getParent() != null) {
-						item.getParent().markDirty();
-						scheduleManagerUpdate(item.getParent());
-					}
+		if (UIEvents.UIElement.VISIBLE.equals(attName)) {
+			if (element instanceof MMenu) {
+				MMenu menuModel = (MMenu) element;
+				MenuManager manager = getManager(menuModel);
+				if (manager == null) {
+					return;
+				}
+				manager.setVisible(menuModel.isVisible());
+				if (manager.getParent() != null) {
+					manager.getParent().markDirty();
+					scheduleManagerUpdate(manager.getParent());
+				}
+			} else if (element instanceof MMenuElement) {
+				MMenuElement itemModel2 = (MMenuElement) element;
+				Object obj2 = getContribution(itemModel2);
+				if (!(obj2 instanceof ContributionItem)) {
+					return;
+				}
+				ContributionItem item = (ContributionItem) obj2;
+				item.setVisible(itemModel2.isVisible());
+				if (item.getParent() != null) {
+					item.getParent().markDirty();
+					scheduleManagerUpdate(item.getParent());
 				}
 			}
 		}
 	};
 
-	private EventHandler selectionUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MToolItem
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
-				return;
+	private EventHandler selectionUpdater = event -> {
+		// Ensure that this event is for a MToolItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
+			return;
 
-			MMenuItem itemModel = (MMenuItem) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
-			IContributionItem ici = getContribution(itemModel);
-			if (ici != null) {
-				ici.update();
-			}
+		MMenuItem itemModel = (MMenuItem) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
+		IContributionItem ici = getContribution(itemModel);
+		if (ici != null) {
+			ici.update();
 		}
 	};
 
-	private EventHandler enabledUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MMenuItem
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
-				return;
+	private EventHandler enabledUpdater = event -> {
+		// Ensure that this event is for a MMenuItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
+			return;
 
-			MMenuItem itemModel = (MMenuItem) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
-			IContributionItem ici = getContribution(itemModel);
-			if (ici != null) {
-				ici.update();
-			}
+		MMenuItem itemModel = (MMenuItem) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
+		IContributionItem ici = getContribution(itemModel);
+		if (ici != null) {
+			ici.update();
 		}
 	};
 
@@ -414,14 +397,11 @@ MenuManagerEventHelper.getInstance()
 					menuModel instanceof MPopupMenu);
 		}
 		if (newMenu != null) {
-			newMenu.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					cleanUp(menuModel);
-					MenuManager manager = getManager(menuModel);
-					if (manager != null) {
-						manager.markDirty();
-					}
+			newMenu.addDisposeListener(e -> {
+				cleanUp(menuModel);
+				MenuManager manager = getManager(menuModel);
+				if (manager != null) {
+					manager.markDirty();
 				}
 			});
 		}
@@ -1177,20 +1157,16 @@ MenuManagerEventHelper.getInstance()
 			if (this.mgrToUpdate.isEmpty()) {
 				Display display = context.get(Display.class);
 				if (display != null && !display.isDisposed()) {
-					display.timerExec(100, new Runnable() {
-
-						@Override
-						public void run() {
-							Collection<IContributionManager> toUpdate = new LinkedHashSet<>();
-							synchronized (mgrToUpdate) {
-								toUpdate.addAll(mgrToUpdate);
-								mgrToUpdate.clear();
-							}
-							for (IContributionManager mgr : toUpdate) {
-								mgr.update(false);
-							}
-					}
-					});
+					display.timerExec(100, () -> {
+						Collection<IContributionManager> toUpdate = new LinkedHashSet<>();
+						synchronized (mgrToUpdate) {
+							toUpdate.addAll(mgrToUpdate);
+							mgrToUpdate.clear();
+						}
+						for (IContributionManager mgr1 : toUpdate) {
+							mgr1.update(false);
+						}
+});
 				}
 				this.mgrToUpdate.add(mgr);
 			}

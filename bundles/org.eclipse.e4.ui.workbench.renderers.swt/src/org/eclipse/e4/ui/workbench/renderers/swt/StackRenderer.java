@@ -71,18 +71,12 @@ import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -94,7 +88,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
@@ -353,50 +346,47 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		preferenceChange(null);
 
 		// TODO: Refactor using findItemForPart(MPart) method
-		itemUpdater = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				MUIElement element = (MUIElement) event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(element instanceof MPart))
-					return;
+		itemUpdater = event -> {
+			MUIElement element = (MUIElement) event
+					.getProperty(UIEvents.EventTags.ELEMENT);
+			if (!(element instanceof MPart))
+				return;
 
-				MPart part = (MPart) element;
+			MPart part = (MPart) element;
 
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-				Object newValue = event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
+			String attName = (String) event
+					.getProperty(UIEvents.EventTags.ATTNAME);
+			Object newValue = event
+					.getProperty(UIEvents.EventTags.NEW_VALUE);
 
-				// is this a direct child of the stack?
-				if (element.getParent() != null
-						&& element.getParent().getRenderer() == StackRenderer.this) {
-					CTabItem cti = findItemForPart(element, element.getParent());
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-					return;
+			// is this a direct child of the stack?
+			if (element.getParent() != null
+					&& element.getParent().getRenderer() == StackRenderer.this) {
+				CTabItem cti1 = findItemForPart(element, element.getParent());
+				if (cti1 != null) {
+					updateTab(cti1, part, attName, newValue);
 				}
+				return;
+			}
 
-				// Do we have any stacks with place holders for the element
-				// that's changed?
-				MWindow win = modelService.getTopLevelWindowFor(part);
-				List<MPlaceholder> refs = modelService.findElements(win, null,
-						MPlaceholder.class, null);
-				if (refs != null) {
-					for (MPlaceholder ref : refs) {
-						if (ref.getRef() != part)
-							continue;
+			// Do we have any stacks with place holders for the element
+			// that's changed?
+			MWindow win = modelService.getTopLevelWindowFor(part);
+			List<MPlaceholder> refs = modelService.findElements(win, null,
+					MPlaceholder.class, null);
+			if (refs != null) {
+				for (MPlaceholder ref : refs) {
+					if (ref.getRef() != part)
+						continue;
 
-						MElementContainer<MUIElement> refParent = ref
-								.getParent();
-						// can be null, see bug 328296
-						if (refParent != null
-								&& refParent.getRenderer() instanceof StackRenderer) {
-							CTabItem cti = findItemForPart(ref, refParent);
-							if (cti != null) {
-								updateTab(cti, part, attName, newValue);
-							}
+					MElementContainer<MUIElement> refParent = ref
+							.getParent();
+					// can be null, see bug 328296
+					if (refParent != null
+							&& refParent.getRenderer() instanceof StackRenderer) {
+						CTabItem cti2 = findItemForPart(ref, refParent);
+						if (cti2 != null) {
+							updateTab(cti2, part, attName, newValue);
 						}
 					}
 				}
@@ -406,48 +396,45 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 
 		// TODO: Refactor using findItemForPart(MPart) method
-		dirtyUpdater = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
+		dirtyUpdater = event -> {
+			Object objElement = event
+					.getProperty(UIEvents.EventTags.ELEMENT);
 
-				// Ensure that this event is for a MMenuItem
-				if (!(objElement instanceof MPart)) {
-					return;
+			// Ensure that this event is for a MMenuItem
+			if (!(objElement instanceof MPart)) {
+				return;
+			}
+
+			// Extract the data bits
+			MPart part = (MPart) objElement;
+
+			String attName = (String) event
+					.getProperty(UIEvents.EventTags.ATTNAME);
+			Object newValue = event
+					.getProperty(UIEvents.EventTags.NEW_VALUE);
+
+			// Is the part directly under the stack?
+			MElementContainer<MUIElement> parent = part.getParent();
+			if (parent != null
+					&& parent.getRenderer() == StackRenderer.this) {
+				CTabItem cti1 = findItemForPart(part, parent);
+				if (cti1 != null) {
+					updateTab(cti1, part, attName, newValue);
 				}
+				return;
+			}
 
-				// Extract the data bits
-				MPart part = (MPart) objElement;
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-				Object newValue = event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-				// Is the part directly under the stack?
-				MElementContainer<MUIElement> parent = part.getParent();
-				if (parent != null
-						&& parent.getRenderer() == StackRenderer.this) {
-					CTabItem cti = findItemForPart(part, parent);
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-					return;
-				}
-
-				// Do we have any stacks with place holders for the element
-				// that's changed?
-				Set<MPlaceholder> refs = renderedMap.get(part);
-				if (refs != null) {
-					for (MPlaceholder ref : refs) {
-						MElementContainer<MUIElement> refParent = ref
-								.getParent();
-						if (refParent.getRenderer() instanceof StackRenderer) {
-							CTabItem cti = findItemForPart(ref, refParent);
-							if (cti != null) {
-								updateTab(cti, part, attName, newValue);
-							}
+			// Do we have any stacks with place holders for the element
+			// that's changed?
+			Set<MPlaceholder> refs = renderedMap.get(part);
+			if (refs != null) {
+				for (MPlaceholder ref : refs) {
+					MElementContainer<MUIElement> refParent = ref
+							.getParent();
+					if (refParent.getRenderer() instanceof StackRenderer) {
+						CTabItem cti2 = findItemForPart(ref, refParent);
+						if (cti2 != null) {
+							updateTab(cti2, part, attName, newValue);
 						}
 					}
 				}
@@ -457,41 +444,38 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		eventBroker.subscribe(UIEvents.buildTopic(UIEvents.Dirtyable.TOPIC,
 				UIEvents.Dirtyable.DIRTY), dirtyUpdater);
 
-		viewMenuUpdater = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
+		viewMenuUpdater = event -> {
+			Object objElement = event
+					.getProperty(UIEvents.EventTags.ELEMENT);
 
-				// Ensure that this event is for a MMenuItem
-				if (!(objElement instanceof MMenuElement)) {
+			// Ensure that this event is for a MMenuItem
+			if (!(objElement instanceof MMenuElement)) {
+				return;
+			}
+
+			// Ensure that it's a View part's menu
+			MMenuElement menuModel = (MMenuElement) objElement;
+			MUIElement menuParent = modelService.getContainer(menuModel);
+			if (!(menuParent instanceof MPart))
+				return;
+
+			MPart element = (MPart) menuParent;
+			MUIElement parentElement = element.getParent();
+			if (parentElement == null) {
+				MPlaceholder placeholder = element.getCurSharedRef();
+				if (placeholder == null) {
 					return;
 				}
 
-				// Ensure that it's a View part's menu
-				MMenuElement menuModel = (MMenuElement) objElement;
-				MUIElement menuParent = modelService.getContainer(menuModel);
-				if (!(menuParent instanceof MPart))
-					return;
-
-				MPart element = (MPart) menuParent;
-				MUIElement parentElement = element.getParent();
+				parentElement = placeholder.getParent();
 				if (parentElement == null) {
-					MPlaceholder placeholder = element.getCurSharedRef();
-					if (placeholder == null) {
-						return;
-					}
-
-					parentElement = placeholder.getParent();
-					if (parentElement == null) {
-						return;
-					}
+					return;
 				}
+			}
 
-				Object widget = parentElement.getWidget();
-				if (widget instanceof CTabFolder) {
-					adjustTopRight((CTabFolder) widget);
-				}
+			Object widget = parentElement.getWidget();
+			if (widget instanceof CTabFolder) {
+				adjustTopRight((CTabFolder) widget);
 			}
 		};
 		eventBroker
@@ -500,52 +484,49 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				viewMenuUpdater);
 
 
-		stylingHandler = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				MUIElement changed = (MUIElement) event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(changed instanceof MPart))
-					return;
+		stylingHandler = event -> {
+			MUIElement changed = (MUIElement) event
+					.getProperty(UIEvents.EventTags.ELEMENT);
+			if (!(changed instanceof MPart))
+				return;
 
-				MPart newActivePart = (MPart) changed;
-				MUIElement partParent = newActivePart.getParent();
-				if (partParent == null
-						&& newActivePart.getCurSharedRef() != null)
-					partParent = newActivePart.getCurSharedRef().getParent();
+			MPart newActivePart = (MPart) changed;
+			MUIElement partParent = newActivePart.getParent();
+			if (partParent == null
+					&& newActivePart.getCurSharedRef() != null)
+				partParent = newActivePart.getCurSharedRef().getParent();
 
-				// Skip sash containers
-				while (partParent != null
-						&& partParent instanceof MPartSashContainer)
-					partParent = partParent.getParent();
+			// Skip sash containers
+			while (partParent != null
+					&& partParent instanceof MPartSashContainer)
+				partParent = partParent.getParent();
 
-				// Ensure the stack of a split part gets updated when one
-				// of its internal parts gets activated
-				if (partParent instanceof MCompositePart) {
-					partParent = partParent.getParent();
-				}
-
-				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
-						: null);
-
-				List<String> tags = new ArrayList<>();
-				tags.add(CSSConstants.CSS_ACTIVE_CLASS);
-				List<MUIElement> activeElements = modelService.findElements(
-						modelService.getTopLevelWindowFor(newActivePart), null,
-						MUIElement.class, tags);
-				for (MUIElement element : activeElements) {
-					if (element instanceof MPartStack && element != pStack) {
-						styleElement(element, false);
-					} else if (element instanceof MPart
-							&& element != newActivePart) {
-						styleElement(element, false);
-					}
-				}
-
-				if (pStack != null)
-					styleElement(pStack, true);
-				styleElement(newActivePart, true);
+			// Ensure the stack of a split part gets updated when one
+			// of its internal parts gets activated
+			if (partParent instanceof MCompositePart) {
+				partParent = partParent.getParent();
 			}
+
+			MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
+					: null);
+
+			List<String> tags = new ArrayList<>();
+			tags.add(CSSConstants.CSS_ACTIVE_CLASS);
+			List<MUIElement> activeElements = modelService.findElements(
+					modelService.getTopLevelWindowFor(newActivePart), null,
+					MUIElement.class, tags);
+			for (MUIElement element : activeElements) {
+				if (element instanceof MPartStack && element != pStack) {
+					styleElement(element, false);
+				} else if (element instanceof MPart
+						&& element != newActivePart) {
+					styleElement(element, false);
+				}
+			}
+
+			if (pStack != null)
+				styleElement(pStack, true);
+			styleElement(newActivePart, true);
 		};
 		eventBroker.subscribe(UIEvents.UILifeCycle.ACTIVATE, stylingHandler);
 
@@ -1015,26 +996,23 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		final CTabFolder ctf = (CTabFolder) me.getWidget();
 
 		// Handle traverse events for accessibility
-		ctf.addTraverseListener(new TraverseListener() {
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_ARROW_NEXT
-						|| e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
-					me.getTransientData().put(INHIBIT_FOCUS, true);
-				} else if (e.detail == SWT.TRAVERSE_RETURN) {
-					me.getTransientData().remove(INHIBIT_FOCUS);
-					CTabItem cti = ctf.getSelection();
-					if (cti != null) {
-						MUIElement stackElement = (MUIElement) cti
-								.getData(OWNING_ME);
-						if (stackElement instanceof MPlaceholder)
-							stackElement = ((MPlaceholder) stackElement)
-									.getRef();
-						if ((stackElement instanceof MPart)
-								&& (ctf.isFocusControl())) {
-							MPart thePart = (MPart) stackElement;
-							renderer.focusGui(thePart);
-						}
+		ctf.addTraverseListener(e -> {
+			if (e.detail == SWT.TRAVERSE_ARROW_NEXT
+					|| e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
+				me.getTransientData().put(INHIBIT_FOCUS, true);
+			} else if (e.detail == SWT.TRAVERSE_RETURN) {
+				me.getTransientData().remove(INHIBIT_FOCUS);
+				CTabItem cti = ctf.getSelection();
+				if (cti != null) {
+					MUIElement stackElement = (MUIElement) cti
+							.getData(OWNING_ME);
+					if (stackElement instanceof MPlaceholder)
+						stackElement = ((MPlaceholder) stackElement)
+								.getRef();
+					if ((stackElement instanceof MPart)
+							&& (ctf.isFocusControl())) {
+						MPart thePart = (MPart) stackElement;
+						renderer.focusGui(thePart);
 					}
 				}
 			}
@@ -1042,29 +1020,26 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		// Detect activation...picks up cases where the user clicks on the
 		// (already active) tab
-		ctf.addListener(SWT.Activate, new org.eclipse.swt.widgets.Listener() {
-			@Override
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				if (event.detail == SWT.MouseDown) {
-					CTabFolder ctf = (CTabFolder) event.widget;
-					if (ctf.getSelection() == null)
-						return;
+		ctf.addListener(SWT.Activate, event -> {
+			if (event.detail == SWT.MouseDown) {
+				CTabFolder ctf1 = (CTabFolder) event.widget;
+				if (ctf1.getSelection() == null)
+					return;
 
-					// get the item under the cursor
-					Point cp = event.display.getCursorLocation();
-					cp = event.display.map(null, ctf, cp);
-					CTabItem overItem = ctf.getItem(cp);
+				// get the item under the cursor
+				Point cp = event.display.getCursorLocation();
+				cp = event.display.map(null, ctf1, cp);
+				CTabItem overItem = ctf1.getItem(cp);
 
-					// If the item we're over is *not* the current one do
-					// nothing (it'll get activated when the tab changes)
-					if (overItem == null || overItem == ctf.getSelection()) {
-						MUIElement uiElement = (MUIElement) ctf.getSelection()
-								.getData(OWNING_ME);
-						if (uiElement instanceof MPlaceholder)
-							uiElement = ((MPlaceholder) uiElement).getRef();
-						if (uiElement instanceof MPart)
-							activate((MPart) uiElement);
-					}
+				// If the item we're over is *not* the current one do
+				// nothing (it'll get activated when the tab changes)
+				if (overItem == null || overItem == ctf1.getSelection()) {
+					MUIElement uiElement = (MUIElement) ctf1.getSelection()
+							.getData(OWNING_ME);
+					if (uiElement instanceof MPlaceholder)
+						uiElement = ((MPlaceholder) uiElement).getRef();
+					if (uiElement instanceof MPart)
+						activate((MPart) uiElement);
 				}
 			}
 		});
@@ -1153,29 +1128,26 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		};
 		ctf.addCTabFolder2Listener(closeListener);
 
-		ctf.addMenuDetectListener(new MenuDetectListener() {
-			@Override
-			public void menuDetected(MenuDetectEvent e) {
-				Point absolutePoint = new Point(e.x, e.y);
-				Point relativePoint = ctf.getDisplay().map(null, ctf,
-						absolutePoint);
-				CTabItem eventTabItem = ctf.getItem(relativePoint);
+		ctf.addMenuDetectListener(e -> {
+			Point absolutePoint = new Point(e.x, e.y);
+			Point relativePoint = ctf.getDisplay().map(null, ctf,
+					absolutePoint);
+			CTabItem eventTabItem = ctf.getItem(relativePoint);
 
-				// If click happened in empty area, still show the menu
-				if (eventTabItem == null) {
-					Rectangle clientArea = ctf.getClientArea();
-					if (!clientArea.contains(relativePoint)) {
-						eventTabItem = ctf.getSelection();
-					}
+			// If click happened in empty area, still show the menu
+			if (eventTabItem == null) {
+				Rectangle clientArea = ctf.getClientArea();
+				if (!clientArea.contains(relativePoint)) {
+					eventTabItem = ctf.getSelection();
 				}
+			}
 
-				if (eventTabItem != null) {
-					MUIElement uiElement = (MUIElement) eventTabItem
-							.getData(AbstractPartRenderer.OWNING_ME);
-					MPart tabPart = (MPart) ((uiElement instanceof MPart) ? uiElement
-							: ((MPlaceholder) uiElement).getRef());
-					openMenuFor(tabPart, ctf, absolutePoint);
-				}
+			if (eventTabItem != null) {
+				MUIElement uiElement = (MUIElement) eventTabItem
+						.getData(AbstractPartRenderer.OWNING_ME);
+				MPart tabPart = (MPart) ((uiElement instanceof MPart) ? uiElement
+						: ((MPlaceholder) uiElement).getRef());
+				openMenuFor(tabPart, ctf, absolutePoint);
 			}
 		});
 
@@ -1211,17 +1183,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		editorList.setVisible(true);
 		editorList.setFocus();
-		editorList.getShell().addListener(SWT.Deactivate, new Listener() {
-			@Override
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				editorList.getShell().getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						editorList.dispose();
-					}
-				});
-			}
-		});
+		editorList.getShell().addListener(SWT.Deactivate, event -> editorList.getShell().getDisplay().asyncExec(() -> editorList.dispose()));
 	}
 
 	private Point getChevronLocation(CTabFolder tabFolder) {
@@ -1340,12 +1302,9 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		if (swtMenu == null)
 			return;
 
-		ctrl.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				if (!swtMenu.isDisposed()) {
-					swtMenu.dispose();
-				}
+		ctrl.addDisposeListener(e -> {
+			if (!swtMenu.isDisposed()) {
+				swtMenu.dispose();
 			}
 		});
 
