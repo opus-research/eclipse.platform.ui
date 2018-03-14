@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -499,7 +498,7 @@ public abstract class WorkbenchPart extends EventManager implements
 		}
     }
 
-	private Map<String, String> partProperties = new HashMap<>();
+	private Map<String, String> partProperties = new HashMap<String, String>();
 
     @Override
 	public void setPartProperty(String key, String value) {
