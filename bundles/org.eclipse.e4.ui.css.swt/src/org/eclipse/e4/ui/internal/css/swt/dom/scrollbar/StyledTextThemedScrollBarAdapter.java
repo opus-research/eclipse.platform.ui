@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Fabio Zadrozny and others.
+ * Copyright (c) 2017 Fabio Zadrozny and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -284,6 +284,18 @@ public class StyledTextThemedScrollBarAdapter extends AbstractThemedScrollBarAda
 				gc.setBackground(background);
 			}
 		}
+
+		/**
+		 * This function is overridden to force an instantaneous redraw in the
+		 * StyledText whenever we change the selection on the vertical
+		 * scrollbar.
+		 */
+		@Override
+		protected void notifyScrollbarSelectionChanged(Scrollable scrollable, int detail) {
+			super.notifyScrollbarSelectionChanged(scrollable, detail);
+			StyledText styledText = (StyledText) scrollable;
+			styledText.update();
+		}
 	}
 
 	/**
@@ -379,6 +391,18 @@ public class StyledTextThemedScrollBarAdapter extends AbstractThemedScrollBarAda
 						fHandleDrawnRect.height, borderRadius, borderRadius);
 				gc.setBackground(background);
 			}
+		}
+
+		/**
+		 * This function is overridden to force an instantaneous redraw in the
+		 * StyledText whenever we change the selection on the horizontal
+		 * scrollbar.
+		 */
+		@Override
+		protected void notifyScrollbarSelectionChanged(Scrollable scrollable, int detail) {
+			super.notifyScrollbarSelectionChanged(scrollable, detail);
+			StyledText styledText = (StyledText) scrollable;
+			styledText.update();
 		}
 	}
 
