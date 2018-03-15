@@ -214,7 +214,8 @@ public class SearchField {
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				IHandlerService hs = SearchField.this.window.getContext().get(IHandlerService.class);
+				IHandlerService hs = SearchField.this.window.getContext()
+						.get(IHandlerService.class);
 				if (commandProvider.getContextSnapshot() == null) {
 					commandProvider.setSnapshot(hs.createContextSnapshot(true));
 				}
