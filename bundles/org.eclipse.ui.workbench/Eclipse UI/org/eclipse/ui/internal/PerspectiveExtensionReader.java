@@ -101,7 +101,8 @@ public class PerspectiveExtensionReader extends RegistryReader {
      */
     private boolean processExtension(IConfigurationElement element) {
         IConfigurationElement[] children = element.getChildren();
-        for (IConfigurationElement child : children) {
+        for (int nX = 0; nX < children.length; nX++) {
+            IConfigurationElement child = children[nX];
             String type = child.getName();
             if (includeTag(type)) {
                 boolean result = false;
@@ -359,8 +360,8 @@ public class PerspectiveExtensionReader extends RegistryReader {
      */
     public void setIncludeOnlyTags(String[] tags) {
         includeOnlyTags = new HashSet();
-        for (String tag : tags) {
-            includeOnlyTags.add(tag);
+        for (int i = 0; i < tags.length; i++) {
+            includeOnlyTags.add(tags[i]);
         }
     }
 }

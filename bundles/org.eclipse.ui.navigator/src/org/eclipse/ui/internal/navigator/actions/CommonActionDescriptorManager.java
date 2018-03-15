@@ -188,9 +188,10 @@ public class CommonActionDescriptorManager {
 			CommonActionProviderDescriptor[] unresolvedDescriptors = unresolvedDependentDescriptors
 					.toArray(new CommonActionProviderDescriptor[unresolvedDependentDescriptors
 							.size()]);
-			for (CommonActionProviderDescriptor unresolvedDescriptor : unresolvedDescriptors) {
-				errorMessage.append("\nUnresolved dependency specified for actionProvider: ") //$NON-NLS-1$
-						.append(unresolvedDescriptor.getDefinedId());
+			for (int i = 0; i < unresolvedDescriptors.length; i++) {
+				errorMessage
+						.append(
+								"\nUnresolved dependency specified for actionProvider: ").append(unresolvedDescriptors[i].getDefinedId()); //$NON-NLS-1$
 			}
 
 			NavigatorPlugin.log(IStatus.WARNING, 0, errorMessage.toString(),
@@ -329,12 +330,12 @@ public class CommonActionDescriptorManager {
 							"an <enablement/> or <possibleChildren /> expression. Please " + //$NON-NLS-1$
 							"review the documentation and correct this error.", null); //$NON-NLS-1$
 					}
-					for (IConfigurationElement actionProvider : actionProviders) {
+					for (int i = 0; i < actionProviders.length; i++) {
 						if(defaultEnablement == null) {
 							NavigatorPlugin.logError(0,
-									"Disabling actionProvider: " + actionProvider.getAttribute(ATT_ID), null); //$NON-NLS-1$
+											"Disabling actionProvider: " + actionProviders[i].getAttribute(ATT_ID), null); //$NON-NLS-1$
 						} else {
-							SafeRunner.run(new AddProviderSafeRunner(actionProvider, defaultEnablement, defaultPriority, anElement));
+							SafeRunner.run(new AddProviderSafeRunner(actionProviders[i], defaultEnablement, defaultPriority, anElement));
 						}
 					}
 				}

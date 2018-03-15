@@ -581,7 +581,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		List<MUIElement> parts = container.getChildren();
 		if (parts != null) {
 			MUIElement[] plist = parts.toArray(new MUIElement[parts.size()]);
-			for (MUIElement childME : plist) {
+			for (int i = 0; i < plist.length; i++) {
+				MUIElement childME = plist[i];
 				modelProcessSwitch(parentManager, (MToolBarElement) childME);
 			}
 		}
