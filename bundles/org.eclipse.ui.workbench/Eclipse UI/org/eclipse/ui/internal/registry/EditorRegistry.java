@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -640,7 +639,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                         .append(IWorkbenchConstants.EDITOR_FILE_NAME)
                         .toOSString());
                 reader = new BufferedReader(new InputStreamReader(stream,
-						StandardCharsets.UTF_8));
+                        "utf-8")); //$NON-NLS-1$
             } else {
                 reader = new StringReader(xmlString);
             }
@@ -790,20 +789,22 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 				}
 			}
             else { // guess at pre 3.1 format defaults
-				if (!editors.isEmpty()) {
+            		if (!editors.isEmpty()) {
 					IEditorDescriptor editor = editors.get(0);
-					defaultEditors.add(editor);
-				}
-				defaultEditors.addAll(Arrays.asList(mapping.getDeclaredDefaultEditors()));
+            			if (editor != null) {
+                			defaultEditors.add(editor);
+                		}
+            		}
+            		defaultEditors.addAll(Arrays.asList(mapping.getDeclaredDefaultEditors()));
             }
 
             // Add any new editors that have already been read from the registry
             // which were not deleted.
             IEditorDescriptor[] editorsArray = mapping.getEditors();
             for (int j = 0; j < editorsArray.length; j++) {
-				IEditorDescriptor descriptor = editorsArray[j];
-				if (descriptor != null && !contains(editors, descriptor) && !deletedEditors.contains(descriptor)) {
-					editors.add(descriptor);
+                if (!contains(editors, editorsArray[j])
+                        && !deletedEditors.contains(editorsArray[j])) {
+                    editors.add(editorsArray[j]);
                 }
             }
             // Map the editor(s) to the file type
@@ -859,7 +860,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                         .append(IWorkbenchConstants.RESOURCE_TYPE_FILE_NAME)
                         .toOSString());
                 reader = new BufferedReader(new InputStreamReader(stream,
-						StandardCharsets.UTF_8));
+                        "utf-8")); //$NON-NLS-1$
             } else {
                 reader = new StringReader(xmlString);
             }
