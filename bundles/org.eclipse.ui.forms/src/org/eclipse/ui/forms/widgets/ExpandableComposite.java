@@ -12,7 +12,6 @@
  *     Didier Villevalois - Fix for Bug 178534
  *     Robin Stocker - Fix for Bug 193034 (tool tip also on text)
  *     Alena Laskavaia - Bug 481604
- *     Ralf Petter - Bug 183675
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -875,7 +874,7 @@ public class ExpandableComposite extends Canvas {
 				getDescriptionControl().setVisible(expanded);
 			if (client != null)
 				client.setVisible(expanded);
-			requestLayout();
+			layout();
 		}
 	}
 
