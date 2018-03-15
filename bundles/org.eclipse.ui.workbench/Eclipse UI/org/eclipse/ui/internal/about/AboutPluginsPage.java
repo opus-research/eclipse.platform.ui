@@ -413,10 +413,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 		gridData.heightHint = convertVerticalDLUsToPixels(TABLE_HEIGHT);
 		vendorInfo.getTable().setLayoutData(gridData);
 
-		calculateAboutBundleData((bundleData) -> {
-			if (!vendorInfo.getTable().isDisposed())
-				vendorInfo.setInput(bundleData);
-		}, parent.getDisplay());
+		calculateAboutBundleData(vendorInfo::setInput, parent.getDisplay());
 	}
 
 	/**
