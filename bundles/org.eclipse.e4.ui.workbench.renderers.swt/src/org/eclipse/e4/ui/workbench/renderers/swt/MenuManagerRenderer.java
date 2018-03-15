@@ -17,7 +17,6 @@
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430, 472654, 460886
  *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -67,6 +66,7 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -118,95 +118,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	@Inject
 	@Optional
-	private void subscribeUIElementTopicAllRenderedVisibility(@UIEventTopic(UIEvents.UIElement.TOPIC_ALL) Event event) {
-		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-		String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
-
-		if (element instanceof MMenuItem) {
-			MMenuItem itemModel = (MMenuItem) element;
-			if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
-				Object obj = itemModel.getParent();
-				if (!(obj instanceof MMenu)) {
-					return;
-				}
-				MenuManager parent = getManager((MMenu) obj);
-				if (itemModel.isToBeRendered()) {
-					if (parent != null) {
-						modelProcessSwitch(parent, itemModel);
-					}
-				} else {
-					IContributionItem ici = getContribution(itemModel);
-					clearModelToContribution(itemModel, ici);
-					if (ici != null && parent != null) {
-						parent.remove(ici);
-					}
-					if (ici != null) {
-						ici.dispose();
-					}
-				}
-			}
-		}
-
-		if (element instanceof MPart) {
-			MPart part = (MPart) element;
-			if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
-				boolean tbr = (Boolean) event.getProperty(UIEvents.EventTags.NEW_VALUE);
-				if (!tbr) {
-					List<MMenu> menus = part.getMenus();
-					for (MMenu menu : menus) {
-						if (menu instanceof MPopupMenu)
-							unlinkMenu(menu);
-					}
-				}
-			}
-		}
-
-		if (UIEvents.UIElement.VISIBLE.equals(attName)) {
-			if (element instanceof MMenu) {
-				MMenu menuModel = (MMenu) element;
-				MenuManager manager = getManager(menuModel);
-				if (manager == null) {
-					return;
-				}
-				boolean visible = menuModel.isVisible();
-				manager.setVisible(visible);
-				if (manager.getParent() != null) {
-					manager.getParent().markDirty();
-					scheduleManagerUpdate(manager.getParent());
-				}
-				if (menuModel.getParent() == null) {
-					if (menuModel instanceof MPopupMenu) {
-						Object data = menuModel.getTransientData().get(IPresentationEngine.RENDERING_PARENT_KEY);
-						if (data instanceof Control) {
-							Menu menu = (Menu) menuModel.getWidget();
-							if (visible && menuModel.isToBeRendered() && menu != null && !menu.isDisposed()) {
-								((Control) data).setMenu(menu);
-							}
-							if (!visible) {
-								((Control) data).setMenu(null);
-							}
-						}
-					}
-				}
-			} else if (element instanceof MMenuElement) {
-				MMenuElement itemModel = (MMenuElement) element;
-				Object obj = getContribution(itemModel);
-				if (!(obj instanceof ContributionItem)) {
-					return;
-				}
-				ContributionItem item = (ContributionItem) obj;
-				item.setVisible(itemModel.isVisible());
-				if (item.getParent() != null) {
-					item.getParent().markDirty();
-					scheduleManagerUpdate(item.getParent());
-				}
-			}
-		}
-	}
-
-
-	@Inject
-	@Optional
 	private void subscribeUILabelTopicAll(@UIEventTopic(UIEvents.UILabel.TOPIC_ALL) Event event) {
 		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 
@@ -218,22 +129,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 		// nothing to do otherwise
 	}
-
-	@Inject
-	@Optional
-	private void subscribeItemEnabledUpdate(@UIEventTopic(UIEvents.Item.TOPIC_ENABLED) Event event) {
-		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(element instanceof MMenuItem)) {
-			return;
-		}
-
-		MMenuItem itemModel = (MMenuItem) element;
-		IContributionItem ici = getContribution(itemModel);
-		if (ici != null) {
-			ici.update();
-		}
-	}
-
 
 	/**
 	 * @param event
@@ -278,6 +173,93 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+	private EventHandler toBeRenderedUpdater = new EventHandler() {
+		@Override
+		public void handleEvent(Event event) {
+			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+			String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+			if (element instanceof MMenuItem) {
+				MMenuItem itemModel = (MMenuItem) element;
+				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
+					Object obj = itemModel.getParent();
+					if (!(obj instanceof MMenu)) {
+						return;
+					}
+					MenuManager parent = getManager((MMenu) obj);
+					if (itemModel.isToBeRendered()) {
+						if (parent != null) {
+							modelProcessSwitch(parent, itemModel);
+						}
+					} else {
+						IContributionItem ici = getContribution(itemModel);
+						clearModelToContribution(itemModel, ici);
+						if (ici != null && parent != null) {
+							parent.remove(ici);
+						}
+						if (ici != null) {
+							ici.dispose();
+						}
+					}
+				}
+			}
+
+			if (element instanceof MPart) {
+				MPart part = (MPart) element;
+				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
+					boolean tbr = (Boolean) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+					if (!tbr) {
+						List<MMenu> menus = part.getMenus();
+						for (MMenu menu : menus) {
+							if (menu instanceof MPopupMenu)
+								unlinkMenu(menu);
+						}
+					}
+				}
+			}
+
+			if (UIEvents.UIElement.VISIBLE.equals(attName)) {
+				if (element instanceof MMenu) {
+					MMenu menuModel = (MMenu) element;
+					MenuManager manager = getManager(menuModel);
+					if (manager == null) {
+						return;
+					}
+					boolean visible = menuModel.isVisible();
+					manager.setVisible(visible);
+					if (manager.getParent() != null) {
+						manager.getParent().markDirty();
+						scheduleManagerUpdate(manager.getParent());
+					}
+					if (menuModel.getParent() == null) {
+						if (menuModel instanceof MPopupMenu) {
+							Object data = menuModel.getTransientData().get(IPresentationEngine.RENDERING_PARENT_KEY);
+							if (data instanceof Control) {
+								Menu menu = (Menu) menuModel.getWidget();
+								if (visible && menuModel.isToBeRendered() && menu != null && !menu.isDisposed()) {
+									((Control) data).setMenu(menu);
+								}
+								if (!visible) {
+									((Control) data).setMenu(null);
+								}
+							}
+						}
+					}
+				} else if (element instanceof MMenuElement) {
+					MMenuElement itemModel = (MMenuElement) element;
+					Object obj = getContribution(itemModel);
+					if (!(obj instanceof ContributionItem)) {
+						return;
+					}
+					ContributionItem item = (ContributionItem) obj;
+					item.setVisible(itemModel.isVisible());
+					if (item.getParent() != null) {
+						item.getParent().markDirty();
+						scheduleManagerUpdate(item.getParent());
+					}
+				}
+			}
+		}
+	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
 		@Override
@@ -294,11 +276,28 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
+	private EventHandler enabledUpdater = new EventHandler() {
+		@Override
+		public void handleEvent(Event event) {
+			// Ensure that this event is for a MMenuItem
+			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
+				return;
+
+			MMenuItem itemModel = (MMenuItem) event.getProperty(UIEvents.EventTags.ELEMENT);
+			IContributionItem ici = getContribution(itemModel);
+			if (ici != null) {
+				ici.update();
+			}
+		}
+	};
+
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
 	public void init() {
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
+		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
+		eventBroker.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
 
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
@@ -332,6 +331,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(selectionUpdater);
+		eventBroker.unsubscribe(enabledUpdater);
+		eventBroker.unsubscribe(toBeRenderedUpdater);
 
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance().getShowHelper(), context);
 		MenuManagerEventHelper.getInstance().setShowHelper(null);
@@ -363,7 +364,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		boolean menuBar = false;
 
 		if (parent instanceof Decorations) {
-			MUIElement container = modelService.getContainer(element);
+			MUIElement container = (MUIElement) ((EObject) element).eContainer();
 			if (container instanceof MWindow) {
 				menuManager = getManager(menuModel);
 				if (menuManager == null) {
@@ -566,7 +567,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	private boolean isPartMenu(MMenu menuModel) {
 		// don't want popup menus as their visibility does not need to be
 		// tracked by a separate RunAndTrack
-		return !(menuModel instanceof MPopupMenu) && modelService.getContainer(menuModel) instanceof MPart;
+		return !(menuModel instanceof MPopupMenu) && ((EObject) menuModel).eContainer() instanceof MPart;
 	}
 
 	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<>();
