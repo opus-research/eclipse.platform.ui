@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,12 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063, 495917
  *     Friederike Schertel <friederike@schertel.org> - Bug 478336
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 504089, 509224, 509232
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.core.commands.Command;
@@ -23,17 +25,10 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 
 /**
  * This handler is used to switch between parts using the keyboard.
@@ -44,10 +39,11 @@ import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
  * @since 3.3
  *
  */
-public class CycleViewHandler extends CycleBaseHandler {
+public class CycleViewHandler extends FilteredTableBaseHandler {
 
 	@Override
-	protected void addItems(Table table, WorkbenchPage page) {
+	protected Object getInput(WorkbenchPage page) {
+		List<IWorkbenchPartReference> refs = new ArrayList<>();
 
 		EPartService partService = page.getWorkbenchWindow().getService(EPartService.class);
 		EModelService modelService = page.getWorkbenchWindow().getService(EModelService.class);
@@ -69,58 +65,41 @@ public class CycleViewHandler extends CycleBaseHandler {
 			if (!partService.isPartOrPlaceholderInPerspective(part.getElementId(), currentPerspective)) {
 				return;
 			}
-
 			if (part.getTags().contains("Editor")) { //$NON-NLS-1$
 				if (includeEditor.getAndSet(false)) {
-					createEditorItem(table, page, part);
+					addExistingReference(refs, part);
 				}
 			} else {
-				TableItem item = new TableItem(table, SWT.NONE);
-				item.setText(part.getLabel());
-				IWorkbenchWindow iwbw = page.getWorkbenchWindow();
-				if (iwbw instanceof WorkbenchWindow) {
-					WorkbenchWindow wbw = (WorkbenchWindow) iwbw;
-					if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
-						SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
-						item.setImage(r.getImage(part));
-					}
-				}
-				item.setData(part);
+				addExistingReference(refs, part);
 			}
 		});
+		return refs;
 
 	}
 
-	private void createEditorItem(Table table, WorkbenchPage page, MPart part) {
-		Object object = part.getObject();
-		TableItem item = new TableItem(table, SWT.NONE);
-		item.setText(WorkbenchMessages.CyclePartAction_editor);
-		if (object instanceof CompatibilityEditor) {
-			IEditorPart editor = ((CompatibilityEditor) object).getEditor();
-			item.setImage(editor.getTitleImage());
-			if (editor.getSite() instanceof PartSite) {
-				item.setData(((PartSite) editor.getSite()).getPartReference());
-				return;
-			}
-		} else {
-			item.setImage(getImage(page, part));
+	/*
+	 * Specialized to get the static label that was shown in the past (509232)
+	 */
+	@Override
+	protected String getWorkbenchPartReferenceText(WorkbenchPartReference ref) {
+		if (ref instanceof EditorReference) {
+			return WorkbenchMessages.CyclePartAction_editor;
+		} else if (ref instanceof ViewReference) {
+			return ref.getPartName();
 		}
-		item.setData(part);
+		return super.getWorkbenchPartReferenceText(ref);
 	}
 
-	private Image getImage(WorkbenchPage page, MPart part) {
-		Object renderer = part.getRenderer();
-		if (renderer instanceof SWTPartRenderer) {
-			SWTPartRenderer partRenderer = (SWTPartRenderer) renderer;
-			return partRenderer.getImage(part);
+	/**
+	 * Adds the {@link IWorkbenchPartReference} contained in part's transient
+	 * data, if exists.
+	 */
+	protected void addExistingReference(List<IWorkbenchPartReference> refs, MPart part) {
+		Object tData = part.getTransientData().get(IWorkbenchPartReference.class.getName());
+		if (tData instanceof IWorkbenchPartReference) {
+			// instanceof checks also for non null values
+			refs.add((IWorkbenchPartReference) tData);
 		}
-		WorkbenchWindow wbw = (WorkbenchWindow) page.getWorkbenchWindow();
-		if (wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
-			SWTPartRenderer partRenderer = (SWTPartRenderer) wbw.getModel().getRenderer();
-			return partRenderer.getImage(part);
-		}
-
-		return null;
 	}
 
 	@Override

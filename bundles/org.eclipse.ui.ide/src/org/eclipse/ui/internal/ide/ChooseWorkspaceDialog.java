@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.window.Window;
@@ -41,6 +40,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -74,7 +74,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 
     private boolean centerOnMonitor = false;
 
-	private Map<String, Composite> recentWorkspacesComposites;
+	private Map<String, Link> recentWorkspacesLinks;
 
 	private Form recentWorkspacesForm;
 
@@ -176,19 +176,16 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 			createRecentWorkspacesComposite(composite);
 		}
 
-        // look for the eclipse.gcj property.
-        // If true, then we dont need any warning messages.
-        // someone is asserting that we're okay on GCJ
-        boolean gcj = Boolean.getBoolean("eclipse.gcj"); //$NON-NLS-1$
-		String vmName = System.getProperty("java.vm.name");//$NON-NLS-1$
-		if (!gcj && vmName != null && vmName.indexOf("libgcj") != -1) { //$NON-NLS-1$
-			composite.getDisplay().asyncExec(() -> setMessage(IDEWorkbenchMessages.UnsupportedVM_message,
-					IMessageProvider.WARNING));
-		}
-
         Dialog.applyDialogFont(composite);
         return composite;
     }
+
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		// create OK and Cancel buttons by default
+		createButton(parent, IDialogConstants.OK_ID, IDEWorkbenchMessages.ChooseWorkspaceDialog_launchLabel, true);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+	}
 
 	/**
 	 * Returns the title that the dialog (or splash) should have.
@@ -258,9 +255,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		launchData.setRecentWorkspaces(recentWorkpaces.toArray(new String[0]));
 		launchData.writePersistedData();
 		// Remove Workspace Composite
-		recentWorkspacesComposites.get(workspace).dispose();
-		recentWorkspacesComposites.remove(workspace);
-		if (recentWorkspacesComposites.isEmpty()) {
+		recentWorkspacesLinks.get(workspace).dispose();
+		recentWorkspacesLinks.remove(workspace);
+		if (recentWorkspacesLinks.isEmpty()) {
 			recentWorkspacesForm.dispose();
 		}
 		getShell().layout();
@@ -317,11 +314,11 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 
 		Composite panel = new Composite(expandableComposite, SWT.NONE);
 		expandableComposite.setClient(panel);
-		RowLayout layout = new RowLayout();
-		layout.type = SWT.VERTICAL;
+		RowLayout layout = new RowLayout(SWT.VERTICAL);
 		layout.marginLeft = 14;
+		layout.spacing = 6;
 		panel.setLayout(layout);
-		recentWorkspacesComposites = new HashMap<>(launchData.getRecentWorkspaces().length);
+		recentWorkspacesLinks = new HashMap<>(launchData.getRecentWorkspaces().length);
 		Map<String, String> uniqueWorkspaceNames = createUniqueWorkspaceNameMap();
 
 		List<String> recentWorkspacesList = Arrays.asList(launchData.getRecentWorkspaces()).stream()
@@ -333,22 +330,18 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		for (Entry<String, String> uniqueWorkspaceEntry : sortedList) {
 			final String recentWorkspace = uniqueWorkspaceEntry.getValue();
 
-			Composite recentWorkspacePanel = new Composite(panel, SWT.NONE);
-			recentWorkspacesComposites.put(recentWorkspace, recentWorkspacePanel);
-			GridLayout recentWorkspacePanelLayout = new GridLayout(3, false);
-			recentWorkspacePanel.setLayout(recentWorkspacePanelLayout);
-
-			Link link = new Link(recentWorkspacePanel, SWT.WRAP);
-			link.setLayoutData(new GridData(500, SWT.DEFAULT));
-			link.setText("<a>" + uniqueWorkspaceEntry.getKey() + "</a>"); //$NON-NLS-1$//$NON-NLS-2$
+			Link link = new Link(panel, SWT.WRAP);
+			link.setLayoutData(new RowData(SWT.DEFAULT, SWT.DEFAULT));
+			link.setText("<a>" + uniqueWorkspaceEntry.getKey() + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
 			link.setToolTipText(recentWorkspace);
-
 			link.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
 					workspaceSelected(recentWorkspace);
 				}
 			});
+
+			recentWorkspacesLinks.put(recentWorkspace, link);
 
 			Menu menu = new Menu(link);
 			MenuItem forgetItem = new MenuItem(menu, SWT.PUSH);
@@ -365,22 +358,37 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 
 	/**
 	 * Creates a map with unique WorkspaceNames for the
-	 * RecentWorkspacesComposite.
-	 *
+	 * RecentWorkspacesComposite. The values are full absolute paths of recently
+	 * used workspaces, the keys are unique segments somehow made from the
+	 * values.
 	 */
 	private Map<String, String> createUniqueWorkspaceNameMap() {
 		final String fileSeparator = File.separator;
 		Map<String, String> uniqueWorkspaceNameMap = new HashMap<>();
+
+		// Convert workspace paths to arrays of single path segments
 		List<String[]> splittedWorkspaceNames = Arrays.asList(launchData.getRecentWorkspaces()).stream()
 				.filter(s -> s != null && !s.isEmpty()).map(s -> s.split(Pattern.quote(fileSeparator)))
 				.collect(Collectors.toList());
+
+		// create and collect unique workspace keys produced from arrays,
+		// try to generate unique keys starting with the last segment of the
+		// workspace path, increasing number of segments if no unique names
+		// could be generated,
+		// loop until all array values are removed from array list
 		for (int i = 1; !splittedWorkspaceNames.isEmpty(); i++) {
 			final int c = i;
+
+			// Function which flattens arrays to (hopefully unique) keys
 			Function<String[], String> stringArraytoName = s -> String.join(fileSeparator,
-					Arrays.copyOfRange(s, s.length - c, s.length));
+					s.length < c ? s : Arrays.copyOfRange(s, s.length - c, s.length));
+
+			// list of found unique keys
 			List<String> uniqueNames = splittedWorkspaceNames.stream().map(stringArraytoName)
 					.collect(Collectors.groupingBy(s -> s, Collectors.counting())).entrySet().stream()
 					.filter(e -> e.getValue() == 1).map(e -> e.getKey()).collect(Collectors.toList());
+
+			// remove paths for which we have found unique keys
 			splittedWorkspaceNames.removeIf(a -> {
 				String joined = stringArraytoName.apply(a);
 				if (uniqueNames.contains(joined)) {
@@ -519,10 +527,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
     }
 
     private void setInitialTextValues(Combo text) {
-        String[] recentWorkspaces = launchData.getRecentWorkspaces();
-        for (int i = 0; i < recentWorkspaces.length; ++i) {
-			if (recentWorkspaces[i] != null) {
-				text.add(recentWorkspaces[i]);
+		for (String recentWorkspace : launchData.getRecentWorkspaces()) {
+			if (recentWorkspace != null) {
+				text.add(recentWorkspace);
 			}
 		}
 
