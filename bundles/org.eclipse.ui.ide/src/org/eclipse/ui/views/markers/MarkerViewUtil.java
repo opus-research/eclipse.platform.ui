@@ -85,8 +85,28 @@ public class MarkerViewUtil {
 	 */
 	public static boolean showMarker(IWorkbenchPage page, IMarker marker,
 			boolean showView) {
+		return showMarkers(page, new IMarker[] { marker }, showView);
+	}
 
+	/**
+	 * Shows the given markers in the appropriate view in the given page. This
+	 * must be called from the UI thread.
+	 *
+	 * @param page
+	 *            the workbench page in which to show the markers
+	 * @param markers
+	 *            the markers to show
+	 * @param showView
+	 *            <code>true</code> if the view should be shown first
+	 *            <code>false</code> to only show the markers if the view is
+	 *            already showing
+	 * @return <code>true</code> if the markers were successfully shown,
+	 *         <code>false</code> if not
+	 * @since 3.12
+	 */
+	public static boolean showMarkers(IWorkbenchPage page, IMarker[] markers, boolean showView) {
 		boolean returnValue = false;
+		IMarker marker = markers[0];
 		try {
 			String viewId = getViewId(marker);
 			if (viewId == null) // Use the problem view by default
@@ -95,11 +115,39 @@ public class MarkerViewUtil {
 			IViewPart view = showView ? page.showView(viewId) : page
 					.findView(viewId);
 			if (view != null)
-				returnValue = MarkerSupportInternalUtilities.showMarker(view,
-						marker);
+				returnValue = MarkerSupportInternalUtilities.showMarkers(view, markers);
+
+			// If we have already shown the new one do not open another one
+			viewId = getLegacyViewId(marker);
+			if (viewId != null) {
+				if (returnValue)
+					view = page.findView(viewId);
+				else
+					view = showView ? page.showView(viewId) : page
+							.findView(viewId);
+			}
 		} catch (CoreException e) {
 			Policy.handle(e);
 		}
 		return returnValue;
 	}
+
+	/**
+	 * Returns the id of the view used to show markers of the same type as the
+	 * given marker using.legacy support
+	 *
+	 * @param marker
+	 *            the marker
+	 * @return the view id or <code>null</code> if no appropriate view could
+	 *         be determined
+	 * @throws CoreException
+	 *             if an exception occurs testing the type of the marker
+	 */
+	private static String getLegacyViewId(IMarker marker) throws CoreException {
+		String viewId = getViewId(marker);
+		if (viewId == null)
+			return null;
+		return viewId + MarkerSupportInternalUtilities.LEGACY_SUFFIX;
+	}
+
 }
