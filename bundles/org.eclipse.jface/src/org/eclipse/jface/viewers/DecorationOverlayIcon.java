@@ -163,7 +163,7 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 				drawImage(overlayImageProvider, getSize().x - overlayWidth, 0);
                 break;
             case IDecoration.BOTTOM_LEFT:
-				int overlayHeight = overlayImageProvider.getHeight();
+				int overlayHeight = overlayImageProvider.getWidth();
 				drawImage(overlayImageProvider, 0, getSize().y - overlayHeight);
                 break;
             case IDecoration.BOTTOM_RIGHT:
