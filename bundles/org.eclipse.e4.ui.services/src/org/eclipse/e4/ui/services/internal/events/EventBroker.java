@@ -27,6 +27,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.internal.services.Activator;
 import org.eclipse.e4.ui.internal.services.ServiceMessages;
+import org.eclipse.osgi.util.NLS;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -79,14 +80,14 @@ public class EventBroker implements IEventBroker {
 		Activator activator = Activator.getDefault();
 		if (activator == null) {
 			if (logger != null) {
-				logger.error(ServiceMessages.NO_EVENT_ADMIN, event.toString());
+				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			}
 			return false;
 		}
 		EventAdmin eventAdmin = activator.getEventAdmin();
 		if (eventAdmin == null) {
 			if (logger != null) {
-				logger.error(ServiceMessages.NO_EVENT_ADMIN, event.toString());
+				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			}
 			return false;
 		}
@@ -100,14 +101,14 @@ public class EventBroker implements IEventBroker {
 		Activator activator = Activator.getDefault();
 		if (activator == null) {
 			if (logger != null) {
-				logger.error(ServiceMessages.NO_EVENT_ADMIN, event.toString());
+				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			}
 			return false;
 		}
 		EventAdmin eventAdmin = activator.getEventAdmin();
 		if (eventAdmin == null) {
 			if (logger != null) {
-				logger.error(ServiceMessages.NO_EVENT_ADMIN, event.toString());
+				logger.error(NLS.bind(ServiceMessages.NO_EVENT_ADMIN, event.toString()));
 			}
 			return false;
 		}
@@ -173,7 +174,7 @@ public class EventBroker implements IEventBroker {
 		BundleContext bundleContext = Activator.getDefault().getBundleContext();
 		if (bundleContext == null) {
 			if (logger != null) {
-				logger.error(ServiceMessages.NO_BUNDLE_CONTEXT, topic);
+				logger.error(NLS.bind(ServiceMessages.NO_BUNDLE_CONTEXT, topic));
 			}
 			return false;
 		}
