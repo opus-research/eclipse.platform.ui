@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     René Brandstetter - Bug 433778
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491410, 476045
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -91,13 +92,14 @@ public class QuickAccessDialog extends PopupDialog {
 
 					@Override
 					public void run() {
-						final CommandProvider commandProvider = new CommandProvider();
+						MApplication application = model.getContext().get(MApplication.class);
+						final CommandProvider commandProvider = new CommandProvider(application.getContext());
 						commandProvider.setSnapshot(new ExpressionContext(model.getContext()
 								.getActiveLeaf()));
 						QuickAccessProvider[] providers = new QuickAccessProvider[] {
 								new PreviousPicksProvider(previousPicksList),
 								new EditorProvider(),
-								new ViewProvider(model.getContext().get(MApplication.class), model),
+								new ViewProvider(application, model),
 								new PerspectiveProvider(), commandProvider, new ActionProvider(),
 								new WizardProvider(), new PreferenceProvider(),
 								new PropertiesProvider() };
