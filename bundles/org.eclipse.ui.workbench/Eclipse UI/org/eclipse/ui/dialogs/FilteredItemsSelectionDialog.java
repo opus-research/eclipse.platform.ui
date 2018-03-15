@@ -685,7 +685,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		});
 
 		list.addSelectionChangedListener(event -> {
-			StructuredSelection selection = (StructuredSelection) event.getSelection();
+			StructuredSelection selection = (StructuredSelection) event
+					.getSelection();
 			handleSelected(selection);
 		});
 
@@ -719,7 +720,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 				if (e.keyCode == SWT.ARROW_UP && (e.stateMask & SWT.SHIFT) != 0
 						&& (e.stateMask & SWT.CTRL) != 0) {
-					StructuredSelection selection = (StructuredSelection) list.getStructuredSelection();
+					StructuredSelection selection = (StructuredSelection) list
+							.getSelection();
 
 					if (selection.size() == 1) {
 						Object element = selection.getFirstElement();
@@ -1079,7 +1081,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 	 */
 	protected StructuredSelection getSelectedItems() {
 
-		StructuredSelection selection = (StructuredSelection) list.getStructuredSelection();
+		StructuredSelection selection = (StructuredSelection) list
+				.getSelection();
 
 		List selectedItems = selection.toList();
 		Object itemToRemove = null;
