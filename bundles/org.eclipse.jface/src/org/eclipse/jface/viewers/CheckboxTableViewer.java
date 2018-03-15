@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 498086
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -44,7 +43,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     /**
      * List of check state listeners (element type: <code>ICheckStateListener</code>).
      */
-	private ListenerList<ICheckStateListener> checkStateListeners = new ListenerList<>();
+    private ListenerList checkStateListeners = new ListenerList();
 
     /**
      * Provides the desired state of the check boxes.
@@ -206,7 +205,9 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      * @see ICheckStateListener#checkStateChanged
      */
     private void fireCheckStateChanged(final CheckStateChangedEvent event) {
-		for (ICheckStateListener l : checkStateListeners) {
+        Object[] array = checkStateListeners.getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -419,7 +420,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      * @param elements the list of checked elements (element type: <code>Object</code>)
      * @see #getCheckedElements
      */
-	public void setCheckedElements(Object... elements) {
+    public void setCheckedElements(Object[] elements) {
         assertElementsNotNull(elements);
         CustomHashtable set = newHashtable(elements.length * 2 + 1);
         for (int i = 0; i < elements.length; ++i) {
@@ -473,7 +474,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      *
      * @see #getGrayedElements
      */
-	public void setGrayedElements(Object... elements) {
+    public void setGrayedElements(Object[] elements) {
         assertElementsNotNull(elements);
         CustomHashtable set = newHashtable(elements.length * 2 + 1);
         for (int i = 0; i < elements.length; ++i) {
