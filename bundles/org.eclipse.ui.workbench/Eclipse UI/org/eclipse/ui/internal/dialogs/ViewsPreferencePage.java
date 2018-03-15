@@ -512,9 +512,10 @@ public class ViewsPreferencePage extends PreferencePage implements
 		String description = ""; //$NON-NLS-1$
 		IThemeDescriptor[] descs = WorkbenchPlugin.getDefault().getThemeRegistry().getThemes();
 
-		for (int i = 0; theme != null && description == null && i < descs.length; i++) {
+		for (int i = 0; theme != null && i < descs.length; i++) {
 			if (descs[i].getId().equals(theme.getId())) {
 				description = descs[i].getDescription();
+				break;
 			}
 		}
 		colorsAndFontsThemeDescriptionText.setText(description);
