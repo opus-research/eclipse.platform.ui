@@ -100,8 +100,6 @@ public abstract class AbstractContributionItem extends ContributionItem {
 	 */
 	private boolean logged = false;
 
-	private int updatePerformedState;
-
 	/**
 	 *
 	 */
@@ -544,35 +542,8 @@ public abstract class AbstractContributionItem extends ContributionItem {
 		return null;
 	}
 
+
 	protected void updateItemEnablement() {
-		if (updatePerformedState == 0) {
-			// Perform the action immediately so that Computation like RATs work
-			// appropriately
-			updatePerformedState = 1;
-			performUpdateItemEnablement();
-
-			// Schedule reset of state
-			Display current = Display.getCurrent();
-			Runnable scheduledUpdate = () -> {
-				updatePerformedState = 0;
-			};
-			current.asyncExec(scheduledUpdate);
-
-		} else if (updatePerformedState == 1) {
-			// Another request has been issued - Schedule a runnable to execute
-			// at the end
-			updatePerformedState = 2;
-			Display current = Display.getCurrent();
-			Runnable scheduledUpdate = () -> {
-				performUpdateItemEnablement();
-			};
-			current.asyncExec(scheduledUpdate);
-		} else {
-			// Skip all other update requests
-		}
-	}
-
-	private void performUpdateItemEnablement() {
 		if (!(modelItem.getWidget() instanceof ToolItem))
 			return;
 
