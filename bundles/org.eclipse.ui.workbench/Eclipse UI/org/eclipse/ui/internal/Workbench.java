@@ -309,45 +309,31 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		private final int maximumProgressCount;
 
+		int increment = 0;
+
+
 		// stack of names of bundles currently starting
-		private final List<String> starting;
 
 		StartupProgressBundleListener(IProgressMonitor progressMonitor, int maximumProgressCount) {
-			super();
 			this.progressMonitor = progressMonitor;
 			this.maximumProgressCount = maximumProgressCount;
-			this.starting = new ArrayList<>();
+
 		}
 
 		@Override
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
-			String bundleName;
-
-			synchronized (this) {
-				if (eventType == BundleEvent.STARTING) {
-					starting.add(bundleName = event.getBundle().getSymbolicName());
-				} else if (eventType == BundleEvent.STARTED) {
-					progressCount++;
-					if (progressCount <= maximumProgressCount) {
-						progressMonitor.worked(1);
+			if (eventType == BundleEvent.STARTED) {
+				progressCount++;
+				if (progressCount <= maximumProgressCount) {
+					if (increment <= 4) {
+						increment++;
 					}
-					int index = starting.lastIndexOf(event.getBundle().getSymbolicName());
-					if (index >= 0) {
-						starting.remove(index);
+					else {
+						progressMonitor.worked(4);
+						increment = 0;
 					}
-					if (index != starting.size()) {
-						return; // not currently displayed
-					}
-					bundleName = index == 0 ? null : (String) starting.get(index - 1);
-				} else {
-					return; // uninteresting event
 				}
-			}
-
-			if (bundleName != null) {
-				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
-				progressMonitor.subTask(taskName);
 			}
 		}
 	}
@@ -661,14 +647,15 @@ public final class Workbench extends EventManager implements IWorkbench,
 									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
 
 					IProgressMonitor progressMonitor = null;
+					SynchronousBundleListener bundleListener = null;
 					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
 							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
 									.getBundleCount() / 10);
-							progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
-							SynchronousBundleListener bundleListener = workbench.new StartupProgressBundleListener(
+							progressMonitor.beginTask("Loading...", expectedProgressCount); //$NON-NLS-1$
+							bundleListener = workbench.new StartupProgressBundleListener(
 									progressMonitor, (int) (expectedProgressCount * cutoff));
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
@@ -682,8 +669,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 								WorkbenchPlugin.getDefault().getViewRegistry());
 						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration finished", null)); //$NON-NLS-1$
 					}
+
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
+						if (bundleListener != null) {
+							WorkbenchPlugin.getDefault().removeBundleListener(bundleListener);
+						}
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
 						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
 						wms.dispose();
