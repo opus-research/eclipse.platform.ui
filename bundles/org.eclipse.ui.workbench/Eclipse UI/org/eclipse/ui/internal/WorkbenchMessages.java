@@ -458,6 +458,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ViewsPreference_visibleTabs_description;
 	public static String ViewsPreference_enableMRU;
 	public static String ViewsPreference_useColoredLabels;
+	public static String ToggleFullScreenMode_ActivationPopup_Description;
 
 	// --- File Editors ---
 	public static String FileEditorPreference_fileTypes;
