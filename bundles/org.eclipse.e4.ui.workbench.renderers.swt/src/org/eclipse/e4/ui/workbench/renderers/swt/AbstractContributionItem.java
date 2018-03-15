@@ -28,7 +28,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
-import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -64,7 +63,6 @@ import org.eclipse.swt.widgets.Widget;
  */
 public abstract class AbstractContributionItem extends ContributionItem {
 
-	protected static final String HELP_CONTEXT_ID = "HelpContextId"; //$NON-NLS-1$
 	protected static final String FORCE_TEXT = "FORCE_TEXT"; //$NON-NLS-1$
 	protected static final String ICON_URI = "iconURI"; //$NON-NLS-1$
 	protected static final String DISABLED_URI = "disabledURI"; //$NON-NLS-1$
@@ -79,10 +77,6 @@ public abstract class AbstractContributionItem extends ContributionItem {
 
 	@Inject
 	private EModelService modelService;
-
-	@Inject
-	@Optional
-	protected EHelpService helpService;
 
 	protected Widget widget;
 	protected Listener menuItemListener;
@@ -496,13 +490,7 @@ public abstract class AbstractContributionItem extends ContributionItem {
 	/**
 	 *
 	 */
-	protected void handleHelpRequest() {
-		if (helpService == null)
-			return;
-		String helpContextId = getModel().getPersistedState().get(HELP_CONTEXT_ID);
-		if (helpContextId != null)
-			helpService.displayHelp(helpContextId);
-	}
+	protected abstract void handleHelpRequest();
 
 	/**
 	 * @param event
