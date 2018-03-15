@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -48,11 +47,6 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * @since 3.0
  */
 public class DeferredTreeContentManager {
-
-	/**
-	 *
-	 */
-	public static final String P2_UI_FETCH_DONE = "p2/ui/fetch/done"; //$NON-NLS-1$
 
 	AbstractTreeViewer treeViewer;
 
@@ -296,8 +290,6 @@ public class DeferredTreeContentManager {
 			@Override
 			public void done(IJobChangeEvent event) {
 				runClearPlaceholderJob(placeholder);
-				IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
-				eventBroker.post(P2_UI_FETCH_DONE, parent);
 			}
 		});
 		job.setRule(adapter.getRule(parent));
