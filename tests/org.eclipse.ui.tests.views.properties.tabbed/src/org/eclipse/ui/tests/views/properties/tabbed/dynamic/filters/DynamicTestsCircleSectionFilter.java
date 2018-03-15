@@ -20,7 +20,6 @@ import org.eclipse.ui.tests.views.properties.tabbed.dynamic.model.DynamicTestsSh
 public class DynamicTestsCircleSectionFilter extends
 		DynamicTestsElementSectionFilter {
 
-	@Override
 	protected boolean appliesToShape(DynamicTestsShape shape) {
 		return DynamicTestsShape.CIRCLE.equals(shape);
 	}

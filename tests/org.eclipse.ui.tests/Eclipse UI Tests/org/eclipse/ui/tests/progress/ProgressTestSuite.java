@@ -7,13 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Red Hat Inc. - Bug 474132
  ******************************************************************************/
 
 package org.eclipse.ui.tests.progress;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Test suite for the Progress View and related API
@@ -22,14 +21,20 @@ import org.junit.runners.Suite;
  * @author Prakash G.R. (grprakash@in.ibm.com)
  *
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-	ProgressContantsTest.class,
-	ProgressViewTests.class,
-	JobInfoTest.class,
-	JobInfoTestOrdering.class,
-	ProgressAnimationItemTest.class
-})
-public class ProgressTestSuite {
+public class ProgressTestSuite extends TestSuite {
 
+	/**
+	 * Returns the suite. This is required to use the JUnit Launcher.
+	 */
+	public static final Test suite() {
+		return new ProgressTestSuite();
+	}
+
+	public ProgressTestSuite() {
+		addTest(new TestSuite(ProgressContantsTest.class));
+		addTest(new TestSuite(ProgressViewTests.class));
+		addTest(new TestSuite(JobInfoTest.class));
+		addTest(new TestSuite(JobInfoTestOrdering.class));
+		addTest(new TestSuite(ProgressAnimationItemTest.class));
+	}
 }

@@ -94,6 +94,9 @@ public final class Context extends NamedHandleObject implements Comparable {
         listeners.add(listener);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     @Override
 	public final int compareTo(final Object object) {
         final Context scheme = (Context) object;

@@ -37,8 +37,7 @@ public class TabbedPropertySheetPageTest
 
     private TreeNode[] treeNodes;
 
-    @Override
-	protected void setUp()
+    protected void setUp()
         throws Exception {
         super.setUp();
 
@@ -77,8 +76,7 @@ public class TabbedPropertySheetPageTest
         assertEquals(treeNodes.length, 8);
     }
 
-    @Override
-	protected void tearDown()
+    protected void tearDown()
         throws Exception {
         super.tearDown();
 

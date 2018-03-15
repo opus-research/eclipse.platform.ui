@@ -25,7 +25,6 @@ import org.eclipse.ui.tests.views.properties.tabbed.dynamic.model.DynamicTestsEl
 public class DynamicTestsTitleBarLabelProvider extends
 		org.eclipse.jface.viewers.LabelProvider {
 
-	@Override
 	public Image getImage(Object obj) {
 		Assert.isTrue(obj instanceof IStructuredSelection);
 		IStructuredSelection structuredSelection = (IStructuredSelection) obj;
@@ -38,7 +37,6 @@ public class DynamicTestsTitleBarLabelProvider extends
 		return dynamicTestsElement.getImage();
 	}
 
-	@Override
 	public String getText(Object obj) {
 		Assert.isTrue(obj instanceof IStructuredSelection);
 		IStructuredSelection structuredSelection = (IStructuredSelection) obj;

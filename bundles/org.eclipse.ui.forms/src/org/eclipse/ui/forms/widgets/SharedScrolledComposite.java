@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2015 IBM Corporation and others.
+ *  Copyright (c) 2000, 2011 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -62,7 +62,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	public SharedScrolledComposite(Composite parent, int style) {
 		super(parent, style);
 		addListener(SWT.Resize, new Listener() {
-			@Override
 			public void handleEvent(Event e) {
 				if (!ignoreResizes) {
 					scheduleReflow(false);
@@ -78,7 +77,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 * @param fg
 	 *            the new foreground color
 	 */
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		if (getContent() != null)
@@ -91,7 +89,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 * @param bg
 	 *            the new background color
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if (getContent() != null)
@@ -102,7 +99,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 * Sets the font of the form. This font will be used to render the title
 	 * text. It will not affect the body.
 	 */
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (getContent() != null)
@@ -112,7 +108,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	/**
 	 * Overrides 'super' to pass the proper colors and font
 	 */
-	@Override
 	public void setContent(Control content) {
 		super.setContent(content);
 		if (content != null) {
@@ -125,7 +120,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	/**
 	 * If content is set, transfers focus to the content.
 	 */
-	@Override
 	public boolean setFocus() {
 		boolean result;
 		FormUtil.setFocusScrollingEnabled(this, false);
@@ -137,7 +131,11 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.swt.widgets.Composite#layout(boolean)
+	 */
 	public void layout(boolean changed) {
 		if (ignoreLayouts) {
 			return;
@@ -149,13 +147,21 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		ignoreResizes = false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.swt.custom.ScrolledComposite#setExpandHorizontal(boolean)
+	 */
 	public void setExpandHorizontal(boolean expand) {
 		expandHorizontal = expand;
 		super.setExpandHorizontal(expand);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.swt.custom.ScrolledComposite#setExpandVertical(boolean)
+	 */
 	public void setExpandVertical(boolean expand) {
 		expandVertical = expand;
 		super.setExpandVertical(expand);
@@ -226,7 +232,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 			}
 			reflowPending = true;
 			getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					reflowPending = false;
 					if (!isDisposed())

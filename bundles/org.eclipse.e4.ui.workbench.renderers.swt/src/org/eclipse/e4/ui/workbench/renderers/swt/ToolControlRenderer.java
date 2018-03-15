@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela <sopotcela@gmail.com> - Bug 431868, 472761
+ *     Sopot Cela <sopotcela@gmail.com> - Bug 431868
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431868
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -125,7 +125,8 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			sep.setWidth(newCtrl.getSize().x);
 		}
 
-		bindWidget(toolControl, newCtrl);
+		setCSSInfo(toolControl, newCtrl);
+
 		boolean vertical = false;
 		MUIElement parentElement = element.getParent();
 		if (parentElement instanceof MTrimBar) {
@@ -134,9 +135,7 @@ public class ToolControlRenderer extends SWTPartRenderer {
 					|| bar.getSide() == SideValue.RIGHT;
 		}
 		CSSRenderingUtils cssUtils = parentContext.get(CSSRenderingUtils.class);
-		MUIElement modelElement = (MUIElement) newCtrl.getData(AbstractPartRenderer.OWNING_ME);
-		boolean draggable = ((modelElement != null) && (modelElement.getTags().contains(IPresentationEngine.DRAGGABLE)));
-		newCtrl = cssUtils.frameMeIfPossible(newCtrl, null, vertical, draggable);
+		newCtrl = cssUtils.frameMeIfPossible(newCtrl, null, vertical, true);
 
 		boolean hideable = isHideable(toolControl);
 		boolean showRestoreMenu = isRestoreMenuShowable(toolControl);
@@ -215,7 +214,6 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			MenuItem hideItem = new MenuItem(toolControlMenu, SWT.NONE);
 			hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
 			hideItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					toolControl.getTags().add(
 							IPresentationEngine.HIDDEN_EXPLICITLY);
@@ -229,7 +227,6 @@ public class ToolControlRenderer extends SWTPartRenderer {
 		restoreHiddenItems
 				.setText(Messages.ToolBarManagerRenderer_MenuRestoreText);
 		restoreHiddenItems.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				removeHiddenTags(toolControl);
 			}

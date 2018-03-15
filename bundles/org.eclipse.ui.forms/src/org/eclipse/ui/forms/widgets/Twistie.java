@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2015 IBM Corporation and others.
+ *  Copyright (c) 2000, 2008 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -55,7 +55,6 @@ public class Twistie extends ToggleHyperlink {
 	/*
 	 * @see SelectableControl#paint(GC)
 	 */
-	@Override
 	protected void paintHyperlink(GC gc) {
 		Color bg;
 		if (!isEnabled())
@@ -90,7 +89,11 @@ public class Twistie extends ToggleHyperlink {
 		return target;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.swt.widgets.Control#setEnabled(boolean)
+	 */
 	public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		redraw();
