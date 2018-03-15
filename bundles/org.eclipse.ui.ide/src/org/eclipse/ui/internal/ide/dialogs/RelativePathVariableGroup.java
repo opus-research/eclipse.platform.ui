@@ -150,10 +150,10 @@ public class RelativePathVariableGroup {
 		String[] variables = pathVariableManager.getPathVariableNames();
 
 		ArrayList items = new ArrayList();
-		for (String variable : variables) {
-			if (variable.equals("PARENT")) //$NON-NLS-1$
+		for (int i = 0; i < variables.length; i++) {
+			if (variables[i].equals("PARENT")) //$NON-NLS-1$
 				continue;
-			items.add(variable);
+			items.add(variables[i]);
 		}
 		items.add(IDEWorkbenchMessages.ImportTypeDialog_editVariables);
 		variableCombo.setItems((String[]) items.toArray(new String[0]));
@@ -251,12 +251,12 @@ public class RelativePathVariableGroup {
 	public static String getPreferredVariable(IPath[] paths,
 			IContainer target) {
 		IPath commonRoot = null;
-		for (IPath path : paths) {
-			if (path != null) {
+		for (int i = 0; i < paths.length; i++) {
+			if (paths[i] != null) {
 				if (commonRoot == null)
-					commonRoot = path;
+					commonRoot = paths[i];
 				else  {
-					int count = commonRoot.matchingFirstSegments(path);
+					int count = commonRoot.matchingFirstSegments(paths[i]);
 					int remainingSegments = commonRoot.segmentCount() - count;
 					if (remainingSegments <= 0)
 						return null;
@@ -272,9 +272,9 @@ public class RelativePathVariableGroup {
 		IPathVariableManager pathVariableManager = target.getPathVariableManager();
 		String [] variables = pathVariableManager.getPathVariableNames();
 
-		for (String variable : variables) {
-			if (isPreferred(variable)) {
-				URI rawValue = pathVariableManager.getURIValue(variable);
+		for (int i = 0; i < variables.length; i++) {
+			if (isPreferred(variables[i])) {
+				URI rawValue = pathVariableManager.getURIValue(variables[i]);
 				URI value = pathVariableManager.resolveURI(rawValue);
 				if (value != null) {
 					IPath path = URIUtil.toPath(value);
@@ -283,7 +283,7 @@ public class RelativePathVariableGroup {
 						if (difference > 0) {
 							if (difference < mostAppropriateCount) {
 								mostAppropriateCount = difference;
-								mostAppropriate = variable;
+								mostAppropriate = variables[i];
 							}
 						}
 						else {
@@ -292,7 +292,7 @@ public class RelativePathVariableGroup {
 							if (difference > 0) {
 								if (difference < mostAppropriateCountToParent) {
 									mostAppropriateCountToParent = difference;
-									mostAppropriateToParent = variable;
+									mostAppropriateToParent = variables[i];
 								}
 							}
 						}

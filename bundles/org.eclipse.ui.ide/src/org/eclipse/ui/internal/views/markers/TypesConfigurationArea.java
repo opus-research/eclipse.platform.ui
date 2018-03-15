@@ -214,9 +214,9 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 	public void apply(MarkerFieldFilter filter) {
 		Collection<MarkerType> selectedTypes = new ArrayList<>();
 		Object[] elements = typesViewer.getCheckedElements();
-		for (Object element : elements) {
-			if (element instanceof MarkerTypeEntry) {
-				selectedTypes.add(((MarkerTypeEntry) element).getMarkerType());
+		for (int i = 0; i < elements.length; i++) {
+			if (elements[i] instanceof MarkerTypeEntry) {
+				selectedTypes.add(((MarkerTypeEntry) elements[i]).getMarkerType());
 			}
 		}
 		MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) typesViewer.getInput();
@@ -285,8 +285,8 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 			private void setChildrenChecked(Object element, boolean checked) {
 				Object[] children = typesContentProvider.getChildren(element);
 				if (children.length > 0) {
-					for (Object child : children) {
-						typesViewer.setChecked(child, checked);
+					for (int i = 0; i < children.length; i++) {
+						typesViewer.setChecked(children[i], checked);
 					}
 				}
 			}
@@ -304,9 +304,9 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 				}
 
 				Object[] children = typesContentProvider.getChildren(parentType);
-				for (Object child : children) {// At least one
+				for (int i = 0; i < children.length; i++) {// At least one
 					// different
-					if (typesViewer.getChecked(child) != checked) {
+					if (typesViewer.getChecked(children[i]) != checked) {
 						typesViewer.setGrayChecked(parentType, true);
 						return;
 					}
@@ -363,8 +363,8 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Object[] elements = typesContentProvider.getElements(typesViewer.getInput());
-				for (Object element : elements) {
-					typesViewer.setSubtreeChecked(element, checked);
+				for (int i = 0; i < elements.length; i++) {
+					typesViewer.setSubtreeChecked(elements[i], checked);
 				}
 			}
 		};
