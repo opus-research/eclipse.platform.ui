@@ -21,13 +21,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.jface.action.Action;
@@ -63,8 +61,6 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.LineDelimiterEditor;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * The IDEWorkspacePreferencePage is the page used to set IDE-specific preferences settings
@@ -110,8 +106,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 	private StringFieldEditor systemExplorer;
 
-	private ComboFieldEditor missingNatureSeverityCombo;
-
     @Override
 	protected Control createContents(Composite parent) {
 
@@ -128,7 +122,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		area.getControl().setLayoutData(data);
 
 		createSpace(composite);
-		createMissingNaturePref(composite);
         createAutoBuildPref(composite);
         createAutoRefreshControls(composite);
         createSaveAllBeforeBuildPref(composite);
@@ -165,31 +158,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
     }
 
     /**
-	 * @param composite
-	 */
-	private void createMissingNaturePref(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		missingNatureSeverityCombo = new ComboFieldEditor(ResourcesPlugin.PREF_MISSING_NATURE_MARKER_SEVERITY,
-				IDEWorkbenchMessages.IDEWorkspacePreference_UnknownNatureSeverity,
-				new String[][] {
-						{ IDEWorkbenchMessages.IDEWorkspacePreference_UnknownNatureSeverity_Ignore,
-								Integer.toString(-1) },
-						{ MarkerMessages.propertiesDialog_infoLabel, Integer.toString(IMarker.SEVERITY_INFO) },
-						{ MarkerMessages.propertiesDialog_warningLabel, Integer.toString(IMarker.SEVERITY_WARNING) },
-						{ MarkerMessages.propertiesDialog_errorLabel, Integer.toString(IMarker.SEVERITY_ERROR) },
-		}, composite);
-		missingNatureSeverityCombo
-				.setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, ResourcesPlugin.PI_RESOURCES));
-		missingNatureSeverityCombo.setPage(this);
-		missingNatureSeverityCombo.load();
-	}
-
-	/**
-	 * Creates controls for the preference to open required projects when opening a
-	 * project.
-	 *
-	 * @param parent
-	 *            The parent control
+     * Creates controls for the preference to open required projects when
+     * opening a project.
+	 * @param parent The parent control
 	 */
 	private void createOpenPrefControls(Composite parent) {
 		String name = IDEInternalPreferences.OPEN_REQUIRED_PROJECTS;
@@ -548,7 +519,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         encodingEditor.loadDefault();
 		lineSeparatorEditor.loadDefault();
 		openReferencesEditor.loadDefault();
-		missingNatureSeverityCombo.loadDefault();
 
 		systemExplorer.loadDefault();
 
@@ -627,7 +597,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         encodingEditor.store();
 		lineSeparatorEditor.store();
 		openReferencesEditor.store();
-		missingNatureSeverityCombo.store();
 
 		return super.performOk();
     }
