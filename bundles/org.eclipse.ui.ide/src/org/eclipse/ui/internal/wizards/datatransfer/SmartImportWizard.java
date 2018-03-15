@@ -309,11 +309,7 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 	 * @return
 	 */
 	private static boolean matchesPage(SmartImportJob easymportJob2, SmartImportRootWizardPage projectRootPage2) {
-		boolean sameSource = easymportJob2.getRoot().getAbsoluteFile().equals(projectRootPage2.getSelectedRoot().getAbsoluteFile())
-				|| (isValidArchive(projectRootPage2.getSelectedRoot())
-						&& getExpandDirectory(projectRootPage2.getSelectedRoot()).getAbsoluteFile()
-								.equals(easymportJob2.getRoot().getAbsoluteFile()));
-		return sameSource
+		return easymportJob2.getRoot().getAbsoluteFile().equals(projectRootPage2.getSelectedRoot().getAbsoluteFile())
 				&& easymportJob2.isDetectNestedProjects() == projectRootPage2.isDetectNestedProject()
 				&& easymportJob2.isConfigureProjects() == projectRootPage2.isConfigureProjects();
 	}
