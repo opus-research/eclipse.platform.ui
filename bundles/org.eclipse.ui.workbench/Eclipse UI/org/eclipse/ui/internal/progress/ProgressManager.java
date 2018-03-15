@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
 import org.eclipse.ui.internal.dialogs.WorkbenchDialogBlockedHandler;
@@ -99,7 +100,7 @@ public class ProgressManager extends ProgressProvider implements
 			.synchronizedMap(new HashMap());
 
 	//	list of IJobProgressManagerListener
-	private ListenerList listeners = new ListenerList();
+	private ListenerList<IJobProgressManagerListener> listeners = new ListenerList<>();
 
 	final IJobChangeListener changeListener;
 
@@ -441,7 +442,7 @@ public class ProgressManager extends ProgressProvider implements
 			public void scheduled(IJobChangeEvent event) {
 				updateFor(event);
 				if (event.getJob().isUser()) {
-					boolean noDialog = true;
+					boolean noDialog = shouldRunInBackground();
 					if (!noDialog) {
 						final IJobChangeEvent finalEvent = event;
 						WorkbenchJob showJob = new WorkbenchJob(
@@ -505,9 +506,7 @@ public class ProgressManager extends ProgressProvider implements
 			sleepGroup(group,info);
 		}
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+		for (IJobProgressManagerListener listener : listeners) {
 			// Is this one the user never sees?
 			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
 				continue;
@@ -524,10 +523,8 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param group
 	 */
 	private void sleepGroup(GroupInfo group, JobInfo info) {
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
+		for (IJobProgressManagerListener listener : listeners) {
 
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
 			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
 				continue;
 
@@ -666,9 +663,8 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public void refreshGroup(GroupInfo info) {
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			((IJobProgressManagerListener)listenersArray[i]).refreshGroup(info);
+		for (IJobProgressManagerListener listener : listeners) {
+			listener.refreshGroup(info);
 		}
 	}
 
@@ -679,9 +675,8 @@ public class ProgressManager extends ProgressProvider implements
 	public void refreshAll() {
 
 		pruneStaleJobs();
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			((IJobProgressManagerListener)listenersArray[i]).refreshAll();
+		for (IJobProgressManagerListener listener : listeners) {
+			listener.refreshAll();
 		}
 
 	}
@@ -693,14 +688,11 @@ public class ProgressManager extends ProgressProvider implements
 	 *            JobInfo
 	 */
 	public void removeJobInfo(JobInfo info) {
-
 		Job job = info.getJob();
 		jobs.remove(job);
 		runnableMonitors.remove(job);
 
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+		for (IJobProgressManagerListener listener : listeners) {
 			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
 				listener.removeJob(info);
 			}
@@ -714,10 +706,8 @@ public class ProgressManager extends ProgressProvider implements
 	 *            GroupInfo
 	 */
 	public void removeGroup(GroupInfo group) {
-
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			((IJobProgressManagerListener)listenersArray[i]).removeGroup(group);
+		for (IJobProgressManagerListener listener : listeners) {
+			listener.removeGroup(group);
 		}
 	}
 
@@ -733,9 +723,7 @@ public class ProgressManager extends ProgressProvider implements
 		}
 
 		jobs.put(info.getJob(), info);
-		Object[] listenersArray = listeners.getListeners();
-		for (int i = 0; i < listenersArray.length; i++) {
-			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+		for (IJobProgressManagerListener listener : listeners) {
 			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
 				listener.addJob(info);
 			}
@@ -1053,7 +1041,13 @@ public class ProgressManager extends ProgressProvider implements
 
 	@Override
 	public void showInDialog(Shell shell, Job job) {
-		throw new RuntimeException("Not supported anymore to run jobs with dialogs"); //$NON-NLS-1$
+		if (shouldRunInBackground()) {
+			return;
+		}
+
+		final ProgressMonitorFocusJobDialog dialog = new ProgressMonitorFocusJobDialog(
+				shell);
+		dialog.show(job, shell);
 	}
 
 	@Override
@@ -1191,6 +1185,15 @@ public class ProgressManager extends ProgressProvider implements
 		return false;
 	}
 
+	/**
+	 * Return whether or not dialogs should be run in the background
+	 *
+	 * @return <code>true</code> if the dialog should not be shown.
+	 */
+	private boolean shouldRunInBackground() {
+		return WorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(
+				IPreferenceConstants.RUN_IN_BACKGROUND);
+	}
 
 	/**
 	 * Set whether or not the ProgressViewUpdater should show system jobs.

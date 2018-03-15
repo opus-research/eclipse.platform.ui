@@ -72,7 +72,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextFunction;
@@ -266,9 +265,9 @@ import org.eclipse.ui.views.IViewRegistry;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -304,19 +303,51 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private static final String CMD_DATA = "-data"; //$NON-NLS-1$
 	private static final String CMD_VMARGS = "-vmargs"; //$NON-NLS-1$
 
-	private final class StartupProgressBundleListener implements BundleListener {
+	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
 		private final IProgressMonitor progressMonitor;
 
-		StartupProgressBundleListener(IProgressMonitor progressMonitor) {
+		private final int maximumProgressCount;
+
+		// stack of names of bundles currently starting
+		private final List<String> starting;
+
+		StartupProgressBundleListener(IProgressMonitor progressMonitor, int maximumProgressCount) {
+			super();
 			this.progressMonitor = progressMonitor;
+			this.maximumProgressCount = maximumProgressCount;
+			this.starting = new ArrayList<>();
 		}
 
 		@Override
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
-			if (eventType == BundleEvent.STARTED) {
-				progressMonitor.worked(1);
+			String bundleName;
+
+			synchronized (this) {
+				if (eventType == BundleEvent.STARTING) {
+					starting.add(bundleName = event.getBundle().getSymbolicName());
+				} else if (eventType == BundleEvent.STARTED) {
+					progressCount++;
+					if (progressCount <= maximumProgressCount) {
+						progressMonitor.worked(1);
+					}
+					int index = starting.lastIndexOf(event.getBundle().getSymbolicName());
+					if (index >= 0) {
+						starting.remove(index);
+					}
+					if (index != starting.size()) {
+						return; // not currently displayed
+					}
+					bundleName = index == 0 ? null : (String) starting.get(index - 1);
+				} else {
+					return; // uninteresting event
+				}
+			}
+
+			if (bundleName != null) {
+				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
+				progressMonitor.subTask(taskName);
 			}
 		}
 	}
@@ -429,7 +460,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/**
 	 * Listener list for registered IWorkbenchListeners .
 	 */
-	private ListenerList workbenchListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList<IWorkbenchListener> workbenchListeners = new ListenerList<>(ListenerList.IDENTITY);
 
 	private ServiceRegistration workbenchService;
 
@@ -626,16 +657,20 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 					AbstractSplashHandler handler = getSplash();
 
-					boolean showProgress = PrefUtil.getAPIPreferenceStore()
-							.getBoolean(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
+					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
+									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
 
 					IProgressMonitor progressMonitor = null;
+					SynchronousBundleListener bundleListener = null;
 					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
-							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault().getBundleCount() / 10);
-							SubMonitor subMonitor = SubMonitor.convert(progressMonitor, expectedProgressCount);
-							BundleListener bundleListener = workbench.new StartupProgressBundleListener(subMonitor);
+							double cutoff = 0.95;
+							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
+									.getBundleCount() / 10);
+							progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
+							bundleListener = workbench.new StartupProgressBundleListener(
+									progressMonitor, (int) (expectedProgressCount * cutoff));
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
 					}
@@ -648,8 +683,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 								WorkbenchPlugin.getDefault().getViewRegistry());
 						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration finished", null)); //$NON-NLS-1$
 					}
+
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
+						if (bundleListener != null) {
+							WorkbenchPlugin.getDefault().removeBundleListener(bundleListener);
+						}
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
 						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
 						wms.dispose();
@@ -944,9 +983,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	boolean firePreShutdown(final boolean forced) {
-		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (final IWorkbenchListener l : workbenchListeners) {
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -967,9 +1004,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	void firePostShutdown() {
-		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (final IWorkbenchListener l : workbenchListeners) {
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -2580,7 +2615,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 			runnable.run();
 		} else {
 			progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
-			BundleListener bundleListener = new StartupProgressBundleListener(progressMonitor);
+			SynchronousBundleListener bundleListener = new StartupProgressBundleListener(
+					progressMonitor, (int) (expectedProgressCount * cutoff));
 			WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 			try {
 				runnable.run();
@@ -3491,8 +3527,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 	}
 
 	@Override
-	public final Object getAdapter(final Class key) {
-		return serviceLocator.getService(key);
+	public final <T> T getAdapter(final Class<T> key) {
+		return key.cast(serviceLocator.getService(key));
 	}
 
 
