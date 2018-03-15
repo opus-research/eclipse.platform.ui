@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
@@ -170,8 +170,6 @@ import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.handlers.ActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
-import org.eclipse.ui.internal.layout.ITrimManager;
-import org.eclipse.ui.internal.layout.IWindowTrim;
 import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
@@ -303,7 +301,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 *
 	 * @since 3.3
 	 */
-	private ListenerList genericPropertyListeners = new ListenerList();
+	private ListenerList<IPropertyChangeListener> genericPropertyListeners = new ListenerList<>();
 
 	private IAdaptable input;
 
@@ -1903,7 +1901,8 @@ STATUS_LINE_ID, model);
 				// We need to do our own cleanup here...
 				int vc = modelService.countRenderableChildren(phParent);
 				if (vc == 0) {
-					phParent.setToBeRendered(false);
+					if (!isLastEditorStack(phParent))
+						phParent.setToBeRendered(false);
 				}
 			}
 		}
@@ -1913,6 +1912,10 @@ STATUS_LINE_ID, model);
 		for (MPart partToRemove : sharedPartsToRemove) {
 			seList.remove(partToRemove);
 		}
+	}
+
+	private boolean isLastEditorStack(MUIElement element) {
+		return modelService.isLastEditorStack(element);
 	}
 
 	/**
@@ -2421,13 +2424,11 @@ STATUS_LINE_ID, model);
 		// there is a separator for the additions group thus >= 2
 	}
 
-	private ListenerList actionSetListeners = null;
+	private ListenerList<IActionSetsListener> actionSetListeners = null;
 
-	private ListenerList backgroundSaveListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList<IBackgroundSaveListener> backgroundSaveListeners = new ListenerList<>(ListenerList.IDENTITY);
 
 	private SelectionService selectionService;
-
-	private ITrimManager trimManager;
 
 	private ActionPresentation actionPresentation;
 
@@ -2451,7 +2452,7 @@ STATUS_LINE_ID, model);
 
 	final void addActionSetsListener(final IActionSetsListener listener) {
 		if (actionSetListeners == null) {
-			actionSetListeners = new ListenerList();
+			actionSetListeners = new ListenerList<>();
 		}
 
 		actionSetListeners.add(listener);
@@ -2733,60 +2734,6 @@ STATUS_LINE_ID, model);
 	 */
 	IAdaptable getDefaultPageInput() {
 		return getWorkbenchImpl().getDefaultPageInput();
-	}
-
-	public ITrimManager getTrimManager() {
-		if (trimManager == null) {
-			// HACK !! Add a 'null' trim manager...this is specifically in place
-			// to prevent an NPE when using Intro's 'Go to Workbench' handling
-			// See Bug 365625 for details...
-			trimManager = new ITrimManager() {
-				@Override
-				public void addTrim(int areaId, IWindowTrim trim) {
-				}
-
-				@Override
-				public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
-				}
-
-				@Override
-				public void removeTrim(IWindowTrim toRemove) {
-				}
-
-				@Override
-				public IWindowTrim getTrim(String id) {
-					return null;
-				}
-
-				@Override
-				public int[] getAreaIds() {
-					return null;
-				}
-
-				@Override
-				public List getAreaTrim(int areaId) {
-					return null;
-				}
-
-				@Override
-				public void updateAreaTrim(int id, List trim, boolean removeExtra) {
-				}
-
-				@Override
-				public List getAllTrim() {
-					return null;
-				}
-
-				@Override
-				public void setTrimVisible(IWindowTrim trim, boolean visible) {
-				}
-
-				@Override
-				public void forceLayout() {
-				}
-			};
-		}
-		return trimManager;
 	}
 
 	/**
