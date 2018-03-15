@@ -2210,31 +2210,49 @@
             class="org.eclipse.ui.internal.CyclePerspectiveHandler:true"
             commandId="org.eclipse.ui.window.nextPerspective">
          <enabledWhen>
-            <with
-                  variable="activeWorkbenchWindow">
-               <test
-                     property="org.eclipse.ui.workbenchWindow.isPerspectiveOpen">
-               </test>
-            </with>
+            <and>
+               <with
+                     variable="activeWorkbenchWindow">
+                  <test
+                        property="org.eclipse.ui.workbenchWindow.isPerspectiveOpen">
+                  </test>
+               </with>
+               <!-- this is a workaround to evaluate the expression -->
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="org.eclipse.ui.IWorkbenchPart">
+                  </instanceof>
+               </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ui.internal.CyclePerspectiveHandler:false"
             commandId="org.eclipse.ui.window.previousPerspective">
          <enabledWhen>
-            <with
-                  variable="activeWorkbenchWindow">
-               <test
-                     property="org.eclipse.ui.workbenchWindow.isPerspectiveOpen">
-               </test>
-            </with>
+            <and>
+               <with
+                     variable="activeWorkbenchWindow">
+                  <test
+                        property="org.eclipse.ui.workbenchWindow.isPerspectiveOpen">
+                  </test>
+               </with>
+               <!-- this is a workaround to evaluate the expression -->
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="org.eclipse.ui.IWorkbenchPart">
+                  </instanceof>
+               </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ui.internal.handlers.CloseAllPerspectivesHandler"
             commandId="org.eclipse.ui.window.closeAllPerspectives">
          <enabledWhen>
-            <or>
+            <and>
                <with
                      variable="activeWorkbenchWindow">
                   <test
@@ -2248,14 +2266,14 @@
                         value="org.eclipse.ui.IWorkbenchPart">
                   </instanceof>
                </with>
-            </or>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ui.internal.handlers.EditActionSetsHandler"
             commandId="org.eclipse.ui.window.customizePerspective">
          <enabledWhen>
-            <or>
+            <and>
                <with
                      variable="activePart">
                   <instanceof
@@ -2268,14 +2286,14 @@
                         property="org.eclipse.ui.workbenchWindow.isPerspectiveOpen">
                   </test>
                </with>
-            </or>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ui.internal.handlers.ClosePerspectiveHandler"
             commandId="org.eclipse.ui.window.closePerspective">
          <enabledWhen>
-            <or>
+            <and>
                <with
                      variable="activeWorkbenchWindow">
                   <test
@@ -2289,7 +2307,7 @@
                         value="org.eclipse.ui.IWorkbenchPart">
                   </instanceof>
                </with>
-            </or>
+            </and>
          </enabledWhen>
       </handler>
       <handler
@@ -2361,7 +2379,7 @@
             class="org.eclipse.ui.internal.handlers.ResetPerspectiveHandler"
             commandId="org.eclipse.ui.window.resetPerspective">
          <enabledWhen>
-            <or>
+            <and>
                <with
                      variable="activeWorkbenchWindow">
                   <test
@@ -2376,14 +2394,14 @@
                   </instanceof>
                </with>
                
-            </or>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ui.internal.handlers.SavePerspectiveHandler"
             commandId="org.eclipse.ui.window.savePerspective">
          <enabledWhen>
-            <or>
+            <and>
                <with
                      variable="activeWorkbenchWindow">
                   <test
@@ -2398,14 +2416,14 @@
                   </instanceof>
                </with>
                
-            </or>
+            </and>
          </enabledWhen>
       </handler>
       <handler
             class="org.eclipse.ui.internal.handlers.IntroHandler"
             commandId="org.eclipse.ui.help.quickStartAction">
          <enabledWhen>
-            <or>
+            <and>
                <with
                      variable="activeWorkbenchWindow">
                   <test
@@ -2419,7 +2437,7 @@
                         value="org.eclipse.ui.IWorkbenchPart">
                   </instanceof>
                </with>
-            </or>
+            </and>
          </enabledWhen>
       </handler>
    </extension>
