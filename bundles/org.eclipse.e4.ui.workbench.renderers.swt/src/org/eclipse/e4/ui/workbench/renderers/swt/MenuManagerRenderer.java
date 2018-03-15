@@ -130,6 +130,20 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		// nothing to do otherwise
 	}
 
+	@Inject
+	@Optional
+	private void subscribeItemTopicSelected(@UIEventTopic(UIEvents.Item.TOPIC_SELECTED) Event event) {
+		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+		// Ensure that this event is for a MMenuItem
+		if (element instanceof MMenuItem) {
+			MMenuItem itemModel = (MMenuItem) element;
+			IContributionItem ici = getContribution(itemModel);
+			if (ici != null) {
+				ici.update();
+			}
+		}
+	}
+
 	/**
 	 * @param event
 	 */
@@ -261,21 +275,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
-	private EventHandler selectionUpdater = new EventHandler() {
-		@Override
-		public void handleEvent(Event event) {
-			// Ensure that this event is for a MToolItem
-			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
-				return;
-
-			MMenuItem itemModel = (MMenuItem) event.getProperty(UIEvents.EventTags.ELEMENT);
-			IContributionItem ici = getContribution(itemModel);
-			if (ici != null) {
-				ici.update();
-			}
-		}
-	};
-
 	private EventHandler enabledUpdater = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
@@ -295,7 +294,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	@PostConstruct
 	public void init() {
-		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
 
@@ -330,7 +328,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	@PreDestroy
 	public void contextDisposed() {
-		eventBroker.unsubscribe(selectionUpdater);
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
 
