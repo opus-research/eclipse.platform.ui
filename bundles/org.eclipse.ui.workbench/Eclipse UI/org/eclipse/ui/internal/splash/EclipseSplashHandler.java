@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,10 +60,35 @@ public class EclipseSplashHandler extends BasicSplashHandler {
 		}
 		Rectangle progressRect = StringConverter.asRectangle(
 				progressRectString, new Rectangle(10, 10, 300, 15));
+		// Calculate scaleFactor
+		String value = System.getProperty("swt.enable.autoScale"); //$NON-NLS-1$
+		boolean autoScaleEnable = true;
+		if (value != null && "false".equalsIgnoreCase(value)) //$NON-NLS-1$
+			autoScaleEnable = false;
+		float scaleFactor = 1f;
+		if (autoScaleEnable) {
+			String deviceZoomStr = System.getProperty("org.eclipse.swt.internal.deviceZoom"); //$NON-NLS-1$
+			int currentDeviceZoom = deviceZoomStr != null ? Integer.parseInt(deviceZoomStr) : 100;
+			scaleFactor = 100f / currentDeviceZoom;
+			// Convert pixels to points
+			if (scaleFactor != 1f) {
+				progressRect.x = Math.round(progressRect.x * scaleFactor);
+				progressRect.y = Math.round(progressRect.y * scaleFactor);
+				progressRect.width = Math.round(progressRect.width * scaleFactor);
+				progressRect.height = Math.round(progressRect.height * scaleFactor);
+			}
+		}
 		setProgressRect(progressRect);
 
 		Rectangle messageRect = StringConverter.asRectangle(messageRectString,
 				new Rectangle(10, 35, 300, 15));
+		// Convert pixels to points
+		if (scaleFactor != 1f) {
+			messageRect.x = Math.round(messageRect.x * scaleFactor);
+			messageRect.y = Math.round(messageRect.y * scaleFactor);
+			messageRect.width = Math.round(messageRect.width * scaleFactor);
+			messageRect.height = Math.round(messageRect.height * scaleFactor);
+		}
 		setMessageRect(messageRect);
 
 		int foregroundColorInteger;
@@ -99,6 +124,13 @@ public class EclipseSplashHandler extends BasicSplashHandler {
 
 			Label idLabel = new Label(getContent(), SWT.RIGHT);
 			idLabel.setForeground(getForeground());
+			// Convert pixels to points
+			if (scaleFactor != 1f) {
+				buildIdRectangle.x = Math.round(buildIdRectangle.x * scaleFactor);
+				buildIdRectangle.y = Math.round(buildIdRectangle.y * scaleFactor);
+				buildIdRectangle.width = Math.round(buildIdRectangle.width * scaleFactor);
+				buildIdRectangle.height = Math.round(buildIdRectangle.height * scaleFactor);
+			}
 			idLabel.setBounds(buildIdRectangle);
 			idLabel.setText(buildId);
 			idLabel.setData(CSSSWTConstants.CSS_ID_KEY, CSS_ID_SPLASH_BUILD_ID);
