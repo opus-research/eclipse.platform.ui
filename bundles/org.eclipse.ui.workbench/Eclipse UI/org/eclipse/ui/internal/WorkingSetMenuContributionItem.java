@@ -11,11 +11,11 @@
 
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -76,12 +76,15 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
         MenuItem mi = new MenuItem(menu, SWT.RADIO, index);
         mi.setText("&" + id + " " + workingSet.getLabel()); //$NON-NLS-1$  //$NON-NLS-2$
         mi.setSelection(workingSet.equals(actionGroup.getWorkingSet()));
-        mi.addSelectionListener(widgetSelectedAdapter(e -> {
-		    IWorkingSetManager manager = PlatformUI.getWorkbench()
-		            .getWorkingSetManager();
-		    actionGroup.setWorkingSet(workingSet);
-		    manager.addRecentWorkingSet(workingSet);
-		}));
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                IWorkingSetManager manager = PlatformUI.getWorkbench()
+                        .getWorkingSetManager();
+                actionGroup.setWorkingSet(workingSet);
+                manager.addRecentWorkingSet(workingSet);
+            }
+        });
         if (image == null) {
 			ImageDescriptor imageDescriptor = workingSet.getImageDescriptor();
 			if (imageDescriptor != null)

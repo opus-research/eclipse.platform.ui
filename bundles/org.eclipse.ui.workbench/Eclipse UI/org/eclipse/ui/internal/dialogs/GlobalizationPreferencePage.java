@@ -107,8 +107,8 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 				WorkbenchMessages.GlobalizationPreference_layoutDirection, 0);
 		layoutDirectionCombo.setItems(new String[] { DEFAULT_DIR, LTR_DIR, RTL_DIR });
 		layoutDirectionCombo.select(getLayoutDirectionIndex(layoutDirection));
-		layoutDirectionCombo.addSelectionListener(widgetSelectedAdapter(e -> layoutDirection = getLayoutDirectionInteger(layoutDirectionCombo
-				.getSelectionIndex())));
+		layoutDirectionCombo.addSelectionListener(widgetSelectedAdapter(
+				e -> layoutDirection = getLayoutDirectionInteger(layoutDirectionCombo.getSelectionIndex())));
 
 		createSpace(composite);
 

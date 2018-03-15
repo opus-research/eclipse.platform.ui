@@ -747,17 +747,14 @@ public final class KeysPreferencePage extends PreferencePage implements
 			menuItem.addSelectionListener(widgetSelectedAdapter(e -> {
 				textTriggerSequenceManager.insert(trappedKey);
 				textTriggerSequence.setFocus();
-				textTriggerSequence.setSelection(textTriggerSequence
-						.getTextLimit());
+				textTriggerSequence.setSelection(textTriggerSequence.getTextLimit());
 			}));
 		}
 		buttonAddKey.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 			Point buttonLocation = buttonAddKey.getLocation();
-			buttonLocation = groupKeySequence.toDisplay(buttonLocation.x,
-					buttonLocation.y);
+			buttonLocation = groupKeySequence.toDisplay(buttonLocation.x, buttonLocation.y);
 			Point buttonSize = buttonAddKey.getSize();
-			menuButtonAddKey.setLocation(buttonLocation.x, buttonLocation.y
-					+ buttonSize.y);
+			menuButtonAddKey.setLocation(buttonLocation.x, buttonLocation.y + buttonSize.y);
 			menuButtonAddKey.setVisible(true);
 		}));
 
