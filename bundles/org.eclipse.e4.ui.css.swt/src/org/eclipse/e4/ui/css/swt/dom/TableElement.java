@@ -61,7 +61,6 @@ implements ISelectionBackgroundCustomizationElement, IHeaderCustomizationElement
 	public void reset() {
 		setHeaderColor(null);
 		setHeaderBackgroundColor(null);
-		super.reset();
 	}
 
 	@Override

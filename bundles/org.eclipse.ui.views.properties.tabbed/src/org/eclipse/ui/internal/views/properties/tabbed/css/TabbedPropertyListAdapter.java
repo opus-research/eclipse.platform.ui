@@ -19,8 +19,8 @@ public class TabbedPropertyListAdapter extends CompositeElement {
 
 	@Override
 	public void reset() {
-		getTabbedPropertyTitle().initColours();
 		super.reset();
+		getTabbedPropertyTitle().initColours();
 	}
 
 	private TabbedPropertyList getTabbedPropertyTitle() {
