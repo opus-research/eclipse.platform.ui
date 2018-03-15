@@ -677,6 +677,8 @@ public class MinMaxAddon {
 			}
 			if (unMax) {
 				maxElement.getTags().remove(IPresentationEngine.MAXIMIZED);
+			} else {
+				element.getTags().remove(MINIMIZED_BY_ZOOM);
 			}
 		}
 		MinMaxAddonUtil.restoreStacksOfMinMaxChildrenArea(this, element, maximizeTag);
