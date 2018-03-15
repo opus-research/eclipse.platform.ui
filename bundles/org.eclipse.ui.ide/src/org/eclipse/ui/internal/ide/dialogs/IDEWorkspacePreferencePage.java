@@ -105,6 +105,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 	private StringFieldEditor systemExplorer;
 
+	private boolean showLocationIsSetOnCommandLine;
+
     @Override
 	protected Control createContents(Composite parent) {
 
@@ -210,10 +212,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	 */
 	private void createWorkspaceLocationGroup(Composite composite) {
 
-		boolean showLocationIsSetOnCommandLine = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
-
 		// show workspace location in window title
-		boolean isShowLocation = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION);
+		boolean isShowLocation = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION) || showLocationIsSetOnCommandLine;
 		boolean isShowName = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
 		boolean isShowPerspective = getIDEPreferenceStore()
 				.getBoolean(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE);
@@ -479,6 +479,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
 		e4Context = workbench.getService(IEclipseContext.class);
+		showLocationIsSetOnCommandLine = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
     }
 
     /**
@@ -577,7 +578,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
             }
         }
 
-		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationPathInTitle.getSelection());
+		if (!showLocationIsSetOnCommandLine) {
+			store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationPathInTitle.getSelection());
+		}
 		store.setValue(IDEInternalPreferences.SHOW_LOCATION_NAME, showLocationNameInTitle.getSelection());
 		store.setValue(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE, showPerspectiveNameInTitle.getSelection());
 		store.setValue(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE, showProductNameInTitle.getSelection());
