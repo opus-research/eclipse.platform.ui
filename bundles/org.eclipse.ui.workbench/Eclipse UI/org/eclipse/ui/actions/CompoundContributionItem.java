@@ -25,7 +25,12 @@ import org.eclipse.swt.widgets.Menu;
  */
 public abstract class CompoundContributionItem extends ContributionItem {
 
-    private IMenuListener menuListener = manager -> manager.markDirty();
+    private IMenuListener menuListener = new IMenuListener() {
+        @Override
+		public void menuAboutToShow(IMenuManager manager) {
+            manager.markDirty();
+        }
+    };
 
     private IContributionItem[] oldItems;
 
