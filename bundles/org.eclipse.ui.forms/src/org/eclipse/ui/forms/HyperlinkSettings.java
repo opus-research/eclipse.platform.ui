@@ -7,6 +7,7 @@
  *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 291349
  *******************************************************************************/
 package org.eclipse.ui.forms;
 import org.eclipse.jface.resource.JFaceColors;
@@ -15,6 +16,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.forms.widgets.FormsResources;
+
 /**
  * Manages color and underline mode settings for a group of hyperlinks. The
  * class is extended by HyperlinkGroup but is otherwise not intended to be
@@ -42,6 +44,10 @@ public class HyperlinkSettings {
 	private Color foreground;
 	private Color activeBackground;
 	private Color activeForeground;
+	private Cursor busyCursor;
+	private Cursor textCursor;
+	private Cursor hyperlinkCursor;
+
 	/**
 	 * The constructor.
 	 *
@@ -50,7 +56,9 @@ public class HyperlinkSettings {
 	 */
 	public HyperlinkSettings(Display display) {
 		initializeDefaultForegrounds(display);
+		initializeDefaultCursors();
 	}
+
 	/**
 	 * Initializes the hyperlink foregrounds from the JFace defaults set for the
 	 * entire workbench.
@@ -67,6 +75,17 @@ public class HyperlinkSettings {
 		setForeground(fg);
 		setActiveForeground(afg);
 	}
+
+	/**
+	 * Initializes the hyperlink cursors from the Forms defaults set for the
+	 * entire workbench.
+	 */
+	public void initializeDefaultCursors() {
+		setBusyCursor(FormsResources.getBusyCursor());
+		setTextCursor(FormsResources.getTextCursor());
+		setHyperlinkCursor(FormsResources.getHandCursor());
+	}
+
 	/**
 	 * Returns the background to use for the active hyperlink.
 	 *
@@ -99,7 +118,7 @@ public class HyperlinkSettings {
 	 * @return the busy cursor
 	 */
 	public Cursor getBusyCursor() {
-		return FormsResources.getBusyCursor();
+		return busyCursor;
 	}
 	/**
 	 * Returns the cursor to use when over text.
@@ -107,7 +126,7 @@ public class HyperlinkSettings {
 	 * @return the text cursor
 	 */
 	public Cursor getTextCursor() {
-		return FormsResources.getTextCursor();
+		return textCursor;
 	}
 	/**
 	 * Returns the foreground to use for the normal hyperlink.
@@ -123,7 +142,7 @@ public class HyperlinkSettings {
 	 * @return the hyperlink cursor
 	 */
 	public Cursor getHyperlinkCursor() {
-		return FormsResources.getHandCursor();
+		return hyperlinkCursor;
 	}
 	/**
 	 * Returns the underline mode to be used for all the hyperlinks in this
@@ -181,4 +200,37 @@ public class HyperlinkSettings {
 	public void setHyperlinkUnderlineMode(int mode) {
 		hyperlinkUnderlineMode = mode;
 	}
+
+	/**
+	 * Sets the new cursor to use when the hyperlink is active for all the
+	 * links.
+	 *
+	 * @param newBusyCursor
+	 *            the new busy cursor
+	 */
+	public void setBusyCursor(Cursor newBusyCursor) {
+		busyCursor = newBusyCursor;
+	}
+
+	/**
+	 * Sets the new cursor to use when over text for all the links.
+	 *
+	 * @param newTextCursor
+	 *            the new text cursor
+	 */
+	public void setTextCursor(Cursor newTextCursor) {
+		textCursor = newTextCursor;
+	}
+
+	/**
+	 * Sets the new cursor to use when hovering over the hyperlink for all the
+	 * links.
+	 *
+	 * @param newHyperlinkCursor
+	 *            the new hyperlink cursor
+	 */
+	public void setHyperlinkCursor(Cursor newHyperlinkCursor) {
+		hyperlinkCursor = newHyperlinkCursor;
+	}
+
 }
