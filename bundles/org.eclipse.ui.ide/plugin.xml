@@ -1764,8 +1764,7 @@
                visible="true">
          </separator>
          <command
-               commandId="org.eclipse.ui.edit.copy"
-               mnemonic="%command.edit.copy.mnemonic">
+               commandId="org.eclipse.ui.edit.copy">
          </command>
          <menu
                id="org.eclipse.ui.ide.markers.copyDetailsMenu"
@@ -1783,12 +1782,10 @@
             </command>
          </menu>
          <command
-               commandId="org.eclipse.ui.edit.delete"
-               mnemonic="%command.edit.delete.mnemonic">
+               commandId="org.eclipse.ui.edit.delete">
          </command>
            <command
-               commandId="org.eclipse.ui.edit.selectAll"
-               mnemonic="%command.edit.selectAll.mnemonic">
+               commandId="org.eclipse.ui.edit.selectAll">
          </command>
          <separator
                name="org.eclipse.ui.ide.markersSeperator1"
@@ -1888,8 +1885,7 @@
                visible="true">
          </separator>
           <command
-               commandId="org.eclipse.ui.file.properties"
-               mnemonic="%command.file.properties.mnemonic">
+               commandId="org.eclipse.ui.file.properties">
              <visibleWhen
                    checkEnabled="false">
                 <and>
