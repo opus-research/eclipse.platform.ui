@@ -21,7 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MGenericTrimContainer;
 import org.eclipse.e4.ui.model.application.ui.MInput;
-import org.eclipse.e4.ui.model.application.ui.MJavaExpression;
 import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -667,7 +666,7 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getSnippetContainer()
 	 * @generated
 	 */
-	public static final int SNIPPET_CONTAINER = 12;
+	public static final int SNIPPET_CONTAINER = 11;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.MLocalizable <em>Localizable</em>}' class.
@@ -677,7 +676,7 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getLocalizable()
 	 * @generated
 	 */
-	public static final int LOCALIZABLE = 13;
+	public static final int LOCALIZABLE = 12;
 
 	/**
 	 * The number of structural features of the '<em>Localizable</em>' class.
@@ -1508,97 +1507,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int CORE_EXPRESSION_OPERATION_COUNT = EXPRESSION_OPERATION_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.impl.JavaExpressionImpl <em>Java Expression</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.JavaExpressionImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getJavaExpression()
-	 * @generated
-	 */
-	public static final int JAVA_EXPRESSION = 11;
-
-	/**
-	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION__ELEMENT_ID = EXPRESSION__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Persisted State</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION__PERSISTED_STATE = EXPRESSION__PERSISTED_STATE;
-
-	/**
-	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION__TAGS = EXPRESSION__TAGS;
-
-	/**
-	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION__CONTRIBUTOR_URI = EXPRESSION__CONTRIBUTOR_URI;
-
-	/**
-	 * The feature id for the '<em><b>Transient Data</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION__TRANSIENT_DATA = EXPRESSION__TRANSIENT_DATA;
-
-	/**
-	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION__CONTRIBUTION_URI = EXPRESSION_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Object</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION__OBJECT = EXPRESSION_FEATURE_COUNT + 1;
-
-	/**
-	 * The number of structural features of the '<em>Java Expression</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 2;
-
-	/**
-	 * The number of operations of the '<em>Java Expression</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int JAVA_EXPRESSION_OPERATION_COUNT = EXPRESSION_OPERATION_COUNT + 0;
-
-	/**
 	 * The feature id for the '<em><b>Snippets</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1633,7 +1541,7 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getSideValue()
 	 * @generated
 	 */
-	public static final int SIDE_VALUE = 14;
+	public static final int SIDE_VALUE = 13;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1711,13 +1619,6 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @generated
 	 */
 	private EClass coreExpressionEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass javaExpressionEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -2316,19 +2217,6 @@ public class UiPackageImpl extends EPackageImpl {
 
 
 	/**
-	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.MJavaExpression <em>Java Expression</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Java Expression</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.MJavaExpression
-	 * @generated
-	 */
-	public EClass getJavaExpression() {
-		return javaExpressionEClass;
-	}
-
-
-	/**
 	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.MSnippetContainer <em>Snippet Container</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2472,8 +2360,6 @@ public class UiPackageImpl extends EPackageImpl {
 		createEAttribute(coreExpressionEClass, CORE_EXPRESSION__CORE_EXPRESSION_ID);
 		createEAttribute(coreExpressionEClass, CORE_EXPRESSION__CORE_EXPRESSION);
 
-		javaExpressionEClass = createEClass(JAVA_EXPRESSION);
-
 		snippetContainerEClass = createEClass(SNIPPET_CONTAINER);
 		createEReference(snippetContainerEClass, SNIPPET_CONTAINER__SNIPPETS);
 
@@ -2553,8 +2439,6 @@ public class UiPackageImpl extends EPackageImpl {
 		genericTrimContainerEClass.getEGenericSuperTypes().add(g1);
 		expressionEClass.getESuperTypes().add(theApplicationPackage.getApplicationElement());
 		coreExpressionEClass.getESuperTypes().add(this.getExpression());
-		javaExpressionEClass.getESuperTypes().add(this.getExpression());
-		javaExpressionEClass.getESuperTypes().add(theApplicationPackage.getContribution());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(contextEClass, MContext.class, "Context", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -2610,8 +2494,6 @@ public class UiPackageImpl extends EPackageImpl {
 		initEClass(coreExpressionEClass, MCoreExpression.class, "CoreExpression", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getCoreExpression_CoreExpressionId(), ecorePackage.getEString(), "coreExpressionId", "", 0, 1, MCoreExpression.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$ //$NON-NLS-2$
 		initEAttribute(getCoreExpression_CoreExpression(), ecorePackage.getEJavaObject(), "coreExpression", null, 0, 1, MCoreExpression.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-
-		initEClass(javaExpressionEClass, MJavaExpression.class, "JavaExpression", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
 		initEClass(snippetContainerEClass, MSnippetContainer.class, "SnippetContainer", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(getSnippetContainer_Snippets(), this.getUIElement(), null, "snippets", null, 0, -1, MSnippetContainer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
@@ -2966,16 +2848,6 @@ public class UiPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EAttribute CORE_EXPRESSION__CORE_EXPRESSION = eINSTANCE.getCoreExpression_CoreExpression();
-
-		/**
-		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.impl.JavaExpressionImpl <em>Java Expression</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see org.eclipse.e4.ui.model.application.ui.impl.JavaExpressionImpl
-		 * @see org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl#getJavaExpression()
-		 * @generated
-		 */
-		public static final EClass JAVA_EXPRESSION = eINSTANCE.getJavaExpression();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.MSnippetContainer <em>Snippet Container</em>}' class.

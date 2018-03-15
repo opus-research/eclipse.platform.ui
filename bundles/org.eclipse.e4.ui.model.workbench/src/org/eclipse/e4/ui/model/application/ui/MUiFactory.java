@@ -37,14 +37,4 @@ public interface MUiFactory {
 	 */
 	MCoreExpression createCoreExpression();
 
-	/**
-	 * Returns a new object of class '<em>Java Expression</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return a new object of class '<em>Java Expression</em>'.
-	 * @generated
-	 * @since 2.0
-	 */
-	MJavaExpression createJavaExpression();
-
 } //MUiFactory

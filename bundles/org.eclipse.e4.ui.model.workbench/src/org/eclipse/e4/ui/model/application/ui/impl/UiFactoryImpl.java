@@ -71,7 +71,6 @@ public class UiFactoryImpl extends EFactoryImpl implements MUiFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case UiPackageImpl.CORE_EXPRESSION: return (EObject)createCoreExpression();
-			case UiPackageImpl.JAVA_EXPRESSION: return (EObject)createJavaExpression();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -115,16 +114,6 @@ public class UiFactoryImpl extends EFactoryImpl implements MUiFactory {
 	public MCoreExpression createCoreExpression() {
 		CoreExpressionImpl coreExpression = new CoreExpressionImpl();
 		return coreExpression;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MJavaExpression createJavaExpression() {
-		JavaExpressionImpl javaExpression = new JavaExpressionImpl();
-		return javaExpression;
 	}
 
 	/**
