@@ -54,7 +54,7 @@ public class SWTPartRendererTest {
 		stylingEngineExecutedMethods = new HashMap<String, Object[]>();
 
 		context = EclipseContextFactory.create();
-		context.set(IStylingEngine.class.getName(), Proxy.newProxyInstance(
+		context.set(IStylingEngine.SERVICE_NAME, Proxy.newProxyInstance(
 				getClass().getClassLoader(),
 				new Class<?>[] { IStylingEngine.class },
 				new InvocationHandler() {
@@ -110,7 +110,7 @@ public class SWTPartRendererTest {
 	public void testSetCSSInfoWhenNoCSSStylingEngineInContext()
 			throws Exception {
 		Button button = new Button(shell, SWT.PUSH);
-		context.remove(IStylingEngine.class);
+		context.remove(IStylingEngine.SERVICE_NAME);
 
 		renderer.setCSSInfo(part, button);
 		Object[] setClassnameAndIdParams = stylingEngineExecutedMethods
