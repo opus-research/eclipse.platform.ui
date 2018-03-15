@@ -20,6 +20,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -37,6 +38,7 @@ public class StackDropAgent extends DropAgent {
 
 	private ArrayList<Rectangle> itemRects;
 	private int curDropIndex = -2;
+	private Rectangle centerArea;
 
 	/**
 	 * @param manager
@@ -45,49 +47,86 @@ public class StackDropAgent extends DropAgent {
 		super(manager);
 	}
 
+	/**
+	 * Returns the stack for the given element or
+	 *
+	 * @param info
+	 */
+	private MPartStack getStackFor(MUIElement dragElement, DnDInfo info) {
+		if (info.curElement instanceof MPartStack) {
+			return (MPartStack) info.curElement;
+		}
+		return SplitDropAgent2.getStackAt(dragElement, info, dndManager.getModelService());
+	}
+
 	@Override
 	public boolean canDrop(MUIElement dragElement, DnDInfo info) {
 		// We only except stack elements and whole stacks
-		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack))
+		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack)) {
+			System.out.println("StackDropAgent wrong element type");
 			return false;
+		}
+
+		MPartStack stack = getStackFor(dragElement, info);
 
 		// We have to be over a stack ourselves
-		if (!(info.curElement instanceof MPartStack))
+		if (stack == null) {
+			System.out.println("StackDropAgent not dragging over a stack (type is: " + info.curElement + ")");
 			return false;
+		}
 
-		MPartStack stack = (MPartStack) info.curElement;
-
-		if (stack.getTags().contains(IPresentationEngine.STANDALONE))
+		if (stack.getTags().contains(IPresentationEngine.STANDALONE)) {
+			System.out.println("StackDropAgent this is a standalone view");
 			return false;
+		}
 
 		// We only work for CTabFolders
-		if (!(stack.getWidget() instanceof CTabFolder))
+		if (!(stack.getWidget() instanceof CTabFolder)) {
+			System.out.println("StackDropAgent only works for CTabFolder");
 			return false;
+		}
 
 		// We can't drop stacks onto itself
-		if (stack == dragElement)
-			return false;
+		// if (stack == dragElement)
+		// return false;
 
 		// You can only drag MParts from window to window
 		// NOTE: Disabled again due to too many issues, see bug 445305 for details
 		// if (!(dragElement instanceof MPart)) {
-			EModelService ms = dndManager.getModelService();
-			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
-			MWindow dropWin = ms.getTopLevelWindowFor(stack);
-			if (dragElementWin != dropWin)
-				return false;
+		EModelService ms = dndManager.getModelService();
+		MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
+		MWindow dropWin = ms.getTopLevelWindowFor(stack);
+		if (dragElementWin != dropWin) {
+			System.out.println("StackDropAgent dragging over wrong window");
+			return false;
+		}
 		// }
 
+		CTabFolder ctf = (CTabFolder) stack.getWidget();
 		// only allow dropping into the the area
-		Rectangle areaRect = getTabAreaRect((CTabFolder) stack.getWidget());
-		boolean inArea = areaRect.contains(info.cursorPos);
+		Rectangle areaRect = getTabAreaRect(ctf);
+		Rectangle centerBounds = getCenterBounds(ctf);
+		boolean inArea = areaRect.contains(info.cursorPos) || centerBounds.contains(info.cursorPos);
 		if (inArea) {
 			tabArea = areaRect;
-			dropStack = (MPartStack) info.curElement;
-			dropCTF = (CTabFolder) dropStack.getWidget();
+			centerArea = centerBounds;
+			dropStack = stack;
+			dropCTF = ctf;
 			createInsertRects();
+		} else {
+			System.out.println("StackDropAgent not dragging over proper area");
 		}
+
 		return inArea;
+	}
+
+	private Rectangle getCenterBounds(CTabFolder ctf) {
+		Rectangle centerBounds = ctf.getBounds();
+		int heightSplitRegion = Math.min(centerBounds.height / 3, 64);
+		int widthSplitRegion = Math.min(centerBounds.width / 3, 64);
+		Geometry.expand(centerBounds, -widthSplitRegion, -widthSplitRegion, -heightSplitRegion, -heightSplitRegion);
+		centerBounds = Display.getCurrent().map(ctf.getParent(), null, centerBounds);
+		return centerBounds;
 	}
 
 	private Rectangle getTabAreaRect(CTabFolder theCTF) {
@@ -163,11 +202,22 @@ public class StackDropAgent extends DropAgent {
 
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
-		if (!tabArea.contains(info.cursorPos) || dropStack == null || !dropStack.isToBeRendered())
-			return false;
 
+		boolean inCenter = centerArea.contains(info.cursorPos);
+		if (!(inCenter || tabArea.contains(info.cursorPos)) || dropStack == null || !dropStack.isToBeRendered()) {
+			System.out.println("track returning false since out of region");
+			return false;
+		}
 		int dropIndex = getDropIndex(info);
-		if (curDropIndex == dropIndex || dropIndex == -1)
+		if (dropIndex == -1) {
+			if (inCenter) {
+				dropIndex = itemRects == null ? 0 : itemRects.size() - 1;
+			} else {
+				System.out.println("track returning true - no tabs under cursor");
+				return true;
+			}
+		}
+		if (curDropIndex == dropIndex)
 			return true;
 		curDropIndex = dropIndex;
 
@@ -318,6 +368,11 @@ public class StackDropAgent extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
+		if (dragElement instanceof MPartStack) {
+			if (info.curElement == dragElement)
+				return true;
+		}
+
 		if (dndManager.getFeedbackStyle() != DnDManager.HOSTED) {
 			int dropIndex = getDropIndex(info);
 			if (dropIndex != -1) {
