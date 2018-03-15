@@ -20,7 +20,7 @@ import org.eclipse.core.databinding.observable.Realm;
 
 /**
  * A factory to create {@link ISideEffect} objects, which are applied to the
- * given {@link Consumer} in {@link ISideEffectFactory#create(Consumer)}.
+ * given {@link Consumer} in {@link ISideEffectFactory#createFactory(Consumer)}.
  *
  * @since 3.3
  *
@@ -28,6 +28,15 @@ import org.eclipse.core.databinding.observable.Realm;
 public final class SideEffectFactory implements ISideEffectFactory {
 
 	private Consumer<ISideEffect> sideEffectConsumer;
+
+	/**
+	 * Default constructor passing in a no-op consumer.
+	 *
+	 */
+	public SideEffectFactory() {
+		this(s -> {
+		});
+	}
 
 	/**
 	 * Constructor.

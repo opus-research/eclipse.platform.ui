@@ -11,11 +11,11 @@
 
 package org.eclipse.core.internal.databinding.observable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.databinding.observable.ICompositeSideEffect;
 import org.eclipse.core.databinding.observable.ISideEffect;
-import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.databinding.observable.list.IObservableList;
-import org.eclipse.core.databinding.observable.list.WritableList;
 
 /**
  * Implementation of the ICompositeSideEffect.
@@ -25,24 +25,13 @@ import org.eclipse.core.databinding.observable.list.WritableList;
  */
 public final class CompositeSideEffect implements ICompositeSideEffect {
 
-	private IObservableList<ISideEffect> sideEffects;
+	private List<ISideEffect> sideEffects;
 
 	/**
 	 * Default constructor of an CompositeSideEffect.
 	 */
 	public CompositeSideEffect() {
-		this(Realm.getDefault());
-	}
-
-	/**
-	 * Constructor of an CompositeSideEffect.
-	 *
-	 * @param realm
-	 *            {@link Realm} for the CompositeSideEffect instance.
-	 *
-	 */
-	public CompositeSideEffect(Realm realm) {
-		sideEffects = new WritableList<>(realm);
+		sideEffects = new ArrayList<>();
 	}
 
 	@Override
@@ -72,8 +61,12 @@ public final class CompositeSideEffect implements ICompositeSideEffect {
 	}
 
 	@Override
-	public void accept(ISideEffect sideEffect) {
+	public void add(ISideEffect sideEffect) {
 		sideEffects.add(sideEffect);
 	}
 
+	@Override
+	public void remove(ISideEffect sideEffect) {
+		sideEffects.remove(sideEffect);
+	}
 }

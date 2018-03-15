@@ -18,21 +18,40 @@ import org.eclipse.core.internal.databinding.observable.SideEffectFactory;
 
 /**
  * A factory to create {@link ISideEffect} objects, which are applied to the
- * given {@link Consumer} in {@link ISideEffectFactory#create(Consumer)}.
+ * given {@link Consumer} in {@link ISideEffectFactory#createFactory(Consumer)}.
  *
  * @since 1.6
- *
+ * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface ISideEffectFactory {
 
 	/**
+	 * Creates a new {@link ISideEffectFactory} is used to create instances of
+	 * {@link ISideEffect} objects.
+	 *
+	 * @return a newly constructed {@link ISideEffectFactory}
+	 */
+	static ISideEffectFactory createFactory() {
+		return new SideEffectFactory();
+	}
+
+	/**
+	 * Creates a new {@link ISideEffectFactory} which will notify the given
+	 * {@link Consumer} of every {@link ISideEffect} that is constructed by the
+	 * factory.
+	 * <p>
+	 * For example, a {@link Consumer} could be passed to this method which
+	 * automatically inserts every {@link ISideEffect} into the same
+	 * {@link ICompositeSideEffect}, allowing their lifecycle to be managed
+	 * automatically by the object which provides the factory.
+	 *
 	 * @param sideEffectConsumer
-	 *            {@link Consumer}, which is usually obtained by passing in an
-	 *            {@link ICompositeSideEffect}
-	 * @return {@link ISideEffectFactory}
+	 *            a consumer which will be notified about every
+	 *            {@link ISideEffect} constructed by this factory.
+	 * @return a newly constructed {@link ISideEffectFactory}
 	 * @see ICompositeSideEffect
 	 */
-	static ISideEffectFactory create(Consumer<ISideEffect> sideEffectConsumer) {
+	static ISideEffectFactory createFactory(Consumer<ISideEffect> sideEffectConsumer) {
 		return new SideEffectFactory(sideEffectConsumer);
 	}
 
