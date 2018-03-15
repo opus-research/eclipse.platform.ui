@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal.activities.ws;
 
 import java.util.ArrayList;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -66,15 +67,15 @@ public class TriggerPointAdvisorRegistry {
 		extensions = RegistryReader.orderExtensions(extensions);
 
 		ArrayList list = new ArrayList(extensions.length);
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] elements = extension
+		for (int i = 0; i < extensions.length; i++) {
+			IConfigurationElement[] elements = extensions[i]
 					.getConfigurationElements();
-			for (IConfigurationElement element : elements) {
-				if (element.getName().equals(
+			for (int j = 0; j < elements.length; j++) {
+				if (elements[j].getName().equals(
 						IWorkbenchRegistryConstants.TAG_TRIGGERPOINTADVISOR)) {
 					try {
 						TriggerPointAdvisorDescriptor descriptor = new TriggerPointAdvisorDescriptor(
-								element);
+								elements[j]);
 						list.add(descriptor);
 					} catch (IllegalArgumentException e) {
 						// log an error since its not safe to open a dialog here
@@ -115,9 +116,9 @@ public class TriggerPointAdvisorRegistry {
 		}
 
 		TriggerPointAdvisorDescriptor[] advisors = getAdvisors();
-		for (TriggerPointAdvisorDescriptor advisor : advisors) {
-			if (advisor.getId().equals(targetIntroId)) {
-				return advisor;
+		for (int i = 0; i < advisors.length; i++) {
+			if (advisors[i].getId().equals(targetIntroId)) {
+				return advisors[i];
 			}
 		}
 
@@ -131,21 +132,21 @@ public class TriggerPointAdvisorRegistry {
 	 */
 	private String getAdvisorForProduct(String targetProductId,
 			IExtension[] extensions) {
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] elements = extension
+		for (int i = 0; i < extensions.length; i++) {
+			IConfigurationElement[] elements = extensions[i]
 					.getConfigurationElements();
-			for (IConfigurationElement element : elements) {
-				if (element.getName().equals(
+			for (int j = 0; j < elements.length; j++) {
+				if (elements[j].getName().equals(
 						IWorkbenchRegistryConstants.TAG_ADVISORPRODUCTBINDING)) {
-					String advisorId = element
+					String advisorId = elements[j]
 							.getAttribute(IWorkbenchRegistryConstants.ATT_ADVISORID);
-					String productId = element
+					String productId = elements[j]
 							.getAttribute(IWorkbenchRegistryConstants.ATT_PRODUCTID);
 
 					if (advisorId == null || productId == null) {
 						IStatus status = new Status(
 								IStatus.ERROR,
-								element.getDeclaringExtension()
+								elements[j].getDeclaringExtension()
 										.getNamespace(),
 								IStatus.ERROR,
 								"triggerPointAdvisorId and productId must be defined.", new IllegalArgumentException()); //$NON-NLS-1$
