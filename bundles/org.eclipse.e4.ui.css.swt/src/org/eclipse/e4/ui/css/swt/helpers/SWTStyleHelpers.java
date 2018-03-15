@@ -44,9 +44,6 @@ public class SWTStyleHelpers {
 	 * @return
 	 */
 	public static String getSWTWidgetStyleAsString(int style, String separator) {
-		if (style == 0) {
-			return "";
-		}
 		StringBuffer swtStyles = new StringBuffer();
 		// Use catch error if SWT version doesn't provide
 		// the SWT constant
@@ -766,7 +763,7 @@ public class SWTStyleHelpers {
 			}
 		} catch (Exception e) {
 		}
-		return swtStyles.length() == 0 ? "" : swtStyles.toString();
+		return swtStyles.toString();
 	}
 
 	/**
