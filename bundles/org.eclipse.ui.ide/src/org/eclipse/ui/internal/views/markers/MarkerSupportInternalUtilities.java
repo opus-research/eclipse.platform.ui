@@ -111,11 +111,6 @@ public class MarkerSupportInternalUtilities {
 	public static final String IMG_MARKERS_QUICK_FIX_DECORATION_PATH = "markers/contassist_ovr.png"; //$NON-NLS-1$
 
 	/**
-	 * The suffix to the view names for the legacy markers views.
-	 */
-	public static final String LEGACY_SUFFIX = ".old"; //$NON-NLS-1$
-
-	/**
 	 * A constant to map migration to the filter being migrated
 	 */
 	public static final String MIGRATE_PREFERENCE_CONSTANT = "_MIGRATE"; //$NON-NLS-1$
