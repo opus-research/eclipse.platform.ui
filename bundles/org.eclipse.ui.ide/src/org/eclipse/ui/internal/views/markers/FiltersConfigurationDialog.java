@@ -59,7 +59,6 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersConfigurationDialog is the dialog for configuring the filters for the
- * problems view
  *
  * @since 3.3
  *
