@@ -24,6 +24,7 @@ import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -39,6 +40,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
@@ -305,9 +307,31 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			workspaceUndoMonitor.shutdown();
 			workspaceUndoMonitor = null;
 		}
-		if (IDEWorkbenchPlugin.getPluginWorkspace() != null) {
-			disconnectFromWorkspace();
-		}
+
+		Display display = getWorkbenchConfigurer().getWorkbench().getDisplay();
+
+		final Runnable disconnectFromWorkspace = new Runnable() {
+			@Override
+			public void run() {
+				IWorkspace workspace = IDEWorkbenchPlugin.getPluginWorkspace();
+				if (workspace != null) {
+					ISchedulingRule currentRule = Job.getJobManager().currentRule();
+					if (currentRule != null && currentRule.isConflicting(workspace.getRoot())) {
+						display.asyncExec(this);
+						return;
+					}
+					disconnectFromWorkspace();
+				}
+			}
+		};
+
+		// postShutdown may be called while workspace is locked, for example -
+		// during file save operation
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=501404
+		// disconnect is postponed until workspace is unlocked to prevent
+		// deadlock between background thread launched by
+		// disconnectFromWorkspace() and current thread
+		display.asyncExec(disconnectFromWorkspace);
 	}
 
 	@Override
@@ -431,6 +455,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Disconnect from the core workspace.
+	 *
+	 * Locks workspace in a background thread, should not be called while
+	 * holding any workspace locks.
 	 */
 	private void disconnectFromWorkspace() {
 		// save the workspace
