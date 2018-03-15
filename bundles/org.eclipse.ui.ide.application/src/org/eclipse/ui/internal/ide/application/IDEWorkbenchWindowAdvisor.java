@@ -17,6 +17,7 @@ package org.eclipse.ui.internal.ide.application;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -31,6 +32,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
@@ -211,12 +213,14 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 						productName);
 			}
 
-			MessageDialogWithToggle dlg = MessageDialogWithToggle
-					.openOkCancelConfirm(parentShell,
-							IDEWorkbenchMessages.PromptOnExitDialog_shellTitle,
-							message,
-							IDEWorkbenchMessages.PromptOnExitDialog_choice,
-							false, null, null);
+			// use of LinkedHashMap to preserve insertion order
+			Map<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+			buttonLabelToIdMap.put(IDEWorkbenchMessages.PromptOnExitDialog_button_label_exit, IDialogConstants.OK_ID);
+			buttonLabelToIdMap.put(IDEWorkbenchMessages.PromptOnExitDialog_button_label_cancel,
+					IDialogConstants.CANCEL_ID);
+			MessageDialogWithToggle dlg = MessageDialogWithToggle.open(MessageDialog.CONFIRM, parentShell,
+					IDEWorkbenchMessages.PromptOnExitDialog_shellTitle, message,
+					IDEWorkbenchMessages.PromptOnExitDialog_choice, false, null, null, SWT.NONE, buttonLabelToIdMap);
 			if (dlg.getReturnCode() != IDialogConstants.OK_ID) {
 				return false;
 			}
