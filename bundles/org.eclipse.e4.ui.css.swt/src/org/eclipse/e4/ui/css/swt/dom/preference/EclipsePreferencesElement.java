@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Timo Kinnunen <timo.kinnunen@gmail.com> - Bug 450727
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 466075
- *     Dawid Pakuła <zulus@w3des.net> - Bug 466075
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom.preference;
 
@@ -84,9 +83,6 @@ public class EclipsePreferencesElement extends ElementAdapter {
 
 	@Override
 	public boolean isPseudoInstanceOf(String s) {
-		if (!super.isStaticPseudoInstance(s)) {
-			this.addStaticPseudoInstance(s);
-		}
 		return true;
 	}
 }
