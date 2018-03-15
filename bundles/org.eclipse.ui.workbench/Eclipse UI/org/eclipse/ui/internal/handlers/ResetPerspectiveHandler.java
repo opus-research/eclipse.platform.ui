@@ -67,13 +67,11 @@ public class ResetPerspectiveHandler extends AbstractHandler {
 							page.resetPerspective();
 						}
 					} else {
-						String message = NLS.bind(WorkbenchMessages.ResetPerspective_message,
-								descriptor.getLabel());
-						final String[] options = { WorkbenchMessages.ResetPerspective_buttonLabel,
-								IDialogConstants.NO_LABEL };
+						String message = NLS.bind(WorkbenchMessages.ResetPerspective_message, descriptor.getLabel());
 
 						int result = MessageDialog.open(MessageDialog.CONFIRM, activeWorkbenchWindow.getShell(),
-								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET, options);
+								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET, WorkbenchMessages.ResetPerspective_buttonLabel,
+								IDialogConstants.NO_LABEL);
 
 						if (result == Window.OK) {
 							page.resetPerspective();
