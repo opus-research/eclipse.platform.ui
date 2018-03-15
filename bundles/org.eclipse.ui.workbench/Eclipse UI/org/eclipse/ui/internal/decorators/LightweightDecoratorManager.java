@@ -144,7 +144,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 */
 	private void buildContributors() {
 		for (LightweightDecoratorDefinition decorator : lightweightDefinitions) {
-			for (String type : getTargetTypes(decorator)) {
+			String[] types = getTargetTypes(decorator);
+			for (String type : types) {
 				registerContributor(decorator, type);
 			}
 		}
@@ -197,12 +198,14 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		int idx = getLightweightDecoratorDefinitionIdx(decorator.getId());
 		if (idx != -1) {
 			LightweightDecoratorDefinition[] oldDefs = lightweightDefinitions;
-			Util.arrayCopyWithRemoval(
+			Util
+					.arrayCopyWithRemoval(
 							oldDefs,
 							lightweightDefinitions = new LightweightDecoratorDefinition[lightweightDefinitions.length - 1],
 							idx);
 			// no reset - handled in the DecoratorManager
-			for (String type : getTargetTypes(decorator)) {
+			String[] types = getTargetTypes(decorator);
+			for (String type : types) {
 				unregisterContributor(decorator, type);
 
 			}
@@ -354,9 +357,12 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 *            true.
 	 */
 	public void getDecorations(Object element, DecorationBuilder decoration) {
-		for (LightweightDecoratorDefinition decorator : getDecoratorsFor(element)) {
-			decoration.setCurrentDefinition(decorator);
-			decorate(element, decoration, decorator);
+
+		LightweightDecoratorDefinition[] decorators = getDecoratorsFor(element);
+
+		for (LightweightDecoratorDefinition dd : decorators) {
+			decoration.setCurrentDefinition(dd);
+			decorate(element, decoration, dd);
 		}
 	}
 

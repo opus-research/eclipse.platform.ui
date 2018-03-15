@@ -163,9 +163,9 @@ public class ActionExpression {
 			}
 
 			list = new ArrayList(children.length);
-			for (IConfigurationElement configElement : children) {
-				String tag = configElement.getName();
-				AbstractExpression expr = createExpression(configElement);
+			for (IConfigurationElement element2 : children) {
+				String tag = element2.getName();
+				AbstractExpression expr = createExpression(element2);
 				if (EXP_TYPE_OBJECT_CLASS.equals(tag)) {
 					list.add(0, expr);
 				} else {
@@ -185,8 +185,8 @@ public class ActionExpression {
 					if (classNames == null) {
 						classNames = new ArrayList();
 					}
-					for (String objectClass : objectClasses) {
-						classNames.add(objectClass);
+					for (String objectClasse : objectClasses) {
+						classNames.add(objectClasse);
 					}
 				}
 			}
@@ -389,8 +389,8 @@ public class ActionExpression {
 
 				// test all the interfaces the class implements
 				Class[] interfaces = clazz.getInterfaces();
-				for (Class currentInterface : interfaces) {
-					if (checkInterfaceHierarchy(currentInterface)) {
+				for (Class interface1 : interfaces) {
+					if (checkInterfaceHierarchy(interface1)) {
 						return true;
 					}
 				}

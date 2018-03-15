@@ -14,6 +14,7 @@ import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -234,8 +235,11 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     @Override
 	protected void performDefaults() {
         super.performDefaults();
-		DecoratorManager manager = WorkbenchPlugin.getDefault().getDecoratorManager();
-		for (DecoratorDefinition definition : manager.getAllDecoratorDefinitions()) {
+        DecoratorManager manager = WorkbenchPlugin.getDefault()
+				.getDecoratorManager();
+        DecoratorDefinition[] definitions = manager
+                .getAllDecoratorDefinitions();
+        for (DecoratorDefinition definition : definitions) {
             checkboxViewer.setChecked(definition, definition
                     .getDefaultValue());
         }
@@ -250,7 +254,9 @@ public class DecoratorsPreferencePage extends PreferencePage implements
             DecoratorManager manager = getDecoratorManager();
             //Clear the caches first to avoid unneccessary updates
             manager.clearCaches();
-			for (DecoratorDefinition definition : manager.getAllDecoratorDefinitions()) {
+            DecoratorDefinition[] definitions = manager
+                    .getAllDecoratorDefinitions();
+            for (DecoratorDefinition definition : definitions) {
                 boolean checked = checkboxViewer.getChecked(definition);
                 definition.setEnabled(checked);
 

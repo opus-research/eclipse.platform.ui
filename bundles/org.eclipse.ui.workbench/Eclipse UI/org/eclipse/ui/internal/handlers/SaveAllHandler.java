@@ -75,8 +75,8 @@ public class SaveAllHandler extends AbstractSaveHandler {
 		if (saveablesList == null) {
 			return EvaluationResult.FALSE;
 		}
-
-		for (ISaveablesSource nonPartSource : saveablesList.getNonPartSources()) {
+		ISaveablesSource[] nonPartSources = saveablesList.getNonPartSources();
+		for (ISaveablesSource nonPartSource : nonPartSources) {
 			Saveable[] saveables = nonPartSource.getSaveables();
 			for (Saveable saveable : saveables) {
 				if (saveable.isDirty()) {

@@ -94,12 +94,14 @@ public class WorkingCopyPreferences extends EventManager implements
 		checkRemoved();
 
 		// clear all values (long way so people get notified)
-		for (String key : keys()) {
+		String[] keys = keys();
+		for (String key : keys) {
 			remove(key);
 		}
 
 		// remove children
-		for (String childName : childrenNames()) {
+		String[] childNames = childrenNames();
+		for (String childName : childNames) {
 			node(childName).removeNode();
 		}
 
@@ -120,7 +122,8 @@ public class WorkingCopyPreferences extends EventManager implements
 		if (!visitor.visit(this)) {
 			return;
 		}
-		for (String childName : childrenNames()) {
+		String[] childNames = childrenNames();
+		for (String childName : childNames) {
 			((IEclipsePreferences) node(childName)).accept(visitor);
 		}
 	}

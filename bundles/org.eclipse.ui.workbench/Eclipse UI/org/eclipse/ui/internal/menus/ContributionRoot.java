@@ -88,9 +88,9 @@ final class ContributionRoot implements
 	 */
 	public void release() {
 		for (IContributionItem item : itemsToExpressions.keySet()) {
-			// menuService.unregisterVisibleWhen(item, restriction);
-			item.dispose();
-		}
+// menuService.unregisterVisibleWhen(item, restriction);
+item.dispose();
+}
 		itemsToExpressions.clear();
 		topLevelItems.clear();
 	}
