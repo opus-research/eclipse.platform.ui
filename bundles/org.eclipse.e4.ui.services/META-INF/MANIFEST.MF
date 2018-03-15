@@ -8,7 +8,7 @@ Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: javax.annotation,
- javax.inject;version="1.0.0",
+ javax.inject,
  org.osgi.framework;version="1.3.0",
  org.osgi.service.event;resolution:=optional,
  org.w3c.dom.css
