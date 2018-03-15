@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.DecorationContext;
@@ -293,16 +294,17 @@ public class DecorationScheduler {
 					}
 				}
 
-				monitor.beginTask(WorkbenchMessages.DecorationScheduler_CalculatingTask, 100);
+				SubMonitor subMonitor = SubMonitor.convert(monitor,
+						WorkbenchMessages.DecorationScheduler_CalculatingTask, 100);
 				// will block if there are no resources to be decorated
 				DecorationReference reference;
-				monitor.worked(5);
+				subMonitor.split(5);
 				int workCount = 5;
 				while ((reference = nextElement()) != null) {
 
 					// Count up to 90 to give the appearance of updating
-					if (workCount < 90) {
-						monitor.worked(1);
+					if (workCount < 95) {
+						subMonitor.split(1);
 						workCount++;
 					}
 
@@ -314,7 +316,6 @@ public class DecorationScheduler {
 						IDecorationContext context = contexts[i];
 						ensureResultCached(element, force, context);
 					}
-
 					// Only notify listeners when we have exhausted the
 					// queue of decoration requests.
 					synchronized (DecorationScheduler.this) {
@@ -323,8 +324,6 @@ public class DecorationScheduler {
 						}
 					}
 				}
-				monitor.worked(100 - workCount);
-				monitor.done();
 				return Status.OK_STATUS;
 			}
 
