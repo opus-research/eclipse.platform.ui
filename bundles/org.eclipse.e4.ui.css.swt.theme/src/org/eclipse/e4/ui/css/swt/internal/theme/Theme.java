@@ -22,12 +22,10 @@ public class Theme implements ITheme {
 		this.label = label;
 	}
 	
-	@Override
 	public String getId() {
 		return id;
 	}
 	
-	@Override
 	public String getLabel() {
 		return label;
 	}

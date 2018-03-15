@@ -78,7 +78,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addOverlay(org.eclipse.jface.resource.ImageDescriptor)
 	 */
-	@Override
 	public void addOverlay(ImageDescriptor overlay) {
 		int quadrant = currentDefinition.getQuadrant();
 		if (descriptors[quadrant] == null) {
@@ -90,7 +89,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addOverlay(org.eclipse.jface.resource.ImageDescriptor)
 	 */
-	@Override
 	public void addOverlay(ImageDescriptor overlay, int quadrant) {
 		if (quadrant >= 0 && quadrant < DECORATOR_ARRAY_SIZE) {
 			if (descriptors[quadrant] == null) {
@@ -106,7 +104,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addPrefix(java.lang.String)
 	 */
-	@Override
 	public void addPrefix(String prefixString) {
 		prefixes.add(prefixString);
 		valueSet = true;
@@ -115,7 +112,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addSuffix(java.lang.String)
 	 */
-	@Override
 	public void addSuffix(String suffixString) {
 		suffixes.add(suffixString);
 		valueSet = true;
@@ -195,7 +191,6 @@ public class DecorationBuilder implements IDecoration {
 	 * @see org.eclipse.jface.viewers.IDecoration#setBackgroundColor(org.eclipse.swt.graphics.Color)
 	 */
 
-	@Override
 	public void setBackgroundColor(Color bgColor) {
 		this.backgroundColor = bgColor;
 		valueSet = true;
@@ -206,7 +201,6 @@ public class DecorationBuilder implements IDecoration {
 	 * 
 	 * @see org.eclipse.jface.viewers.IDecoration#setFont(org.eclipse.swt.graphics.Font)
 	 */
-	@Override
 	public void setFont(Font newFont) {
 		this.font = newFont;
 		valueSet = true;
@@ -217,7 +211,6 @@ public class DecorationBuilder implements IDecoration {
 	 * 
 	 * @see org.eclipse.jface.viewers.IDecoration#setForegroundColor(org.eclipse.swt.graphics.Color)
 	 */
-	@Override
 	public void setForegroundColor(Color fgColor) {
 		this.foregroundColor = fgColor;
 		valueSet = true;
@@ -228,7 +221,6 @@ public class DecorationBuilder implements IDecoration {
 	 * 
 	 * @see org.eclipse.jface.viewers.IDecoration#getDecorationContext()
 	 */
-	@Override
 	public IDecorationContext getDecorationContext() {
 		return context;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,8 +37,7 @@ public class ActionSetMenuManager extends SubMenuManager {
      * In the case of menu's not added by this manager,
      * ensure that we return a wrapper for the menu.
      */
-    @Override
-	public IContributionItem find(String id) {
+    public IContributionItem find(String id) {
         IContributionItem item = getParentMenuManager().find(id);
         if (item instanceof SubContributionItem) {
 			// Return the item passed to us, not the wrapper.
@@ -60,34 +59,24 @@ public class ActionSetMenuManager extends SubMenuManager {
         return item;
     }
 
-	/**
-	 * @return Returns the actionSetId.
-	 */
-	public String getActionSetId() {
-		return actionSetId;
-	}
-
-	/*
-	 * (non-Javadoc) Method declared on IContributionManager.
-	 */
-    @Override
-	public IContributionItem[] getItems() {
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
+    public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
     }
 
     /* (non-Javadoc)
      * Method declared on SubContributionManager.
      */
-    @Override
-	protected SubContributionItem wrap(IContributionItem item) {
+    protected SubContributionItem wrap(IContributionItem item) {
         return new ActionSetContributionItem(item, actionSetId);
     }
 
     /* (non-Javadoc)
      * Method declared on SubMenuManager.
      */
-    @Override
-	protected SubMenuManager wrapMenu(IMenuManager menu) {
+    protected SubMenuManager wrapMenu(IMenuManager menu) {
         return new ActionSetMenuManager(menu, actionSetId);
     }
 }

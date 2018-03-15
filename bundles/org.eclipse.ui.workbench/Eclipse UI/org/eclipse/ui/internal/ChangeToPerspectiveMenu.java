@@ -57,8 +57,7 @@ public class ChangeToPerspectiveMenu extends PerspectiveMenu {
     /* (non-Javadoc)
      * @see PerspectiveMenu#run(IPerspectiveDescriptor)
      */
-    @Override
-	protected void run(IPerspectiveDescriptor desc) {
+    protected void run(IPerspectiveDescriptor desc) {
 		IPreferenceStore store = PrefUtil.getInternalPreferenceStore();
 		int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 		IWorkbenchPage page = getWindow().getActivePage();

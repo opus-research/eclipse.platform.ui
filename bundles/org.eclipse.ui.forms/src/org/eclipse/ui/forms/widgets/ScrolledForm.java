@@ -113,10 +113,7 @@ public class ScrolledForm extends SharedScrolledComposite {
 	 */
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
-		if (content != null) {
-			// also set in setContent()
-			content.setForeground(fg);
-		}
+		content.setForeground(fg);
 	}
 
 	/**
@@ -125,10 +122,7 @@ public class ScrolledForm extends SharedScrolledComposite {
 	 */
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
-		if (content != null) {
-			// also set in super.setContent()
-			content.setBackground(bg);
-		}
+		content.setBackground(bg);
 	}
 
 	/**

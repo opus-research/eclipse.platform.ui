@@ -68,8 +68,7 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partActivated(part);
                 }
             }, l, part, "activated::"); //$NON-NLS-1$
@@ -84,8 +83,7 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partBroughtToTop(part);
                 }
             }, l, part, "broughtToTop::"); //$NON-NLS-1$
@@ -100,8 +98,7 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partClosed(part);
                 }
             }, l, part, "closed::"); //$NON-NLS-1$
@@ -116,8 +113,7 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partDeactivated(part);
                 }
             }, l, part, "deactivated::"); //$NON-NLS-1$
@@ -132,8 +128,7 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partOpened(part);
                 }
             }, l, part, "opened::"); //$NON-NLS-1$

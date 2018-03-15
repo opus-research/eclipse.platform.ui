@@ -40,7 +40,6 @@ public class ViewSettingsDialog extends Dialog {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
 	 */
-	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == DEFAULTS_BUTTON_ID) {
 			performDefaults();
@@ -64,7 +63,6 @@ public class ViewSettingsDialog extends Dialog {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		parent.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 

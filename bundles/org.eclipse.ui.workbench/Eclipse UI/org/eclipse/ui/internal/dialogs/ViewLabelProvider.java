@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,22 +8,26 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla  - bug 77710
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430603
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IPluginContribution;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.internal.decorators.ContributingPluginDecorator;
 import org.eclipse.ui.views.IViewCategory;
 import org.eclipse.ui.views.IViewDescriptor;
 
@@ -31,9 +35,10 @@ import org.eclipse.ui.views.IViewDescriptor;
  * Provides labels for view children.
  */
 public class ViewLabelProvider extends ColumnLabelProvider {
-    private HashMap<ImageDescriptor, Image> images;
+    private HashMap images;
 	private final IWorkbenchWindow window;
 	private final Color dimmedForeground;
+	private ILabelDecorator decorator;
 
     /**
 	 * @param window the workbench window
@@ -42,18 +47,22 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 	public ViewLabelProvider(IWorkbenchWindow window, Color dimmedForeground) {
 		this.window = window;
 		this.dimmedForeground = dimmedForeground;
+		this.decorator = window.getWorkbench().getDecoratorManager().getLabelDecorator(
+				ContributingPluginDecorator.ID);
 	}
-
-	@Override
+	
 	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
 		super.initialize(viewer, column);
+		if (decorator != null) {
+			ColumnViewerToolTipSupport.enableFor(viewer);
+		}
 	}
 
 	Image cacheImage(ImageDescriptor desc) {
         if (images == null) {
-			images = new HashMap<ImageDescriptor, Image>(21);
+			images = new HashMap(21);
 		}
-        Image image = images.get(desc);
+        Image image = (Image) images.get(desc);
         if (image == null) {
             image = desc.createImage();
             images.put(desc, image);
@@ -61,19 +70,23 @@ public class ViewLabelProvider extends ColumnLabelProvider {
         return image;
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+     */
+    public void dispose() {
         if (images != null) {
-			for (Image i : images.values()) {
-				i.dispose();
-			}
+            for (Iterator i = images.values().iterator(); i.hasNext();) {
+                ((Image) i.next()).dispose();
+            }
             images = null;
         }
         super.dispose();
     }
 
-    @Override
-	public Image getImage(Object element) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
+     */
+    public Image getImage(Object element) {
         if (element instanceof IViewDescriptor) {
             ImageDescriptor desc = ((IViewDescriptor) element)
                     .getImageDescriptor();
@@ -88,8 +101,10 @@ public class ViewLabelProvider extends ColumnLabelProvider {
         return null;
     }
 
-    @Override
-	public String getText(Object element) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+     */
+    public String getText(Object element) {
         String label = WorkbenchMessages.ViewLabel_unknown;
         if (element instanceof IViewCategory) {
 			label = ((IViewCategory) element).getLabel();
@@ -99,12 +114,10 @@ public class ViewLabelProvider extends ColumnLabelProvider {
         return DialogUtil.removeAccel(label);
     }
 
-	@Override
 	public Color getBackground(Object element) {
 		return null;
 	}
 
-	@Override
 	public Color getForeground(Object element) {
 		if (element instanceof IViewDescriptor) {
 			IWorkbenchPage activePage = window.getActivePage();
@@ -114,6 +127,17 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 					return dimmedForeground;
 				}
 			}
+		}
+		return null;
+	}
+
+	public String getToolTipText(Object element) {
+		if (decorator == null) {
+			return null;
+		}
+		if (element instanceof IPluginContribution) {
+			IPluginContribution contribution = (IPluginContribution) element;
+			return decorator.decorateText(getText(element), contribution.getPluginId());
 		}
 		return null;
 	}

@@ -56,7 +56,6 @@ final class LegacySchemeListenerWrapper implements ISchemeListener {
 		this.bindingManager = bindingManager;
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacySchemeListenerWrapper) {
 			final LegacySchemeListenerWrapper wrapper = (LegacySchemeListenerWrapper) object;
@@ -71,7 +70,6 @@ final class LegacySchemeListenerWrapper implements ISchemeListener {
 		return false;
 	}
 
-	@Override
 	public final int hashCode() {
 		return listener.hashCode();
 	}
@@ -81,7 +79,6 @@ final class LegacySchemeListenerWrapper implements ISchemeListener {
 	 * 
 	 * @see org.eclipse.jface.bindings.ISchemeListener#schemeChanged(org.eclipse.jface.bindings.SchemeEvent)
 	 */
-	@Override
 	public final void schemeChanged(final SchemeEvent schemeEvent) {
 		final IKeyConfiguration keyConfiguration = new SchemeLegacyWrapper(
 				schemeEvent.getScheme(), bindingManager);

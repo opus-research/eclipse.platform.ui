@@ -42,8 +42,7 @@ public class ObjectActionContributorReader extends RegistryReader {
     /**
      * Implements abstract method to handle configuration elements. 
      */
-    @Override
-	protected boolean readElement(IConfigurationElement element) {
+    protected boolean readElement(IConfigurationElement element) {
         String tagName = element.getName();
         if (tagName.equals(IWorkbenchRegistryConstants.TAG_OBJECT_CONTRIBUTION)) {
             processObjectContribution(element);

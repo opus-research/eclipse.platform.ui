@@ -499,7 +499,6 @@ public class FormHeading extends Canvas {
 				if (messageHyperlink == null) {
 					messageHyperlink = new Hyperlink(FormHeading.this, SWT.NULL);
 					messageHyperlink.setUnderlined(true);
-					messageHyperlink.setBackground(getBackground());
 					messageHyperlink.setText(message);
 					messageHyperlink.setHref(messages);
 					Object[] llist = listeners.getListeners();
@@ -519,7 +518,6 @@ public class FormHeading extends Canvas {
 					messageHyperlink.setVisible(false);
 				if (messageLabel == null) {
 					messageLabel = new CLabel(FormHeading.this, SWT.NULL);
-					messageLabel.setBackground(getBackground());
 					messageLabel.setText(message);
 					if (messageToolTipManager != null)
 						messageToolTipManager.createToolTip(messageLabel, false);
@@ -528,7 +526,6 @@ public class FormHeading extends Canvas {
 					messageLabel.setVisible(true);
 				}
 			}
-			updateForeground();
 			layout(true);
 		}
 
@@ -545,7 +542,6 @@ public class FormHeading extends Canvas {
 
 		public void setForeground(Color fg) {
 			this.fg = fg;
-			updateForeground();
 		}
 
 		private void updateForeground() {
@@ -808,9 +804,6 @@ public class FormHeading extends Canvas {
 		if (!isSeparatorVisible() && getBackgroundImage() == null)
 			return;
 		Rectangle carea = getClientArea();
-		if (carea.width == 0 || carea.height == 0) {
-			return;
-		}
 		Image buffer = new Image(getDisplay(), carea.width, carea.height);
 		buffer.setBackground(getBackground());
 		GC igc = new GC(buffer);

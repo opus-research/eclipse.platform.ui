@@ -31,7 +31,6 @@ public class ShowKeyAssistHandler extends WorkbenchWindowHandlerDelegate {
 	 *            Ignored
 	 * @return <code>null</code>
 	 */
-	@Override
 	public Object execute(final ExecutionEvent event) {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		final IBindingService bindingService = (IBindingService) workbench.getService(IBindingService.class);

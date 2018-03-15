@@ -128,7 +128,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	private Comparator<IPerspectiveDescriptor> comparator = new Comparator<IPerspectiveDescriptor>() {
         private Collator collator = Collator.getInstance();
 
-		@Override
 		public int compare(IPerspectiveDescriptor ob1, IPerspectiveDescriptor ob2) {
 			IPerspectiveDescriptor d1 = ob1;
 			IPerspectiveDescriptor d2 = ob2;
@@ -139,7 +138,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * Creates the page's UI content.
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		// @issue if the product subclasses this page, then it should provide
 		// the help content
@@ -201,7 +199,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 				.setSelection(IPreferenceConstants.OPM_ACTIVE_PAGE == openPerspMode);
 		openSameWindowButton.setFont(font);
 		openSameWindowButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				openPerspMode = IPreferenceConstants.OPM_ACTIVE_PAGE;
 			}
@@ -213,7 +210,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 				.setSelection(IPreferenceConstants.OPM_NEW_WINDOW == openPerspMode);
 		openNewWindowButton.setFont(font);
 		openNewWindowButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				openPerspMode = IPreferenceConstants.OPM_NEW_WINDOW;
 			}
@@ -250,7 +246,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		openEmbedButton
 				.setSelection(openViewMode == IPreferenceConstants.OVM_EMBED);
 		openEmbedButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				openViewMode = IPreferenceConstants.OVM_EMBED;
 			}
@@ -267,7 +262,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		openFastButton
 				.setSelection(openViewMode == IPreferenceConstants.OVM_FAST);
 		openFastButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				openViewMode = IPreferenceConstants.OVM_FAST;
 			}
@@ -328,7 +322,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		perspectivesTable = new Table(perspectivesComponent, SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER);
 	    perspectivesTable.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateButtons();
 			}
@@ -394,7 +387,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		data.horizontalAlignment = GridData.FILL;
 
 		button.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				verticalButtonPressed(event.widget);
 			}
@@ -449,7 +441,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * @see IWorkbenchPreferencePage
 	 */
-	@Override
 	public void init(IWorkbench aWorkbench) {
 		this.workbench = aWorkbench;
 		this.perspectiveRegistry = (PerspectiveRegistry) workbench
@@ -468,7 +459,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * The default button has been pressed.
 	 */
-	@Override
 	protected void performDefaults() {
 		//Project perspective preferences
 		IPreferenceStore store = WorkbenchPlugin.getDefault()
@@ -569,7 +559,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	/**
 	 * Apply the user's changes if any
 	 */
-	@Override
 	public boolean performOk() {
 		// Set the default perspective
 		if (!Util.equals(defaultPerspectiveId, perspectiveRegistry.getDefaultPerspective())) {

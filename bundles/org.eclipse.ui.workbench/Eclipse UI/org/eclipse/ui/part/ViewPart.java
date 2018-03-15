@@ -71,8 +71,7 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         /* (non-Javadoc)
          * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
          */
-        @Override
-		public void propertyChanged(Object source, int propId) {
+        public void propertyChanged(Object source, int propId) {
             if (propId == IWorkbenchPartConstants.PROP_TITLE) {
                 setDefaultContentDescription();
             }
@@ -91,8 +90,7 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
     /* (non-Javadoc)
      * Method declared on IViewPart.
      */
-    @Override
-	public IViewSite getViewSite() {
+    public IViewSite getViewSite() {
         return (IViewSite) getSite();
     }
 
@@ -100,8 +98,7 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite)
      */
-    @Override
-	public void init(IViewSite site) throws PartInitException {
+    public void init(IViewSite site) throws PartInitException {
         setSite(site);
 
         setDefaultContentDescription();
@@ -111,8 +108,7 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
      * (non-Javadoc)
      * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
      */
-    @Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+    public void init(IViewSite site, IMemento memento) throws PartInitException {
     	/*
     	* Initializes this view with the given view site.  A memento is passed to
         * the view which contains a snapshot of the views state from a previous
@@ -130,16 +126,14 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IViewPart#saveState(org.eclipse.ui.IMemento)
      */
-    @Override
-	public void saveState(IMemento memento) {
+    public void saveState(IMemento memento) {
         // do nothing
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#setPartName(java.lang.String)
      */
-    @Override
-	protected void setPartName(String partName) {
+    protected void setPartName(String partName) {
         if (compatibilityTitleListener != null) {
             removePropertyListener(compatibilityTitleListener);
             compatibilityTitleListener = null;
@@ -151,8 +145,7 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
      */
-    @Override
-	protected void setContentDescription(String description) {
+    protected void setContentDescription(String description) {
         if (compatibilityTitleListener != null) {
             removePropertyListener(compatibilityTitleListener);
             compatibilityTitleListener = null;
@@ -164,8 +157,7 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setInitializationData(IConfigurationElement cfig,
+    public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
         super.setInitializationData(cfig, propertyName, data);
 
@@ -194,8 +186,7 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
      * @param site the site to check
      * @since 3.1
      */
-    @Override
-	protected final void checkSite(IWorkbenchPartSite site) {
+    protected final void checkSite(IWorkbenchPartSite site) {
         super.checkSite(site);
         Assert.isTrue(site instanceof IViewSite, "The site for a view must be an IViewSite"); //$NON-NLS-1$
     }    

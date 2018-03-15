@@ -37,8 +37,11 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 	 */
 	private int originalShellCount;
 
-	@Override
-	final protected void setUp() throws Exception {
+	/**
+	 * Sets up this field assist test case. Subclasses should extend but not
+	 * override.
+	 */
+	protected void setUp() throws Exception {
 		super.setUp();
 		Display display = getDisplay();
 		anotherShell = new Shell(display);
@@ -50,8 +53,11 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 		assertNotNull(window);
 	}
 
-	@Override
-	final protected void tearDown() throws Exception {
+	/**
+	 * Tears down this field assist test case. Subclasses should extend but not
+	 * override.
+	 */
+	protected void tearDown() throws Exception {
 		if (window != null) {
 			spinEventLoop();
 		}

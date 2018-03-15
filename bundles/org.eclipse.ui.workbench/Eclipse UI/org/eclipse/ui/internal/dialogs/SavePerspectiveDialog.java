@@ -82,8 +82,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
     /* (non-Javadoc)
      * Method declared in Window.
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell
                 .setText(WorkbenchMessages.SavePerspective_shellTitle); 
@@ -96,8 +95,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
      *
      * @param parent the button bar composite
      */
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
@@ -113,8 +111,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
      * @param parent the parent composite to contain the dialog area
      * @return the dialog area control
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         Font font = parent.getFont();
         // Run super.
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -213,8 +210,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
     /**
      * The user has typed some text.
      */
-    @Override
-	public void modifyText(org.eclipse.swt.events.ModifyEvent e) {
+    public void modifyText(org.eclipse.swt.events.ModifyEvent e) {
         // Get text.
         perspName = text.getText();
 
@@ -241,8 +237,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
      * and closes the dialog. Subclasses may override.
      * </p>
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         perspName = text.getText();
         persp = perspReg.findPerspectiveWithLabel(perspName);
         if (persp != null) {
@@ -253,7 +248,6 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
 			MessageDialog d = new MessageDialog(this.getShell(),
 					WorkbenchMessages.SavePerspective_overwriteTitle, null,
 					message, MessageDialog.QUESTION, buttons, 0) {
-				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
@@ -280,8 +274,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
      *
      * @param event event object describing the change
      */
-    @Override
-	public void selectionChanged(SelectionChangedEvent event) {
+    public void selectionChanged(SelectionChangedEvent event) {
         // If a selection is caused by modifyText ignore it.
         if (ignoreSelection) {
 			return;

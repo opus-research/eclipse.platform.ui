@@ -35,7 +35,6 @@ public class CommandServiceFactory extends AbstractServiceFactory {
 	 * org.eclipse.ui.services.IServiceLocator,
 	 * org.eclipse.ui.services.IServiceLocator)
 	 */
-	@Override
 	public Object create(Class serviceInterface, IServiceLocator parentLocator,
 			IServiceLocator locator) {
 		if (!ICommandService.class.equals(serviceInterface)) {

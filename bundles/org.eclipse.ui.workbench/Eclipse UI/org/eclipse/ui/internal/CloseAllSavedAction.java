@@ -51,8 +51,7 @@ public class CloseAllSavedAction extends PageEventAction implements
     /* (non-Javadoc)
      * Method declared on PageEventAction.
      */
-    @Override
-	public void pageActivated(IWorkbenchPage page) {
+    public void pageActivated(IWorkbenchPage page) {
         super.pageActivated(page);
         updateState();
     }
@@ -60,8 +59,7 @@ public class CloseAllSavedAction extends PageEventAction implements
     /* (non-Javadoc)
      * Method declared on PageEventAction.
      */
-    @Override
-	public void pageClosed(IWorkbenchPage page) {
+    public void pageClosed(IWorkbenchPage page) {
         super.pageClosed(page);
         updateState();
     }
@@ -69,8 +67,7 @@ public class CloseAllSavedAction extends PageEventAction implements
     /* (non-Javadoc)
      * Method declared on PartEventAction.
      */
-    @Override
-	public void partClosed(IWorkbenchPart part) {
+    public void partClosed(IWorkbenchPart part) {
         super.partClosed(part);
         if (part instanceof IEditorPart) {
             part.removePropertyListener(this);
@@ -82,8 +79,7 @@ public class CloseAllSavedAction extends PageEventAction implements
     /* (non-Javadoc)
      * Method declared on PartEventAction.
      */
-    @Override
-	public void partOpened(IWorkbenchPart part) {
+    public void partOpened(IWorkbenchPart part) {
         super.partOpened(part);
         if (part instanceof IEditorPart) {
             part.addPropertyListener(this);
@@ -95,8 +91,7 @@ public class CloseAllSavedAction extends PageEventAction implements
     /* (non-Javadoc)
      * Method declared on IPropertyListener.
      */
-    @Override
-	public void propertyChanged(Object source, int propID) {
+    public void propertyChanged(Object source, int propID) {
         if (source instanceof IEditorPart) {
             if (propID == IEditorPart.PROP_DIRTY) {
                 updateState();
@@ -107,8 +102,7 @@ public class CloseAllSavedAction extends PageEventAction implements
     /* (non-Javadoc)
      * Method declared on Action.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (getWorkbenchWindow() == null) {
             // action has been dispose
             return;
@@ -141,8 +135,7 @@ public class CloseAllSavedAction extends PageEventAction implements
     /* (non-Javadoc)
      * Method declared on PageEventAction.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         for (Iterator it = partsWithListeners.iterator(); it.hasNext();) {
             IWorkbenchPart part = (IWorkbenchPart) it.next();

@@ -16,7 +16,6 @@ package org.eclipse.e4.ui.model.application.ui.basic;
  * The <b>Factory</b> for the model.
  * It provides a create method for each non-abstract class of the model.
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-user-doc -->
  * @generated
  */
@@ -37,16 +36,6 @@ public interface MBasicFactory {
 	 * @generated
 	 */
 	MPart createPart();
-
-	/**
-	 * Returns a new object of class '<em>Composite Part</em>'.
-	 * <!-- begin-user-doc -->
-	 * @since 1.1
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Composite Part</em>'.
-	 * @generated
-	 */
-	MCompositePart createCompositePart();
 
 	/**
 	 * Returns a new object of class '<em>Input Part</em>'.
@@ -101,25 +90,5 @@ public interface MBasicFactory {
 	 * @generated
 	 */
 	MTrimBar createTrimBar();
-
-	/**
-	 * Returns a new object of class '<em>Dialog</em>'.
-	 * <!-- begin-user-doc -->
-	 * @since 1.1
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Dialog</em>'.
-	 * @generated
-	 */
-	MDialog createDialog();
-
-	/**
-	 * Returns a new object of class '<em>Wizard Dialog</em>'.
-	 * <!-- begin-user-doc -->
-	 * @since 1.1
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Wizard Dialog</em>'.
-	 * @generated
-	 */
-	MWizardDialog createWizardDialog();
 
 } //MBasicFactory

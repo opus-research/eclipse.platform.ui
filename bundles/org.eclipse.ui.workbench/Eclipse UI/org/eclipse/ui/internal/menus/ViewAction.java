@@ -57,7 +57,6 @@ public class ViewAction extends ActionSet {
 		}
 	}
 
-	@Override
 	protected Expression createExpression(IConfigurationElement configElement) {
 		return null;
 	}

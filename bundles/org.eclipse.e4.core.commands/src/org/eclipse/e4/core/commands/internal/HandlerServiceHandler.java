@@ -42,7 +42,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 	public boolean isEnabled() {
 		ExecutionContexts contexts = HandlerServiceImpl.peek();
 		// setEnabled(contexts);
-		IEclipseContext executionContext = contexts != null ? contexts.context : null; // getExecutionContext(contexts);
+		IEclipseContext executionContext = getExecutionContext(contexts);
 		if (executionContext == null) {
 			return super.isEnabled();
 		}
@@ -51,13 +51,18 @@ public class HandlerServiceHandler extends AbstractHandler {
 			setBaseEnabled(false);
 			return super.isEnabled();
 		}
-		IEclipseContext staticContext = contexts.staticContext; // getStaticContext(contexts);
+		IEclipseContext staticContext = getStaticContext(contexts);
 		Boolean result = (Boolean) ContextInjectionFactory.invoke(handler, CanExecute.class,
 				executionContext, staticContext, Boolean.TRUE);
 		setBaseEnabled(result.booleanValue());
 		return super.isEnabled();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#setEnabled(java.lang.Object)
+	 */
 	@Override
 	public void setEnabled(Object evaluationContext) {
 		boolean createContext = false;
@@ -69,7 +74,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 		if (handler == null) {
 			return;
 		}
-		IEclipseContext staticContext = getStaticContext(executionContext);
+		IEclipseContext staticContext = getStaticContext(evaluationContext);
 		if (staticContext == null) {
 			staticContext = EclipseContextFactory.create();
 			createContext = true;
@@ -81,21 +86,32 @@ public class HandlerServiceHandler extends AbstractHandler {
 		}
 	}
 
-	private IEclipseContext getStaticContext(IEclipseContext executionContext) {
+	IEclipseContext getStaticContext(Object evalObj) {
+		if (evalObj instanceof ExecutionContexts) {
+			return ((ExecutionContexts) evalObj).staticContext;
+		}
+		if (evalObj instanceof IEclipseContext) {
+			return (IEclipseContext) ((IEclipseContext) evalObj)
+					.get(HandlerServiceImpl.STATIC_CONTEXT);
+		}
+		if (evalObj instanceof ExpressionContext) {
+			return (IEclipseContext) (((ExpressionContext) evalObj).eclipseContext)
+					.get(HandlerServiceImpl.STATIC_CONTEXT);
+		}
+		if (evalObj instanceof IEvaluationContext) {
+			return getStaticContext(((IEvaluationContext) evalObj).getParent());
+		}
 		final ExecutionContexts pair = HandlerServiceImpl.peek();
 		if (pair != null) {
-			if (pair.context != executionContext) {
-				// log this
-			}
 			return pair.staticContext;
 		}
 		return null;
 	}
 
 	protected IEclipseContext getExecutionContext(Object evalObj) {
-		// if (evalObj instanceof ExecutionContexts) {
-		// return ((ExecutionContexts) evalObj).context;
-		// }
+		if (evalObj instanceof ExecutionContexts) {
+			return ((ExecutionContexts) evalObj).context;
+		}
 		if (evalObj instanceof IEclipseContext) {
 			return (IEclipseContext) evalObj;
 		}
@@ -112,6 +128,11 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#isHandled()
+	 */
 	@Override
 	public boolean isHandled() {
 		ExecutionContexts contexts = HandlerServiceImpl.peek();
@@ -126,7 +147,11 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IEclipseContext executionContext = getExecutionContext(event.getApplicationContext());
 		if (executionContext == null) {
@@ -134,27 +159,21 @@ public class HandlerServiceHandler extends AbstractHandler {
 					new NotHandledException(FAILED_TO_FIND_HANDLER_DURING_EXECUTION));
 		}
 
+		IEclipseContext staticContext = getStaticContext(event.getApplicationContext());
 		Object handler = HandlerServiceImpl.lookUpHandler(executionContext, commandId);
 		if (handler == null) {
 			return null;
 		}
-		IEclipseContext staticContext = getStaticContext(executionContext);
-		IEclipseContext localStaticContext = null;
-		try {
-			if (staticContext == null) {
-				staticContext = localStaticContext = EclipseContextFactory
-						.create(HandlerServiceImpl.TMP_STATIC_CONTEXT);
-				staticContext.set(HandlerServiceImpl.PARM_MAP, event.getParameters());
-			}
-			return ContextInjectionFactory.invoke(handler, Execute.class, executionContext,
-					staticContext, null);
-		} finally {
-			if (localStaticContext != null) {
-				localStaticContext.dispose();
-			}
-		}
+		return ContextInjectionFactory.invoke(handler, Execute.class, executionContext,
+				staticContext, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#fireHandlerChanged(org.eclipse.core.commands.
+	 * HandlerEvent)
+	 */
 	@Override
 	public void fireHandlerChanged(HandlerEvent handlerEvent) {
 		super.fireHandlerChanged(handlerEvent);

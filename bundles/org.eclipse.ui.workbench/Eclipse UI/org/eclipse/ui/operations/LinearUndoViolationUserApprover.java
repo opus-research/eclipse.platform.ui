@@ -69,7 +69,6 @@ public final class LinearUndoViolationUserApprover extends
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected IStatus allowLinearRedoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
 
@@ -82,7 +81,6 @@ public final class LinearUndoViolationUserApprover extends
 				getTitle(part), operation.getLabel());
 		final boolean [] proceed = new boolean[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				// Show a dialog.
 				part.setFocus();
@@ -122,7 +120,6 @@ public final class LinearUndoViolationUserApprover extends
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected IStatus allowLinearUndoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
 
@@ -135,7 +132,6 @@ public final class LinearUndoViolationUserApprover extends
 				getTitle(part), operation.getLabel());
 		final boolean [] proceed = new boolean[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				// Show a dialog.
 				part.setFocus();

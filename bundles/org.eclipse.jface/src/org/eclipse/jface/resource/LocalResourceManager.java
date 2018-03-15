@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,8 +61,7 @@ public final class LocalResourceManager extends AbstractResourceManager {
 	        /* (non-Javadoc)
 	         * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	         */
-	        @Override
-			public void widgetDisposed(DisposeEvent e) {
+	        public void widgetDisposed(DisposeEvent e) {
 	            LocalResourceManager.this.dispose();
 	        } 
         });
@@ -71,16 +70,14 @@ public final class LocalResourceManager extends AbstractResourceManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ResourceManager#getDevice()
      */
-    @Override
-	public Device getDevice() {
+    public Device getDevice() {
         return parentRegistry.getDevice();
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.AbstractResourceManager#allocate(org.eclipse.jface.resource.DeviceResourceDescriptor)
      */
-    @Override
-	protected Object allocate(DeviceResourceDescriptor descriptor)
+    protected Object allocate(DeviceResourceDescriptor descriptor)
             throws DeviceResourceException {
         return parentRegistry.create(descriptor);
     }
@@ -88,8 +85,7 @@ public final class LocalResourceManager extends AbstractResourceManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.AbstractResourceManager#deallocate(java.lang.Object, org.eclipse.jface.resource.DeviceResourceDescriptor)
      */
-    @Override
-	protected void deallocate(Object resource,
+    protected void deallocate(Object resource,
             DeviceResourceDescriptor descriptor) {
         
         parentRegistry.destroy(descriptor);
@@ -98,8 +94,7 @@ public final class LocalResourceManager extends AbstractResourceManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ResourceManager#getDefaultImage()
      */
-    @Override
-	protected Image getDefaultImage() {
+    protected Image getDefaultImage() {
         return parentRegistry.getDefaultImage();
     }
 }

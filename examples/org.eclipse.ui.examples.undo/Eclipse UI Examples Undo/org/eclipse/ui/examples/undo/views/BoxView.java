@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,25 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 427961
  *******************************************************************************/
 package org.eclipse.ui.examples.undo.views;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IOperationApprover;
-import org.eclipse.core.commands.operations.IOperationHistory;
-import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -37,7 +21,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
+
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -55,6 +39,25 @@ import org.eclipse.ui.examples.undo.preferences.PreferenceConstants;
 import org.eclipse.ui.operations.RedoActionHandler;
 import org.eclipse.ui.operations.UndoActionHandler;
 import org.eclipse.ui.part.ViewPart;
+
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IOperationApprover;
+import org.eclipse.core.commands.operations.IOperationHistory;
+import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.core.commands.operations.ObjectUndoContext;
+
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.SWT;
 
 public class BoxView extends ViewPart {
 	/*
@@ -143,7 +146,6 @@ public class BoxView extends ViewPart {
 	 * Create the canvas on which boxes are drawn and hook up all actions and
 	 * listeners.
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		paintCanvas = new Canvas(parent, SWT.BORDER | SWT.V_SCROLL
 				| SWT.H_SCROLL | SWT.NO_REDRAW_RESIZE);
@@ -168,15 +170,11 @@ public class BoxView extends ViewPart {
 	 */
 	private void addListeners() {
 		paintCanvas.addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseDown(MouseEvent event) {
-				if (event.button != 1) {
+				if (event.button != 1)
 					return;
-				}
 				if (dragInProgress || moveInProgress)
-				 {
 					return; // spurious event
-				}
 
 				tempPosition.x = event.x;
 				tempPosition.y = event.y;
@@ -195,7 +193,6 @@ public class BoxView extends ViewPart {
 				}
 			}
 
-			@Override
 			public void mouseUp(MouseEvent event) {
 				if (event.button != 1) {
 					resetDrag(true); // abort if right or middle mouse button
@@ -203,9 +200,7 @@ public class BoxView extends ViewPart {
 					return;
 				}
 				if (anchorPosition.x == -1)
-				 {
 					return; // spurious event
-				}
 
 				if (dragInProgress) {
 					Box box = new Box(anchorPosition.x, anchorPosition.y,
@@ -239,12 +234,10 @@ public class BoxView extends ViewPart {
 				paintCanvas.redraw();
 			}
 
-			@Override
 			public void mouseDoubleClick(MouseEvent event) {
 			}
 		});
 		paintCanvas.addMouseMoveListener(new MouseMoveListener() {
-			@Override
 			public void mouseMove(MouseEvent event) {
 				if (dragInProgress) {
 					clearRubberBandSelection();
@@ -262,7 +255,6 @@ public class BoxView extends ViewPart {
 			}
 		});
 		paintCanvas.addPaintListener(new PaintListener() {
-			@Override
 			public void paintControl(PaintEvent event) {
 				event.gc.setForeground(paintCanvas.getForeground());
 				boxes.draw(event.gc);
@@ -270,7 +262,6 @@ public class BoxView extends ViewPart {
 		});
 
 		paintCanvas.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent event) {
 				// dispose the gc
 				gc.dispose();
@@ -281,7 +272,6 @@ public class BoxView extends ViewPart {
 
 		// listen for a change in the undo limit
 		propertyChangeListener = new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty() == PreferenceConstants.PREF_UNDOLIMIT) {
 					int limit = UndoPlugin.getDefault().getPreferenceStore()
@@ -313,7 +303,6 @@ public class BoxView extends ViewPart {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
 			public void menuAboutToShow(IMenuManager manager) {
 				BoxView.this.fillContextMenu(manager);
 			}
@@ -364,7 +353,6 @@ public class BoxView extends ViewPart {
 	 */
 	private void makeActions() {
 		clearBoxesAction = new Action() {
-			@Override
 			public void run() {
 				try {
 					getOperationHistory().execute(
@@ -401,7 +389,6 @@ public class BoxView extends ViewPart {
 	/*
 	 * Set focus to the canvas.
 	 */
-	@Override
 	public void setFocus() {
 		paintCanvas.setFocus();
 	}
@@ -449,7 +436,7 @@ public class BoxView extends ViewPart {
 	 * Initialize the workbench operation history for our undo context.
 	 */
 	private void initializeOperationHistory() {
-		// create a unique undo context to
+		// create a unique undo context to 
 		// represent this view's undo history
 		undoContext = new ObjectUndoContext(this);
 

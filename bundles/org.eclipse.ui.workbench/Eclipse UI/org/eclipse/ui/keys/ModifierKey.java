@@ -35,7 +35,6 @@ import org.eclipse.jface.util.Util;
  * @since 3.0
  * @see org.eclipse.ui.keys.NaturalKey
  */
-@Deprecated
 public final class ModifierKey extends Key {
 
 	/**

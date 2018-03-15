@@ -20,8 +20,6 @@ package org.eclipse.ui.commands;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.ExecutionException
  */
-@Deprecated
-@SuppressWarnings("all")
 public final class ExecutionException extends CommandException {
 
     /**

@@ -79,7 +79,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 		private boolean listening = false;
 
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			String property = event.getProperty();
 			Object newValue = event.getNewValue();
@@ -139,7 +138,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 	}
 
 	private IPropertyChangeListener filterChangeListener = new IPropertyChangeListener() {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			
 			if (ignoreFilterChangeEvents)
@@ -181,7 +179,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 		private IWorkingSet savedWorkingSet;
 
-		@Override
 		public void onExtensionActivation(String aViewerId, String[] theNavigatorExtensionIds, boolean isActive) {
 
 			for (int i = 0; i < theNavigatorExtensionIds.length; i++) {
@@ -211,7 +208,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 	};
 
-	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		viewer = (CommonViewer) aSite.getStructuredViewer();
 		contentService = aSite.getContentService();
@@ -223,7 +219,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		workingSetRootModeActionGroup = new WorkingSetRootModeActionGroup(viewer, extensionStateModel);
 
 		topLevelModeListener = new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				setWorkingSet(workingSet);
 				viewer.getFrameList().reset();
@@ -326,13 +321,11 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		}
 	}
 
-	@Override
 	public void restoreState(final IMemento aMemento) {
 		super.restoreState(aMemento);
 
 		// Need to run this async to avoid being reentered when processing a selection change
 		viewer.getControl().getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				boolean showWorkingSets = true;
 				if (aMemento != null) {
@@ -356,7 +349,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		});
 	}
 
-	@Override
 	public void saveState(IMemento aMemento) {
 		super.saveState(aMemento);
 
@@ -372,7 +364,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 	}
 
-	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		if (!contributedToViewMenu) {
 			try {
@@ -387,7 +378,6 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 		}
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 		workingSetActionGroup.dispose();

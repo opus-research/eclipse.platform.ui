@@ -56,8 +56,7 @@ public class PluginDropAdapter extends ViewerDropAdapter {
      * Method declared on DropTargetAdapter.
      * The user has dropped something on the desktop viewer.
      */
-    @Override
-	public void drop(DropTargetEvent event) {
+    public void drop(DropTargetEvent event) {
         try {
             if (PluginTransfer.getInstance().isSupportedType(
                     event.currentDataType)) {
@@ -114,8 +113,7 @@ public class PluginDropAdapter extends ViewerDropAdapter {
     /**
      * @see ViewerDropAdapter#performDrop
      */
-    @Override
-	public boolean performDrop(Object data) {
+    public boolean performDrop(Object data) {
         //should never be called, since we override the drop() method.
         return false;
     }
@@ -125,8 +123,7 @@ public class PluginDropAdapter extends ViewerDropAdapter {
      * <code>ViewerDropAdapter</code> method is used to notify the action that some
      * aspect of the drop operation has changed. Subclasses may override.
      */
-    @Override
-	public boolean validateDrop(Object target, int operation,
+    public boolean validateDrop(Object target, int operation,
             TransferData transferType) {
         currentTransfer = transferType;
         if (currentTransfer != null

@@ -25,8 +25,7 @@ public class PreferenceContentProvider implements ITreeContentProvider {
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         manager = null;
     }
 
@@ -65,8 +64,7 @@ public class PreferenceContentProvider implements ITreeContentProvider {
      *  (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
      */
-    @Override
-	public Object[] getChildren(Object parentElement) {//must be an instance of <code>IPreferenceNode</code>.
+    public Object[] getChildren(Object parentElement) {//must be an instance of <code>IPreferenceNode</code>.
         return ((IPreferenceNode) parentElement).getSubNodes();
     }
 
@@ -74,8 +72,7 @@ public class PreferenceContentProvider implements ITreeContentProvider {
      *  (non-Javadoc)
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
      */
-    @Override
-	public Object[] getElements(Object inputElement) {// must be an instance of <code>PreferenceManager</code>.
+    public Object[] getElements(Object inputElement) {// must be an instance of <code>PreferenceManager</code>.
         return getChildren(((PreferenceManager) inputElement).getRoot());
     }
 
@@ -83,8 +80,7 @@ public class PreferenceContentProvider implements ITreeContentProvider {
      *  (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
      */
-    @Override
-	public Object getParent(Object element) {//must be an instance of <code>IPreferenceNode</code>.
+    public Object getParent(Object element) {//must be an instance of <code>IPreferenceNode</code>.
         IPreferenceNode targetNode = (IPreferenceNode) element;
         IPreferenceNode root = manager.getRoot();
         return findParent(root, targetNode);
@@ -93,16 +89,14 @@ public class PreferenceContentProvider implements ITreeContentProvider {
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
      */
-    @Override
-	public boolean hasChildren(Object element) {
+    public boolean hasChildren(Object element) {
         return getChildren(element).length > 0;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
      */
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         manager = (PreferenceManager) newInput;
     }
 	/**

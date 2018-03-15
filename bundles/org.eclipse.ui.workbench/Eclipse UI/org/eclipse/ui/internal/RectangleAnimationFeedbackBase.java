@@ -51,7 +51,6 @@ public abstract class RectangleAnimationFeedbackBase extends AnimationFeedbackBa
 	 * 
 	 * Prevent execution if there are no rects to draw or there's a mismatch in the count
 	 */
-	@Override
 	public boolean jobInit(AnimationEngine engine) {
 		if (!super.jobInit(engine))
 			return false;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,6 @@ public abstract class SafeRunnable implements ISafeRunnable {
 	 * 
 	 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
 	 */
-	@Override
 	public void handleException(Throwable e) {
 		// Workaround to avoid interactive error dialogs during
 		// automated testing
@@ -77,7 +76,6 @@ public abstract class SafeRunnable implements ISafeRunnable {
 	 * @return true if errors should be ignored
 	 * @deprecated use getIgnoreErrors()
 	 */
-	@Deprecated
 	public static boolean getIgnoreErrors(boolean flag) {
 		return ignoreErrors;
 	}
@@ -125,7 +123,6 @@ public abstract class SafeRunnable implements ISafeRunnable {
 	 */
 	private static ISafeRunnableRunner createDefaultRunner() {
 		return new ISafeRunnableRunner() {
-			@Override
 			public void run(ISafeRunnable code) {
 				try {
 					code.run();

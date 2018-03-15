@@ -93,8 +93,7 @@ public final class ActivityRequirementBindingDefinition {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof ActivityRequirementBindingDefinition)) {
 			return false;
 		}
@@ -124,8 +123,7 @@ public final class ActivityRequirementBindingDefinition {
         return sourceId;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR
                     + Util.hashCode(requiredActivityId);
@@ -139,8 +137,7 @@ public final class ActivityRequirementBindingDefinition {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

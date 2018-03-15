@@ -23,7 +23,6 @@ import org.eclipse.jface.viewers.ViewerSorter;
  * @see IWorkbenchAdapter
  * @deprecated as of 3.3, use {@link WorkbenchViewerComparator} instead
  */
-@Deprecated
 public class WorkbenchViewerSorter extends ViewerSorter {
 
     /**
@@ -45,8 +44,7 @@ public class WorkbenchViewerSorter extends ViewerSorter {
     /* (non-Javadoc)
      * Method declared on ViewerSorter.
      */
-    @Override
-	public boolean isSorterProperty(Object element, String propertyId) {
+    public boolean isSorterProperty(Object element, String propertyId) {
         return propertyId.equals(IBasicPropertyConstants.P_TEXT);
     }
 }

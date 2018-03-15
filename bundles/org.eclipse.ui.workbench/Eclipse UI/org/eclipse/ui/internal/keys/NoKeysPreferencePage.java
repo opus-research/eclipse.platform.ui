@@ -24,7 +24,6 @@ public class NoKeysPreferencePage extends PreferencePage implements IWorkbenchPr
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	@Override
 	public void init(IWorkbench workbench) {
 		// do nothing, we don't have content
 	}

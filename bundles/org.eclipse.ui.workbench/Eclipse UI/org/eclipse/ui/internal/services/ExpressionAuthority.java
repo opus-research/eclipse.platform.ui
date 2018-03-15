@@ -272,7 +272,6 @@ public abstract class ExpressionAuthority implements ISourceProviderListener {
 		// this is a no-op, since we're late in the game
 	}
 
-	@Override
 	public final void sourceChanged(final int sourcePriority,
 			final Map sourceValuesByName) {
 		// If the selection has changed, invalidate the current state.
@@ -292,7 +291,6 @@ public abstract class ExpressionAuthority implements ISourceProviderListener {
 				.toArray(new String[0]));
 	}
 
-	@Override
 	public final void sourceChanged(final int sourcePriority,
 			final String sourceName, final Object sourceValue) {
 		// If the selection has changed, invalidate the current state.

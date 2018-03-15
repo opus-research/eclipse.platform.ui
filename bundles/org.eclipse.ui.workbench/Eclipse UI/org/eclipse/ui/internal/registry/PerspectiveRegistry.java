@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -55,14 +52,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	@Inject
 	MApplication application;
 
-	@Inject
-	IEclipseContext context;
-
-	private IEclipseContext impExpHandlerContext;
-
-	@Inject
-	Logger logger;
-
 	private Map<String, PerspectiveDescriptor> descriptors = new HashMap<String, PerspectiveDescriptor>();
 
 	@PostConstruct
@@ -84,45 +73,18 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 				
 				if (existingDescriptor == null) {
 					// A custom perspective with its own name.
-					createDescriptor(perspective);
+					String label = perspective.getLabel();
+					String originalId = getOriginalId(perspective.getElementId());
+					PerspectiveDescriptor originalDescriptor = descriptors.get(originalId);
+					PerspectiveDescriptor newDescriptor = new PerspectiveDescriptor(id, label,
+							originalDescriptor);
+					descriptors.put(id, newDescriptor);
 				} else {
 					// A custom perspecitve with a name of a pre-defined perspective
 					existingDescriptor.setHasCustomDefinition(true);
 				}
 			}
 		}
-
-		impExpHandlerContext = context.createChild();
-		impExpHandlerContext.set(PerspectiveRegistry.class, this);
-		ContextInjectionFactory.make(ImportExportPespectiveHandler.class, impExpHandlerContext);
-	}
-
-	public void addPerspective(MPerspective perspective) {
-		application.getSnippets().add(perspective);
-		createDescriptor(perspective);
-	}
-
-	private void createDescriptor(MPerspective perspective) {
-		String label = perspective.getLocalizedLabel();
-		String originalId = getOriginalId(perspective.getElementId());
-		PerspectiveDescriptor originalDescriptor = descriptors.get(originalId);
-		String id = perspective.getElementId();
-		PerspectiveDescriptor newDescriptor = new PerspectiveDescriptor(id, label, originalDescriptor);
-
-		/*
-		 * if (perspective.getIconURI() != null) { try { ImageDescriptor img =
-		 * ImageDescriptor.createFromURL(new
-		 * URI(perspective.getIconURI()).toURL());
-		 * newDescriptor.setImageDescriptor(img); } catch (MalformedURLException
-		 * e) { logger.warn(e,
-		 * MessageFormat.format("Error on applying configured perspective icon: {0}"
-		 * , //$NON-NLS-1$ perspective.getIconURI())); } catch
-		 * (URISyntaxException e) { logger.warn(e,
-		 * MessageFormat.format("Error on applying configured perspective icon: {0}"
-		 * , //$NON-NLS-1$ perspective.getIconURI())); } }
-		 */
-
-		descriptors.put(id, newDescriptor);
 	}
 
 	/**
@@ -141,7 +103,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * org.eclipse.ui.IPerspectiveRegistry#clonePerspective(java.lang.String,
 	 * java.lang.String, org.eclipse.ui.IPerspectiveDescriptor)
 	 */
-	@Override
 	public IPerspectiveDescriptor clonePerspective(String id, String label,
 			IPerspectiveDescriptor desc) throws IllegalArgumentException {
 		// FIXME: compat clonePerspective. Not called in 3.8
@@ -156,7 +117,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * org.eclipse.ui.IPerspectiveRegistry#deletePerspective(org.eclipse.ui.
 	 * IPerspectiveDescriptor)
 	 */
-	@Override
 	public void deletePerspective(IPerspectiveDescriptor toDelete) {
 		PerspectiveDescriptor perspective = (PerspectiveDescriptor) toDelete;
 		if (perspective.isPredefined())
@@ -192,7 +152,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * org.eclipse.ui.IPerspectiveRegistry#findPerspectiveWithId(java.lang.String
 	 * )
 	 */
-	@Override
 	public IPerspectiveDescriptor findPerspectiveWithId(String perspectiveId) {
 		return findPerspectiveWithId(perspectiveId, true);
 	}
@@ -213,7 +172,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * org.eclipse.ui.IPerspectiveRegistry#findPerspectiveWithLabel(java.lang
 	 * .String)
 	 */
-	@Override
 	public IPerspectiveDescriptor findPerspectiveWithLabel(String label) {
 		for (IPerspectiveDescriptor descriptor : descriptors.values()) {
 			if (descriptor.getLabel().equals(label)) {
@@ -231,7 +189,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * 
 	 * @see org.eclipse.ui.IPerspectiveRegistry#getDefaultPerspective()
 	 */
-	@Override
 	public String getDefaultPerspective() {
 		String defaultId = PrefUtil.getAPIPreferenceStore().getString(
 				IWorkbenchPreferenceConstants.DEFAULT_PERSPECTIVE_ID);
@@ -250,7 +207,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * 
 	 * @see org.eclipse.ui.IPerspectiveRegistry#getPerspectives()
 	 */
-	@Override
 	public IPerspectiveDescriptor[] getPerspectives() {
 		Collection<?> descs = WorkbenchActivityHelper.restrictCollection(descriptors.values(),
 				new ArrayList<Object>());
@@ -260,7 +216,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	/**
 	 * @see IPerspectiveRegistry#setDefaultPerspective(String)
 	 */
-	@Override
 	public void setDefaultPerspective(String id) {
 		IPerspectiveDescriptor desc = findPerspectiveWithId(id);
 		if (desc != null) {
@@ -294,7 +249,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * org.eclipse.ui.IPerspectiveRegistry#revertPerspective(org.eclipse.ui.
 	 * IPerspectiveDescriptor)
 	 */
-	@Override
 	public void revertPerspective(IPerspectiveDescriptor perspToRevert) {
 		PerspectiveDescriptor perspective = (PerspectiveDescriptor) perspToRevert;
 		if (!perspective.isPredefined())
@@ -308,9 +262,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * Dispose the receiver.
 	 */
 	public void dispose() {
-		if (impExpHandlerContext != null) {
-			impExpHandlerContext.dispose();
-		}
 		PlatformUI.getWorkbench().getExtensionTracker().unregisterHandler(this);
 		// FIXME: what was this listener for?
 		// WorkbenchPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(
@@ -323,7 +274,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#
 	 * removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
 	 */
-	@Override
 	public void removeExtension(IExtension source, Object[] objects) {
 		// TODO compat: what do we do about disappearing extensions
 	}
@@ -336,7 +286,6 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * (org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
 	 * org.eclipse.core.runtime.IExtension)
 	 */
-	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension addedExtension) {
 		// TODO compat: what do we do about appeaering extensions
 	}

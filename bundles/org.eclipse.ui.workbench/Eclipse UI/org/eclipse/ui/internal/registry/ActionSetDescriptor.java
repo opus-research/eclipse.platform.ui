@@ -76,8 +76,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      *
      * @return the action set
      */
-    @Override
-	public IActionSet createActionSet() throws CoreException {
+    public IActionSet createActionSet() throws CoreException {
         return new PluginActionSet(this);
     }
 
@@ -86,8 +85,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      * associated with this object. Returns <code>null</code> if
      * no such object can be found.
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
 			return this;
 		}
@@ -97,8 +95,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /**
      * @see IWorkbenchAdapter#getChildren
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
 
 
         return NO_CHILDREN;
@@ -108,8 +105,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.IActionSetDescriptor#getConfigurationElement()
      */
-    @Override
-	public IConfigurationElement getConfigurationElement() {
+    public IConfigurationElement getConfigurationElement() {
         return configElement;
     }
 
@@ -119,8 +115,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      *
      * @return the description
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -131,8 +126,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      *
      * @return the action set id
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return id;
     }
 
@@ -142,16 +136,14 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      *
      * @return the label
      */
-    @Override
-	public String getLabel() {
+    public String getLabel() {
         return label;
     }
 
     /**
      * @see IWorkbenchAdapter#getLabel
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
         if (o == this) {
 			return getLabel();
 		}
@@ -161,8 +153,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /**
      * Returns whether this action set is initially visible.
      */
-    @Override
-	public boolean isInitiallyVisible() {
+    public boolean isInitiallyVisible() {
         if (id == null) {
 			return visible;
 		}
@@ -180,8 +171,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
      * 
      * @since 3.0
      */
-    @Override
-	public void setInitiallyVisible(boolean newValue) {
+    public void setInitiallyVisible(boolean newValue) {
         if (id == null) {
 			return;
 		}
@@ -193,37 +183,32 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
      */
-    @Override
-	public Object getParent(Object o) {
+    public Object getParent(Object o) {
         return null;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getLocalId()
      */
-    @Override
-	public String getLocalId() {
+    public String getLocalId() {
         return id;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getPluginId()
      */
-    @Override
-	public String getPluginId() {
+    public String getPluginId() {
         return pluginId;
     }
     
-    @Override
-	public boolean equals(Object arg0) {
+    public boolean equals(Object arg0) {
         if (!(arg0 instanceof ActionSetDescriptor)) {
             return false;
         }
@@ -233,8 +218,7 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
         return id.equals(descr.id) && descr.pluginId.equals(pluginId);
     }
     
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return id.hashCode() + pluginId.hashCode();
     }
 }

@@ -91,8 +91,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                     /* (non-Javadoc)
                      * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
                      */
-                    @Override
-					public void activityManagerChanged(
+                    public void activityManagerChanged(
                             ActivityManagerEvent activityManagerEvent) {
                         Set activityIds = mutableActivityManager
                                 .getEnabledActivityIds();
@@ -132,8 +131,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                         /* (non-Javadoc)
                                          * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
                                          */
-                                        @Override
-										public void run(IProgressMonitor monitor) {
+                                        public void run(IProgressMonitor monitor) {
 
                                             openTime = System
                                                     .currentTimeMillis()
@@ -265,8 +263,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                                 /* (non-Javadoc)
                                                  * @see java.lang.Runnable#run()
                                                  */
-                                                @Override
-												public void run() {
+                                                public void run() {
                                                     BusyIndicator
                                                             .showWhile(
                                                                     workbench
@@ -276,8 +273,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                                                         /* (non-Javadoc)
                                                                          * @see java.lang.Runnable#run()
                                                                          */
-                                                                        @Override
-																		public void run() {
+                                                                        public void run() {
                                                                             try {
                                                                                 dialog
                                                                                         .run(
@@ -313,23 +309,20 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getActivityManager()
      */
-    @Override
-	public IActivityManager getActivityManager() {
+    public IActivityManager getActivityManager() {
         return proxyActivityManager;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#setEnabledActivityIds(java.util.Set)
      */
-    @Override
-	public void setEnabledActivityIds(Set enabledActivityIds) {
+    public void setEnabledActivityIds(Set enabledActivityIds) {
         mutableActivityManager.setEnabledActivityIds(enabledActivityIds);
     }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getImageDescriptor(org.eclipse.ui.activities.IActivity)
 	 */
-	@Override
 	public ImageDescriptor getImageDescriptor(IActivity activity) {
 		if (activity.isDefined()) {
 			ImageDescriptor descriptor = getActivityImageBindingRegistry()
@@ -345,7 +338,6 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getImageDescriptor(org.eclipse.ui.activities.ICategory)
 	 */
-	@Override
 	public ImageDescriptor getImageDescriptor(ICategory category) {
 		if (category.isDefined()) {
 			ImageDescriptor descriptor = getCategoryImageBindingRegistry()
@@ -453,7 +445,6 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getTriggerPointManager()
 	 */
-	@Override
 	public ITriggerPointManager getTriggerPointManager() {
 		return triggerPointManager;
 	}
@@ -461,7 +452,6 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
 	 */
-	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		// reset the advisor if it's the "default" advisor.
 		// this will give getAdvisor the chance to find a proper trigger/binding if
@@ -485,7 +475,6 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
 	 */
-	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
 			if (objects[i] == advisor) {
@@ -498,8 +487,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
     /* (non-Javadoc)
      * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#createWorkingCopy()
      */
-    @Override
-	public IMutableActivityManager createWorkingCopy() {
+    public IMutableActivityManager createWorkingCopy() {
         MutableActivityManager clone = (MutableActivityManager) mutableActivityManager.clone();
         clone.unhookRegistryListeners();
         return clone;

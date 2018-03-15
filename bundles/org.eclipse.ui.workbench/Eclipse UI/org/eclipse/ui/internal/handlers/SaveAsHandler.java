@@ -33,7 +33,6 @@ public class SaveAsHandler extends AbstractSaveHandler {
 		registerEnablement();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) {
 
 		ISaveablePart saveablePart = getSaveablePart(event);
@@ -44,7 +43,6 @@ public class SaveAsHandler extends AbstractSaveHandler {
 		return null;
 	}
 
-	@Override
 	protected EvaluationResult evaluate(IEvaluationContext context) {
 
 		IWorkbenchWindow window = InternalHandlerUtil.getActiveWorkbenchWindow(context);

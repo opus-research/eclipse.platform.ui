@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -140,8 +140,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    protected void adjustForNumColumns(int numColumns) {
         Control control = getLabelControl();
         if (control != null) {
             ((GridData) control.getLayoutData()).horizontalSpan = numColumns;
@@ -172,8 +171,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         if (useGroup) {
             Control control = getRadioBoxControl(parent);
             GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -195,24 +193,21 @@ public class RadioGroupFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doLoad() {
+    protected void doLoad() {
         updateValue(getPreferenceStore().getString(getPreferenceName()));
     }
 
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doLoadDefault() {
+    protected void doLoadDefault() {
         updateValue(getPreferenceStore().getDefaultString(getPreferenceName()));
     }
 
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doStore() {
+    protected void doStore() {
         if (value == null) {
             getPreferenceStore().setToDefault(getPreferenceName());
             return;
@@ -224,8 +219,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	public int getNumberOfControls() {
+    public int getNumberOfControls() {
         return 1;
     }
 
@@ -271,8 +265,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
                 radio.setData(labelAndValue[1]);
                 radio.setFont(font);
                 radio.addSelectionListener(new SelectionAdapter() {
-                    @Override
-					public void widgetSelected(SelectionEvent event) {
+                    public void widgetSelected(SelectionEvent event) {
                         String oldValue = value;
                         value = (String) event.widget.getData();
                         setPresentsDefaultValue(false);
@@ -281,8 +274,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
                 });
             }
             radioBox.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     radioBox = null;
                     radioButtons = null;
                 }
@@ -345,8 +337,7 @@ public class RadioGroupFieldEditor extends FieldEditor {
     /*
      * @see FieldEditor.setEnabled(boolean,Composite).
      */
-    @Override
-	public void setEnabled(boolean enabled, Composite parent) {
+    public void setEnabled(boolean enabled, Composite parent) {
         if (!useGroup) {
 			super.setEnabled(enabled, parent);
 		}

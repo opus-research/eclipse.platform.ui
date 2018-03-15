@@ -55,7 +55,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * @see
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#clearResult()
 	 */
-	@Override
 	public void clearResult() {
 	}
 
@@ -65,7 +64,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * @see
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getExpression()
 	 */
-	@Override
 	public Expression getExpression() {
 		return expression;
 	}
@@ -77,7 +75,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getSourcePriority
 	 * ()
 	 */
-	@Override
 	public int getSourcePriority() {
 		return sourcePriority;
 	}
@@ -89,7 +86,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#evaluate(org.
 	 * eclipse.core.expressions.IEvaluationContext)
 	 */
-	@Override
 	public boolean evaluate(IEvaluationContext context) {
 		if (expression == null) {
 			cache = true;
@@ -110,7 +106,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.ui.internal.services.IEvaluationResultCache#setResult(boolean
 	 * )
 	 */
-	@Override
 	public void setResult(boolean result) {
 		cache = result;
 	}
@@ -122,7 +117,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * org.eclipse.e4.core.services.context.IRunAndTrack#notify(org.eclipse.
 	 * e4.core.services.context.ContextChangeEvent)
 	 */
-	@Override
 	public boolean changed(IEclipseContext context) {
 		if (!participating) {
 			return false;
@@ -158,7 +152,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * 
 	 * @see org.eclipse.ui.services.IEvaluationReference#getListener()
 	 */
-	@Override
 	public IPropertyChangeListener getListener() {
 		return listener;
 	}
@@ -168,7 +161,6 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 	 * 
 	 * @see org.eclipse.ui.services.IEvaluationReference#getProperty()
 	 */
-	@Override
 	public String getProperty() {
 		return property;
 	}

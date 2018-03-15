@@ -89,7 +89,6 @@ public abstract class JobTreeElement implements Comparable {
 	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public int compareTo(Object arg0) {
 		if (arg0 instanceof JobTreeElement)
 			return getDisplayString().compareTo(

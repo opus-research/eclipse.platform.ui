@@ -50,7 +50,6 @@ public final class ContextManagerLegacyWrapper implements
 		/**
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public final int compare(final Object object1, final Object object2) {
 			final String contextId1 = (String) object1;
 			final String contextId2 = (String) object2;
@@ -149,7 +148,6 @@ public final class ContextManagerLegacyWrapper implements
 		this.contextManager.addContextManagerListener(this);
 	}
 
-	@Override
 	public void addContextManagerListener(
 			IContextManagerListener contextManagerListener) {
 		if (contextManagerListener == null) {
@@ -170,7 +168,6 @@ public final class ContextManagerLegacyWrapper implements
 	 * 
 	 * @see org.eclipse.core.commands.contexts.IContextManagerListener#contextManagerChanged(org.eclipse.core.commands.contexts.ContextManagerEvent)
 	 */
-	@Override
 	public void contextManagerChanged(
 			org.eclipse.core.commands.contexts.ContextManagerEvent contextManagerEvent) {
 		final String contextId = contextManagerEvent.getContextId();
@@ -213,24 +210,20 @@ public final class ContextManagerLegacyWrapper implements
 		}
 	}
 
-	@Override
 	public IContext getContext(String contextId) {
 		return new ContextLegacyWrapper(contextManager.getContext(contextId),
 				contextManager);
 	}
 
-	@Override
 	public SortedSet getDefinedContextIds() {
 		return new DepthSortedContextIdSet(contextManager
 				.getDefinedContextIds());
 	}
 
-	@Override
 	public SortedSet getEnabledContextIds() {
 		return new DepthSortedContextIdSet(contextManager.getActiveContextIds());
 	}
 
-	@Override
 	public void removeContextManagerListener(
 			IContextManagerListener contextManagerListener) {
 		if (contextManagerListener == null) {

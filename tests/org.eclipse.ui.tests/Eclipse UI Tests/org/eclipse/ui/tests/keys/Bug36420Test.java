@@ -79,7 +79,7 @@ public class Bug36420Test extends UITestCase {
         String[] pluginIds = Platform.getExtensionRegistry().getNamespaces();
 		for (int i = 0; i < pluginIds.length; i++) {
 			preferences.put(pluginIds[i], new PluginVersionIdentifier(
-					Platform.getBundle(pluginIds[i]).getHeaders().get(
+					(String) Platform.getBundle(pluginIds[i]).getHeaders().get(
 							org.osgi.framework.Constants.BUNDLE_VERSION)));
 		}
 

@@ -38,8 +38,7 @@ public final class EditorPluginAction extends PartPluginAction {
     /* (non-Javadoc)
      * Method declared on PluginAction.
      */
-    @Override
-	protected IActionDelegate validateDelegate(Object obj)
+    protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
         if (obj instanceof IEditorActionDelegate) {
 			return (IEditorActionDelegate) obj;
@@ -52,8 +51,7 @@ public final class EditorPluginAction extends PartPluginAction {
     /* (non-Javadoc)
      * Method declared on PluginAction.
      */
-    @Override
-	protected void initDelegate() {
+    protected void initDelegate() {
         super.initDelegate();
         ((IEditorActionDelegate) getDelegate()).setActiveEditor(this,
                 currentEditor);
@@ -85,7 +83,6 @@ public final class EditorPluginAction extends PartPluginAction {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.PluginAction#dispose()
 	 */
-	@Override
 	public void dispose() {
         if (currentEditor != null) {
             unregisterSelectionListener(currentEditor);

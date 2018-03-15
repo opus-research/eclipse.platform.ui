@@ -59,7 +59,6 @@ public class NestableContextService extends SlaveContextService implements
 	 * 
 	 * @see org.eclipse.ui.internal.contexts.SlaveContextService#doActivateContext(org.eclipse.ui.contexts.IContextActivation)
 	 */
-	@Override
 	protected IContextActivation doActivateContext(IContextActivation activation) {
 		if (fActive) {
 			return super.doActivateContext(activation);
@@ -73,7 +72,6 @@ public class NestableContextService extends SlaveContextService implements
 	 * 
 	 * @see org.eclipse.ui.internal.services.INestable#activate()
 	 */
-	@Override
 	public void activate() {
 		if (fActive) {
 			return;
@@ -92,7 +90,6 @@ public class NestableContextService extends SlaveContextService implements
 	 * 
 	 * @see org.eclipse.ui.internal.services.INestable#deactivate()
 	 */
-	@Override
 	public void deactivate() {
 		if (!fActive) {
 			return;

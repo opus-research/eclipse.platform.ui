@@ -36,13 +36,21 @@ public class ExpressionContext implements IEvaluationContext {
 		this.eclipseContext = eclipseContext;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#getParent()
+	 */
 	public IEvaluationContext getParent() {
 		IEclipseContext parent = eclipseContext.getParent();
 		return parent == null ? null : new ExpressionContext(parent);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#getRoot()
+	 */
 	public IEvaluationContext getRoot() {
 		IEclipseContext current = eclipseContext;
 		IEclipseContext parent = current.getParent();
@@ -56,18 +64,30 @@ public class ExpressionContext implements IEvaluationContext {
 		return new ExpressionContext(current);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#setAllowPluginActivation(boolean)
+	 */
 	public void setAllowPluginActivation(boolean value) {
 		eclipseContext.set(ALLOW_ACTIVATION, Boolean.valueOf(value));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#getAllowPluginActivation()
+	 */
 	public boolean getAllowPluginActivation() {
 		Object obj = eclipseContext.get(ALLOW_ACTIVATION);
 		return obj instanceof Boolean ? ((Boolean) obj).booleanValue() : false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#getDefaultVariable()
+	 */
 	public Object getDefaultVariable() {
 		final Object sel;
 		if (defaultVariableConverter != null) {
@@ -78,19 +98,32 @@ public class ExpressionContext implements IEvaluationContext {
 		return sel == null ? Collections.EMPTY_LIST : sel;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#addVariable(java.lang.String,
+	 * java.lang.Object)
+	 */
 	public void addVariable(String name, Object value) {
 		eclipseContext.set(name, value);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#removeVariable(java.lang.String)
+	 */
 	public Object removeVariable(String name) {
 		Object obj = eclipseContext.getLocal(name);
 		eclipseContext.remove(name);
 		return obj;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#getVariable(java.lang.String)
+	 */
 	public Object getVariable(String name) {
 		if (IEclipseContext.class.getName().equals(name)) {
 			return eclipseContext;
@@ -99,7 +132,12 @@ public class ExpressionContext implements IEvaluationContext {
 		return obj == null ? IEvaluationContext.UNDEFINED_VARIABLE : obj;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IEvaluationContext#resolveVariable(java.lang.String,
+	 * java.lang.Object[])
+	 */
 	public Object resolveVariable(String name, Object[] args) throws CoreException {
 		// TODO Auto-generated method stub
 		return null;

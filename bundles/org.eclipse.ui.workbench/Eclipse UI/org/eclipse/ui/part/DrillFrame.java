@@ -45,8 +45,7 @@ import java.util.List;
      * @return  <code>true</code> if this object is the same as the obj
      *          argument; <code>false</code> otherwise.
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         // Compare handles.
         if (this == obj) {
 			return true;

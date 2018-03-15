@@ -73,7 +73,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * Passes the dipose on to the proxied handler, if it has been loaded.
 	 */
-	@Override
 	public void dispose() {
 		if (handler != null) {
 			handler.dispose();
@@ -83,7 +82,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * @see IHandler#execute(Map)
 	 */
-	@Override
 	public Object execute(Map parameters) throws ExecutionException {
 		if (loadHandler()) {
 			return handler.execute(parameters);
@@ -95,7 +93,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 	/**
 	 * @see IHandler#getAttributeValuesByName()
 	 */
-	@Override
 	public Map getAttributeValuesByName() {
 		if (loadHandler()) {
 			return handler.getAttributeValuesByName();
@@ -136,7 +133,6 @@ public final class LegacyHandlerProxy extends AbstractHandler {
 		return true;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -209,16 +209,22 @@ public abstract class AbstractListViewer extends StructuredViewer {
         add(new Object[] { element });
     }
 
-    @Override
-	protected Widget doFindInputItem(Object element) {
+    /* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     * Since SWT.List doesn't use items we always return the List itself.
+     */
+    protected Widget doFindInputItem(Object element) {
         if (element != null && equals(element, getRoot())) {
 			return getControl();
 		}
         return null;
     }
 
-    @Override
-	protected Widget doFindItem(Object element) {
+    /* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     * Since SWT.List doesn't use items we always return the List itself.
+     */
+    protected Widget doFindItem(Object element) {
         if (element != null) {
             if (listMapContains(element)) {
 				return getControl();
@@ -227,8 +233,10 @@ public abstract class AbstractListViewer extends StructuredViewer {
         return null;
     }
 
-    @Override
-	protected void doUpdateItem(Widget data, Object element, boolean fullMap) {
+	/* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     */
+    protected void doUpdateItem(Widget data, Object element, boolean fullMap) {
         if (element != null) {
             int ix = getElementIndex(element);
             if (ix >= 0) {
@@ -258,13 +266,17 @@ public abstract class AbstractListViewer extends StructuredViewer {
      * method returns the label provider, which in the case of list
      * viewers will be an instance of <code>ILabelProvider</code>.
      */
-    @Override
-	public IBaseLabelProvider getLabelProvider() {
+    public IBaseLabelProvider getLabelProvider() {
         return super.getLabelProvider();
     }
 
-    @Override
-	protected List getSelectionFromWidget() {
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
+    /* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     */
+    protected List getSelectionFromWidget() {
         int[] ixs = listGetSelectionIndices();
         ArrayList list = new ArrayList(ixs.length);
         for (int i = 0; i < ixs.length; i++) {
@@ -312,8 +324,10 @@ public abstract class AbstractListViewer extends StructuredViewer {
         return min;
     }
 
-    @Override
-	protected void inputChanged(Object input, Object oldInput) {
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
+    protected void inputChanged(Object input, Object oldInput) {
         listMap.clear();
         Object[] children = getSortedChildren(getRoot());
         int size = children.length;
@@ -329,8 +343,10 @@ public abstract class AbstractListViewer extends StructuredViewer {
         listSetItems(labels);
     }
 
-    @Override
-	protected void internalRefresh(Object element) {
+    /* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     */
+    protected void internalRefresh(Object element) {
         Control list = getControl();
         if (element == null || equals(element, getRoot())) {
             // the parent
@@ -438,8 +454,7 @@ public abstract class AbstractListViewer extends StructuredViewer {
         	return;
         }
         preservingSelection(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 internalRemove(elements);
             }
         });
@@ -466,18 +481,19 @@ public abstract class AbstractListViewer extends StructuredViewer {
 	 * The list viewer implementation of this <code>Viewer</code> framework
 	 * method ensures that the given label provider is an instance of
 	 * <code>ILabelProvider</code>.
-	 *
+	 * 
 	 * <b>The optional interfaces {@link IColorProvider} and
 	 * {@link IFontProvider} have no effect for this type of viewer</b>
 	 */
-    @Override
-	public void setLabelProvider(IBaseLabelProvider labelProvider) {
+    public void setLabelProvider(IBaseLabelProvider labelProvider) {
         Assert.isTrue(labelProvider instanceof ILabelProvider);
         super.setLabelProvider(labelProvider);
     }
 
-    @Override
-	protected void setSelectionToWidget(List in, boolean reveal) {
+    /* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     */
+    protected void setSelectionToWidget(List in, boolean reveal) {
         if (in == null || in.size() == 0) { // clear selection
             listDeselectAll();
         } else {

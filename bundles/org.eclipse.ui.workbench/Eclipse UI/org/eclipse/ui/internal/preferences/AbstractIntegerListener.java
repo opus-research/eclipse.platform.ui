@@ -39,8 +39,7 @@ public abstract class AbstractIntegerListener extends AbstractPropertyListener {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.preferences.AbstractPropertyListener#update()
      */
-    @Override
-	protected void update() {
+    protected void update() {
         handleValue(PropertyUtil.get(map, propertyId, defaultValue));
     }
 

@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -54,8 +54,7 @@ public abstract class AbstractElementSelector
      * Indicates whether some other object is "equal to" this one.
      * @param obj the reference object with which to compare.
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null || (obj.getClass() != getClass())) {
             return false;
         }
@@ -68,8 +67,7 @@ public abstract class AbstractElementSelector
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.ElementSelector#getNamespaceURI()}.
      */
-    @Override
-	public String getNamespaceURI() {
+    public String getNamespaceURI() {
         return namespaceURI;
     }
 
@@ -77,15 +75,13 @@ public abstract class AbstractElementSelector
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.ElementSelector#getLocalName()}.
      */
-    @Override
-	public String getLocalName() {
+    public String getLocalName() {
         return localName;
     }
 
     /**
      * Fills the given set with the attribute names found in this selector.
      */
-    @Override
-	public void fillAttributeSet(Set attrSet) {
+    public void fillAttributeSet(Set attrSet) {
     }
 }

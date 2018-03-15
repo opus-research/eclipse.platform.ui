@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -211,7 +211,6 @@ public class FilteredTree extends Composite {
 	 *             {@link #FilteredTree(Composite, int, PatternFilter, boolean)}
 	 *             where using the new look is encouraged
 	 */
-	@Deprecated
 	public FilteredTree(Composite parent, int treeStyle, PatternFilter filter) {
 		super(parent, SWT.NONE);
 		this.parent = parent;
@@ -254,7 +253,6 @@ public class FilteredTree extends Composite {
 	 *             {@link #FilteredTree(Composite, boolean)} where using the
 	 *             look is encouraged
 	 */
-	@Deprecated
 	protected FilteredTree(Composite parent) {
 		super(parent, SWT.NONE);
 		this.parent = parent;
@@ -406,7 +404,13 @@ public class FilteredTree extends Composite {
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		treeViewer.getControl().setLayoutData(data);
 		treeViewer.getControl().addDisposeListener(new DisposeListener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse
+			 * .swt.events.DisposeEvent)
+			 */
 			public void widgetDisposed(DisposeEvent e) {
 				refreshJob.cancel();
 			}
@@ -472,7 +476,6 @@ public class FilteredTree extends Composite {
 	 */
 	protected BasicUIJob doCreateRefreshJob() {
 		return new BasicUIJob("Refresh Filter", parent.getDisplay()) {//$NON-NLS-1$
-			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (treeViewer.getControl().isDisposed()) {
 					return Status.CANCEL_STATUS;
@@ -628,7 +631,6 @@ public class FilteredTree extends Composite {
 					 * org.eclipse.swt.accessibility.AccessibleListener#getName
 					 * (org.eclipse.swt.accessibility.AccessibleEvent)
 					 */
-					@Override
 					public void getName(AccessibleEvent e) {
 						String filterTextString = filterText.getText();
 						if (filterTextString.length() == 0
@@ -678,7 +680,13 @@ public class FilteredTree extends Composite {
 				});
 
 		filterText.addFocusListener(new FocusAdapter() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt
+			 * .events.FocusEvent)
+			 */
 			public void focusGained(FocusEvent e) {
 				if (!useNewLook) {
 					/*
@@ -687,7 +695,6 @@ public class FilteredTree extends Composite {
 					 */
 					Display display = filterText.getDisplay();
 					display.asyncExec(new Runnable() {
-						@Override
 						public void run() {
 							if (!filterText.isDisposed()) {
 								if (getInitialText().equals(
@@ -701,7 +708,13 @@ public class FilteredTree extends Composite {
 				}
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.swt.events.FocusAdapter#focusLost(org.eclipse.swt
+			 * .events.FocusEvent)
+			 */
 			public void focusLost(FocusEvent e) {
 				if (!useNewLook) {
 					return;
@@ -715,7 +728,13 @@ public class FilteredTree extends Composite {
 
 		if (useNewLook) {
 			filterText.addMouseListener(new MouseAdapter() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.swt.events.MouseAdapter#mouseDown(org.eclipse
+				 * .swt.events.MouseEvent)
+				 */
 				public void mouseDown(MouseEvent e) {
 					if (filterText.getText().equals(initialText)) {
 						// XXX: We cannot call clearText() due to
@@ -728,7 +747,13 @@ public class FilteredTree extends Composite {
 		}
 
 		filterText.addKeyListener(new KeyAdapter() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt
+			 * .events.KeyEvent)
+			 */
 			public void keyPressed(KeyEvent e) {
 				// on a CR we want to transfer focus to the list
 				boolean hasItems = getViewer().getTree().getItemCount() > 0;
@@ -741,7 +766,6 @@ public class FilteredTree extends Composite {
 
 		// enter key set focus to tree
 		filterText.addTraverseListener(new TraverseListener() {
-			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_RETURN) {
 					e.doit = false;
@@ -773,7 +797,13 @@ public class FilteredTree extends Composite {
 		});
 
 		filterText.addModifyListener(new ModifyListener() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.
+			 * swt.events.ModifyEvent)
+			 */
 			public void modifyText(ModifyEvent e) {
 				textChanged();
 			}
@@ -784,7 +814,13 @@ public class FilteredTree extends Composite {
 		// pressed)
 		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0) {
 			filterText.addSelectionListener(new SelectionAdapter() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.swt.events.SelectionAdapter#widgetDefaultSelected
+				 * (org.eclipse.swt.events.SelectionEvent)
+				 */
 				public void widgetDefaultSelected(SelectionEvent e) {
 					if (e.detail == SWT.ICON_CANCEL)
 						clearText();
@@ -854,7 +890,6 @@ public class FilteredTree extends Composite {
 	 * @param background
 	 *            background <code>Color</code> to set
 	 */
-	@Override
 	public void setBackground(Color background) {
 		super.setBackground(background);
 		if (filterComposite != null
@@ -880,7 +915,11 @@ public class FilteredTree extends Composite {
 			filterToolBar.createControl(parent);
 
 			IAction clearTextAction = new Action("", IAction.AS_PUSH_BUTTON) {//$NON-NLS-1$
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.action.Action#run()
+				 */
 				public void run() {
 					clearText();
 				}
@@ -925,13 +964,11 @@ public class FilteredTree extends Composite {
 			clearButton.addMouseListener(new MouseAdapter() {
 				private MouseMoveListener fMoveListener;
 
-				@Override
 				public void mouseDown(MouseEvent e) {
 					clearButton.setImage(pressedImage);
 					fMoveListener = new MouseMoveListener() {
 						private boolean fMouseInButton = true;
 
-						@Override
 						public void mouseMove(MouseEvent e) {
 							boolean mouseInButton = isMouseInButton(e);
 							if (mouseInButton != fMouseInButton) {
@@ -945,7 +982,6 @@ public class FilteredTree extends Composite {
 					clearButton.addMouseMoveListener(fMoveListener);
 				}
 
-				@Override
 				public void mouseUp(MouseEvent e) {
 					if (fMoveListener != null) {
 						clearButton.removeMouseMoveListener(fMoveListener);
@@ -967,22 +1003,18 @@ public class FilteredTree extends Composite {
 				}
 			});
 			clearButton.addMouseTrackListener(new MouseTrackListener() {
-				@Override
 				public void mouseEnter(MouseEvent e) {
 					clearButton.setImage(activeImage);
 				}
 
-				@Override
 				public void mouseExit(MouseEvent e) {
 					clearButton.setImage(inactiveImage);
 				}
 
-				@Override
 				public void mouseHover(MouseEvent e) {
 				}
 			});
 			clearButton.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					inactiveImage.dispose();
 					activeImage.dispose();
@@ -991,14 +1023,12 @@ public class FilteredTree extends Composite {
 			});
 			clearButton.getAccessible().addAccessibleListener(
 					new AccessibleAdapter() {
-						@Override
 						public void getName(AccessibleEvent e) {
 							e.result = WorkbenchSWTMessages.FilteredTree_AccessibleListenerClearButton;
 						}
 					});
 			clearButton.getAccessible().addAccessibleControlListener(
 					new AccessibleControlAdapter() {
-						@Override
 						public void getRole(AccessibleControlEvent e) {
 							e.detail = ACC.ROLE_PUSHBUTTON;
 						}
@@ -1082,7 +1112,6 @@ public class FilteredTree extends Composite {
 				textChanged();
 			} else {
 				getDisplay().asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						if (!filterText.isDisposed()
 								&& filterText.isFocusControl()) {
@@ -1177,93 +1206,78 @@ public class FilteredTree extends Composite {
 			super(parent, style);
 		}
 
-		@Override
 		public void add(Object parentElementOrTreePath, Object childElement) {
 			getPatternFilter().clearCaches();
 			super.add(parentElementOrTreePath, childElement);
 		}
 
-		@Override
 		public void add(Object parentElementOrTreePath, Object[] childElements) {
 			getPatternFilter().clearCaches();
 			super.add(parentElementOrTreePath, childElements);
 		}
 
-		@Override
 		protected void inputChanged(Object input, Object oldInput) {
 			getPatternFilter().clearCaches();
 			super.inputChanged(input, oldInput);
 		}
 
-		@Override
 		public void insert(Object parentElementOrTreePath, Object element,
 				int position) {
 			getPatternFilter().clearCaches();
 			super.insert(parentElementOrTreePath, element, position);
 		}
 
-		@Override
 		public void refresh() {
 			getPatternFilter().clearCaches();
 			super.refresh();
 		}
 
-		@Override
 		public void refresh(boolean updateLabels) {
 			getPatternFilter().clearCaches();
 			super.refresh(updateLabels);
 		}
 
-		@Override
 		public void refresh(Object element) {
 			getPatternFilter().clearCaches();
 			super.refresh(element);
 		}
 
-		@Override
 		public void refresh(Object element, boolean updateLabels) {
 			getPatternFilter().clearCaches();
 			super.refresh(element, updateLabels);
 		}
 
-		@Override
 		public void remove(Object elementsOrTreePaths) {
 			getPatternFilter().clearCaches();
 			super.remove(elementsOrTreePaths);
 		}
 
-		@Override
 		public void remove(Object parent, Object[] elements) {
 			getPatternFilter().clearCaches();
 			super.remove(parent, elements);
 		}
 
-		@Override
 		public void remove(Object[] elementsOrTreePaths) {
 			getPatternFilter().clearCaches();
 			super.remove(elementsOrTreePaths);
 		}
 
-		@Override
 		public void replace(Object parentElementOrTreePath, int index,
 				Object element) {
 			getPatternFilter().clearCaches();
 			super.replace(parentElementOrTreePath, index, element);
 		}
 
-		@Override
 		public void setChildCount(Object elementOrTreePath, int count) {
 			getPatternFilter().clearCaches();
 			super.setChildCount(elementOrTreePath, count);
 		}
 
-		@Override
 		public void setContentProvider(IContentProvider provider) {
 			getPatternFilter().clearCaches();
 			super.setContentProvider(provider);
 		}
 
-		@Override
 		public void setHasChildren(Object elementOrTreePath, boolean hasChildren) {
 			getPatternFilter().clearCaches();
 			super.setHasChildren(elementOrTreePath, hasChildren);

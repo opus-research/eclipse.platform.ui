@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -57,8 +57,7 @@ public class CSSConditionalSelectorImpl
      * Indicates whether some other object is "equal to" this one.
      * @param obj the reference object with which to compare.
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null || (obj.getClass() != getClass())) {
             return false;
         }
@@ -71,16 +70,14 @@ public class CSSConditionalSelectorImpl
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.Selector#getSelectorType()}.
      */
-    @Override
-	public short getSelectorType() {
+    public short getSelectorType() {
         return SAC_CONDITIONAL_SELECTOR;
     }
 
     /**
      * Tests whether this selector matches the given element.
      */
-    @Override
-	public boolean match(Element e, String pseudoE) {
+    public boolean match(Element e, String pseudoE) {
         return ((ExtendedSelector)getSimpleSelector()).match(e, pseudoE) &&
                ((ExtendedCondition)getCondition()).match(e, pseudoE);
     }
@@ -88,8 +85,7 @@ public class CSSConditionalSelectorImpl
     /**
      * Fills the given set with the attribute names found in this selector.
      */
-    @Override
-	public void fillAttributeSet(Set attrSet) {
+    public void fillAttributeSet(Set attrSet) {
         ((ExtendedSelector)getSimpleSelector()).fillAttributeSet(attrSet);
         ((ExtendedCondition)getCondition()).fillAttributeSet(attrSet);
     }
@@ -97,8 +93,7 @@ public class CSSConditionalSelectorImpl
     /**
      * Returns the specificity of this selector.
      */
-    @Override
-	public int getSpecificity() {
+    public int getSpecificity() {
         return ((ExtendedSelector)getSimpleSelector()).getSpecificity() +
                ((ExtendedCondition)getCondition()).getSpecificity();
     }
@@ -107,8 +102,7 @@ public class CSSConditionalSelectorImpl
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.ConditionalSelector#getSimpleSelector()}.
      */
-    @Override
-	public SimpleSelector getSimpleSelector() {
+    public SimpleSelector getSimpleSelector() {
         return simpleSelector;
     }
 
@@ -116,16 +110,14 @@ public class CSSConditionalSelectorImpl
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.ConditionalSelector#getCondition()}.
      */
-    @Override
-	public Condition getCondition() {
+    public Condition getCondition() {
         return condition;
     }
 
     /**
      * Returns a representation of the selector.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return String.valueOf( simpleSelector ) + condition;
     }
 }

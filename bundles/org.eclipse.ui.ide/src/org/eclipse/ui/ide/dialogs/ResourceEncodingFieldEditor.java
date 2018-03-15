@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Hochstein (Freescale) - Bug 409996 - 'Restore Defaults' does not work properly on Project Properties > Resource tab
  *******************************************************************************/
 package org.eclipse.ui.ide.dialogs;
 
@@ -55,11 +54,8 @@ import org.osgi.service.prefs.Preferences;
  * 
  * @since 3.1
  */
-public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEditor {
-
-
-	private static boolean DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS = ResourcesPlugin.DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS;
-
+public final class ResourceEncodingFieldEditor extends
+		AbstractEncodingFieldEditor {
 
 	/**
 	 * The resource being edited.
@@ -158,24 +154,23 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		// be careful looking up for our node so not to create any nodes as side effect
 		Preferences node = Platform.getPreferencesService().getRootNode()
 				.node(ProjectScope.SCOPE);
-		String projectName = resource.getName();
+		String projectName = ((IProject) resource).getName();
 		try {
 			//TODO once bug 90500 is fixed, should be as simple as this:
 			//			String path = projectName + IPath.SEPARATOR + ResourcesPlugin.PI_RESOURCES;
 			//			return node.nodeExists(path) ? node.node(path).getBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS, false) : false;
 			// for now, take the long way
 			if (!node.nodeExists(projectName))
-				return DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS;
+				return false;
 			node = node.node(projectName);
 			if (!node.nodeExists(ResourcesPlugin.PI_RESOURCES))
-				return DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS;
+				return false;
 			node = node.node(ResourcesPlugin.PI_RESOURCES);
 			return node.getBoolean(
-					ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS,
-					DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS);
+					ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS, false);
 		} catch (BackingStoreException e) {
 			// default value
-			return DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS;
+			return false;
 		}
 	}
 
@@ -258,12 +253,10 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 					}
 					if (!hasSameSeparateDerivedEncodings) {
 						Preferences prefs = new ProjectScope((IProject) resource).getNode(ResourcesPlugin.PI_RESOURCES);
-						boolean newValue = !getStoredSeparateDerivedEncodingsValue();
-						// Remove the pref if it's the default, otherwise store it.
-						if (newValue == DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS)
+						if (getStoredSeparateDerivedEncodingsValue())
 							prefs.remove(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS);
 						else
-							prefs.putBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS, newValue);
+							prefs.putBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS, true);
 						prefs.flush();
 					}
 					return Status.OK_STATUS;
@@ -324,7 +317,8 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	protected void doLoadDefault() {
 		super.doLoadDefault();
 		if (separateDerivedEncodingsButton != null)
-			separateDerivedEncodingsButton.setSelection(DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS);
+			separateDerivedEncodingsButton
+					.setSelection(getStoredSeparateDerivedEncodingsValue());
 	}
 
 	/*

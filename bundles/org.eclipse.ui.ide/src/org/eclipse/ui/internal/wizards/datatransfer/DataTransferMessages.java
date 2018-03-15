@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2012, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,8 @@
  *
  * Contributors:
  * IBM - Initial API and implementation
- * Red Hat, Inc - WizardProjectsImportPage[_ArchiveSelectTitle, _SelectArchiveDialogTitle]
+ * Red Hat, Inc - WizardProjectsImportPage[_ArchiveSelectTitle,
+ * 										   _SelectArchiveDialogTitle]
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -101,7 +102,6 @@ public class DataTransferMessages extends NLS {
 	public static String WizardProjectsImportPage_projectsInWorkspace;
 	public static String WizardProjectsImportPage_noProjectsToImport;
 	public static String WizardProjectsImportPage_projectLabel;
-	public static String WizardProjectsImportPage_hideExistingProjects;
 
 	// --- Export Wizards ---
 	public static String DataTransfer_export;

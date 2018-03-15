@@ -30,8 +30,7 @@ public class WizardContentProvider implements ITreeContentProvider {
      * 
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         input = null;
     }
 
@@ -40,8 +39,7 @@ public class WizardContentProvider implements ITreeContentProvider {
      * 
      * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
      */
-    @Override
-	public Object[] getChildren(Object parentElement) {
+    public Object[] getChildren(Object parentElement) {
         if (parentElement instanceof WizardCollectionElement) {
             ArrayList list = new ArrayList();
             WizardCollectionElement element = (WizardCollectionElement) parentElement;
@@ -87,8 +85,7 @@ public class WizardContentProvider implements ITreeContentProvider {
      * 
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
      */
-    @Override
-	public Object[] getElements(Object inputElement) {
+    public Object[] getElements(Object inputElement) {
         return getChildren(inputElement);
     }
 
@@ -97,8 +94,7 @@ public class WizardContentProvider implements ITreeContentProvider {
      * 
      * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
      */
-    @Override
-	public Object getParent(Object element) {
+    public Object getParent(Object element) {
         if (element instanceof WizardCollectionElement) {
             Object[] children = input.getChildren();
             for (int i = 0; i < children.length; i++) {
@@ -133,8 +129,7 @@ public class WizardContentProvider implements ITreeContentProvider {
      * 
      * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
      */
-    @Override
-	public boolean hasChildren(Object element) {
+    public boolean hasChildren(Object element) {
         if (element instanceof WizardCollectionElement) {
             if (getChildren(element).length > 0) {
 				return true;
@@ -149,8 +144,7 @@ public class WizardContentProvider implements ITreeContentProvider {
      * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
      *      java.lang.Object, java.lang.Object)
      */
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         input = (AdaptableList) newInput;
     }
 }

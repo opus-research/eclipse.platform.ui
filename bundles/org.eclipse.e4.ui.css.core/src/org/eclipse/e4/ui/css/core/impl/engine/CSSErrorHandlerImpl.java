@@ -15,10 +15,10 @@ import org.eclipse.e4.ui.css.core.engine.CSSErrorHandler;
 /**
  * Basic implementation for CSS Engine error handlers which print stack trace of
  * the exception throwed.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSSErrorHandlerImpl implements CSSErrorHandler {
 
@@ -28,7 +28,6 @@ public class CSSErrorHandlerImpl implements CSSErrorHandler {
 	 * (non-Javadoc)
 	 * @see org.eclipse.e4.ui.css.core.engine.CSSErrorHandler#error(java.lang.Exception)
 	 */
-	@Override
 	public void error(Exception e) {
 		e.printStackTrace();
 	}

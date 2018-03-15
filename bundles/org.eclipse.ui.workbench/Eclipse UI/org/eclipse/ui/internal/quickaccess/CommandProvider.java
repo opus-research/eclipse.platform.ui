@@ -18,9 +18,7 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.commands.ExpressionContext;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -43,37 +41,32 @@ public class CommandProvider extends QuickAccessProvider {
 
 	private Map idToElement;
 	private IHandlerService handlerService;
-	private ICommandService commandService;
-	private EHandlerService ehandlerService;
 	
 	public CommandProvider() {
 	}
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.commands"; //$NON-NLS-1$
 	}
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return (CommandElement) idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
-			ICommandService commandService = getCommandService();
-			EHandlerService ehandlerService = getEHandlerService();
+			ICommandService commandService = (ICommandService) PlatformUI
+					.getWorkbench().getService(ICommandService.class);
 			final Collection commandIds = commandService.getDefinedCommandIds();
 			final Iterator commandIdItr = commandIds.iterator();
 			while (commandIdItr.hasNext()) {
 				final String currentCommandId = (String) commandIdItr.next();
 				final Command command = commandService
 						.getCommand(currentCommandId);
-				ParameterizedCommand pcmd = new ParameterizedCommand(command, null);
-				if (command != null && ehandlerService.canExecute(pcmd)) {
+				if (command != null && command.isHandled()
+						&& command.isEnabled()) {
 					try {
 						Collection combinations = ParameterizedCommand
 								.generateCombinations(command);
@@ -94,52 +87,19 @@ public class CommandProvider extends QuickAccessProvider {
 				new QuickAccessElement[idToElement.values().size()]);
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Commands;
 	}
 	
-	EHandlerService getEHandlerService() {
-		if (ehandlerService == null) {
-			if (currentSnapshot instanceof ExpressionContext) {
-				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
-				ehandlerService = ctx.get(EHandlerService.class);
-			} else {
-				ehandlerService = (EHandlerService) PlatformUI.getWorkbench().getService(
-						EHandlerService.class);
-			}
-		}
-		return ehandlerService;
-	}
-
-	ICommandService getCommandService() {
-		if (commandService == null) {
-			if (currentSnapshot instanceof ExpressionContext) {
-				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
-				commandService = ctx.get(ICommandService.class);
-			} else {
-				commandService = (ICommandService) PlatformUI.getWorkbench().getService(
-						ICommandService.class);
-			}
-		}
-		return commandService;
-	}
-
 	IHandlerService getHandlerService() {
 		if (handlerService == null) {
-			if (currentSnapshot instanceof ExpressionContext) {
-				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
-				handlerService = ctx.get(IHandlerService.class);
-			} else {
-				handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
-						IHandlerService.class);
-			}
+			handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
+					IHandlerService.class);
 		}
 		return handlerService;
 	}
@@ -148,7 +108,6 @@ public class CommandProvider extends QuickAccessProvider {
 		return currentSnapshot;
 	}
 
-	@Override
 	protected void doReset() {
 		idToElement = null;
 		if (currentSnapshot instanceof ExpressionContext) {

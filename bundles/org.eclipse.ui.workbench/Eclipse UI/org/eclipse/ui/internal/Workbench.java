@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422533
  *     Terry Parker <tparker@google.com> - Bug 416673
  *******************************************************************************/
 
@@ -35,7 +34,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.ExecutionException;
@@ -95,7 +93,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -124,7 +121,6 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -145,7 +141,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IDecoratorManager;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IElementFactory;
@@ -168,7 +163,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.WorkbenchException;
@@ -198,7 +192,6 @@ import org.eclipse.ui.internal.dialogs.PropertyPageContributorManager;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.E4Util;
-import org.eclipse.ui.internal.e4.migration.WorkbenchMigrationProcessor;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
 import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
 import org.eclipse.ui.internal.intro.IIntroRegistry;
@@ -213,7 +206,6 @@ import org.eclipse.ui.internal.model.ContributionService;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
-import org.eclipse.ui.internal.registry.ImportExportPespectiveHandler;
 import org.eclipse.ui.internal.registry.UIExtensionTracker;
 import org.eclipse.ui.internal.registry.ViewDescriptor;
 import org.eclipse.ui.internal.services.EvaluationService;
@@ -226,7 +218,6 @@ import org.eclipse.ui.internal.services.SourceProviderService;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
 import org.eclipse.ui.internal.splash.EclipseSplashHandler;
 import org.eclipse.ui.internal.splash.SplashHandlerFactory;
-import org.eclipse.ui.internal.testing.ContributionInfoMessages;
 import org.eclipse.ui.internal.testing.WorkbenchTestable;
 import org.eclipse.ui.internal.themes.ColorDefinition;
 import org.eclipse.ui.internal.themes.FontDefinition;
@@ -250,7 +241,6 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.eclipse.ui.splash.AbstractSplashHandler;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.swt.IFocusService;
-import org.eclipse.ui.testing.ContributionInfo;
 import org.eclipse.ui.themes.IThemeManager;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.eclipse.ui.views.IViewRegistry;
@@ -277,14 +267,11 @@ import org.osgi.util.tracker.ServiceTracker;
  * rewritten to use the new workbench advisor API.
  * </p>
  */
-public final class Workbench extends EventManager implements IWorkbench,
-		org.eclipse.e4.ui.workbench.IWorkbench {
+public final class Workbench extends EventManager implements IWorkbench {
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
 
-	public static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
-
-	public static final String EDITOR_TAG = "Editor"; //$NON-NLS-1$
+	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
 
 	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
@@ -302,7 +289,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			this.starting = new ArrayList();
 		}
 
-		@Override
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
 			String bundleName;
@@ -328,10 +314,15 @@ public final class Workbench extends EventManager implements IWorkbench,
 				}
 			}
 
-			if (bundleName != null) {
-				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
-				progressMonitor.subTask(taskName);
+			String taskName;
+
+			if (bundleName == null) {
+				taskName = WorkbenchMessages.Startup_Loading_Workbench;
+			} else {
+				taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
 			}
+
+			progressMonitor.subTask(taskName);
 		}
 	}
 
@@ -342,7 +333,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	static final String VERSION_STRING[] = { "0.046", "2.0" }; //$NON-NLS-1$ //$NON-NLS-2$
 
-	public static final String DEFAULT_WORKBENCH_STATE_FILENAME = "workbench.xml"; //$NON-NLS-1$
+	static final String DEFAULT_WORKBENCH_STATE_FILENAME = "workbench.xml"; //$NON-NLS-1$
 
 	/**
 	 * Holds onto the only instance of Workbench.
@@ -463,9 +454,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private Job autoSaveJob;
 
-	private String id;
-	private ServiceRegistration<?> e4WorkbenchService;
-
 	/**
 	 * Creates a new workbench.
 	 * 
@@ -480,7 +468,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app,
 			IEclipseContext appContext) {
 		super();
-		this.id = createId();
 		StartupThreading.setWorkbench(this);
 		if (instance != null && instance.isRunning()) {
 			throw new IllegalStateException(WorkbenchMessages.Workbench_CreatingWorkbenchTwice);
@@ -497,12 +484,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 		appContext.set(getClass().getName(), this);
 		appContext.set(IWorkbench.class.getName(), this);
 		appContext.set(IEventLoopAdvisor.class, new IEventLoopAdvisor() {
-			@Override
 			public void eventLoopIdle(Display display) {
 				advisor.eventLoopIdle(display);
 			}
 
-			@Override
 			public void eventLoopException(Throwable exception) {
 				advisor.eventLoopException(exception);
 			}
@@ -526,7 +511,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		Platform.getExtensionRegistry().addRegistryChangeListener(extensionEventHandler);
 		IServiceLocatorCreator slc = new ServiceLocatorCreator();
 		serviceLocator = (ServiceLocator) slc.createServiceLocator(null, null, new IDisposable() {
-			@Override
 			public void dispose() {
 				final Display display = getDisplay();
 				if (display != null && !display.isDisposed()) {
@@ -541,6 +525,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		serviceLocator.registerService(IWorkbenchLocationService.class,
 				new WorkbenchLocationService(IServiceScopes.WORKBENCH_SCOPE, this, null, null,
 						null, null, 0));
+
 	}
 
 	/**
@@ -551,10 +536,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	public static final Workbench getInstance() {
 		return instance;
-	}
-
-	private static boolean isFirstE4WorkbenchRun(MApplication app) {
-		return app.getContext().containsKey(E4Workbench.NO_SAVED_MODEL_FOUND);
 	}
 
 	/**
@@ -585,7 +566,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			final WorkbenchAdvisor advisor) {
 		final int[] returnCode = new int[1];
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				final String nlExtensions = Platform.getNLExtensions();
 				if (nlExtensions.length() > 0) {
@@ -597,43 +577,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 				System.setProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG,
 						"org.eclipse.ui.workbench/LegacyIDE.e4xmi"); //$NON-NLS-1$
 				Object obj = getApplication(Platform.getCommandLineArgs());
-
-				IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-				if (!store.isDefault(IPreferenceConstants.LAYOUT_DIRECTION)) {
-					int orientation = store.getInt(IPreferenceConstants.LAYOUT_DIRECTION);
-					Window.setDefaultOrientation(orientation);
-				}
-
 				if (obj instanceof E4Application) {
 					E4Application e4app = (E4Application) obj;
 					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(),
 							display);
-
-					MApplication appModel = e4Workbench.getApplication();
-					IEclipseContext context = e4Workbench.getContext();
-
-					WorkbenchMigrationProcessor migrationProcessor = null;
-					// migration is enabled by default
-					if (ImportExportPespectiveHandler.isImpExpEnabled()) {
-						try {
-							migrationProcessor = ContextInjectionFactory.make(
-									WorkbenchMigrationProcessor.class, context);
-						} catch (@SuppressWarnings("restriction") InjectionException e) {
-							WorkbenchPlugin.log(e);
-						}
-					}
-
-					if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)
-							&& migrationProcessor.isLegacyWorkbenchDetected()) {
-						try {
-							WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO,
-									"Workbench migration started", null)); //$NON-NLS-1$
-							migrationProcessor.migrate();
-						} catch (Exception e) {
-							WorkbenchPlugin.log("Workbench migration failed", e); //$NON-NLS-1$
-							migrationProcessor.restoreDefaultModel();
-						}
-					}
 
 					// create the workbench instance
 					Workbench workbench = new Workbench(display, advisor, e4Workbench
@@ -645,11 +592,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 					AbstractSplashHandler handler = getSplash();
 
-					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
-									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
-
 					IProgressMonitor progressMonitor = null;
-					if (handler != null && showProgress) {
+					if (handler != null) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
@@ -661,17 +605,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
 					}
-
-					setSearchContribution(appModel, true);
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
-					if (migrationProcessor != null && migrationProcessor.isWorkbenchMigrated()) {
-						migrationProcessor.updatePartsAfterMigration(WorkbenchPlugin.getDefault()
-								.getPerspectiveRegistry(), WorkbenchPlugin.getDefault()
-								.getViewRegistry());
-						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO,
-								"Workbench migration finished", null)); //$NON-NLS-1$
-					}
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
@@ -680,7 +615,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
-						setSearchContribution(appModel, false);
 						e4app.saveModel();
 					}
 					e4Workbench.close();
@@ -689,17 +623,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			}
 		});
 		return returnCode[0];
-	}
-
-	private static void setSearchContribution(MApplication app, boolean enabled) {
-		for (MTrimContribution contribution : app.getTrimContributions()) {
-			if ("org.eclipse.ui.ide.application.trimcontribution.QuickAccess".contains(contribution //$NON-NLS-1$
-					.getElementId())) {
-				// allows us to handle the case where someone opens a workspace
-				// with Luna and then with Kepler
-				contribution.setToBeRendered(enabled);
-			}
-		}
 	}
 
 	private static ServiceTracker instanceAppContext;
@@ -798,7 +721,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		SafeRunnable run = new SafeRunnable() {
 
-			@Override
 			public void run() throws Exception {
 				if (!WorkbenchPlugin.isSplashHandleSpecified()) {
 					createSplash = false;
@@ -828,7 +750,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 				final ServiceRegistration registration[] = new ServiceRegistration[1];
 				StartupMonitor startupMonitor = new StartupMonitor() {
 
-					@Override
 					public void applicationRunning() {
 						if (background != null)
 							background.dispose();
@@ -846,7 +767,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 						}
 					}
 
-					@Override
 					public void update() {
 						// do nothing - we come into the picture far too late
 						// for this to be relevant
@@ -865,7 +785,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			 * org.eclipse.jface.util.SafeRunnable#handleException(java.lang
 			 * .Throwable)
 			 */
-			@Override
 			public void handleException(Throwable e) {
 				StatusManager.getManager().handle(
 						StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH,
@@ -955,7 +874,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * 
 	 * @since 3.2
 	 */
-	@Override
 	public void addWorkbenchListener(IWorkbenchListener listener) {
 		workbenchListeners.add(listener);
 	}
@@ -965,7 +883,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * 
 	 * @since 3.2
 	 */
-	@Override
 	public void removeWorkbenchListener(IWorkbenchListener listener) {
 		workbenchListeners.remove(listener);
 	}
@@ -985,7 +902,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			final IWorkbenchListener l = (IWorkbenchListener) list[i];
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					result[0] = l.preShutdown(Workbench.this, forced);
 				}
@@ -1007,7 +923,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		for (int i = 0; i < list.length; i++) {
 			final IWorkbenchListener l = (IWorkbenchListener) list[i];
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.postShutdown(Workbench.this);
 				}
@@ -1018,7 +933,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public void addWindowListener(IWindowListener l) {
 		addListenerObject(l);
 	}
@@ -1026,7 +940,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public void removeWindowListener(IWindowListener l) {
 		removeListenerObject(l);
 	}
@@ -1042,7 +955,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		for (int i = 0; i < list.length; i++) {
 			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.windowOpened(window);
 				}
@@ -1061,7 +973,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		for (int i = 0; i < list.length; i++) {
 			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.windowClosed(window);
 				}
@@ -1081,7 +992,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		for (int i = 0; i < list.length; i++) {
 			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.windowActivated(window);
 				}
@@ -1101,7 +1011,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		for (int i = 0; i < list.length; i++) {
 			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.windowDeactivated(window);
 				}
@@ -1118,8 +1027,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @return true if the close succeeded, and false otherwise
 	 */
 	private boolean busyClose(final boolean force) {
-		// Fire an E4 lifecycle notification
-		UIEvents.publishEvent(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, application);
 
 		// notify the advisor of preShutdown and allow it to veto if not forced
 		isClosing = advisor.preShutdown();
@@ -1151,7 +1058,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 						IWorkbenchPreferenceConstants.CLOSE_EDITORS_ON_EXIT);
 		if (closeEditors) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					IWorkbenchWindow windows[] = getWorkbenchWindows();
 					for (int i = 0; i < windows.length; i++) {
@@ -1176,7 +1082,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		}
 
 		SafeRunner.run(new SafeRunnable(WorkbenchMessages.ErrorClosing) {
-			@Override
 			public void run() {
 				if (isClosing || force) {
 					// isClosing = windowManager.close();
@@ -1228,7 +1133,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private void persist(final boolean shutdown) {
 		// persist editors that can be and possibly close the others
 		SafeRunner.run(new SafeRunnable() {
-			@Override
 			public void run() {
 				IWorkbenchWindow windows[] = getWorkbenchWindows();
 				for (int i = 0; i < windows.length; i++) {
@@ -1256,12 +1160,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// persist workbench state
 		if (getWorkbenchConfigurer().getSaveAndRestore()) {
 			SafeRunner.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					persistWorkbenchState();
 				}
 
-				@Override
 				public void handleException(Throwable e) {
 					String message;
 					if (e.getMessage() == null) {
@@ -1279,7 +1181,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		// persist view states
 		SafeRunner.run(new SafeRunnable() {
-			@Override
 			public void run() {
 				IWorkbenchWindow windows[] = getWorkbenchWindows();
 				for (int i = 0; i < windows.length; i++) {
@@ -1353,7 +1254,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private static void cleanUpCopy(MApplication appCopy, IEclipseContext context) {
 		// clean up all trim bars that come from trim bar contributions
 		// the trim elements that need to be removed are stored in the trimBar.
-		setSearchContribution(appCopy, false);
 		EModelService modelService = context.get(EModelService.class);
 		List<MWindow> windows = modelService.findElements(appCopy, null, MWindow.class, null);
 		for (MWindow window : windows) {
@@ -1396,7 +1296,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#saveAllEditors(boolean)
 	 */
-	@Override
 	public boolean saveAllEditors(boolean confirm) {
 		return saveAllEditors(confirm, false);
 	}
@@ -1416,7 +1315,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public boolean close() {
 		return close(PlatformUI.RETURN_OK, false);
 	}
@@ -1446,7 +1344,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		this.returnCode = returnCode;
 		final boolean[] ret = new boolean[1];
 		BusyIndicator.showWhile(null, new Runnable() {
-			@Override
 			public void run() {
 				ret[0] = busyClose(force);
 			}
@@ -1457,7 +1354,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkbenchWindow getActiveWorkbenchWindow() {
 		// Return null if called from a non-UI thread.
 		// This is not spec'ed behaviour and is misleading, however this is how
@@ -1548,7 +1444,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IEditorRegistry getEditorRegistry() {
 		return WorkbenchPlugin.getDefault().getEditorRegistry();
 	}
@@ -1556,7 +1451,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkbenchOperationSupport getOperationSupport() {
 		return WorkbenchPlugin.getDefault().getOperationSupport();
 	}
@@ -1564,7 +1458,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IPerspectiveRegistry getPerspectiveRegistry() {
 		return WorkbenchPlugin.getDefault().getPerspectiveRegistry();
 	}
@@ -1572,7 +1465,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public PreferenceManager getPreferenceManager() {
 		return WorkbenchPlugin.getDefault().getPreferenceManager();
 	}
@@ -1580,7 +1472,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IPreferenceStore getPreferenceStore() {
 		return WorkbenchPlugin.getDefault().getPreferenceStore();
 	}
@@ -1588,7 +1479,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public ISharedImages getSharedImages() {
 		return WorkbenchPlugin.getDefault().getSharedImages();
 	}
@@ -1598,7 +1488,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public int getWorkbenchWindowCount() {
 		return getWorkbenchWindows().length;
 	}
@@ -1606,7 +1495,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkbenchWindow[] getWorkbenchWindows() {
 		List<IWorkbenchWindow> windows = new ArrayList<IWorkbenchWindow>();
 		for (MWindow window : application.getChildren()) {
@@ -1625,7 +1513,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkingSetManager getWorkingSetManager() {
 		return WorkbenchPlugin.getDefault().getWorkingSetManager();
 	}
@@ -1633,7 +1520,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public ILocalWorkingSetManager createLocalWorkingSetManager() {
 		return new LocalWorkingSetManager(WorkbenchPlugin.getDefault().getBundleContext());
 	}
@@ -1665,7 +1551,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				serviceLocator.registerService(IEvaluationService.class, evaluationService);
 			}
@@ -1678,12 +1563,16 @@ public final class Workbench extends EventManager implements IWorkbench,
 		activityHelper = ActivityPersistanceHelper.getInstance();
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				WorkbenchImages.getImageRegistry();
 			}
 		});
 		initializeE4Services();
+		initializeDefaultServices();
+		initializeFonts();
+		initializeColors();
+		initializeApplicationColors();
+
 		IIntroRegistry introRegistry = WorkbenchPlugin.getDefault().getIntroRegistry();
 		if (introRegistry.getIntroCount() > 0) {
 			IProduct product = Platform.getProduct();
@@ -1692,16 +1581,11 @@ public final class Workbench extends EventManager implements IWorkbench,
 						.getId());
 			}
 		}
-		initializeDefaultServices();
-		initializeFonts();
-		initializeColors();
-		initializeApplicationColors();
 
 		// now that the workbench is sufficiently initialized, let the advisor
 		// have a turn.
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				advisor.internalBasicInitialize(getWorkbenchConfigurer());
 			}
@@ -1715,14 +1599,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// initialize workbench single-click vs double-click behavior
 		initializeSingleClickOption();
 
-		initializeGlobalization();
-		initializeNLExtensions();
-
 		initializeWorkbenchImages();
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				((GrabFocus) Tweaklets.get(GrabFocus.KEY)).init(getDisplay());
 			}
@@ -1735,7 +1615,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			final boolean bail[] = new boolean[1];
 			StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-				@Override
 				public void runWithException() throws Throwable {
 					advisor.preStartup();
 					// TODO compat: open the windows here/instantiate the model
@@ -1767,7 +1646,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	private void initializeWorkbenchImages() {
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
-			@Override
 			public void runWithException() {
 				WorkbenchImages.getDescriptors();
 			}
@@ -1781,13 +1659,11 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private void initializeCommandResolver() {
 		ExternalActionManager.getInstance().setCallback(
 				new CommandCallback(bindingManager, commandManager, new IActiveChecker() {
-					@Override
 					public final boolean isActive(final String commandId) {
 						return workbenchActivitySupport.getActivityManager().getIdentifier(
 								commandId).isEnabled();
 					}
 				}, new IExecuteApplicable() {
-					@Override
 					public boolean isApplicable(IAction action) {
 						return !(action instanceof CommandAction);
 					}
@@ -1803,7 +1679,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private void initializeApplicationColors() {
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				ColorDefinition[] colorDefinitions = WorkbenchPlugin.getDefault()
 						.getThemeRegistry().getColors();
@@ -1813,7 +1688,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		});
 	}
 
-	void initializeSingleClickOption() {
+	private void initializeSingleClickOption() {
 		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 		boolean openOnSingleClick = store.getBoolean(IPreferenceConstants.OPEN_ON_SINGLE_CLICK);
 		boolean selectOnHover = store.getBoolean(IPreferenceConstants.SELECT_ON_HOVER);
@@ -1831,33 +1706,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 		OpenStrategy.setOpenMethod(singleClickMethod);
 	}
 
-	private void initializeGlobalization() {
-		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-
-		if (!store.isDefault(IPreferenceConstants.BIDI_SUPPORT)) {
-			BidiUtils.setBidiSupport(store.getBoolean(IPreferenceConstants.BIDI_SUPPORT));
-		}
-		if (!store.isDefault(IPreferenceConstants.TEXT_DIRECTION)) {
-			BidiUtils.setTextDirection(store.getString(IPreferenceConstants.TEXT_DIRECTION));
-		}
-	}
-
-	private void initializeNLExtensions() {
-		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-		if (!store.isDefault(IPreferenceConstants.NL_EXTENSIONS)) {
-			String nlExtensions = store.getString(IPreferenceConstants.NL_EXTENSIONS);
-			ULocale.setDefault(Category.FORMAT, new ULocale(ULocale.getDefault(Category.FORMAT)
-					.getBaseName() + nlExtensions));
-		}
-	}
-
 	/*
 	 * Initializes the workbench fonts with the stored values.
 	 */
 	private void initializeFonts() {
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				FontDefinition[] fontDefinitions = WorkbenchPlugin.getDefault().getThemeRegistry()
 						.getFonts();
@@ -1912,7 +1766,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	private void initializeColors() {
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
-			@Override
 			public void runWithException() {
 				WorkbenchColors.startup();
 			}
@@ -1922,7 +1775,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public boolean isClosing() {
 		return isClosing;
 	}
@@ -1932,7 +1784,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// the new value
 		IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
 		preferenceStore.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS.equals(event.getProperty())) {
 					Object o = event.getNewValue();
@@ -1950,7 +1801,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		});
 
 		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, new EventHandler() {
-			@Override
 			public void handleEvent(org.osgi.service.event.Event event) {
 				if (application == event.getProperty(UIEvents.EventTags.ELEMENT)) {
 					if (UIEvents.isREMOVE(event)) {
@@ -1971,7 +1821,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			}
 		});
 		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT, new EventHandler() {
-			@Override
 			public void handleEvent(org.osgi.service.event.Event event) {
 				if (application == event.getProperty(UIEvents.EventTags.ELEMENT)) {
 					if (UIEvents.EventTypes.SET.equals(event
@@ -1996,7 +1845,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// reference
 		eventBroker.subscribe(
 UIEvents.UIElement.TOPIC_TOBERENDERED, new EventHandler() {
-			@Override
 			public void handleEvent(org.osgi.service.event.Event event) {
 				if (Boolean.TRUE.equals(event.getProperty(UIEvents.EventTags.NEW_VALUE))) {
 					Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
@@ -2013,7 +1861,6 @@ UIEvents.UIElement.TOPIC_TOBERENDERED, new EventHandler() {
 		eventBroker.subscribe(
 UIEvents.Context.TOPIC_CONTEXT,
 				new EventHandler() {
-					@Override
 					public void handleEvent(org.osgi.service.event.Event event) {
 						Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 						if (element instanceof MPart) {
@@ -2027,7 +1874,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				});
 		
 		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, new EventHandler() {
-			@Override
 			public void handleEvent(org.osgi.service.event.Event event) {
 				Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 				if (!(element instanceof MApplication)) {
@@ -2100,43 +1946,20 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	private void setReference(MPart part, IEclipseContext context) {
 		String uri = part.getContributionURI();
-		if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
-			WorkbenchPage page = getWorkbenchPage(part);
-			EditorReference ref = page.getEditorReference(part);
-			if (ref == null) {
-				// If this editor was cloned from an existing editor (as
-				// part of a split...) then re-create a valid EditorReference
-				// from the existing editor's ref.
-				MPart clonedFrom = (MPart) part.getTransientData().get(
-						EModelService.CLONED_FROM_KEY);
-				if (clonedFrom != null && clonedFrom.getContext() != null) {
-					EditorReference originalRef = page.getEditorReference(clonedFrom);
-					if (originalRef != null) {
-						IEditorInput partInput = null;
-						String editorId = originalRef.getDescriptor().getId();
-						try {
-							partInput = originalRef.getEditorInput();
-						} catch (PartInitException e) {
-							System.out.println("Ooops !!!"); //$NON-NLS-1$
-						}
-						ref = page.createEditorReferenceForPart(part, partInput, editorId, null);
-					}
-				}
-
-				// Fallback code
-				if (ref == null) {
-					ref = createEditorReference(part, page);
-				}
-			}
-			context.set(EditorReference.class.getName(), ref);
-		} else {
-			// Create View References for 'e4' parts as well
+		if (CompatibilityPart.COMPATIBILITY_VIEW_URI.equals(uri)) {
 			WorkbenchPage page = getWorkbenchPage(part);
 			ViewReference ref = page.getViewReference(part);
 			if (ref == null) {
 				ref = createViewReference(part, page);
 			}
 			context.set(ViewReference.class.getName(), ref);
+		} else if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
+			WorkbenchPage page = getWorkbenchPage(part);
+			EditorReference ref = page.getEditorReference(part);
+			if (ref == null) {
+				ref = createEditorReference(part, page);
+			}
+			context.set(EditorReference.class.getName(), ref);
 		}
 	}
 
@@ -2202,7 +2025,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	private final void initializeLazyServices() {
 		e4Context.set(IExtensionTracker.class.getName(), new ContextFunction() {
 
-			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (tracker == null) {
 					tracker = new UIExtensionTracker(getDisplay());
@@ -2212,7 +2034,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		});
 		e4Context.set(IWorkbenchActivitySupport.class.getName(), new ContextFunction() {
 
-			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (workbenchActivitySupport == null) {
 					workbenchActivitySupport = new WorkbenchActivitySupport();
@@ -2325,7 +2146,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				serviceLocator.registerService(ISaveablesLifecycleListener.class,
 						new SaveablesList());
@@ -2339,7 +2159,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		 */
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				Command.DEBUG_COMMAND_EXECUTION = Policy.DEBUG_COMMANDS;
 				commandManager = e4Context.get(CommandManager.class);
@@ -2349,7 +2168,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		final CommandService[] commandService = new CommandService[1];
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				commandService[0] = initializeCommandService(e4Context);
 
@@ -2358,7 +2176,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				ContextManager.DEBUG = Policy.DEBUG_CONTEXTS;
 				contextManager = e4Context.get(ContextManager.class);
@@ -2372,10 +2189,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				contextManager.addContextManagerListener(new IContextManagerListener() {
-					@Override
 					public void contextManagerChanged(ContextManagerEvent contextManagerEvent) {
 						if (contextManagerEvent.isContextChanged()) {
 							String id = contextManagerEvent.getContextId();
@@ -2396,7 +2211,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				BindingManager.DEBUG = Policy.DEBUG_KEY_BINDINGS;
 				bindingManager = e4Context.get(BindingManager.class);
@@ -2422,7 +2236,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		// the menu service
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				menuService.readRegistry();
 			}
@@ -2439,7 +2252,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		serviceLocator.registerService(ISourceProviderService.class, sourceProviderService);
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				// this currently instantiates all players ... sigh
 				sourceProviderService.readRegistry();
@@ -2455,7 +2267,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				// these guys are need to provide the variables they say
 				// they source
@@ -2477,7 +2288,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		final IHandlerService[] handlerService = new IHandlerService[1];
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-			@Override
 			public void runWithException() {
 				handlerService[0] = new LegacyHandlerService(e4Context);
 				e4Context.set(IHandlerService.class.getName(), handlerService[0]);
@@ -2497,7 +2307,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		backForwardListener = createBackForwardListener();
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
-			@Override
 			public void runWithException() {
 				getDisplay().addFilter(SWT.MouseDown, backForwardListener);
 			}
@@ -2506,7 +2315,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	private Listener createBackForwardListener() {
 		return new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				String commandId;
 				switch (event.button) {
@@ -2546,7 +2354,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * @return <code>true</code> if the Workbench is starting, but not yet
 	 *         running the event loop.
 	 */
-	@Override
 	public boolean isStarting() {
 		return isStarting && isRunning();
 	}
@@ -2585,7 +2392,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		final String threadPerspId = perspId;
 		final IWorkbenchWindow threadWin = win;
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
-			@Override
 			public void runWithException() throws Throwable {
 				try {
 					showPerspective(threadPerspId, threadWin);
@@ -2616,7 +2422,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 					.getBundleCount() / 10);
 
 			runStartupWithProgress(expectedProgressCount, new Runnable() {
-				@Override
 				public void run() {
 					doOpenFirstTimeWindow();
 				}
@@ -2629,7 +2434,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 			final IAdaptable input[] = new IAdaptable[1];
 			StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-				@Override
 				public void runWithException() throws Throwable {
 					input[0] = getDefaultPageInput();
 				}
@@ -2641,7 +2445,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 			// as the window is not open yet (bug 76724).
 			StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-				@Override
 				public void runWithException() throws Throwable {
 					ErrorDialog.openError(null, WorkbenchMessages.Problems_Opening_Page, e
 							.getMessage(), e.getStatus());
@@ -2684,7 +2487,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkbenchWindow openWorkbenchWindow(IAdaptable input) throws WorkbenchException {
 		return openWorkbenchWindow(getDefaultPerspectiveId(), input);
 	}
@@ -2692,7 +2494,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkbenchWindow openWorkbenchWindow(String perspectiveId, IAdaptable input)
 			throws WorkbenchException {
 		IPerspectiveDescriptor descriptor = getPerspectiveRegistry().findPerspectiveWithId(
@@ -2713,7 +2514,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public boolean restart() {
 		return close(PlatformUI.RETURN_RESTART, false);
 	}
@@ -2726,7 +2526,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @return the ids of all plug-ins containing 1 or more startup extensions
 	 */
-	public ContributionInfo[] getEarlyActivatedPlugins() {
+	public String[] getEarlyActivatedPlugins() {
 		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
 		IExtension[] extensions = point.getExtensions();
@@ -2737,13 +2537,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 				pluginIds.add(id);
 			}
 		}
-		ContributionInfo[] result = new ContributionInfo[pluginIds.size()];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = new ContributionInfo((String) pluginIds.get(i),
-					ContributionInfoMessages.ContributionInfo_EarlyStartupPlugin, null);
-
-		}
-		return result;
+		return (String[]) pluginIds.toArray(new String[pluginIds.size()]);
 	}
 
 	/**
@@ -2778,7 +2572,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 			return;
 		}
 		Job job = new Job("Workbench early startup") { //$NON-NLS-1$
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				HashSet disabledPlugins = new HashSet(Arrays
 						.asList(getDisabledEarlyActivatedPlugins()));
@@ -2801,7 +2594,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				return Status.OK_STATUS;
 			}
 
-			@Override
 			public boolean belongsTo(Object family) {
 				return EARLY_STARTUP_FAMILY.equals(family);
 			}
@@ -2819,8 +2611,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	public void setEnableAutoSave(boolean b) {
 		workbenchAutoSave = b;
 	}
-
-	private volatile boolean initDone = false;
 
 	/**
 	 * Internal method for running the workbench UI. This entails processing and
@@ -2873,7 +2663,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		// run while starting the Workbench, log a warning.
 		if (WorkbenchPlugin.getDefault().isDebugging()) {
 			display.asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					if (isStarting()) {
 						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
@@ -2885,7 +2674,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		}
 
 		Listener closeListener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				event.doit = close();
 			}
@@ -2905,6 +2693,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 			if (getSplash() != null) {
 
+				final boolean[] initDone = new boolean[] { false };
 				final Throwable[] error = new Throwable[1];
 				Thread initThread = new Thread() {
 					/*
@@ -2912,7 +2701,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 					 * 
 					 * @see java.lang.Thread#run()
 					 */
-					@Override
 					public void run() {
 						try {
 							// declare us to be a startup thread so that our
@@ -2922,13 +2710,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 						} catch (Throwable e) {
 							error[0] = e;
 						} finally {
-							initDone = true;
-							yield();
-							try {
-								Thread.sleep(5);
-							} catch (InterruptedException e) {
-								// this is a no-op in this case.
-							}
+							initDone[0] = true;
 							display.wake();
 						}
 					}
@@ -2936,7 +2718,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 				initThread.start();
 				while (true) {
 					if (!display.readAndDispatch()) {
-						if (initDone)
+						if (initDone[0])
 							break;
 						display.sleep();
 					}
@@ -2964,19 +2746,9 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 
 			if (initOK[0] && runEventLoop) {
-				// Same registration as in E4Workbench
-				Hashtable<String, Object> properties = new Hashtable<String, Object>();
-				properties.put("id", getId()); //$NON-NLS-1$
-
-				workbenchService = WorkbenchPlugin.getDefault().getBundleContext()
-						.registerService(IWorkbench.class.getName(), this, properties);
-
-				e4WorkbenchService = WorkbenchPlugin.getDefault().getBundleContext()
-						.registerService(org.eclipse.e4.ui.workbench.IWorkbench.class.getName(),
-								this, properties);
-
+				workbenchService = WorkbenchPlugin.getDefault().getBundleContext().registerService(
+						IWorkbench.class.getName(), this, null);
 				Runnable earlyStartup = new Runnable() {
-					@Override
 					public void run() {
 						// start eager plug-ins
 						startPlugins();
@@ -3025,7 +2797,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// WWinPluginAction.refreshActionList();
 
 				display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						UIStats.end(UIStats.START_WORKBENCH, this, "Workbench"); //$NON-NLS-1$
 						UIStats.startupComplete();
@@ -3073,21 +2844,20 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window)
 			throws WorkbenchException {
-		return showPerspective(perspectiveId, window, advisor.getDefaultPageInput());
+		return showPerspective(perspectiveId, window, null);
 	}
 
-	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input) {
+	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input,
+			boolean checkPerspective) {
 		if (page != null) {
 			for (IPerspectiveDescriptor openedPerspective : page.getOpenPerspectives()) {
-				if (openedPerspective.getId().equals(perspectiveId)) {
+				if (!checkPerspective || openedPerspective.getId().equals(perspectiveId)) {
 					if (page.getInput() == input) {
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
-						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
@@ -3099,7 +2869,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow targetWindow,
 			IAdaptable input) throws WorkbenchException {
 		Assert.isNotNull(perspectiveId);
@@ -3112,20 +2881,23 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
+			if (activate(perspectiveId, page, input, false)) {
+				return page;
+			}
 			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 			int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 
@@ -3165,10 +2937,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		if (workbenchService != null)
 			workbenchService.unregister();
 		workbenchService = null;
-
-		if (e4WorkbenchService != null)
-			e4WorkbenchService.unregister();
-		e4WorkbenchService = null;
 
 		// for dynamic UI
 		Platform.getExtensionRegistry().removeRegistryChangeListener(extensionEventHandler);
@@ -3216,7 +2984,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public IDecoratorManager getDecoratorManager() {
 		return WorkbenchPlugin.getDefault().getDecoratorManager();
 	}
@@ -3256,7 +3023,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	/*
 	 * (non-Javadoc) Method declared on IWorkbench.
 	 */
-	@Override
 	public Display getDisplay() {
 		return display;
 	}
@@ -3297,7 +3063,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @since 3.0
 	 */
-	@Override
 	public IElementFactory getElementFactory(String factoryId) {
 		Assert.isNotNull(factoryId);
 		return WorkbenchPlugin.getDefault().getElementFactory(factoryId);
@@ -3308,7 +3073,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getProgressService()
 	 */
-	@Override
 	public IProgressService getProgressService() {
 		return (IProgressService) e4Context.get(IProgressService.class.getName());
 	}
@@ -3349,17 +3113,14 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	private ContextManager contextManager;
 
-	@Override
 	public IWorkbenchActivitySupport getActivitySupport() {
 		return (IWorkbenchActivitySupport) e4Context.get(IWorkbenchActivitySupport.class.getName());
 	}
 
-	@Override
 	public IWorkbenchCommandSupport getCommandSupport() {
 		return workbenchCommandSupport;
 	}
 
-	@Override
 	public IWorkbenchContextSupport getContextSupport() {
 		return workbenchContextSupport;
 	}
@@ -3375,7 +3136,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	private final IBindingManagerListener bindingManagerListener = new IBindingManagerListener() {
 
-		@Override
 		public void bindingManagerChanged(BindingManagerEvent bindingManagerEvent) {
 			if (bindingManagerEvent.isActiveBindingsChanged()) {
 				updateActiveWorkbenchWindowMenuManager(true);
@@ -3411,7 +3171,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getIntroManager()
 	 */
-	@Override
 	public IIntroManager getIntroManager() {
 		return getWorkbenchIntroManager();
 	}
@@ -3470,7 +3229,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		 * org.eclipse.core.runtime.IRegistryChangeListener#registryChanged(
 		 * org.eclipse.core.runtime.IRegistryChangeEvent)
 		 */
-		@Override
 		public void registryChanged(IRegistryChangeEvent event) {
 			final IExtensionDelta[] deltas = event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
 					IWorkbenchRegistryConstants.PL_STARTUP);
@@ -3504,7 +3262,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getThemeManager()
 	 */
-	@Override
 	public IThemeManager getThemeManager() {
 		return WorkbenchThemeManager.getInstance();
 	}
@@ -3606,7 +3363,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getExtensionTracker()
 	 */
-	@Override
 	public IExtensionTracker getExtensionTracker() {
 		return (IExtensionTracker) e4Context.get(IExtensionTracker.class.getName());
 	}
@@ -3626,7 +3382,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getHelpSystem()
 	 */
-	@Override
 	public IWorkbenchHelpSystem getHelpSystem() {
 		return WorkbenchHelpSystem.getInstance();
 	}
@@ -3636,7 +3391,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getHelpSystem()
 	 */
-	@Override
 	public IWorkbenchBrowserSupport getBrowserSupport() {
 		return WorkbenchBrowserSupport.getInstance();
 	}
@@ -3646,7 +3400,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getViewRegistry()
 	 */
-	@Override
 	public IViewRegistry getViewRegistry() {
 		return WorkbenchPlugin.getDefault().getViewRegistry();
 	}
@@ -3656,7 +3409,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getNewWizardRegistry()
 	 */
-	@Override
 	public IWizardRegistry getNewWizardRegistry() {
 		return WorkbenchPlugin.getDefault().getNewWizardRegistry();
 	}
@@ -3666,7 +3418,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getImportWizardRegistry()
 	 */
-	@Override
 	public IWizardRegistry getImportWizardRegistry() {
 		return WorkbenchPlugin.getDefault().getImportWizardRegistry();
 	}
@@ -3676,12 +3427,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getExportWizardRegistry()
 	 */
-	@Override
 	public IWizardRegistry getExportWizardRegistry() {
 		return WorkbenchPlugin.getDefault().getExportWizardRegistry();
 	}
 
-	@Override
 	public final Object getAdapter(final Class key) {
 		return serviceLocator.getService(key);
 	}
@@ -3692,7 +3441,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.services.IServiceLocator#getService(java.lang.Object)
 	 */
-	@Override
 	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
@@ -3702,7 +3450,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.services.IServiceLocator#hasService(java.lang.Object)
 	 */
-	@Override
 	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
@@ -3777,7 +3524,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * , org.eclipse.jface.operation.IRunnableContext,
 	 * org.eclipse.ui.ISaveableFilter, boolean)
 	 */
-	@Override
 	public boolean saveAll(final IShellProvider shellProvider,
 			final IRunnableContext runnableContext, final ISaveableFilter filter, boolean confirm) {
 		SaveablesList saveablesList = (SaveablesList) getService(ISaveablesLifecycleListener.class);
@@ -3838,10 +3584,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @see org.eclipse.ui.IWorkbench#getModalDialogShellProvider()
 	 */
-	@Override
 	public IShellProvider getModalDialogShellProvider() {
 		return new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return ProgressManagerUtil.getDefaultParent();
 			}
@@ -3852,7 +3596,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		return e4Context;
 	}
 
-	@Override
 	public MApplication getApplication() {
 		return application;
 	}
@@ -3926,14 +3669,5 @@ UIEvents.Context.TOPIC_CONTEXT,
 			UIStats.end(UIStats.RESTORE_WORKBENCH, this, "MRUList"); //$NON-NLS-1$
 		}
 		return result;
-	}
-
-	@Override
-	public final String getId() {
-		return id;
-	}
-
-	protected String createId() {
-		return UUID.randomUUID().toString();
 	}
 }

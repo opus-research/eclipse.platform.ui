@@ -25,7 +25,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.Selector;
 
 /**
  * This service is used to find, create and handle model elements
@@ -68,82 +67,80 @@ public interface EModelService {
 	/** Returned Location if the element is in an MTrimBar */
 	public static final int IN_TRIM = 0x10;
 
-	/**
-	 * Returned Location if the element is in a main menu of an MWindow
-	 * 
-	 * @since 1.1
-	 */
-	public static final int IN_MAIN_MENU = 0x20;
-
-	/**
-	 * Returned Location if the element is in an MPart
-	 * 
-	 * @since 1.1
-	 */
-	public static final int IN_PART = 0x40;
-
 	// 'Standard' searches
 
 	/** Searches for elements in the UI that the user is currently seeing (excluding trim) */
 	public static final int PRESENTATION = OUTSIDE_PERSPECTIVE | IN_ACTIVE_PERSPECTIVE
 			| IN_SHARED_AREA;
 
-	/** Searches for elements in the UI presentation, including all perspectives */
+	/** Searches for elements in the UI that the user is currently seeing */
 	public static final int ANYWHERE = OUTSIDE_PERSPECTIVE | IN_ANY_PERSPECTIVE | IN_SHARED_AREA
 			| IN_TRIM;
 
 	/**
 	 * Searches for elements in the UI that the user is currently seeing that are OUTSIDE the
-	 * perspective (i.e. visible regardless of the current perspective)
+	 * perspective
 	 */
 	public static final int GLOBAL = OUTSIDE_PERSPECTIVE | IN_SHARED_AREA;
 
 	/**
-	 * When invoking the 'cloneElement' method the newly cloned element's 'transientData' map will
-	 * contain a reference to the original element using this as a key.
-	 * 
-	 * @since 1.1
-	 */
-	public static String CLONED_FROM_KEY = "Cloned From"; //$NON-NLS-1$
-
-	/**
-	 * Creates instances of model elements. The method supports any type extending
-	 * {@link MApplicationElement}, both in the standard e4 UI model and in an extension models.
-	 * 
-	 * <p>
-	 * <b>Caution:</b> To create model element instances of extension models you need to register
-	 * them with the <code>the org.eclipse.e4.workbench.model.definition.enrichment</code>
-	 * ExtensionPoint.
-	 * </p>
+	 * Creates instances of model elements. Supported types are
+	 * <ul>
+	 * <li>{@link org.eclipse.e4.ui.model.application.MAddon MAddon}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.MApplication MApplication}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MArea MArea}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MBindingContext MBindingContext}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MBindingTable MBindingTable}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MCategory MCategory}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MCommand MCommand}</li>
+	 * <li>
+	 * {@link org.eclipse.e4.ui.model.application.commands.MCommandParameter MCommandParameter}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.MCoreExpression MCoreExpression}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem MDirectMenuItem}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem MDirectToolItem}</li>
+	 * <li>
+	 * {@link org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution
+	 * MDynamicMenuContribution}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem MHandledMenuItem}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem MHandledToolItem}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MHandler MHandler}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MInputPart MInputPart}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MKeyBinding MKeyBinding}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MMenu MMenu}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution MMenuContribution}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator MMenuSeparator}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MParameter MParameter}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart MPart}</li>
+	 * <li>
+	 * {@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor MPartDescriptor}</li>
+	 * <li>
+	 * {@link org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer MPartSashContainer}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPartStack MPartStack}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective MPerspective}</li>
+	 * <li>
+	 * {@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack MPerspectiveStack}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder MPlaceholder}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu MPopupMenu}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MToolBar MToolBar}</li>
+	 * <li>
+	 * {@link org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution MToolBarContribution}
+	 * </li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator MToolBarSeparator}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MToolControl MToolControl}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar MTrimBar}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution MTrimContribution}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow MTrimmedWindow}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MWindow MWindow}</li>
+	 * </ul>
 	 * 
 	 * @param elementType
-	 *            the class to instantiate. Cannot be <code>null</code>
-	 * @return a new instance
-	 * @throws NullPointerException
-	 *             if the passed class is <code>null</code>
+	 *            the class to instantiate
+	 * @return a new instance or <code>null</code>
 	 * @throws IllegalArgumentException
 	 *             if the passed class is not supported.
+	 * @generated
 	 */
 	public <T extends MApplicationElement> T createModelElement(Class<T> elementType);
-
-	/**
-	 * This is a convenience method that constructs a new Selector based on {@link ElementMatcher}
-	 * and forwards the call on to the base API
-	 * {@link EModelService#findElements(MApplicationElement, Class, int, Selector)}.
-	 * 
-	 * @see EModelService#findElements(MApplicationElement, Class, int, Selector)
-	 */
-	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
-			List<String> tagsToMatch, int searchFlags);
-
-	/**
-	 * This is a convenience method that forwards the parameters on to
-	 * {@link EModelService#findElements(MUIElement, String, Class, List, int)}, passing
-	 * {@link EModelService#ANYWHERE} as the 'searchFlags'.
-	 * 
-	 */
-	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
-			List<String> tagsToMatch);
 
 	/**
 	 * Return a list of any elements that match the given search criteria. The search is recursive
@@ -152,7 +149,7 @@ public interface EModelService {
 	 * <p>
 	 * NOTE: This is a generically typed method with the List's generic type expected to be the
 	 * value of the 'clazz' parameter. If the 'clazz' parameter is null then the returned list is
-	 * untyped.
+	 * untyped but may safely be assigned to List&lt;MUIElement&gt;.
 	 * </p>
 	 * 
 	 * @param <T>
@@ -160,19 +157,21 @@ public interface EModelService {
 	 * @param searchRoot
 	 *            The element at which to start the search. This element must be non-null and is
 	 *            included in the search.
+	 * @param id
+	 *            The ID of the element. May be null to omit the test for this field.
 	 * @param clazz
-	 *            The type of element to be searched for. If non-null this also defines the return
-	 *            type of the List.
+	 *            The class specifier determining the 'instanceof' type of the elements to be found.
+	 *            If specified then the returned List will be generically specified as being of this
+	 *            type.
+	 * @param tagsToMatch
+	 *            The list of tags to match. All the tags specified in this list must be defined in
+	 *            the search element's tags in order to be a match.
 	 * @param searchFlags
 	 *            A bitwise combination of the following constants:
 	 *            <ul>
 	 *            <li><b>OUTSIDE_PERSPECTIVE</b> Include the elements in the window's model that are
 	 *            not in a perspective</;i>
 	 *            <li><b>IN_ANY_PERSPECTIVE</b> Include the elements in all perspectives</;i>
-	 *            <li><b>IN_ACTIVE_PERSPECTIVE</b> Include the elements in the currently active
-	 *            perspective only</;i>
-	 *            <li><b>IN_MAIN_MENU</b> Include elements in an MWindow's main menu</;i>
-	 *            <li><b>IN_PART</b> Include MMenu and MToolbar elements owned by parts</;i>
 	 *            <li><b>IN_ACTIVE_PERSPECTIVE</b> Include the elements in the currently active
 	 *            perspective only</;i>
 	 *            <li><b>IN_SHARED_AREA</b> Include the elements in the shared area</;i>
@@ -182,15 +181,40 @@ public interface EModelService {
 	 *            <b>IN_SHARED_AREA</b>; the flags <b>OUTSIDE_PERSPECTIVE | IN_SHARED_AREA</b> for
 	 *            example will search the presentation <i>excluding</i> the elements in perspective
 	 *            stacks.
-	 * @param matcher
-	 *            An implementation of a Selector that will return true for elements that it wants
-	 *            in the returned list.
 	 * @return The generically typed list of matching elements.
-	 * 
-	 * @since 1.1
 	 */
-	public <T> List<T> findElements(MApplicationElement searchRoot, Class<T> clazz,
-			int searchFlags, Selector matcher);
+	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
+			List<String> tagsToMatch, int searchFlags);
+
+	/**
+	 * Return a list of any elements that match the given search criteria. The search is recursive
+	 * and includes the specified search root. Any of the search parameters may be specified as
+	 * <code>null</code> in which case that field will always 'match'.
+	 * <p>
+	 * NOTE: This is a generically typed method with the List's generic type expected to be the
+	 * value of the 'clazz' parameter. If the 'clazz' parameter is null then the returned list is
+	 * untyped but may safely be assigned to List&lt;MUIElement&gt;.
+	 * </p>
+	 * 
+	 * @param <T>
+	 *            The generic type of the returned list
+	 * @param searchRoot
+	 *            The element at which to start the search. This element must be non-null and is
+	 *            included in the search.
+	 * @param id
+	 *            The ID of the element. May be null to omit the test for this field.
+	 * @param clazz
+	 *            The class specifier determining the 'instanceof' type of the elements to be found.
+	 *            If specified then the returned List will be generically specified as being of this
+	 *            type.
+	 * @param tagsToMatch
+	 *            The list of tags to match. All the tags specified in this list must be defined in
+	 *            the search element's tags in order to be a match.
+	 * 
+	 * @return The generically typed list of matching elements.
+	 */
+	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
+			List<String> tagsToMatch);
 
 	/**
 	 * Returns the first element, recursively searching under the specified search root (inclusive)
@@ -226,10 +250,6 @@ public interface EModelService {
 
 	/**
 	 * Clones the element, creating a deep copy of its structure.
-	 * 
-	 * NOTE: The cloned element gets the original element added into its 'transientData' map using
-	 * the CLONED_FROM_KEY key. This is useful in cases where there may be other information the
-	 * newly cloned element needs from the original.
 	 * 
 	 * @param element
 	 *            The element to clone

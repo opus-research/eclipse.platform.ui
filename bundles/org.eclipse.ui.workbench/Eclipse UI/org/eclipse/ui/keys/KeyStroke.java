@@ -50,7 +50,6 @@ import org.eclipse.ui.internal.util.Util;
  * @see org.eclipse.ui.keys.ModifierKey
  * @see org.eclipse.ui.keys.NaturalKey
  */
-@Deprecated
 public final class KeyStroke implements Comparable {
 
     /**
@@ -264,8 +263,7 @@ public final class KeyStroke implements Comparable {
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         KeyStroke castedObject = (KeyStroke) object;
         int compareTo = Util.compare(modifierKeysAsArray,
                 castedObject.modifierKeysAsArray);
@@ -280,8 +278,7 @@ public final class KeyStroke implements Comparable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof KeyStroke)) {
 			return false;
 		}
@@ -327,8 +324,7 @@ public final class KeyStroke implements Comparable {
     /**
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (!hashCodeComputed) {
             hashCode = HASH_INITIAL;
             hashCode = hashCode * HASH_FACTOR + modifierKeys.hashCode();
@@ -356,8 +352,7 @@ public final class KeyStroke implements Comparable {
      *         not to be <code>null</code>.
      * @see java.lang.Object#toString()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return KeyFormatterFactory.getFormalKeyFormatter().format(this);
     }
 }

@@ -49,7 +49,6 @@ public class Snippet013TableViewerEditing {
 	public static void main(String[] args) {
 		final Display display = new Display();
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				ViewModel viewModel = new ViewModel();
 				Shell shell = new View(viewModel).createShell();
@@ -161,12 +160,10 @@ public class Snippet013TableViewerEditing {
 			cellEditor = new TextCellEditor((Composite) viewer.getControl());
 		}
 
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return cellEditor;
 		}
 
-		@Override
 		protected IObservableValue doCreateCellEditorObservable(
 				CellEditor cellEditor) {
 
@@ -174,7 +171,6 @@ public class Snippet013TableViewerEditing {
 					SWT.Modify);
 		}
 
-		@Override
 		protected IObservableValue doCreateElementObservable(Object element,
 				ViewerCell cell) {
 			return BeansObservables.observeValue(element, "name");

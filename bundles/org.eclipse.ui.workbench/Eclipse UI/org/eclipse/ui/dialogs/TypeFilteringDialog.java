@@ -119,8 +119,7 @@ public class TypeFilteringDialog extends SelectionDialog {
         Button selectButton = createButton(buttonComposite,
                 IDialogConstants.SELECT_ALL_ID, WorkbenchMessages.WizardTransferPage_selectAll, false);
         SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 listViewer.setAllChecked(true);
             }
         };
@@ -128,8 +127,7 @@ public class TypeFilteringDialog extends SelectionDialog {
         Button deselectButton = createButton(buttonComposite,
                 IDialogConstants.DESELECT_ALL_ID, WorkbenchMessages.WizardTransferPage_deselectAll, false); 
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 listViewer.setAllChecked(false);
             }
         };
@@ -200,8 +198,7 @@ public class TypeFilteringDialog extends SelectionDialog {
      *  (non-Javadoc)
      * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.TYPE_FILTERING_DIALOG);
@@ -211,8 +208,7 @@ public class TypeFilteringDialog extends SelectionDialog {
      *  (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
         createMessageArea(composite);
@@ -294,8 +290,7 @@ public class TypeFilteringDialog extends SelectionDialog {
      * <code>Dialog</code> method builds a list of the selected elements for
      * later retrieval by the client and closes this dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         // Get the input children.
         IFileEditorMapping[] children = getInput();
         List list = new ArrayList();

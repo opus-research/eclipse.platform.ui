@@ -54,7 +54,6 @@ public class ElementReference implements IElementReference {
 	 * 
 	 * @see org.eclipse.ui.commands.IElementReference#getElement()
 	 */
-	@Override
 	public UIElement getElement() {
 		return element;
 	}
@@ -62,7 +61,6 @@ public class ElementReference implements IElementReference {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.commands.IElementReference#getCommandId()
 	 */
-	@Override
 	public String getCommandId() {
 		return commandId;
 	}
@@ -70,7 +68,6 @@ public class ElementReference implements IElementReference {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.commands.IElementReference#getParameters()
 	 */
-	@Override
 	public Map getParameters() {
 		return parameters;
 	}

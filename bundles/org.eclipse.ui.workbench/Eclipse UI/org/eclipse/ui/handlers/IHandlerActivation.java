@@ -47,7 +47,6 @@ public interface IHandlerActivation extends IEvaluationResultCache, Comparable {
 	 * 
 	 * @deprecated Use {@link IEvaluationResultCache#clearResult()} instead.
 	 */
-	@Deprecated
 	public void clearActive();
 
 	/**
@@ -99,6 +98,5 @@ public interface IHandlerActivation extends IEvaluationResultCache, Comparable {
 	 *             {@link IEvaluationResultCache#evaluate(IEvaluationContext)}
 	 *             instead.
 	 */
-	@Deprecated
 	public boolean isActive(IEvaluationContext context);
 }

@@ -61,8 +61,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
      */
-    @Override
-	public String format(Key key) {
+    public String format(Key key) {
         String name = key.toString();
         return Util.translateString(RESOURCE_BUNDLE, name, name, false, false);
     }
@@ -72,8 +71,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
      */
-    @Override
-	public String format(KeySequence keySequence) {
+    public String format(KeySequence keySequence) {
         StringBuffer stringBuffer = new StringBuffer();
 
         Iterator keyStrokeItr = keySequence.getKeyStrokes().iterator();
@@ -93,8 +91,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.KeyFormatter#formatKeyStroke(org.eclipse.ui.keys.KeyStroke)
      */
-    @Override
-	public String format(KeyStroke keyStroke) {
+    public String format(KeyStroke keyStroke) {
         String keyDelimiter = getKeyDelimiter();
 
         // Format the modifier keys, in sorted order.

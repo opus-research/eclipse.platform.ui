@@ -135,7 +135,6 @@ public class PreferenceTransferElement extends WorkbenchAdapter implements
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
-	@Override
 	public String getLocalId() {
 		return getID();
 	}
@@ -145,7 +144,6 @@ public class PreferenceTransferElement extends WorkbenchAdapter implements
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
-	@Override
 	public String getPluginId() {
 		return (configurationElement != null) ? configurationElement
 				.getContributor().getName() : null;
@@ -161,12 +159,10 @@ public class PreferenceTransferElement extends WorkbenchAdapter implements
 			this.mappings = mappings;
 		}
 
-		@Override
 		public String[] getScopes() {
 			return scopes;
 		}
 
-		@Override
 		public Map getMapping(String scope) {
 			return (Map) mappings.get(scope);
 		}
@@ -178,7 +174,6 @@ public class PreferenceTransferElement extends WorkbenchAdapter implements
 	 * 
 	 * @see org.eclipse.ui.model.WorkbenchAdapter#getLabel(java.lang.Object)
 	 */
-	@Override
 	public String getLabel(Object object) {
 		return getName();
 	}
@@ -190,7 +185,6 @@ public class PreferenceTransferElement extends WorkbenchAdapter implements
 	 * org.eclipse.ui.model.WorkbenchAdapter#getImageDescriptor(java.lang.Object
 	 * )
 	 */
-	@Override
 	public ImageDescriptor getImageDescriptor(Object object) {
 		if (imageDescriptor == null) {
 			String iconName = configurationElement

@@ -61,10 +61,9 @@ public class E4Workbench implements IWorkbench {
 	 * The argument for setting the delta store location <br>
 	 * <br>
 	 * Value is: <code>deltaRestore</code>
-	 *
+	 * 
 	 * @deprecated
 	 */
-	@Deprecated
 	public static final String DELTA_RESTORE = "deltaRestore"; //$NON-NLS-1$
 	/**
 	 * The argument for setting RTL mode <br>
@@ -72,12 +71,6 @@ public class E4Workbench implements IWorkbench {
 	 * Value is: <code>dir</code>
 	 */
 	public static final String RTL_MODE = "dir"; //$NON-NLS-1$
-	/**
-	 * The argument for the perspective to activate <br>
-	 * <br>
-	 * Value is: <code>perspectiveId</code>
-	 */
-	public static final String FORCED_PERSPECTIVE_ID = "forcedPerspetiveId"; //$NON-NLS-1$
 
 	public static final String NO_SAVED_MODEL_FOUND = "NO_SAVED_MODEL_FOUND"; //$NON-NLS-1$
 
@@ -100,7 +93,7 @@ public class E4Workbench implements IWorkbench {
 
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param uiRoot
 	 *            the root UI element
 	 * @param applicationContext
@@ -128,7 +121,6 @@ public class E4Workbench implements IWorkbench {
 				.registerService(IWorkbench.class.getName(), this, properties);
 	}
 
-	@Override
 	public final String getId() {
 		return id;
 	}
@@ -150,7 +142,7 @@ public class E4Workbench implements IWorkbench {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	public void instantiateRenderer() {
 		renderer = (IPresentationEngine) appContext.get(IPresentationEngine.class.getName());
@@ -178,7 +170,11 @@ public class E4Workbench implements IWorkbench {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.IWorkbench#close()
+	 */
 	public boolean close() {
 		if (renderer != null) {
 			renderer.stop();
@@ -194,7 +190,6 @@ public class E4Workbench implements IWorkbench {
 		return true;
 	}
 
-	@Override
 	public boolean restart() {
 		this.restart = true;
 		return close();
@@ -214,7 +209,6 @@ public class E4Workbench implements IWorkbench {
 		return EclipseContextFactory.getServiceContext(Activator.getDefault().getContext());
 	}
 
-	@Override
 	public MApplication getApplication() {
 		return appModel;
 	}
@@ -222,7 +216,7 @@ public class E4Workbench implements IWorkbench {
 	/**
 	 * Create the context chain. It both creates the chain for the current model, and adds eAdapters
 	 * so it can add new contexts when new model items are added.
-	 *
+	 * 
 	 * @param parentContext
 	 *            The parent context
 	 * @param contextModel

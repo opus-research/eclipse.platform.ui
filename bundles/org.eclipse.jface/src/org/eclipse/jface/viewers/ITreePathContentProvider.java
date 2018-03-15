@@ -29,7 +29,6 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 * <a href="https://bugs.eclipse.org/9262">bug 9262</a>).
 	 * </p>
 	 */
-	@Override
 	public Object[] getElements(Object inputElement);
 
 	/**

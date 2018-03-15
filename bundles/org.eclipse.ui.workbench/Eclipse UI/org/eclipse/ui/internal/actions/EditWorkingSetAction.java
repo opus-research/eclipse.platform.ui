@@ -58,8 +58,7 @@ public class EditWorkingSetAction extends Action {
      * 
      * @see Action#run
      */
-    @Override
-	public void run() {
+    public void run() {
         IWorkingSetManager manager = PlatformUI.getWorkbench()
                 .getWorkingSetManager();
         IWorkingSet workingSet = actionGroup.getWorkingSet();

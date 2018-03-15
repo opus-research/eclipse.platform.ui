@@ -27,7 +27,6 @@ public class CSSValueSWTImageConverterImpl extends AbstractCSSValueConverter {
 		super(Image.class);
 	}
 
-	@Override
 	public Object convert(CSSValue value, CSSEngine engine, Object context)
 			throws Exception {
 		Display display = (Display) context;
@@ -35,7 +34,6 @@ public class CSSValueSWTImageConverterImpl extends AbstractCSSValueConverter {
 				.getResourcesLocatorManager(), display);
 	}
 
-	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		// TODO : manage SWT image to CSS value conversion.

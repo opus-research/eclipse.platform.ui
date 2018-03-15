@@ -79,8 +79,7 @@ class NewWizardSelectionPage extends WorkbenchWizardSelectionPage {
     /** (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public void createControl(Composite parent) {
+    public void createControl(Composite parent) {
         IDialogSettings settings = getDialogSettings();
         newResourcePage = new NewWizardNewPage(this, wizardCategories,
 				primaryWizards, projectsOnly);
@@ -103,8 +102,7 @@ class NewWizardSelectionPage extends WorkbenchWizardSelectionPage {
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizardPage#canFlipToNextPage()
      */
-    @Override
-	public boolean canFlipToNextPage() {
+    public boolean canFlipToNextPage() {
         // if the current page advertises that it does have pages then ask it via the super call
     		if (hasPages) {
 				return super.canFlipToNextPage();

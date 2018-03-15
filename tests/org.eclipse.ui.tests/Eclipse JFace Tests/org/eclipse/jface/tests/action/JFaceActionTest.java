@@ -35,7 +35,9 @@ public abstract class JFaceActionTest extends TestCase {
         super(name);
     }
 
-    @Override
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#setUp()
+     */
     protected void setUp() throws Exception {
 	    display = Display.getCurrent();
 	    if (display == null) {
@@ -46,8 +48,10 @@ public abstract class JFaceActionTest extends TestCase {
 	    shell.setLayout(new FillLayout());
 	    shell.open();
     }
-
-    @Override
+    
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#tearDown()
+     */
     protected void tearDown() throws Exception {
        shell.dispose();
     }

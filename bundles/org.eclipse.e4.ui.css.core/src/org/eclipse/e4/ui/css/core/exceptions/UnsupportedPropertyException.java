@@ -12,10 +12,10 @@ package org.eclipse.e4.ui.css.core.exceptions;
 
 /**
  * Exception used when CSS property handler is not retrieved.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class UnsupportedPropertyException extends Exception {
 	private static final long serialVersionUID = 1L;
@@ -27,7 +27,6 @@ public class UnsupportedPropertyException extends Exception {
 		this.property = property;
 	}
 
-	@Override
 	public String getMessage() {
 		return "CSS Property " + property + " is not supported.";
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -17,6 +16,7 @@ import java.util.Comparator;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+
 import org.eclipse.jface.util.Policy;
 
 /**
@@ -26,10 +26,8 @@ import org.eclipse.jface.util.Policy;
  * The default <code>compare</code> method compares elements using two steps. 
  * The first step uses the values returned from <code>category</code>. 
  * By default, all elements are in the same category. 
- * The second level uses strings obtained from the content viewer's label
- * provider via <code>ILabelProvider.getText()</code>.
- * The strings are compared using a comparator from {@link Policy#getComparator()}
- * which by default does a case sensitive string comparison.
+ * The second level is based on a case insensitive compare of the strings obtained 
+ * from the content viewer's label provider via <code>ILabelProvider.getText</code>.
  * </p>
  * <p>
  * Subclasses may implement the <code>isSorterProperty</code> method;
@@ -187,7 +185,6 @@ public class ViewerComparator {
 	public void sort(final Viewer viewer, Object[] elements) {
 		try {
 			Arrays.sort(elements, new Comparator() {
-				@Override
 				public int compare(Object a, Object b) {
 					return ViewerComparator.this.compare(viewer, a, b);
 				}
@@ -198,8 +195,8 @@ public class ViewerComparator {
 					+ "\nthis: " + getClass().getName() //$NON-NLS-1$
 					+ "\ncomparator: " + (comparator != null ? comparator.getClass().getName() : null) //$NON-NLS-1$
 					+ "\narray:"; //$NON-NLS-1$
-			for (Object element : elements) {
-				msg += "\n\t" + getLabel(viewer, element); //$NON-NLS-1$
+			for (int i = 0; i < elements.length; i++) {
+				msg += "\n\t" + getLabel(viewer, elements[i]); //$NON-NLS-1$
 			}
 			Policy.getLog().log(new Status(IStatus.ERROR, "org.eclipse.jface", msg)); //$NON-NLS-1$
 			throw e;

@@ -69,8 +69,7 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * The action handler has changed.  Update self.
      */
-    @Override
-	protected void propagateChange(PropertyChangeEvent event) {
+    protected void propagateChange(PropertyChangeEvent event) {
         super.propagateChange(event);
         String prop = event.getProperty();
         if (prop.equals(IAction.TEXT)) {
@@ -87,8 +86,7 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * Sets the action handler.  Update self.
      */
-    @Override
-	protected void setActionHandler(IAction handler) {
+    protected void setActionHandler(IAction handler) {
         // Run the default behavior.
         super.setActionHandler(handler);
 
@@ -111,8 +109,7 @@ public class LabelRetargetAction extends RetargetAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void setDisabledImageDescriptor(ImageDescriptor image) {
+    public void setDisabledImageDescriptor(ImageDescriptor image) {
         super.setDisabledImageDescriptor(image);
         defaultDisabledImage = image;
     }
@@ -120,8 +117,7 @@ public class LabelRetargetAction extends RetargetAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void setHoverImageDescriptor(ImageDescriptor image) {
+    public void setHoverImageDescriptor(ImageDescriptor image) {
         super.setHoverImageDescriptor(image);
         defaultHoverImage = image;
     }
@@ -129,8 +125,7 @@ public class LabelRetargetAction extends RetargetAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    @Override
-	public void setImageDescriptor(ImageDescriptor image) {
+    public void setImageDescriptor(ImageDescriptor image) {
         super.setImageDescriptor(image);
         defaultImage = image;
     }
@@ -138,8 +133,7 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * Sets the action's label text to the given value.
      */
-    @Override
-	public void setText(String text) {
+    public void setText(String text) {
         super.setText(text);
         acceleratorText = LegacyActionTools.extractAcceleratorText(text);
         defaultText = text;
@@ -149,8 +143,7 @@ public class LabelRetargetAction extends RetargetAction {
      * Sets the tooltip text to the given text.
      * The value <code>null</code> clears the tooltip text.
      */
-    @Override
-	public void setToolTipText(String text) {
+    public void setToolTipText(String text) {
         super.setToolTipText(text);
         defaultToolTipText = text;
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,8 +38,7 @@ public class GroupMarker extends AbstractGroupMarker {
      * The <code>GroupMarker</code> implementation of this method
      * returns <code>false</code> since group markers are always invisible.
      */
-    @Override
-	public boolean isVisible() {
+    public boolean isVisible() {
         return false;
     }
 }

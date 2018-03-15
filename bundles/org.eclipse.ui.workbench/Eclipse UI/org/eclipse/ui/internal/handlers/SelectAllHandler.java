@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 */
 	private static final Class[] METHOD_PARAMETERS = { Point.class };
 
-	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {
 		final Method methodToExecute = getMethodToExecute();
@@ -75,14 +74,13 @@ public class SelectAllHandler extends WidgetMethodHandler {
 						final Object focusComponent = getFocusComponent();
 						if (focusComponent != null) {
 							Runnable methodRunnable = new Runnable() {
-								@Override
 								public void run() {
 									try {
-										methodToExecute.invoke(focusComponent);
+										methodToExecute.invoke(focusComponent,
+												null);
 										// and back to the UI thread :-)
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
-													@Override
 													public void run() {
 														if (!focusControl
 																.isDisposed()) {
@@ -106,7 +104,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 										 */
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
-													@Override
 													public void run() {
 														ExceptionHandler
 																.getInstance()
@@ -134,7 +131,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 					}
 				} else if (numParams == 0) {
 					// This is a no-argument selectAll method.
-					methodToExecute.invoke(focusControl);
+					methodToExecute.invoke(focusControl, null);
 					focusControl.notifyListeners(SWT.Selection, null);
 
 				} else if (numParams == 1) {
@@ -142,7 +139,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 					final Method textLimitAccessor = focusControl.getClass()
 							.getMethod("getTextLimit", NO_PARAMETERS); //$NON-NLS-1$
 					final Integer textLimit = (Integer) textLimitAccessor
-							.invoke(focusControl);
+							.invoke(focusControl, null);
 					final Object[] parameters = { new Point(0, textLimit
 							.intValue()) };
 					methodToExecute.invoke(focusControl, parameters);
@@ -182,7 +179,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 * 
 	 * @return The method on the focus control; <code>null</code> if none.
 	 */
-	@Override
 	protected Method getMethodToExecute() {
 		Method method = super.getMethodToExecute();
 
@@ -206,7 +202,6 @@ public class SelectAllHandler extends WidgetMethodHandler {
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
 		// The name is always "selectAll".

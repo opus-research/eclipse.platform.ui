@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Robin Stocker - Bug 236006 - [Viewers] Add tooltip support for DelegatingStyledCellLabelProvider
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -34,12 +33,6 @@ import org.eclipse.swt.graphics.Image;
  * The {@link DelegatingStyledCellLabelProvider.IStyledLabelProvider} can
  * optionally implement {@link IColorProvider} and {@link IFontProvider} to
  * provide foreground and background color and a default font.
- * </p>
- *
- * <p>
- * Since 3.10, {@link DelegatingStyledCellLabelProvider.IStyledLabelProvider}
- * can optionally implement {@link IToolTipProvider} to provide tooltip
- * support.
  * </p>
  * 
  * @since 3.4
@@ -99,7 +92,11 @@ public class DelegatingStyledCellLabelProvider extends StyledCellLabelProvider {
 		this.styledLabelProvider = labelProvider;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.StyledCellLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	public void update(ViewerCell cell) {
 		Object element = cell.getElement();
 
@@ -173,14 +170,6 @@ public class DelegatingStyledCellLabelProvider extends StyledCellLabelProvider {
 		return null;
 	}
 
-	@Override
-	public String getToolTipText(Object element) {
-		if (styledLabelProvider instanceof IToolTipProvider) {
-			return ((IToolTipProvider) this.styledLabelProvider).getToolTipText(element);
-		}
-		return super.getToolTipText(element);
-	}
-
 	/**
 	 * Returns the image for the label of the given element. The image is owned
 	 * by the label provider and must not be disposed directly. Instead, dispose
@@ -215,24 +204,20 @@ public class DelegatingStyledCellLabelProvider extends StyledCellLabelProvider {
 		return this.styledLabelProvider;
 	}
 
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 		super.addListener(listener);
 		this.styledLabelProvider.addListener(listener);
 	}
 
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 		super.removeListener(listener);
 		this.styledLabelProvider.removeListener(listener);
 	}
 
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return this.styledLabelProvider.isLabelProperty(element, property);
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 		this.styledLabelProvider.dispose();

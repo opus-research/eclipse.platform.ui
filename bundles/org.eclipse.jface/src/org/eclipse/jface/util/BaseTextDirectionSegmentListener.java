@@ -39,7 +39,6 @@ import org.eclipse.swt.events.SegmentListener;
 		textDirection = textDir;
 	}
 
-	@Override
 	public void getSegments(SegmentEvent event) {
 		int length = event.lineText.length();
 		if (length > 0) {

@@ -34,7 +34,6 @@ public class DirectMenuItemRenderer extends MenuItemRenderer {
 	@Inject
 	Logger logger;
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MDirectMenuItem) || !(parent instanceof Menu))
 			return null;
@@ -93,7 +92,6 @@ public class DirectMenuItemRenderer extends MenuItemRenderer {
 			final IEclipseContext lclContext = getContext(me);
 			MenuItem mi = (MenuItem) me.getWidget();
 			mi.addSelectionListener(new SelectionListener() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					lclContext.set(MItem.class.getName(), item);
 					ContextInjectionFactory.invoke(contrib.getObject(),
@@ -101,7 +99,6 @@ public class DirectMenuItemRenderer extends MenuItemRenderer {
 					lclContext.remove(MItem.class.getName());
 				}
 
-				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 				}
 			});

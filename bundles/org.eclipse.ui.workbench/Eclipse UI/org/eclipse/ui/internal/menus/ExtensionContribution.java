@@ -25,7 +25,6 @@ import org.eclipse.ui.services.IServiceLocator;
 
 public class ExtensionContribution implements IDelegateInitializer {
 
-	@Override
 	public void initialize(MApplicationElement model, Object delegate) {
 		if (delegate instanceof IWorkbenchContribution) {
 			IServiceLocator locator = getServiceLocator((EObject) model);

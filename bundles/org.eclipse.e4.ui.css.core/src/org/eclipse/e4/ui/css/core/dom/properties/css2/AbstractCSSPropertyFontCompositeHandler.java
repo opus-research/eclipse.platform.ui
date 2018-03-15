@@ -20,10 +20,10 @@ import org.w3c.dom.css.CSSValue;
  * Abstract class which dispatch font CSS Property defined to call the
  * applyCSSProperty methods CSS Properties font-style, font-family, font-weight,
  * font-size.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public abstract class AbstractCSSPropertyFontCompositeHandler extends
 		AbstractCSSPropertyCompositeHandler {
@@ -31,7 +31,6 @@ public abstract class AbstractCSSPropertyFontCompositeHandler extends
 	private static final String[] FONT_CSSPROPERTIES = { "font-style",
 			"font-variant", "font-weight", "font-size", "font-family" };
 
-	@Override
 	public void applyCSSProperty(Object element, CSSValue value, String pseudo,
 			CSSEngine engine) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
@@ -43,12 +42,10 @@ public abstract class AbstractCSSPropertyFontCompositeHandler extends
 		}
 	}
 
-	@Override
 	public boolean isCSSPropertyComposite(String property) {
 		return "font".equals(property);
 	}
 
-	@Override
 	public String[] getCSSPropertiesNames(String property) {
 		if ("font".equals(property))
 			return FONT_CSSPROPERTIES;

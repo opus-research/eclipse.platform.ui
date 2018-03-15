@@ -55,32 +55,28 @@ public class FileSystemElement implements IAdaptable {
         /**
          * Answer the children property of this element
          */
-        @Override
-		public Object[] getChildren(Object o) {
+        public Object[] getChildren(Object o) {
             return getFolders().getChildren(o);
         }
 
         /**
          * Returns the parent of this element
          */
-        @Override
-		public Object getParent(Object o) {
+        public Object getParent(Object o) {
             return parent;
         }
 
         /**
          * Returns an appropriate label for this file system element.
          */
-        @Override
-		public String getLabel(Object o) {
+        public String getLabel(Object o) {
             return name;
         }
 
         /**
          * Returns an image descriptor for this file system element
          */
-        @Override
-		public ImageDescriptor getImageDescriptor(Object object) {
+        public ImageDescriptor getImageDescriptor(Object object) {
             if (isDirectory()) {
                 return WorkbenchImages
                         .getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
@@ -137,8 +133,7 @@ public class FileSystemElement implements IAdaptable {
     /**
      * Returns the adapter
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
             return workbenchAdapter;
         }
@@ -247,8 +242,7 @@ public class FileSystemElement implements IAdaptable {
     /**
      * For debugging purposes only.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         if (isDirectory()) {
             buf.append("Folder(");//$NON-NLS-1$

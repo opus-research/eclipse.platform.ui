@@ -106,8 +106,7 @@ public abstract class MultiEditor extends AbstractMultiEditor {
         content.setLayout(new FillLayout());
         e.createPartControl(content);
         parent.addListener(SWT.Activate, new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 if (event.type == SWT.Activate) {
 					activateEditor(e);
 				}
@@ -119,8 +118,7 @@ public abstract class MultiEditor extends AbstractMultiEditor {
     /*
      * @see IWorkbenchPart#setFocus()
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
     	super.setFocus();
         updateGradient(getActiveEditor());
     }
@@ -131,8 +129,7 @@ public abstract class MultiEditor extends AbstractMultiEditor {
      * @param part the nested editor
      * @since 3.5
      */
-    @Override
-	public void activateEditor(IEditorPart part) {
+    public void activateEditor(IEditorPart part) {
         IEditorPart oldEditor = getActiveEditor();
         super.activateEditor(part);
         updateGradient(oldEditor);
@@ -147,14 +144,12 @@ public abstract class MultiEditor extends AbstractMultiEditor {
         return window.getShellActivated();
     }
 
-	@Override
 	public Composite getInnerEditorContainer(
 			IEditorReference innerEditorReference) {
 		// This method is not used by MutliEditor
 		return null;
 	}
 
-	@Override
 	protected void innerEditorsCreated() {
 		// Nothing to do
 	}

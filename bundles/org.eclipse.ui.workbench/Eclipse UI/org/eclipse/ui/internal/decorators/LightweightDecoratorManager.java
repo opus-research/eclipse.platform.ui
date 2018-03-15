@@ -57,7 +57,6 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		/*
 		 * @see ISafeRunnable.handleException(Throwable).
 		 */
-		@Override
 		public void handleException(Throwable exception) {
 			IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
 					.getMessage(), exception);
@@ -78,7 +77,6 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 		/*
 		 * @see ISafeRunnable.run
 		 */
-		@Override
 		public void run() throws Exception {
 			decorator.decorate(element, decoration);
 			clearReferences();
@@ -388,7 +386,6 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
 	 *      org.eclipse.core.runtime.IExtension)
 	 */
-	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		// Do nothing as this is handled by the DecoratorManager
 		// This is not called as canHandleExtensionTracking returns

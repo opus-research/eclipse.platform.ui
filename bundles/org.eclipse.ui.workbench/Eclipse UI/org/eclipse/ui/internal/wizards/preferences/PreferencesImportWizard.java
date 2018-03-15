@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.preferences;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -47,12 +46,8 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public class PreferencesImportWizard extends Wizard implements IImportWizard {
 
-	public static final String EVENT_IMPORT_END = "org/eclipse/ui/internal/wizards/preferences/import/end"; //$NON-NLS-1$
-
-	private WizardPreferencesImportPage1 mainPage;
+    private WizardPreferencesImportPage1 mainPage;
 	
-	private IEventBroker eventBroker;
-
     /**
      * Creates a wizard for importing resources into the workspace from
      * the file system.
@@ -70,8 +65,7 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         super.addPages();
         mainPage = new WizardPreferencesImportPage1();
         addPage(mainPage);
@@ -80,9 +74,7 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * Method declared on IWorkbenchWizard.
      */
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
-		eventBroker = workbench.getService(IEventBroker.class);
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(PreferencesMessages.PreferencesImportWizard_import);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_IMPORT_PREF_WIZ));
@@ -92,16 +84,7 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public boolean performFinish() {
-		boolean success = mainPage.finish();
-		sendEvent(EVENT_IMPORT_END);
-		return success;
+    public boolean performFinish() {
+        return mainPage.finish();
     }
-
-	private void sendEvent(String topic) {
-		if (eventBroker != null) {
-			eventBroker.send(topic, null);
-		}
-	}
 }

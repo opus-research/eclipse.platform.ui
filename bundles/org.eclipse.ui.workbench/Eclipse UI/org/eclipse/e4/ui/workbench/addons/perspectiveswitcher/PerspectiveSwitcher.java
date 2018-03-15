@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 380233
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.perspectiveswitcher;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -30,7 +26,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
@@ -120,9 +115,6 @@ public class PerspectiveSwitcher {
 	@Inject
 	private MWindow window;
 
-	@Inject
-	private Logger logger;
-
 	private MToolControl psME;
 	private ToolBar psTB;
 	private Composite comp;
@@ -134,7 +126,6 @@ public class PerspectiveSwitcher {
 	IPropertyChangeListener propertyChangeListener;
 
 	private EventHandler selectionHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			if (psTB.isDisposed()) {
 				return;
@@ -162,7 +153,6 @@ public class PerspectiveSwitcher {
 	};
 
 	private EventHandler toBeRenderedHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			if (psTB.isDisposed()) {
 				return;
@@ -191,7 +181,6 @@ public class PerspectiveSwitcher {
 	};
 
 	private EventHandler labelHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			if (psTB.isDisposed()) {
 				return;
@@ -233,30 +222,11 @@ public class PerspectiveSwitcher {
 			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 				String newTTip = (String) newValue;
 				ti.setToolTipText(newTTip);
-			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				Image currentImage = ti.getImage();
-				String uri = (String) newValue;
-				URL url = null;
-				try {
-					url = new URL(uri);
-					ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
-					if (descriptor == null) {
-						ti.setImage(null);
-					} else
-						ti.setImage(descriptor.createImage());
-				} catch (IOException e) {
-					ti.setImage(null);
-					logger.warn(e);
-				} finally {
-					if (currentImage != null)
-						currentImage.dispose();
-				}
 			}
 		}
 	};
 
 	private EventHandler childrenHandler = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			if (psTB.isDisposed()) {
 				return;
@@ -341,7 +311,6 @@ public class PerspectiveSwitcher {
 		psTB = new ToolBar(comp, SWT.FLAT | SWT.WRAP | SWT.RIGHT + orientation);
 		comp.addPaintListener(new PaintListener() {
 
-			@Override
 			public void paintControl(PaintEvent e) {
 				paint(e);
 			}
@@ -349,11 +318,9 @@ public class PerspectiveSwitcher {
 		toolParent = ((Control) toolControl.getParent().getWidget());
 		toolParent.addPaintListener(new PaintListener() {
 
-			@Override
 			public void paintControl(PaintEvent e) {
-				if (borderColor == null || borderColor.isDisposed()) {
+				if (borderColor == null)
 					borderColor = e.display.getSystemColor(SWT.COLOR_BLACK);
-				}
 				e.gc.setForeground(borderColor);
 				Rectangle bounds = ((Control) e.widget).getBounds();
 				e.gc.drawLine(0, bounds.height - 1, bounds.width, bounds.height - 1);
@@ -361,7 +328,6 @@ public class PerspectiveSwitcher {
 		});
 
 		comp.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				dispose();
 			}
@@ -369,7 +335,6 @@ public class PerspectiveSwitcher {
 		});
 
 		psTB.addMenuDetectListener(new MenuDetectListener() {
-			@Override
 			public void menuDetected(MenuDetectEvent e) {
 				ToolBar tb = (ToolBar) e.widget;
 				Point p = new Point(e.x, e.y);
@@ -388,7 +353,6 @@ public class PerspectiveSwitcher {
 		});
 
 		psTB.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				disposeTBImages();
 			}
@@ -396,7 +360,6 @@ public class PerspectiveSwitcher {
 		});
 
 		psTB.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-			@Override
 			public void getName(AccessibleEvent e) {
 				if (0 <= e.childID && e.childID < psTB.getItemCount()) {
 					ToolItem item = psTB.getItem(e.childID);
@@ -413,12 +376,10 @@ public class PerspectiveSwitcher {
 		createItem.setImage(getOpenPerspectiveImage());
 		createItem.setToolTipText(WorkbenchMessages.OpenPerspectiveDialogAction_tooltip);
 		createItem.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				selectPerspective();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				selectPerspective();
 			}
@@ -476,11 +437,7 @@ public class PerspectiveSwitcher {
 
 	private void hookupDnD(ToolBar bar) {
 		bar.addMouseListener(new MouseListener() {
-			@Override
 			public void mouseUp(MouseEvent e) {
-				if (dragItem == null)
-					return;
-
 				ToolBar bar = (ToolBar) e.widget;
 				ToolItem curItem = bar.getItem(new Point(e.x, e.y));
 				if (curItem != null && curItem.getData() instanceof MPerspective) {
@@ -523,7 +480,6 @@ public class PerspectiveSwitcher {
 				dragShell = null;
 			}
 
-			@Override
 			public void mouseDown(MouseEvent e) {
 				ToolBar bar = (ToolBar) e.widget;
 				downPos = new Point(e.x, e.y);
@@ -535,13 +491,11 @@ public class PerspectiveSwitcher {
 					dragItem = downItem;
 			}
 
-			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 		});
 
 		bar.addDragDetectListener(new DragDetectListener() {
-			@Override
 			public void dragDetected(DragDetectEvent e) {
 				if (dragItem != null) {
 					dragging = true;
@@ -551,7 +505,6 @@ public class PerspectiveSwitcher {
 		});
 
 		bar.addMouseMoveListener(new MouseMoveListener() {
-			@Override
 			public void mouseMove(MouseEvent e) {
 				if (dragging) {
 					track(e);
@@ -595,11 +548,8 @@ public class PerspectiveSwitcher {
 					psItem.setImage(image);
 
 					psItem.addListener(SWT.Dispose, new Listener() {
-						@Override
 						public void handleEvent(org.eclipse.swt.widgets.Event event) {
-							Image currentImage = psItem.getImage();
-							if (currentImage != null)
-								currentImage.dispose();
+							image.dispose();
 						}
 					});
 					foundImage = true;
@@ -617,13 +567,11 @@ public class PerspectiveSwitcher {
 		psItem.setSelection(persp == persp.getParent().getSelectedElement());
 
 		psItem.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MPerspective persp = (MPerspective) e.widget.getData();
 				persp.getParent().setSelectedElement(persp);
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				MPerspective persp = (MPerspective) e.widget.getData();
 				persp.getParent().setSelectedElement(persp);
@@ -631,7 +579,6 @@ public class PerspectiveSwitcher {
 		});
 
 		psItem.addListener(SWT.MenuDetect, new Listener() {
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				MPerspective persp = (MPerspective) event.widget.getData();
 				openMenuFor(psItem, persp);
@@ -666,7 +613,6 @@ public class PerspectiveSwitcher {
 		final Menu menu = new Menu(psTB);
 		menu.setData(persp);
 		if (persp.getParent().getSelectedElement() == persp) {
-			addCustomizeItem(menu);
 			addSaveAsItem(menu);
 			addResetItem(menu);
 		}
@@ -685,11 +631,9 @@ public class PerspectiveSwitcher {
 		menu.setVisible(true);
 		menu.addMenuListener(new MenuListener() {
 
-			@Override
 			public void menuHidden(MenuEvent e) {
 				psTB.getDisplay().asyncExec(new Runnable() {
 
-					@Override
 					public void run() {
 						menu.dispose();
 					}
@@ -697,7 +641,6 @@ public class PerspectiveSwitcher {
 				});
 			}
 
-			@Override
 			public void menuShown(MenuEvent e) {
 				// Nothing to do
 			}
@@ -709,7 +652,6 @@ public class PerspectiveSwitcher {
 		MenuItem menuItem = new MenuItem(menu, SWT.NONE);
 		menuItem.setText(WorkbenchMessages.WorkbenchWindow_close);
 		menuItem.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MPerspective persp = (MPerspective) menu.getData();
 				if (persp != null)
@@ -735,7 +677,6 @@ public class PerspectiveSwitcher {
 		workbenchWindow.getWorkbench().getHelpSystem()
 				.setHelp(saveAsMenuItem, IWorkbenchHelpContextIds.SAVE_PERSPECTIVE_ACTION);
 		saveAsMenuItem.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (psTB.isDisposed())
 					return;
@@ -767,7 +708,6 @@ public class PerspectiveSwitcher {
 		workbenchWindow.getWorkbench().getHelpSystem()
 				.setHelp(resetMenuItem, IWorkbenchHelpContextIds.RESET_PERSPECTIVE_ACTION);
 		resetMenuItem.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (psTB.isDisposed())
 					return;
@@ -792,40 +732,10 @@ public class PerspectiveSwitcher {
 		});
 	}
 
-	private void addCustomizeItem(final Menu menu) {
-		final MenuItem customizeMenuItem = new MenuItem(menu, SWT.Activate);
-		customizeMenuItem.setText(WorkbenchMessages.PerspectiveBar_customize);
-		final IWorkbenchWindow workbenchWindow = window.getContext().get(IWorkbenchWindow.class);
-		customizeMenuItem.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent event) {
-				if (psTB.isDisposed()) {
-					return;
-				}
-				IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
-				IStatus status = Status.OK_STATUS;
-				try {
-					handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_CUSTOMIZE_PERSPECTIVE, null);
-				} catch (ExecutionException e) {
-					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-				} catch (NotDefinedException e) {
-					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-				} catch (NotEnabledException e) {
-					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-				} catch (NotHandledException e) {
-				}
-				if (!status.isOK()) {
-					StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.LOG);
-				}
-			}
-		});
-	}
-
 	private void addShowTextItem(final Menu menu) {
 		final MenuItem showtextMenuItem = new MenuItem(menu, SWT.CHECK);
 		showtextMenuItem.setText(WorkbenchMessages.PerspectiveBar_showText);
 		showtextMenuItem.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				boolean preference = showtextMenuItem.getSelection();
 				if (preference != PrefUtil.getAPIPreferenceStore().getDefaultBoolean(
@@ -845,7 +755,6 @@ public class PerspectiveSwitcher {
 	private void setPropertyChangeListener() {
 		propertyChangeListener = new IPropertyChangeListener() {
 
-			@Override
 			public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
 				if (IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR
 						.equals(propertyChangeEvent.getProperty())) {
@@ -915,9 +824,8 @@ public class PerspectiveSwitcher {
 	void paint(PaintEvent e) {
 		GC gc = e.gc;
 		Point size = comp.getSize();
-		if (curveColor == null || curveColor.isDisposed()) {
+		if (curveColor == null)
 			curveColor = e.display.getSystemColor(SWT.COLOR_BLACK);
-		}
 		int h = size.y;
 		int[] simpleCurve = new int[] { 0, h - 1, 1, h - 1, 2, h - 2, 2, 1, 3, 0 };
 		// draw border

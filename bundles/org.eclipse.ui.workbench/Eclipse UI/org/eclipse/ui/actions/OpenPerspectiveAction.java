@@ -74,8 +74,7 @@ public final class OpenPerspectiveAction extends Action implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IAction#runWithEvent(org.eclipse.swt.widgets.Event)
      */
-    @Override
-	public final void runWithEvent(final Event event) {
+    public final void runWithEvent(final Event event) {
         callback.run(descriptor, new SelectionEvent(event));
     }
 
@@ -84,8 +83,7 @@ public final class OpenPerspectiveAction extends Action implements
      * 
      * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
      */
-    @Override
-	public String getLocalId() {
+    public String getLocalId() {
         return descriptor.getId();
     }
 
@@ -94,8 +92,7 @@ public final class OpenPerspectiveAction extends Action implements
      * 
      * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
      */
-    @Override
-	public String getPluginId() {
+    public String getPluginId() {
         return descriptor instanceof IPluginContribution ? ((IPluginContribution) descriptor)
                 .getPluginId()
                 : null;

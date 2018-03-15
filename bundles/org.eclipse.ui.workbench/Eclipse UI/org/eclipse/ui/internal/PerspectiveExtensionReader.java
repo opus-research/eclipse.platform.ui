@@ -338,8 +338,7 @@ public class PerspectiveExtensionReader extends RegistryReader {
         return true;
     }
 
-    @Override
-	protected boolean readElement(IConfigurationElement element) {
+    protected boolean readElement(IConfigurationElement element) {
         String type = element.getName();
         if (type.equals(IWorkbenchRegistryConstants.TAG_PERSPECTIVE_EXTENSION)) {
             String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_TARGET_ID);

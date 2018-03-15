@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -109,7 +109,6 @@ public class ActionContributionItem extends ContributionItem {
 		/**
 		 * @see IPropertyChangeListener#propertyChange(PropertyChangeEvent)
 		 */
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			update(event.getProperty());
 		}
@@ -134,7 +133,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * Listener for action property change notifications.
 	 */
 	private final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			actionPropertyChange(event);
 		}
@@ -178,7 +176,6 @@ public class ActionContributionItem extends ContributionItem {
 				update(e.getProperty());
 			} else {
 				display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						update(e.getProperty());
 					}
@@ -192,7 +189,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * Compares this action contribution item with another object. Two action
 	 * contribution items are equal if they refer to the identical Action.
 	 */
-	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof ActionContributionItem)) {
 			return false;
@@ -207,7 +203,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * action's checked property has been set, the button is created and primed
 	 * to the value of the checked property.
 	 */
-	@Override
 	public void fill(Composite parent) {
 		if (widget == null && parent != null) {
 			int flags = SWT.PUSH;
@@ -255,7 +250,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * the value of the checked property. If the action's menu creator property
 	 * has been set, a cascading submenu is created.
 	 */
-	@Override
 	public void fill(Menu parent, int index) {
 		if (widget == null && parent != null) {
 			int flags = SWT.PUSH;
@@ -319,7 +313,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * the value of the checked property. If the action's menu creator property
 	 * has been set, a drop-down tool item is created.
 	 */
-	@Override
 	public void fill(ToolBar parent, int index) {
 		if (widget == null && parent != null) {
 			int flags = SWT.PUSH;
@@ -380,7 +373,6 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getButtonListener() {
 		if (buttonListener == null) {
 			buttonListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -408,7 +400,6 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getMenuItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -450,7 +441,6 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getToolItemListener() {
 		if (toolItemListener == null) {
 			toolItemListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -578,7 +568,6 @@ public class ActionContributionItem extends ContributionItem {
 				IPropertyChangeListener resultListener = null;
 				if (callback != null) {
 					resultListener = new IPropertyChangeListener() {
-						@Override
 						public void propertyChange(PropertyChangeEvent event) {
 							// Check on result
 							if (event.getProperty().equals(IAction.RESULT)) {
@@ -622,7 +611,9 @@ public class ActionContributionItem extends ContributionItem {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Object.
+	 */
 	public int hashCode() {
 		return action.hashCode();
 	}
@@ -664,7 +655,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * method returns <code>true</code> for menu items and <code>false</code>
 	 * for everything else.
 	 */
-	@Override
 	public boolean isDynamic() {
 		if (widget instanceof MenuItem) {
 			// Optimization. Only recreate the item is the check or radio style
@@ -681,7 +671,9 @@ public class ActionContributionItem extends ContributionItem {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IContributionItem.
+	 */
 	public boolean isEnabled() {
 		return action != null && action.isEnabled();
 	}
@@ -707,7 +699,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * by also checking whether the command corresponding to this action is
 	 * active.
 	 */
-	@Override
 	public boolean isVisible() {
 		return super.isVisible() && isCommandActive();
 	}
@@ -730,7 +721,6 @@ public class ActionContributionItem extends ContributionItem {
 	 * The action item implementation of this <code>IContributionItem</code>
 	 * method calls <code>update(null)</code>.
 	 */
-	@Override
 	public final void update() {
 		update(null);
 	}
@@ -742,7 +732,6 @@ public class ActionContributionItem extends ContributionItem {
 	 *            the name of the property, or <code>null</code> meaning all
 	 *            applicable properties
 	 */
-	@Override
 	public void update(String propertyName) {
 		if (widget != null) {
 			// determine what to do
@@ -1192,7 +1181,11 @@ public class ActionContributionItem extends ContributionItem {
 		return textValue;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	public void dispose() {
 		if (widget != null) {
 			widget.dispose();
@@ -1211,7 +1204,6 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getMenuCreatorListener() {
 		if (menuCreatorListener == null) {
 			menuCreatorListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Show:
@@ -1276,7 +1268,6 @@ public class ActionContributionItem extends ContributionItem {
 		realMenu.notifyListeners(SWT.Show, null);
 
 		final Listener passThrough = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				if (!event.widget.isDisposed()) {
 					Widget realItem = (Widget) event.widget.getData();
@@ -1319,7 +1310,6 @@ public class ActionContributionItem extends ContributionItem {
 				subMenu.setData(itemMenu);
 				proxyItem.setMenu(subMenu);
 				subMenu.addListener(SWT.Show, new Listener() {
-					@Override
 					public void handleEvent(Event event) {
 						event.widget.removeListener(SWT.Show, this);
 						if (event.type == SWT.Show) {
@@ -1343,7 +1333,6 @@ public class ActionContributionItem extends ContributionItem {
 	private void handleHideProxy(final Menu proxy) {
 		proxy.removeListener(SWT.Hide, getMenuCreatorListener());
 		proxy.getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				if (!proxy.isDisposed()) {
 					MenuItem parentItem = proxy.getParentItem();

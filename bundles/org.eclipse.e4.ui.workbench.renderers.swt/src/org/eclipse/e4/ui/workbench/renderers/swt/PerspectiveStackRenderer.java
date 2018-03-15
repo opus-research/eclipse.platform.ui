@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -120,12 +120,8 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 
 		// Force a context switch
 		if (tabElement instanceof MPerspective) {
-			MPerspective selected = (MPerspective) tabElement.getParent()
-					.getSelectedElement();
-			if (selected != null) {
-				IEclipseContext context = selected.getContext();
-				context.get(EPartService.class).switchPerspective(selected);
-			}
+			IEclipseContext context = persp.getContext();
+			context.get(EPartService.class).switchPerspective(persp);
 		}
 
 		// Move any other controls to 'limbo'

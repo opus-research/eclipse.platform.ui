@@ -53,7 +53,6 @@ public final class ShowViewHandler extends AbstractHandler {
 
     }
     
-	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil

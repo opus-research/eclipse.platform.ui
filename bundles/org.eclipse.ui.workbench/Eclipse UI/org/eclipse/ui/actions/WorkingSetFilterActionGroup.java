@@ -102,7 +102,6 @@ public class WorkingSetFilterActionGroup extends ActionGroup {
         editWorkingSetAction = new EditWorkingSetAction(this, shell);
         mruList = new CompoundContributionItem() {
 
-			@Override
 			protected IContributionItem[] getContributionItems() {
 				IWorkingSet[] workingSets = PlatformUI.getWorkbench()
 						.getWorkingSetManager().getRecentWorkingSets();
@@ -140,8 +139,7 @@ public class WorkingSetFilterActionGroup extends ActionGroup {
     /* (non-Javadoc)
      * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
      */
-    @Override
-	public void fillActionBars(IActionBars actionBars) {
+    public void fillActionBars(IActionBars actionBars) {
         menuManager = actionBars.getMenuManager();
         
         if(menuManager.find(IWorkbenchActionConstants.MB_ADDITIONS) != null)
@@ -161,7 +159,6 @@ public class WorkingSetFilterActionGroup extends ActionGroup {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.action.IMenuManager)
 	 */
-	@Override
 	public void fillContextMenu(IMenuManager menuManager) {
 		menuManager.add(selectWorkingSetAction);
 		menuManager.add(clearWorkingSetAction);

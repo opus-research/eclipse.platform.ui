@@ -70,8 +70,7 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#doSave(IProgressMonitor)
      */
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
         for (int i = 0; i < innerEditors.length; i++) {
             IEditorPart e = innerEditors[i];
             e.doSave(monitor);
@@ -81,16 +80,14 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#doSaveAs()
      */
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
         //no-op
     }
 
     /*
      * @see IEditorPart#init(IEditorSite, IEditorInput)
      */
-    @Override
-	public void init(IEditorSite site, IEditorInput input)
+    public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         init(site, (MultiEditorInput) input);
     }
@@ -114,8 +111,7 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#isDirty()
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
         for (int i = 0; i < innerEditors.length; i++) {
             IEditorPart e = innerEditors[i];
             if (e.isDirty()) {
@@ -128,16 +124,14 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#isSaveAsAllowed()
      */
-    @Override
-	public boolean isSaveAsAllowed() {
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
 	/*
      * @see IWorkbenchPart#setFocus()
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         innerEditors[activeEditorIndex].setFocus();
     }
 
@@ -172,7 +166,6 @@ public abstract class AbstractMultiEditor extends EditorPart {
 
 		for (int i = 0; i < children.length; i++) {
 			children[i].addPropertyListener( new IPropertyListener() {
-				@Override
 				public void propertyChanged(Object source, int propId) {
 					handlePropertyChange(propId);
 				}
@@ -223,15 +216,12 @@ public abstract class AbstractMultiEditor extends EditorPart {
      */
     private void setupEvents() {
 		propagationListener = new IPartListener2() {
-			@Override
 			public void partActivated(IWorkbenchPartReference partRef) {
 			}
 
-			@Override
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {
 			}
 
-			@Override
 			public void partClosed(IWorkbenchPartReference partRef) {
 				IWorkbenchPart part = partRef.getPart(false);
 				if (part == AbstractMultiEditor.this && innerEditors != null) {
@@ -240,11 +230,9 @@ public abstract class AbstractMultiEditor extends EditorPart {
 				}
 			}
 
-			@Override
 			public void partDeactivated(IWorkbenchPartReference partRef) {
 			}
 
-			@Override
 			public void partOpened(IWorkbenchPartReference partRef) {
 				IWorkbenchPart part = partRef.getPart(false);
 				if (part == AbstractMultiEditor.this && innerEditors != null) {
@@ -261,15 +249,12 @@ public abstract class AbstractMultiEditor extends EditorPart {
 				}
 			}
 
-			@Override
 			public void partHidden(IWorkbenchPartReference partRef) {
 			}
 
-			@Override
 			public void partVisible(IWorkbenchPartReference partRef) {
 			}
 
-			@Override
 			public void partInputChanged(IWorkbenchPartReference partRef) {
 			}
 		};
@@ -281,7 +266,6 @@ public abstract class AbstractMultiEditor extends EditorPart {
      * 
      * @since 3.2
      */
-	@Override
 	public void dispose() {
 		getSite().getPage().removePartListener(propagationListener);
 		super.dispose();

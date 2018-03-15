@@ -284,12 +284,10 @@ public class WorkingSetDescriptor implements IPluginContribution {
         return getPageClassName() != null;
     }
 
-	@Override
 	public String getLocalId() {
 		return getId();
 	}
 
-	@Override
 	public String getPluginId() {
 		return getDeclaringNamespace();
 	}

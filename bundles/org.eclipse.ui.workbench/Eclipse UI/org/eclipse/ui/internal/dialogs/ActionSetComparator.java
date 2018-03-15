@@ -30,8 +30,7 @@ public class ActionSetComparator extends ViewerComparator {
      * the first element is less than, equal to, or greater than
      * the second element.
      */
-    @Override
-	public int compare(Viewer viewer, Object e1, Object e2) {
+    public int compare(Viewer viewer, Object e1, Object e2) {
         if (e1 instanceof IActionSetDescriptor) {
             String str1 = DialogUtil.removeAccel(((IActionSetDescriptor) e1)
                     .getLabel());

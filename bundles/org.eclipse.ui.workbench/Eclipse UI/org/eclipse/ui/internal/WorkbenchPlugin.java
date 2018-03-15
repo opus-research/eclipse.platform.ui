@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,11 +26,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.IHelpService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -52,8 +50,6 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.decorators.DecoratorManager;
 import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceManager;
-import org.eclipse.ui.internal.help.CommandHelpServiceImpl;
-import org.eclipse.ui.internal.help.HelpServiceImpl;
 import org.eclipse.ui.internal.intro.IIntroRegistry;
 import org.eclipse.ui.internal.intro.IntroRegistry;
 import org.eclipse.ui.internal.misc.StatusUtil;
@@ -204,10 +200,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     
 	private ServiceTracker testableTracker = null;
 	
-	private IHelpService helpService;
-
-	private ICommandHelpService commandHelpService;
-
     /**
      * Create an instance of the WorkbenchPlugin. The workbench plugin is
      * effectively the "application" for the workbench UI. The entire UI
@@ -253,9 +245,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
         productInfo = null;
         introRegistry = null;
-
-		helpService = null;
-		commandHelpService = null;
         
         if (operationSupport != null) {
         	operationSupport.dispose();
@@ -287,8 +276,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
             BusyIndicator.showWhile(null, new Runnable() {
-                @Override
-				public void run() {
+                public void run() {
                     try {
                         ret[0] = element
                                 .createExecutableExtension(classAttribute);
@@ -444,8 +432,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 * convenience access to the graphics resources and fast field access for
 	 * some of the commonly used graphical images.
 	 */
-    @Override
-	protected ImageRegistry createImageRegistry() {
+    protected ImageRegistry createImageRegistry() {
         return WorkbenchImages.getImageRegistry();
     }
 
@@ -698,9 +685,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * Answer the workbench.
      * @deprecated Use <code>PlatformUI.getWorkbench()</code> instead.
      */
-    @Deprecated
-	@Override
-	public IWorkbench getWorkbench() {
+    public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
@@ -709,8 +694,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * This method must be called whenever the preference store is initially loaded
      * because the default values are not stored in the preference store.
      */
-    @Override
-	protected void initializeDefaultPreferences(IPreferenceStore store) {
+    protected void initializeDefaultPreferences(IPreferenceStore store) {
         // Do nothing.  This should not be called.
         // Prefs are initialized in WorkbenchPreferenceInitializer.
     }
@@ -859,8 +843,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      *  (non-Javadoc)
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
-    @Override
-	public void start(BundleContext context) throws Exception {
+    public void start(BundleContext context) throws Exception {
     	context.addBundleListener(getBundleListener());
         super.start(context);
         bundleContext = context;
@@ -868,7 +851,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         JFaceUtil.initializeJFace();
 		
 		parseBidiArguments();
-		Window.setDefaultOrientation(getDefaultOrientation());
+		 Window.setDefaultOrientation(getDefaultOrientation());
 
         // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
         // which needs to be done as early as possible, before the workbench
@@ -948,9 +931,9 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Get the default orientation from the command line arguments. If there are
-	 * no arguments imply the orientation.
-	 * 
+     * Get the default orientation from the command line
+     * arguments. If there are no arguments imply the 
+     * orientation.
 	 * @return int
 	 * @see SWT#NONE
 	 * @see SWT#RIGHT_TO_LEFT
@@ -1157,8 +1140,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     /* (non-Javadoc)
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
-    @Override
-	public void stop(BundleContext context) throws Exception {
+    public void stop(BundleContext context) throws Exception {
     	if (bundleListener!=null) {
     		context.removeBundleListener(bundleListener);
     		bundleListener = null;
@@ -1268,7 +1250,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
 			bundleListener = new SynchronousBundleListener() {
-				@Override
 				public void bundleChanged(BundleEvent event) {
 					WorkbenchPlugin.this.bundleChanged(event);
 				}
@@ -1533,25 +1514,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 					editorRegistry = new EditorRegistry();
 				}
 				return editorRegistry;
-			}
-		});
-		context.set(IHelpService.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				if (helpService == null) {
-					helpService = new HelpServiceImpl();
-				}
-				return helpService;
-			}
-		});
-		context.set(ICommandHelpService.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				if (commandHelpService == null) {
-					commandHelpService = ContextInjectionFactory.make(CommandHelpServiceImpl.class,
-							e4Context);
-				}
-				return commandHelpService;
 			}
 		});
 	}

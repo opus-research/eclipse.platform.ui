@@ -149,7 +149,6 @@ public class ResourceHandler implements IModelResourceHandler {
 		return !application.getChildren().isEmpty();
 	}
 
-	@Override
 	public Resource loadMostRecentModel() {
 		// This is temporary code to migrate existing delta files into full models
 		if (deltaRestore && saveAndRestore && !clearPersistedState) {
@@ -170,7 +169,7 @@ public class ResourceHandler implements IModelResourceHandler {
 					context.set(MApplication.class, appElement);
 					ModelAssembler contribProcessor = ContextInjectionFactory.make(
 							ModelAssembler.class, context);
-					contribProcessor.processModel(true);
+					contribProcessor.processModel();
 
 					File deltaOldFile = new File(baseLocation, "deltas_42M7migration.xml"); //$NON-NLS-1$
 					deltaFile.renameTo(deltaOldFile);
@@ -224,7 +223,6 @@ public class ResourceHandler implements IModelResourceHandler {
 		// long lastApplicationModification = getLastApplicationModification();
 		// boolean restore = restoreLastModified > lastApplicationModification;
 		boolean restore = restoreLastModified > 0;
-		boolean initialModel;
 
 		resource = null;
 		if (restore && saveAndRestore) {
@@ -244,9 +242,6 @@ public class ResourceHandler implements IModelResourceHandler {
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
 			resource = createResourceWithApp(theApp);
 			context.set(E4Workbench.NO_SAVED_MODEL_FOUND, Boolean.TRUE);
-			initialModel = true;
-		} else {
-			initialModel = false;
 		}
 
 		// Add model items described in the model extension point
@@ -256,25 +251,19 @@ public class ResourceHandler implements IModelResourceHandler {
 		this.context.set(MApplication.class, appElement);
 		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
 				context);
-		contribProcessor.processModel(initialModel);
+		contribProcessor.processModel();
 
 		if (!hasTopLevelWindows(resource) && logger != null) {
-			logger.error(new Exception(), // log a stack trace to help debug the
-											// corruption
+			logger.error(
+					new Exception(), // log a stack trace to help debug the
+										// corruption
 					"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
 							+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
-		}
-
-		if (!clearPersistedState) {
-			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
-					CommandLineOptionModelProcessor.class, context);
-			processor.process();
 		}
 
 		return resource;
 	}
 
-	@Override
 	public void save() throws IOException {
 		if (saveAndRestore)
 			resource.save(null);
@@ -287,7 +276,6 @@ public class ResourceHandler implements IModelResourceHandler {
 	 *            the application model to add to the resource
 	 * @return a resource with a proper save path with the model as contents
 	 */
-	@Override
 	public Resource createResourceWithApp(MApplication theApp) {
 		Resource res = createResource();
 		res.getContents().add((EObject) theApp);

@@ -71,14 +71,12 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
      * 
      * @see org.eclipse.jface.action.ContributionItem#fill(Menu,int)
      */
-    @Override
-	public void fill(Menu menu, int index) {
+    public void fill(Menu menu, int index) {
         MenuItem mi = new MenuItem(menu, SWT.RADIO, index);
         mi.setText("&" + id + " " + workingSet.getLabel()); //$NON-NLS-1$  //$NON-NLS-2$
         mi.setSelection(workingSet.equals(actionGroup.getWorkingSet()));
         mi.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 IWorkingSetManager manager = PlatformUI.getWorkbench()
                         .getWorkingSetManager();
                 actionGroup.setWorkingSet(workingSet);
@@ -96,8 +94,7 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
     /**
      * Overridden to always return true and force dynamic menu building.
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return true;
     }
 
@@ -105,7 +102,6 @@ public class WorkingSetMenuContributionItem extends ContributionItem {
 	 * @see org.eclipse.jface.action.ContributionItem#dispose()
 	 * @since 3.3
 	 */
-	@Override
 	public void dispose() {
 		if (image != null && !image.isDisposed())
 			image.dispose();

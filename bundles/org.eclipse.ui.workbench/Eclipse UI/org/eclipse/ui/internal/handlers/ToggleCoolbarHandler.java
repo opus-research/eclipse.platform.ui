@@ -32,7 +32,13 @@ import org.eclipse.ui.menus.UIElement;
 public class ToggleCoolbarHandler extends AbstractHandler implements
 		IElementUpdater {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -44,7 +50,13 @@ public class ToggleCoolbarHandler extends AbstractHandler implements
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.
+	 * menus.UIElement, java.util.Map)
+	 */
 	public void updateElement(UIElement element, Map parameters) {
 		IWorkbenchLocationService wls = (IWorkbenchLocationService) element
 				.getServiceLocator()

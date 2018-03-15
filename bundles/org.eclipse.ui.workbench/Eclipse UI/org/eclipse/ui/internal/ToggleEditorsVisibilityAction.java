@@ -25,8 +25,7 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
     /* (non-Javadoc)
      * Method declared on IPerspectiveListener
      */
-    @Override
-	public void perspectiveActivated(IWorkbenchPage page,
+    public void perspectiveActivated(IWorkbenchPage page,
             IPerspectiveDescriptor perspective) {
         if (page.isEditorAreaVisible()) {
             setText(WorkbenchMessages.ToggleEditor_hideEditors); 
@@ -38,8 +37,7 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
     /* (non-Javadoc)
      * Method declared on IPerspectiveListener
      */
-    @Override
-	public void perspectiveChanged(IWorkbenchPage page,
+    public void perspectiveChanged(IWorkbenchPage page,
             IPerspectiveDescriptor perspective, String changeId) {
         if (changeId == IWorkbenchPage.CHANGE_RESET
                 || changeId == IWorkbenchPage.CHANGE_EDITOR_AREA_HIDE
@@ -71,8 +69,7 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
     /* (non-Javadoc)
      * Method declared on PerspectiveAction.
      */
-    @Override
-	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
+    protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         boolean visible = page.isEditorAreaVisible();
         if (visible) {
             page.setEditorAreaVisible(false);
@@ -86,8 +83,7 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
     /* (non-Javadoc)
      * Method declared on ActionFactory.IWorkbenchAction.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (getWindow() != null) {
             getWindow().removePerspectiveListener(this);
         }

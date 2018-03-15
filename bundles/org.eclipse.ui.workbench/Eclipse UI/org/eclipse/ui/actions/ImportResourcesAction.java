@@ -81,16 +81,14 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
      * @param workbench the workbench
      * @deprecated use the constructor <code>ImportResourcesAction(IWorkbenchWindow)</code>
      */
-    @Deprecated
-	public ImportResourcesAction(IWorkbench workbench) {
+    public ImportResourcesAction(IWorkbench workbench) {
         this(workbench.getActiveWorkbenchWindow());
     }
 
     /**
      * Invoke the Import wizards selection Wizard.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -105,8 +103,7 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
      * @param selection the new selection
      * @deprecated
      */
-    @Deprecated
-	public void setSelection(IStructuredSelection selection) {
+    public void setSelection(IStructuredSelection selection) {
         selectionChanged(selection);
     }
 
@@ -114,8 +111,7 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
      * Method declared on ActionFactory.IWorkbenchAction.
      * @since 3.0
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
     	workbenchWindow = null;
     	if (action!=null) {
     	action.dispose();

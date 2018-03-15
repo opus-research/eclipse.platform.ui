@@ -62,8 +62,7 @@ public class CacheWrapper {
     private Rectangle lastBounds = new Rectangle(0, 0, 0, 0);
 
     private class WrapperLayout extends Layout implements ICachingLayout {
-        @Override
-		protected Point computeSize(Composite composite, int wHint, int hHint,
+        protected Point computeSize(Composite composite, int wHint, int hHint,
                 boolean flushCache) {
             Control[] children = composite.getChildren();
             if (children.length != 1) {
@@ -75,8 +74,7 @@ public class CacheWrapper {
             return cache.computeSize(wHint, hHint);
         }
 
-        @Override
-		protected void layout(Composite composite, boolean flushCache) {
+        protected void layout(Composite composite, boolean flushCache) {
             Control[] children = composite.getChildren();
             if (children.length != 1) {
                 return;
@@ -94,8 +92,7 @@ public class CacheWrapper {
         /* (non-Javadoc)
          * @see org.eclipse.ui.internal.layout.ICachingLayout#flush(org.eclipse.swt.widgets.Control)
          */
-        @Override
-		public void flush(Control dirtyControl) {
+        public void flush(Control dirtyControl) {
             CacheWrapper.this.flushCache();
         }
     }
