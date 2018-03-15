@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,13 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *     Francis Upton - <francisu@ieee.org> - Bug 217777
  *     Tristan Hume - <trishume@gmail.com> - Bug 2369
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661, 456897, 472654, 481516, 486543
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661, 456897, 472654, 481516
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *     Snjezana Peco <snjeza.peco@gmail.com> - Bug 405542
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Mickael Istria (Red Hat Inc.) - Bug 469918
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487297
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -690,7 +689,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
+						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
+								.get(IMenuService.class);
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
@@ -984,8 +984,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	boolean firePreShutdown(final boolean forced) {
 		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (int i = 0; i < list.length; i++) {
+			final IWorkbenchListener l = (IWorkbenchListener) list[i];
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -1007,8 +1007,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	void firePostShutdown() {
 		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (int i = 0; i < list.length; i++) {
+			final IWorkbenchListener l = (IWorkbenchListener) list[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1036,8 +1036,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowOpened(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (Object element : list) {
-			final IWindowListener l = (IWindowListener) element;
+		for (int i = 0; i < list.length; i++) {
+			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1055,8 +1055,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowClosed(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (Object element : list) {
-			final IWindowListener l = (IWindowListener) element;
+		for (int i = 0; i < list.length; i++) {
+			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1075,8 +1075,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowActivated(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (Object element : list) {
-			final IWindowListener l = (IWindowListener) element;
+		for (int i = 0; i < list.length; i++) {
+			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1095,8 +1095,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowDeactivated(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (Object element : list) {
-			final IWindowListener l = (IWindowListener) element;
+		for (int i = 0; i < list.length; i++) {
+			final IWindowListener l = (IWindowListener) list[i];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1151,10 +1151,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 				@Override
 				public void run() {
 					IWorkbenchWindow windows[] = getWorkbenchWindows();
-					for (IWorkbenchWindow window : windows) {
-						IWorkbenchPage pages[] = window.getPages();
-						for (IWorkbenchPage page : pages) {
-							isClosing = isClosing && page.closeAllEditors(false);
+					for (int i = 0; i < windows.length; i++) {
+						IWorkbenchPage pages[] = windows[i].getPages();
+						for (int j = 0; j < pages.length; j++) {
+							isClosing = isClosing && pages[j].closeAllEditors(false);
 						}
 					}
 				}
@@ -1228,10 +1228,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 			@Override
 			public void run() {
 				IWorkbenchWindow windows[] = getWorkbenchWindows();
-				for (IWorkbenchWindow window : windows) {
-					IWorkbenchPage pages[] = window.getPages();
-					for (IWorkbenchPage page : pages) {
-						List<EditorReference> editorReferences = ((WorkbenchPage) page)
+				for (int i = 0; i < windows.length; i++) {
+					IWorkbenchPage pages[] = windows[i].getPages();
+					for (int j = 0; j < pages.length; j++) {
+						List<EditorReference> editorReferences = ((WorkbenchPage) pages[j])
 								.getInternalEditorReferences();
 						List<EditorReference> referencesToClose = new ArrayList<>();
 						for (EditorReference reference : editorReferences) {
@@ -1242,7 +1242,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 						}
 						if (shutdown) {
 							for (EditorReference reference : referencesToClose) {
-								((WorkbenchPage) page).closeEditor(reference);
+								((WorkbenchPage) pages[j]).closeEditor(reference);
 							}
 						}
 					}
@@ -1279,13 +1279,13 @@ public final class Workbench extends EventManager implements IWorkbench,
 			@Override
 			public void run() {
 				IWorkbenchWindow windows[] = getWorkbenchWindows();
-				for (IWorkbenchWindow window : windows) {
-					IWorkbenchPage pages[] = window.getPages();
-					for (IWorkbenchPage page : pages) {
-						IViewReference[] references = page.getViewReferences();
-						for (IViewReference reference : references) {
-							if (reference.getView(false) != null) {
-								((ViewReference) reference).persist();
+				for (int i = 0; i < windows.length; i++) {
+					IWorkbenchPage pages[] = windows[i].getPages();
+					for (int j = 0; j < pages.length; j++) {
+						IViewReference[] references = pages[j].getViewReferences();
+						for (int k = 0; k < references.length; k++) {
+							if (references[k].getView(false) != null) {
+								((ViewReference) references[k]).persist();
 							}
 						}
 					}
@@ -1908,8 +1908,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 		WorkbenchImages.dispose();
 		Image[] images = Window.getDefaultImages();
 		Window.setDefaultImage(null);
-		for (Image image : images) {
-			image.dispose();
+		for (int i = 0; i < images.length; i++) {
+			images[i].dispose();
 		}
 	}
 
@@ -2822,15 +2822,16 @@ UIEvents.Context.TOPIC_CONTEXT,
 				HashSet disabledPlugins = new HashSet(Arrays
 						.asList(getDisabledEarlyActivatedPlugins()));
 				monitor.beginTask(WorkbenchMessages.Workbench_startingPlugins, extensions.length);
-				for (IExtension extension : extensions) {
+				for (int i = 0; i < extensions.length; ++i) {
 					if (monitor.isCanceled() || !isRunning()) {
 						return Status.CANCEL_STATUS;
 					}
+					IExtension extension = extensions[i];
 
 					// if the plugin is not in the set of disabled plugins, then
 					// execute the code to start it
-					if (!disabledPlugins.contains(extension.getNamespaceIdentifier())) {
-						monitor.subTask(extension.getNamespaceIdentifier());
+					if (!disabledPlugins.contains(extension.getNamespace())) {
+						monitor.subTask(extension.getNamespace());
 						SafeRunner.run(new EarlyStartupRunnable(extension));
 					}
 					monitor.worked(1);
@@ -2878,8 +2879,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 		boolean avoidDeadlock = true;
 
 		String[] commandLineArgs = Platform.getCommandLineArgs();
-		for (String commandLineArg : commandLineArgs) {
-			if (commandLineArg.equalsIgnoreCase("-allowDeadlock")) { //$NON-NLS-1$
+		for (int i = 0; i < commandLineArgs.length; i++) {
+			if (commandLineArgs[i].equalsIgnoreCase("-allowDeadlock")) { //$NON-NLS-1$
 				avoidDeadlock = false;
 			}
 		}
@@ -3405,16 +3406,16 @@ UIEvents.Context.TOPIC_CONTEXT,
 			final String disabledPlugins = PrefUtil.getInternalPreferenceStore().getString(
 					IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP);
 
-			for (IExtensionDelta delta : deltas) {
-				IExtension extension = delta.getExtension();
-				if (delta.getKind() == IExtensionDelta.REMOVED) {
+			for (int i = 0; i < deltas.length; i++) {
+				IExtension extension = deltas[i].getExtension();
+				if (deltas[i].getKind() == IExtensionDelta.REMOVED) {
 					continue;
 				}
 
 				// if the plugin is not in the set of disabled plugins,
 				// then
 				// execute the code to start it
-				if (disabledPlugins.indexOf(extension.getNamespaceIdentifier()) == -1) {
+				if (disabledPlugins.indexOf(extension.getNamespace()) == -1) {
 					SafeRunner.run(new EarlyStartupRunnable(extension));
 				}
 			}
@@ -3632,14 +3633,16 @@ UIEvents.Context.TOPIC_CONTEXT,
 	private List<Saveable> getFilteredSaveables(ISaveableFilter filter, Saveable[] saveables) {
 		List<Saveable> toSave = new ArrayList<>();
 		if (filter == null) {
-			for (Saveable saveable : saveables) {
+			for (int i = 0; i < saveables.length; i++) {
+				Saveable saveable = saveables[i];
 				if (saveable.isDirty()) {
 					toSave.add(saveable);
 				}
 			}
 		} else {
 			SaveablesList saveablesList = (SaveablesList) getService(ISaveablesLifecycleListener.class);
-			for (Saveable saveable : saveables) {
+			for (int i = 0; i < saveables.length; i++) {
+				Saveable saveable = saveables[i];
 				if (saveable.isDirty()) {
 					IWorkbenchPart[] parts = saveablesList.getPartsForSaveable(saveable);
 					if (matchesFilter(filter, saveable, parts)) {
