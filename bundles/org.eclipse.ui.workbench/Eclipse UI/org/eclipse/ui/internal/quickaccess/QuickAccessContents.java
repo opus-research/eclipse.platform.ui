@@ -728,7 +728,8 @@ public abstract class QuickAccessContents {
 		textLayout.setText(QuickAccessMessages.QuickAccess_AvailableCategories);
 		int maxProviderWidth = (textLayout.getBounds().width);
 		textLayout.setFont(boldFont);
-		for (QuickAccessProvider provider : providers) {
+		for (int i = 0; i < providers.length; i++) {
+			QuickAccessProvider provider = providers[i];
 			textLayout.setText(provider.getName());
 			int width = (textLayout.getBounds().width);
 			if (width > maxProviderWidth) {
