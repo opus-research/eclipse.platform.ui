@@ -591,7 +591,8 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * @return boolean
      */
     private boolean noOpenProjects() {
-		IProject[] projects = IDEWorkbenchPlugin.getPluginWorkspace().getRoot().getProjects();
+        IProject[] projects = IDEWorkbenchPlugin.getPluginWorkspace().getRoot()
+                .getProjects();
         for (IProject project : projects) {
             if (project.isOpen()) {
 				return false;

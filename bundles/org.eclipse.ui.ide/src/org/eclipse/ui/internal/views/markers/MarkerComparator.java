@@ -184,11 +184,12 @@ class MarkerComparator implements Comparator<MarkerItem> {
 		IMemento[] descending = memento.getChildren(DESCENDING_FIELDS);
 
 		for (MarkerField field : fields) {
-			for (IMemento currentMemento : descending) {
-				if (currentMemento.getID().equals(MarkerSupportInternalUtilities.getId(field))) {
+			for (IMemento element : descending) {
+				if (element.getID().equals(MarkerSupportInternalUtilities.getId(field))) {
 					descendingFields.add(field);
 					continue;
 				}
+
 			}
 		}
 	}

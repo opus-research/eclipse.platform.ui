@@ -148,11 +148,12 @@ class Markers {
 			inChange = true;
 			if (builder.isShowingHierarchy()) {
 				Comparator<MarkerItem> comparator = builder.getComparator().getFieldsComparator();
-				for (MarkerCategory category : categories) {
+				for (MarkerCategory categorie : categories) {
 					if (monitor.isCanceled()) {
 						return false;
 					}
 					// sort various categories
+					MarkerCategory category = categorie;
 					category.children = null; // reset cached children
 					int avaliable = category.end - category.start + 1;
 					int effLimit = getShowingLimit(avaliable);
@@ -298,14 +299,14 @@ class Markers {
 	 */
 	static Integer[] getMarkerCounts(MarkerEntry[] entries) {
 		int[] ints = new int[] { 0, 0, 0, 0 };
-		for (MarkerEntry entry : entries) {
-			IMarker marker = entry.getMarker();
+		for (MarkerEntry entrie : entries) {
+			IMarker marker = entrie.getMarker();
 			int severity = -1;
 			Object value = null;
 			try {
 				value = marker.getAttribute(IMarker.SEVERITY);
 			} catch (CoreException e) {
-				entry.checkIfMarkerStale();
+				entrie.checkIfMarkerStale();
 			}
 			if (value instanceof Integer) {
 				severity = ((Integer) value).intValue();
@@ -328,10 +329,10 @@ class Markers {
 	public MarkerItem getMarkerItem(IMarker marker) {
 		if (markerToEntryMap == null) {
 			markerToEntryMap = new HashMap<>();
-			for (MarkerEntry markerEntry : markerEntryArray) {
-				IMarker nextMarker = markerEntry.getMarker();
+			for (MarkerEntry element : markerEntryArray) {
+				IMarker nextMarker = element.getMarker();
 				if (nextMarker != null) {
-					markerToEntryMap.put(nextMarker, markerEntry);
+					markerToEntryMap.put(nextMarker, element);
 				}
 			}
 		}

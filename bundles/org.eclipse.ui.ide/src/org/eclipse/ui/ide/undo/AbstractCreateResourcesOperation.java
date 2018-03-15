@@ -79,7 +79,8 @@ abstract class AbstractCreateResourcesOperation extends
 		} else {
 			for (ResourceDescription resourceDescription : resourceDescriptions) {
 				if (resourceDescription != null) {
-					IResource resource = resourceDescription.createResourceHandle();
+					IResource resource = resourceDescription
+							.createResourceHandle();
 					factory.create(resource);
 					modified = true;
 				}

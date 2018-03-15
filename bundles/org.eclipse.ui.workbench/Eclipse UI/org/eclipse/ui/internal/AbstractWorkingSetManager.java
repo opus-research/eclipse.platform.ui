@@ -366,13 +366,13 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
         final PropertyChangeEvent event = new PropertyChangeEvent(this,
                 changeId, oldValue, newValue);
 		Runnable notifier = () -> {
-			for (Object listener : listeners) {
-				final IPropertyChangeListener propertyChangeListener = (IPropertyChangeListener) listener;
+			for (Object listener2 : listeners) {
+				final IPropertyChangeListener listener = (IPropertyChangeListener) listener2;
 				ISafeRunnable safetyWrapper = new ISafeRunnable() {
 
 					@Override
 					public void run() throws Exception {
-						propertyChangeListener.propertyChange(event);
+						listener.propertyChange(event);
 					}
 
 					@Override
@@ -477,8 +477,10 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
      * @param memento the persistence store
      */
 	protected void restoreWorkingSetState(IMemento memento) {
-		for (IMemento child : memento.getChildren(IWorkbenchConstants.TAG_WORKING_SET)) {
-			AbstractWorkingSet workingSet = (AbstractWorkingSet) restoreWorkingSet(child);
+		IMemento[] children = memento.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
+
+		for (IMemento element : children) {
+			AbstractWorkingSet workingSet = (AbstractWorkingSet) restoreWorkingSet(element);
 			if (workingSet != null) {
 				internalAddWorkingSet(workingSet);
 			}
@@ -691,7 +693,8 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 
 	private List getWorkingSetsForId(String id) {
 		List result= new ArrayList();
-		for (IWorkingSet ws : workingSets) {
+    	for (Object element : workingSets) {
+    		IWorkingSet ws= (IWorkingSet)element;
     		if (id.equals(ws.getId())) {
 				result.add(ws);
 			}

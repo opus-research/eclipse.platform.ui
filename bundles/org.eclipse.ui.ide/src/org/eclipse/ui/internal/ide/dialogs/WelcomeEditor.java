@@ -188,9 +188,10 @@ public class WelcomeEditor extends EditorPart {
 		}
 
         WelcomeItem item = (WelcomeItem) text.getData();
+        StyleRange[] ranges = text.getStyleRanges();
         int currentSelectionEnd = text.getSelection().y;
 
-		for (StyleRange range : text.getStyleRanges()) {
+        for (StyleRange range : ranges) {
             if (range.start >= currentSelectionEnd) {
 				if (item.isLinkAt(range.start)) {
 					return range;
@@ -226,10 +227,11 @@ public class WelcomeEditor extends EditorPart {
      * Finds the current link of the current selection.
      */
     protected StyleRange getCurrentLink(StyledText text) {
+        StyleRange[] ranges = text.getStyleRanges();
         int currentSelectionEnd = text.getSelection().y;
         int currentSelectionStart = text.getSelection().x;
 
-        for (StyleRange range : text.getStyleRanges()) {
+        for (StyleRange range : ranges) {
             if ((currentSelectionStart >= range.start)
                     && (currentSelectionEnd <= (range.start + range.length))) {
                 return range;
@@ -536,11 +538,16 @@ public class WelcomeEditor extends EditorPart {
 
         // Create the welcome items
         Label imageLabel = null;
-		for (WelcomeItem welcomeItem : getItems()) {
+        WelcomeItem[] items = getItems();
+        for (WelcomeItem item2 : items) {
             Label label = new Label(infoArea, SWT.NONE);
             label.setBackground(background);
-			label.setImage(PlatformUI.getWorkbench().getSharedImages()
-					.getImage(IDEInternalWorkbenchImages.IMG_OBJS_WELCOME_ITEM));
+            label
+                    .setImage(PlatformUI
+                            .getWorkbench()
+                            .getSharedImages()
+                            .getImage(
+                                    IDEInternalWorkbenchImages.IMG_OBJS_WELCOME_ITEM));
             GridData gd = new GridData();
             gd.horizontalIndent = HINDENT;
             gd.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
@@ -554,15 +561,15 @@ public class WelcomeEditor extends EditorPart {
             sampleStyledText = styledText;
             styledText.setCursor(null);
             JFaceColors.setColors(styledText, foreground, background);
-			styledText.setText(welcomeItem.getText());
-			setBoldRanges(styledText, welcomeItem.getBoldRanges());
-			setLinkRanges(styledText, welcomeItem.getActionRanges());
-			setLinkRanges(styledText, welcomeItem.getHelpRanges());
+            styledText.setText(item2.getText());
+            setBoldRanges(styledText, item2.getBoldRanges());
+            setLinkRanges(styledText, item2.getActionRanges());
+            setLinkRanges(styledText, item2.getHelpRanges());
             gd = new GridData(GridData.FILL_HORIZONTAL);
             gd.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
             gd.verticalSpan = 2;
             styledText.setLayoutData(gd);
-			styledText.setData(welcomeItem);
+            styledText.setData(item2);
             addListeners(styledText);
 
             Label spacer = new Label(infoArea, SWT.NONE);
@@ -978,7 +985,8 @@ public class WelcomeEditor extends EditorPart {
      */
     private void setBoldRanges(StyledText styledText, int[][] boldRanges) {
         for (int[] boldRange : boldRanges) {
-			StyleRange r = new StyleRange(boldRange[0], boldRange[1], null, null, SWT.BOLD);
+            StyleRange r = new StyleRange(boldRange[0], boldRange[1],
+                    null, null, SWT.BOLD);
             styledText.setStyleRange(r);
         }
     }

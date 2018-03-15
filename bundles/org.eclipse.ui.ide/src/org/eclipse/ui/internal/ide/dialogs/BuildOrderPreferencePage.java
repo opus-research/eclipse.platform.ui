@@ -486,8 +486,8 @@ public class BuildOrderPreferencePage extends PreferencePage implements
      */
     private boolean includes(String[] testArray, String searchElement) {
 
-        for (String currentSearchElement : testArray) {
-            if (searchElement.equals(currentSearchElement)) {
+        for (String element : testArray) {
+            if (searchElement.equals(element)) {
 				return true;
 			}
         }
@@ -613,8 +613,9 @@ public class BuildOrderPreferencePage extends PreferencePage implements
 
         // Only change enablement of buttons. Leave list alone
         // because you can't scroll it when disabled.
-		for (Control child : this.buttonComposite.getChildren()) {
-			child.setEnabled(value);
+        Control[] children = this.buttonComposite.getChildren();
+        for (Control element : children) {
+            element.setEnabled(value);
         }
     }
 

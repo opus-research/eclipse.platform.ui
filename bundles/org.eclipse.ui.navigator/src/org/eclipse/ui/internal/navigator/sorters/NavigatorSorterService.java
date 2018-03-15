@@ -52,11 +52,13 @@ public class NavigatorSorterService implements INavigatorSorterService, Visibili
 	}
 
 	private synchronized void computeSortOnlyDescriptors() {
+		INavigatorContentDescriptor[] allDescriptors;
+		allDescriptors = NavigatorContentDescriptorManager.getInstance().getSortOnlyContentDescriptors();
+
 		List sortOnlyList = new ArrayList();
-		for (INavigatorContentDescriptor descriptor : NavigatorContentDescriptorManager.getInstance()
-				.getSortOnlyContentDescriptors()) {
-			if (contentService.isActive(descriptor.getId())) {
-				sortOnlyList.add(descriptor);
+		for (INavigatorContentDescriptor allDescriptor : allDescriptors) {
+			if (contentService.isActive(allDescriptor.getId())) {
+				sortOnlyList.add(allDescriptor);
 			}
 		}
 

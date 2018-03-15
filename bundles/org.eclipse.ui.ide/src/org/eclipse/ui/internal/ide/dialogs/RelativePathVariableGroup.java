@@ -147,12 +147,13 @@ public class RelativePathVariableGroup {
 			pathVariableManager = content.getResource().getPathVariableManager();
 		else
 			pathVariableManager = ResourcesPlugin.getWorkspace().getPathVariableManager();
+		String[] variables = pathVariableManager.getPathVariableNames();
 
 		ArrayList items = new ArrayList();
-		for (String variableName : pathVariableManager.getPathVariableNames()) {
-			if (variableName.equals("PARENT")) //$NON-NLS-1$
+		for (String variable : variables) {
+			if (variable.equals("PARENT")) //$NON-NLS-1$
 				continue;
-			items.add(variableName);
+			items.add(variable);
 		}
 		items.add(IDEWorkbenchMessages.ImportTypeDialog_editVariables);
 		variableCombo.setItems((String[]) items.toArray(new String[0]));
@@ -269,10 +270,11 @@ public class RelativePathVariableGroup {
 		int mostAppropriateCount = Integer.MAX_VALUE;
 		int mostAppropriateCountToParent = Integer.MAX_VALUE;
 		IPathVariableManager pathVariableManager = target.getPathVariableManager();
+		String [] variables = pathVariableManager.getPathVariableNames();
 
-		for (String variableName : pathVariableManager.getPathVariableNames()) {
-			if (isPreferred(variableName)) {
-				URI rawValue = pathVariableManager.getURIValue(variableName);
+		for (String variable : variables) {
+			if (isPreferred(variable)) {
+				URI rawValue = pathVariableManager.getURIValue(variable);
 				URI value = pathVariableManager.resolveURI(rawValue);
 				if (value != null) {
 					IPath path = URIUtil.toPath(value);
@@ -281,7 +283,7 @@ public class RelativePathVariableGroup {
 						if (difference > 0) {
 							if (difference < mostAppropriateCount) {
 								mostAppropriateCount = difference;
-								mostAppropriate = variableName;
+								mostAppropriate = variable;
 							}
 						}
 						else {
@@ -290,7 +292,7 @@ public class RelativePathVariableGroup {
 							if (difference > 0) {
 								if (difference < mostAppropriateCountToParent) {
 									mostAppropriateCountToParent = difference;
-									mostAppropriateToParent = variableName;
+									mostAppropriateToParent = variable;
 								}
 							}
 						}

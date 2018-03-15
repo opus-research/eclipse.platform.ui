@@ -582,18 +582,19 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 		}
 
 		List<MarkerType> selectedTypes = new ArrayList<>();
-		for (IConfigurationElement type : element.getChildren(SELECTED_TYPE)) {
-			String markerId = type.getAttribute(MARKER_ID);
+		IConfigurationElement[] types = element.getChildren(SELECTED_TYPE);
+		for (IConfigurationElement type2 : types) {
+			String markerId = type2.getAttribute(MARKER_ID);
 			if (markerId != null) {
-				MarkerType markerType = filter.getMarkerType(markerId);
-				if (markerType == null) {
+				MarkerType type = filter.getMarkerType(markerId);
+				if (type == null) {
 					IStatus status = new Status(IStatus.WARNING, IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.WARNING,
 							NLS.bind(MarkerMessages.ProblemFilterRegistry_nullType,
 									new Object[] { markerId, filter.getName() }),
 							null);
 					IDEWorkbenchPlugin.getDefault().getLog().log(status);
 				} else {
-					selectedTypes.add(markerType);
+					selectedTypes.add(type);
 				}
 			}
 		}
@@ -743,13 +744,14 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	 * @return TableSorter or <code>null</code>.
 	 */
 	private TableComparator findSorterInChildren(String typeName, MarkerType type) {
+		MarkerType[] types = type.getAllSubTypes();
 		TableComparator defaultSorter = null;
 		if (hierarchyOrders.containsKey(type.getId())) {
 			defaultSorter = hierarchyOrders.get(type.getId());
 		}
 
-		for (MarkerType markerSubType : type.getAllSubTypes()) {
-			MarkerType[] subtypes = markerSubType.getAllSubTypes();
+		for (MarkerType type2 : types) {
+			MarkerType[] subtypes = type2.getAllSubTypes();
 			for (MarkerType subtype : subtypes) {
 				TableComparator sorter = findSorterInChildren(typeName, subtype);
 				if (sorter != null) {

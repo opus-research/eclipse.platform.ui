@@ -250,11 +250,11 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     private void internalComputeInterfaceOrder(Class[] interfaces, List result,
             Map seen) {
         List newInterfaces = new ArrayList(seen.size());
-        for (Class currentInterface : interfaces) {
-            if (seen.get(currentInterface) == null) {
-                result.add(currentInterface);
-                seen.put(currentInterface, currentInterface);
-                newInterfaces.add(currentInterface);
+        for (Class interfac : interfaces) {
+            if (seen.get(interfac) == null) {
+                result.add(interfac);
+                seen.put(interfac, interfac);
+                newInterfaces.add(interfac);
             }
         }
         for (Iterator newList = newInterfaces.iterator(); newList.hasNext();) {
@@ -525,8 +525,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
             result.add(clazz);
             // add all the interfaces it implements
             Class[] interfaces = clazz.getInterfaces();
-            for (Class currentInterface : interfaces) {
-                result.add(currentInterface);
+            for (Class interface1 : interfaces) {
+                result.add(interface1);
             }
             // get the superclass
             clazz = clazz.getSuperclass();
@@ -858,7 +858,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         IAdapterManager adapterMgr = Platform.getAdapterManager();
         for (Iterator list = classList.iterator(); list.hasNext();) {
             Class clazz = ((Class) list.next());
-			for (String adapter : adapterMgr.computeAdapterTypes(clazz)) {
+            String[] adapters = adapterMgr.computeAdapterTypes(clazz);
+            for (String adapter2 : adapters) {
+                String adapter = adapter2;
                 if (!result.contains(adapter)) {
                     result.add(adapter);
                 }

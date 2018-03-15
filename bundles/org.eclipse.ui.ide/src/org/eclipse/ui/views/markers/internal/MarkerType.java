@@ -56,7 +56,9 @@ public class MarkerType {
      * Appends all this type's supertypes to the given list.
      */
     private void getAllSupertypes(ArrayList<MarkerType> result) {
-		for (MarkerType sup : getSupertypes()) {
+        MarkerType[] supers = getSupertypes();
+        for (MarkerType super1 : supers) {
+            MarkerType sup = super1;
             if (!result.contains(sup)) {
                 result.add(sup);
                 sup.getAllSupertypes(result);
@@ -87,8 +89,9 @@ public class MarkerType {
         MarkerType[] types = model.getTypes();
         ArrayList<MarkerType> result = new ArrayList<>();
         for (MarkerType type : types) {
-			for (String supertypeId : type.getSupertypeIds()) {
-				if (supertypeId.equals(id)) {
+            String[] supers = type.getSupertypeIds();
+            for (String super1 : supers) {
+                if (super1.equals(id)) {
                     result.add(type);
                 }
             }
@@ -108,7 +111,9 @@ public class MarkerType {
     }
 
     private void addSubTypes(List<MarkerType> list, MarkerType superType) {
-		for (MarkerType subType : superType.getSubtypes()) {
+        MarkerType[] subTypes = superType.getSubtypes();
+        for (MarkerType subType2 : subTypes) {
+            MarkerType subType = subType2;
             if (!list.contains(subType)) {
                 list.add(subType);
             }

@@ -86,7 +86,8 @@ public class FrameList extends EventManager {
      * @see IPropertyChangeListener#propertyChange
      */
     protected void firePropertyChange(PropertyChangeEvent event) {
-		for (Object listener : getListeners()) {
+        Object[] listeners = getListeners();
+        for (Object listener : listeners) {
             ((IPropertyChangeListener) listener).propertyChange(event);
         }
     }

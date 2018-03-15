@@ -326,7 +326,8 @@ public final class NavigatorActivationService implements
 
 			for (NavigatorContentDescriptor descriptor : descriptors) {
 				for (String extensionId : extensionIds) {
-					if (descriptor.getId().equals(extensionId)) {
+					if (descriptor.getId().equals(
+							extensionId)) {
 						descriptorList.remove(descriptor);
 					}
 				}
@@ -363,7 +364,8 @@ public final class NavigatorActivationService implements
 
 			for (NavigatorContentDescriptor descriptor : descriptors) {
 				for (String extensionId : extensionIds) {
-					if (descriptor.getId().equals(extensionId)) {
+					if (descriptor.getId().equals(
+							extensionId)) {
 						descriptorList.remove(descriptor);
 					}
 				}

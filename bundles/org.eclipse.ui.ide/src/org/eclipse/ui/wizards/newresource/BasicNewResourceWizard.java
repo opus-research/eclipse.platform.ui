@@ -141,13 +141,15 @@ public abstract class BasicNewResourceWizard extends Wizard implements
 
         // get all the view and editor parts
 		List<IWorkbenchPart> parts = new ArrayList<>();
-		for (IWorkbenchPartReference ref : page.getViewReferences()) {
+        IWorkbenchPartReference refs[] = page.getViewReferences();
+        for (IWorkbenchPartReference ref : refs) {
             IWorkbenchPart part = ref.getPart(false);
             if (part != null) {
 				parts.add(part);
 			}
         }
-		for (IWorkbenchPartReference ref : page.getEditorReferences()) {
+        refs = page.getEditorReferences();
+        for (IWorkbenchPartReference ref : refs) {
             if (ref.getPart(false) != null) {
 				parts.add(ref.getPart(false));
 			}

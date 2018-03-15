@@ -432,8 +432,9 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);
 		group.setEnabled(enabled);
-		for (Control child : group.getChildren()) {
-			child.setEnabled(enabled);
+		Control[] children = group.getChildren();
+		for (Control element : children) {
+			element.setEnabled(enabled);
 
 		}
 	}

@@ -12,6 +12,7 @@ package org.eclipse.ui.internal;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
@@ -70,7 +71,8 @@ public class ShellPool {
                         // The shell can 'cancel' the close by setting
                         // the 'doit' to false...if so, do nothing
                         if (e.doit) {
-						for (Control control : s.getChildren()) {
+                            Control[] children = s.getChildren();
+	                        for (Control control : children) {
 	                            control.dispose();
 	                        }
 	                        availableShells.add(s);

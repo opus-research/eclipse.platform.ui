@@ -150,8 +150,9 @@ public class OpenWorkspaceAction extends Action implements
 		public Menu getMenu(Control parent) {
 			createDropDownMenuMgr();
 			dropDownMenuMgr.addMenuListener(manager -> {
-				for (IContributionItem contributionItem : getContributionItems()) {
-					manager.add(contributionItem);
+				IContributionItem[] items = getContributionItems();
+				for (IContributionItem item : items) {
+					manager.add(item);
 				}
 				manager.add(new OpenDialogAction());
 			});
@@ -166,10 +167,12 @@ public class OpenWorkspaceAction extends Action implements
 				if (menu.isDisposed()) {
 					return;
 				}
-				for (MenuItem item : menu.getItems()) {
+				MenuItem[] items = menu.getItems();
+				for (MenuItem item : items) {
 					item.dispose();
 				}
-				for (IContributionItem contribution : getContributionItems()) {
+				IContributionItem[] contributions = getContributionItems();
+				for (IContributionItem contribution : contributions) {
 					contribution.fill(menu, -1);
 				}
 				new ActionContributionItem(new OpenDialogAction()).fill(

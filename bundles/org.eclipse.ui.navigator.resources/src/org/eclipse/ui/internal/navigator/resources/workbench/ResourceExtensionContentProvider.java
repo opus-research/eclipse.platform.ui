@@ -167,9 +167,10 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		// and trying to map the change to a remove and add is too dicey.
 		// The case is: folder A renamed to existing file B, answering yes to
 		// overwrite B.
-		IResourceDelta[] affectedChildren = delta.getAffectedChildren(IResourceDelta.CHANGED);
-		for (IResourceDelta affectedChild : affectedChildren) {
-			if ((affectedChild.getFlags() & IResourceDelta.TYPE) != 0) {
+		IResourceDelta[] affectedChildren = delta
+				.getAffectedChildren(IResourceDelta.CHANGED);
+		for (IResourceDelta element : affectedChildren) {
+			if ((element.getFlags() & IResourceDelta.TYPE) != 0) {
 				toRefresh.add(resource);
 				return;
 			}
@@ -204,8 +205,8 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 
 		// Handle changed children .
-		for (IResourceDelta affectedChild : affectedChildren) {
-			processDelta(affectedChild, addAndRemoveRunnables, toRefresh);
+		for (IResourceDelta element : affectedChildren) {
+			processDelta(element, addAndRemoveRunnables, toRefresh);
 		}
 
 		// @issue several problems here:

@@ -104,15 +104,16 @@ public class ResourceWorkingSetPage extends WizardPage implements
      */
     private void addWorkingSetElements(List collectedResources,
             IContainer container) {
+        IAdaptable[] elements = workingSet.getElements();
         IPath containerPath = container.getFullPath();
 
-		for (IAdaptable adaptable : workingSet.getElements()) {
-			IResource resource = Adapters.adapt(adaptable, IResource.class);
+        for (IAdaptable element : elements) {
+			IResource resource = Adapters.adapt(element, IResource.class);
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
                 if (containerPath.isPrefixOf(resourcePath)) {
-					collectedResources.add(adaptable);
+					collectedResources.add(element);
 				}
             }
         }
@@ -523,8 +524,10 @@ public class ResourceWorkingSetPage extends WizardPage implements
         }
         if (errorMessage == null
                 && (workingSet == null || newText.equals(workingSet.getName()) == false)) {
-			for (IWorkingSet workingSet : PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSets()) {
-                if (newText.equals(workingSet.getName())) {
+            IWorkingSet[] workingSets = PlatformUI.getWorkbench()
+                    .getWorkingSetManager().getWorkingSets();
+            for (IWorkingSet workingSet2 : workingSets) {
+                if (newText.equals(workingSet2.getName())) {
                     errorMessage = IDEWorkbenchMessages.ResourceWorkingSetPage_warning_workingSetExists;
                 }
             }

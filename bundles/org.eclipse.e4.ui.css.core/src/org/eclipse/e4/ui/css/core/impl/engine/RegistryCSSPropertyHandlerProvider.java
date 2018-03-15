@@ -166,8 +166,8 @@ public class RegistryCSSPropertyHandlerProvider extends
 				String[] compositePropertiesNames = engine
 						.getCSSCompositePropertiesNames(propertyName);
 				if (compositePropertiesNames != null) {
-					for (String compositePropertyName : compositePropertiesNames) {
-						propertyName = compositePropertyName;
+					for (String compositePropertiesName : compositePropertiesNames) {
+						propertyName = compositePropertiesName;
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {

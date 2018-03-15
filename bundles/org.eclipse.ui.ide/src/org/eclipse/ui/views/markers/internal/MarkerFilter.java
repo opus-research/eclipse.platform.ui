@@ -106,7 +106,7 @@ public class MarkerFilter implements Cloneable {
 
 	protected boolean enabled;
 
-	private IResource[] focusResources;
+	private IResource[] focusResource;
 
 	private Set<String> cachedWorkingSet;
 
@@ -156,7 +156,9 @@ public class MarkerFilter implements Cloneable {
 			types.add(type);
 		}
 
-		for (MarkerType subType : type.getSubtypes()) {
+		MarkerType[] subTypes = type.getSubtypes();
+
+		for (MarkerType subType : subTypes) {
 			addAllSubTypes(types, subType);
 		}
 	}
@@ -191,8 +193,8 @@ public class MarkerFilter implements Cloneable {
 		IAdaptable[] elements = workingSet.getElements();
 		List<IResource> result = new ArrayList<>(elements.length);
 
-		for (IAdaptable adaptable : elements) {
-			IResource next = Adapters.adapt(adaptable, IResource.class);
+		for (IAdaptable element : elements) {
+			IResource next = Adapters.adapt(element, IResource.class);
 			if (next != null) {
 				result.add(next);
 			}
@@ -301,7 +303,7 @@ public class MarkerFilter implements Cloneable {
 			return true;
 		}
 
-		if (focusResources == null) {
+		if (focusResource == null) {
 			return true;
 		}
 
@@ -317,8 +319,8 @@ public class MarkerFilter implements Cloneable {
 				return false;
 			}
 
-			for (IResource focusResource : focusResources) {
-				IProject selectedProject = focusResource.getProject();
+			for (IResource element : focusResource) {
+				IProject selectedProject = element.getProject();
 				if (selectedProject == null) {
 					continue;
 				}
@@ -328,16 +330,16 @@ public class MarkerFilter implements Cloneable {
 				}
 			}
 		} else if (onResource == ON_SELECTED_ONLY) {
-			for (IResource focusResource : focusResources) {
-				if (resource.equals(focusResource)) {
+			for (IResource element : focusResource) {
+				if (resource.equals(element)) {
 					return true;
 				}
 			}
 		} else if (onResource == ON_SELECTED_AND_CHILDREN) {
-			for (IResource focusResource : focusResources) {
+			for (IResource element : focusResource) {
 				IResource parentResource = resource;
 				while (parentResource != null) {
-					if (parentResource.equals(focusResource)) {
+					if (parentResource.equals(element)) {
 						return true;
 					}
 					parentResource = parentResource.getParent();
@@ -414,7 +416,7 @@ public class MarkerFilter implements Cloneable {
 	 * @return the selected resource(s) withing the workbench.
 	 */
 	IResource[] getFocusResource() {
-		return focusResources;
+		return focusResource;
 	}
 
 	/**
@@ -423,7 +425,7 @@ public class MarkerFilter implements Cloneable {
 	 * @param resources
 	 */
 	public void setFocusResource(IResource[] resources) {
-		focusResources = resources;
+		focusResource = resources;
 	}
 
 	/**
