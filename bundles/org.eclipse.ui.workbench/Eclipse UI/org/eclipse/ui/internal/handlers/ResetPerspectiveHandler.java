@@ -16,6 +16,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -68,10 +69,13 @@ public class ResetPerspectiveHandler extends AbstractHandler {
 					} else {
 						String message = NLS.bind(WorkbenchMessages.ResetPerspective_message,
 								descriptor.getLabel());
-						boolean result = MessageDialog.open(MessageDialog.QUESTION,
-								activeWorkbenchWindow.getShell(),
-								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET);
-						if (result) {
+						final String[] options = { WorkbenchMessages.ResetPerspective_buttonLabel,
+								IDialogConstants.NO_LABEL };
+
+						int result = MessageDialog.open(MessageDialog.CONFIRM, activeWorkbenchWindow.getShell(),
+								WorkbenchMessages.ResetPerspective_title, message, SWT.SHEET, options);
+
+						if (result == Window.OK) {
 							page.resetPerspective();
 						}
 					}
