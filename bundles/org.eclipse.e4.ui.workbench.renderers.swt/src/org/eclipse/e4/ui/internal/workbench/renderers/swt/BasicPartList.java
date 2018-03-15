@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *      Robert Roth <robert.roth.off@gmail.com> - Bug 356575
  *******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
@@ -58,7 +57,8 @@ public class BasicPartList extends AbstractTableInformationControl {
 		public Font getFont(Object element) {
 			if (element instanceof MPart) {
 				MPart part = (MPart) element;
-				if (part.equals(partService.getActivePart())) {
+				CTabItem item = renderer.findItemForPart(part);
+				if (item != null && !item.isShowing()) {
 					return boldFont;
 				}
 			}
