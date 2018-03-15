@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bugs 411578, 486842, 487673
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 492918
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bugs 411578, 486842
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -307,11 +306,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		expandableComposite.addExpansionListener(new ExpansionAdapter() {
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
+				getShell().layout();
+				initializeBounds();
 				launchData.setShowRecentWorkspaces(((ExpandableComposite) e.getSource()).isExpanded());
-				Point size = getInitialSize();
-				Shell shell = getShell();
-				shell.setBounds(getConstrainedShellBounds(
-						new Rectangle(shell.getLocation().x, shell.getLocation().y, size.x, size.y)));
 			}
 		});
 
@@ -323,14 +320,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		panel.setLayout(layout);
 		recentWorkspacesComposites = new HashMap<>(launchData.getRecentWorkspaces().length);
 		Map<String, String> uniqueWorkspaceNames = createUniqueWorkspaceNameMap();
-
-		List<String> recentWorkspacesList = Arrays.asList(launchData.getRecentWorkspaces()).stream()
-				.filter(s -> s != null && !s.isEmpty()).collect(Collectors.toList());
-		List<Entry<String, String>> sortedList = uniqueWorkspaceNames.entrySet().stream().sorted((e1, e2) -> Integer
-				.compare(recentWorkspacesList.indexOf(e1.getValue()), recentWorkspacesList.indexOf(e2.getValue())))
-				.collect(Collectors.toList());
-
-		for (Entry<String, String> uniqueWorkspaceEntry : sortedList) {
+		for (Entry<String, String> uniqueWorkspaceEntry : uniqueWorkspaceNames.entrySet()) {
 			final String recentWorkspace = uniqueWorkspaceEntry.getValue();
 
 			Composite recentWorkspacePanel = new Composite(panel, SWT.NONE);
