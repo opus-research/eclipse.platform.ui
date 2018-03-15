@@ -207,6 +207,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	public class JobMonitor implements IProgressMonitorWithBlocking {
 		Job job;
+		JobInfo info;
 		String currentTaskName;
 		Set<IProgressMonitorWithBlocking> monitors = Collections.emptySet();
 
@@ -215,8 +216,9 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		 *
 		 * @param newJob
 		 */
-		JobMonitor(Job newJob) {
+		JobMonitor(Job newJob, JobInfo jobInfo) {
 			job = newJob;
+			info = jobInfo;
 		}
 
 		/**
@@ -245,7 +247,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void beginTask(String taskName, int totalWork) {
-			JobInfo info = getJobInfo(job);
 			info.beginTask(taskName, totalWork);
 			refreshJobInfo(info);
 			currentTaskName = taskName;
@@ -254,7 +255,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void done() {
-			JobInfo info = getJobInfo(job);
 			info.clearTaskInfo();
 			info.clearChildren();
 			runnableMonitors.remove(job);
@@ -263,7 +263,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void internalWorked(double work) {
-			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.addWork(work);
 				refreshJobInfo(info);
@@ -294,7 +293,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void setTaskName(String taskName) {
-			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.setTaskName(taskName);
 			} else {
@@ -312,7 +310,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 			if (name == null) {
 				return;
 			}
-			JobInfo info = getJobInfo(job);
 			info.clearChildren();
 			info.addSubTask(name);
 			refreshJobInfo(info);
@@ -326,7 +323,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void clearBlocked() {
-			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(null);
 			refreshJobInfo(info);
 			monitors.stream().forEach(IProgressMonitorWithBlocking::clearBlocked);
@@ -334,7 +330,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 		@Override
 		public void setBlocked(IStatus reason) {
-			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(reason);
 			refreshJobInfo(info);
 			monitors.stream().forEach(listener -> listener.setBlocked(reason));
@@ -513,7 +508,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 				if (jobs.containsKey(event.getJob())) {
 					refreshJobInfo(getJobInfo(event.getJob()));
 				} else {
-					addJobInfo(new JobInfo(event.getJob()));
+					addJobInfo(getJobInfo(event.getJob()));
 				}
 			}
 
@@ -614,7 +609,9 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 * @return IProgressMonitor
 	 */
 	public JobMonitor progressFor(Job job) {
-		return runnableMonitors.computeIfAbsent(job, JobMonitor::new);
+		return runnableMonitors.computeIfAbsent(job, (j) -> {
+			return new JobMonitor(j, getJobInfo(j));
+		});
 	}
 
 	/**
