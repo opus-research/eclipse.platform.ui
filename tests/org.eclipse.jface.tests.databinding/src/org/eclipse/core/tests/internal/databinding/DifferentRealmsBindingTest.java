@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Conrad Groth - Testing my fix, that validation status is set in the correct realm
+ *                    Bug 491657 - Bindings have to be created within the validation realm
  ******************************************************************************/
 package org.eclipse.core.tests.internal.databinding;
 
@@ -52,15 +53,29 @@ public class DifferentRealmsBindingTest extends TestCase {
 				targetAndModelRealm.block();
 			}
 		}.start();
+		new Thread() {
+			@Override
+			public void run() {
+				validationRealm.init(Thread.currentThread());
+				validationRealm.block();
+			}
+		}.start();
 
-		validationRealm.init(Thread.currentThread());
 		dbc = new DataBindingContext(validationRealm);
 		Policy.setLog(logger);
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
-		dbc.dispose();
+		validationRealm.exec(new Runnable() {
+			@Override
+			public void run() {
+				dbc.dispose();
+			}
+		});
+		validationRealm.processQueue();
+		targetAndModelRealm.unblock();
+		validationRealm.unblock();
 	}
 
 	public void testListBindingValidationRealm() throws Throwable {
@@ -84,4 +99,5 @@ public class DifferentRealmsBindingTest extends TestCase {
 		targetAndModelRealm.unblock();
 		assertTrue(errorStatusses.toString(), errorStatusses.isEmpty());
 	}
+
 }

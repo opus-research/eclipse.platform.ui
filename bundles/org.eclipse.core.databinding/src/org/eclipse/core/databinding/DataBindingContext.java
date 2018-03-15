@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     Matthew Hall - bugs 118516, 124684, 218269, 260329, 252732, 146906,
  *                    278550
  *     Boris Bokowski - bug 218269
+ *     Conrad Groth - bug 491657
  *******************************************************************************/
 package org.eclipse.core.databinding;
 
@@ -35,10 +36,12 @@ import org.eclipse.core.runtime.IStatus;
  * <p>
  * A DataBindingContext provides the following abilities:
  * <ul>
- * <li>Ability to create bindings between
- * {@link IObservableValue observable values}.</li>
- * <li>Ability to create bindings between
- * {@link IObservableList observable lists}.</li>
+ * <li>Ability to create bindings between {@link IObservableValue observable
+ * values}.</li>
+ * <li>Ability to create bindings between {@link IObservableList observable
+ * lists}.</li>
+ * <li>Ability to create bindings between {@link IObservableSet observable
+ * sets}.</li>
  * <li>Access to the bindings created by the instance.</li>
  * <li>Access to the list of validation status providers (this includes all
  * bindings).</li>
@@ -47,9 +50,12 @@ import org.eclipse.core.runtime.IStatus;
  * <p>
  * Multiple contexts can be used at any point in time. One strategy for the
  * management of contexts is the aggregation of validation statuses. For example
- * an <code>IWizardPage</code> could use a single context and the statuses
- * could be aggregated to set the page status and fulfillment. Each page in the
+ * an <code>IWizardPage</code> could use a single context and the statuses could
+ * be aggregated to set the page status and fulfillment. Each page in the
  * <code>IWizard</code> would have its own context instance.
+ * <p>
+ * All methods, that are not explicitly marked, can be called from any realm,
+ * e.g. all bind methods.
  * </p>
  *
  * @since 1.0
@@ -417,7 +423,8 @@ public class DataBindingContext {
 
 	/**
 	 * Adds the given binding to this data binding context. This will also add
-	 * the given binding to the list of validation status providers.
+	 * the given binding to the list of validation status providers. This method
+	 * must be called in the {@link #getValidationRealm() validation realm}.
 	 *
 	 * @param binding
 	 *            The binding to add.
@@ -431,6 +438,8 @@ public class DataBindingContext {
 
 	/**
 	 * Adds the given validation status provider to this data binding context.
+	 * This method must be called in the {@link #getValidationRealm() validation
+	 * realm}.
 	 *
 	 * @param validationStatusProvider
 	 *            The validation status provider to add.
@@ -443,7 +452,8 @@ public class DataBindingContext {
 
 	/**
 	 * Updates all model observable objects to reflect the current state of the
-	 * target observable objects.
+	 * target observable objects. This method must be called in the
+	 * {@link #getValidationRealm() validation realm}.
 	 *
 	 */
 	public final void updateModels() {
@@ -455,7 +465,8 @@ public class DataBindingContext {
 
 	/**
 	 * Updates all target observable objects to reflect the current state of the
-	 * model observable objects.
+	 * model observable objects. This method must be called in the
+	 * {@link #getValidationRealm() validation realm}.
 	 *
 	 */
 	public final void updateTargets() {
@@ -466,7 +477,8 @@ public class DataBindingContext {
 	}
 
 	/**
-	 * Removes the given binding.
+	 * Removes the given binding. This method must be called in the
+	 * {@link #getValidationRealm() validation realm}.
 	 *
 	 * @param binding
 	 * @return <code>true</code> if was associated with the context,
@@ -477,7 +489,8 @@ public class DataBindingContext {
 	}
 
 	/**
-	 * Removes the validation status provider.
+	 * Removes the validation status provider. This method must be called in the
+	 * {@link #getValidationRealm() validation realm}.
 	 *
 	 * @param validationStatusProvider
 	 * @return <code>true</code> if was associated with the context,
