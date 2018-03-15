@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marc-Andre Laperle (Ericsson) - Bug 413278
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497618, 368977, 504088, 506696
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497618, 368977, 504088
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -34,16 +34,6 @@ public class WorkbookEditorsHandler extends FilteredTableBaseHandler {
 	 *
 	 */
 	private static final String ORG_ECLIPSE_UI_WINDOW_OPEN_EDITOR_DROP_DOWN = "org.eclipse.ui.window.openEditorDropDown"; //$NON-NLS-1$
-
-	/*
-	 * The WorkbookEditorsHandler has no restriction on the number of editors
-	 */
-	@Override
-	protected void initializeDialog() {
-		// skip super initialization
-		limitMaxHeight = false;
-		maxNItems = 0;
-	}
 
 	@Override
 	protected Object getInput(WorkbenchPage page) {
