@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,10 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *     Michael Krkoska - initial API and implementation (bug 188333)
  *     Pawel Piech - Bug 291245 - [Viewers] StyledCellLabelProvider.paint(...) does not respect column alignment
+ *     Patrik Suzzi <psuzzi@gmail.com> bug 512541
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -312,6 +314,11 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		Color oldForeground = gc.getForeground();
 		Color oldBackground = gc.getBackground();
 
+		// Windows hack to extend the bgcolor to the full table viewer row
+		if (Util.isWindows() && !drawFocus(event) && (cell.getViewerRow() instanceof TableViewerRow)) {
+			gc.fillRectangle(cell.getBounds());
+		}
+
 		if (applyColors) {
 			Color foreground= cell.getForeground();
 			if (foreground != null) {
@@ -323,6 +330,7 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 				gc.setBackground(background);
 			}
 		}
+
 		Image image = cell.getImage();
 		if (image != null) {
 			Rectangle imageBounds = cell.getImageBounds();
