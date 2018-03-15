@@ -927,7 +927,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	private String getEntryElementName(EObject object, Entry<?, ?> entry) {
 		if (object instanceof MContext) {
 			for (Entry<String, String> property : ((MContext) object).getProperties().entrySet()) {
-				if (property.equals(entry)) {
+				if (property == entry) {
 					return CONTEXT_PROPERTIES_ATTNAME;
 				}
 			}
@@ -936,7 +936,7 @@ public class XMLModelReconciler extends ModelReconciler {
 		if (object instanceof MContribution) {
 			for (Entry<String, String> state : ((MContribution) object).getPersistedState()
 					.entrySet()) {
-				if (state.equals(entry)) {
+				if (state == entry) {
 					return APPLICATIONELEMENT_PERSISTEDSTATE_ATTNAME;
 				}
 			}
