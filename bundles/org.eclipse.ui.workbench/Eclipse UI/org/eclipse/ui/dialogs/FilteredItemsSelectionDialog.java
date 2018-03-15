@@ -1489,8 +1489,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		@Override
 		public void run() {
-			List selectedElements = ((StructuredSelection) list.getSelection())
-					.toList();
+			List selectedElements = ((StructuredSelection) list.getSelection()).toList();
 			removeSelectedItems(selectedElements);
 		}
 	}
@@ -1499,8 +1498,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		return PlatformUI.getPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS);
 	}
 
-	private class ItemsListLabelProvider extends StyledCellLabelProvider
-			implements ILabelProviderListener {
+	private class ItemsListLabelProvider extends StyledCellLabelProvider implements ILabelProviderListener {
 		private ILabelProvider provider;
 
 		private ILabelDecorator selectionDecorator;
@@ -1591,8 +1589,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		private boolean isSelected(Object element) {
 			if (element != null && currentSelection != null) {
-				for (Object element2 : currentSelection) {
-					if (element.equals(element2))
+				for (Object entry : currentSelection) {
+					if (element.equals(entry))
 						return true;
 				}
 			}
@@ -1601,8 +1599,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		private String getText(Object element) {
 			if (element instanceof ItemsListSeparator) {
-				return getSeparatorLabel(((ItemsListSeparator) element)
-						.getName());
+				return getSeparatorLabel(((ItemsListSeparator) element).getName());
 			}
 
 			String str = provider.getText(element);
@@ -1613,13 +1610,11 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			return str;
 		}
 
-		private StyledString getStyledText(Object element,
-				IStyledLabelProvider provider) {
+		private StyledString getStyledText(Object element, IStyledLabelProvider provider) {
 			StyledString string = provider.getStyledText(element);
 
 			if (selectionDecorator != null && isSelected(element)) {
-				String decorated = selectionDecorator.decorateText(string
-						.getString(), element);
+				String decorated = selectionDecorator.decorateText(string.getString(), element);
 				return StyledCellLabelProvider.styleDecoratedString(decorated, null, string);
 				// no need to add colors when element is selected
 			}
