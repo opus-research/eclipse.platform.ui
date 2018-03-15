@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760, 461786
- *     Lucas Bullen (Red Hat Inc.) - Bug 522096 - "Close Projects" on working set
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -60,11 +59,6 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
      * The id of this action.
      */
 	public static final String ID = PlatformUI.PLUGIN_ID + ".CloseResourceAction"; //$NON-NLS-1$
-
-	protected String TEXT_STRING = IDEWorkbenchMessages.CloseResourceAction_text;
-	protected String TOOLTIP_STRING = IDEWorkbenchMessages.CloseResourceAction_toolTip;
-	protected String TEXT_PLURAL_STRING = IDEWorkbenchMessages.CloseResourceAction_text_plural;
-	protected String TOOLTIP_PLURAL_STRING = IDEWorkbenchMessages.CloseResourceAction_toolTip_plural;
 
 	private String[] modelProviderIds;
 
@@ -123,8 +117,6 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
 
     @Override
 	protected String getOperationMessage() {
-		if (getActionResources().size() > 1)
-			return IDEWorkbenchMessages.CloseResourceAction_operationMessage_plural;
         return IDEWorkbenchMessages.CloseResourceAction_operationMessage;
     }
 
@@ -191,27 +183,19 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
      */
     @Override
 	protected boolean updateSelection(IStructuredSelection s) {
-		// don't call super since we want to enable if open project is selected.
-		setText(TEXT_STRING);
-		setToolTipText(TOOL_TIP_TEXT);
-		if (!selectionIsOfType(IResource.PROJECT)) {
+        // don't call super since we want to enable if open project is selected.
+        if (!selectionIsOfType(IResource.PROJECT)) {
 			return false;
 		}
 
-		boolean hasOpenProjects = false;
 		Iterator<? extends IResource> resources = getSelectedResources().iterator();
-		while (resources.hasNext()) {
-			IProject currentResource = (IProject) resources.next();
-			if (currentResource.isOpen()) {
-				if (hasOpenProjects) {
-					setText(TEXT_PLURAL_STRING);
-					setToolTipText(TOOLTIP_PLURAL_STRING);
-					break;
-				}
-				hasOpenProjects = true;
-			}
-		}
-		return hasOpenProjects;
+        while (resources.hasNext()) {
+            IProject currentResource = (IProject) resources.next();
+            if (currentResource.isOpen()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
