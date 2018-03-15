@@ -72,7 +72,6 @@ public class MarkerMessages extends NLS {
 
 	public static String deleteActionConfirmTitle;
 	public static String deleteActionConfirmMessage;
-	public static String deleteActionConfirm_buttonDeleteLabel;
 
 	public static String filtersDialog_title;
 	public static String configureFiltersCommand_title;
