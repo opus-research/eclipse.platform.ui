@@ -52,7 +52,6 @@ Composite > Composite > Composite > ToolBar, /* Window->Preference (top toolbar)
 Composite > Composite > Composite > Group > *, /* Group > CreateRefactoringScriptWizardPage$... */
 Shell > Composite > Composite > Composite > *, /* Composite > FilteredPreferenceDialog$... */
 ScrolledComposite > Composite > Composite > Composite > *, /* Composite > NewKeysPreferencePage$... */
-Shell > Composite > Composite > Composite > Composite > *, /* Bug 520364 */
 Shell > Composite > Composite > Composite > Composite > Composite > *, /* Composite > ShowRefactoringHistoryWizardPage$... */
 Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > *, /* Composite > RefactoringWizardDialog$... */
 Shell[style~='SWT.RADIO'][style~='SWT.CASCADE'][style~='SWT.SHADOW_ETCHED_IN'][style~='SWT.SHADOW_ETCHED_OUT'][style~='SWT.RESIZE'][style~='SWT.MENU'][style~='SWT.FULL_SELECTION'][style~='SWT.DATE'] > Composite > * > *, /* Composite > RefactoringWizardDialog$... */ 
