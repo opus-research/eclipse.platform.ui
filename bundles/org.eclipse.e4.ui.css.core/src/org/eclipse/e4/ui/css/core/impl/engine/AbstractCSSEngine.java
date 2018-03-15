@@ -391,7 +391,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			 */
 			String[] pseudoInstances = getStaticPseudoInstances(elt);
 			if (pseudoInstances != null) {
-				// there are static pseudo instances defined, loop for it and
+				// there are static pseudo instances definied, loop for it and
 				// apply styles for each pseudo instance.
 				for (String pseudoInstance : pseudoInstances) {
 					CSSStyleDeclaration styleWithPseudoInstance = viewCSS
@@ -434,12 +434,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				 */
 				NodeList nodes = elt instanceof ChildVisibilityAwareElement
 						? ((ChildVisibilityAwareElement) elt).getVisibleChildNodes() : elt.getChildNodes();
-						if (nodes != null) {
-							for (int k = 0; k < nodes.getLength(); k++) {
-								applyStyles(nodes.item(k), applyStylesToChildNodes);
-							}
-							onStylesAppliedToChildNodes(elt, nodes);
-						}
+				if (nodes != null) {
+					for (int k = 0; k < nodes.getLength(); k++) {
+						applyStyles(nodes.item(k), applyStylesToChildNodes);
+					}
+					onStylesAppliedToChildNodes(elt, nodes);
+				}
 			}
 		}
 
