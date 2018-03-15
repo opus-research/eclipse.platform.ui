@@ -232,7 +232,7 @@ public abstract class MenuItemImpl extends ItemImpl implements MMenuItem {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (mnemonics: "); //$NON-NLS-1$
 		result.append(mnemonics);
 		result.append(')');

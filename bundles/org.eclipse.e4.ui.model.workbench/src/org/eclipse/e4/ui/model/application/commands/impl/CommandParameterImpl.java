@@ -261,7 +261,7 @@ public class CommandParameterImpl extends ApplicationElementImpl implements MCom
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (name: "); //$NON-NLS-1$
 		result.append(name);
 		result.append(", typeId: "); //$NON-NLS-1$

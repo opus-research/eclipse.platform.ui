@@ -59,7 +59,6 @@ class OverridableTabListContentProvider extends TabListContentProvider
 	/**
 	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 	 */
-	@Override
 	public Object[] getElements(Object inputElement) {
 		if (tabbedPropertySheetPage.getCurrentTab() == null) {
 			/*
@@ -78,7 +77,6 @@ class OverridableTabListContentProvider extends TabListContentProvider
 	 *
 	 * @see org.eclipse.ui.internal.views.properties.tabbed.view.TabListContentProvider#dispose()
 	 */
-	@Override
 	public void dispose() {
 		stopListening();
 		this.tabbedPropertyViewer = null;
@@ -92,7 +90,6 @@ class OverridableTabListContentProvider extends TabListContentProvider
 	 * @see org.eclipse.ui.internal.views.properties.tabbed.view.TabListContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 	 *      java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (tabbedPropertyViewer == null) {
 			Assert.isTrue(viewer instanceof TabbedPropertyViewer);
@@ -155,7 +152,6 @@ class OverridableTabListContentProvider extends TabListContentProvider
 	 *
 	 * @see org.eclipse.ui.views.properties.tabbed.ITabSelectionListener#tabSelected(org.eclipse.ui.views.properties.tabbed.ITabDescriptor)
 	 */
-	@Override
 	public void tabSelected(ITabDescriptor tabDescriptor) {
 		AbstractOverridableTabListPropertySection section = getOverridableTabListPropertySection();
 		Assert.isNotNull(section);
@@ -263,7 +259,6 @@ class OverridableTabListContentProvider extends TabListContentProvider
 	 *
 	 * @see org.eclipse.ui.views.properties.tabbed.IOverridableTabListContentProvider#overrideTabs()
 	 */
-	@Override
 	public void overrideTabs() {
 		stopListening();
 		Object input = tabbedPropertyViewer.getInput();
