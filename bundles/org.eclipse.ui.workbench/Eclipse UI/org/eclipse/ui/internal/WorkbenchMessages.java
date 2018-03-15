@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -167,6 +168,8 @@ public class WorkbenchMessages extends NLS {
 	// --- Window Menu ---
 	public static String PerspectiveMenu_otherItem;
 	public static String SelectPerspective_shellTitle;
+	public static String SelectPerspective_selectPerspectiveHelp;
+	public static String SelectPerspective_noDesc;
 	public static String Workbench_showPerspectiveError;
 	public static String ChangeToPerspectiveMenu_errorTitle;
     public static String OpenPerspectiveDialogAction_text;
@@ -284,6 +287,9 @@ public class WorkbenchMessages extends NLS {
 	public static String ActivateEditorAction_toolTip;
 	public static String MaximizePartAction_toolTip;
 	public static String MinimizePartAction_toolTip;
+
+	// --- Filtered Table Base ---
+	public static String FilteredTableBase_Filter;
 
 
 
@@ -458,6 +464,9 @@ public class WorkbenchMessages extends NLS {
 	public static String ViewsPreference_visibleTabs_description;
 	public static String ViewsPreference_enableMRU;
 	public static String ViewsPreference_useColoredLabels;
+	public static String ToggleFullScreenMode_ActivationPopup_Description;
+	public static String ToggleFullScreenMode_ActivationPopup_Description_NoKeybinding;
+	public static String ToggleFullScreenMode_ActivationPopup_DoNotShowAgain;
 
 	// --- File Editors ---
 	public static String FileEditorPreference_fileTypes;
@@ -709,9 +718,6 @@ public class WorkbenchMessages extends NLS {
 	public static String EditorManager_reuseEditorDialogTitle;
 	public static String PinEditorAction_toolTip;
 	public static String WorkbenchPreference_reuseEditors;
-	public static String WorkbenchPreference_reuseDirtyEditorGroupTitle;
-	public static String WorkbenchPreference_promptToReuseEditor;
-	public static String WorkbenchPreference_openNewEditor;
 	public static String WorkbenchPreference_reuseEditorsThreshold;
 	public static String WorkbenchPreference_reuseEditorsThresholdError;
 	public static String WorkbenchPreference_recentFiles;
@@ -745,6 +751,8 @@ public class WorkbenchMessages extends NLS {
 	public static String ToggleCoolbarVisibilityAction_hide_text;
 	public static String ToggleCoolbarVisibilityAction_toolTip;
 
+	public static String ToggleStatusBarVisibilityAction_show_text;
+	public static String ToggleStatusBarVisibilityAction_hide_text;
 
 	// ==============================================================================
 	// Working Set Framework.
@@ -893,6 +901,16 @@ public class WorkbenchMessages extends NLS {
     public static String ContentTypes_editDialog_messageHeader;
     public static String ContentTypes_editDialog_message;
     public static String ContentTypes_editDialog_label;
+	public static String ContentTypes_addRootContentTypeButton;
+	public static String ContentTypes_addChildContentTypeButton;
+	public static String ContentTypes_removeContentTypeButton;
+	public static String ContentTypes_newContentTypeDialog_title;
+	public static String ContentTypes_newContentTypeDialog_descritption;
+	public static String ContentTypes_newContentTypeDialog_nameLabel;
+	public static String ContentTypes_newContentTypeDialog_defaultNameNoParent;
+	public static String ContentTypes_newContentTypeDialog_defaultNameWithParent;
+	public static String ContentTypes_newContentTypeDialog_invalidContentTypeName;
+	public static String ContentTypes_failedAtEditingContentTypes;
     public static String Edit;
 
     // =========================================================================
@@ -953,6 +971,8 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
+	public static String WorkbenchLayoutSettings_Name;
+	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,19 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
+ * Mickael Istria (Red Hat Inc.) Bug 264404 - Problem decorators
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.workbench;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -23,6 +29,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.internal.navigator.resources.nested.PathComparator;
 import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorPlugin;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 
@@ -91,9 +98,28 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 			return;
 		}
 
-
 		final Collection<Runnable> runnables = new ArrayList<Runnable>();
-		processDelta(delta, runnables);
+		final SortedSet<IResource> resourcesToRefresh = new TreeSet<IResource>(new Comparator<IResource>() {
+			private PathComparator pathComparator = new PathComparator();
+			@Override
+			public int compare(IResource arg0, IResource arg1) {
+				return pathComparator.compare(arg0.getFullPath(), arg1.getFullPath());
+			}
+		});
+		processDelta(delta, runnables, resourcesToRefresh);
+
+		IResource currentTopLevelResource = null;
+		for (IResource resource : resourcesToRefresh) {
+			if (resource == null) {
+				// paranoia, see bug 509821
+				continue;
+			}
+			if (currentTopLevelResource == null
+					|| !currentTopLevelResource.getFullPath().isPrefixOf(resource.getFullPath())) {
+				currentTopLevelResource = resource;
+				runnables.add(getRefreshRunnable(resource));
+			}
+		}
 
 		if (runnables.isEmpty()) {
 			return;
@@ -120,9 +146,11 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 	}
 
 	/**
-	 * Process a resource delta. Add any runnables
+	 * Process a resource delta. Add runnables for addAndRemove and
+	 * resourceToUpdate.
 	 */
-	private void processDelta(IResourceDelta delta, Collection<Runnable> runnables) {
+	private void processDelta(IResourceDelta delta, Collection<Runnable> addAndRemoveRunnables,
+			Set<IResource> toRefresh) {
 		//he widget may have been destroyed
 		// by the time this is run. Check for this and do nothing if so.
 		Control ctrl = viewer.getControl();
@@ -143,7 +171,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 				.getAffectedChildren(IResourceDelta.CHANGED);
 		for (int i = 0; i < affectedChildren.length; i++) {
 			if ((affectedChildren[i].getFlags() & IResourceDelta.TYPE) != 0) {
-				runnables.add(getRefreshRunnable(resource));
+				toRefresh.add(resource);
 				return;
 			}
 		}
@@ -154,28 +182,31 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		int changeFlags = delta.getFlags();
 		if ((changeFlags & (IResourceDelta.OPEN | IResourceDelta.SYNC
 				| IResourceDelta.TYPE | IResourceDelta.DESCRIPTION)) != 0) {
-//			Runnable updateRunnable =  new Runnable(){
-//				public void run() {
-//					((StructuredViewer) viewer).update(resource, null);
-//				}
-//			};
-//			runnables.add(updateRunnable);
-
 			/* support the Closed Projects filter;
 			 * when a project is closed, it may need to be removed from the view.
 			 */
-			runnables.add(getRefreshRunnable(resource.getParent()));
+			IContainer parent = resource.getParent();
+			if (parent != null) {
+				toRefresh.add(parent);
+			}
 		}
 		// Replacing a resource may affect its label and its children
 		if ((changeFlags & IResourceDelta.REPLACED) != 0) {
-			runnables.add(getRefreshRunnable(resource));
+			toRefresh.add(resource);
 			return;
+		}
+		if ((changeFlags & IResourceDelta.MARKERS) != 0) {
+			IProject project = resource.getProject();
+			if (project != null) {
+				toRefresh.add(project);
+				return;
+			}
 		}
 
 
 		// Handle changed children .
 		for (int i = 0; i < affectedChildren.length; i++) {
-			processDelta(affectedChildren[i], runnables);
+			processDelta(affectedChildren[i], addAndRemoveRunnables, toRefresh);
 		}
 
 		// @issue several problems here:
@@ -267,7 +298,7 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 				}
 			}
 		};
-		runnables.add(addAndRemove);
+		addAndRemoveRunnables.add(addAndRemove);
 	}
 
 	/**

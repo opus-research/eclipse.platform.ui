@@ -11,7 +11,6 @@
 
 package org.eclipse.ui.internal;
 
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
@@ -20,8 +19,6 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.InternalPolicy;
 import org.eclipse.jface.preference.JFacePreferences;
-import org.eclipse.jface.util.ILogger;
-import org.eclipse.jface.util.ISafeRunnableRunner;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.util.StatusHandler;
@@ -44,24 +41,16 @@ final class JFaceUtil {
 	 */
 	public static void initializeJFace() {
 		// Set the SafeRunner to run all SafeRunnables
-		SafeRunnable.setRunner(new ISafeRunnableRunner() {
-			@Override
-			public void run(ISafeRunnable code) {
-				SafeRunner.run(code);
-			}
-		});
+		SafeRunnable.setRunner(code -> SafeRunner.run(code));
 
 		// Pass all errors and warnings to the status handling facility
 		// and the rest to the main runtime log
-		Policy.setLog(new ILogger() {
-			@Override
-			public void log(IStatus status) {
-				if (status.getSeverity() == IStatus.WARNING
-						|| status.getSeverity() == IStatus.ERROR) {
-					StatusManager.getManager().handle(status);
-				} else {
-					WorkbenchPlugin.log(status);
-				}
+		Policy.setLog(status -> {
+			if (status.getSeverity() == IStatus.WARNING
+					|| status.getSeverity() == IStatus.ERROR) {
+				StatusManager.getManager().handle(status);
+			} else {
+				WorkbenchPlugin.log(status);
 			}
 		});
 
@@ -85,7 +74,8 @@ final class JFaceUtil {
 			InternalPolicy.DEBUG_TRACE_URL_IMAGE_DESCRIPTOR = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/trace/URLImageDescriptor")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/logURLImageDescriptorMissing2x")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptorDirectly")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2x")); //$NON-NLS-1$ //$NON-NLS-2$
+			// loadURLImageDescriptor2x is "true" by default and should stay "true" when absent in the debug options file:
+			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = !"false".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2x")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x_PNG_FOR_GIF = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2xPngForGif")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}

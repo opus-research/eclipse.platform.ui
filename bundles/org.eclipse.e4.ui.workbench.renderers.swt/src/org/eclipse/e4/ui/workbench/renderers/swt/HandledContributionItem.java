@@ -89,12 +89,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 
 	private Runnable unreferenceRunnable;
 
-	private IStateListener stateListener = new IStateListener() {
-		@Override
-		public void handleStateChange(State state, Object oldValue) {
-			updateState();
-		}
-	};
+	private IStateListener stateListener = (state, oldValue) -> updateState();
 
 	private IEclipseContext infoContext;
 
@@ -188,7 +183,10 @@ public class HandledContributionItem extends AbstractContributionItem {
 	@Override
 	protected void postMenuFill() {
 		if (updateService != null) {
-			unreferenceRunnable = updateService.registerElementForUpdate(getModel().getWbCommand(), getModel());
+			ParameterizedCommand wbCommand = getModel().getWbCommand();
+			if (wbCommand != null) {
+				unreferenceRunnable = updateService.registerElementForUpdate(wbCommand, getModel());
+			}
 		}
 	}
 
@@ -197,7 +195,10 @@ public class HandledContributionItem extends AbstractContributionItem {
 		hookCheckListener();
 
 		if (updateService != null) {
-			unreferenceRunnable = updateService.registerElementForUpdate(getModel().getWbCommand(), getModel());
+			ParameterizedCommand wbCommand = getModel().getWbCommand();
+			if (wbCommand != null) {
+				unreferenceRunnable = updateService.registerElementForUpdate(wbCommand, getModel());
+			}
 		}
 	}
 

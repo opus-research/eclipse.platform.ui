@@ -9,7 +9,7 @@
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
  *     Christian Georgi (SAP) - Bug 432480
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 393171
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 393171, 508450
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -18,6 +18,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.e4.core.commands.ExpressionContext;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
@@ -128,6 +129,8 @@ public class E4Workbench implements IWorkbench {
 
 		osgiRegistration = Activator.getDefault().getContext()
 				.registerService(IWorkbench.class.getName(), this, properties);
+
+		ContextInjectionFactory.make(PartOnTopManager.class, appContext);
 	}
 
 	@Override
@@ -155,17 +158,16 @@ public class E4Workbench implements IWorkbench {
 	 *
 	 */
 	public void instantiateRenderer() {
-		renderer = (IPresentationEngine) appContext.get(IPresentationEngine.class.getName());
+		renderer = appContext.get(IPresentationEngine.class);
 		if (renderer == null) {
 			String presentationURI = (String) appContext.get(IWorkbench.PRESENTATION_URI_ARG);
 			if (presentationURI != null) {
-				IContributionFactory factory = (IContributionFactory) appContext
-						.get(IContributionFactory.class.getName());
+				IContributionFactory factory = appContext.get(IContributionFactory.class);
 				renderer = (IPresentationEngine) factory.create(presentationURI, appContext);
-				appContext.set(IPresentationEngine.class.getName(), renderer);
+				appContext.set(IPresentationEngine.class, renderer);
 			}
 			if (renderer == null) {
-				Logger logger = (Logger) appContext.get(Logger.class.getName());
+				Logger logger = appContext.get(Logger.class);
 				logger.error("Failed to create the presentation engine for URI: " + presentationURI); //$NON-NLS-1$
 			}
 		}
