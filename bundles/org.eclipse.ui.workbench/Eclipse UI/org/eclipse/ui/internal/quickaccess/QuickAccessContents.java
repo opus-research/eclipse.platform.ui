@@ -316,7 +316,7 @@ public abstract class QuickAccessContents {
 
 		int maxCount = computeNumberOfItems();
 		int[] indexPerProvider = new int[providers.length];
-		int countPerProvider = INITIAL_COUNT_PER_PROVIDER;
+		int countPerProvider = Math.min(maxCount / 4, INITIAL_COUNT_PER_PROVIDER);
 		int prevPick = 0;
 		int countTotal = 0;
 		boolean perfectMatchAdded = true;
@@ -420,9 +420,9 @@ public abstract class QuickAccessContents {
 			}
 			// from now on, add one element per provider
 			countPerProvider = 1;
-		}
-		// add matches beyond countPerProvider
-		while (showAllMatches && !done);
+
+		} while ((showAllMatches || countTotal < maxCount) && !done);
+
 		if (!perfectMatchAdded) {
 			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
 			if (entryEnabled(providers[0], entry)) {
