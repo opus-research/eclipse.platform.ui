@@ -21,6 +21,7 @@
 package org.eclipse.e4.ui.css.core.impl.sac;
 
 import java.util.Set;
+
 import org.w3c.dom.Element;
 
 /**
@@ -122,12 +123,9 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	 */
 	@Override
 	public boolean match(Element e, String pseudoE) {
-		if (!e.hasAttribute(getLocalName())) {
-			return false;
-		}
 		String val = getValue();
 		if (val == null) {
-			return true;
+			return !e.getAttribute(getLocalName()).equals("");
 		}
 		return e.getAttribute(getLocalName()).equals(val);
 	}
