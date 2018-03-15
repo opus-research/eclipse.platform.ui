@@ -1487,13 +1487,11 @@ STATUS_LINE_ID, model);
 		final Shell shell = getShell();
 		if (shell != null) {
 			final Expression expression = new ActiveShellExpression(shell);
-			for (Iterator<Entry<String, ActionHandler>> iterator = handlersByCommandId.entrySet()
-					.iterator(); iterator.hasNext();) {
-				Entry<String, ActionHandler> entry = iterator.next();
-				String commandId = entry.getKey();
-				IHandler handler = entry.getValue();
-				newHandlers.add(handlerService.activateHandler(commandId, handler, expression));
-			}
+			for (Entry<String, ActionHandler> entry : handlersByCommandId.entrySet()) {
+String commandId = entry.getKey();
+IHandler handler = entry.getValue();
+newHandlers.add(handlerService.activateHandler(commandId, handler, expression));
+}
 		}
 
 		handlerActivations = newHandlers;
@@ -1525,8 +1523,8 @@ STATUS_LINE_ID, model);
 			final Object newValue) {
 		PropertyChangeEvent event = new PropertyChangeEvent(this, property, oldValue, newValue);
 		Object[] listeners = genericPropertyListeners.getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
+		for (Object listener2 : listeners) {
+			IPropertyChangeListener listener = (IPropertyChangeListener) listener2;
 			listener.propertyChange(event);
 		}
 	}
@@ -1707,11 +1705,11 @@ STATUS_LINE_ID, model);
 	private void allowUpdates(IMenuManager menuManager) {
 		menuManager.markDirty();
 		final IContributionItem[] items = menuManager.getItems();
-		for (int i = 0; i < items.length; i++) {
-			if (items[i] instanceof IMenuManager) {
-				allowUpdates((IMenuManager) items[i]);
-			} else if (items[i] instanceof SubContributionItem) {
-				final IContributionItem innerItem = ((SubContributionItem) items[i]).getInnerItem();
+		for (IContributionItem item : items) {
+			if (item instanceof IMenuManager) {
+				allowUpdates((IMenuManager) item);
+			} else if (item instanceof SubContributionItem) {
+				final IContributionItem innerItem = ((SubContributionItem) item).getInnerItem();
 				if (innerItem instanceof IMenuManager) {
 					allowUpdates((IMenuManager) innerItem);
 				}
@@ -2282,8 +2280,7 @@ STATUS_LINE_ID, model);
 		IEvaluationService es = serviceLocator
 				.getService(IEvaluationService.class);
 		IEvaluationContext currentState = es.getCurrentState();
-		for (int i = 0; i < refs.length; i++) {
-			EvaluationReference reference = refs[i];
+		for (EvaluationReference reference : refs) {
 			reference.setPostingChanges(true);
 
 			boolean os = reference.evaluate(currentState);
@@ -2450,8 +2447,8 @@ STATUS_LINE_ID, model);
 	private final void fireActionSetsChanged() {
 		if (actionSetListeners != null) {
 			final Object[] listeners = actionSetListeners.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				final IActionSetsListener listener = (IActionSetsListener) listeners[i];
+			for (Object listener2 : listeners) {
+				final IActionSetsListener listener = (IActionSetsListener) listener2;
 				final WorkbenchPage currentPage = (WorkbenchPage) getActivePage();
 				final IActionSetDescriptor[] newActionSets;
 				if (currentPage == null) {
@@ -2852,8 +2849,8 @@ STATUS_LINE_ID, model);
 
 	/* package */void fireBackgroundSaveStarted() {
 		Object[] listeners = backgroundSaveListeners.getListeners();
-		for (int i = 0; i < listeners.length; i++) {
-			IBackgroundSaveListener listener = (IBackgroundSaveListener) listeners[i];
+		for (Object listener2 : listeners) {
+			IBackgroundSaveListener listener = (IBackgroundSaveListener) listener2;
 			listener.handleBackgroundSaveStarted();
 		}
 	}

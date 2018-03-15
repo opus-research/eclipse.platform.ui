@@ -214,12 +214,12 @@ public class CopyFilesAndFoldersOperation {
 		MultiStatus multiStatus = new MultiStatus(PlatformUI.PLUGIN_ID,
 				IStatus.OK, getProblemsMessage(), null);
 
-		for (int i = 0; i < stores.length; i++) {
-			if (stores[i].fetchInfo().exists() == false) {
+		for (IFileStore store : stores) {
+			if (store.fetchInfo().exists() == false) {
 				String message = NLS
 						.bind(
 								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_resourceDeleted,
-								stores[i].getName());
+								store.getName());
 				IStatus status = new Status(IStatus.ERROR,
 						PlatformUI.PLUGIN_ID, IStatus.OK, message, null);
 				multiStatus.add(status);
@@ -239,8 +239,8 @@ public class CopyFilesAndFoldersOperation {
 		MultiStatus multiStatus = new MultiStatus(PlatformUI.PLUGIN_ID,
 				IStatus.OK, getProblemsMessage(), null);
 
-		for (int i = 0; i < resources.length; i++) {
-			IResource resource = resources[i];
+		for (IResource resource2 : resources) {
+			IResource resource = resource2;
 			if (resource != null && !resource.isVirtual()) {
 				URI location = resource.getLocationURI();
 				String message = null;
@@ -377,8 +377,7 @@ public class CopyFilesAndFoldersOperation {
 			IResource[] copyResources, ArrayList existing) {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
-		for (int i = 0; i < copyResources.length; i++) {
-			IResource source = copyResources[i];
+		for (IResource source : copyResources) {
 			IPath newDestinationPath = destinationPath.append(source.getName());
 			IResource newDestination = workspaceRoot
 					.findMember(newDestinationPath);
@@ -437,9 +436,8 @@ public class CopyFilesAndFoldersOperation {
 		SubMonitor subMonitor = SubMonitor.convert(monitor,
 				IDEWorkbenchMessages.CopyFilesAndFoldersOperation_CopyResourcesTask, resources.length);
 
-		for (int i = 0; i < resources.length; i++) {
+		for (IResource source : resources) {
 			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
-			IResource source = resources[i];
 			IPath destinationPath = destination.append(source.getName());
 			IWorkspace workspace = source.getWorkspace();
 			IWorkspaceRoot workspaceRoot = workspace.getRoot();
@@ -1248,8 +1246,7 @@ public class CopyFilesAndFoldersOperation {
 			IContainer destination) {
 		IPath destinationLocation = destination.getLocation();
 
-		for (int i = 0; i < sourceResources.length; i++) {
-			IResource sourceResource = sourceResources[i];
+		for (IResource sourceResource : sourceResources) {
 			if (sourceResource.getParent().equals(destination)) {
 				return true;
 			} else if (destinationLocation != null) {
@@ -1495,8 +1492,8 @@ public class CopyFilesAndFoldersOperation {
 		}
 		IContainer firstParent = null;
 		URI destinationLocation = destination.getLocationURI();
-		for (int i = 0; i < sourceResources.length; i++) {
-			IResource sourceResource = sourceResources[i];
+		for (IResource sourceResource2 : sourceResources) {
+			IResource sourceResource = sourceResource2;
 			if (firstParent == null) {
 				firstParent = sourceResource.getParent();
 			} else if (firstParent.equals(sourceResource.getParent()) == false) {
@@ -1649,8 +1646,7 @@ public class CopyFilesAndFoldersOperation {
 								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_internalError,
 								exception.getLocalizedMessage());
 			}
-			for (int i = 0; i < sourceStores.length; i++) {
-				IFileStore sourceStore = sourceStores[i];
+			for (IFileStore sourceStore : sourceStores) {
 				IFileStore sourceParentStore = sourceStore.getParent();
 
 				if (sourceStore != null) {
@@ -1703,9 +1699,9 @@ public class CopyFilesAndFoldersOperation {
 			// file system folder
 			try {
 				IResource[] members = destination.members();
-				for (int j = 0; j < members.length; j++) {
-					if (sourceLocation.equals(members[j].getLocation())
-							&& source.getName().equals(members[j].getName())) {
+				for (IResource member : members) {
+					if (sourceLocation.equals(member.getLocation())
+							&& source.getName().equals(member.getName())) {
 						return NLS
 								.bind(
 										IDEWorkbenchMessages.CopyFilesAndFoldersOperation_sameSourceAndDest,
@@ -1741,8 +1737,7 @@ public class CopyFilesAndFoldersOperation {
 
 		// Check to see if we would be overwriting a parent folder.
 		// Cancel entire copy operation if we do.
-		for (int i = 0; i < sourceResources.length; i++) {
-			final IResource sourceResource = sourceResources[i];
+		for (final IResource sourceResource : sourceResources) {
 			final IPath destinationPath = destination.getFullPath().append(
 					sourceResource.getName());
 			final IPath sourcePath = sourceResource.getFullPath();
@@ -1759,8 +1754,7 @@ public class CopyFilesAndFoldersOperation {
 			}
 		}
 		// Check for overwrite conflicts
-		for (int i = 0; i < sourceResources.length; i++) {
-			final IResource source = sourceResources[i];
+		for (final IResource source : sourceResources) {
 			final IPath destinationPath = destination.getFullPath().append(
 					source.getName());
 
