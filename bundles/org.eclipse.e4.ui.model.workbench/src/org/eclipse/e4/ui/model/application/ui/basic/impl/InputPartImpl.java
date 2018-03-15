@@ -190,7 +190,7 @@ public class InputPartImpl extends PartImpl implements MInputPart {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (inputURI: "); //$NON-NLS-1$
 		result.append(inputURI);
 		result.append(')');

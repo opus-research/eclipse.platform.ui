@@ -422,7 +422,7 @@ public class CommandImpl extends ApplicationElementImpl implements MCommand {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (commandName: "); //$NON-NLS-1$
 		result.append(commandName);
 		result.append(", description: "); //$NON-NLS-1$
