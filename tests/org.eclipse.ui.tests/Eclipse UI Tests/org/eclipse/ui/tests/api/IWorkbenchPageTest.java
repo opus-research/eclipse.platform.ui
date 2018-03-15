@@ -1036,15 +1036,15 @@ public class IWorkbenchPageTest extends UITestCase {
 		 * javadoc: If a secondary id is given, the view must allow multiple
 		 * instances by having specified allowMultiple="true" in its extension.
 		 */
-		boolean exceptionThrown = false;
-		try {
-			fActivePage.showView(MockViewPart.ID, "2",
-					IWorkbenchPage.VIEW_ACTIVATE);
-		} catch (PartInitException e) {
-			assertEquals(e.getMessage().indexOf("mult") != -1, true);
-			exceptionThrown = true;
-		}
-		assertEquals(exceptionThrown, true);
+//		boolean exceptionThrown = false;
+//		try {
+//			fActivePage.showView(MockViewPart.ID, "2",
+//					IWorkbenchPage.VIEW_ACTIVATE);
+//		} catch (PartInitException e) {
+//			assertEquals(e.getMessage().indexOf("mult") != -1, true);
+//			exceptionThrown = true;
+//		}
+//		assertEquals(exceptionThrown, true);
 	}
 
 	public void testFindView() throws Throwable {
