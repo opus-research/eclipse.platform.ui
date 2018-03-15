@@ -71,6 +71,10 @@ public class PartServiceImpl implements EPartService {
 	 * The part activation time of a part is stored in it's transient data.
 	 */
 	public static final String PART_ACTIVATION_TIME = "partActivationTime"; //$NON-NLS-1$
+	/**
+	 * The perspective de-selecting flag is stored in it's transient data.
+	 */
+	public static final String PERSP_DESELECTING = "perspDeselecting"; //$NON-NLS-1$
 
 	private EventHandler selectedHandler = new EventHandler() {
 		@Override
@@ -186,6 +190,7 @@ public class PartServiceImpl implements EPartService {
 
 	private PartActivationHistory partActivationHistory;
 
+	private MPerspective activePerspective;
 	private MPart activePart;
 
 	private ListenerList<IPartListener> listeners = new ListenerList<>();
@@ -610,6 +615,7 @@ public class PartServiceImpl implements EPartService {
 		Assert.isNotNull(perspective);
 		MWindow window = getWindow();
 		if (window != null && isInContainer(window, perspective)) {
+			activePerspective = perspective;
 			perspective.getParent().setSelectedElement(perspective);
 			List<MPart> newPerspectiveParts = modelService.findElements(perspective, null,
 					MPart.class, null);
@@ -815,6 +821,19 @@ public class PartServiceImpl implements EPartService {
 
 	@Override
 	public MPart getActivePart() {
+		if (activePart != null && activePart.getTags().contains("View")) { //$NON-NLS-1$
+			// See bug 489335: if we are middle in perspective switch code, the
+			// new parts for the next perspective are created in
+			// PerspectiveStackRenderer before the previous perspective
+			// has a chance to deactivate the old active part via
+			// switchPerspective().
+			// If now the client code in the new perspective asks for an active
+			// part, we should not return the part from the old perspective,
+			// even if it is still "active" here.
+			if (activePerspective != null && activePerspective.getTransientData().containsKey(PERSP_DESELECTING)) {
+				return null;
+			}
+		}
 		return activePart;
 	}
 
@@ -1205,7 +1224,7 @@ public class PartServiceImpl implements EPartService {
 			activate(addedPart);
 			return addedPart;
 		case VISIBLE:
-			MPart activePart = getActivePart();
+			MPart activePart = this.activePart;
 			if (activePart == null
 					|| (activePart != addedPart && getParent(activePart) == getParent(addedPart))) {
 				delegateBringToTop(addedPart);
