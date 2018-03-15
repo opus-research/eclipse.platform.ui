@@ -248,7 +248,7 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
 
     @Override
 	protected void computeResult() {
-		setResult(fViewer.getStructuredSelection().toList());
+        setResult(((IStructuredSelection) fViewer.getSelection()).toList());
     }
 
     @Override
