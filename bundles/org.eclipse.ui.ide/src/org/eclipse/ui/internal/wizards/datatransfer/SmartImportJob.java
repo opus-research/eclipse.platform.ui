@@ -71,6 +71,7 @@ public class SmartImportJob extends Job {
 	private boolean discardRootProject;
 	private boolean deepChildrenDetection;
 	private boolean configureProjects;
+	private boolean importClosed;
 	private boolean reconfigureEclipseProjects;
 	private IWorkingSet[] workingSets;
 
@@ -545,7 +546,9 @@ public class SmartImportJob extends Job {
 			}
 			subMonitor.setWorkRemaining(1);
 
-			project.open(refreshMode, subMonitor.split(1));
+			if (!importClosed) {
+				project.open(refreshMode, subMonitor.split(1));
+			}
 			if (!this.report.containsKey(project)) {
 				this.report.put(project, new ArrayList<ProjectConfigurator>());
 			}
@@ -718,6 +721,10 @@ public class SmartImportJob extends Job {
 	 */
 	public void setDetectNestedProjects(boolean detectNestedProjects) {
 		this.deepChildrenDetection = detectNestedProjects;
+	}
+
+	void setImportClosed(boolean importClosed) {
+		this.importClosed = importClosed;
 	}
 
 	/**
