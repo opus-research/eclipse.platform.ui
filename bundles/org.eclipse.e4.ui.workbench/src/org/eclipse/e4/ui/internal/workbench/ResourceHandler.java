@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -38,11 +37,7 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsPackageImpl;
 import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl;
@@ -222,8 +217,8 @@ public class ResourceHandler implements IModelResourceHandler {
 		}
 
 		// last stored time-stamp
-		long restoreLastModified = restoreLocation == null ? 0L
-				: new File(restoreLocation.toFileString()).lastModified();
+		long restoreLastModified = restoreLocation == null ? 0L : new File(
+				restoreLocation.toFileString()).lastModified();
 
 		// See bug 380663, bug 381219
 		// long lastApplicationModification = getLastApplicationModification();
@@ -235,11 +230,13 @@ public class ResourceHandler implements IModelResourceHandler {
 		if (restore && saveAndRestore) {
 			resource = loadResource(restoreLocation);
 			// If the saved model does not have any top-level windows, Eclipse will exit
-			// immediately, so throw out the persisted state and reinitialize with the defaults.
+			// immediately, so we ignore the persisted state and reinitialize
+			// with the default application model.
 			if (!hasTopLevelWindows(resource)) {
 				if (logger != null) {
-					logger.error(new Exception(), // log a stack trace to help debug the corruption
-							"The persisted workbench has no top-level windows, so reinitializing with defaults."); //$NON-NLS-1$
+					// log a stack trace to help debug the corruption
+					logger.error(new Exception(),
+							"The persisted application model has no top-level windows. Reinitializing with the default application model."); //$NON-NLS-1$
 				}
 				resource = null;
 			}
@@ -257,31 +254,24 @@ public class ResourceHandler implements IModelResourceHandler {
 		// Add model items described in the model extension point
 		// This has to be done before commands are put into the context
 		MApplication appElement = (MApplication) resource.getContents().get(0);
+
 		this.context.set(MApplication.class, appElement);
-
-		MPartSashContainer sash = (MPartSashContainer) ((MPerspectiveStack) appElement.getChildren().get(0)
-				.getChildren().get(0)).getChildren().get(0).getChildren().get(0);
-		MPartSashContainer sash2 = (MPartSashContainer) sash.getChildren().get(0);
-		MPartStack stack = (MPartStack) sash2.getChildren().get(0);
-		List<MStackElement> list = stack.getChildren();
-		System.out.println(list);
-
-		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class, context);
+		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
+				context);
 		contribProcessor.processModel(initialModel);
 
-		MApplication myApp = this.context.get(MApplication.class);
-		System.out.println(myApp);
 		if (!hasTopLevelWindows(resource) && logger != null) {
 			logger.error(new Exception(), // log a stack trace to help debug the
 											// corruption
-					"Initializing from the application definition instance yields no top-level windows! " //$NON-NLS-1$
+					"Loading the application model results in no top-level window " //$NON-NLS-1$
 							+ "Continuing execution, but the missing windows may cause other initialization failures."); //$NON-NLS-1$
 		}
 
-		CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(CommandLineOptionModelProcessor.class,
-				context);
-		processor.process();
-
+		if (!clearPersistedState) {
+			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
+					CommandLineOptionModelProcessor.class, context);
+			processor.process();
+		}
 
 		return resource;
 	}
