@@ -97,7 +97,7 @@ public class SavePerspectiveDialog extends org.eclipse.jface.dialogs.Dialog
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
-				WorkbenchMessages.SavePerspective_saveButtonLabel, true);
+                IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
                 IDialogConstants.CANCEL_LABEL, false);
         updateButtons();
