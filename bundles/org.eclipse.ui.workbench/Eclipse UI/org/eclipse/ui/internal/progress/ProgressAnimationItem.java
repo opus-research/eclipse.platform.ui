@@ -396,12 +396,24 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	@Override
 	public void removed(JobTreeElement info) {
-		refresh();
+		final Display display = Display.getDefault();
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		});
 	}
 
 	@Override
 	public void finished(final JobTreeElement jte) {
-		refresh();
+		final Display display = Display.getDefault();
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		});
 	}
 
 }
