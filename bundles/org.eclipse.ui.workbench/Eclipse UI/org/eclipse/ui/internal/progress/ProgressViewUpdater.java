@@ -10,10 +10,12 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
@@ -29,6 +31,8 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     boolean debug;
 
+	Throttler throttledUpdate = new Throttler(PlatformUI.getWorkbench().getDisplay(), Duration.ofMillis(100),
+			this::update);
 
     /**
      * The UpdatesInfo is a private class for keeping track of the updates
@@ -205,10 +209,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 		}
     }
 
-    /**
-     * Schedule an update.
-     */
-    void scheduleUpdate() {
+	private void update() {
 		// Abort the update if there isn't anything
 		if (collectors.length == 0) {
 			return;
@@ -247,7 +248,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 				}
 			}
 		}
-    }
+	}
 
     /**
      * Get the updates info that we are using in the receiver.
@@ -269,7 +270,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 			currentInfo.refresh(group);
 		}
         //Add in a 100ms delay so as to keep priority low
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
 
     }
 
@@ -277,7 +278,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 	public void refreshJobInfo(JobInfo info) {
 		currentInfo.refresh(info);
         //Add in a 100ms delay so as to keep priority low
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
 
     }
 
@@ -285,7 +286,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 	public void refreshGroup(GroupInfo info) {
 		currentInfo.refresh(info);
         //Add in a 100ms delay so as to keep priority low
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
 
     }
 
@@ -293,7 +294,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 	public void addGroup(GroupInfo info) {
 
 		currentInfo.add(info);
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
 
     }
 
@@ -303,7 +304,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 		currentInfo.updateAll = true;
 
         //Add in a 100ms delay so as to keep priority low
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
 
     }
 
@@ -316,7 +317,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 		} else {
 			currentInfo.refresh(group);
         }
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
 
     }
 
@@ -328,13 +329,13 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 		} else {
 			currentInfo.refresh(group);
         }
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
     }
 
     @Override
 	public void removeGroup(GroupInfo group) {
 		currentInfo.remove(group);
-        scheduleUpdate();
+		throttledUpdate.throttledExec();
 
     }
 

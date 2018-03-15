@@ -108,14 +108,18 @@ public class ProgressAnimationItemTest {
 	}
 
 	private void assertSingleAccessibleListener() throws Exception {
-		PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		// ProgressManager has enqueued some runnables for the refresh to
+		// happen. The assert will be wrong before these runnables have
+		// completed. We call asynchExec here to ensure that the assert will be
+		// executed after the PM runnables.
+		display.asyncExec(() -> {
 			try {
 				assertEquals(1, getAccessibleListenersSize(getToolBar(animationItem).getAccessible()));
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		});
-		Display display = Display.getCurrent();
 		while (display.readAndDispatch()) {
 		}
 	}
