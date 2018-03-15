@@ -147,7 +147,12 @@ public class UISynchronizer extends Synchronizer {
         PendingSyncExec work = new PendingSyncExec(runnable);
         work.setOperationThread(Thread.currentThread());
         lockListener.addPendingWork(work);
-        asyncExec(() -> lockListener.doPendingWork());
+        asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                lockListener.doPendingWork();
+            }
+        });
 
 		try {
 			work.waitUntilExecuted(lockListener);

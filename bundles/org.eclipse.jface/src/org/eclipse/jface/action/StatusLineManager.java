@@ -116,8 +116,8 @@ public class StatusLineManager extends ContributionManager implements
         statusLine = null;
 
         IContributionItem items[] = getItems();
-        for (IContributionItem item : items) {
-            item.dispose();
+        for (int i = 0; i < items.length; i++) {
+            items[i].dispose();
         }
     }
 
@@ -274,7 +274,8 @@ public class StatusLineManager extends ContributionManager implements
                 // is not possible.
 
                 Control ws[] = statusLine.getChildren();
-                for (Control w : ws) {
+                for (int i = 0; i < ws.length; i++) {
+                    Control w = ws[i];
                     Object data = w.getData();
                     if (data instanceof IContributionItem) {
                         w.dispose();
@@ -283,7 +284,8 @@ public class StatusLineManager extends ContributionManager implements
 
                 int oldChildCount = statusLine.getChildren().length;
                 IContributionItem[] items = getItems();
-                for (IContributionItem ci : items) {
+                for (int i = 0; i < items.length; ++i) {
+                    IContributionItem ci = items[i];
                     if (ci.isVisible()) {
                         ci.fill(statusLine);
                         // associate controls with contribution item

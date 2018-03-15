@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -471,7 +472,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 			String message = buildingStatus.getMessage();
 			sb.append(message);
 			java.util.List<String> lines = readLines(sb.toString());
-			for (String line : lines) {
+			for (Iterator<String> iterator = lines.iterator(); iterator.hasNext();) {
+				String line = iterator.next();
 				listToPopulate.add(line);
 			}
 			incrementNesting = true;
@@ -510,8 +512,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		// Look for child status
 		IStatus[] children = buildingStatus.getChildren();
-		for (IStatus element : children) {
-			populateList(listToPopulate, element, nesting, true);
+		for (int i = 0; i < children.length; i++) {
+			populateList(listToPopulate, children[i], nesting, true);
 		}
 	}
 
@@ -573,8 +575,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		// Look for child status
 		IStatus[] children = buildingStatus.getChildren();
-		for (IStatus element : children) {
-			result |= listContentExists(element, true);
+		for (int i = 0; i < children.length; i++) {
+			result |= listContentExists(children[i], true);
 		}
 
 		return result;
@@ -596,8 +598,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 		if (children == null || children.length == 0) {
 			return status.matches(mask);
 		}
-		for (IStatus element : children) {
-			if (element.matches(mask)) {
+		for (int i = 0; i < children.length; i++) {
+			if (children[i].matches(mask)) {
 				return true;
 			}
 		}
@@ -668,8 +670,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 
 		IStatus[] children = buildingStatus.getChildren();
-		for (IStatus element : children) {
-			populateCopyBuffer(element, buffer, nesting + 1);
+		for (int i = 0; i < children.length; i++) {
+			populateCopyBuffer(children[i], buffer, nesting + 1);
 		}
 	}
 
