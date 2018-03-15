@@ -13,7 +13,7 @@
 *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
 *     Christian Georgi (SAP SE)          -  bug 458811
 *     Mickael Istria (Red Hat Inc.) - Bug 486901
-*     Patrik Suzzi <psuzzi@gmail.com> - Bug 502050, 508934
+*     Patrik Suzzi <psuzzi@gmail.com> - Bug 502050
 *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -210,6 +210,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	 */
 	private void createWorkspaceLocationGroup(Composite composite) {
 
+		boolean showLocationIsSetOnCommandLine = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
+
 		// show workspace location in window title
 		boolean isShowLocation = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION);
 		boolean isShowName = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
@@ -255,8 +257,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		// show full workspace path
 		showLocationPathInTitle = new Button(grpWindowTitle, SWT.CHECK);
 		showLocationPathInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle);
-		// if location is forced, select the button
-		showLocationPathInTitle.setSelection(forcedShowlocation || isShowLocation);
+		showLocationPathInTitle.setSelection(isShowLocation);
 
 		Composite compositeWsPath = new Composite(grpWindowTitle, SWT.NONE);
 		compositeWsPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -271,9 +272,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		Text workspacePath = new Text(compositeWsPath, SWT.READ_ONLY);
 		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		String location = (forcedShowlocation) ? commandLineLocation
-				: TextProcessor.process(Platform.getLocation().toOSString());
-		workspacePath.setText(location);
+		workspacePath.setText(TextProcessor.process(Platform.getLocation().toOSString()));
 		workspacePath.setSelection(workspacePath.getText().length());
 		workspacePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
@@ -284,7 +283,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		// disable location component if -showlocation forced
 		Stream.of(showLocationPathInTitle, locationLabel, workspacePath)
-				.forEach(c -> c.setEnabled(!forcedShowlocation));
+				.forEach(c -> c.setEnabled(!showLocationIsSetOnCommandLine));
 	}
 
     /**
@@ -477,16 +476,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         return composite;
     }
 
-	/** true if showlocation is forced via command line */
-	boolean forcedShowlocation = false;
-	/** holds the valueof the command line forced location */
-	String commandLineLocation = null;
-
 	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
 		e4Context = workbench.getService(IEclipseContext.class);
-		forcedShowlocation = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
-		commandLineLocation = (String) e4Context.get(E4Workbench.FORCED_SHOW_LOCATION);
     }
 
     /**
@@ -509,8 +501,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		boolean showLocationName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
 		boolean showPerspectiveName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE);
 		boolean showProductName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE);
-		// if location is forced, select the button
-		showLocationPathInTitle.setSelection(forcedShowlocation || showLocationPath);
+		showLocationPathInTitle.setSelection(showLocationPath);
 		showLocationNameInTitle.setSelection(showLocationName);
 		showPerspectiveNameInTitle.setSelection(showPerspectiveName);
 		showProductNameInTitle.setSelection(showProductName);
@@ -586,15 +577,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
             }
         }
 
-		// store location if not forced by command line
-		if(!forcedShowlocation) {
-			store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationPathInTitle.getSelection());
-		}
+		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationPathInTitle.getSelection());
 		store.setValue(IDEInternalPreferences.SHOW_LOCATION_NAME, showLocationNameInTitle.getSelection());
 		store.setValue(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE, showPerspectiveNameInTitle.getSelection());
 		store.setValue(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE, showProductNameInTitle.getSelection());
 
-		workspaceName.store();
+        workspaceName.store();
 
 		systemExplorer.store();
 
