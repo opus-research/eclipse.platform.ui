@@ -32,7 +32,7 @@ public class UILockListener extends LockListener {
     public class Queue {
         private static final int BASE_SIZE = 8;
 
-        protected PendingSyncExec[] elements = new PendingSyncExec[BASE_SIZE];
+        protected Semaphore[] elements = new Semaphore[BASE_SIZE];
 
         protected int head = 0;
 
@@ -42,7 +42,7 @@ public class UILockListener extends LockListener {
          * Add the semaphore to the queue.
          * @param element
          */
-        public synchronized void add(PendingSyncExec element) {
+        public synchronized void add(Semaphore element) {
             int newTail = increment(tail);
             if (newTail == head) {
                 grow();
@@ -54,7 +54,7 @@ public class UILockListener extends LockListener {
 
         private void grow() {
             int newSize = elements.length * 2;
-            PendingSyncExec[] newElements = new PendingSyncExec[newSize];
+            Semaphore[] newElements = new Semaphore[newSize];
             if (tail >= head) {
 				System.arraycopy(elements, head, newElements, head, size());
 			} else {
@@ -75,16 +75,16 @@ public class UILockListener extends LockListener {
          * Remove the next semaphore to be woken up.
          * @return
          */
-        public synchronized PendingSyncExec remove() {
+        public synchronized Semaphore remove() {
             if (tail == head) {
 				return null;
 			}
-            PendingSyncExec result = elements[head];
+            Semaphore result = elements[head];
             elements[head] = null;
             head = increment(head);
             //reset the queue if it is empty and it has grown
             if (tail == head && elements.length > BASE_SIZE) {
-                elements = new PendingSyncExec[BASE_SIZE];
+                elements = new Semaphore[BASE_SIZE];
                 tail = head = 0;
             }
             return result;
@@ -100,12 +100,9 @@ public class UILockListener extends LockListener {
 
     protected final Queue pendingWork = new Queue();
 
-    protected PendingSyncExec currentWork = null;
+    protected Semaphore currentWork = null;
 
-	/**
-	 * Points to the UI thread if it is currently waiting on a lock or null
-	 */
-	protected volatile Thread ui;
+    protected Thread ui;
 
     /**
      * Create a new instance of the receiver.
@@ -143,7 +140,7 @@ public class UILockListener extends LockListener {
         return false;
     }
 
-    void addPendingWork(PendingSyncExec work) {
+    void addPendingWork(Semaphore work) {
         pendingWork.add(work);
     }
 
@@ -152,25 +149,30 @@ public class UILockListener extends LockListener {
 		return !isUI();
 	}
 
-	/**
-	 * Should always be called from the UI thread.
-	 */
-	void doPendingWork() {
-		// Clear the interrupt flag that we may have set in interruptUI()
-		Thread.interrupted();
-		PendingSyncExec work;
-		while ((work = pendingWork.remove()) != null) {
-			// Remember the old current work before replacing, to handle
-			// the nested waiting case (bug 76378)
-			PendingSyncExec oldWork = currentWork;
-			try {
-				currentWork = work;
-				work.run();
-			} finally {
-				currentWork = oldWork;
-			}
-		}
-	}
+    /**
+     * Should always be called from the UI thread.
+     */
+    void doPendingWork() {
+    	//clear the interrupt flag that we may have set in interruptUI()
+    	Thread.interrupted();
+        Semaphore work;
+        while ((work = pendingWork.remove()) != null) {
+        	//remember the old current work before replacing, to handle
+        	//the nested waiting case (bug 76378)
+        	Semaphore oldWork = currentWork;
+            try {
+                currentWork = work;
+                Runnable runnable = work.getRunnable();
+                if (runnable != null) {
+					runnable.run();
+				}
+
+            } finally {
+                currentWork = oldWork;
+                work.release();
+            }
+        }
+    }
 
 	void interruptUI(Runnable runnable) {
 		reportInterruption(runnable);
@@ -186,10 +188,9 @@ public class UILockListener extends LockListener {
                 && (display.getThread() == Thread.currentThread());
     }
 
-	boolean isUIWaiting() {
-		Thread localUi = ui;
-		return (localUi != null) && (Thread.currentThread() != localUi);
-	}
+    boolean isUIWaiting() {
+        return (ui != null) && (Thread.currentThread() != ui);
+    }
 
 	/**
 	 * Adds a 'UI thread interrupted' message to the log with extra lock state
