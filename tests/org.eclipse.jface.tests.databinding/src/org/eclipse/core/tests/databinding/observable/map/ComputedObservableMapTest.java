@@ -12,11 +12,6 @@
 
 package org.eclipse.core.tests.databinding.observable.map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -28,8 +23,6 @@ import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.core.tests.internal.databinding.beans.Bean;
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -41,8 +34,8 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 	private String propertyName;
 	private Bean bean;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		keySet = new WritableSet();
 		map = new ComputedObservableMapStub(keySet);
@@ -50,38 +43,32 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 		bean = new Bean("a");
 	}
 
-	@Test
 	public void testGet_ElementNotInKeySet() {
 		assertNull(map.get(bean));
 	}
 
-	@Test
 	public void testGet_ElementInKeySet() {
 		keySet.add(bean);
 		assertEquals("a", map.get(bean));
 	}
 
-	@Test
 	public void testPut_ElementNotInKeySet() {
 		assertNull(map.put(bean, "b"));
 		assertEquals("a", bean.getValue());
 	}
 
-	@Test
 	public void testPut_ElementInKeySet() {
 		keySet.add(bean);
 		assertEquals("a", map.put(bean, "b"));
 		assertEquals("b", map.get(bean));
 	}
 
-	@Test
 	public void testAddToKeySet_BeforeFirstListenerAdded_DoesNotAddListenerToKey() {
 		assertFalse(bean.hasListeners(propertyName));
 		keySet.add(bean);
 		assertFalse(bean.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testAddToKeySet_AfterFirstListenerAdded_AddsListenerToKey() {
 		ChangeEventTracker.observe(map);
 		assertFalse(bean.hasListeners(propertyName));
@@ -89,7 +76,6 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 		assertTrue(bean.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testRemoveFromKeySet_RemovesListenersFromKey() {
 		ChangeEventTracker.observe(map);
 		keySet.add(bean);
@@ -98,7 +84,6 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 		assertFalse(bean.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testRemoveLastListener_DoNotDiscardKeySet() {
 		IChangeListener listener = new IChangeListener() {
 			@Override
@@ -112,7 +97,6 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, map.size());
 	}
 
-	@Test
 	public void testDispose_RemoveListenersFromKeySetElements() {
 		ChangeEventTracker.observe(map);
 		keySet.add(bean);
@@ -121,14 +105,12 @@ public class ComputedObservableMapTest extends AbstractDefaultRealmTestCase {
 		assertFalse(bean.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testDisposeKeySet_DisposesMap() {
 		assertFalse(map.isDisposed());
 		keySet.dispose();
 		assertTrue(map.isDisposed());
 	}
 
-	@Test
 	public void testDisposeKeySet_RemoveListenersFromKeySetElements() {
 		ChangeEventTracker.observe(map);
 		keySet.add(bean);

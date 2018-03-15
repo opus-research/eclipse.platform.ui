@@ -13,41 +13,36 @@
 
 package org.eclipse.core.tests.databinding.observable.map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.databinding.observable.map.MapDiff;
 import org.eclipse.core.databinding.observable.map.ObservableMap;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.MapChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
  *
  */
-public class ObservableMapTest {
+public class ObservableMapTest extends TestCase {
 	ObservableMapStub map;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 		map = new ObservableMapStub(new HashMap());
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
-	@Test
 	public void testDisposeMapChangeListeners() throws Exception {
 		MapChangeEventTracker listener = MapChangeEventTracker.observe(map);
 
@@ -66,7 +61,6 @@ public class ObservableMapTest {
 				listener.count);
 	}
 
-	@Test
 	public void testIsStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -76,7 +70,6 @@ public class ObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testSetStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -86,7 +79,6 @@ public class ObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testFireMapChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -96,7 +88,6 @@ public class ObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testEquals() {
 		assertTrue(map.equals(Collections.EMPTY_MAP));
 	}

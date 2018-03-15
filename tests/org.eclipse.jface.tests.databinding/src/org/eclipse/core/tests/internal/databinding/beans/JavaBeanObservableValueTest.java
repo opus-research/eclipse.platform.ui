@@ -14,12 +14,10 @@
 
 package org.eclipse.core.tests.internal.databinding.beans;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.beans.PropertyDescriptor;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -40,10 +38,6 @@ import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
 import org.eclipse.jface.examples.databinding.model.SimplePerson;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -56,8 +50,7 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 	private String propertyName;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		bean = new Bean();
@@ -68,17 +61,14 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		beanObservable = (IBeanObservable) observableValue;
 	}
 
-	@Test
 	public void testGetObserved() throws Exception {
 		assertEquals(bean, beanObservable.getObserved());
 	}
 
-	@Test
 	public void testGetPropertyDescriptor() throws Exception {
 		assertEquals(propertyDescriptor, beanObservable.getPropertyDescriptor());
 	}
 
-	@Test
 	public void testSetValueThrowsExceptionThrownByBean() throws Exception {
 		ThrowsSetException temp = new ThrowsSetException();
 		IObservableValue observable = BeansObservables.observeValue(temp,
@@ -92,7 +82,6 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testGetValueThrowsExceptionThrownByBean() throws Exception {
 		ThrowsGetException temp = new ThrowsGetException();
 		IObservableValue observable = BeansObservables.observeValue(temp,
@@ -106,7 +95,6 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testBug198519() {
 		final SimplePerson person = new SimplePerson();
 		final ComputedValue cv = new ComputedValue() {
@@ -127,7 +115,6 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		person.setName("foo");
 	}
 
-	@Test
 	public void testConstructor_RegistersListeners() throws Exception {
 		IObservableValue observable = BeansObservables.observeValue(bean,
 				propertyName);
@@ -136,7 +123,6 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertTrue(bean.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testConstructor_SkipRegisterListeners() throws Exception {
 		IObservableValue observable = PojoObservables.observeValue(bean,
 				propertyName);
@@ -145,7 +131,6 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertFalse(bean.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testSetBeanProperty_CorrectForNullOldAndNewValues() {
 		// The java bean spec allows the old and new values in a
 		// PropertyChangeEvent to
@@ -167,7 +152,6 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals("new", tracker.event.diff.getNewValue());
 	}
 
-	@Test
 	public void testSetBeanPropertyOutsideRealm_FiresEventInsideRealm() {
 		Bean bean = new Bean("old");
 		CurrentRealm realm = new CurrentRealm(true);
@@ -185,8 +169,10 @@ public class JavaBeanObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Diffs.createValueDiff("old", "new"), tracker.event.diff);
 	}
 
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(JavaBeanObservableValueTest.class.getName());
+	public static Test suite() {
+		TestSuite suite = new TestSuite(JavaBeanObservableValueTest.class
+				.getName());
+		suite.addTestSuite(JavaBeanObservableValueTest.class);
 		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
 		return suite;
 	}

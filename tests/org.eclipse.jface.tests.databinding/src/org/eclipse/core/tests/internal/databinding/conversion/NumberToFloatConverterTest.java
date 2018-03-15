@@ -13,7 +13,6 @@ package org.eclipse.core.tests.internal.databinding.conversion;
 
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.internal.databinding.conversion.NumberToFloatConverter;
-import org.junit.Before;
 
 import com.ibm.icu.text.NumberFormat;
 
@@ -23,8 +22,10 @@ import com.ibm.icu.text.NumberFormat;
 public class NumberToFloatConverterTest extends NumberToNumberTestHarness {
 	private NumberFormat numberFormat;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
 		numberFormat = NumberFormat.getInstance();
 	}
 

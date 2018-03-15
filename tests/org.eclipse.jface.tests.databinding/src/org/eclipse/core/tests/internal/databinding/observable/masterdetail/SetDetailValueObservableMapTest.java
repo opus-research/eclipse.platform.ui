@@ -11,14 +11,11 @@
 
 package org.eclipse.core.tests.internal.databinding.observable.masterdetail;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -29,7 +26,6 @@ import org.eclipse.core.internal.databinding.observable.masterdetail.SetDetailVa
 import org.eclipse.jface.databinding.conformance.util.MapChangeEventTracker;
 import org.eclipse.jface.examples.databinding.model.SimplePerson;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Test;
 
 /**
  * @since 1.3
@@ -37,7 +33,13 @@ import org.junit.Test;
 public class SetDetailValueObservableMapTest extends
 		AbstractDefaultRealmTestCase {
 
-	@Test
+	public static Test suite() {
+		TestSuite suite = new TestSuite(SetDetailValueObservableMapTest.class
+				.getName());
+		suite.addTestSuite(SetDetailValueObservableMapTest.class);
+		return suite;
+	}
+
 	public void testGetValueType() {
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
 				new WritableSet(), BeansObservables.valueFactory("name"),
@@ -46,7 +48,6 @@ public class SetDetailValueObservableMapTest extends
 		assertSame(String.class, sdom.getValueType());
 	}
 
-	@Test
 	public void testGetObserved() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -57,7 +58,6 @@ public class SetDetailValueObservableMapTest extends
 		assertSame(masterKeySet, sdom.getObserved());
 	}
 
-	@Test
 	public void testMasterSetInitiallyNotEmpty() {
 		WritableSet masterKeySet = new WritableSet();
 		SimplePerson person = new SimplePerson();
@@ -72,7 +72,6 @@ public class SetDetailValueObservableMapTest extends
 		assertEquals(person.getName(), sdom.get(person));
 	}
 
-	@Test
 	public void testAddRemove() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -107,7 +106,6 @@ public class SetDetailValueObservableMapTest extends
 		assertTrue(sdom.isEmpty());
 	}
 
-	@Test
 	public void testChangeDetail() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -129,7 +127,6 @@ public class SetDetailValueObservableMapTest extends
 		assertEquals(p2.getName(), sdom.get(p2));
 	}
 
-	@Test
 	public void testPut() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -149,7 +146,6 @@ public class SetDetailValueObservableMapTest extends
 		assertEquals(person.getName(), sdom.get(person));
 	}
 
-	@Test
 	public void testContainsValue() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -170,7 +166,6 @@ public class SetDetailValueObservableMapTest extends
 		assertFalse(sdom.containsValue(person.getName()));
 	}
 
-	@Test
 	public void testRemove() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -198,7 +193,6 @@ public class SetDetailValueObservableMapTest extends
 		assertTrue(sdom.containsKey(p2));
 	}
 
-	@Test
 	public void testDetailObservableChangeEvent() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -238,7 +232,6 @@ public class SetDetailValueObservableMapTest extends
 		assertEquals("new name", changeTracker.event.diff.getNewValue(person));
 	}
 
-	@Test
 	public void testMasterNull() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(
@@ -251,7 +244,6 @@ public class SetDetailValueObservableMapTest extends
 		assertNull(sdom.get(null));
 	}
 
-	@Test
 	public void testDetailObservableValuesAreDisposed() {
 		final Map detailObservables = new HashMap();
 		IObservableFactory detailValueFactory = new IObservableFactory() {
@@ -301,7 +293,6 @@ public class SetDetailValueObservableMapTest extends
 				.isDisposed());
 	}
 
-	@Test
 	public void testDisposeOnMasterDisposed() {
 		WritableSet masterKeySet = new WritableSet();
 		SetDetailValueObservableMap sdom = new SetDetailValueObservableMap(

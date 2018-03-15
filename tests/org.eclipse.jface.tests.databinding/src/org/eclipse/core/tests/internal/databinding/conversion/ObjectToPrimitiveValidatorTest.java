@@ -11,24 +11,21 @@
 
 package org.eclipse.core.tests.internal.databinding.conversion;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
 import org.eclipse.core.internal.databinding.validation.ObjectToPrimitiveValidator;
 import org.eclipse.core.runtime.IStatus;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
  *
  */
-public class ObjectToPrimitiveValidatorTest {
+public class ObjectToPrimitiveValidatorTest extends TestCase {
 
 	private ObjectToPrimitiveValidator objectToPrimitiveValidator;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		this.objectToPrimitiveValidator = new ObjectToPrimitiveValidator(
 				Integer.TYPE);
 	}
@@ -37,7 +34,6 @@ public class ObjectToPrimitiveValidatorTest {
 	 * Test method for
 	 * {@link org.eclipse.jface.internal.databinding.provisional.validation.ObjectToPrimitiveValidator#isValid(java.lang.Object)}.
 	 */
-	@Test
 	public void testIsValid() {
 		IStatus result = this.objectToPrimitiveValidator.validate(null);
 		assertEquals("The wrong validation error was found.", result

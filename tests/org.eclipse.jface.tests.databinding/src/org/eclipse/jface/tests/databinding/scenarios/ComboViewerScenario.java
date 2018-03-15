@@ -13,8 +13,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.databinding.scenarios;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.list.IObservableList;
@@ -29,9 +27,6 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * To run the tests in this class, right-click and select "Run As JUnit Plug-in
@@ -48,8 +43,8 @@ public class ComboViewerScenario extends ScenariosTestCase {
 
 	private ComboViewer comboViewer;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		// do any setup work here
 		combo = new Combo(getComposite(), SWT.READ_ONLY | SWT.DROP_DOWN);
@@ -57,15 +52,14 @@ public class ComboViewerScenario extends ScenariosTestCase {
 		catalog = SampleData.CATALOG_2005; // Lodging source
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		combo.dispose();
 		combo = null;
 		comboViewer = null;
 		super.tearDown();
 	}
 
-	@Test
 	public void testScenario01() {
 		// Bind the catalog's lodgings to the combo
 		IObservableList lodgings = BeansObservables.observeList(realm, catalog,

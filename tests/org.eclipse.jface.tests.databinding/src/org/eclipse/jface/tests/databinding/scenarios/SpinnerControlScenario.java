@@ -12,17 +12,12 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.databinding.scenarios;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.examples.databinding.model.Adventure;
 import org.eclipse.jface.examples.databinding.model.SampleData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Spinner;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * To run the tests in this class, right-click and select "Run As JUnit Plug-in
@@ -35,21 +30,20 @@ public class SpinnerControlScenario extends ScenariosTestCase {
 
     private Adventure adventure;
 
-    @Before
-	public void setUp() throws Exception {
+    @Override
+	protected void setUp() throws Exception {
         super.setUp();
         // do any setup work here
         adventure = SampleData.WINTER_HOLIDAY;
     }
 
-    @After
-	public void tearDown() throws Exception {
+    @Override
+	protected void tearDown() throws Exception {
         // do any teardown work here
         super.tearDown();
     }
 
-    @Test
-	public void testScenario01() {
+    public void testScenario01() {
         // Bind the adventure "maxNumberOfPeople" property to a spinner
         // Change the UI and verify the model changes
         // Change the model and verify the UI changes

@@ -11,14 +11,12 @@
 
 package org.eclipse.core.tests.databinding.observable.set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.AbstractObservable;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -32,30 +30,23 @@ import org.eclipse.jface.databinding.conformance.ObservableCollectionContractTes
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.SetChangeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 public class ComputedSetTest extends AbstractDefaultRealmTestCase {
 	ComputedSetStub set;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		set = new ComputedSetStub();
 		set.size(); // Force set to compute
 	}
 
-	@Test
 	public void testDependency_Staleness() {
 		assertFalse(set.isStale());
 		set.dependency.fireStale();
 		assertTrue(set.isStale());
 	}
 
-	@Test
 	public void testDependency_FiresSetChange() {
 		assertEquals(set.nextComputation, set);
 
@@ -67,7 +58,6 @@ public class ComputedSetTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Collections.singleton(element), set);
 	}
 
-	@Test
 	public void testDependency_NoStaleEventIfAlreadyDirty() {
 		set.dependency.fireChange();
 		set.addStaleListener(new IStaleListener() {
@@ -79,7 +69,6 @@ public class ComputedSetTest extends AbstractDefaultRealmTestCase {
 		set.dependency.fireStale();
 	}
 
-	@Test
 	public void testDependency_SetChangeEventFiresOnlyWhenNotDirty() {
 		SetChangeEventTracker tracker = SetChangeEventTracker.observe(set);
 
@@ -144,8 +133,9 @@ public class ComputedSetTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(ComputedSetTest.class.getName());
+		suite.addTestSuite(ComputedSetTest.class);
 		suite.addTest(ObservableCollectionContractTest.suite(new Delegate()));
 		return suite;
 	}

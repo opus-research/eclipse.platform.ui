@@ -12,9 +12,8 @@
 
 package org.eclipse.core.tests.internal.databinding.observable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -27,11 +26,6 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValu
 import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Display;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * Tests for DelayedObservableValue
@@ -45,8 +39,7 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 	private IObservableValue delayed;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		target = new ObservableValueStub(Realm.getDefault());
 		oldValue = new Object();
@@ -56,14 +49,12 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 	}
 
 	@Override
-	@After
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 		target.dispose();
 		target = null;
 		super.tearDown();
 	}
 
-	@Test
 	public void testIsStale_WhenTargetIsStale() {
 		assertFalse(target.isStale());
 		assertFalse(delayed.isStale());
@@ -74,7 +65,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertTrue(delayed.isStale());
 	}
 
-	@Test
 	public void testIsStale_DuringDelay() {
 		assertFalse(target.isStale());
 		assertFalse(delayed.isStale());
@@ -85,12 +75,10 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertTrue(delayed.isStale());
 	}
 
-	@Test
 	public void testGetValueType_SameAsTarget() {
 		assertEquals(target.getValueType(), delayed.getValueType());
 	}
 
-	@Test
 	public void testGetValue_FiresPendingValueChange() {
 		assertFiresPendingValueChange(new Runnable() {
 			@Override
@@ -101,7 +89,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testSetValue_PropagatesToTarget() {
 		assertEquals(oldValue, delayed.getValue());
 		assertEquals(oldValue, target.getValue());
@@ -112,7 +99,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(newValue, delayed.getValue());
 	}
 
-	@Test
 	public void testSetValue_CachesGetValueFromTarget() {
 		Object overrideValue = target.overrideValue = new Object();
 
@@ -125,7 +111,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(overrideValue, delayed.getValue());
 	}
 
-	@Test
 	public void testSetValue_FiresValueChangeEvent() {
 		ValueChangeEventTracker targetTracker = ValueChangeEventTracker
 				.observe(target);
@@ -143,7 +128,6 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(newValue, delayedTracker.event.diff.getNewValue());
 	}
 
-	@Test
 	public void testWait_FiresPendingValueChange() {
 		assertFiresPendingValueChange(new Runnable() {
 			@Override
@@ -234,9 +218,12 @@ public class DelayedObservableValueTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(DelayedObservableValueTest.class.getName());
-		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
+	public static Test suite() {
+		TestSuite suite = new TestSuite(DelayedObservableValueTest.class
+				.getName());
+		suite.addTestSuite(DelayedObservableValueTest.class);
+		suite.addTest(MutableObservableValueContractTest
+				.suite(new Delegate()));
 		return suite;
 	}
 
