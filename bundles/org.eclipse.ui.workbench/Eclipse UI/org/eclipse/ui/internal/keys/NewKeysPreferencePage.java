@@ -230,7 +230,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 
 		public BindingModelComparator() {
 			for (int i = 0; i < NUM_OF_COLUMNS; i++) {
-				sortColumns.add(Integer.valueOf(i));
+				sortColumns.add(new Integer(i));
 			}
 		}
 
@@ -242,7 +242,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 			if (column == getSortColumn()) {
 				return;
 			}
-			Integer sortColumn = Integer.valueOf(column);
+			Integer sortColumn = new Integer(column);
 			sortColumns.remove(sortColumn);
 			sortColumns.addFirst(sortColumn);
 		}

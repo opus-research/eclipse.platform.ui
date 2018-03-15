@@ -28,8 +28,8 @@ public class IntegerFieldEditor extends StringFieldEditor {
     private static final int DEFAULT_TEXT_LIMIT = 10;
 
     /**
-	 * Creates a new field editor
-	 */
+    * Creates a new integer field editor
+    */
     protected IntegerFieldEditor() {
     }
 
