@@ -57,8 +57,8 @@ class MarkerCategory extends MarkerSupportItem {
 			int totalSize = getChildrenCount();
 			children = new MarkerEntry[totalSize];
 			System.arraycopy(allMarkers, start, children, 0, totalSize);
-			for (MarkerEntry markerEntry : children) {
-				markerEntry.setCategory(this);
+			for (int i = 0; i < children.length; i++) {
+				children[i].setCategory(this);
 			}
 		}
 		return children;
@@ -106,9 +106,10 @@ class MarkerCategory extends MarkerSupportItem {
 		if (severity >= 0)
 			return severity;
 		severity = 0;// Reset to info
-		for (MarkerSupportItem supportItem : getChildren()) {
-			if (supportItem.isConcrete()) {
-				int elementSeverity = supportItem.getAttributeValue(
+		MarkerSupportItem[] contents = getChildren();
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i].isConcrete()) {
+				int elementSeverity = contents[i].getAttributeValue(
 						IMarker.SEVERITY, -1);
 				if (elementSeverity > severity)
 					severity = elementSeverity;
@@ -143,8 +144,9 @@ class MarkerCategory extends MarkerSupportItem {
 	 */
 	@Override
 	void clearCache() {
-		for (MarkerSupportItem supportItem : getChildren()) {
-			supportItem.clearCache();
+		MarkerSupportItem[] entries = getChildren();
+		for (int i = 0; i < entries.length; i++) {
+			entries[i].clearCache();
 		}
 	}
 
