@@ -37,13 +37,13 @@ public class WizardContentProvider implements ITreeContentProvider {
             WizardCollectionElement element = (WizardCollectionElement) parentElement;
 
             Object[] childCollections = element.getChildren();
-            for (Object childCollection : childCollections) {
-                handleChild(childCollection, list);
+            for (int i = 0; i < childCollections.length; i++) {
+                handleChild(childCollections[i], list);
             }
 
             Object[] childWizards = element.getWizards();
-            for (Object childWizard : childWizards) {
-                handleChild(childWizard, list);
+            for (int i = 0; i < childWizards.length; i++) {
+                handleChild(childWizards[i], list);
             }
 
             // flatten lists with only one category
@@ -57,8 +57,8 @@ public class WizardContentProvider implements ITreeContentProvider {
             AdaptableList aList = (AdaptableList) parentElement;
             Object[] children = aList.getChildren();
             ArrayList list = new ArrayList(children.length);
-            for (Object element : children) {
-                handleChild(element, list);
+            for (int i = 0; i < children.length; i++) {
+                handleChild(children[i], list);
             }
             // if there is only one category, return it's children directly (flatten list)
             if (list.size() == 1
@@ -81,8 +81,8 @@ public class WizardContentProvider implements ITreeContentProvider {
 	public Object getParent(Object element) {
         if (element instanceof WizardCollectionElement) {
             Object[] children = input.getChildren();
-            for (Object element2 : children) {
-                if (element2.equals(element)) {
+            for (int i = 0; i < children.length; i++) {
+                if (children[i].equals(element)) {
 					return input;
 				}
             }

@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -417,8 +418,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 * states need to change as a result of their ShortcutItems.
 		 */
 		public void update() {
-			for (ShortcutItem shortcutItem : contributionItems) {
-				DisplayItem item = shortcutItem;
+			for (Iterator<ShortcutItem> i = contributionItems.iterator(); i.hasNext();) {
+				DisplayItem item = i.next();
 				if (item.getState()) {
 					this.setCheckState(true);
 					return;

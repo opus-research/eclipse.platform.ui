@@ -93,11 +93,11 @@ public class CyclePageHandler extends FilteredTableBaseHandler {
 
 	protected void addItemz(Table table, WorkbenchPage page) {
 		Object[] pages = pageSwitcher.getPages();
-		for (Object page2 : pages) {
+		for (int i = 0; i < pages.length; i++) {
 			TableItem item = null;
 			item = new TableItem(table, SWT.NONE);
 			ImageDescriptor imageDescriptor = pageSwitcher
-					.getImageDescriptor(page2);
+					.getImageDescriptor(pages[i]);
 			if (imageDescriptor != null) {
 				if (lrm == null) {
 					lrm = new LocalResourceManager(JFaceResources
@@ -105,8 +105,8 @@ public class CyclePageHandler extends FilteredTableBaseHandler {
 				}
 				item.setImage(lrm.createImage(imageDescriptor));
 			}
-			item.setData(page2);
-			String name = pageSwitcher.getName(page2);
+			item.setData(pages[i]);
+			String name = pageSwitcher.getName(pages[i]);
 			if (name.length() > TEXT_LIMIT) {
 				name = name.substring(0, TEXT_LIMIT) + "..."; //$NON-NLS-1$
 			}

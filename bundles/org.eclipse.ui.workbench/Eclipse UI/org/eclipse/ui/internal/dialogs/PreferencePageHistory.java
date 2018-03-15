@@ -141,9 +141,9 @@ class PreferencePageHistory {
 	private void updateHistoryControls() {
 		historyToolbar.update(false);
 		IContributionItem[] items = historyToolbar.getItems();
-		for (IContributionItem item : items) {
-			item.update(IAction.ENABLED);
-			item.update(IAction.TOOL_TIP_TEXT);
+		for (int i = 0; i < items.length; i++) {
+			items[i].update(IAction.ENABLED);
+			items[i].update(IAction.TOOL_TIP_TEXT);
 		}
 	}
 

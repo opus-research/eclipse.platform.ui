@@ -146,7 +146,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
      */
     private boolean allActivityEnabled(IWizardCategory category) {
         IWizardDescriptor [] wizards = category.getWizards();
-        for (IWizardDescriptor wizard : wizards) {
+        for (int i = 0; i < wizards.length; i++) {
+            IWizardDescriptor wizard = wizards[i];
             if (WorkbenchActivityHelper.filterItem(wizard)) {
 				return false;
 			}
@@ -172,9 +173,9 @@ class NewWizardNewPage implements ISelectionChangedListener {
 			return;//No categories so nothing to trim
 		}
 
-        for (IWizardDescriptor primaryWizard : primaryWizards) {
-            if (wizardCategories.findWizard(primaryWizard.getId()) != null) {
-				newPrimaryWizards.add(primaryWizard);
+        for (int i = 0; i < primaryWizards.length; i++) {
+            if (wizardCategories.findWizard(primaryWizards[i].getId()) != null) {
+				newPrimaryWizards.add(primaryWizards[i]);
 			}
         }
 
@@ -188,8 +189,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
      */
     private boolean allPrimary(IWizardCategory category) {
         IWizardDescriptor [] wizards = category.getWizards();
-        for (IWizardDescriptor wizard2 : wizards) {
-        	IWizardDescriptor wizard = wizard2;
+        for (int i = 0; i < wizards.length; i++) {
+        	IWizardDescriptor wizard = wizards[i];
             if (!isPrimary(wizard)) {
 				return false;
 			}
@@ -210,8 +211,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
      * @return whether the given wizard is primary
      */
     private boolean isPrimary(IWizardDescriptor wizard) {
-        for (IWizardDescriptor primaryWizard : primaryWizards) {
-            if (primaryWizard.equals(wizard)) {
+        for (int j = 0; j < primaryWizards.length; j++) {
+            if (primaryWizards[j].equals(wizard)) {
 				return true;
 			}
         }
@@ -309,8 +310,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
         ArrayList inputArray = new ArrayList();
 
-        for (IWizardDescriptor primaryWizard : primaryWizards) {
-            inputArray.add(primaryWizard);
+        for (int i = 0; i < primaryWizards.length; i++) {
+            inputArray.add(primaryWizards[i]);
         }
 
         boolean expandTop = false;
@@ -318,8 +319,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
         if (wizardCategories != null) {
             if (wizardCategories.getParent() == null) {
                 IWizardCategory [] children = wizardCategories.getCategories();
-                for (IWizardCategory element : children) {
-                    inputArray.add(element);
+                for (int i = 0; i < children.length; i++) {
+                    inputArray.add(children[i]);
                 }
             } else {
                 expandTop = true;
@@ -485,9 +486,9 @@ class NewWizardNewPage implements ISelectionChangedListener {
         List categoriesToExpand = new ArrayList(expandedCategoryPaths.length);
 
         if (wizardCategories != null) {
-            for (String expandedCategoryPath : expandedCategoryPaths) {
+            for (int i = 0; i < expandedCategoryPaths.length; i++) {
                 IWizardCategory category = wizardCategories
-                        .findCategory(new Path(expandedCategoryPath));
+                        .findCategory(new Path(expandedCategoryPaths[i]));
                 if (category != null) {
 					categoriesToExpand.add(category);
 				}
@@ -606,10 +607,10 @@ class NewWizardNewPage implements ISelectionChangedListener {
     protected void storeExpandedCategories() {
         Object[] expandedElements = filteredTree.getViewer().getExpandedElements();
         List expandedElementPaths = new ArrayList(expandedElements.length);
-        for (Object expandedElement : expandedElements) {
-            if (expandedElement instanceof IWizardCategory) {
+        for (int i = 0; i < expandedElements.length; ++i) {
+            if (expandedElements[i] instanceof IWizardCategory) {
 				expandedElementPaths
-                        .add(((IWizardCategory) expandedElement)
+                        .add(((IWizardCategory) expandedElements[i])
                                 .getPath().toString());
 			}
         }

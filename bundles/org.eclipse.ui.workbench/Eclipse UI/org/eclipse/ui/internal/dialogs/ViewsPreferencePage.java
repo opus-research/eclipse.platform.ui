@@ -495,13 +495,13 @@ public class ViewsPreferencePage extends PreferencePage implements
 		result.add(new ColorsAndFontsTheme(IThemeManager.DEFAULT_THEME, defaultThemeString));
 
 		String themeString;
-		for (IThemeDescriptor desc : descs) {
-			themeString = desc.getName();
-			if (desc.getId().equals(currentTheme.getId())) {
+		for (int i = 0; i < descs.length; i++) {
+			themeString = descs[i].getName();
+			if (descs[i].getId().equals(currentTheme.getId())) {
 				themeString = NLS.bind(WorkbenchMessages.ViewsPreference_currentThemeFormat,
 						new Object[] { themeString });
 			}
-			result.add(new ColorsAndFontsTheme(desc.getId(), themeString));
+			result.add(new ColorsAndFontsTheme(descs[i].getId(), themeString));
 		}
 		return result;
 	}
