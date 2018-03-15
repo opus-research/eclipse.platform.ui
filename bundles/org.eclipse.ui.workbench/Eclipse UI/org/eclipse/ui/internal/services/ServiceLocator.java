@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.services.AbstractServiceFactory;
@@ -76,7 +75,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	private IDisposable owner;
 
-	private IEclipseContext e4Context;
+	private volatile IEclipseContext e4Context;
 
 	private final Map<Class<?>, Object> servicesToDispose = new ConcurrentHashMap<>();
 
@@ -128,7 +127,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	@Override
 	public final void dispose() {
-		disposed = true;
 		disposeServices();
 		if (servicesToDispose.size() > 0) {
 			// If someone registered during shutdown, dispose of it too.
@@ -145,6 +143,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 					null));
 		}
 		servicesToDispose.clear();
+		disposed = true;
 		e4Context = null;
 		owner = null;
 	}
@@ -164,21 +163,22 @@ public final class ServiceLocator implements IDisposable, INestable,
 	@SuppressWarnings("unchecked")
 	@Override
 	public final <T> T getService(final Class<T> key) {
-		if (disposed) {
+		IEclipseContext context = e4Context;
+		if (context == null) {
 			return null;
-		} else if (IEclipseContext.class.equals(key)) {
-			return (T) e4Context;
 		}
-		checkUiThread();
+		if (IEclipseContext.class.equals(key)) {
+			return (T) context;
+		}
 
-		Object service = e4Context.get(key.getName());
+		Object service = context.get(key.getName());
 		if (service == null) {
 			// this scenario can happen when we dispose the service locator
 			// after the window has been removed, in that case the window's
 			// context has been destroyed so we should check our own local cache
 			// of services first before checking the registry
 			service = servicesToDispose.get(key);
-		} else if (service == e4Context.getLocal(key.getName())) {
+		} else if (service == context.getLocal(key.getName())) {
 			// store this service retrieved from the context in the map only if
 			// it is a local service for this context, as otherwise we do not
 			// want to dispose it when this service locator gets disposed
@@ -209,10 +209,11 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	@Override
 	public final boolean hasService(final Class<?> key) {
-		if (disposed) {
+		IEclipseContext context = e4Context;
+		if (context == null) {
 			return false;
 		}
-		return e4Context.containsKey(key.getName());
+		return context.containsKey(key.getName());
 	}
 
 	/**
@@ -240,8 +241,11 @@ public final class ServiceLocator implements IDisposable, INestable,
 			throw new IllegalArgumentException(
 					"The service does not implement the given interface"); //$NON-NLS-1$
 		}
-
-		checkUiThread();
+		if (isDisposed()) {
+			throw new IllegalStateException("An attempt was made to register service " + service //$NON-NLS-1$
+					+ " with implementation class " + api + " on a disposed service locator"); //$NON-NLS-1$//$NON-NLS-2$
+																								// ;
+		}
 
 		if (service instanceof INestable && activated) {
 			((INestable) service).activate();
@@ -250,7 +254,11 @@ public final class ServiceLocator implements IDisposable, INestable,
 		servicesToDispose.put(api, service);
 
 		if (saveInContext) {
-			e4Context.set(api.getName(), service);
+			IEclipseContext context = e4Context;
+			if (context == null) {
+				return;
+			}
+			context.set(api.getName(), service);
 		}
 	}
 
@@ -259,14 +267,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 	 */
 	public boolean isDisposed() {
 		return disposed;
-	}
-
-	void checkUiThread() {
-		if (Display.getCurrent() == null) {
-			IllegalStateException e = new IllegalStateException(
-					"Unexpected access to ServiceLocator from non-UI thread " + Thread.currentThread().getName()); //$NON-NLS-1$
-			WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING, e.getMessage(), e));
-		}
 	}
 
 	/**
