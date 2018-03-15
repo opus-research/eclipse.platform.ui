@@ -12,10 +12,6 @@
 
 package org.eclipse.ui.tests.statushandlers;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -38,7 +34,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -54,7 +49,6 @@ import org.eclipse.ui.statushandlers.AbstractStatusAreaProvider;
 import org.eclipse.ui.statushandlers.IStatusAdapterConstants;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.eclipse.ui.statushandlers.StatusManager.INotificationListener;
 import org.eclipse.ui.statushandlers.WorkbenchErrorHandler;
 import org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager;
 import org.eclipse.ui.tests.harness.util.UITestCase;
@@ -1055,76 +1049,6 @@ public class StatusDialogManagerTest extends TestCase {
 		assertTrue("Custom support area provider should be consulted", consulted[0]);
 	}
 
-	public void testDeadlockFromBug501681() throws Exception {
-		assertNotNull("Test must run in UI thread", Display.getCurrent());
-		final StatusAdapter statusAdapter = createStatusAdapter("Oops");
-		AtomicReference<StatusAdapter[]> reported = new AtomicReference<>();
-		INotificationListener listener = (type, adapters) -> {
-			reported.set(adapters);
-		};
-
-		AtomicReference<ReentrantLock> lock = new AtomicReference<>();
-		lock.set(new ReentrantLock());
-		AtomicBoolean wait = new AtomicBoolean(true);
-
-		// This simulates a thread locked some shared resource
-		// It will release lock only if "wait" is set to "false"
-		Thread t = new Thread(() -> {
-			lock.get().lock();
-			while (wait.get()) {
-				try {
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					// ignore
-				}
-			}
-			lock.get().unlock();
-		});
-		t.start();
-
-		// Wait for thread to acquire the lock
-		while (!lock.get().isLocked()) {
-			Thread.sleep(50);
-		}
-		assertTrue(lock.get().isLocked());
-
-		StatusManager.getManager().addListener(listener);
-		try {
-			// this job will try to report some "blocking" status
-			// if it does NOT deadlock, the "wait" will be unset and lock will
-			// be released
-			Job badJob = new Job("Will report blocking error") {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					StatusManager.getManager().handle(statusAdapter, StatusManager.BLOCK | StatusManager.LOG);
-					wait.set(false);
-					return Status.OK_STATUS;
-				}
-			};
-
-			// start later so that we have time to lock ourselves
-			badJob.schedule(100);
-
-			// This will now block UI until the lock is released
-			// Without the patch for bug 501681 this will never happen
-			// because the job we start in a moment will wait for UI thread to
-			// show the blocking dialog
-			lock.get().lock();
-		} finally {
-			StatusManager.getManager().removeListener(listener);
-		}
-
-		assertFalse("Job should successfully finish", wait.get());
-		assertSame(statusAdapter, reported.get()[0]);
-
-		// Will "unblock" the blocking dialog shown by the job
-		Display.getDefault().timerExec(500, () -> {
-			Shell shell = StatusDialogUtil.getStatusShellImmediately();
-			if (shell != null) {
-				shell.dispose();
-			}
-		});
-	}
 
 	/**
 	 * Delivers custom support area.

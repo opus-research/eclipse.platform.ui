@@ -185,7 +185,7 @@ public class SmartImportJob extends Job {
 				directories.addAll(this.directoriesToImport);
 				SortedMap<File, IProject> leafToRootProjects = new TreeMap<>(Collections.reverseOrder(rootToLeafComparator));
 				final Set<IProject> alreadyConfiguredProjects = new HashSet<>();
-				loopMonitor.worked(1);
+				loopMonitor.step(1);
 				for (final File directoryToImport : directories) {
 					final boolean alreadyAnEclipseProject = new File(directoryToImport, IProjectDescription.DESCRIPTION_FILE_NAME).isFile();
 					try {
@@ -195,7 +195,7 @@ public class SmartImportJob extends Job {
 							alreadyConfiguredProjects.add(newProject);
 						}
 						leafToRootProjects.put(directoryToImport, newProject);
-						loopMonitor.worked(1);
+						loopMonitor.step(1);
 					} catch (CouldNotImportProjectException ex) {
 						Path path = new Path(directoryToImport.getAbsolutePath());
 						if (listener != null) {
@@ -364,13 +364,12 @@ public class SmartImportJob extends Job {
 				crawlerJob.schedule();
 			} else {
 				crawlerJob.run(subMonitor);
-				subMonitor.worked(1);
+				subMonitor.step(1);
 			}
 		}
 		for (CrawlFolderJob job : jobs) {
 			job.join(0, subMonitor.split(1));
 		}
-		subMonitor.done();
 		return res;
 	}
 

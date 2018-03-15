@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Serge Beauchamp (Freescale Semiconductor) - Bug 229633
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -652,7 +651,8 @@ public class CopyFilesAndFoldersOperation {
 		IDEWorkbenchPlugin.getDefault().getLog().log(
 				StatusUtil.newStatus(IStatus.ERROR, MessageFormat.format(
 						"Exception in {0}.performCopy(): {1}", //$NON-NLS-1$
-						getClass().getName(), e.getTargetException()), null));
+						new Object[] { getClass().getName(),
+								e.getTargetException() }), null));
 		displayError(NLS
 				.bind(
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_internalError,
@@ -1793,9 +1793,9 @@ public class CopyFilesAndFoldersOperation {
 		// creating the task.
 		SubMonitor subMonitor = SubMonitor.convert(mon, 100);
 		subMonitor.setTaskName(getOperationTitle());
-		subMonitor.worked(10); // show some initial progress
+		subMonitor.step(10); // show some initial progress
 
-		// Checks only required if this is an exisiting container path.
+		// Checks only required if this is an existing container path.
 		boolean copyWithAutoRename = false;
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		if (root.exists(destinationPath)) {
@@ -1837,7 +1837,7 @@ public class CopyFilesAndFoldersOperation {
 
 	private void copyFileStores(final IFileStore[] stores,
 			final IPath destinationPath, IProgressMonitor monitor) {
-		// Checks only required if this is an exisiting container path.
+		// Checks only required if this is an existing container path.
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		if (root.exists(destinationPath)) {
 			IContainer container = (IContainer) root

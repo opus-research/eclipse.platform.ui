@@ -833,16 +833,12 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				.getSelection();
 		try {
 			getContainer().run(true, true, monitor -> {
-
-				monitor
-						.beginTask(
-								DataTransferMessages.WizardProjectsImportPage_SearchingMessage,
-								100);
+				SubMonitor subMonitor = SubMonitor.convert(monitor,
+						DataTransferMessages.WizardProjectsImportPage_SearchingMessage, 100);
 				selectedProjects = new ProjectRecord[0];
 				Collection files = new ArrayList();
-				monitor.worked(10);
-				if (!dirSelected
-						&& ArchiveFileManipulations.isTarFile(path)) {
+				subMonitor.step(10);
+				if (!dirSelected && ArchiveFileManipulations.isTarFile(path)) {
 					TarFile sourceTarFile = getSpecifiedTarSourceFile(path);
 					if (sourceTarFile == null) {
 						return;
@@ -859,15 +855,13 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 					Iterator filesIterator1 = files.iterator();
 					selectedProjects = new ProjectRecord[files.size()];
 					int index1 = 0;
-					monitor.worked(50);
-					monitor
-							.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
+					subMonitor.step(50);
+					subMonitor.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
 					while (filesIterator1.hasNext()) {
 						selectedProjects[index1++] = (ProjectRecord) filesIterator1
 								.next();
 					}
-				} else if (!dirSelected
-						&& ArchiveFileManipulations.isZipFile(path)) {
+				} else if (!dirSelected && ArchiveFileManipulations.isZipFile(path)) {
 					ZipFile sourceFile = getSpecifiedZipSourceFile(path);
 					if (sourceFile == null) {
 						return;
@@ -876,16 +870,14 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 							sourceFile);
 					Object child2 = structureProvider.getRoot();
 
-					if (!collectProjectFilesFromProvider(files, child2, 0,
-							monitor)) {
+					if (!collectProjectFilesFromProvider(files, child2, 0, monitor)) {
 						return;
 					}
 					Iterator filesIterator2 = files.iterator();
 					selectedProjects = new ProjectRecord[files.size()];
 					int index2 = 0;
-					monitor.worked(50);
-					monitor
-							.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
+					subMonitor.step(50);
+					monitor.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
 					while (filesIterator2.hasNext()) {
 						selectedProjects[index2++] = (ProjectRecord) filesIterator2
 								.next();
@@ -901,18 +893,17 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 					Iterator filesIterator3 = files.iterator();
 					selectedProjects = new ProjectRecord[files.size()];
 					int index3 = 0;
-					monitor.worked(50);
-					monitor
-							.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
+					subMonitor.step(50);
+					monitor.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
 					while (filesIterator3.hasNext()) {
 						File file = (File) filesIterator3.next();
 						selectedProjects[index3] = new ProjectRecord(file);
 						index3++;
 					}
 				} else {
-					monitor.worked(60);
+					subMonitor.step(50);
 				}
-				monitor.done();
+				subMonitor.step(40);
 			});
 		} catch (InvocationTargetException e) {
 			IDEWorkbenchPlugin.log(e.getMessage(), e);
