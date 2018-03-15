@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -25,18 +27,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.LayoutConstants;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -288,32 +284,20 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		descriptionData.heightHint = convertHeightInCharsToPixels(3);
 		descText.setLayoutData(descriptionData);
 
-		transferAllButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (transferAllButton.getSelection()) {
-					viewer.setAllChecked(false);
-				}
-				updateEnablement();
-				updatePageCompletion();
+		transferAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
+			if (transferAllButton.getSelection()) {
+				viewer.setAllChecked(false);
 			}
-		});
+			updateEnablement();
+			updatePageCompletion();
+		}));
 
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		viewer.addSelectionChangedListener(event -> updateDescription());
 
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				updateDescription();
-			}
-		});
-
-		viewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				transferAllButton.setSelection(false);
-				updateEnablement();
-				updatePageCompletion();
-			}
+		viewer.addCheckStateListener(event -> {
+			transferAllButton.setSelection(false);
+			updateEnablement();
+			updatePageCompletion();
 		});
 
 		addSelectionButtons(group);
@@ -370,13 +354,10 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		selectAllButton.setData(Integer.valueOf(IDialogConstants.SELECT_ALL_ID));
 		setButtonLayoutData(selectAllButton);
 
-		SelectionListener listener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				viewer.setAllChecked(true);
-				updatePageCompletion();
-			}
-		};
+		SelectionListener listener = widgetSelectedAdapter(e -> {
+			viewer.setAllChecked(true);
+			updatePageCompletion();
+		});
 		selectAllButton.addSelectionListener(listener);
 		selectAllButton.setFont(parentFont);
 
@@ -385,13 +366,10 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		deselectAllButton.setData(Integer.valueOf(IDialogConstants.DESELECT_ALL_ID));
 		setButtonLayoutData(deselectAllButton);
 
-		listener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				viewer.setAllChecked(false);
-				updatePageCompletion();
-			}
-		};
+		listener = widgetSelectedAdapter(e -> {
+			viewer.setAllChecked(false);
+			updatePageCompletion();
+		});
 		deselectAllButton.addSelectionListener(listener);
 		deselectAllButton.setFont(parentFont);
 	}
@@ -990,12 +968,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
-		getControl().getDisplay().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				dialog.open();
-			}
-		});
+		getControl().getDisplay().syncExec(() -> dialog.open());
 		return dialog.getReturnCode() < 0 ? CANCEL : response[dialog
 				.getReturnCode()];
 	}

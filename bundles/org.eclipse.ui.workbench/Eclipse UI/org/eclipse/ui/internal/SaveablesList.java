@@ -13,6 +13,8 @@
 
 package org.eclipse.ui.internal;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,8 +41,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -649,26 +649,23 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	public boolean saveModels(final List<Saveable> finalModels, final IShellProvider shellProvider,
 			IRunnableContext runnableContext, final boolean blockUntilSaved) {
-		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) {
-				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Saving_Modifications,
-						finalModels.size());
-				for (Saveable model : finalModels) {
-					// handle case where this model got saved as a result of
-					// saving another
-					if (!model.isDirty()) {
-						subMonitor.worked(1);
-						continue;
-					}
-					SaveableHelper.doSaveModel(model, subMonitor.split(1),
-							shellProvider, blockUntilSaved);
-					if (subMonitor.isCanceled())
-						break;
+		IRunnableWithProgress progressOp = monitor -> {
+			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
+			SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Saving_Modifications,
+					finalModels.size());
+			for (Saveable model : finalModels) {
+				// handle case where this model got saved as a result of
+				// saving another
+				if (!model.isDirty()) {
+					subMonitor.worked(1);
+					continue;
 				}
-				monitorWrap.done();
+				SaveableHelper.doSaveModel(model, subMonitor.split(1),
+						shellProvider, blockUntilSaved);
+				if (subMonitor.isCanceled())
+					break;
 			}
+			monitorWrap.done();
 		};
 
 		// Do the save.
@@ -809,12 +806,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				 checkboxComposite.setLayout(new GridLayout(2, false));
 
 				 checkbox = new Button(checkboxComposite, SWT.CHECK);
-				 checkbox.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						dontPromptSelection = checkbox.getSelection();
-					}
-				 });
+				 checkbox.addSelectionListener(widgetSelectedAdapter(e -> dontPromptSelection = checkbox.getSelection()));
 				 GridData gd = new GridData();
 				 gd.horizontalAlignment = SWT.BEGINNING;
 				 checkbox.setLayoutData(gd);

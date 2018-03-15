@@ -14,11 +14,11 @@
 
 package org.eclipse.ui.internal.dialogs;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -29,8 +29,6 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -168,17 +166,13 @@ public class SelectPerspectiveDialog extends Dialog implements
         showAllButton = new Button(parent, SWT.CHECK);
         showAllButton
                 .setText(ActivityMessages.Perspective_showAll);
-        showAllButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-			public void widgetSelected(SelectionEvent e) {
-                if (showAllButton.getSelection()) {
-                    list.resetFilters();
-                } else {
-                    list.addFilter(activityViewerFilter);
-                }
-            }
-        });
+        showAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
+		    if (showAllButton.getSelection()) {
+		        list.resetFilters();
+		    } else {
+		        list.addFilter(activityViewerFilter);
+		    }
+		}));
 
     }
 
@@ -198,12 +192,7 @@ public class SelectPerspectiveDialog extends Dialog implements
         list.setComparator(new ViewerComparator());
         list.setInput(perspReg);
         list.addSelectionChangedListener(this);
-        list.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
-                handleDoubleClickEvent();
-            }
-        });
+        list.addDoubleClickListener(event -> handleDoubleClickEvent());
 		list.getControl().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {

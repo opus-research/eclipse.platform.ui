@@ -15,15 +15,15 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -31,8 +31,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -296,18 +294,15 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
 
     @Override
 	public void create() {
-        BusyIndicator.showWhile(null, new Runnable() {
-            @Override
-			public void run() {
-                access$superCreate();
-                fViewer.setCheckedElements(getInitialElementSelections()
-                        .toArray());
-                if (fExpandedElements != null) {
-                    fViewer.setExpandedElements(fExpandedElements);
-                }
-                updateOKStatus();
-            }
-        });
+        BusyIndicator.showWhile(null, () -> {
+		    access$superCreate();
+		    fViewer.setCheckedElements(getInitialElementSelections()
+		            .toArray());
+		    if (fExpandedElements != null) {
+		        fViewer.setExpandedElements(fExpandedElements);
+		    }
+		    updateOKStatus();
+		});
     }
 
     @Override
@@ -345,12 +340,7 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
         }
         fViewer.setContentProvider(fContentProvider);
         fViewer.setLabelProvider(fLabelProvider);
-        fViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-                updateOKStatus();
-            }
-        });
+        fViewer.addCheckStateListener(event -> updateOKStatus());
         fViewer.setComparator(fComparator);
         if (fFilters != null) {
             for (int i = 0; i != fFilters.size(); i++) {
@@ -392,31 +382,25 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
         Button selectButton = createButton(buttonComposite,
                 IDialogConstants.SELECT_ALL_ID, WorkbenchMessages.CheckedTreeSelectionDialog_select_all,
                 false);
-        SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
-                Object[] viewerElements = fContentProvider.getElements(fInput);
-                if (fContainerMode) {
-					fViewer.setCheckedElements(viewerElements);
-				} else {
-                    for (int i = 0; i < viewerElements.length; i++) {
-						fViewer.setSubtreeChecked(viewerElements[i], true);
-					}
-                }
-                updateOKStatus();
-            }
-        };
+        SelectionListener listener = widgetSelectedAdapter(e -> {
+		    Object[] viewerElements = fContentProvider.getElements(fInput);
+		    if (fContainerMode) {
+				fViewer.setCheckedElements(viewerElements);
+			} else {
+		        for (Object viewerElement : viewerElements) {
+					fViewer.setSubtreeChecked(viewerElement, true);
+				}
+		    }
+		    updateOKStatus();
+		});
         selectButton.addSelectionListener(listener);
         Button deselectButton = createButton(buttonComposite,
                 IDialogConstants.DESELECT_ALL_ID, WorkbenchMessages.CheckedTreeSelectionDialog_deselect_all,
                 false);
-        listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
-                fViewer.setCheckedElements(new Object[0]);
-                updateOKStatus();
-            }
-        };
+        listener = widgetSelectedAdapter(e -> {
+		    fViewer.setCheckedElements(new Object[0]);
+		    updateOKStatus();
+		});
         deselectButton.addSelectionListener(listener);
         return buttonComposite;
     }

@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2016 Patrik Suzzi and others.
+ * Copyright (c) 2017 Patrik Suzzi and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091, 509232
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -43,8 +43,6 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -637,18 +635,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	 *            must not be <code>null</code>.
 	 */
 	protected final void addTraverseListener(final Table table) {
-		table.addTraverseListener(new TraverseListener() {
-			/**
-			 * Blocks all key traversal events.
-			 *
-			 * @param event
-			 *            The trigger event; must not be <code>null</code>.
-			 */
-			@Override
-			public final void keyTraversed(final TraverseEvent event) {
-				event.doit = false;
-			}
-		});
+		table.addTraverseListener(event -> event.doit = false);
 	}
 
 	/**
@@ -757,6 +744,14 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		return perspectiveLabelProvider;
 	}
 
+	/** Returns the text for the given {@link WorkbenchPartReference} */
+	protected String getWorkbenchPartReferenceText(WorkbenchPartReference ref) {
+		if (ref.isDirty()) {
+			return "*" + ref.getTitle(); //$NON-NLS-1$
+		}
+		return ref.getTitle();
+	}
+
 	/** Default ColumnLabelProvider. The table has only one column */
 	protected ColumnLabelProvider getColumnLabelProvider() {
 		return new ColumnLabelProvider() {
@@ -765,11 +760,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 				if (element instanceof FilteredTableItem) {
 					return ((FilteredTableItem) element).text;
 				} else if (element instanceof WorkbenchPartReference) {
-					WorkbenchPartReference ref = ((WorkbenchPartReference) element);
-					if (ref.isDirty()) {
-						return "*" + ref.getTitle(); //$NON-NLS-1$
-					}
-					return ref.getTitle();
+					return getWorkbenchPartReferenceText((WorkbenchPartReference) element);
 				} else if (element instanceof IPerspectiveDescriptor) {
 					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
 					String text = getPerspectiveLabelProvider().getText(desc);

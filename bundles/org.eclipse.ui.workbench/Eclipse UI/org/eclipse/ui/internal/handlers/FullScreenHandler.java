@@ -6,10 +6,12 @@
  *
  * Contributors:
  * 	Simon Scholz <simon.scholz@vogella.com> - initial API and implementation;
- * 	Patrik Suzzi <psuzzi@gmail.com> - Bug 491572, 491785, 492749
+ * 	Patrik Suzzi <psuzzi@gmail.com> - Bug 491572, 491785
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -25,8 +27,6 @@ import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -34,7 +34,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -57,17 +56,10 @@ public class FullScreenHandler extends AbstractHandler {
 
 	private boolean showInfoPopup;
 
-	private int timeLastEvent;
-	private FullScreenInfoPopup fullScreenInfoPopup;
-
 	@Override
 	public Object execute(ExecutionEvent event) {
-		// 493186 skips execution of duplicated event
-		if (checkDuplicatedEvent(event)) {
-			return null;
-		}
+		Shell shell = HandlerUtil.getActiveShell(event);
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
-		Shell shell = window.getShell();
 		IBindingService bindingService = window.getService(IBindingService.class);
 		ECommandService commandService = window.getService(ECommandService.class);
 		BindingTableManager bindingTableManager = window.getService(BindingTableManager.class);
@@ -89,32 +81,12 @@ public class FullScreenHandler extends AbstractHandler {
 				message = NLS.bind(WorkbenchMessages.ToggleFullScreenMode_ActivationPopup_Description, keybinding);
 			}
 			if (showInfoPopup) {
-				fullScreenInfoPopup = new FullScreenInfoPopup(shell, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false,
-						false, false, false, null, null, message);
+				FullScreenInfoPopup fullScreenInfoPopup = new FullScreenInfoPopup(shell, PopupDialog.HOVER_SHELLSTYLE,
+						true, false, false, false, false, null, null, message);
 				fullScreenInfoPopup.open();
-			}
-		} else {
-			if (fullScreenInfoPopup != null) {
-				fullScreenInfoPopup.close();
 			}
 		}
 		return Status.OK_STATUS;
-	}
-
-	/**
-	 * Check if an event is duplicate, by recording and comparing the time of
-	 * the trigger event. Returns true if an event is triggered twice with an
-	 * event with the same time
-	 */
-	boolean checkDuplicatedEvent(ExecutionEvent event) {
-		if (event != null && event.getTrigger() != null && event.getTrigger() instanceof Event) {
-			int time = ((Event) event.getTrigger()).time;
-			if (time == timeLastEvent) {
-				return true;
-			}
-			timeLastEvent = time;
-		}
-		return false;
 	}
 
 	private static class FullScreenInfoPopup extends PopupDialog {
@@ -164,14 +136,11 @@ public class FullScreenHandler extends AbstractHandler {
 			gd2.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
 			btnDoNotShow.setLayoutData(gd2);
 
-			link.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					WorkbenchPlugin.getDefault().getPreferenceStore()
-							.setValue(FULL_SCREEN_COMMAND_DO_NOT_SHOW_INFO_AGAIN_PREF_ID, btnDoNotShow.getSelection());
-					close();
-				}
-			});
+			link.addSelectionListener(widgetSelectedAdapter(e -> {
+				WorkbenchPlugin.getDefault().getPreferenceStore()
+						.setValue(FULL_SCREEN_COMMAND_DO_NOT_SHOW_INFO_AGAIN_PREF_ID, btnDoNotShow.getSelection());
+				close();
+			}));
 
 			return composite;
 		}

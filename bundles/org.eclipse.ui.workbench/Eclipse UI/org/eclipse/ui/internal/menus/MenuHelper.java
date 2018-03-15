@@ -71,7 +71,6 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionDelegate;
@@ -101,7 +100,7 @@ import org.osgi.framework.FrameworkUtil;
 public class MenuHelper {
 
 	public static void trace(String msg, Throwable error) {
-		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
+		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, msg, error);
 	}
 
 	private static final Pattern SCHEME_PATTERN = Pattern.compile("\\p{Alpha}[\\p{Alnum}+.-]*:.*"); //$NON-NLS-1$
@@ -393,8 +392,10 @@ public class MenuHelper {
 			return ItemType.RADIO;
 		}
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)) {
-			trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
-			// return CommandContributionItem.STYLE_PULLDOWN;
+			if (Policy.DEBUG_MENUS) {
+				trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
+				// return CommandContributionItem.STYLE_PULLDOWN;
+			}
 		}
 		return ItemType.PUSH;
 	}
@@ -714,16 +715,13 @@ public class MenuHelper {
 				}
 				ActionDescriptor desc = getDescriptor(context);
 				final IAction action = desc.getAction();
-				final IPropertyChangeListener propListener = new IPropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						if (IAction.CHECKED.equals(event.getProperty())) {
-							boolean checked = false;
-							if (event.getNewValue() instanceof Boolean) {
-								checked = ((Boolean) event.getNewValue()).booleanValue();
-							}
-							model.setSelected(checked);
+				final IPropertyChangeListener propListener = event -> {
+					if (IAction.CHECKED.equals(event.getProperty())) {
+						boolean checked = false;
+						if (event.getNewValue() instanceof Boolean) {
+							checked = ((Boolean) event.getNewValue()).booleanValue();
 						}
+						model.setSelected(checked);
 					}
 				};
 				action.addPropertyChangeListener(propListener);
@@ -947,30 +945,22 @@ public class MenuHelper {
 			toolItem.setObject(new DirectProxy(action));
 			toolItem.setEnabled(action.isEnabled());
 
-			final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent event) {
-					String property = event.getProperty();
-					if (property.equals(IAction.ENABLED)) {
-						toolItem.setEnabled(action.isEnabled());
-					} else if (property.equals(IAction.CHECKED)) {
-						toolItem.setSelected(action.isChecked());
-					} else if (property.equals(IAction.TEXT)) {
-						toolItem.setLabel(action.getText());
-					} else if (property.equals(IAction.TOOL_TIP_TEXT)) {
-						toolItem.setLabel(action.getToolTipText());
-					}
+			final IPropertyChangeListener propertyListener = event -> {
+				String property = event.getProperty();
+				if (property.equals(IAction.ENABLED)) {
+					toolItem.setEnabled(action.isEnabled());
+				} else if (property.equals(IAction.CHECKED)) {
+					toolItem.setSelected(action.isChecked());
+				} else if (property.equals(IAction.TEXT)) {
+					toolItem.setLabel(action.getText());
+				} else if (property.equals(IAction.TOOL_TIP_TEXT)) {
+					toolItem.setLabel(action.getToolTipText());
 				}
 			};
 			// property listener is removed in
 			// DirectContributionItem#handleWidgetDispose()
 			action.addPropertyChangeListener(propertyListener);
-			toolItem.getTransientData().put(AbstractContributionItem.DISPOSABLE, new Runnable() {
-						@Override
-						public void run() {
-							action.removePropertyChangeListener(propertyListener);
-						}
-					});
+			toolItem.getTransientData().put(AbstractContributionItem.DISPOSABLE, (Runnable) () -> action.removePropertyChangeListener(propertyListener));
 			return toolItem;
 		}
 		return null;
