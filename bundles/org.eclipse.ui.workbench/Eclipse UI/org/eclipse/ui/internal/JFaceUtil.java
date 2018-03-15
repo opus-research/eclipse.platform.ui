@@ -12,7 +12,6 @@
 
 package org.eclipse.ui.internal;
 
-import org.eclipse.core.internal.runtime.Activator;
 import org.eclipse.core.internal.runtime.CancelabilityMonitor;
 import org.eclipse.core.internal.runtime.CancelabilityMonitor.BasicOptionsImpl;
 import org.eclipse.core.internal.runtime.CancelabilityMonitor.Options;
@@ -83,7 +82,7 @@ final class JFaceUtil {
 			private Options defaultOptions;
 			@Override
 			protected Options delegate() {
-				Options optionService = Activator.getDefault().getCancelabilityMonitorOptions();
+				Options optionService = WorkbenchPlugin.getDefault().getCancelabilityMonitorOptions();
 				if (optionService == null) {
 					if (defaultOptions == null) {
 						defaultOptions = new CancelabilityMonitor.BasicOptionsImpl();
