@@ -13,7 +13,6 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799, 466230
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
- *     Stefan Prieschl <stefan.prieschl@gmail.com> - Bug 374132
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -87,7 +86,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IPageChangeProvider;
@@ -162,9 +160,9 @@ import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityView;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
-import org.eclipse.ui.internal.EditorReference;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.misc.ExternalEditor;
 import org.eclipse.ui.internal.misc.StatusUtil;
@@ -3970,36 +3968,29 @@ public class WorkbenchPage implements IWorkbenchPage {
 		visiblePerspective.setLabel(perspective.getLabel());
 		visiblePerspective.setTooltip(perspective.getLabel());
 		visiblePerspective.setElementId(perspective.getId());
-
-		MPerspective copy = (MPerspective) EcoreUtil.copy((EObject) visiblePerspective);
-
-		List<MPlaceholder> elementsToHide = modelService.findElements(copy, null, MPlaceholder.class, null);
+		MUIElement clone = modelService.cloneElement(visiblePerspective, application);
+		MWindow window = WorkbenchWindow.class.cast(getActivePart().getSite().getWorkbenchWindow()).getModel();
+		ModelServiceImpl.class.cast(modelService).getNullRefPlaceHolders(clone, window);
+		List<MPlaceholder> elementsToHide = modelService.findElements(clone, null, MPlaceholder.class, null);
 		for (MPlaceholder elementToHide : elementsToHide) {
-			if (elementToHide.isToBeRendered()
-					&& elementToHide.getRef().getTags().contains(IPresentationEngine.NO_RESTORE)) {
+			if (elementToHide.getRef().getTags().contains(IPresentationEngine.NO_RESTORE)) {
 				elementToHide.setToBeRendered(false);
-				updateSelectionAndParentVisibility(elementToHide);
+				MElementContainer<MUIElement> phParent = elementToHide.getParent();
+				if (phParent.getSelectedElement() == elementToHide) {
+					phParent.setSelectedElement(null);
+				}
+				int vc = modelService.countRenderableChildren(phParent);
+				if (vc == 0) {
+					if (!modelService.isLastEditorStack(phParent))
+						phParent.setToBeRendered(false);
+				}
 			}
 		}
-		// remove placeholder refs and save as snippet
-		modelService.cloneElement(copy, application);
 		if (perspective instanceof PerspectiveDescriptor) {
 			((PerspectiveDescriptor) perspective).setHasCustomDefinition(true);
 		}
 
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_SAVED, visiblePerspective);
-	}
-
-	private void updateSelectionAndParentVisibility(MUIElement elementToHide) {
-		MElementContainer<MUIElement> phParent = elementToHide.getParent();
-		if (phParent.getSelectedElement() == elementToHide) {
-			phParent.setSelectedElement(null);
-		}
-		int vc = modelService.countRenderableChildren(phParent);
-		if (vc == 0 && !modelService.isLastEditorStack(phParent)) {
-			phParent.setToBeRendered(false);
-			updateSelectionAndParentVisibility(phParent);
-		}
 	}
 
 	@Override
@@ -4754,21 +4745,16 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public void showEditor(IEditorReference ref) {
-		IWorkbenchPart wPart = ref.getPart(false);
-		MPart part = ((EditorReference)ref).getModel();
-		part.setVisible(true);
+		// FIXME compat showEditor
+		E4Util.unsupported("showEditor"); //$NON-NLS-1$
 
-		//Workaround to get content visible. Otherwise the content sometimes is not rendered.
-		MElementContainer<MUIElement> partStack = part.getParent();
-		partStack.setSelectedElement(null);
-		partStack.setSelectedElement(part);
-		wPart.setFocus();
 	}
 
 	@Override
 	public void hideEditor(IEditorReference ref) {
-		MPart part = ((EditorReference)ref).getModel();
-		part.setVisible(false);
+		// FIXME compat hideEditor
+		E4Util.unsupported("hideEditor"); //$NON-NLS-1$
+
 	}
 
 	private String getEditorImageURI(EditorReference reference) {
