@@ -170,7 +170,6 @@ public class WorkbenchMessages extends NLS {
 	public static String SelectPerspective_shellTitle;
 	public static String SelectPerspective_selectPerspectiveHelp;
 	public static String SelectPerspective_noDesc;
-	public static String SelectPerspective_open_button_label;
 	public static String Workbench_showPerspectiveError;
 	public static String ChangeToPerspectiveMenu_errorTitle;
     public static String OpenPerspectiveDialogAction_text;
@@ -180,6 +179,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ShowView_shellTitle;
 	public static String ShowView_selectViewHelp;
 	public static String ShowView_noDesc;
+	public static String ShowView_open_button_label;
 
 	public static String ToggleEditor_hideEditors;
 	public static String ToggleEditor_showEditors;
