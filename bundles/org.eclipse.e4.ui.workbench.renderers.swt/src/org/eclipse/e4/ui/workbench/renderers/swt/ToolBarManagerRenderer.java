@@ -157,6 +157,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					parent.update(true);
 					ToolBar toolbar = parent.getControl();
 					if (toolbar != null && !toolbar.isDisposed()) {
+						toolbar.pack();
 						toolbar.requestLayout();
 					}
 				}
@@ -205,6 +206,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			parent.update(true);
 			ToolBar toolbar = parent.getControl();
 			if (toolbar != null && !toolbar.isDisposed()) {
+				toolbar.pack();
 				toolbar.requestLayout();
 			}
 		}
@@ -624,6 +626,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 			ToolBar toolbar = (ToolBar) getUIContainer(child);
 			if (toolbar != null && !toolbar.isDisposed()) {
+				toolbar.pack();
 				toolbar.requestLayout();
 			}
 		}
@@ -635,6 +638,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		processContents(parentElement);
 		ToolBar toolbar = (ToolBar) getUIContainer(element);
 		if (toolbar != null && !toolbar.isDisposed()) {
+			toolbar.pack();
 			toolbar.requestLayout();
 		}
 	}
