@@ -13,7 +13,6 @@
 
 package org.eclipse.jface.viewers;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -63,7 +62,6 @@ public class ViewerCell {
 	 * @param columnIndex
 	 */
 	ViewerCell(ViewerRow row, int columnIndex, Object element) {
-		Assert.isNotNull(row);
 		this.row = row;
 		this.columnIndex = columnIndex;
 		this.element = element;
