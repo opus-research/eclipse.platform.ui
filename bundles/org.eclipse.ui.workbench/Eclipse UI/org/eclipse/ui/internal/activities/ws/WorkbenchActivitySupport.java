@@ -107,9 +107,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                     .getWorkbench();
                             IWorkbenchWindow[] windows = workbench
                                     .getWorkbenchWindows();
-                            for (int i = 0; i < windows.length; i++) {
-                                if (windows[i] instanceof WorkbenchWindow) {
-                                    final WorkbenchWindow window = (WorkbenchWindow) windows[i];
+                            for (IWorkbenchWindow window2 : windows) {
+                                if (window2 instanceof WorkbenchWindow) {
+                                    final WorkbenchWindow window = (WorkbenchWindow) window2;
 
                                     final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
                                             window.getShell());
@@ -152,12 +152,11 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                             // update all of the (realized) views in all of the pages
                                             IWorkbenchPage[] pages = window
                                                     .getPages();
-                                            for (int j = 0; j < pages.length; j++) {
-                                                IWorkbenchPage page = pages[j];
+                                            for (IWorkbenchPage page : pages) {
                                                 IViewReference[] refs = page
                                                         .getViewReferences();
-                                                for (int k = 0; k < refs.length; k++) {
-                                                    IViewPart part = refs[k]
+                                                for (IViewReference ref : refs) {
+                                                    IViewPart part = ref
                                                             .getView(false);
                                                     if (part != null) {
                                                         updateViewBars(part);
@@ -444,8 +443,8 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			if (objects[i] == advisor) {
+		for (Object object : objects) {
+			if (object == advisor) {
 				advisor = null;
 				break;
 			}
