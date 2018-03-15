@@ -14,6 +14,7 @@ package org.eclipse.jface.tests.viewers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -73,9 +74,11 @@ public class ListViewerRefreshTest extends TestCase {
 	 * @throws Exception
 	 */
 	public void testNoSelectionRefresh() throws Exception {
-		if (OS.GTK3) {
-			System.out.println(getName() + " disabled due to Bug 493357");
-			return;
+		if (Util.isGtk()) {
+			if (OS.GTK3) {
+				System.out.println(getName() + " disabled due to Bug 493357");
+				return;
+			}
 		}
 
 		shell.setText("Lost Scrolled Position Test"); //$NON-NLS-1$
@@ -106,9 +109,11 @@ public class ListViewerRefreshTest extends TestCase {
 	 * @throws Exception
 	 */
 	public void testSelectionRefresh() throws Exception {
-		if (OS.GTK3) {
-			System.out.println(getName() + " disabled due to Bug 493357");
-			return;
+		if (Util.isGtk()) {
+			if (OS.GTK3) {
+				System.out.println(getName() + " disabled due to Bug 493357");
+				return;
+			}
 		}
 		shell.setText("Preserved Scrolled Position Test"); //$NON-NLS-1$
 		readAndDispatch();
