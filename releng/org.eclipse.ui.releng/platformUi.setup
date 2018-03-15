@@ -43,11 +43,49 @@
       xsi:type="setup.targlets:TargletTask">
     <targlet
         name="Platform UI"
-        activeRepositoryList="${eclipse.target.platform}">
+        activeRepositoryList="${eclipse.target.platform}"
+        includeAllPlatforms="true">
       <requirement
           name="*"/>
       <sourceLocator
-          rootFolder="${git.clone.platform.ui.location}"/>
+          rootFolder="${git.clone.platform.ui.location}"
+          locateNestedProjects="true">
+        <predicate
+            xsi:type="predicates:AndPredicate">
+          <operand
+              xsi:type="predicates:OrPredicate">
+            <operand
+                xsi:type="predicates:NotPredicate">
+              <operand
+                  xsi:type="predicates:FilePredicate"
+                  filePattern="META-INF/MANIFEST.MF"
+                  contentPattern="(?m)^Eclipse-PlatformFilter: "/>
+            </operand>
+            <operand
+                xsi:type="predicates:FilePredicate"
+                filePattern="META-INF/MANIFEST.MF"
+                contentPattern="(?m)^Eclipse-PlatformFilter: *\(osgi.ws=${osgi.ws}\)"/>
+          </operand>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org\.eclipse\.ui\.dynamicCode"/>
+          </operand>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="org\.eclipse\.ui\.images\.renderer"/>
+          </operand>
+          <operand
+              xsi:type="predicates:NotPredicate">
+            <operand
+                xsi:type="predicates:NamePredicate"
+                pattern="eclipse\.platform\.ui"/>
+          </operand>
+        </predicate>
+      </sourceLocator>
       <repositoryList
           name="Neon">
         <repository
@@ -130,7 +168,7 @@
             project="org.eclipse.ui"/>
         <operand
             xsi:type="predicates:NamePredicate"
-            pattern=".*\.(examples|snippets|demo).*|Widget.*"/>
+            pattern=".*\.(examples|snippets).*|Widget.*"/>
       </predicate>
     </workingSet>
   </setupTask>

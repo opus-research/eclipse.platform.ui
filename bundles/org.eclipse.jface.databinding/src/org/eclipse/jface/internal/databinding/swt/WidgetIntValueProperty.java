@@ -38,7 +38,7 @@ public abstract class WidgetIntValueProperty extends WidgetValueProperty {
 
 	@Override
 	protected Object doGetValue(Object source) {
-		return Integer.valueOf(doGetIntValue(source));
+		return new Integer(doGetIntValue(source));
 	}
 
 	@Override
