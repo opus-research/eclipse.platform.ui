@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -114,7 +114,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 	public void processContents(MElementContainer<MUIElement> me) {
 		// Lazy Loading: here we only process the contents through childAdded,
 		// we specifically do not render them
-		IPresentationEngine renderer = context.get(IPresentationEngine.class);
+		IPresentationEngine renderer = (IPresentationEngine) context.get(IPresentationEngine.class.getName());
 
 		for (MUIElement element : me.getChildren()) {
 			if (!element.isToBeRendered() || !element.isVisible())
@@ -242,10 +242,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			if (context != null) {
 				IEclipseContext newParentContext = modelService.getContainingContext(element);
 				if (context.getParent() != newParentContext) {
-					// System.out.println("Update Context: " +
-					// context.toString() //$NON-NLS-1$
-					// + " new parent: " + newParentContext.toString());
-					// //$NON-NLS-1$
 					context.setParent(newParentContext);
 				}
 			}
