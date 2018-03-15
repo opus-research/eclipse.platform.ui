@@ -167,8 +167,7 @@ public final class IDEEncoding {
 		ArrayList result = new ArrayList();
 
 		//Drop any encodings that are not valid
-		for (int i = 0; i < preferenceEncodings.length; i++) {
-			String string = preferenceEncodings[i];
+		for (String string : preferenceEncodings) {
 			boolean isSupported;
 			try {
 				isSupported = Charset.isSupported(string);

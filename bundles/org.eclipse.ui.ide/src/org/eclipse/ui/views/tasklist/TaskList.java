@@ -445,11 +445,11 @@ public class TaskList extends ViewPart {
             //restore columns width
             IMemento children[] = memento.getChildren(TAG_COLUMN);
             if (children != null) {
-                for (int i = 0; i < children.length; i++) {
-                    Integer val = children[i].getInteger(TAG_NUMBER);
+                for (IMemento element : children) {
+                    Integer val = element.getInteger(TAG_NUMBER);
                     if (val != null) {
                         int index = val.intValue();
-                        val = children[i].getInteger(TAG_WIDTH);
+                        val = element.getInteger(TAG_WIDTH);
                         if (val != null) {
                             columnLayouts[index] = new ColumnPixelData(val
                                     .intValue(), true);
@@ -510,8 +510,8 @@ public class TaskList extends ViewPart {
         buf.append(System.getProperty("line.separator")); //$NON-NLS-1$
 
         // Create the report for the markers
-        for (int i = 0; i < markers.length; i++) {
-            writeMarker(buf, markers[i]);
+        for (IMarker marker : markers) {
+            writeMarker(buf, marker);
         }
         return buf.toString();
     }
@@ -995,8 +995,8 @@ public class TaskList extends ViewPart {
         if (showOwnerProject()) {
             IProject project;
 
-            for (int i = 0, l = resources.length; i < l; i++) {
-                resource2 = resources[i];
+            for (IResource resource3 : resources) {
+                resource2 = resource3;
 
                 if (resource2 == null) {
                     return true;
@@ -1011,8 +1011,8 @@ public class TaskList extends ViewPart {
         }
 
         if (showChildrenHierarchy()) {
-            for (int i = 0, l = resources.length; i < l; i++) {
-                resource2 = resources[i];
+            for (IResource resource3 : resources) {
+                resource2 = resource3;
 
                 if (resource2 != null
                         && resource2.getFullPath().isPrefixOf(
@@ -1021,8 +1021,8 @@ public class TaskList extends ViewPart {
 				}
             }
         } else {
-			for (int i = 0, l = resources.length; i < l; i++) {
-                resource2 = resources[i];
+			for (IResource resource3 : resources) {
+                resource2 = resource3;
 
                 if (resource.equals(resource2)) {
 					return true;
@@ -1269,10 +1269,10 @@ public class TaskList extends ViewPart {
         if (selectionMem != null) {
             ArrayList selectionList = new ArrayList();
             IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
-            for (int i = 0; i < markerMems.length; i++) {
+            for (IMemento markerMem : markerMems) {
                 try {
-                    long id = Long.parseLong(markerMems[i].getString(TAG_ID));
-                    IResource resource = root.findMember(markerMems[i]
+                    long id = Long.parseLong(markerMem.getString(TAG_ID));
+                    IResource resource = root.findMember(markerMem
                             .getString(TAG_RESOURCE));
                     if (resource != null) {
                         IMarker marker = resource.findMarker(id);
@@ -1336,9 +1336,9 @@ public class TaskList extends ViewPart {
                 .toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);
-            for (int i = 0; i < markers.length; i++) {
+            for (Object marker2 : markers) {
                 IMemento elementMem = selectionMem.createChild(TAG_MARKER);
-                IMarker marker = (IMarker) markers[i];
+                IMarker marker = (IMarker) marker2;
                 elementMem.putString(TAG_RESOURCE, marker.getResource()
                         .getFullPath().toString());
                 elementMem.putString(TAG_ID, String.valueOf(marker.getId()));
@@ -1635,8 +1635,8 @@ public class TaskList extends ViewPart {
         IMarker[] markerData = (IMarker[]) getClipboard().getContents(transfer);
         boolean canPaste = false;
         if (markerData != null) {
-            for (int i = 0; i < markerData.length; i++) {
-                if (MarkerUtil.isMarkerType(markerData[i], IMarker.TASK)) {
+            for (IMarker element : markerData) {
+                if (MarkerUtil.isMarkerType(element, IMarker.TASK)) {
                     canPaste = true;
                     break;
                 }

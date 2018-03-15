@@ -103,15 +103,15 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 						+ ResourcePatternFilter.FILTERS_TAG);
 		if (extension != null) {
 			IExtension[] extensions = extension.getExtensions();
-			for (int i = 0; i < extensions.length; i++) {
-				IConfigurationElement[] configElements = extensions[i]
+			for (IExtension extension2 : extensions) {
+				IConfigurationElement[] configElements = extension2
 						.getConfigurationElements();
-				for (int j = 0; j < configElements.length; j++) {
-					String pattern = configElements[j].getAttribute("pattern");//$NON-NLS-1$
+				for (IConfigurationElement configElement : configElements) {
+					String pattern = configElement.getAttribute("pattern");//$NON-NLS-1$
 					if (pattern != null) {
 						definedFilters.add(pattern);
 					}
-					String selected = configElements[j]
+					String selected = configElement
 							.getAttribute("selected");//$NON-NLS-1$
 					if (selected != null && selected.equalsIgnoreCase("true")) { //$NON-NLS-1$
 						defaultFilters.add(pattern);

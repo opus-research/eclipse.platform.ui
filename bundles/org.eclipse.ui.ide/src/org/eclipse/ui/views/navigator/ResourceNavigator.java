@@ -1023,13 +1023,13 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                     && children[0].getString(TAG_IS_ENABLED) != null) {
                 ArrayList selectedFilters = new ArrayList();
                 ArrayList unSelectedFilters = new ArrayList();
-                for (int i = 0; i < children.length; i++) {
-                    if (children[i].getString(TAG_IS_ENABLED).equals(
+                for (IMemento element : children) {
+                    if (element.getString(TAG_IS_ENABLED).equals(
                             String.valueOf(true))) {
-						selectedFilters.add(children[i].getString(TAG_ELEMENT));
+						selectedFilters.add(element.getString(TAG_ELEMENT));
 					} else {
 						//enabled == false
-                        unSelectedFilters.add(children[i]
+                        unSelectedFilters.add(element
                                 .getString(TAG_ELEMENT));
 					}
                 }
@@ -1085,8 +1085,8 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (childMem != null) {
                 ArrayList elements = new ArrayList();
                 IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-                for (int i = 0; i < elementMem.length; i++) {
-                    Object element = container.findMember(elementMem[i]
+                for (IMemento element2 : elementMem) {
+                    Object element = container.findMember(element2
                             .getString(TAG_PATH));
                     if (element != null) {
                         elements.add(element);
@@ -1098,8 +1098,8 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (childMem != null) {
                 ArrayList list = new ArrayList();
                 IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-                for (int i = 0; i < elementMem.length; i++) {
-                    Object element = container.findMember(elementMem[i]
+                for (IMemento element2 : elementMem) {
+                    Object element = container.findMember(element2
                             .getString(TAG_PATH));
                     if (element != null) {
                         list.add(element);
@@ -1164,12 +1164,12 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             Object expandedElements[] = viewer.getVisibleExpandedElements();
             if (expandedElements.length > 0) {
                 IMemento expandedMem = memento.createChild(TAG_EXPANDED);
-                for (int i = 0; i < expandedElements.length; i++) {
-                    if (expandedElements[i] instanceof IResource) {
+                for (Object expandedElement : expandedElements) {
+                    if (expandedElement instanceof IResource) {
                         IMemento elementMem = expandedMem
                                 .createChild(TAG_ELEMENT);
                         elementMem.putString(TAG_PATH,
-                                ((IResource) expandedElements[i]).getFullPath()
+                                ((IResource) expandedElement).getFullPath()
                                         .toString());
                     }
                 }
@@ -1179,12 +1179,12 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                     .toArray();
             if (elements.length > 0) {
                 IMemento selectionMem = memento.createChild(TAG_SELECTION);
-                for (int i = 0; i < elements.length; i++) {
-                    if (elements[i] instanceof IResource) {
+                for (Object element : elements) {
+                    if (element instanceof IResource) {
                         IMemento elementMem = selectionMem
                                 .createChild(TAG_ELEMENT);
                         elementMem.putString(TAG_PATH,
-                                ((IResource) elements[i]).getFullPath()
+                                ((IResource) element).getFullPath()
                                         .toString());
                     }
                 }
