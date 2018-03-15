@@ -582,14 +582,15 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	protected void assertElementsNotNull(Object[] elements) {
 		Assert.isNotNull(elements);
-		for (Object element : elements) {
-			Assert.isNotNull(element);
+		for (int i = 0, n = elements.length; i < n; ++i) {
+			Assert.isNotNull(elements[i]);
 		}
 
 		if (InternalPolicy.DEBUG_LOG_EQUAL_VIEWER_ELEMENTS
 				&& elements.length > 1) {
 			CustomHashtable elementSet = newHashtable(elements.length * 2);
-			for (Object element : elements) {
+			for (int i = 0; i < elements.length; i++) {
+				Object element = elements[i];
 				Object old = elementSet.put(element, element);
 				if (old != null) {
 					String message = "Sibling elements in viewer must not be equal:\n  " //$NON-NLS-1$
@@ -727,19 +728,19 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		if (filters != null) {
 			ArrayList filtered = new ArrayList(elements.length);
 			Object root = getRoot();
-			for (Object element : elements) {
+			for (int i = 0; i < elements.length; i++) {
 				boolean add = true;
 				for (int j = 0; j < filters.size(); j++) {
-					add = filters.get(j).select(this, root, element);
+					add = filters.get(j).select(this, root, elements[i]);
 					if (!add) {
 						break;
 					}
 				}
 				if (add) {
-					filtered.add(element);
+					filtered.add(elements[i]);
 				} else {
 					if (associateListener != null)
-						associateListener.filteredOut(element);
+						associateListener.filteredOut(elements[i]);
 				}
 			}
 			return filtered.toArray();
@@ -899,8 +900,8 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	protected Object[] getFilteredChildren(Object parent) {
 		Object[] result = getRawChildren(parent);
 		if (filters != null) {
-			for (Object element : filters) {
-				ViewerFilter f = (ViewerFilter) element;
+			for (Iterator iter = filters.iterator(); iter.hasNext();) {
+				ViewerFilter f = (ViewerFilter) iter.next();
 				Object[] filteredResult = f.filter(this, parent, result);
 				if (associateListener != null && filteredResult.length != result.length) {
 					notifyFilteredOut(result, filteredResult);
@@ -2027,8 +2028,8 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		boolean previousValue = refreshOccurred;
 		refreshOccurred = false;
 		try {
-			for (Object element : elements) {
-				update(element, properties);
+			for (int i = 0; i < elements.length; ++i) {
+				update(elements[i], properties);
 				if (refreshOccurred) {
 					return;
 				}
@@ -2083,8 +2084,8 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		Widget[] items = findItems(element);
 
 		boolean mayExitEarly = !refreshOccurred;
-		for (Widget item : items) {
-			internalUpdate(item, element, properties);
+		for (int i = 0; i < items.length; i++) {
+			internalUpdate(items[i], element, properties);
 			if (mayExitEarly && refreshOccurred) {
 				// detected a change from refreshOccurred==false to refreshOccurred==true
 				return;
@@ -2114,8 +2115,8 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	protected void internalUpdate(Widget widget, Object element, String[] properties) {
 		boolean needsRefilter = false;
 		if (properties != null) {
-			for (String property : properties) {
-				needsRefilter = needsRefilter(element, property);
+			for (int i = 0; i < properties.length; ++i) {
+				needsRefilter = needsRefilter(element, properties[i]);
 				if (needsRefilter) {
 					break;
 				}
@@ -2135,8 +2136,8 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		} else {
 			needsUpdate = false;
 			IBaseLabelProvider labelProvider = getLabelProvider();
-			for (String property : properties) {
-				needsUpdate = labelProvider.isLabelProperty(element, property);
+			for (int i = 0; i < properties.length; ++i) {
+				needsUpdate = labelProvider.isLabelProperty(element, properties[i]);
 				if (needsUpdate) {
 					break;
 				}
