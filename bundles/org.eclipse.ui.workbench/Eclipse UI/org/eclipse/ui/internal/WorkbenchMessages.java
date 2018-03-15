@@ -14,7 +14,7 @@
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811, 511198, 514458
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811, 511198
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -761,9 +761,6 @@ public class WorkbenchMessages extends NLS {
 
 	public static String ToggleStatusBarVisibilityAction_show_text;
 	public static String ToggleStatusBarVisibilityAction_hide_text;
-
-	public static String MenuAppearanceTheme_label;
-	public static String MenuAppearanceTheme_tooltip;
 
 	// ==============================================================================
 	// Working Set Framework.
