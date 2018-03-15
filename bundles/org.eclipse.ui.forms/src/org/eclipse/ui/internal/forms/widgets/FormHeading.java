@@ -7,7 +7,7 @@
  *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter <ralf.petter@gmail.com> - Bug 509719, 510232
+ *     Ralf M Petter <ralf.petter@gmail.com> - Bug 509719
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -528,7 +528,7 @@ public class FormHeading extends Canvas {
 				}
 			}
 			updateForeground();
-			requestLayout();
+			layout(true);
 		}
 
 		private boolean needHyperlink() {
@@ -936,7 +936,7 @@ public class FormHeading extends Canvas {
 		titleRegion.updateImage(messageRegion.getMessageImage(), false);
 		if (messageToolTipManager != null)
 			messageToolTipManager.update();
-		requestLayout();
+		layout();
 		redraw();
 	}
 
@@ -960,7 +960,7 @@ public class FormHeading extends Canvas {
 
 	public void setBusy(boolean busy) {
 		if (titleRegion.setBusy(busy))
-			requestLayout();
+			layout();
 	}
 
 	public Control getHeadClient() {
@@ -971,7 +971,7 @@ public class FormHeading extends Canvas {
 		if (headClient != null)
 			Assert.isTrue(headClient.getParent() == this);
 		this.headClient = headClient;
-		requestLayout();
+		layout();
 	}
 
 	public void putColor(String key, Color color) {

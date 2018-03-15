@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Wojciech Galanciak - fix for Bug 294868 [Forms] Problem with text
  *     wrapping in SharedScrolledComposite:
- *      Ralf Petter <ralf.petter@gmail.com> - Bug 510232
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -141,7 +140,7 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 
 		ignoreLayouts = true;
 		ignoreResizes = true;
-		super.requestLayout();
+		super.layout(changed);
 		ignoreResizes = false;
 	}
 
@@ -202,7 +201,7 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		}
 
 		ignoreLayouts = false;
-		requestLayout();
+		layout(flushCache);
 		ignoreLayouts = true;
 
 		contentCache.layoutIfNecessary();

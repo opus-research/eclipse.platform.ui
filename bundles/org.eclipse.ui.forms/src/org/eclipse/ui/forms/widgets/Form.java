@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *      Ralf Petter <ralf.petter@gmail.com> - 510232
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -274,7 +273,7 @@ public class Form extends Composite {
 	 * <p>
 	 * <strong>Note:</strong> Mnemonics are indicated by an '&amp;' that causes
 	 * the next character to be the mnemonic. Mnemonics are not applicable in
-	 * the case of the form title but need to be taken into acount due to the
+	 * the case of the form title but need to be taken into account due to the
 	 * usage of the underlying widget that renders mnemonics in the title area.
 	 * The mnemonic indicator character '&amp;' can be escaped by doubling it in
 	 * the string, causing a single '&amp;' to be displayed.
@@ -285,7 +284,7 @@ public class Form extends Composite {
 	 */
 	public void setText(String text) {
 		head.setText(text);
-		requestLayout();
+		layout();
 		redraw();
 	}
 
@@ -305,7 +304,7 @@ public class Form extends Composite {
 	 */
 	public void setImage(Image image) {
 		head.setImage(image);
-		requestLayout();
+		layout();
 		redraw();
 	}
 
@@ -448,7 +447,7 @@ public class Form extends Composite {
 	 */
 	public void setHeadClient(Control headClient) {
 		head.setHeadClient(headClient);
-		requestLayout();
+		layout();
 	}
 
 	/**
@@ -682,7 +681,7 @@ public class Form extends Composite {
 
 	public void setMessage(String newMessage, int newType, IMessage[] children) {
 		head.showMessage(newMessage, newType, children);
-		requestLayout();
+		layout();
 	}
 
 	/**

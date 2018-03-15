@@ -12,7 +12,7 @@
  *     Didier Villevalois - Fix for Bug 178534
  *     Robin Stocker - Fix for Bug 193034 (tool tip also on text)
  *     Alena Laskavaia - Bug 481604
- *     Ralf Petter <ralf.petter@gmail.com> - Bug 183675, 510232
+ *     Ralf Petter <ralf.petter@gmail.com> - Bug 183675
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -804,7 +804,7 @@ public class ExpandableComposite extends Canvas {
 		} else {
 			return;
 		}
-		requestLayout();
+		layout();
 	}
 
 	@Override

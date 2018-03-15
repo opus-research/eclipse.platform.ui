@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Roland Tepp (roland@videobet.com) - patch (see Bugzilla #107197)
- *     Ralf Petter <ralf.petter@gmail.com> - Bug 510232
  *******************************************************************************/
 package org.eclipse.ui.forms;
 
@@ -97,7 +96,7 @@ public abstract class MasterDetailsBlock {
 
 		@Override
 		public void layout(boolean changed) {
-			super.requestLayout();
+			super.layout(changed);
 			hookSashListeners();
 		}
 
