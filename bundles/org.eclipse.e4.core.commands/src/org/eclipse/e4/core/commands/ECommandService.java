@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 493459
  *******************************************************************************/
 package org.eclipse.e4.core.commands;
 
@@ -20,7 +21,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
  * @noimplement
  */
 public interface ECommandService {
-	public ParameterizedCommand createCommand(String id, Map<String, Object> parameters);
+	public ParameterizedCommand createCommand(String id, Map<String, ?> parameters);
 
 	/**
 	 * @param id

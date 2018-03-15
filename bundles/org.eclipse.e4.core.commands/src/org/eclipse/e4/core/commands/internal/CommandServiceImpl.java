@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 493459
  ******************************************************************************/
 
 package org.eclipse.e4.core.commands.internal;
@@ -33,7 +34,7 @@ public class CommandServiceImpl implements ECommandService {
 	}
 
 	@Override
-	public ParameterizedCommand createCommand(String id, Map<String, Object> parameters) {
+	public ParameterizedCommand createCommand(String id, Map<String, ?> parameters) {
 		Command command = getCommand(id);
 		if (command == null) {
 			return null;
