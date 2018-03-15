@@ -15,7 +15,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Axel Richard <axel.richard@obeo.fr> - Bug 354538
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -33,7 +32,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.expressions.Expression;
@@ -172,8 +170,6 @@ import org.eclipse.ui.internal.e4.compatibility.SelectionService;
 import org.eclipse.ui.internal.handlers.ActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.IActionCommandMappingService;
 import org.eclipse.ui.internal.handlers.LegacyHandlerService;
-import org.eclipse.ui.internal.layout.ITrimManager;
-import org.eclipse.ui.internal.layout.IWindowTrim;
 import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
@@ -252,10 +248,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private WorkbenchWindowAdvisor windowAdvisor;
 
 	private ActionBarAdvisor actionBarAdvisor;
-
-	private MenuManagerRenderer renderer;
-
-	private MMenu mainMenu;
 
 	private PageListenerList pageListeners = new PageListenerList();
 
@@ -689,10 +681,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			Shell shell = (Shell) model.getWidget();
 			if (model.getMainMenu() == null) {
-				mainMenu = modelService.createModelElement(MMenu.class);
+				final MMenu mainMenu = modelService.createModelElement(MMenu.class);
 				mainMenu.setElementId(ActionSet.MAIN_MENU);
 
-				renderer = (MenuManagerRenderer) rendererFactory
+				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory
 						.getRenderer(mainMenu, null);
 				renderer.linkModelToManager(mainMenu, menuManager);
 				fill(renderer, mainMenu, menuManager);
@@ -791,13 +783,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		} finally {
 			HandlerServiceImpl.pop();
 		}
-	}
-
-	@PreDestroy
-	public void tearDown() {
-		renderer.clearModelToManager(mainMenu, menuManager);
-		mainMenu = null;
-		renderer = null;
 	}
 
 	private void configureShell(Shell shell, IEclipseContext context) {
@@ -1916,7 +1901,8 @@ STATUS_LINE_ID, model);
 				// We need to do our own cleanup here...
 				int vc = modelService.countRenderableChildren(phParent);
 				if (vc == 0) {
-					phParent.setToBeRendered(false);
+					if (!isLastEditorStack(phParent))
+						phParent.setToBeRendered(false);
 				}
 			}
 		}
@@ -1926,6 +1912,10 @@ STATUS_LINE_ID, model);
 		for (MPart partToRemove : sharedPartsToRemove) {
 			seList.remove(partToRemove);
 		}
+	}
+
+	private boolean isLastEditorStack(MUIElement element) {
+		return modelService.isLastEditorStack(element);
 	}
 
 	/**
@@ -2440,8 +2430,6 @@ STATUS_LINE_ID, model);
 
 	private SelectionService selectionService;
 
-	private ITrimManager trimManager;
-
 	private ActionPresentation actionPresentation;
 
 	private final void fireActionSetsChanged() {
@@ -2746,60 +2734,6 @@ STATUS_LINE_ID, model);
 	 */
 	IAdaptable getDefaultPageInput() {
 		return getWorkbenchImpl().getDefaultPageInput();
-	}
-
-	public ITrimManager getTrimManager() {
-		if (trimManager == null) {
-			// HACK !! Add a 'null' trim manager...this is specifically in place
-			// to prevent an NPE when using Intro's 'Go to Workbench' handling
-			// See Bug 365625 for details...
-			trimManager = new ITrimManager() {
-				@Override
-				public void addTrim(int areaId, IWindowTrim trim) {
-				}
-
-				@Override
-				public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
-				}
-
-				@Override
-				public void removeTrim(IWindowTrim toRemove) {
-				}
-
-				@Override
-				public IWindowTrim getTrim(String id) {
-					return null;
-				}
-
-				@Override
-				public int[] getAreaIds() {
-					return null;
-				}
-
-				@Override
-				public List getAreaTrim(int areaId) {
-					return null;
-				}
-
-				@Override
-				public void updateAreaTrim(int id, List trim, boolean removeExtra) {
-				}
-
-				@Override
-				public List getAllTrim() {
-					return null;
-				}
-
-				@Override
-				public void setTrimVisible(IWindowTrim trim, boolean visible) {
-				}
-
-				@Override
-				public void forceLayout() {
-				}
-			};
-		}
-		return trimManager;
 	}
 
 	/**
