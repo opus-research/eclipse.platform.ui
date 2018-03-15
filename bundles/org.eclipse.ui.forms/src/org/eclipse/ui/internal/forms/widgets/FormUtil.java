@@ -33,7 +33,7 @@ import org.eclipse.ui.forms.widgets.ColumnLayout;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.SizeCache;
+import org.eclipse.ui.forms.widgets.ILayoutExtension;
 
 import com.ibm.icu.text.BreakIterator;
 
@@ -54,39 +54,6 @@ public class FormUtil {
 	public static final String FOCUS_SCROLLING = "focusScrolling"; //$NON-NLS-1$
 
 	public static final String IGNORE_BODY = "__ignore_body__"; //$NON-NLS-1$
-
-	public static Point computeControlSize(SizeCache cache, int constrainedWidth,
-			int widthHintFromLayoutData, int heightHintFromLayoutData, boolean isFillAligned) {
-		int widthHint;
-		int heightHint = heightHintFromLayoutData;
-		// If using non-fill alignment and there is a width hint specified in both the
-		// argument and the layout data,
-		// use whichever one is smaller.
-		if (isFillAligned) {
-			// If width is unbounded, apply a width hint iff requested in the layout data
-			if (constrainedWidth == SWT.DEFAULT) {
-				widthHint = widthHintFromLayoutData;
-			} else {
-				widthHint = constrainedWidth;
-			}
-		} else {
-			// If not using fill alignment, make a first attempt at computing the size
-			// without considering the
-			// column width
-			widthHint = widthHintFromLayoutData;
-		}
-
-		Point result = cache.computeSize(widthHint, heightHint);
-
-		// If using non-fill alignment, it's possible that the result is larger than the
-		// column width. In that case,
-		// constrain the width and try again.
-		if (!isFillAligned && constrainedWidth != SWT.DEFAULT && result.x > constrainedWidth) {
-			result = cache.computeSize(constrainedWidth, heightHint);
-		}
-
-		return result;
-	}
 
 	public static Text createText(Composite parent, String label,
 			FormToolkit factory) {
@@ -439,6 +406,20 @@ public class FormUtil {
 		}
 	}
 
+	public static boolean isWrapControl(Control c) {
+		if ((c.getStyle() & SWT.WRAP) != 0)
+			return true;
+		if (c instanceof Composite) {
+			return ((Composite) c).getLayout() instanceof ILayoutExtension;
+		}
+		return false;
+	}
+
+	public static int getWidthHint(int wHint, Control c) {
+		boolean wrap = isWrapControl(c);
+		return wrap ? wHint : SWT.DEFAULT;
+	}
+
 	public static int getHeightHint(int hHint, Control c) {
 		if (c instanceof Composite) {
 			Layout layout = ((Composite) c).getLayout();
@@ -446,6 +427,26 @@ public class FormUtil {
 				return hHint;
 		}
 		return SWT.DEFAULT;
+	}
+
+	public static int computeMinimumWidth(Control c, boolean changed) {
+		if (c instanceof Composite) {
+			Layout layout = ((Composite) c).getLayout();
+			if (layout instanceof ILayoutExtension)
+				return ((ILayoutExtension) layout).computeMinimumWidth(
+						(Composite) c, changed);
+		}
+		return c.computeSize(FormUtil.getWidthHint(5, c), SWT.DEFAULT, changed).x;
+	}
+
+	public static int computeMaximumWidth(Control c, boolean changed) {
+		if (c instanceof Composite) {
+			Layout layout = ((Composite) c).getLayout();
+			if (layout instanceof ILayoutExtension)
+				return ((ILayoutExtension) layout).computeMaximumWidth(
+						(Composite) c, changed);
+		}
+		return c.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed).x;
 	}
 
 	public static Form getForm(Control c) {

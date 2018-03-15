@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.forms.widgets;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -29,11 +27,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.SizeCache;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class SizeCacheTest {
+import junit.framework.TestCase;
+
+public class SizeCacheTest extends TestCase {
 	private static Display display;
 	private Shell shell;
 	private static final String SHORT_TEXT = "Hedgehog";
@@ -56,7 +54,7 @@ public class SizeCacheTest {
 		}
 	}
 
-	@Before
+	@Override
 	public void setUp() throws Exception {
 		font = new Font(display, "Arial", 12, SWT.NORMAL);
 		shell = new Shell(display);
@@ -66,7 +64,7 @@ public class SizeCacheTest {
 		shell.open();
 	}
 
-	@After
+	@Override
 	public void tearDown() throws Exception {
 		if (humanWatching)
 			dispatch(1000);
@@ -122,41 +120,15 @@ public class SizeCacheTest {
 		control.setSize(expectedSize);
 		dispatch();
 
+		expectedSize = getAdjustedExpected(expectedSize, whint, hhint);
+
 		checkDoubleCall(whint, hhint);
 		checkPreferedThenOther(whint, hhint);
 		return expectedSize;
 	}
 
-	private Point controlComputeSize(int wHint, int hHint) {
-		Point adjusted = computeHintOffset();
-
-		int adjustedWidthHint = wHint;
-		if (adjustedWidthHint != SWT.DEFAULT) {
-			adjustedWidthHint = Math.max(0, wHint - adjusted.x);
-		}
-
-		int adjustedHeightHint = hHint;
-		if (adjustedHeightHint != SWT.DEFAULT) {
-			adjustedHeightHint = Math.max(0, hHint - adjusted.y);
-		}
-
-		Point result = control.computeSize(adjustedWidthHint, adjustedHeightHint, true);
-
-		// Ignore any component if the hint was something other than SWT.DEFAULT.
-		// There's no way to measure hints smaller than the adjustment value and
-		// somecontrols have buggy computeSize methods that don't return non-default
-		// hints verbatim. The purpose of this test is to verify SizeCache, not the
-		// controls, and we don't want such quirks to create failures, so we correct the
-		// result here if necessary.
-		if (wHint != SWT.DEFAULT) {
-			result.x = wHint;
-		}
-
-		if (hHint != SWT.DEFAULT) {
-			result.y = hHint;
-		}
-
-		return result;
+	private Point controlComputeSize(int whint, int hhint) {
+		return control.computeSize(whint, hhint, true);
 	}
 
 	private Point checkAlterate(int whint, int hhint) {
@@ -169,6 +141,13 @@ public class SizeCacheTest {
 		checkCacheComputeSize(expectedSize2, whint, -1);
 		checkCacheComputeSize(expectedSize2, whint, -1);
 		return expectedSize1;
+	}
+
+	private Point getAdjustedExpected(Point calcSize, int whint, int hhint) {
+		Point adjusted = computeHintOffset();
+		int expectedHeight = hhint == SWT.DEFAULT ? calcSize.y : hhint + adjusted.y;
+		int expectedWidth = whint == SWT.DEFAULT ? calcSize.x : whint + adjusted.x;
+		return new Point(expectedWidth, expectedHeight);
 	}
 
 	private Point computeHintOffset() {
