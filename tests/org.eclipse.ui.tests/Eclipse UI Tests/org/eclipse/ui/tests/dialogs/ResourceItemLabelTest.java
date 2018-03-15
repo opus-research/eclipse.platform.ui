@@ -148,9 +148,9 @@ public class ResourceItemLabelTest extends UITestCase {
 			protected boolean condition() {
 				return table.getItemCount() > 0;
 			}
-		}.waitForCondition(shell.getDisplay(), 1000);
+		}.waitForCondition(shell.getDisplay(), 3000);
 
-		assertEquals("Impropper number of results", 1, table.getItemCount());
+		assertEquals("Impropper number of results when searching: " + searchString, 1, table.getItemCount());
 
 		Object data = table.getItem(0).getData("org.eclipse.jfacestyled_label_key_0");
 
