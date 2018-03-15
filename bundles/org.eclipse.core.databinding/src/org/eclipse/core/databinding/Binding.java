@@ -77,7 +77,12 @@ public abstract class Binding extends ValidationStatusProvider {
 		target.addDisposeListener(disposeListener);
 		model.addDisposeListener(disposeListener);
 		preInit();
-		context.addBinding(this);
+		context.getValidationRealm().exec(new Runnable() {
+			@Override
+			public void run() {
+				context.addBinding(Binding.this);
+			}
+		});
 		postInit();
 	}
 
