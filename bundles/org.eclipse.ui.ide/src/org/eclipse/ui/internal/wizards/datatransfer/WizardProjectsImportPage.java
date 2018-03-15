@@ -1036,11 +1036,8 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		// first look for project description files
 		final String dotProject = IProjectDescription.DESCRIPTION_FILE_NAME;
-		List<File> directories = new ArrayList<>();
 		for (File file : contents) {
-			if(file.isDirectory()){
-				directories.add(file);
-			} else if (file.getName().equals(dotProject) && file.isFile()) {
+			if (file.isFile() && file.getName().equals(dotProject)) {
 				files.add(file);
 				if (!nestedProjects) {
 					// don't search sub-directories since we can't have nested
@@ -1049,25 +1046,26 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				}
 			}
 		}
-		
 		// no project description found or search for nested projects enabled,
 		// so recurse into sub-directories
-		for (File dir : directories) {
-			if (!dir.getName().equals(METADATA_FOLDER)) {
-				try {
-					String canonicalPath = dir.getCanonicalPath();
-					if (!directoriesVisited.add(canonicalPath)) {
-						// already been here --> do not recurse
-						continue;
-					}
-				} catch (IOException exception) {
-					StatusManager.getManager().handle(
-							StatusUtil.newStatus(IStatus.ERROR, exception
-									.getLocalizedMessage(), exception));
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i].isDirectory()) {
+				if (!contents[i].getName().equals(METADATA_FOLDER)) {
+					try {
+						String canonicalPath = contents[i].getCanonicalPath();
+						if (!directoriesVisited.add(canonicalPath)) {
+							// already been here --> do not recurse
+							continue;
+						}
+					} catch (IOException exception) {
+						StatusManager.getManager().handle(
+								StatusUtil.newStatus(IStatus.ERROR, exception
+										.getLocalizedMessage(), exception));
 
+					}
+					collectProjectFilesFromDirectory(files, contents[i],
+							directoriesVisited, monitor);
 				}
-				collectProjectFilesFromDirectory(files, dir,
-						directoriesVisited, monitor);
 			}
 		}
 		return true;
