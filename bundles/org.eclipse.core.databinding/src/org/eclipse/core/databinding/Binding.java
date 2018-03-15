@@ -125,6 +125,7 @@ public abstract class Binding extends ValidationStatusProvider {
 		if (context != null) {
 			context.removeBinding(this);
 		}
+		context = null;
 		if (disposeListener != null) {
 			if (target != null) {
 				target.removeDisposeListener(disposeListener);
@@ -134,7 +135,6 @@ public abstract class Binding extends ValidationStatusProvider {
 			}
 			disposeListener = null;
 		}
-		context = null;
 		target = null;
 		model = null;
 		super.dispose();
