@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091, 509232, 506019
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091, 509232
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -190,7 +190,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		table.setBackground(getBackground());
 
 		tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		setLabelProvider(tableViewerColumn);
+		tableViewerColumn.setLabelProvider(getColumnLabelProvider());
 		tc = tableViewerColumn.getColumn();
 		tc.setResizable(false);
 
@@ -750,16 +750,6 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			return "*" + ref.getTitle(); //$NON-NLS-1$
 		}
 		return ref.getTitle();
-	}
-
-	/**
-	 * Sets the label provider for the only column visible in the table.
-	 *
-	 * @param tableViewerColumn
-	 * @return
-	 */
-	protected void setLabelProvider(TableViewerColumn tableViewerColumn) {
-		tableViewerColumn.setLabelProvider(getColumnLabelProvider());
 	}
 
 	/** Default ColumnLabelProvider. The table has only one column */
