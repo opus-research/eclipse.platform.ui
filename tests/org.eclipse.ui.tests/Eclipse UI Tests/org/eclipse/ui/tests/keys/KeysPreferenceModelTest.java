@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2017 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.keys.KeyBinding;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.keys.model.BindingElement;
@@ -115,9 +116,14 @@ public class KeysPreferenceModelTest extends UITestCase {
 		assertNull(cm.getSelectedElement());
 		assertNotNull(dialog);
 
-		final ArrayList<PropertyChangeEvent> events = new ArrayList<>();
+		final ArrayList events = new ArrayList();
 		// test setup vars
-		controller.addPropertyChangeListener(event -> events.add(event));
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				events.add(event);
+			}
+		});
 		cm.setSelectedElement(dialog);
 
 		assertTrue(cm.getSelectedElement() == dialog);
@@ -157,8 +163,13 @@ public class KeysPreferenceModelTest extends UITestCase {
 		assertNull(bm.getSelectedElement());
 
 		// test setup vars
-		final ArrayList<PropertyChangeEvent> events = new ArrayList<>();
-		controller.addPropertyChangeListener(event -> events.add(event));
+		final ArrayList events = new ArrayList();
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				events.add(event);
+			}
+		});
 
 		bm.setSelectedElement(activateEditor);
 
@@ -206,8 +217,13 @@ public class KeysPreferenceModelTest extends UITestCase {
 		assertEquals(Boolean.FALSE, activateEditor.getConflict());
 
 		// test setup vars
-		final ArrayList<PropertyChangeEvent> events = new ArrayList<>();
-		controller.addPropertyChangeListener(event -> events.add(event));
+		final ArrayList events = new ArrayList();
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				events.add(event);
+			}
+		});
 
 		bm.setSelectedElement(conflict1);
 		assertEquals(conflict1, bm.getSelectedElement());
@@ -259,8 +275,13 @@ public class KeysPreferenceModelTest extends UITestCase {
 		final BindingElement conflict3 = getBindingElement(bm, ID_CMD_CONFLICT3);
 
 		// test setup vars
-		final ArrayList<PropertyChangeEvent> events = new ArrayList<>();
-		controller.addPropertyChangeListener(event -> events.add(event));
+		final ArrayList events = new ArrayList();
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				events.add(event);
+			}
+		});
 
 		bm.setSelectedElement(conflict1);
 		assertEquals(conflict1, bm.getSelectedElement());
@@ -398,8 +419,13 @@ public class KeysPreferenceModelTest extends UITestCase {
 		assertEquals(dialog, cm.getSelectedElement());
 
 		// test setup vars
-		final ArrayList<PropertyChangeEvent> events = new ArrayList<>();
-		controller.addPropertyChangeListener(event -> events.add(event));
+		final ArrayList events = new ArrayList();
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				events.add(event);
+			}
+		});
 
 		cm.setSelectedElement(window);
 		assertEquals(window, ((BindingElement) bm.getSelectedElement())
@@ -445,8 +471,13 @@ public class KeysPreferenceModelTest extends UITestCase {
 		assertEquals(dialog, cm.getSelectedElement());
 
 		// test setup vars
-		final ArrayList<PropertyChangeEvent> events = new ArrayList<>();
-		controller.addPropertyChangeListener(event -> events.add(event));
+		final ArrayList events = new ArrayList();
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				events.add(event);
+			}
+		});
 
 		KeySequence oldKeySequence = (KeySequence) conflict2.getTrigger();
 		KeySequence ctrl5 = KeySequence.getInstance("CTRL+5 N");
@@ -523,8 +554,13 @@ public class KeysPreferenceModelTest extends UITestCase {
 		assertNull(cm.getSelectedElement());
 
 		// test setup vars
-		final ArrayList<PropertyChangeEvent> events = new ArrayList<>();
-		controller.addPropertyChangeListener(event -> events.add(event));
+		final ArrayList events = new ArrayList();
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				events.add(event);
+			}
+		});
 
 		KeySequence ctrl5 = KeySequence.getInstance("CTRL+5 N");
 		conflict4.setTrigger(ctrl5);
@@ -741,9 +777,9 @@ public class KeysPreferenceModelTest extends UITestCase {
 		BindingModel bm = controller.getBindingModel();
 		BindingElement conflict4 = null;
 		ArrayList activates = new ArrayList();
-		Iterator<BindingElement> i = bm.getBindings().iterator();
+		Iterator i = bm.getBindings().iterator();
 		while (i.hasNext()) {
-			BindingElement be = i.next();
+			BindingElement be = (BindingElement) i.next();
 			if (be.getId().equals(ID_CMD_CONFLICT4)) {
 				activates.add(be);
 				if (be.getModelObject() instanceof ParameterizedCommand) {
@@ -759,7 +795,7 @@ public class KeysPreferenceModelTest extends UITestCase {
 		activates.clear();
 		i = bm.getBindings().iterator();
 		while (i.hasNext()) {
-			BindingElement be = i.next();
+			BindingElement be = (BindingElement) i.next();
 			if (be.getId().equals(ID_CMD_CONFLICT4)) {
 				activates.add(be);
 			}
@@ -806,9 +842,9 @@ public class KeysPreferenceModelTest extends UITestCase {
 		assertEquals(Integer.valueOf(Binding.USER), activeTwo.getUserDelta());
 
 		ArrayList activates = new ArrayList();
-		Iterator<BindingElement> i = bm.getBindings().iterator();
+		Iterator i = bm.getBindings().iterator();
 		while (i.hasNext()) {
-			BindingElement be = i.next();
+			BindingElement be = (BindingElement) i.next();
 			if (be.getId().equals(ID_ACTIVATE_EDITOR)) {
 				activates.add(be);
 			}
@@ -820,7 +856,7 @@ public class KeysPreferenceModelTest extends UITestCase {
 		activates = new ArrayList();
 		i = bm.getBindings().iterator();
 		while (i.hasNext()) {
-			BindingElement be = i.next();
+			BindingElement be = (BindingElement) i.next();
 			if (be.getId().equals(ID_ACTIVATE_EDITOR)) {
 				activates.add(be);
 				activateEditor = be;
