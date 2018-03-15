@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Comparator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.Job;
@@ -72,7 +73,12 @@ public class ProgressManagerUtil {
 			 */
 			for (int retries = 3; retries > 0; retries--) {
 				try {
-					Arrays.sort(elements, (a, b) -> ProgressViewerComparator.this.compare(viewer, a, b));
+					Arrays.sort(elements, new Comparator<Object>() {
+						@Override
+						public int compare(Object a, Object b) {
+							return ProgressViewerComparator.this.compare(viewer, a, b);
+						}
+					});
 					return; // success
 				} catch (IllegalArgumentException e) {
 					// retry
@@ -605,7 +611,13 @@ public class ProgressManagerUtil {
 	 * @return IShellProvider
 	 */
 	static IShellProvider getShellProvider() {
-		return () -> getDefaultParent();
+		return new IShellProvider() {
+
+			@Override
+			public Shell getShell() {
+				return getDefaultParent();
+			}
+		};
 	}
 
 	/**
