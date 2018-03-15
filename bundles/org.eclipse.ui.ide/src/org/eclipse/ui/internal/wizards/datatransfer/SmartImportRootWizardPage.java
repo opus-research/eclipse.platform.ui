@@ -189,6 +189,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	public SmartImportRootWizardPage(SmartImportWizard wizard, File initialSelection,
 			Set<IWorkingSet> initialWorkingSets) {
 		super(SmartImportRootWizardPage.class.getName());
+		this.potentialProjects = Collections.emptyMap();
 		this.selection = initialSelection;
 		this.workingSets = initialWorkingSets;
 		if (this.workingSets == null) {
