@@ -74,11 +74,11 @@ public class ClassLookupSupport {
 
 	private static void computeInterfaceOrder(Class[] interfaces, Collection classes, Set seen) {
 		List newInterfaces = new ArrayList(interfaces.length);
-		for (Class aInterface : interfaces) {
-			if (seen.add(aInterface)) {
+		for (Class interfaze : interfaces) {
+			if (seen.add(interfaze)) {
 				//note we cannot recurse here without changing the resulting interface order
-				classes.add(aInterface);
-				newInterfaces.add(aInterface);
+				classes.add(interfaze);
+				newInterfaces.add(interfaze);
 			}
 		}
 		for (Iterator it = newInterfaces.iterator(); it.hasNext();)
