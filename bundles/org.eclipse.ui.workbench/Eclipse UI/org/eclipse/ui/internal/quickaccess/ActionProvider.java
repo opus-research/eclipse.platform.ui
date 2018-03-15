@@ -58,8 +58,7 @@ public class ActionProvider extends QuickAccessProvider {
 				ActionContributionItem[] actions = (ActionContributionItem[]) result
 						.toArray(new ActionContributionItem[result.size()]);
 				for (ActionContributionItem action : actions) {
-					ActionElement actionElement = new ActionElement(action,
-							this);
+					ActionElement actionElement = new ActionElement(action, this);
 					idToElement.put(actionElement.getId(), actionElement);
 				}
 			}

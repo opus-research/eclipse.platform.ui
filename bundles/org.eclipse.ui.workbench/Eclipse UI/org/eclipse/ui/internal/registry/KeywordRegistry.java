@@ -61,8 +61,7 @@ public final class KeywordRegistry implements IExtensionChangeHandler {
 		IExtensionTracker tracker = PlatformUI.getWorkbench().getExtensionTracker();
         tracker.registerHandler(this, ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
 		for (IExtension extension : getExtensionPointFilter().getExtensions()) {
-			addExtension(PlatformUI.getWorkbench().getExtensionTracker(),
-					extension);
+			addExtension(PlatformUI.getWorkbench().getExtensionTracker(), extension);
 		}
 	}
 

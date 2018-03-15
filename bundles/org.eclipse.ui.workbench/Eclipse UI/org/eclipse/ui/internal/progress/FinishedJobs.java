@@ -219,21 +219,20 @@ public class FinishedJobs extends EventManager {
 
 			if (myJob != null) {
 
-				Object prop = myJob
-						.getProperty(ProgressManagerUtil.KEEPONE_PROPERTY);
+				Object prop = myJob.getProperty(ProgressManagerUtil.KEEPONE_PROPERTY);
 				if (prop instanceof Boolean && ((Boolean) prop).booleanValue()) {
 					ArrayList found = null;
 					JobTreeElement[] all;
 					all = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
-					for (JobTreeElement jte : all) {
-						if (jte != info && jte.isJobInfo()) {
-							Job job = ((JobInfo) jte).getJob();
+					for (JobTreeElement jobTreeElement : all) {
+						if (jobTreeElement != info && jobTreeElement.isJobInfo()) {
+							Job job = ((JobInfo) jobTreeElement).getJob();
 							if (job != null && job != myJob
 									&& job.belongsTo(myJob)) {
 								if (found == null) {
 									found = new ArrayList();
 								}
-								found.add(jte);
+								found.add(jobTreeElement);
 							}
 						}
 					}
@@ -381,8 +380,8 @@ public class FinishedJobs extends EventManager {
 		synchronized (keptjobinfos) {
 			JobTreeElement[] all = (JobTreeElement[]) keptjobinfos
 					.toArray(new JobTreeElement[keptjobinfos.size()]);
-			for (JobTreeElement element : all) {
-				disposeAction(element);
+			for (JobTreeElement jobTreeElement : all) {
+				disposeAction(jobTreeElement);
 			}
 			keptjobinfos.clear();
 			finishedTime.clear();

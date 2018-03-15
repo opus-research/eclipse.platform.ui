@@ -454,8 +454,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
             // determine the program icon this editor would need (do not let it
             // be cached in the workbench registry)
-            ImageDescriptor desc = new ExternalProgramImageDescriptor(
-                    program);
+			ImageDescriptor desc = new ExternalProgramImageDescriptor(program);
             editor.setImageDescriptor(desc);
             externalEditors.add(editor);
         }
@@ -732,33 +731,26 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
      *
      * @throws WorkbenchException
      */
-	public void readResources(Map<String, IEditorDescriptor> editorTable, Reader reader)
-            throws WorkbenchException {
+	public void readResources(Map<String, IEditorDescriptor> editorTable, Reader reader) throws WorkbenchException {
         XMLMemento memento = XMLMemento.createReadRoot(reader);
         String versionString = memento.getString(IWorkbenchConstants.TAG_VERSION);
         boolean versionIs31 = "3.1".equals(versionString); //$NON-NLS-1$
 
 		for (IMemento childMemento : memento.getChildren(IWorkbenchConstants.TAG_INFO)) {
-			String name = childMemento
-                    .getString(IWorkbenchConstants.TAG_NAME);
+			String name = childMemento.getString(IWorkbenchConstants.TAG_NAME);
             if (name == null) {
 				name = "*"; //$NON-NLS-1$
 			}
-			String extension = childMemento
-                    .getString(IWorkbenchConstants.TAG_EXTENSION);
-			IMemento[] idMementos = childMemento
-                    .getChildren(IWorkbenchConstants.TAG_EDITOR);
+			String extension = childMemento.getString(IWorkbenchConstants.TAG_EXTENSION);
+			IMemento[] idMementos = childMemento.getChildren(IWorkbenchConstants.TAG_EDITOR);
             String[] editorIDs = new String[idMementos.length];
             for (int j = 0; j < idMementos.length; j++) {
-                editorIDs[j] = idMementos[j]
-                        .getString(IWorkbenchConstants.TAG_ID);
+				editorIDs[j] = idMementos[j].getString(IWorkbenchConstants.TAG_ID);
             }
-			idMementos = childMemento
-                    .getChildren(IWorkbenchConstants.TAG_DELETED_EDITOR);
+			idMementos = childMemento.getChildren(IWorkbenchConstants.TAG_DELETED_EDITOR);
             String[] deletedEditorIDs = new String[idMementos.length];
             for (int j = 0; j < idMementos.length; j++) {
-                deletedEditorIDs[j] = idMementos[j]
-                        .getString(IWorkbenchConstants.TAG_ID);
+				deletedEditorIDs[j] = idMementos[j].getString(IWorkbenchConstants.TAG_ID);
             }
 			String key = name;
 			if (extension != null && extension.length() > 0) {

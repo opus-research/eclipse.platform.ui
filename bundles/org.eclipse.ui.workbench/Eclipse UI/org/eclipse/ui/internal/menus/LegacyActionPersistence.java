@@ -501,21 +501,18 @@ public final class LegacyActionPersistence extends RegistryPersistence {
 			 * We might need the identifier to generate the command, so we'll
 			 * read it out now.
 			 */
-			final String id = readRequired(configElement, ATT_ID, warningsToLog,
-					"Actions require an id"); //$NON-NLS-1$
+			final String id = readRequired(configElement, ATT_ID, warningsToLog, "Actions require an id"); //$NON-NLS-1$
 			if (id == null) {
 				continue;
 			}
 
 			// Try to break out the command part of the action.
-			final ParameterizedCommand command = convertActionToCommand(
-					configElement, primaryId, id, warningsToLog);
+			final ParameterizedCommand command = convertActionToCommand(configElement, primaryId, id, warningsToLog);
 			if (command == null) {
 				continue;
 			}
 
-			convertActionToHandler(configElement, id, command, visibleWhenExpression,
-					viewId, warningsToLog);
+			convertActionToHandler(configElement, id, command, visibleWhenExpression, viewId, warningsToLog);
 			// TODO Read the overrideActionId attribute
 		}
 	}
