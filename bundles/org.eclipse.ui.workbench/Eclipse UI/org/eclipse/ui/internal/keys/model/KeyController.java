@@ -190,79 +190,33 @@ public class KeyController {
 	}
 
 	private void addSetContextListener() {
-		addPropertyChangeListener(event -> {
-			if (event.getSource() == contextModel
-					&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
-							.getProperty())) {
-				updateBindingContext((ContextElement) event.getNewValue());
+		addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getSource() == contextModel
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
+								.getProperty())) {
+					updateBindingContext((ContextElement) event.getNewValue());
+				}
 			}
 		});
 	}
 
 	private void addSetBindingListener() {
-		addPropertyChangeListener(event -> {
-			if (event.getSource() == bindingModel
-					&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
-							.getProperty())) {
-				BindingElement binding = (BindingElement) event
-						.getNewValue();
-				if (binding == null) {
-					conflictModel.setSelectedElement(null);
-					return;
-				}
-				conflictModel.setSelectedElement(binding);
-				ContextElement context = binding.getContext();
-				if (context != null) {
-					contextModel.setSelectedElement(context);
-				}
-			}
-		});
-	}
-
-	private void addSetConflictListener() {
-		addPropertyChangeListener(event -> {
-			if (event.getSource() == conflictModel
-					&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
-							.getProperty())) {
-				if (event.getNewValue() != null) {
-					bindingModel.setSelectedElement((ModelElement) event
-							.getNewValue());
-				}
-			}
-		});
-	}
-
-	private void addSetKeySequenceListener() {
-		addPropertyChangeListener(event -> {
-			if (BindingElement.PROP_TRIGGER.equals(event.getProperty())) {
-				updateTrigger((BindingElement) event.getSource(),
-						(KeySequence) event.getOldValue(),
-						(KeySequence) event.getNewValue());
-			}
-		});
-	}
-
-	private void addSetModelObjectListener() {
-		addPropertyChangeListener(event -> {
-			if (event.getSource() instanceof BindingElement
-					&& ModelElement.PROP_MODEL_OBJECT.equals(event
-							.getProperty())) {
-				if (event.getNewValue() != null) {
-					BindingElement element = (BindingElement) event
-							.getSource();
-					Object oldValue = event.getOldValue();
-					Object newValue = event.getNewValue();
-					if (oldValue instanceof Binding
-							&& newValue instanceof Binding) {
-						conflictModel.updateConflictsFor(element,
-								((Binding) oldValue).getTriggerSequence(),
-								((Binding) newValue).getTriggerSequence(),
-								false);
-					} else {
-						conflictModel.updateConflictsFor(element, false);
+		addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getSource() == bindingModel
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
+								.getProperty())) {
+					BindingElement binding = (BindingElement) event
+							.getNewValue();
+					if (binding == null) {
+						conflictModel.setSelectedElement(null);
+						return;
 					}
-
-					ContextElement context = element.getContext();
+					conflictModel.setSelectedElement(binding);
+					ContextElement context = binding.getContext();
 					if (context != null) {
 						contextModel.setSelectedElement(context);
 					}
@@ -271,13 +225,77 @@ public class KeyController {
 		});
 	}
 
+	private void addSetConflictListener() {
+		addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getSource() == conflictModel
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
+								.getProperty())) {
+					if (event.getNewValue() != null) {
+						bindingModel.setSelectedElement((ModelElement) event
+								.getNewValue());
+					}
+				}
+			}
+		});
+	}
+
+	private void addSetKeySequenceListener() {
+		addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (BindingElement.PROP_TRIGGER.equals(event.getProperty())) {
+					updateTrigger((BindingElement) event.getSource(),
+							(KeySequence) event.getOldValue(),
+							(KeySequence) event.getNewValue());
+				}
+			}
+		});
+	}
+
+	private void addSetModelObjectListener() {
+		addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getSource() instanceof BindingElement
+						&& ModelElement.PROP_MODEL_OBJECT.equals(event
+								.getProperty())) {
+					if (event.getNewValue() != null) {
+						BindingElement element = (BindingElement) event
+								.getSource();
+						Object oldValue = event.getOldValue();
+						Object newValue = event.getNewValue();
+						if (oldValue instanceof Binding
+								&& newValue instanceof Binding) {
+							conflictModel.updateConflictsFor(element,
+									((Binding) oldValue).getTriggerSequence(),
+									((Binding) newValue).getTriggerSequence(),
+									false);
+						} else {
+							conflictModel.updateConflictsFor(element, false);
+						}
+
+						ContextElement context = element.getContext();
+						if (context != null) {
+							contextModel.setSelectedElement(context);
+						}
+					}
+				}
+			}
+		});
+	}
+
 	private void addSetSchemeListener() {
-		addPropertyChangeListener(event -> {
-			if (event.getSource() == fSchemeModel
-					&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
-							.getProperty())) {
-				changeScheme((SchemeElement) event.getOldValue(),
-						(SchemeElement) event.getNewValue());
+		addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getSource() == fSchemeModel
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
+								.getProperty())) {
+					changeScheme((SchemeElement) event.getOldValue(),
+							(SchemeElement) event.getNewValue());
+				}
 			}
 		});
 	}
