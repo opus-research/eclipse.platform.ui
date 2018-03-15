@@ -277,7 +277,6 @@ public class MToolItemTest {
 	}
 
 	@Test
-	@Ignore("See bug 452765")
 	public void testMToolItem_RadioItems() {
 		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
 				.createTrimmedWindow();
@@ -338,8 +337,10 @@ public class MToolItemTest {
 		assertTrue(toolItemWidget2.getSelection());
 	}
 
-	private void testMToolItem_Text(String before, String beforeExpected, String after, String afterExpected) {
-		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE.createTrimmedWindow();
+	private void testMToolItem_Text(String before, String beforeExpected,
+			String after, String afterExpected) {
+		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
+				.createTrimmedWindow();
 		MTrimBar trimBar = BasicFactoryImpl.eINSTANCE.createTrimBar();
 		MToolBar toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 		MToolItem toolItem = MenuFactoryImpl.eINSTANCE.createDirectToolItem();
@@ -383,7 +384,6 @@ public class MToolItemTest {
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Text_EmptyString() {
 		testMToolItem_Text("", "", "label", "label");
 	}
@@ -399,25 +399,21 @@ public class MToolItemTest {
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Text_NullString() {
 		testMToolItem_Text(null, "", "label", "label");
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Text_StringEmpty() {
 		testMToolItem_Text("label", "label", "", "");
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Text_StringNull() {
 		testMToolItem_Text("label", "label", null, "");
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Text_StringStringChanged() {
 		testMToolItem_Text("label", "label", "label2", "label2");
 	}
@@ -469,19 +465,16 @@ public class MToolItemTest {
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Tooltip_EmptyNull() {
 		testMToolItem_Tooltip("", "", null, null);
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Tooltip_EmptyString() {
 		testMToolItem_Tooltip("", "", "toolTip", "toolTip");
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Tooltip_NullEmpty() {
 		testMToolItem_Tooltip(null, null, "", "");
 	}
@@ -492,25 +485,21 @@ public class MToolItemTest {
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Tooltip_NullString() {
 		testMToolItem_Tooltip(null, null, "toolTip", "toolTip");
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Tooltip_StringEmpty() {
 		testMToolItem_Tooltip("toolTip", "toolTip", "", "");
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Tooltip_StringNull() {
 		testMToolItem_Tooltip("toolTip", "toolTip", null, null);
 	}
 
 	@Test
-	@Ignore("See Bug 452765")
 	public void testMToolItem_Tooltip_StringStringChanged() {
 		testMToolItem_Tooltip("toolTip", "toolTip", "toolTip2", "toolTip2");
 	}
