@@ -225,8 +225,6 @@ public class ExpandableComposite extends Canvas {
 
 	private class ExpandableLayout extends Layout implements ILayoutExtension {
 
-		private static final int MIN_WIDTH = -2;
-
 		private SizeCache toggleCache = new SizeCache();
 
 		private SizeCache textClientCache = new SizeCache();
@@ -320,8 +318,10 @@ public class ExpandableComposite extends Canvas {
 
 			boolean leftAlignment = textClient != null && (expansionStyle & LEFT_TEXT_CLIENT_ALIGNMENT) != 0;
 			if (toggle != null) {
-				// if label control is absent we vertically center the toggle,
-				// because the text client is usually a lot thicker
+				// if label control is absent we vcenter the toggle, because
+				// text client is usually a lot thicker
+				// before it was using leftAlignment flag for that which I think
+				// is not related to this at all
 				int ty = size.x == 0 ? (height - toggleSize.y) / 2 : 0;
 				ty = Math.max(ty, 0);
 				ty += marginHeight + tvmargin;
@@ -418,7 +418,7 @@ public class ExpandableComposite extends Canvas {
 			Point labelDefault = this.textLabelCache.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
 			int width = 0;
-			if (wHint == SWT.DEFAULT || wHint == MIN_WIDTH) {
+			if (wHint == SWT.DEFAULT) {
 				width += toggleWidthPlusGap;
 				width += labelDefault.x;
 				width += gapBetweenTcAndLabel;
@@ -463,23 +463,17 @@ public class ExpandableComposite extends Canvas {
 				if ((expansionStyle & CLIENT_INDENT) != 0)
 					clientIndent = toggleWidthPlusGap;
 
-				if (cwHint != SWT.DEFAULT && cwHint != MIN_WIDTH) {
+				if (cwHint != SWT.DEFAULT) {
 					cwHint -= marginWidth + marginWidth + thmargin + thmargin;
 					if ((expansionStyle & CLIENT_INDENT) != 0)
 						if (tcsize.x > 0)
 							cwHint -= toggleWidthPlusGap;
 				}
 				Point dsize = null;
-				Point csize;
-				if (cwHint == MIN_WIDTH) {
-					int minWidth = clientCache.computeMinimumWidth();
-					csize = clientCache.computeSize(minWidth, SWT.DEFAULT);
-				} else {
-					csize = clientCache.computeSize(cwHint, SWT.DEFAULT);
-				}
+				Point csize = clientCache.computeSize(cwHint, SWT.DEFAULT);
 				if (getDescriptionControl() != null) {
 					int dwHint = cwHint;
-					if (dwHint == SWT.DEFAULT || dwHint == MIN_WIDTH) {
+					if (dwHint == SWT.DEFAULT) {
 						dwHint = csize.x;
 						if ((expansionStyle & CLIENT_INDENT) != 0)
 							dwHint -= toggleWidthPlusGap;
@@ -502,7 +496,7 @@ public class ExpandableComposite extends Canvas {
 
 			int resultWidth = width + marginWidth + marginWidth + thmargin + thmargin;
 
-			if (wHint != SWT.DEFAULT && wHint != MIN_WIDTH) {
+			if (wHint != SWT.DEFAULT) {
 				resultWidth = wHint;
 			}
 
@@ -518,7 +512,7 @@ public class ExpandableComposite extends Canvas {
 
 		@Override
 		public int computeMinimumWidth(Composite parent, boolean changed) {
-			return computeSize(parent, MIN_WIDTH, SWT.DEFAULT, changed).x;
+			return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 		}
 
 		@Override
