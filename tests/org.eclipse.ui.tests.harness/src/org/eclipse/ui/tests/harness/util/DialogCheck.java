@@ -67,7 +67,14 @@ public class DialogCheck {
 	 */
 	@Deprecated
 	public static void assertDialog(Dialog dialog, Assert assertion) {
-		assertDialog(dialog);
+		assertNotNull(dialog);
+		if (_verifyDialog.getShell() == null) {
+			// force the creation of the verify dialog
+			getShell();
+		}
+		if (_verifyDialog.open(dialog) == IDialogConstants.NO_ID) {
+			assertTrue(_verifyDialog.getFailureText(), false);
+		}
 	}
 
 	/**
