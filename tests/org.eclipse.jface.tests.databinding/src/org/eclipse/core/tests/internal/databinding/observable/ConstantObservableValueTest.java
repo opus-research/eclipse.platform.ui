@@ -20,10 +20,9 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValu
 import org.eclipse.jface.databinding.conformance.delegate.IObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.SuiteBuilder;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * Tests for ConstantObservableValue
@@ -31,23 +30,20 @@ import org.junit.runners.AllTests;
  * @since 1.1
  */
 public class ConstantObservableValueTest extends AbstractDefaultRealmTestCase {
-
-	@Test(expected = RuntimeException.class)
 	public void testConstructor_NullRealm() {
-		new ConstantObservableValue(null, null, null);
-	}
-
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			return new SuiteBuilder()
-					.addObservableContractTest(UnchangeableObservableValueContractTest.class, new Delegate()).build();
+		try {
+			new ConstantObservableValue(null, null, null);
+			fail("Constructor should throw an exception when null realm is passed in");
+		} catch (RuntimeException expected) {
 		}
+	}
+
+	public static Test suite() {
+		TestSuite suite = new TestSuite("ConstantValueTest");
+		suite.addTestSuite(ConstantObservableValueTest.class);
+		suite.addTest(UnchangeableObservableValueContractTest
+				.suite(new Delegate()));
+		return suite;
 	}
 
 	private static class Delegate extends
@@ -75,88 +71,80 @@ public class ConstantObservableValueTest extends AbstractDefaultRealmTestCase {
 		}
 
 		@Override
-		@Test
-	public void testChange_OrderOfNotifications() {
+		public void testChange_OrderOfNotifications() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ValueChangeEvent() {
+		public void testChange_ValueChangeEvent() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ValueChangeEventDiff() {
+		public void testChange_ValueChangeEventDiff() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ValueChangeEventFiredAfterValueIsSet() {
+		public void testChange_ValueChangeEventFiredAfterValueIsSet() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testRemoveValueChangeListener_RemovesListener()
+		public void testRemoveValueChangeListener_RemovesListener()
 				throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ChangeEvent() {
+		public void testChange_ChangeEvent() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_EventObservable() {
+		public void testChange_EventObservable() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ObservableRealmIsTheCurrentRealm() {
+		public void testChange_ObservableRealmIsTheCurrentRealm() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_RealmCheck() {
+		public void testChange_RealmCheck() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testRemoveChangeListener_RemovesListener() {
+		public void testRemoveChangeListener_RemovesListener() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsStale_RealmChecks() {
+		public void testIsStale_RealmChecks() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsStale_GetterCalled() throws Exception {
+		public void testIsStale_GetterCalled() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsDisposed() throws Exception {
+		public void testIsDisposed() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testAddDisposeListener_HandleDisposeInvoked() {
+		public void testAddDisposeListener_HandleDisposeInvoked() {
 			// disabled
+		}
+
+		public static Test suite(IObservableValueContractDelegate delegate) {
+			return new SuiteBuilder().addObservableContractTest(
+					UnchangeableObservableValueContractTest.class, delegate)
+					.build();
 		}
 	}
 }

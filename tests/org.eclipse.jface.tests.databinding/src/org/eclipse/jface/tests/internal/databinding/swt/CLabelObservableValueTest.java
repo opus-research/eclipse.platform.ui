@@ -12,7 +12,9 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -25,26 +27,20 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  *
  */
-public class CLabelObservableValueTest {
+public class CLabelObservableValueTest extends TestCase {
 	private Delegate delegate;
 	private IObservableValue observable;
 	private CLabel label;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
 		delegate = new Delegate();
 		delegate.setUp();
 		label = delegate.label;
@@ -52,13 +48,14 @@ public class CLabelObservableValueTest {
 				.getRealm(Display.getDefault()));
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+
 		delegate.tearDown();
 		observable.dispose();
 	}
 
-	@Test
 	public void testSetValue() throws Exception {
 		// preconditions
 		assertEquals(null, label.getText());
@@ -70,18 +67,13 @@ public class CLabelObservableValueTest {
 		assertEquals("observable value", value, observable.getValue());
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(CLabelObservableValueTest.class.getName());
-			suite.addTest(SWTMutableObservableValueContractTest.suite(new Delegate()));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(CLabelObservableValueTest.class
+				.getName());
+		suite.addTestSuite(CLabelObservableValueTest.class);
+		suite.addTest(SWTMutableObservableValueContractTest
+				.suite(new Delegate()));
+		return suite;
 	}
 
 	/* package */static class Delegate extends

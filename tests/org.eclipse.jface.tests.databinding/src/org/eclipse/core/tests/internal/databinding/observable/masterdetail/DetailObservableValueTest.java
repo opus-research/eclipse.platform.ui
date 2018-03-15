@@ -15,10 +15,8 @@
 
 package org.eclipse.core.tests.internal.databinding.observable.masterdetail;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -35,13 +33,6 @@ import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.DisposeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -50,13 +41,11 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 	private WritableValue outerObservable;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		outerObservable = new WritableValue();
 	}
 
-	@Test
 	public void testSetValue() throws Exception {
 		WritableValueFactory factory = new WritableValueFactory();
 		outerObservable.setValue("");
@@ -71,7 +60,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals("inner value", value, innerObservable.getValue());
 	}
 
-	@Test
 	public void testGetValueType() throws Exception {
 		DetailObservableValue detailObservable = new DetailObservableValue(
 				outerObservable, null, String.class);
@@ -83,7 +71,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 	 * type checking is performed and the value type is always <code>null</code>
 	 * .
 	 */
-	@Test
 	public void testGetValueTypeNullValueType() throws Exception {
 		WritableValueFactory factory = new WritableValueFactory();
 		DetailObservableValue detailObservable = new DetailObservableValue(
@@ -108,7 +95,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 	 * Asserts that the master observable value is not disposed upon disposing
 	 * its detail observable value (bug 241318).
 	 */
-	@Test
 	public void testMasterNotDisposedWhenDetailDisposed() {
 		class OuterObservable extends WritableValue {
 			boolean disposed = false;
@@ -131,7 +117,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertFalse(outerObservable.disposed);
 	}
 
-	@Test
 	public void testDisposeMasterDisposesDetail() {
 		IObservableValue master = new WritableValue();
 		WritableValueFactory factory = new WritableValueFactory();
@@ -148,7 +133,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertTrue(detailObservable.isDisposed());
 	}
 
-	@Test
 	public void testDisposeWhileFiringEvents() {
 		IObservableValue master = new WritableValue();
 		WritableValueFactory factory = new WritableValueFactory();
@@ -184,18 +168,12 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(DetailObservableValueTest.class.getName());
-			suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(DetailObservableValueTest.class
+				.getName());
+		suite.addTestSuite(DetailObservableValueTest.class);
+		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
+		return suite;
 	}
 
 	private static class DetailObservableValueStub extends

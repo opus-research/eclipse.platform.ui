@@ -11,18 +11,12 @@
 
 package org.eclipse.core.tests.databinding;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
 
 public class BindingTest extends AbstractDefaultRealmTestCase {
 	private IObservable target;
@@ -31,8 +25,8 @@ public class BindingTest extends AbstractDefaultRealmTestCase {
 
 	private DataBindingContext dbc;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		target = WritableValue.withValueType(String.class);
@@ -40,7 +34,6 @@ public class BindingTest extends AbstractDefaultRealmTestCase {
 		dbc = new DataBindingContext();
 	}
 
-	@Test
 	public void testDisposeTargetDisposesBinding() {
 		Binding binding = createBinding();
 		assertFalse(binding.isDisposed());
@@ -48,7 +41,6 @@ public class BindingTest extends AbstractDefaultRealmTestCase {
 		assertTrue(binding.isDisposed());
 	}
 
-	@Test
 	public void testDisposeModelDisposesBinding() {
 		Binding binding = createBinding();
 		assertFalse(binding.isDisposed());
@@ -56,7 +48,6 @@ public class BindingTest extends AbstractDefaultRealmTestCase {
 		assertTrue(binding.isDisposed());
 	}
 
-	@Test
 	public void testPreDisposedTarget_FiresIllegalArgumentException() {
 		try {
 			target.dispose();
@@ -66,7 +57,6 @@ public class BindingTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testPreDisposedModel_FiresIllegalArgumentException() {
 		try {
 			model.dispose();
@@ -76,21 +66,18 @@ public class BindingTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testDisposeModelThenBinding() {
 		Binding binding = createBinding();
 		model.dispose();
 		binding.dispose();
 	}
 
-	@Test
 	public void testDisposeTargetThenBinding() {
 		Binding binding = createBinding();
 		target.dispose();
 		binding.dispose();
 	}
 
-	@Test
 	public void testDisposeObservablesThenBinding() {
 		Binding binding = createBinding();
 		model.dispose();
@@ -98,21 +85,18 @@ public class BindingTest extends AbstractDefaultRealmTestCase {
 		binding.dispose();
 	}
 
-	@Test
 	public void testDisposeBindingThenModel() {
 		Binding binding = createBinding();
 		binding.dispose();
 		model.dispose();
 	}
 
-	@Test
 	public void testDisposeBindingThenTarget() {
 		Binding binding = createBinding();
 		binding.dispose();
 		target.dispose();
 	}
 
-	@Test
 	public void testDisposeBindingThenObservables() {
 		Binding binding = createBinding();
 		binding.dispose();

@@ -12,6 +12,9 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -24,13 +27,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -49,8 +45,7 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 	}
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		delegate = (Delegate) getObservableContractDelegate();
@@ -64,7 +59,6 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 				DisplayRealm.getRealm(Display.getDefault()));
 	}
 
-	@Test
 	public void testSetValue() throws Exception {
 		// preconditions
 		assertEquals("", label.getText());
@@ -76,18 +70,13 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 		assertEquals("observable value", value, observable.getValue());
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(LabelObservableValueTest.class.toString());
-			suite.addTest(SWTMutableObservableValueContractTest.suite(new Delegate()));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(LabelObservableValueTest.class
+				.toString());
+		suite.addTestSuite(LabelObservableValueTest.class);
+		suite.addTest(SWTMutableObservableValueContractTest
+				.suite(new Delegate()));
+		return suite;
 	}
 
 	/* package */static class Delegate extends

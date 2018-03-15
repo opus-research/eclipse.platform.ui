@@ -11,10 +11,6 @@
 
 package org.eclipse.core.tests.internal.databinding.beans;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -24,8 +20,6 @@ import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.internal.databinding.beans.BeanPropertyListenerSupport;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 1.1
@@ -35,15 +29,14 @@ public class BeanPropertyListenerSupportTest extends
 	private PropertyChangeListenerStub listener;
 	private String propertyName;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		listener = new PropertyChangeListenerStub();
 		propertyName = "value";
 	}
 
-	@Test
 	public void testAddPropertyChangeListenerWithPropertyName()
 			throws Exception {
 		SpecificListenerBean bean = new SpecificListenerBean();
@@ -55,7 +48,6 @@ public class BeanPropertyListenerSupportTest extends
 				.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testAddPropertyChangeListenerWithoutPropertyName()
 			throws Exception {
 		GenericListenerBean bean = new GenericListenerBean();
@@ -67,7 +59,6 @@ public class BeanPropertyListenerSupportTest extends
 				.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testLogStatusWhenAddPropertyChangeListenerMethodIsNotFound()
 			throws Exception {
 		class BeanStub {
@@ -95,7 +86,6 @@ public class BeanPropertyListenerSupportTest extends
 		assertEquals(IStatus.WARNING, log.status.getSeverity());
 	}
 
-	@Test
 	public void testRemovePropertyChangeListenerWithPropertyName()
 			throws Exception {
 		SpecificListenerBean bean = new SpecificListenerBean();
@@ -109,7 +99,6 @@ public class BeanPropertyListenerSupportTest extends
 				.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testRemovePropertyChangeListenerWithoutPropertyName()
 			throws Exception {
 		GenericListenerBean bean = new GenericListenerBean();
@@ -123,7 +112,6 @@ public class BeanPropertyListenerSupportTest extends
 				.hasListeners(propertyName));
 	}
 
-	@Test
 	public void testLogStatusWhenRemovePropertyChangeListenerMethodIsNotFound()
 			throws Exception {
 		class InvalidBean {

@@ -12,9 +12,6 @@
 
 package org.eclipse.jface.tests.databinding.viewers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.HashSet;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -22,15 +19,13 @@ import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.examples.databinding.ModelObject;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Test;
 
 /**
  * @since 1.1
  */
 public class ObservableMapLabelProviderTest extends AbstractDefaultRealmTestCase {
 
-    @Test
-	public void testGetColumnText() throws Exception {
+    public void testGetColumnText() throws Exception {
         WritableSet set = new WritableSet(new HashSet(), Item.class);
         Item item = new Item();
         String value = "value";
@@ -41,8 +36,7 @@ public class ObservableMapLabelProviderTest extends AbstractDefaultRealmTestCase
         assertEquals(item.getValue(), labelProvider.getColumnText(item, 0));
     }
 
-    @Test
-	public void testGetColumnTextNullValue() throws Exception {
+    public void testGetColumnTextNullValue() throws Exception {
         WritableSet set = new WritableSet(new HashSet(), Item.class);
         Item item = new Item();
         set.add(item);

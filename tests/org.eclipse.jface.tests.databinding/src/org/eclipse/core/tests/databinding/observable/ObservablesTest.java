@@ -11,9 +11,6 @@
 
 package org.eclipse.core.tests.databinding.observable;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,10 +19,8 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.ObservableList;
 import org.eclipse.core.internal.databinding.observable.UnmodifiableObservableList;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Test;
 
 public class ObservablesTest extends AbstractDefaultRealmTestCase {
-	@Test
 	public void testUnmodifableObservableListExceptions() throws Exception {
 		try {
 			Observables.unmodifiableObservableList(null);
@@ -34,7 +29,6 @@ public class ObservablesTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testUnmodifiableObservableList() throws Exception {
 		IObservableList unmodifiable = Observables.unmodifiableObservableList(new ObservableListStub(
 				new ArrayList<Object>(0), String.class));

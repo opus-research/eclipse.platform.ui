@@ -13,12 +13,11 @@
 
 package org.eclipse.core.tests.internal.databinding.observable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -36,13 +35,6 @@ import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.ListChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.StaleEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 public class UnmodifiableObservableListTest extends
 		AbstractDefaultRealmTestCase {
@@ -50,8 +42,7 @@ public class UnmodifiableObservableListTest extends
 	ObservableList mutable;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		List list = new ArrayList();
@@ -62,7 +53,6 @@ public class UnmodifiableObservableListTest extends
 		unmodifiable = Observables.unmodifiableObservableList(mutable);
 	}
 
-	@Test
 	public void testFiresChangeEvents() throws Exception {
 		ChangeEventTracker mutableListener = new ChangeEventTracker();
 		ChangeEventTracker unmodifiableListener = new ChangeEventTracker();
@@ -77,7 +67,6 @@ public class UnmodifiableObservableListTest extends
 		assertEquals(1, unmodifiableListener.count);
 	}
 
-	@Test
 	public void testFiresListChangeEvents() throws Exception {
 		ListChangeEventTracker mutableListener = new ListChangeEventTracker();
 		ListChangeEventTracker unmodifiableListener = new ListChangeEventTracker();
@@ -109,7 +98,6 @@ public class UnmodifiableObservableListTest extends
 		assertEquals(3, unmodifiable.size());
 	}
 
-	@Test
 	public void testFiresStaleEvents() throws Exception {
 		StaleEventTracker mutableListener = new StaleEventTracker();
 		StaleEventTracker unmodifiableListener = new StaleEventTracker();
@@ -128,7 +116,6 @@ public class UnmodifiableObservableListTest extends
 		assertTrue(unmodifiable.isStale());
 	}
 
-	@Test
 	public void testIsStale() throws Exception {
 		assertFalse(mutable.isStale());
 		assertFalse(unmodifiable.isStale());
@@ -156,18 +143,11 @@ public class UnmodifiableObservableListTest extends
 		}
 	}
 
-	@Test
-	public void testSuite() throws Exception {
-		JUnitCore.runClasses(Suite.class);
-	}
-
-	@RunWith(AllTests.class)
-	public static class Suite {
-		public static junit.framework.Test suite() {
-			TestSuite suite = new TestSuite(UnmodifiableObservableListTest.class.getName());
-			suite.addTest(ObservableListContractTest.suite(new Delegate()));
-			return suite;
-		}
+	public static Test suite() {
+		TestSuite suite = new TestSuite(UnmodifiableObservableListTest.class.getName());
+		suite.addTestSuite(UnmodifiableObservableListTest.class);
+		suite.addTest(ObservableListContractTest.suite(new Delegate()));
+		return suite;
 	}
 
 	private static class Delegate extends

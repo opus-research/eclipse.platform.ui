@@ -11,6 +11,9 @@
 
 package org.eclipse.core.tests.databinding.observable.value;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -19,19 +22,16 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.databinding.conformance.MutableObservableValueContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  *
  */
-@RunWith(AllTests.class)
 public class SelectObservableValueTest extends AbstractDefaultRealmTestCase {
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(SelectObservableValueTest.class.getName());
+	public static Test suite() {
+		TestSuite suite = new TestSuite(SelectObservableValueTest.class
+				.getName());
+		// suite.addTestSuite(SelectObservableValueValueTest.class);
 		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
 		return suite;
 	}

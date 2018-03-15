@@ -11,30 +11,26 @@
 
 package org.eclipse.core.tests.internal.databinding.conversion;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import junit.framework.TestCase;
 
 import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 import org.eclipse.core.internal.databinding.conversion.StringToNumberParser.ParseResult;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.ibm.icu.text.NumberFormat;
 
 /**
  * @since 1.1
  */
-public class StringToNumberParserTest {
+public class StringToNumberParserTest extends TestCase {
 	private NumberFormat integerFormat;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
 		integerFormat = NumberFormat.getIntegerInstance();
 	}
 
-	@Test
 	public void testParseNonStringThrowsIllegalArgumentException()
 			throws Exception {
 		try {
@@ -44,14 +40,12 @@ public class StringToNumberParserTest {
 		}
 	}
 
-	@Test
 	public void testEmptyStringReturnsNullIfNotPrimitive() throws Exception {
 		ParseResult result = StringToNumberParser.parse("",
 				integerFormat, false);
 		assertNull(result.getNumber());
 	}
 
-	@Test
 	public void testReturnsParsePositionWhenValueCannotBeParsed()
 			throws Exception {
 		ParseResult result = StringToNumberParser.parse("adsf",
@@ -60,7 +54,6 @@ public class StringToNumberParserTest {
 		assertNull(result.getNumber());
 	}
 
-	@Test
 	public void testReturnsNumberWhenSuccessfullyParsed() throws Exception {
 		Integer number = Integer.valueOf(5);
 		ParseResult result = StringToNumberParser.parse(integerFormat

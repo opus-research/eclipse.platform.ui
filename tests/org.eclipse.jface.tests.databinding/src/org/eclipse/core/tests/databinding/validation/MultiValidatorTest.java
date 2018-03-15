@@ -13,13 +13,6 @@
 
 package org.eclipse.core.tests.databinding.validation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,16 +39,14 @@ import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.StaleEventTracker;
 import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
 
 public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 	private DependencyObservableValue dependency;
 	private MultiValidator validator;
 	private IObservableValue validationStatus;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		dependency = new DependencyObservableValue(null, IStatus.class);
 		validator = new MultiValidator() {
@@ -67,7 +58,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		validationStatus = validator.getValidationStatus();
 	}
 
-	@Test
 	public void testConstructor_NullArgument() {
 		try {
 			new MultiValidator(null) {
@@ -81,13 +71,11 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testGetValidationStatus_NullResultYieldsOKStatus() {
 		IStatus status = (IStatus) validationStatus.getValue();
 		assertTrue(status.isOK()); // null -> OK
 	}
 
-	@Test
 	public void testGetValidationStatus_ExceptionThrownYieldsErrorStatus() {
 		final RuntimeException e = new RuntimeException("message");
 		validator = new MultiValidator() {
@@ -99,21 +87,18 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertEquals(ValidationStatus.error("message", e), validator.getValidationStatus().getValue());
 	}
 
-	@Test
 	public void testGetValidationStatus_TracksWithDependency() {
 		IStatus newStatus = ValidationStatus.error("error");
 		dependency.setValue(newStatus);
 		assertEquals(newStatus, validationStatus.getValue());
 	}
 
-	@Test
 	public void testInit_AddsValidationProducer() {
 		DataBindingContext dbc = new DataBindingContext();
 		dbc.addValidationStatusProvider(validator);
 		assertTrue(dbc.getValidationStatusProviders().contains(validator));
 	}
 
-	@Test
 	public void testObserveValidatedValue_NullArgument() {
 		try {
 			validator.observeValidatedValue(null);
@@ -122,7 +107,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testObserveValidatedValue_WrongRealm() {
 		Realm otherRealm = new CurrentRealm(true);
 		try {
@@ -132,7 +116,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testObserveValidatedValue_ReturnValue() {
 		WritableValue target = new WritableValue();
 		ValidatedObservableValue validated = (ValidatedObservableValue) validator.observeValidatedValue(target);
@@ -152,7 +135,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertFalse(validated.isStale());
 	}
 
-	@Test
 	public void testBug237884_DisposeCausesNPE() {
 		MultiValidator validator = new MultiValidator() {
 			@Override
@@ -167,13 +149,11 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testBug237884_MultipleDispose() {
 		validator.dispose();
 		validator.dispose();
 	}
 
-	@Test
 	public void testBug237884_Comment3_ValidationStatusAsDependencyCausesStackOverflow() {
 		dependency = new DependencyObservableValue(new Object(), Object.class);
 		validator = new MultiValidator() {
@@ -208,7 +188,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testBug237884_ValidationStatusListenerCausesLoopingDependency() {
 		validationStatus.addChangeListener(new IChangeListener() {
 			@Override
@@ -222,7 +201,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertFalse(validator.getTargets().contains(validationStatus));
 	}
 
-	@Test
 	public void testRevalidate() {
 		// Use this as an easy way to inject a validation status into the
 		// validator without using an observable value.
@@ -256,7 +234,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertSame(status[0], validator.getValidationStatus().getValue());
 	}
 
-	@Test
 	public void testBug237884_ValidationStatusAccessDuringValidationCausesLoopingDependency() {
 		validator = new MultiValidator() {
 			@Override
@@ -270,7 +247,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertFalse(validator.getTargets().contains(validationStatus));
 	}
 
-	@Test
 	public void testBug240590_ValidationStatusSetWhileTrackingDependencies() {
 		final IObservableValue noDependency = new WritableValue();
 		validationStatus.addValueChangeListener(new IValueChangeListener() {
@@ -289,7 +265,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertFalse(validator.getTargets().contains(noDependency));
 	}
 
-	@Test
 	public void testValidationStaleness() {
 		ValueChangeEventTracker validationChangeCounter = ValueChangeEventTracker.observe(validationStatus);
 
@@ -328,7 +303,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, validationStaleCounter.count);
 	}
 
-	@Test
 	public void testStatusValueChangeWhileValidationStale() {
 		// Change to a stale state.
 		dependency.setStale(true);
@@ -344,7 +318,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertEquals(dependency.getValue(), validationStatus.getValue());
 	}
 
-	@Test
 	public void testValidationStatusBecomesStaleThroughNewDependency() {
 		final DependencyObservableValue nonStaleDependency = new DependencyObservableValue(ValidationStatus.ok(),
 				IStatus.class);
@@ -378,7 +351,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, validationStaleCounter.count);
 	}
 
-	@Test
 	public void testBug251003_CompareDependenciesByIdentity() {
 		DependencyObservable dependency1 = new DependencyObservable();
 		DependencyObservable dependency2 = new DependencyObservable();
@@ -410,7 +382,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertSame(dependency2, targets.get(0));
 	}
 
-	@Test
 	public void testBug251003_MissingDependencies() {
 		final WritableList emptyListDependency = new WritableList();
 		validator = new MultiValidator() {
@@ -428,7 +399,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		assertTrue(validator.getTargets().contains(emptyListDependency));
 	}
 
-	@Test
 	public void testBug357568_MultiValidatorTargetAsDependency() {
 		validator = new MultiValidator() {
 			@Override
@@ -444,7 +414,6 @@ public class MultiValidatorTest extends AbstractDefaultRealmTestCase {
 		dependency.setValue(ValidationStatus.info("foo"));
 	}
 
-	@Test
 	public void testBug357568_ValidationStatusAsDependency() {
 		validator = new MultiValidator() {
 			@Override
