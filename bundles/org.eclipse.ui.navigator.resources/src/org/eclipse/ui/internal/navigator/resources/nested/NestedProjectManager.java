@@ -12,7 +12,10 @@
 package org.eclipse.ui.internal.navigator.resources.nested;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IContainer;
@@ -32,8 +35,18 @@ public class NestedProjectManager {
 
 	private static NestedProjectManager INSTANCE = new NestedProjectManager();
 
-	private Map<IPath, IProject> locationsToProjects = Collections
-			.synchronizedMap(new TreeMap<IPath, IProject>(new PathComparator()));
+	/**
+	 * This structure sorts project by location, so we can assume that:
+	 * <ul>
+	 * <li>If a project is nested under another, then the parent project is the
+	 * previous item in the map. So getting the parent is just about checking
+	 * the previous project for parency.</li>
+	 * <li>the children project of a project (with any depth not only direct
+	 * ones) are the immediately following items in the map.</li>
+	 * </ul>
+	 */
+	private SortedMap<IPath, IProject> locationsToProjects = Collections
+			.synchronizedSortedMap(new TreeMap<IPath, IProject>(new PathComparator()));
 
 	private int knownProjectsCount;
 
@@ -153,6 +166,29 @@ public class NestedProjectManager {
 			return mostDirectParentProject.getFolder(parentFolderPathRelativeToProject);
 		}
 		return null;
+	}
+
+	/**
+	 * @param container
+	 *            a container to ask for nested projects
+	 * @return the direct children projects for given container
+	 */
+	public IProject[] getDirectChildrenProjects(IContainer container) {
+		Set<IProject> res = new HashSet<>();
+		IPath containerLocation = container.getLocation();
+		for (Entry<IPath, IProject> entry : locationsToProjects.tailMap(container.getProject().getLocation())
+				.entrySet()) {
+			if (entry.getValue().equals(container.getProject())) {
+				// ignore current project
+			} else if (containerLocation.isPrefixOf(entry.getKey())) {
+				if (entry.getKey().segmentCount() == containerLocation.segmentCount() + 1) {
+					res.add(entry.getValue());
+				}
+			} else { // moved to another branch, not worth continuing
+				break;
+			}
+		}
+		return res.toArray(new IProject[res.size()]);
 	}
 
 }
