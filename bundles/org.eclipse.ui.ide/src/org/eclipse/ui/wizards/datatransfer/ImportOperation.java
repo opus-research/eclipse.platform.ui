@@ -14,6 +14,8 @@ package org.eclipse.ui.wizards.datatransfer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -524,7 +526,17 @@ public class ImportOperation extends WorkspaceModifyOperation {
             return;
         }
 
+		/*
+		 * Fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=211427
+		 */
+		if (noReadPermissions(fileObject)) {
+			errorTable.add(new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0,
+					NLS.bind(DataTransferMessages.ImportOperation_cannotReadError, fileObjectPath), null));
+			return;
+		}
+
         InputStream contentStream = provider.getContents(fileObject);
+
         if (contentStream == null) {
             errorTable
                     .add(new Status(
@@ -573,6 +585,38 @@ public class ImportOperation extends WorkspaceModifyOperation {
 						NLS.bind(DataTransferMessages.ImportOperation_closeStreamError, fileObjectPath), e));
 			}
 		}
+	}
+
+	/**
+	 * Test if a file exists but has no read permissions.
+	 *
+	 * @param file
+	 *            the File object
+	 * @return true is File exists but is not readable, false otherwise; false
+	 *         if other Objects are passed
+	 */
+	private boolean noReadPermissions(Object file) {
+		if (file instanceof File) {
+			// File.canRead does not properly work on Windows 7
+			// see http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6203387
+			// java.nio works properly on all OSes
+			java.nio.file.Path path = ((File) file).toPath();
+			boolean readable = Files.isReadable(((File) file).toPath());
+			boolean regular = false;
+			try {
+				// File.exists will return false in the case the user has no
+				// read permissions, so we need to
+				// query the regularFile attribute instead
+				BasicFileAttributes readAttributes = Files.readAttributes(path, BasicFileAttributes.class);
+				regular = readAttributes.isRegularFile();
+			} catch (IOException e) {
+				return false;
+			}
+			if (regular && !readable) {
+				return true;
+			}
+		}
+		return false;
 	}
 
     /**
