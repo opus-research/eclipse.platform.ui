@@ -120,14 +120,22 @@ public class SizeCacheTest extends TestCase {
 		control.setSize(expectedSize);
 		dispatch();
 
-		expectedSize = getAdjustedExpected(expectedSize, whint, hhint);
-
 		checkDoubleCall(whint, hhint);
 		checkPreferedThenOther(whint, hhint);
 		return expectedSize;
 	}
 
 	private Point controlComputeSize(int whint, int hhint) {
+		Point adjusted = computeHintOffset();
+
+		if (whint != SWT.DEFAULT) {
+			whint -= adjusted.x;
+		}
+
+		if (hhint != SWT.DEFAULT) {
+			hhint -= adjusted.y;
+		}
+
 		return control.computeSize(whint, hhint, true);
 	}
 
@@ -141,13 +149,6 @@ public class SizeCacheTest extends TestCase {
 		checkCacheComputeSize(expectedSize2, whint, -1);
 		checkCacheComputeSize(expectedSize2, whint, -1);
 		return expectedSize1;
-	}
-
-	private Point getAdjustedExpected(Point calcSize, int whint, int hhint) {
-		Point adjusted = computeHintOffset();
-		int expectedHeight = hhint == SWT.DEFAULT ? calcSize.y : hhint + adjusted.y;
-		int expectedWidth = whint == SWT.DEFAULT ? calcSize.x : whint + adjusted.x;
-		return new Point(expectedWidth, expectedHeight);
 	}
 
 	private Point computeHintOffset() {
