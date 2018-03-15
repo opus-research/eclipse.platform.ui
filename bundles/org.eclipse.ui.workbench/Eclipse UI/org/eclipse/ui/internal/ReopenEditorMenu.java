@@ -229,6 +229,7 @@ public class ReopenEditorMenu extends ContributionItem {
                     MenuItem mi = new MenuItem(menu, SWT.PUSH, menuIndex[0]);
                     ++menuIndex[0];
                     mi.setText(text);
+					mi.setToolTipText(item.getToolTipText());
                     mi.addSelectionListener(widgetSelectedAdapter(e -> open(item)));
                 }
 
