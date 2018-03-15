@@ -23,7 +23,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.Adapters;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -76,15 +75,14 @@ public class QuickFixHandler extends MarkerViewHandler {
 		final IMarker firstSelectedMarker = selectedMarkers[0];
 
 		IRunnableWithProgress resolutionsRunnable = monitor -> {
-			SubMonitor subMonitor = SubMonitor.convert(monitor,
-					MarkerMessages.resolveMarkerAction_computationManyAction, 10000);
+			monitor.beginTask(MarkerMessages.resolveMarkerAction_computationManyAction, 100);
 
 			IMarker[] allMarkers = view.getAllMarkers();
-			subMonitor.step(2000);
+			monitor.worked(20);
 			IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(firstSelectedMarker);
-			int progressCount = 8000;
+			int progressCount = 80;
 			if (resolutions.length > 1) {
-				progressCount = progressCount / resolutions.length;
+				progressCount= progressCount / resolutions.length;
 			}
 			for (int i = 0; i < resolutions.length; i++) {
 				IMarkerResolution markerResolution= resolutions[i];
@@ -97,14 +95,14 @@ public class QuickFixHandler extends MarkerViewHandler {
 						markers1.addAll(Arrays.asList(other));
 						resolutionsMap.put(markerResolution, markers1);
 					}
-					subMonitor.step(1);
 				} else if (selectedMarkers.length == 1) {
 					Collection<IMarker> markers2 = new ArrayList<>(1);
 					markers2.add(firstSelectedMarker);
 					resolutionsMap.put(markerResolution, markers2);
 				}
-				subMonitor.step(progressCount);
+				monitor.worked(progressCount);
 			}
+			monitor.done();
 		};
 
 		IWorkbenchSiteProgressService service = Adapters.adapt(view.getSite(), IWorkbenchSiteProgressService.class);

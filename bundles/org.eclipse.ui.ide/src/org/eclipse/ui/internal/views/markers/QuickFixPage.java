@@ -18,7 +18,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -450,6 +449,7 @@ public class QuickFixPage extends WizardPage {
 	 * @param monitor
 	 */
 	void performFinish(IProgressMonitor monitor) {
+
 		final IMarkerResolution resolution = getSelectedResolution();
 		if (resolution == null)
 			return;
@@ -477,20 +477,26 @@ public class QuickFixPage extends WizardPage {
 		} else {
 
 			try {
-				getWizard().getContainer().run(false, true, progressMonitor -> {
-					SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
-							MarkerMessages.MarkerResolutionDialog_Fixing, checked.length);
+				getWizard().getContainer().run(false, true, monitor1 -> {
+					monitor1.beginTask(MarkerMessages.MarkerResolutionDialog_Fixing, checked.length);
 					for (int i = 0; i < checked.length; i++) {
 						// Allow paint events and wake up the button
 						getShell().getDisplay().readAndDispatch();
+						if (monitor1.isCanceled()) {
+							return;
+						}
 						IMarker marker = (IMarker) checked[i];
-						subMonitor.subTask(Util.getProperty(IMarker.MESSAGE, marker));
+						monitor1.subTask(Util.getProperty(IMarker.MESSAGE, marker));
 						resolution.run(marker);
-						subMonitor.step(1);
+						monitor1.worked(1);
 					}
 				});
-			} catch (InvocationTargetException | InterruptedException e) {
-				StatusManager.getManager().handle(MarkerSupportInternalUtilities.errorFor(e));
+			} catch (InvocationTargetException e) {
+				StatusManager.getManager().handle(
+						MarkerSupportInternalUtilities.errorFor(e));
+			} catch (InterruptedException e) {
+				StatusManager.getManager().handle(
+						MarkerSupportInternalUtilities.errorFor(e));
 			}
 
 		}

@@ -1793,9 +1793,9 @@ public class CopyFilesAndFoldersOperation {
 		// creating the task.
 		SubMonitor subMonitor = SubMonitor.convert(mon, 100);
 		subMonitor.setTaskName(getOperationTitle());
-		subMonitor.step(10); // show some initial progress
+		subMonitor.worked(10); // show some initial progress
 
-		// Checks only required if this is an existing container path.
+		// Checks only required if this is an exisiting container path.
 		boolean copyWithAutoRename = false;
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		if (root.exists(destinationPath)) {
@@ -1837,7 +1837,7 @@ public class CopyFilesAndFoldersOperation {
 
 	private void copyFileStores(final IFileStore[] stores,
 			final IPath destinationPath, IProgressMonitor monitor) {
-		// Checks only required if this is an existing container path.
+		// Checks only required if this is an exisiting container path.
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		if (root.exists(destinationPath)) {
 			IContainer container = (IContainer) root
