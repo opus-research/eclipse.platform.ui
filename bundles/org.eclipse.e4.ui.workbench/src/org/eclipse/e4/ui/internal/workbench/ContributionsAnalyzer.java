@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
@@ -237,21 +236,21 @@ public final class ContributionsAnalyzer {
 		if (menuContribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible(menuContribution.getVisibleWhen(), eContext);
+		return isVisible((MCoreExpression) menuContribution.getVisibleWhen(), eContext);
 	}
 
 	public static boolean isVisible(MToolBarContribution contribution, ExpressionContext eContext) {
 		if (contribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible(contribution.getVisibleWhen(), eContext);
+		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
 	}
 
 	public static boolean isVisible(MTrimContribution contribution, ExpressionContext eContext) {
 		if (contribution.getVisibleWhen() == null) {
 			return true;
 		}
-		return isVisible(contribution.getVisibleWhen(), eContext);
+		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
 	}
 
 	public static boolean isVisible(MExpression exp, final ExpressionContext eContext) {
@@ -512,9 +511,9 @@ public final class ContributionsAnalyzer {
 			Key other = (Key) obj;
 			Object exp1 = vexp == null ? null : vexp.getCoreExpression();
 			Object exp2 = other.vexp == null ? null : other.vexp.getCoreExpression();
-			return Objects.equals(parentId, other.parentId) && Objects.equals(position, other.position)
-					&& getSchemeTag() == other.getSchemeTag() && Objects.equals(exp1, exp2)
-					&& Objects.equals(factory, other.factory);
+			return Util.equals(parentId, other.parentId) && Util.equals(position, other.position)
+					&& getSchemeTag() == other.getSchemeTag() && Util.equals(exp1, exp2)
+					&& Util.equals(factory, other.factory);
 		}
 
 		@Override
@@ -733,7 +732,7 @@ public final class ContributionsAnalyzer {
 
 	private static boolean containsMatching(List<MMenuElement> children, MMenuElement me) {
 		for (MMenuElement element : children) {
-			if (Objects.equals(me.getElementId(), element.getElementId())
+			if (Util.equals(me.getElementId(), element.getElementId())
 					&& element.getClass().isInstance(me)
 					&& (element instanceof MMenuSeparator || element instanceof MMenu)) {
 				return true;
@@ -744,7 +743,7 @@ public final class ContributionsAnalyzer {
 
 	private static boolean containsMatching(List<MToolBarElement> children, MToolBarElement me) {
 		for (MToolBarElement element : children) {
-			if (Objects.equals(me.getElementId(), element.getElementId())
+			if (Util.equals(me.getElementId(), element.getElementId())
 					&& element.getClass().isInstance(me)
 					&& (element instanceof MToolBarSeparator || element instanceof MToolBar)) {
 				return true;
@@ -755,7 +754,7 @@ public final class ContributionsAnalyzer {
 
 	private static boolean containsMatching(List<MTrimElement> children, MTrimElement me) {
 		for (MTrimElement element : children) {
-			if (Objects.equals(me.getElementId(), element.getElementId())
+			if (Util.equals(me.getElementId(), element.getElementId())
 					&& element.getClass().isInstance(me)
 					&& (element instanceof MToolBarSeparator || element instanceof MToolBar)) {
 				return true;
