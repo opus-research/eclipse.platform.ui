@@ -194,10 +194,9 @@ class DnDInfo {
 			}
 		}
 
-		curCtrl = DragAndDropUtil.findControl(display, display.getCursorLocation());
-		if (curCtrl == null) {
+		curCtrl = display.getCursorControl();
+		if (curCtrl == null)
 			return;
-		}
 
 		curElement = getModelElement(curCtrl);
 		setItemInfo();

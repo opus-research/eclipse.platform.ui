@@ -84,6 +84,10 @@ public class HandledContributionItem extends AbstractContributionItem {
 
 	@Inject
 	@Optional
+	private EHelpService helpService;
+
+	@Inject
+	@Optional
 	@SuppressWarnings("restriction")
 	private ICommandHelpService commandHelpService;
 
@@ -188,10 +192,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 	@Override
 	protected void postMenuFill() {
 		if (updateService != null) {
-			ParameterizedCommand wbCommand = getModel().getWbCommand();
-			if (wbCommand != null) {
-				unreferenceRunnable = updateService.registerElementForUpdate(wbCommand, getModel());
-			}
+			unreferenceRunnable = updateService.registerElementForUpdate(getModel().getWbCommand(), getModel());
 		}
 	}
 
@@ -200,10 +201,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 		hookCheckListener();
 
 		if (updateService != null) {
-			ParameterizedCommand wbCommand = getModel().getWbCommand();
-			if (wbCommand != null) {
-				unreferenceRunnable = updateService.registerElementForUpdate(wbCommand, getModel());
-			}
+			unreferenceRunnable = updateService.registerElementForUpdate(getModel().getWbCommand(), getModel());
 		}
 	}
 
@@ -389,15 +387,9 @@ public class HandledContributionItem extends AbstractContributionItem {
 	@Override
 	@SuppressWarnings("restriction")
 	protected void handleHelpRequest() {
-		if(helpService==null)
-			return;
-		String helpContextId = getModel().getPersistedState().get(EHelpService.HELP_CONTEXT_ID);
-		if (helpContextId != null) {
-			helpService.displayHelp(helpContextId);
-			return;
-		}
 		MCommand command = getModel().getCommand();
-		if (command == null || commandHelpService == null) {
+		if (command == null || helpService == null
+				|| commandHelpService == null) {
 			return;
 		}
 

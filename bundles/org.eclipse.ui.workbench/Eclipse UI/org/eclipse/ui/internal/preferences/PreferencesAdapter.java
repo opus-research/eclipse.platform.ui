@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.preferences;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.runtime.Preferences;
 
 /**
@@ -75,7 +76,7 @@ public final class PreferencesAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Integer.class) {
-			return Integer.valueOf(store.getInt(propertyId));
+            return new Integer(store.getInt(propertyId));
         }
 
         if (propertyType == Long.class) {

@@ -19,7 +19,6 @@
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
  * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
  * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
- * Simon Scholz <simon.scholz@vogella.com> - Bug 486777
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -622,7 +621,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ResourceInfo_derivedHasDerivedAncestor;
 	public static String ResourceInfo_type;
 	public static String ResourceInfo_location;
-	public static String ResourceInfo_location_button_tooltip;
 	public static String ResourceInfo_resolvedLocation;
 	public static String ResourceInfo_size;
 	public static String ResourceInfo_bytes;
@@ -697,14 +695,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String LinkedResourceEditor_removeTitle;
 	public static String LinkedResourceEditor_removeMessage;
 	public static String LinkedResourceEditor_removingMessage;
-
-	// --- Auto-save ---
-	public static String AutoSavePreferencPage_autoSaveButton;
-	public static String AutoSavePreferencPage_intervalMessage;
-	public static String AutoSavePreferencPage_errorMessage;
-	public static String AutoSavePreferencPage_resetMessage;
-	public static String AutoSavePreferencPage_noteLabel;
-	public static String AutoSavePreferencPage_noteMessage;
 
 	// ==============================================================================
 	// Editors
@@ -1031,7 +1021,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String editorAssociationOverride_error_invalidElementName_message;
 	public static String editorAssociationOverride_error_invalidExtension_message;
 
-	public static String ExtendedFileEditorsPreferencePage_strategyForUnassociatedFiles;
+	public static String ExtendedFileEditorsPreferencePage_strategyForUnknownFiles;
 	public static String ExtendedFileEditorsPreferencePage_labelNotResolved;
 
 	static {
