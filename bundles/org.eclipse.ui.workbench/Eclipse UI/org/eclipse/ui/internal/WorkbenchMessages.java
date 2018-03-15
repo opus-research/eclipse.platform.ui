@@ -16,7 +16,7 @@
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811, 511198
  * Kaloyan Raev <kaloyan.r@zend.com> - Bug 322002
- * Lucas Bullen (Red Hat Inc.) - Bug 500051, 525974
+ * Lucas Bullen (Red Hat Inc.) - Bug 500051
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -968,8 +968,7 @@ public class WorkbenchMessages extends NLS {
 	public static String FilteredItemsSelectionDialog_toggleStatusAction;
 	public static String FilteredItemsSelectionDialog_removeItemsFromHistoryAction;
 	public static String FilteredItemsSelectionDialog_searchJob_taskName;
-	public static String FilteredItemsSelectionDialog_separatorLabel_workspace;
-	public static String FilteredItemsSelectionDialog_separatorLabel_history;
+	public static String FilteredItemsSelectionDialog_separatorLabel;
     public static String FilteredItemsSelectionDialog_storeError;
     public static String FilteredItemsSelectionDialog_restoreError;
     public static String FilteredItemsSelectionDialog_nItemsSelected;
