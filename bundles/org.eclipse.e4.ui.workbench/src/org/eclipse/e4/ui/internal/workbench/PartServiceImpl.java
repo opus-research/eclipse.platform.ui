@@ -481,10 +481,22 @@ public class PartServiceImpl implements EPartService {
 			}
 
 			if (parent instanceof MPartStack) {
-				return parent.getSelectedElement() == element;
+				boolean isSelected = parent.getSelectedElement() == element;
+				if (!isSelected) {
+					return false;
+				}
+				if (parent.getTags().contains(IPresentationEngine.MINIMIZED)) {
+					return false;
+				}
+				return true;
 			}
-
-			return element.isVisible();
+			if (!element.isVisible()) {
+				return false;
+			}
+			if (parent.getTags().contains(IPresentationEngine.MINIMIZED)) {
+				return false;
+			}
+			return true;
 		}
 		return false;
 	}
