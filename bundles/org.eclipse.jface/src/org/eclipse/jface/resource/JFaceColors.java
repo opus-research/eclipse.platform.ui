@@ -11,7 +11,6 @@
 package org.eclipse.jface.resource;
 
 import org.eclipse.jface.preference.JFacePreferences;
-import org.eclipse.jface.util.Util;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
@@ -96,64 +95,6 @@ public class JFaceColors {
                 JFacePreferences.ACTIVE_HYPERLINK_COLOR);
     }
 
-	/**
-	 * Background color intended for Widgets that display text. These may
-	 * include hovers and viewers.<br>
-	 * Note, there is no need to free this color because it's a color managed by
-	 * the system not the application.
-	 *
-	 * @param display
-	 *            the display the color is from
-	 * @return Color most suitable for presenting text depending on the
-	 *         platform, to match the rest of the environment.
-	 * 
-	 * @since 3.13
-	 */
-	public static Color getInformationViewerBackgroundColor(Display display) {
-		if (Util.isWin32() || Util.isCocoa()) {
-			// Technically COLOR_INFO_* should only be used for tooltips. But on
-			// Windows/Cocoa COLOR_INFO_* gives info viewers/hovers a
-			// yellow background which is very suitable for information
-			// presentation.
-			return display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-		}
-
-		// Technically, COLOR_LIST_* is not the best system color for this
-		// because it is only supposed to be used for Tree/List controls. But at
-		// the moment COLOR_TEXT_* is not implemented, so this should work for
-		// now. See Bug 508612.
-		return display.getSystemColor(SWT.COLOR_LIST_BACKGROUND);
-	}
-
-	/**
-	 * Background color intended for Widgets that display text. These may
-	 * include hovers and viewers.<br>
-	 * Note, there is no need to free this color because it's a color managed by
-	 * the system not the application.
-	 *
-	 * @param display
-	 *            the display the color is from
-	 * @return Color most suitable for presenting text depending on the
-	 *         platform, to match the rest of the environment. platform, to
-	 *         match the rest of the environment.
-	 *
-	 * @since 3.13
-	 */
-	public static Color getInformationViewerForegroundColor(Display display) {
-		if (Util.isWin32() || Util.isCocoa()) {
-			// Technically COLOR_INFO_* should only be used for tooltips. But on
-			// Windows/Cocoa COLOR_INFO_* gives info viewers/hovers a
-			// yellow background which is very suitable for information
-			// presentation.
-			return display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		}
-
-		// Technically, COLOR_LIST_* is not the best system color for this
-		// because it is only supposed to be used for Tree/List controls. But at
-		// the moment COLOR_TEXT_* is not implemented, so this should work for
-		// now. See Bug 508612.
-		return display.getSystemColor(SWT.COLOR_LIST_FOREGROUND);
-	}
     /**
      * Clear out the cached color for name. This is generally
      * done when the color preferences changed and any cached colors
