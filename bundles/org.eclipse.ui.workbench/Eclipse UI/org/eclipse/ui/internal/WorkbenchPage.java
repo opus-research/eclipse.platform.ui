@@ -140,6 +140,7 @@ import org.eclipse.ui.IShowEditorInput;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -4529,7 +4530,14 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public IViewPart[] getViewStack(IViewPart part) {
-		MPart mpart = partService.findPart(part.getSite().getId());
+		IViewSite viewSite = part.getViewSite();
+		if (viewSite == null)
+			return null;
+		String compoundId = viewSite.getId();
+		String secondaryId = viewSite.getSecondaryId();
+		if (secondaryId != null && !secondaryId.isEmpty())
+			compoundId += ":" + secondaryId; //$NON-NLS-1$
+		MPart mpart = partService.findPart(compoundId);
 		if (mpart != null) {
 			MElementContainer<?> parent = mpart.getParent();
 			if (parent == null) {
