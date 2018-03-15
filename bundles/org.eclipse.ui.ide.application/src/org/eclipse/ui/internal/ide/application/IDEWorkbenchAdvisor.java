@@ -637,8 +637,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// remove the previously known from the current set
 		if (previousFeaturesArray != null) {
-			for (String previousFeature : previousFeaturesArray) {
-				bundleGroups.remove(previousFeature);
+			for (String element : previousFeaturesArray) {
+				bundleGroups.remove(element);
 			}
 		}
 

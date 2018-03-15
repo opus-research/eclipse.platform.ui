@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.commands.contexts.IContextManagerListener;
 import org.eclipse.core.expressions.Expression;
@@ -209,19 +210,22 @@ public class SlaveContextService implements IContextService {
 		// Remove any "resource", like listeners, that were associated
 		// with this service.
 		if (!fContextManagerListeners.isEmpty()) {
-			for (Object element : fContextManagerListeners.toArray()) {
+			Object[] array = fContextManagerListeners.toArray();
+			for (Object element : array) {
 				removeContextManagerListener((IContextManagerListener) element);
 			}
 			fContextManagerListeners.clear();
 		}
 		if (!fSourceProviders.isEmpty()) {
-			for (Object element : fSourceProviders.toArray()) {
+			Object[] array = fSourceProviders.toArray();
+			for (Object element : array) {
 				removeSourceProvider((ISourceProvider) element);
 			}
 			fSourceProviders.clear();
 		}
 		if (!fRegisteredShells.isEmpty()) {
-			for (Object element : fRegisteredShells.toArray()) {
+			Object[] array = fRegisteredShells.toArray();
+			for (Object element : array) {
 				unregisterShell((Shell) element);
 			}
 			fRegisteredShells.clear();
