@@ -62,6 +62,9 @@ public abstract class ValueDiff<T> implements IDiff {
 		return result;
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuilder buffer = new StringBuilder();

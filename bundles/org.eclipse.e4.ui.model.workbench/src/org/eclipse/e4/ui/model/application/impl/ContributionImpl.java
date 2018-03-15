@@ -208,7 +208,7 @@ public abstract class ContributionImpl extends ApplicationElementImpl implements
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (contributionURI: "); //$NON-NLS-1$
 		result.append(contributionURI);
 		result.append(", object: "); //$NON-NLS-1$
