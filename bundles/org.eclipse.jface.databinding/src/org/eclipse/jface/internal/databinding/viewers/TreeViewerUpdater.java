@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
 /**
@@ -76,9 +77,26 @@ public class TreeViewerUpdater {
 			treeViewer.replace(parent, position, newElement);
 			treeViewer.refresh(newElement);
 		} else {
+			ITreeSelection selection = viewer.getStructuredSelection();
+
 			remove(parent, oldElement, position);
 			insert(parent, newElement, position);
+
+			// don't call selectionContains(...) here, because we have to
+			// iterate all selected paths anyway.
+			replaceElementInSelection(oldElement, newElement, selection);
 		}
+	}
+
+	private void replaceElementInSelection(final Object oldElement, final Object newElement,
+			final ITreeSelection selection) {
+		TreePath[] paths = selection.getPaths();
+		for (int i = 0; i < paths.length; i++) {
+			if (eq(viewer.getComparer(), paths[i].getLastSegment(), oldElement)) {
+				paths[i] = paths[i].getParentPath().createChildPath(newElement);
+			}
+		}
+		viewer.setSelection(new TreeSelection(paths, viewer.getComparer()));
 	}
 
 	boolean isElementOrderPreserved() {
@@ -120,16 +138,11 @@ public class TreeViewerUpdater {
 			Object element) {
 		if (!selection.isEmpty()) {
 			IElementComparer comparer = viewer.getComparer();
-			TreePath[] paths = selection.getPaths();
+			TreePath[] paths = selection.getPathsFor(element);
 			for (int i = 0; i < paths.length; i++) {
 				TreePath path = paths[i];
-				for (int j = 0; j < path.getSegmentCount() - 1; j++) {
-					Object pathParent = path.getSegment(j);
-					Object pathElement = path.getSegment(j + 1);
-					if (eq(comparer, parent, pathParent)
-							&& eq(comparer, element, pathElement)) {
-						return true;
-					}
+				if (eq(comparer, parent == viewer.getInput() ? null : parent, path.getParentPath().getLastSegment())) {
+					return true;
 				}
 			}
 		}
