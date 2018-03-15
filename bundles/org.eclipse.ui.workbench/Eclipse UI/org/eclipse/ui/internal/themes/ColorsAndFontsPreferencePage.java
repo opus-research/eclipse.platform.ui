@@ -1755,7 +1755,7 @@ getPreferenceStore(),
 	private void saveTreeSelection() {
 		IStructuredSelection selection = tree.getViewer().getStructuredSelection();
 		Object element = selection.getFirstElement();
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		appendMarkerToBuffer(buffer, element);
 		if (buffer.length() > 0)
 			buffer.append(((IThemeElementDefinition) element).getId());
@@ -1821,7 +1821,7 @@ getPreferenceStore(),
 		Object[] elements = tree.getViewer().getExpandedElements();
 		List elementIds = new ArrayList(elements.length);
 
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		for (Object object : elements) {
 			appendMarkerToBuffer(buffer, object);
 
@@ -1843,7 +1843,7 @@ getPreferenceStore(),
 		getPreferenceStore().setValue(EXPANDED_ELEMENTS_PREF, buffer.toString());
 	}
 
-	private void appendMarkerToBuffer(StringBuilder buffer, Object object) {
+	private void appendMarkerToBuffer(StringBuffer buffer, Object object) {
 		if (object instanceof FontDefinition) {
 			buffer.append(MARKER_FONT);
 		} else if (object instanceof ColorDefinition) {
@@ -1957,7 +1957,7 @@ getPreferenceStore(),
 		FontData[] fontData = currentFont != null ? currentFont.getFontData() : new FontData[0];
 
 		// recalculate sample text
-		StringBuilder tmp = new StringBuilder();
+		StringBuffer tmp = new StringBuffer();
 		for (FontData currentFontData : fontData) {
 			tmp.append(currentFontData.getName());
 			tmp.append(' ');
