@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
+import org.eclipse.core.internal.runtime.CancelabilityMonitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -204,6 +205,8 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	private EHelpService helpService;
 
 	private ICommandHelpService commandHelpService;
+
+	private ServiceTracker<Object, CancelabilityMonitor.Options> cancelabilityMonitorOptionsTracker = null;
 
     /**
      * Create an instance of the WorkbenchPlugin. The workbench plugin is
@@ -1091,6 +1094,10 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			testableTracker.close();
 			testableTracker = null;
 		}
+		if (cancelabilityMonitorOptionsTracker != null) {
+			cancelabilityMonitorOptionsTracker.close();
+			cancelabilityMonitorOptionsTracker = null;
+		}
         super.stop(context);
     }
 
@@ -1488,5 +1495,20 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			testableTracker.open();
 		}
 		return (TestableObject) testableTracker.getService();
+	}
+
+	/**
+	 * Returns the options for the cancelability monitor. Options have to
+	 * registered as an OSGi service.
+	 *
+	 * @return the options for the cancelability monitor.
+	 */
+	public CancelabilityMonitor.Options getCancelabilityMonitorOptions() {
+		if (cancelabilityMonitorOptionsTracker == null) {
+			cancelabilityMonitorOptionsTracker = new ServiceTracker<>(bundleContext,
+					CancelabilityMonitor.Options.class.getName(), null);
+			cancelabilityMonitorOptionsTracker.open();
+		}
+		return cancelabilityMonitorOptionsTracker.getService();
 	}
 }
