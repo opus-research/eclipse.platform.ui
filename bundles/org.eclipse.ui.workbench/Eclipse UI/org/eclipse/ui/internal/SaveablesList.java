@@ -455,9 +455,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param modelsDecrementing
 	 */
 	private void fillModelsClosing(Set<Saveable> modelsClosing, Map<Saveable, Integer> modelsDecrementing) {
-		for (Entry<Saveable, Integer> entry : modelsDecrementing.entrySet()) {
-			Saveable model = entry.getKey();
-			if (entry.getValue().equals(modelRefCounts.get(model))) {
+		for (Saveable model : modelsDecrementing.keySet()) {
+			if (modelsDecrementing.get(model).equals(modelRefCounts.get(model))) {
 				modelsClosing.add(model);
 			}
 		}
