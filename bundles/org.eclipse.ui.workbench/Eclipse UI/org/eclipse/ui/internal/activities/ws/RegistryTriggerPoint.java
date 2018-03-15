@@ -65,10 +65,10 @@ public class RegistryTriggerPoint extends AbstractTriggerPoint {
 
             IConfigurationElement[] hintElements = element
                     .getChildren(IWorkbenchRegistryConstants.TAG_HINT);
-            for (IConfigurationElement hintElement : hintElements) {
-                String id = hintElement
+            for (int i = 0; i < hintElements.length; i++) {
+                String id = hintElements[i]
                         .getAttribute(IWorkbenchRegistryConstants.ATT_ID);
-                String value = hintElement
+                String value = hintElements[i]
                         .getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
 
                 if (id == null || value == null) {
