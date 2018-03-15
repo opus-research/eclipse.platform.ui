@@ -178,6 +178,8 @@ public class ProgressManager extends ProgressProvider implements
 	class JobMonitor implements IProgressMonitorWithBlocking {
 		Job job;
 
+		JobInfo info;
+
 		String currentTaskName;
 
 		IProgressMonitorWithBlocking listener;
@@ -187,8 +189,9 @@ public class ProgressManager extends ProgressProvider implements
 		 *
 		 * @param newJob
 		 */
-		JobMonitor(Job newJob) {
+		JobMonitor(Job newJob, JobInfo jobInfo) {
 			job = newJob;
+			info = jobInfo;
 		}
 
 		/**
@@ -198,7 +201,6 @@ public class ProgressManager extends ProgressProvider implements
 		 */
 		void addProgressListener(IProgressMonitorWithBlocking monitor) {
 			listener = monitor;
-			JobInfo info = getJobInfo(job);
 			TaskInfo currentTask = info.getTaskInfo();
 			if (currentTask != null) {
 				listener.beginTask(currentTaskName, currentTask.totalWork);
@@ -208,7 +210,6 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void beginTask(String taskName, int totalWork) {
-			JobInfo info = getJobInfo(job);
 			info.beginTask(taskName, totalWork);
 			refreshJobInfo(info);
 			currentTaskName = taskName;
@@ -219,10 +220,8 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void done() {
-			JobInfo info = getJobInfo(job);
 			info.clearTaskInfo();
 			info.clearChildren();
-			runnableMonitors.remove(job);
 			if (listener != null) {
 				listener.done();
 			}
@@ -230,7 +229,6 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void internalWorked(double work) {
-			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.addWork(work);
 				refreshJobInfo(info);
@@ -242,9 +240,6 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public boolean isCanceled() {
-			// Use the internal get so we don't create a Job Info for
-			// a job that is not running (see bug 149857)
-			JobInfo info = internalGetJobInfo(job);
 			if (info == null)
 				return false;
 			return info.isCanceled();
@@ -252,7 +247,6 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void setCanceled(boolean value) {
-			JobInfo info = getJobInfo(job);
 			// Don't bother cancelling twice
 			if (value && !info.isCanceled()) {
 				info.cancel();
@@ -265,7 +259,6 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void setTaskName(String taskName) {
-			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.setTaskName(taskName);
 			} else {
@@ -285,7 +278,6 @@ public class ProgressManager extends ProgressProvider implements
 			if (name == null) {
 				return;
 			}
-			JobInfo info = getJobInfo(job);
 			info.clearChildren();
 			info.addSubTask(name);
 			refreshJobInfo(info);
@@ -301,7 +293,6 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void clearBlocked() {
-			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(null);
 			refreshJobInfo(info);
 			if (listener != null) {
@@ -311,14 +302,12 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void setBlocked(IStatus reason) {
-			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(reason);
 			refreshJobInfo(info);
 			if (listener != null) {
 				listener.setBlocked(reason);
 			}
 		}
-
 	}
 
 	/**
@@ -476,7 +465,7 @@ public class ProgressManager extends ProgressProvider implements
 				if (jobs.containsKey(event.getJob())) {
 					refreshJobInfo(getJobInfo(event.getJob()));
 				} else {
-					addJobInfo(new JobInfo(event.getJob()));
+					addJobInfo(getJobInfo(event.getJob()));
 				}
 			}
 
@@ -578,7 +567,9 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return IProgressMonitor
 	 */
 	public JobMonitor progressFor(Job job) {
-		return runnableMonitors.computeIfAbsent(job, JobMonitor::new);
+		return runnableMonitors.computeIfAbsent(job, (j) -> {
+			return new JobMonitor(j, getJobInfo(j));
+		});
 	}
 
 	/**
@@ -608,17 +599,6 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	JobInfo getJobInfo(Job job) {
 		return jobs.computeIfAbsent(job, JobInfo::new);
-	}
-
-	/**
-	 * Return an existing job info for the given Job or <code>null</code> if
-	 * there isn't one.
-	 *
-	 * @param job
-	 * @return JobInfo
-	 */
-	JobInfo internalGetJobInfo(Job job) {
-		return jobs.get(job);
 	}
 
 	/**
