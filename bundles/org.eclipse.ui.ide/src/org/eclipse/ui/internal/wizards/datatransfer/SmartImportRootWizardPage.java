@@ -18,7 +18,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -49,9 +48,7 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.IColorProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -80,6 +77,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ToolBar;
@@ -88,13 +86,10 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
-import org.eclipse.ui.dialogs.WorkingSetGroup;
-import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.dialogs.WorkingSetConfigurationBlock;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressManager.JobMonitor;
-import org.eclipse.ui.internal.registry.WorkingSetDescriptor;
-import org.eclipse.ui.internal.registry.WorkingSetRegistry;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
@@ -125,7 +120,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private boolean configureProjects = true;
 	// Working sets
 	private Set<IWorkingSet> workingSets;
-	private WorkingSetGroup workingSetsGroup;
+	private WorkingSetConfigurationBlock workingSetsBlock;
 	// Progress monitor
 	protected Supplier<ProgressMonitorPart> wizardProgressMonitor = new Supplier<ProgressMonitorPart>() {
 		private ProgressMonitorPart progressMonitorPart;
@@ -283,7 +278,18 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		createConfigurationOptions(res);
 
-		createWorkingSetsGroup(res);
+		Group workingSetsGroup = new Group(res, SWT.NONE);
+		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
+		layoutData.verticalIndent = 20;
+		workingSetsGroup.setLayoutData(layoutData);
+		workingSetsGroup.setLayout(new GridLayout(1, false));
+		workingSetsGroup.setText(DataTransferMessages.SmartImportWizardPage_workingSets);
+		workingSetsBlock = new WorkingSetConfigurationBlock(getDialogSettings(),
+				"org.eclipse.ui.resourceWorkingSetPage"); //$NON-NLS-1$
+		if (this.workingSets != null) {
+			workingSetsBlock.setWorkingSets(this.workingSets.toArray(new IWorkingSet[this.workingSets.size()]));
+		}
+		workingSetsBlock.createContent(workingSetsGroup);
 
 		if (this.selection != null) {
 			rootDirectoryText.setText(this.selection.getAbsolutePath());
@@ -293,29 +299,13 @@ public class SmartImportRootWizardPage extends WizardPage {
 		setControl(res);
 	}
 
-	private void createWorkingSetsGroup(Composite parent) {
-		Composite workingSetComposite = new Composite(parent, SWT.NONE);
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1);
-		layoutData.verticalIndent = 20;
-		workingSetComposite.setLayoutData(layoutData);
-		workingSetComposite.setLayout(new GridLayout(1, false));
-		WorkingSetRegistry registry = WorkbenchPlugin.getDefault().getWorkingSetRegistry();
-		String[] workingSetIds = Arrays.stream(registry.getNewPageWorkingSetDescriptors())
-				.map(WorkingSetDescriptor::getId).toArray(String[]::new);
-		IStructuredSelection wsSel = null;
-		if (this.workingSets != null) {
-			wsSel = new StructuredSelection(this.workingSets.toArray());
-		}
-		this.workingSetsGroup = new WorkingSetGroup(workingSetComposite, wsSel, workingSetIds);
-	}
-
 	/**
-	 * @param parent
+	 * @param res
 	 */
-	private void createInputSelectionOptions(Composite parent) {
-		Label rootDirectoryLabel = new Label(parent, SWT.NONE);
+	private void createInputSelectionOptions(Composite res) {
+		Label rootDirectoryLabel = new Label(res, SWT.NONE);
 		rootDirectoryLabel.setText(DataTransferMessages.SmartImportWizardPage_selectRootDirectory);
-		rootDirectoryText = new Combo(parent, SWT.BORDER);
+		rootDirectoryText = new Combo(res, SWT.BORDER);
 		String[] knownSources = getWizard().getDialogSettings().getArray(IMPORTED_SOURCES);
 		if (knownSources != null) {
 			rootDirectoryText.setItems(knownSources);
@@ -369,7 +359,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		this.rootDirectoryTextDecorator
 				.setDescriptionText(DataTransferMessages.SmartImportWizardPage_incorrectRootDirectory);
 		this.rootDirectoryTextDecorator.hide();
-		Button directoryButton = new Button(parent, SWT.PUSH);
+		Button directoryButton = new Button(res, SWT.PUSH);
 		directoryButton.setText(DataTransferMessages.SmartImportWizardPage_browse);
 		setButtonLayoutData(directoryButton);
 		directoryButton.addSelectionListener(new SelectionAdapter() {
@@ -395,7 +385,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				}
 			}
 		});
-		Button browseArchiveButton = new Button(parent, SWT.PUSH);
+		Button browseArchiveButton = new Button(res, SWT.PUSH);
 		browseArchiveButton.setText(DataTransferMessages.SmartImportWizardPage_selectArchiveButton);
 		setButtonLayoutData(browseArchiveButton);
 		browseArchiveButton.addSelectionListener(new SelectionAdapter() {
@@ -428,8 +418,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 	/**
 	 * Creates the UI elements for the import options
 	 */
-	private void createConfigurationOptions(Composite parent) {
-		Link showDetectorsLink = new Link(parent, SWT.NONE);
+	private void createConfigurationOptions(Composite res) {
+		Link showDetectorsLink = new Link(res, SWT.NONE);
 		showDetectorsLink.setText(DataTransferMessages.SmartImportWizardPage_showAvailableDetectors);
 		showDetectorsLink.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		showDetectorsLink.addSelectionListener(new SelectionAdapter() {
@@ -451,7 +441,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 						DataTransferMessages.SmartImportWizardPage_availableDetectors_title, message.toString());
 			}
 		});
-		final Button detectNestedProjectsCheckbox = new Button(parent, SWT.CHECK);
+		final Button detectNestedProjectsCheckbox = new Button(res, SWT.CHECK);
 		detectNestedProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_detectNestedProjects);
 		detectNestedProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		detectNestedProjectsCheckbox.setSelection(this.detectNestedProjects);
@@ -462,7 +452,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				refreshProposals();
 			}
 		});
-		final Button configureProjectsCheckbox = new Button(parent, SWT.CHECK);
+		final Button configureProjectsCheckbox = new Button(res, SWT.CHECK);
 		configureProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_configureProjects);
 		configureProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
 		configureProjectsCheckbox.setSelection(this.configureProjects);
@@ -685,12 +675,11 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 */
 	public Set<IWorkingSet> getSelectedWorkingSets() {
 		this.workingSets.clear();
-		// workingSetsGroup doesn't support listeners...
+		// workingSetsBlock doesn't support listeners...
 		Runnable workingSetsRetriever = new Runnable() {
 			@Override
 			public void run() {
-				for (IWorkingSet workingSet : SmartImportRootWizardPage.this.workingSetsGroup
-						.getSelectedWorkingSets()) {
+				for (IWorkingSet workingSet : SmartImportRootWizardPage.this.workingSetsBlock.getSelectedWorkingSets()) {
 					SmartImportRootWizardPage.this.workingSets.add(workingSet);
 				}
 			}
