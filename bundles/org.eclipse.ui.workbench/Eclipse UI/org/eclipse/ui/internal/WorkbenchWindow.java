@@ -1903,8 +1903,7 @@ STATUS_LINE_ID, model);
 				// We need to do our own cleanup here...
 				int vc = modelService.countRenderableChildren(phParent);
 				if (vc == 0) {
-					if (!isLastEditorStack(phParent))
-						phParent.setToBeRendered(false);
+					phParent.setToBeRendered(false);
 				}
 			}
 		}
@@ -1914,10 +1913,6 @@ STATUS_LINE_ID, model);
 		for (MPart partToRemove : sharedPartsToRemove) {
 			seList.remove(partToRemove);
 		}
-	}
-
-	private boolean isLastEditorStack(MUIElement element) {
-		return modelService.isLastEditorStack(element);
 	}
 
 	/**
