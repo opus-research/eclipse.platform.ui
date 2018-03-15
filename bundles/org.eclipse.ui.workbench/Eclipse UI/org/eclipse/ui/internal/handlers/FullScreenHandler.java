@@ -105,10 +105,7 @@ public class FullScreenHandler extends AbstractHandler {
 
 		@Override
 		protected Point getInitialLocation(Point initialSize) {
-			if (getShell().getParent() == null) {
-				return super.getInitialLocation(initialSize);
-			}
-			Rectangle bounds = getShell().getParent().getMonitor().getBounds();
+			Rectangle bounds = getShell().getMonitor().getBounds();
 			GC gc = new GC(getShell().getDisplay());
 			int textExtendX = gc.textExtent(message).x;
 			gc.dispose();
