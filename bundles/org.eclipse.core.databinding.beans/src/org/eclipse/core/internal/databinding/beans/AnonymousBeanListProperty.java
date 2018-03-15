@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.property.list.IListProperty;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class AnonymousBeanListProperty extends DelegatingListProperty {
 	private final String propertyName;
@@ -38,6 +38,7 @@ public class AnonymousBeanListProperty extends DelegatingListProperty {
 		this.delegates = new HashMap();
 	}
 
+	@Override
 	protected IListProperty doGetDelegate(Object source) {
 		Class beanClass = source.getClass();
 		if (delegates.containsKey(beanClass))
@@ -54,6 +55,7 @@ public class AnonymousBeanListProperty extends DelegatingListProperty {
 		return delegate;
 	}
 
+	@Override
 	public String toString() {
 		String s = "?." + propertyName + "[]"; //$NON-NLS-1$ //$NON-NLS-2$
 		Class elementType = (Class) getElementType();

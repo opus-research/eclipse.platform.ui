@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,15 +11,14 @@
 
 package org.eclipse.jface.tests.dialogs;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Display;
+
+import junit.framework.TestCase;
 
 public class ProgressMonitorDialogTest extends TestCase {
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -30,16 +29,14 @@ public class ProgressMonitorDialogTest extends TestCase {
 	private void testRun(boolean fork, boolean cancelable) throws Exception {
 		ProgressMonitorDialog pmd = new ProgressMonitorDialog(null);
 		pmd.open();
-		pmd.run(fork, cancelable, new IRunnableWithProgress() {
-			public void run(IProgressMonitor monitor) {
-				// nothing to do, just need this to happen to test bug 299731
-			}
+		pmd.run(fork, cancelable, monitor -> {
+			// nothing to do, just need this to happen to test bug 299731
 		});
 
 		// process asynchronous runnables, the error will happen here when we
 		// try to do some with a widget that has already been disposed
-		while (Display.getDefault().readAndDispatch())
-			;
+		while (Display.getDefault().readAndDispatch()) {
+		}
 	}
 
 	public void testRunTrueTrue() throws Exception {

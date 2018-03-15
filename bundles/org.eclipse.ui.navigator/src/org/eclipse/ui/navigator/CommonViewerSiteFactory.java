@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,13 +26,13 @@ import org.eclipse.ui.part.IPageSite;
  * {@link NavigatorActionService} to allow customization for any
  * {@link CommonActionProvider} used by a particular instance of the Common
  * Navigator.
- *  
- * 
+ *
+ *
  * @since 3.2
  */
 public final class CommonViewerSiteFactory {
 	/**
-	 * 
+	 *
 	 * @param aViewSite
 	 *            The viewer site that should be delegated to to satisfy the
 	 *            contract of ICommonViewerSite.
@@ -44,7 +44,7 @@ public final class CommonViewerSiteFactory {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param aEditorSite
 	 *            The editor site that should be delegated to to satisfy the
 	 *            contract of ICommonViewerSite.
@@ -56,15 +56,15 @@ public final class CommonViewerSiteFactory {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param anId
 	 *            The unique identifier corresponding to the abstract viewer for
 	 *            the returned ICommonViewerSite.
-	 * 
+	 *
 	 * @param aSelectionProvider
 	 *            The selection provider that will initially be returned by
 	 *            {@link ICommonViewerSite#getSelectionProvider()}
-	 * 
+	 *
 	 * @param aShell
 	 *            The shell that will be returned by
 	 *            {@link ICommonViewerSite#getShell()}
@@ -76,7 +76,7 @@ public final class CommonViewerSiteFactory {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param anId
 	 *            The unique identifier corresponding to the abstract viewer for
 	 *            the returned ICommonViewerSite.

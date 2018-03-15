@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,20 +22,17 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardContainer2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -47,11 +44,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchWizard;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.internal.WorkbenchMessages;
-import org.eclipse.ui.internal.decorators.ContributingPluginDecorator;
+import org.eclipse.ui.internal.registry.WizardsRegistryReader;
 import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.wizards.IWizardCategory;
@@ -77,9 +73,9 @@ class NewWizardNewPage implements ISelectionChangedListener {
             + "STORE_SELECTED_ID"; //$NON-NLS-1$
 
     private NewWizardSelectionPage page;
-    
+
     private FilteredTree filteredTree;
-    
+
     private WizardPatternFilter filteredTreeFilter;
 
     //Keep track of the wizards we have previously selected
@@ -109,10 +105,10 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
     /**
      * Create an instance of this class
-     * @param mainPage 
-     * @param wizardCategories 
-     * @param primaryWizards 
-     * @param projectsOnly 
+     * @param mainPage
+     * @param wizardCategories
+     * @param primaryWizards
+     * @param projectsOnly
      */
     public NewWizardNewPage(NewWizardSelectionPage mainPage,
 			IWizardCategory wizardCategories,
@@ -134,6 +130,14 @@ class NewWizardNewPage implements ISelectionChangedListener {
         } else {
             needShowAll = !allActivityEnabled(wizardCategories);
         }
+
+		IWizard wizard = mainPage.getWizard();
+		if (wizard instanceof NewWizard) {
+			if (WizardsRegistryReader.FULL_EXAMPLES_WIZARD_CATEGORY.equals(((NewWizard) wizard)
+					.getCategoryId())) {
+				filter.setFilterPrimaryWizards(true);
+			}
+		}
     }
 
     /**
@@ -141,20 +145,17 @@ class NewWizardNewPage implements ISelectionChangedListener {
      * @return whether all of the wizards in the category are enabled via activity filtering
      */
     private boolean allActivityEnabled(IWizardCategory category) {
-        IWizardDescriptor [] wizards = category.getWizards();
-        for (int i = 0; i < wizards.length; i++) {
-            IWizardDescriptor wizard = wizards[i];
+		for (IWizardDescriptor wizard : category.getWizards()) {
             if (WorkbenchActivityHelper.filterItem(wizard)) {
 				return false;
 			}
         }
 
-        IWizardCategory [] children = category.getCategories();
-        for (int i = 0; i < children.length; i++) {
-            if (!allActivityEnabled(children[i])) {
+		for (IWizardCategory wizard : category.getCategories()) {
+			if (!allActivityEnabled(wizard)) {
 				return false;
 			}
-        }
+		}
 
         return true;
     }
@@ -169,9 +170,9 @@ class NewWizardNewPage implements ISelectionChangedListener {
 			return;//No categories so nothing to trim
 		}
 
-        for (int i = 0; i < primaryWizards.length; i++) {
-            if (wizardCategories.findWizard(primaryWizards[i].getId()) != null) {
-				newPrimaryWizards.add(primaryWizards[i]);
+        for (IWizardDescriptor primaryWizard : primaryWizards) {
+            if (wizardCategories.findWizard(primaryWizard.getId()) != null) {
+				newPrimaryWizards.add(primaryWizard);
 			}
         }
 
@@ -184,20 +185,17 @@ class NewWizardNewPage implements ISelectionChangedListener {
      * @return whether all wizards in the category are considered primary
      */
     private boolean allPrimary(IWizardCategory category) {
-        IWizardDescriptor [] wizards = category.getWizards();
-        for (int i = 0; i < wizards.length; i++) {
-        	IWizardDescriptor wizard = wizards[i];
+		for (IWizardDescriptor wizard : category.getWizards()) {
             if (!isPrimary(wizard)) {
 				return false;
 			}
         }
 
-        IWizardCategory [] children = category.getCategories();
-        for (int i = 0; i < children.length; i++) {
-            if (!allPrimary(children[i])) {
+		for (IWizardCategory wizard : category.getCategories()) {
+			if (!allPrimary(wizard)) {
 				return false;
 			}
-        }
+		}
 
         return true;
     }
@@ -207,8 +205,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
      * @return whether the given wizard is primary
      */
     private boolean isPrimary(IWizardDescriptor wizard) {
-        for (int j = 0; j < primaryWizards.length; j++) {
-            if (primaryWizards[j].equals(wizard)) {
+        for (IWizardDescriptor primaryWizard : primaryWizards) {
+            if (primaryWizard.equals(wizard)) {
 				return true;
 			}
         }
@@ -225,7 +223,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
     /**
      * Create this tab's visual components
-     * 
+     *
      * @param parent Composite
      * @return Control
      */
@@ -241,7 +239,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
         GridData data = new GridData(SWT.BEGINNING, SWT.FILL, false, true);
         outerContainer.setLayoutData(data);
         wizardLabel.setFont(wizardFont);
-        wizardLabel.setText(WorkbenchMessages.NewWizardNewPage_wizardsLabel);    
+        wizardLabel.setText(WorkbenchMessages.NewWizardNewPage_wizardsLabel);
 
         Composite innerContainer = new Composite(outerContainer, SWT.NONE);
         layout = new GridLayout(2, false);
@@ -249,12 +247,12 @@ class NewWizardNewPage implements ISelectionChangedListener {
         layout.marginWidth = 0;
         innerContainer.setLayout(layout);
         innerContainer.setFont(wizardFont);
-        data = new GridData(SWT.FILL, SWT.FILL, true, true);	
+        data = new GridData(SWT.FILL, SWT.FILL, true, true);
         innerContainer.setLayoutData(data);
 
         filteredTree = createFilteredTree(innerContainer);
         createOptionsButtons(innerContainer);
-        
+
         createImage(innerContainer);
 
         updateDescription(null);
@@ -268,7 +266,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
     /**
      * Create a new FilteredTree in the parent.
-     * 
+     *
      * @param parent the parent <code>Composite</code>.
      * @since 3.0
      */
@@ -278,10 +276,10 @@ class NewWizardNewPage implements ISelectionChangedListener {
         layout.marginHeight = 0;
         layout.marginWidth = 0;
         composite.setLayout(layout);
-        
+
         GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
         data.widthHint = SIZING_VIEWER_WIDTH;
-        data.horizontalSpan = 2;	 
+        data.horizontalSpan = 2;
         data.grabExcessHorizontalSpace = true;
         data.grabExcessVerticalSpace = true;
 
@@ -294,40 +292,28 @@ class NewWizardNewPage implements ISelectionChangedListener {
         composite.setLayoutData(data);
 
         filteredTreeFilter = new WizardPatternFilter();
-    	FilteredTree filterTree = new FilteredTree(composite, 
+    	FilteredTree filterTree = new FilteredTree(composite,
     			SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER, filteredTreeFilter, true);
-  	
+		filterTree.setQuickSelectionMode(true);
+
 		final TreeViewer treeViewer = filterTree.getViewer();
 		treeViewer.setContentProvider(new WizardContentProvider());
-		treeViewer.setLabelProvider(new DelegatingLabelProviderWithTooltip(
-				new WorkbenchLabelProvider(), PlatformUI.getWorkbench()
-				.getDecoratorManager().getLabelDecorator(ContributingPluginDecorator.ID)) {
-					protected Object unwrapElement(Object element) {
-						if (element instanceof WorkbenchWizardElement) {
-							element = ((WorkbenchWizardElement) element).getConfigurationElement();
-						}
-						if (element instanceof WizardCollectionElement) {
-							element = ((WizardCollectionElement) element).getConfigurationElement();
-						}
-						return element;
-					}
-				});
+		treeViewer.setLabelProvider(new WorkbenchLabelProvider());
 		treeViewer.setComparator(NewWizardCollectionComparator.INSTANCE);
 		treeViewer.addSelectionChangedListener(this);
 
         ArrayList inputArray = new ArrayList();
 
-        for (int i = 0; i < primaryWizards.length; i++) {
-            inputArray.add(primaryWizards[i]);
+        for (IWizardDescriptor primaryWizard : primaryWizards) {
+            inputArray.add(primaryWizard);
         }
 
         boolean expandTop = false;
 
         if (wizardCategories != null) {
             if (wizardCategories.getParent() == null) {
-                IWizardCategory [] children = wizardCategories.getCategories();
-                for (int i = 0; i < children.length; i++) {
-                    inputArray.add(children[i]);
+				for (IWizardCategory wizardCategory : wizardCategories.getCategories()) {
+					inputArray.add(wizardCategory);
                 }
             } else {
                 expandTop = true;
@@ -349,29 +335,22 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
         treeViewer.getTree().setFont(parent.getFont());
 
-        treeViewer.addDoubleClickListener(new IDoubleClickListener() {
-            /*
-             * (non-Javadoc)
-             * 
-             * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
-             */
-            public void doubleClick(DoubleClickEvent event) {
-            	    IStructuredSelection s = (IStructuredSelection) event
-						.getSelection();
-				selectionChanged(new SelectionChangedEvent(event.getViewer(), s));
-				
-				Object element = s.getFirstElement();
-                if (treeViewer.isExpandable(element)) {
-                	treeViewer.setExpandedState(element, !treeViewer
-                            .getExpandedState(element));
-                } else if (element instanceof WorkbenchWizardElement) {
-                    page.advanceToNextPageOrFinish();
-                }
-            }
-        });
-        
+        treeViewer.addDoubleClickListener(event -> {
+			    IStructuredSelection s = (IStructuredSelection) event
+					.getSelection();
+			selectionChanged(new SelectionChangedEvent(event.getViewer(), s));
+
+			Object element = s.getFirstElement();
+		    if (treeViewer.isExpandable(element)) {
+		    	treeViewer.setExpandedState(element, !treeViewer
+		                .getExpandedState(element));
+		    } else if (element instanceof WorkbenchWizardElement) {
+		        page.advanceToNextPageOrFinish();
+		    }
+		});
+
         treeViewer.addFilter(filter);
-        
+
         if (projectsOnly) {
 			treeViewer.addFilter(projectFilter);
 		}
@@ -379,10 +358,10 @@ class NewWizardNewPage implements ISelectionChangedListener {
 		Dialog.applyDialogFont(filterTree);
 		return filterTree;
     }
-    
+
     /**
      * Create the Show All and help buttons at the bottom of the page.
-     * 
+     *
      * @param parent the parent composite on which to create the widgets
      */
     private void createOptionsButtons(Composite parent){
@@ -391,7 +370,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
             GridData data = new GridData();
             showAllCheck.setLayoutData(data);
             showAllCheck.setFont(parent.getFont());
-            showAllCheck.setText(WorkbenchMessages.NewWizardNewPage_showAll); 
+            showAllCheck.setText(WorkbenchMessages.NewWizardNewPage_showAll);
             showAllCheck.setSelection(false);
 
             // flipping tabs updates the selected node
@@ -401,7 +380,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
                 // and the current 'no show all'
                 private Object[] delta = new Object[0];
 
-                public void widgetSelected(SelectionEvent e) {
+                @Override
+				public void widgetSelected(SelectionEvent e) {
                     boolean showAll = showAllCheck.getSelection();
 
                     if (showAll) {
@@ -460,10 +440,10 @@ class NewWizardNewPage implements ISelectionChangedListener {
             });
         }
     }
-    
+
     /**
      * Create the image controls.
-     * 
+     *
      * @param parent the parent <code>Composite</code>.
      * @since 3.0
      */
@@ -476,18 +456,12 @@ class NewWizardNewPage implements ISelectionChangedListener {
         descImageCanvas.setLayoutData(data);
 
         // hook a listener to get rid of cached images.
-        descImageCanvas.addDisposeListener(new DisposeListener() {
-
-            /* (non-Javadoc)
-             * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
-             */
-            public void widgetDisposed(DisposeEvent e) {
-                for (Iterator i = imageTable.values().iterator(); i.hasNext();) {
-                    ((Image) i.next()).dispose();
-                }
-                imageTable.clear();
-            }
-        });
+        descImageCanvas.addDisposeListener(e -> {
+		    for (Iterator i = imageTable.values().iterator(); i.hasNext();) {
+		        ((Image) i.next()).dispose();
+		    }
+		    imageTable.clear();
+		});
     }
 
     /**
@@ -505,9 +479,9 @@ class NewWizardNewPage implements ISelectionChangedListener {
         List categoriesToExpand = new ArrayList(expandedCategoryPaths.length);
 
         if (wizardCategories != null) {
-            for (int i = 0; i < expandedCategoryPaths.length; i++) {
+            for (String expandedCategoryPath : expandedCategoryPaths) {
                 IWizardCategory category = wizardCategories
-                        .findCategory(new Path(expandedCategoryPaths[i]));
+                        .findCategory(new Path(expandedCategoryPath));
                 if (category != null) {
 					categoriesToExpand.add(category);
 				}
@@ -532,7 +506,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
     /**
      * Set self's widgets to the values that they held last time this page was
      * open
-     *  
+     *
      */
     protected void restoreWidgetValues() {
         expandPreviouslyExpandedCategories();
@@ -542,7 +516,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
     /**
      * Store the current values of self's widgets so that they can be restored
      * in the next instance of self
-     *  
+     *
      */
     public void saveWidgetValues() {
         storeExpandedCategories();
@@ -552,10 +526,11 @@ class NewWizardNewPage implements ISelectionChangedListener {
     /**
      * The user selected either new wizard category(s) or wizard element(s).
      * Proceed accordingly.
-     * 
+     *
      * @param selectionEvent ISelection
      */
-    public void selectionChanged(SelectionChangedEvent selectionEvent) {
+    @Override
+	public void selectionChanged(SelectionChangedEvent selectionEvent) {
         page.setErrorMessage(null);
         page.setMessage(null);
 
@@ -605,16 +580,12 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
         //work around for 62039
         final StructuredSelection selection = new StructuredSelection(selected);
-        filteredTree.getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-            public void run() {
-            	filteredTree.getViewer().setSelection(selection, true);
-            }
-        });
+        filteredTree.getViewer().getControl().getDisplay().asyncExec(() -> filteredTree.getViewer().setSelection(selection, true));
     }
 
     /**
      * Set the dialog store to use for widget value storage and retrieval
-     * 
+     *
      * @param settings IDialogSettings
      */
     public void setDialogSettings(IDialogSettings settings) {
@@ -629,10 +600,10 @@ class NewWizardNewPage implements ISelectionChangedListener {
     protected void storeExpandedCategories() {
         Object[] expandedElements = filteredTree.getViewer().getExpandedElements();
         List expandedElementPaths = new ArrayList(expandedElements.length);
-        for (int i = 0; i < expandedElements.length; ++i) {
-            if (expandedElements[i] instanceof IWizardCategory) {
+        for (Object expandedElement : expandedElements) {
+            if (expandedElement instanceof IWizardCategory) {
 				expandedElementPaths
-                        .add(((IWizardCategory) expandedElements[i])
+                        .add(((IWizardCategory) expandedElement)
                                 .getPath().toString());
 			}
         }
@@ -664,7 +635,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
     /**
      * Update the current description controls.
-     * 
+     *
      * @param selectedObject the new wizard
      * @since 3.0
      */
@@ -711,7 +682,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
 
     /**
      * Tests whether the given wizard has an associated image.
-     * 
+     *
      * @param selectedObject the wizard to test
      * @return whether the given wizard has an associated image
      */
@@ -738,7 +709,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
                     .get(selectedObject);
         } else {
             selectedNode = new WorkbenchWizardNode(page, selectedObject) {
-                public IWorkbenchWizard createWizard() throws CoreException {
+                @Override
+				public IWorkbenchWizard createWizard() throws CoreException {
                     return wizardElement.createWizard();
                 }
             };

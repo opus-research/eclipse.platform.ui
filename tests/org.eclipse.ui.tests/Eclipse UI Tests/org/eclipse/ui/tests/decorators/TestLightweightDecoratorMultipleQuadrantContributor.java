@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ public class TestLightweightDecoratorMultipleQuadrantContributor implements
 
     public static TestLightweightDecoratorMultipleQuadrantContributor contributor;
 
-    private Set listeners = new HashSet();
+	private Set<ILabelProviderListener> listeners = new HashSet<>();
 
     private ImageDescriptor descriptor;
 
@@ -43,53 +43,42 @@ public class TestLightweightDecoratorMultipleQuadrantContributor implements
         contributor = this;
     }
 
-    /*
-     * @see IBaseLabelProvider#addListener(ILabelProviderListener)
-     */
-    public void addListener(ILabelProviderListener listener) {
+    @Override
+	public void addListener(ILabelProviderListener listener) {
         listeners.add(listener);
     }
 
-    /*
-     * @see IBaseLabelProvider#dispose()
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         contributor = null;
-        listeners = new HashSet();
+		listeners = new HashSet<>();
     }
 
-    /*
-     * @see IBaseLabelProvider#isLabelProperty(Object, String)
-     */
-    public boolean isLabelProperty(Object element, String property) {
+    @Override
+	public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
-    /*
-     * @see IBaseLabelProvider#removeListener(ILabelProviderListener)
-     */
-    public void removeListener(ILabelProviderListener listener) {
+    @Override
+	public void removeListener(ILabelProviderListener listener) {
         listeners.remove(listener);
     }
 
     /**
-     * Refresh the listeners to update the decorators for 
+     * Refresh the listeners to update the decorators for
      * element.
      */
 
     public void refreshListeners(Object element) {
-        Iterator iterator = listeners.iterator();
+		Iterator<ILabelProviderListener> iterator = listeners.iterator();
         while (iterator.hasNext()) {
             LabelProviderChangedEvent event = new LabelProviderChangedEvent(
                     this, element);
-            ((ILabelProviderListener) iterator.next())
+            iterator.next()
                     .labelProviderChanged(event);
         }
     }
 
-    /**
-     * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#getOverlay(java.lang.Object)
-     */
     public ImageDescriptor getOverlay(Object element) {
         Assert.isTrue(element instanceof IResource);
         if (descriptor == null) {
@@ -106,10 +95,8 @@ public class TestLightweightDecoratorMultipleQuadrantContributor implements
 
     }
 
-    /**
-     * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(java.lang.Object, org.eclipse.jface.viewers.IDecoration)
-     */
-    public void decorate(Object element, IDecoration decoration) {
+    @Override
+	public void decorate(Object element, IDecoration decoration) {
         decoration.addOverlay(getOverlay(element), IDecoration.BOTTOM_LEFT);
         decoration.addOverlay(getOverlay(element), IDecoration.BOTTOM_RIGHT);
         decoration.addOverlay(getOverlay(element), IDecoration.TOP_LEFT);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,18 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.test.performance.Dimension;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class ObjectContributionsPerformance extends BasicPerformanceTest {
 
 	public  static final int SEED = 1001001;
 	private IStructuredSelection selection;
-	
+
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Object contribution performance");
         suite.addTest(new ObjectContributionsPerformance(
@@ -39,12 +39,13 @@ public class ObjectContributionsPerformance extends BasicPerformanceTest {
                         BasicPerformanceTest.NONE));
         return suite;
 	}
-	
+
 	public ObjectContributionsPerformance(String label, IStructuredSelection selection, int tagging) {
 		super("testObjectContributions:" + label, tagging);
 		this.selection = selection;
 	}
 
+	@Override
 	protected void runTest() {
 		ObjectContributionTest tests = new ObjectContributionTest(
                 "testObjectContributions");
@@ -59,10 +60,10 @@ public class ObjectContributionsPerformance extends BasicPerformanceTest {
         commitMeasurements();
         assertPerformance();
 	}
-	
+
 	protected static IStructuredSelection generateAdaptableSelection(int seed, int size) {
 		Random rand = new Random(seed);
-		List selection = new ArrayList();
+		List<Object> selection = new ArrayList<>();
 		for (int i = 0; i < size; i++) {
 			switch ((int) Math.round(rand.nextDouble() * 5)) {
 				case 0 :

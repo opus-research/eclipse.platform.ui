@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.jface.bindings;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.util.Util;
 
 /**
@@ -17,11 +19,11 @@ import org.eclipse.jface.util.Util;
  * A sequence of one or more triggers. None of these triggers may be
  * <code>null</code>.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public abstract class TriggerSequence {
-	
+
 	/**
 	 * The value to see that hash code to if the hash code is not yet computed.
 	 */
@@ -54,7 +56,7 @@ public abstract class TriggerSequence {
 
 	/**
 	 * Constructs a new instance of <code>TriggerSequence</code>.
-	 * 
+	 *
 	 * @param triggers
 	 *            The triggers contained within this sequence; must not be
 	 *            <code>null</code> or contain <code>null</code> elements.
@@ -65,8 +67,8 @@ public abstract class TriggerSequence {
 			throw new NullPointerException("The triggers cannot be null"); //$NON-NLS-1$
 		}
 
-		for (int i = 0; i < triggers.length; i++) {
-			if (triggers[i] == null) {
+		for (Trigger trigger : triggers) {
+			if (trigger == null) {
 				throw new IllegalArgumentException(
 						"All triggers in a trigger sequence must be an instance of Trigger"); //$NON-NLS-1$
 			}
@@ -80,7 +82,7 @@ public abstract class TriggerSequence {
 	/**
 	 * Returns whether or not this key sequence ends with the given key
 	 * sequence.
-	 * 
+	 *
 	 * @param triggerSequence
 	 *            a trigger sequence. Must not be <code>null</code>.
 	 * @param equals
@@ -99,6 +101,7 @@ public abstract class TriggerSequence {
 		return Util.endsWith(triggers, triggerSequence.triggers, equals);
 	}
 
+	@Override
 	public final boolean equals(final Object object) {
 		// Check if they're the same.
 		if (object == this) {
@@ -111,12 +114,12 @@ public abstract class TriggerSequence {
 		}
 
 		final TriggerSequence triggerSequence = (TriggerSequence) object;
-		return Util.equals(triggers, triggerSequence.triggers);
+		return Arrays.equals(triggers, triggerSequence.triggers);
 	}
 
 	/**
 	 * Formats this trigger sequence into the current default look.
-	 * 
+	 *
 	 * @return A string representation for this trigger sequence using the
 	 *         default look; never <code>null</code>.
 	 */
@@ -133,7 +136,7 @@ public abstract class TriggerSequence {
 	 * A, B, C and D. The prefixes would be "", "A", "A B", and "A B C". The
 	 * list of prefixes must always be the same as the size of the trigger list.
 	 * </p>
-	 * 
+	 *
 	 * @return The array of possible prefixes for this sequence. This array must
 	 *         not be <code>null</code>, but may be empty. It must only
 	 *         contains instances of <code>TriggerSequence</code>.
@@ -142,7 +145,7 @@ public abstract class TriggerSequence {
 
 	/**
 	 * Returns the list of triggers.
-	 * 
+	 *
 	 * @return The triggers; never <code>null</code> and guaranteed to only
 	 *         contain instances of <code>Trigger</code>.
 	 */
@@ -153,11 +156,7 @@ public abstract class TriggerSequence {
 		return triggerCopy;
 	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-	 */
+	@Override
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL;
@@ -172,7 +171,7 @@ public abstract class TriggerSequence {
 
 	/**
 	 * Returns whether or not this trigger sequence is empty.
-	 * 
+	 *
 	 * @return <code>true</code>, iff the trigger sequence is empty.
 	 */
 	public final boolean isEmpty() {
@@ -182,7 +181,7 @@ public abstract class TriggerSequence {
 	/**
 	 * Returns whether or not this trigger sequence starts with the given
 	 * trigger sequence.
-	 * 
+	 *
 	 * @param triggerSequence
 	 *            a trigger sequence. Must not be <code>null</code>.
 	 * @param equals

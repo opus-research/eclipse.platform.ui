@@ -33,10 +33,8 @@ public class ReadmeContentOutlineDragListener extends DragSourceAdapter {
         this.page = page;
     }
 
-    /* (non-Javadoc)
-     * Method declared on DragSourceListener
-     */
-    public void dragSetData(DragSourceEvent event) {
+    @Override
+	public void dragSetData(DragSourceEvent event) {
         if (PluginTransfer.getInstance().isSupportedType(event.dataType)) {
             byte[] segmentData = getSegmentText().getBytes();
             event.data = new PluginTransferData(ReadmeDropActionDelegate.ID,
@@ -53,7 +51,7 @@ public class ReadmeContentOutlineDragListener extends DragSourceAdapter {
      * Returns the text of the currently selected readme segment.
      */
     private String getSegmentText() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         ISelection selection = page.getSelection();
         if (selection instanceof org.eclipse.jface.viewers.IStructuredSelection) {
             Object[] selected = ((IStructuredSelection) selection).toArray();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 448060
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430988
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 455527
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
@@ -14,8 +17,14 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -36,7 +45,6 @@ import org.eclipse.ui.internal.dialogs.FileExtensionDialog;
 import org.eclipse.ui.internal.dialogs.SavePerspectiveDialog;
 import org.eclipse.ui.internal.dialogs.SelectPerspectiveDialog;
 import org.eclipse.ui.internal.dialogs.ShowViewDialog;
-import org.eclipse.ui.internal.ide.dialogs.SimpleListContentProvider;
 import org.eclipse.ui.internal.registry.PerspectiveRegistry;
 import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
@@ -62,9 +70,9 @@ public class UIDialogsAuto extends TestCase {
     public void testAbout() {
         Dialog dialog = null;
         dialog = new AboutDialog(getShell());
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
-    
+
      public void testAboutPlugins() {
         Dialog dialog = null;
         dialog = new AboutPluginsDialog(
@@ -74,14 +82,13 @@ public class UIDialogsAuto extends TestCase {
 				WorkbenchMessages.AboutFeaturesDialog_pluginInfoTitle,
 				"Title",
 				IWorkbenchHelpContextIds.ABOUT_FEATURES_PLUGINS_DIALOG);
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testAddProjects() {
-        Dialog dialog = new ListSelectionDialog(getShell(), null,
-                new SimpleListContentProvider(), new LabelProvider(),
-                PROJECT_SELECTION_MESSAGE);
-        DialogCheck.assertDialogTexts(dialog, this);
+		Dialog dialog = new ListSelectionDialog(getShell(), null, ArrayContentProvider.getInstance(),
+				new LabelProvider(), PROJECT_SELECTION_MESSAGE);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testCopyMoveProject() {
@@ -89,13 +96,13 @@ public class UIDialogsAuto extends TestCase {
                 .getProject("DummyProject");
         Dialog dialog = new ProjectLocationSelectionDialog(getShell(),
                 dummyProject);
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testCopyMoveResource() {
         Dialog dialog = new ContainerSelectionDialog(getShell(), null, true,
                 "Copy Resources");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testEditActionSetsDialog() {
@@ -109,46 +116,45 @@ public class UIDialogsAuto extends TestCase {
          * (WorkbenchPage)getWorkbench().getActiveWorkbenchWindow().getActivePage() );
          * dialog = new CustomizePerspectiveDialog(getShell(), persp); } catch
          * (WorkbenchException e) { dialog = null; }
-         * DialogCheck.assertDialogTexts(dialog, this); if (persp != null) {
+         * DialogCheck.assertDialogTexts(dialog); if (persp != null) {
          * persp.dispose(); }
          */
     }
 
     public void testEditorSelection() {
         Dialog dialog = new EditorSelectionDialog(getShell());
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     /**
      * 1GJWD2E: ITPUI:ALL - Test classes should not be released in public
      * packages. public void testFindReplace() { Dialog dialog =
      * TextEditorTestStub.newFindReplaceDialog( getShell() );
-     * DialogCheck.assertDialogTexts(dialog, this); } public void
+     * DialogCheck.assertDialogTexts(dialog); } public void
      * testGotoResource() { Dialog dialog =
      * NavigatorTestStub.newGotoResourceDialog(getShell(), new IResource[0]);
-     * DialogCheck.assertDialogTexts(dialog, this); }
+     * DialogCheck.assertDialogTexts(dialog); }
      */
     public void testNavigatorFilter() {
-        Dialog dialog = new ListSelectionDialog(getShell(), null,
-                new SimpleListContentProvider(), new LabelProvider(),
-                FILTER_SELECTION_MESSAGE);
-        DialogCheck.assertDialogTexts(dialog, this);
+		Dialog dialog = new ListSelectionDialog(getShell(), null, ArrayContentProvider.getInstance(),
+				new LabelProvider(), FILTER_SELECTION_MESSAGE);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testNewFileType() {
         Dialog dialog = new FileExtensionDialog(getShell());
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testProgressInformation() {
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
         dialog.setBlockOnOpen(true);
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testSaveAs() {
         Dialog dialog = new SaveAsDialog(getShell());
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testSavePerspective() {
@@ -162,29 +168,37 @@ public class UIDialogsAuto extends TestCase {
                         .getActiveWorkbenchWindow().getActivePage()
                         .getPerspective().getId());
         dialog.setInitialSelection(description);
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testSelectPerspective() {
         Dialog dialog = new SelectPerspectiveDialog(getShell(), PlatformUI
                 .getWorkbench().getPerspectiveRegistry());
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testSelectTypes() {
         Dialog dialog = new TypeFilteringDialog(getShell(), null);
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testShowView() {
-        Dialog dialog = new ShowViewDialog(getWorkbench().getActiveWorkbenchWindow(), WorkbenchPlugin
-                .getDefault().getViewRegistry());
-        DialogCheck.assertDialogTexts(dialog, this);
+    	IWorkbench workbench = getWorkbench();
+
+    	Shell shell = workbench.getActiveWorkbenchWindow().getShell();
+		// Get the view identifier, if any.
+		IEclipseContext ctx = workbench.getService(IEclipseContext.class);
+		EModelService modelService = workbench.getService(EModelService.class);
+		EPartService partService = workbench.getService(EPartService.class);
+		MApplication app = workbench.getService(MApplication.class);
+		MWindow window = workbench.getService(MWindow.class);
+		Dialog dialog = new ShowViewDialog(shell, app, window, modelService, partService, ctx);
+        DialogCheck.assertDialogTexts(dialog);
     }
     /**
      * 1GJWD2E: ITPUI:ALL - Test classes should not be released in public
      * packages. public void testTaskFilters() { Dialog dialog =
      * TaskListTestStub.newFiltersDialog( getShell() );
-     * DialogCheck.assertDialogTexts(dialog, this); }
+     * DialogCheck.assertDialogTexts(dialog); }
      */
 }

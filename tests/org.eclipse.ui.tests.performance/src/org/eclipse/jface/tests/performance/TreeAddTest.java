@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,7 +87,7 @@ public class TreeAddTest extends TreeTest {
 
 	/**
 	 * Run the test for one of the fast insertions.
-	 * 
+	 *
 	 * @param count
 	 * @throws CoreException
 	 */
@@ -97,6 +97,7 @@ public class TreeAddTest extends TreeTest {
 		openBrowser();
 
 		exercise(new TestRunnable() {
+			@Override
 			public void run() {
 
 				TestTreeElement input = new TestTreeElement(0, null);
@@ -104,7 +105,7 @@ public class TreeAddTest extends TreeTest {
 				input.createChildren(total);
 				if (preSort)
 					viewer.getSorter().sort(viewer, input.children);
-				Collection batches = new ArrayList();
+				Collection<Object> batches = new ArrayList<>();
 				int blocks = input.children.length / increment;
 				for (int j = 0; j < blocks; j = j + increment) {
 					Object[] batch = new Object[increment];

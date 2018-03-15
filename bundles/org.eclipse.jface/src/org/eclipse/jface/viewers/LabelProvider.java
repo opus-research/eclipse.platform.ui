@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
 	 * <code>ILabelProvider</code> method returns <code>null</code>.
 	 * Subclasses may override.
 	 */
+	@Override
 	public Image getImage(Object element) {
 		return null;
 	}
@@ -50,6 +51,7 @@ public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
 	 * <code>ILabelProvider</code> method returns the element's
 	 * <code>toString</code> string. Subclasses may override.
 	 */
+	@Override
 	public String getText(Object element) {
 		return element == null ? "" : element.toString();//$NON-NLS-1$
 	}

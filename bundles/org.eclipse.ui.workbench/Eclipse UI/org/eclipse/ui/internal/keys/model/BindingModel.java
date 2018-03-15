@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys.model;
@@ -32,7 +33,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class BindingModel extends CommonModel {
 	public static final String PROP_BINDING_ADD = "bindingAdd"; //$NON-NLS-1$
@@ -87,7 +88,7 @@ public class BindingModel extends CommonModel {
 
 	/**
 	 * Makes a copy of the selected element.
-	 * 
+	 *
 	 */
 	public void copy() {
 		BindingElement element = (BindingElement) getSelectedElement();
@@ -96,7 +97,7 @@ public class BindingModel extends CommonModel {
 
 	/**
 	 * Makes a copy of the
-	 * 
+	 *
 	 * @param element
 	 */
 	public void copy(BindingElement element) {
@@ -137,7 +138,7 @@ public class BindingModel extends CommonModel {
 
 	/**
 	 * The initialization only.
-	 * 
+	 *
 	 * @param locator
 	 * @param manager
 	 * @param model
@@ -163,7 +164,7 @@ public class BindingModel extends CommonModel {
 			cmdsForBindings.add(b.getParameterizedCommand());
 		}
 
-		ICommandService commandService = (ICommandService) locator
+		ICommandService commandService = locator
 				.getService(ICommandService.class);
 		final Collection commandIds = commandService.getDefinedCommandIds();
 		allParameterizedCommands = new HashSet();
@@ -195,7 +196,7 @@ public class BindingModel extends CommonModel {
 
 	/**
 	 * Refreshes the binding model to be in sync with the {@link BindingManager}.
-	 * 
+	 *
 	 * @param contextModel
 	 */
 	public void refresh(ContextModel contextModel) {
@@ -268,7 +269,7 @@ public class BindingModel extends CommonModel {
 
 	/**
 	 * Removes the selected element's binding
-	 * 
+	 *
 	 */
 	public void remove() {
 		BindingElement element = (BindingElement) getSelectedElement();
@@ -277,7 +278,7 @@ public class BindingModel extends CommonModel {
 
 	/**
 	 * Removes the <code>bindingElement</code> binding.
-	 * 
+	 *
 	 * @param bindingElement
 	 */
 	public void remove(BindingElement bindingElement) {
@@ -302,8 +303,8 @@ public class BindingModel extends CommonModel {
 			Collection conflictsList = conflictModel.getConflicts();
 			if (conflictsList != null) {
 				Object[] conflicts = conflictsList.toArray();
-				for (int i = 0; i < conflicts.length; i++) {
-					BindingElement be = (BindingElement) conflicts[i];
+				for (Object conflict : conflicts) {
+					BindingElement be = (BindingElement) conflict;
 					if (be == bindingElement) {
 						continue;
 					}
@@ -333,7 +334,7 @@ public class BindingModel extends CommonModel {
 	 * Restores the specified BindingElement. A refresh should be performed
 	 * afterwards. The refresh may be done after several elements have been
 	 * restored.
-	 * 
+	 *
 	 * @param element
 	 */
 	public void restoreBinding(BindingElement element) {
@@ -360,14 +361,14 @@ public class BindingModel extends CommonModel {
 		Binding[] managerBindings = bindingManager.getBindings();
 		ArrayList systemBindings = new ArrayList();
 		ArrayList removalBindings = new ArrayList();
-		for (int i = 0; i < managerBindings.length; i++) {
-			if (managerBindings[i].getParameterizedCommand() == null) {
-				removalBindings.add(managerBindings[i]);
-			} else if (managerBindings[i].getParameterizedCommand().equals(cmd)) {
-				if (managerBindings[i].getType() == Binding.USER) {
-					bindingManager.removeBinding(managerBindings[i]);
-				} else if (managerBindings[i].getType() == Binding.SYSTEM) {
-					systemBindings.add(managerBindings[i]);
+		for (Binding managerBinding : managerBindings) {
+			if (managerBinding.getParameterizedCommand() == null) {
+				removalBindings.add(managerBinding);
+			} else if (managerBinding.getParameterizedCommand().equals(cmd)) {
+				if (managerBinding.getType() == Binding.USER) {
+					bindingManager.removeBinding(managerBinding);
+				} else if (managerBinding.getType() == Binding.SYSTEM) {
+					systemBindings.add(managerBinding);
 				}
 			}
 		}
@@ -395,7 +396,7 @@ public class BindingModel extends CommonModel {
 
 	/**
 	 * Restores the currently selected binding.
-	 * 
+	 *
 	 * @param contextModel
 	 */
 	public void restoreBinding(ContextModel contextModel) {

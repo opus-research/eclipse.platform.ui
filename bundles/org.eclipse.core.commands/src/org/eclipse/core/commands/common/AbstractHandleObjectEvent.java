@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ package org.eclipse.core.commands.common;
  * An event fired from a <code>NamedHandleObject</code>. This provides
  * notification of changes to the defined state, the name and the description.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public abstract class AbstractHandleObjectEvent extends AbstractBitSetEvent {
@@ -34,7 +34,7 @@ public abstract class AbstractHandleObjectEvent extends AbstractBitSetEvent {
 
 	/**
 	 * Constructs a new instance of <code>AbstractHandleObjectEvent</code>.
-	 * 
+	 *
 	 * @param definedChanged
 	 *            <code>true</code>, iff the defined property changed.
 	 */
@@ -46,7 +46,7 @@ public abstract class AbstractHandleObjectEvent extends AbstractBitSetEvent {
 
 	/**
 	 * Returns whether or not the defined property changed.
-	 * 
+	 *
 	 * @return <code>true</code>, iff the defined property changed.
 	 */
 	public final boolean isDefinedChanged() {

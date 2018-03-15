@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,9 +27,9 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * ColorAndFontProviderTest is a test of a color and font provider but not an
  * IViewerLabelProvider.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class ColorAndFontLabelProviderTest extends CompositeLabelProviderTest {
 
@@ -43,29 +43,17 @@ public class ColorAndFontLabelProviderTest extends CompositeLabelProviderTest {
 			super();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-		 */
+		@Override
 		public Font getFont(Object element) {
 			return font;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-		 */
+		@Override
 		public Color getBackground(Object element) {
 			return background;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-		 */
+		@Override
 		public Color getForeground(Object element) {
 			return foreground;
 		}
@@ -75,24 +63,19 @@ public class ColorAndFontLabelProviderTest extends CompositeLabelProviderTest {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param name
 	 */
 	public ColorAndFontLabelProviderTest(String name) {
 		super(name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#createViewer(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		initializeColors(parent);
 		final TableViewer v = new TableViewer(parent);
 		v.setContentProvider(new LabelTableContentProvider());
 		v.setLabelProvider(new ColorAndFontProvider());
-		;
 		v.getTable().setLinesVisible(true);
 		return v;
 	}
@@ -110,7 +93,7 @@ public class ColorAndFontLabelProviderTest extends CompositeLabelProviderTest {
 		assertTrue("Foreground was not set", item.getForeground(0).equals(
 				foreground));
 		assertTrue("Font was not set", item.getFont(0).equals(font));
-		
+
 		Font oldFont = font;
 
 		clearColors();

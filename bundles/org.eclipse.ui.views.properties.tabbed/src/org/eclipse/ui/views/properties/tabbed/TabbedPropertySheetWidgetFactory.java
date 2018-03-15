@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2006 IBM Corporation and others.
+ * Copyright (c) 2001, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -25,7 +25,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * A FormToolkit customized for use by tabbed property sheet page.
- * 
+ *
  * @author Anthony Hunter
  */
 public class TabbedPropertySheetWidgetFactory
@@ -40,7 +40,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates the tab folder as a part of the form.
-     * 
+     *
      * @param parent
      *            the composite parent.
      * @param style
@@ -54,7 +54,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates the tab item as a part of the tab folder.
-     * 
+     *
      * @param tabFolder
      *            the parent.
      * @param style
@@ -68,7 +68,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates the list as a part of the form.
-     * 
+     *
      * @param parent
      *            the composite parent.
      * @param style
@@ -80,20 +80,22 @@ public class TabbedPropertySheetWidgetFactory
         return list;
     }
 
-    public Composite createComposite(Composite parent, int style) {
+    @Override
+	public Composite createComposite(Composite parent, int style) {
         Composite c = super.createComposite(parent, style);
         paintBordersFor(c);
         return c;
     }
 
-    public Composite createComposite(Composite parent) {
+    @Override
+	public Composite createComposite(Composite parent) {
         Composite c = createComposite(parent, SWT.NONE);
         return c;
     }
 
     /**
      * Creates a plain composite as a part of the form.
-     * 
+     *
      * @param parent
      *            the composite parent.
      * @param style
@@ -109,7 +111,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates a scrolled composite as a part of the form.
-     * 
+     *
      * @param parent
      *            the composite parent.
      * @param style
@@ -124,7 +126,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates a combo box as a part of the form.
-     * 
+     *
      * @param parent
      *            the combo box parent.
      * @param comboStyle
@@ -143,7 +145,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates a combo box as a part of the form.
-     * 
+     *
      * @param parent
      *            the combo box parent.
      * @return the combo box.
@@ -154,7 +156,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates a group as a part of the form.
-     * 
+     *
      * @param parent
      *            the group parent.
      * @param text
@@ -171,7 +173,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates a flat form composite as a part of the form.
-     * 
+     *
      * @param parent
      *            the composite parent.
      * @return the composite.
@@ -188,7 +190,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates a label as a part of the form.
-     * 
+     *
      * @param parent
      *            the label parent.
      * @param text
@@ -201,7 +203,7 @@ public class TabbedPropertySheetWidgetFactory
 
     /**
      * Creates a label as a part of the form.
-     * 
+     *
      * @param parent
      *            the label parent.
      * @param text
@@ -217,7 +219,8 @@ public class TabbedPropertySheetWidgetFactory
         return label;
     }
 
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (getColors() != null) {
             super.dispose();
         }

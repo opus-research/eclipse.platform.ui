@@ -26,19 +26,21 @@ import org.eclipse.swt.graphics.Image;
 /**
  * Most of the setup has been taken from
  * org.eclipse.jface.snippets.viewers.Snippet010OwnerDraw.java
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class IDecorationContextTest extends TestCase {
 
 	private IDecorationContext getDecorationContext() {
 		return new IDecorationContext() {
 
+			@Override
 			public String[] getProperties() {
 				return null;
 			}
 
+			@Override
 			public Object getProperty(String property) {
 				return null;
 			}
@@ -48,26 +50,32 @@ public class IDecorationContextTest extends TestCase {
 	private IStyledLabelProvider getStyledLabelProvider() {
 		return new IStyledLabelProvider() {
 
+			@Override
 			public Image getImage(Object element) {
 				return null;
 			}
 
+			@Override
 			public StyledString getStyledText(Object element) {
 				return null;
 			}
 
+			@Override
 			public void addListener(ILabelProviderListener listener) {
 
 			}
 
+			@Override
 			public void dispose() {
 
 			}
 
+			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 
+			@Override
 			public void removeListener(ILabelProviderListener listener) {
 
 			}
@@ -77,26 +85,32 @@ public class IDecorationContextTest extends TestCase {
 	private ILabelDecorator getLabelDecorator() {
 		return new ILabelDecorator() {
 
+			@Override
 			public Image decorateImage(Image image, Object element) {
 				return null;
 			}
 
+			@Override
 			public String decorateText(String text, Object element) {
 				return null;
 			}
 
+			@Override
 			public void addListener(ILabelProviderListener listener) {
 
 			}
 
+			@Override
 			public void dispose() {
 
 			}
 
+			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 
+			@Override
 			public void removeListener(ILabelProviderListener listener) {
 
 			}

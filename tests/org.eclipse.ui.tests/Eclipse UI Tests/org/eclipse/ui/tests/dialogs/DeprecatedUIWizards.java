@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -23,7 +21,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectReferencePage;
-import org.eclipse.ui.help.WorkbenchHelp;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.ExportWizard;
@@ -35,6 +32,8 @@ import org.eclipse.ui.tests.harness.util.DialogCheck;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
+
+import junit.framework.TestCase;
 
 public class DeprecatedUIWizards extends TestCase {
     private static final int SIZING_WIZARD_WIDTH = 470;
@@ -64,9 +63,10 @@ public class DeprecatedUIWizards extends TestCase {
                 .getDialogSettings();
         IDialogSettings wizardSettings = workbenchSettings
                 .getSection("ExportResourcesAction");
-        if (wizardSettings == null)
-            wizardSettings = workbenchSettings
+        if (wizardSettings == null) {
+			wizardSettings = workbenchSettings
                     .addNewSection("ExportResourcesAction");
+		}
         wizard.setDialogSettings(wizardSettings);
         wizard.setForcePreviousAndNextButtons(true);
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
@@ -74,8 +74,7 @@ public class DeprecatedUIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT);
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IWorkbenchHelpContextIds.EXPORT_WIZARD });
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IWorkbenchHelpContextIds.EXPORT_WIZARD);
 
         if (page != null) {
             page.setWizard(wizard);
@@ -91,9 +90,10 @@ public class DeprecatedUIWizards extends TestCase {
                 .getDialogSettings();
         IDialogSettings wizardSettings = workbenchSettings
                 .getSection("ImportResourcesAction");
-        if (wizardSettings == null)
-            wizardSettings = workbenchSettings
+        if (wizardSettings == null) {
+			wizardSettings = workbenchSettings
                     .addNewSection("ImportResourcesAction");
+		}
         wizard.setDialogSettings(wizardSettings);
         wizard.setForcePreviousAndNextButtons(true);
 
@@ -102,8 +102,7 @@ public class DeprecatedUIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT);
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IWorkbenchHelpContextIds.IMPORT_WIZARD });
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IWorkbenchHelpContextIds.IMPORT_WIZARD);
 
         if (page != null) {
             page.setWizard(wizard);
@@ -114,36 +113,36 @@ public class DeprecatedUIWizards extends TestCase {
 
     public void testExportResources() {//reference: ExportResourcesAction
         Dialog dialog = exportWizard(null);
-        DialogCheck.assertDialog(dialog, this);
+        DialogCheck.assertDialog(dialog);
     }
 
     /**
      * 1GJWD2E: ITPUI:ALL - Test classes should not be released in public packages.
-     * 
+     *
      public void testFileSystemExport() {
      Dialog dialog = exportWizard( DataTransferTestStub.newFileSystemResourceExportPage1(null) );
-     DialogCheck.assertDialog(dialog, this);
+     DialogCheck.assertDialog(dialog);
      }
      public void testZipFileExport() {
      Dialog dialog = exportWizard( DataTransferTestStub.newZipFileResourceExportPage1(null) );
-     DialogCheck.assertDialog(dialog, this);
+     DialogCheck.assertDialog(dialog);
      }
      */
     public void testImportResources() {//reference: ImportResourcesAction
         Dialog dialog = importWizard(null);
-        DialogCheck.assertDialog(dialog, this);
+        DialogCheck.assertDialog(dialog);
     }
 
     /**
      * 1GJWD2E: ITPUI:ALL - Test classes should not be released in public packages.
-     * 
+     *
      public void testFileSystemImport() {
      Dialog dialog = importWizard( DataTransferTestStub.newFileSystemResourceImportPage1(WorkbenchPlugin.getDefault().getWorkbench(), StructuredSelection.EMPTY) );
-     DialogCheck.assertDialog(dialog, this);
+     DialogCheck.assertDialog(dialog);
      }
      public void testZipFileImport() {
      Dialog dialog = importWizard( DataTransferTestStub.newZipFileResourceImportPage1(null) );
-     DialogCheck.assertDialog(dialog, this);
+     DialogCheck.assertDialog(dialog);
      }
      */
     public void testNewFile() {
@@ -153,9 +152,8 @@ public class DeprecatedUIWizards extends TestCase {
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.create();
         dialog.getShell().setText("CreateFileAction_title");
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IIDEHelpContextIds.NEW_FILE_WIZARD });
-        DialogCheck.assertDialog(dialog, this);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IIDEHelpContextIds.NEW_FILE_WIZARD);
+        DialogCheck.assertDialog(dialog);
     }
 
     public void testNewFolder() {
@@ -165,10 +163,9 @@ public class DeprecatedUIWizards extends TestCase {
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         dialog.create();
         dialog.getShell().setText(
-                "CreateFolderAction_title"); 
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IIDEHelpContextIds.NEW_FOLDER_WIZARD });
-        DialogCheck.assertDialog(dialog, this);
+                "CreateFolderAction_title");
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IIDEHelpContextIds.NEW_FOLDER_WIZARD);
+        DialogCheck.assertDialog(dialog);
     }
 
     public void testNewProjectPage1() {
@@ -181,10 +178,10 @@ public class DeprecatedUIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
-        dialog.getShell().setText("CreateFileAction_title"); 
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IIDEHelpContextIds.NEW_PROJECT_WIZARD });
-        DialogCheck.assertDialog(dialog, this);
+        dialog.getShell().setText("CreateFileAction_title");
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IIDEHelpContextIds.NEW_PROJECT_WIZARD);
+
+        DialogCheck.assertDialog(dialog);
     }
 
     public void testNewProjectPage2() {
@@ -203,11 +200,11 @@ public class DeprecatedUIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
-        dialog.getShell().setText("CreateFileAction_title"); 
+        dialog.getShell().setText("CreateFileAction_title");
         dialog.showPage(page);
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IIDEHelpContextIds.NEW_PROJECT_WIZARD });
-        DialogCheck.assertDialog(dialog, this);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IIDEHelpContextIds.NEW_PROJECT_WIZARD);
+
+        DialogCheck.assertDialog(dialog);
     }
 
     public void testNewProject() {
@@ -217,17 +214,20 @@ public class DeprecatedUIWizards extends TestCase {
         ISelection selection = getWorkbench().getActiveWorkbenchWindow()
                 .getSelectionService().getSelection();
         IStructuredSelection selectionToPass = null;
-        if (selection instanceof IStructuredSelection)
-            selectionToPass = (IStructuredSelection) selection;
-        else
-            selectionToPass = StructuredSelection.EMPTY;
+        if (selection instanceof IStructuredSelection) {
+			selectionToPass = (IStructuredSelection) selection;
+		} else {
+			selectionToPass = StructuredSelection.EMPTY;
+		}
         wizard.init(getWorkbench(), selectionToPass);
         IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault()
                 .getDialogSettings();
         IDialogSettings wizardSettings = workbenchSettings
                 .getSection("NewWizardAction");//$NON-NLS-1$
         if (wizardSettings == null)
-            wizardSettings = workbenchSettings.addNewSection("NewWizardAction");//$NON-NLS-1$
+		 {
+			wizardSettings = workbenchSettings.addNewSection("NewWizardAction");//$NON-NLS-1$
+		}
         wizard.setDialogSettings(wizardSettings);
         wizard.setForcePreviousAndNextButtons(true);
 
@@ -237,9 +237,10 @@ public class DeprecatedUIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IIDEHelpContextIds.NEW_PROJECT_WIZARD });
-        DialogCheck.assertDialog(dialog, this);
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IIDEHelpContextIds.NEW_PROJECT_WIZARD);
+
+
+        DialogCheck.assertDialog(dialog);
     }
 
     public void testNewResource() {
@@ -247,17 +248,20 @@ public class DeprecatedUIWizards extends TestCase {
         ISelection selection = getWorkbench().getActiveWorkbenchWindow()
                 .getSelectionService().getSelection();
         IStructuredSelection selectionToPass = null;
-        if (selection instanceof IStructuredSelection)
-            selectionToPass = (IStructuredSelection) selection;
-        else
-            selectionToPass = StructuredSelection.EMPTY;
+        if (selection instanceof IStructuredSelection) {
+			selectionToPass = (IStructuredSelection) selection;
+		} else {
+			selectionToPass = StructuredSelection.EMPTY;
+		}
         wizard.init(getWorkbench(), selectionToPass);
         IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault()
                 .getDialogSettings();
         IDialogSettings wizardSettings = workbenchSettings
                 .getSection("NewWizardAction");//$NON-NLS-1$
         if (wizardSettings == null)
-            wizardSettings = workbenchSettings.addNewSection("NewWizardAction");//$NON-NLS-1$
+		 {
+			wizardSettings = workbenchSettings.addNewSection("NewWizardAction");//$NON-NLS-1$
+		}
         wizard.setDialogSettings(wizardSettings);
         wizard.setForcePreviousAndNextButtons(true);
 
@@ -266,9 +270,9 @@ public class DeprecatedUIWizards extends TestCase {
         dialog.getShell().setSize(
                 Math.max(SIZING_WIZARD_WIDTH_2, dialog.getShell().getSize().x),
                 SIZING_WIZARD_HEIGHT_2);
-        WorkbenchHelp.setHelp(dialog.getShell(),
-                new Object[] { IWorkbenchHelpContextIds.NEW_WIZARD });
-        DialogCheck.assertDialog(dialog, this);
+
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IWorkbenchHelpContextIds.NEW_WIZARD);
+        DialogCheck.assertDialog(dialog);
     }
 }
 

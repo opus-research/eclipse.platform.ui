@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,19 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
+ * Mickael Istria (Red Hat Inc.) Bug 264404 - Problem decorators
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.workbench;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -24,6 +29,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.internal.navigator.resources.nested.PathComparator;
 import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorPlugin;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 
@@ -31,40 +37,30 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
  * @since 3.2
  */
 public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
- 
+
 	private static final Object[] NO_CHILDREN = new Object[0];
 	private Viewer viewer;
-	
+
 	/**
-	 *  
+	 *
 	 */
 	public ResourceExtensionContentProvider() {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#getElements(java.lang.Object)
-	 */
+	@Override
 	public Object[] getElements(Object element) {
 		return super.getChildren(element);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#getChildren(java.lang.Object)
-	 */
+	@Override
 	public Object[] getChildren(Object element) {
 		if(element instanceof IResource)
 			return super.getChildren(element);
 		return NO_CHILDREN;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.BaseWorkbenchContentProvider#hasChildren(java.lang.Object)
-	 */
+
+	@Override
 	public boolean hasChildren(Object element) {
 		try {
 			if (element instanceof IContainer) {
@@ -81,11 +77,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 		return super.hasChildren(element);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.model.WorkbenchContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) { 
+
+	@Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		super.inputChanged(viewer, oldInput, newInput);
 		this.viewer = viewer;
 	}
@@ -93,19 +87,39 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 	/**
 	 * Process the resource delta.
-	 * 
+	 *
 	 * @param delta
 	 */
-	protected void processDelta(IResourceDelta delta) {		
+	@Override
+	protected void processDelta(IResourceDelta delta) {
 
 		Control ctrl = viewer.getControl();
 		if (ctrl == null || ctrl.isDisposed()) {
 			return;
 		}
-		
-		
-		final Collection runnables = new ArrayList();
-		processDelta(delta, runnables);
+
+		final Collection<Runnable> runnables = new ArrayList<Runnable>();
+		final SortedSet<IResource> resourcesToRefresh = new TreeSet<IResource>(new Comparator<IResource>() {
+			private PathComparator pathComparator = new PathComparator();
+			@Override
+			public int compare(IResource arg0, IResource arg1) {
+				return pathComparator.compare(arg0.getFullPath(), arg1.getFullPath());
+			}
+		});
+		processDelta(delta, runnables, resourcesToRefresh);
+
+		IResource currentTopLevelResource = null;
+		for (IResource resource : resourcesToRefresh) {
+			if (resource == null) {
+				// paranoia, see bug 509821
+				continue;
+			}
+			if (currentTopLevelResource == null
+					|| !currentTopLevelResource.getFullPath().isPrefixOf(resource.getFullPath())) {
+				currentTopLevelResource = resource;
+				runnables.add(getRefreshRunnable(resource));
+			}
+		}
 
 		if (runnables.isEmpty()) {
 			return;
@@ -116,27 +130,27 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 			runUpdates(runnables);
 		} else {
 			ctrl.getDisplay().asyncExec(new Runnable(){
-				/* (non-Javadoc)
-				 * @see java.lang.Runnable#run()
-				 */
+				@Override
 				public void run() {
 					//Abort if this happens after disposes
 					Control ctrl = viewer.getControl();
 					if (ctrl == null || ctrl.isDisposed()) {
 						return;
 					}
-					
+
 					runUpdates(runnables);
 				}
 			});
 		}
 
 	}
-	
+
 	/**
-	 * Process a resource delta. Add any runnables
+	 * Process a resource delta. Add runnables for addAndRemove and
+	 * resourceToUpdate.
 	 */
-	private void processDelta(IResourceDelta delta, Collection runnables) {
+	private void processDelta(IResourceDelta delta, Collection<Runnable> addAndRemoveRunnables,
+			Set<IResource> toRefresh) {
 		//he widget may have been destroyed
 		// by the time this is run. Check for this and do nothing if so.
 		Control ctrl = viewer.getControl();
@@ -146,18 +160,17 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 		// Get the affected resource
 		final IResource resource = delta.getResource();
-	
+
 		// If any children have changed type, just do a full refresh of this
 		// parent,
 		// since a simple update on such children won't work,
 		// and trying to map the change to a remove and add is too dicey.
 		// The case is: folder A renamed to existing file B, answering yes to
 		// overwrite B.
-		IResourceDelta[] affectedChildren = delta
-				.getAffectedChildren(IResourceDelta.CHANGED);
-		for (int i = 0; i < affectedChildren.length; i++) {
-			if ((affectedChildren[i].getFlags() & IResourceDelta.TYPE) != 0) {
-				runnables.add(getRefreshRunnable(resource));
+		IResourceDelta[] affectedChildren = delta.getAffectedChildren(IResourceDelta.CHANGED);
+		for (IResourceDelta affectedChild : affectedChildren) {
+			if ((affectedChild.getFlags() & IResourceDelta.TYPE) != 0) {
+				toRefresh.add(resource);
 				return;
 			}
 		}
@@ -168,28 +181,31 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		int changeFlags = delta.getFlags();
 		if ((changeFlags & (IResourceDelta.OPEN | IResourceDelta.SYNC
 				| IResourceDelta.TYPE | IResourceDelta.DESCRIPTION)) != 0) {
-//			Runnable updateRunnable =  new Runnable(){
-//				public void run() {
-//					((StructuredViewer) viewer).update(resource, null);
-//				}
-//			};
-//			runnables.add(updateRunnable);
-			
-			/* support the Closed Projects filter; 
+			/* support the Closed Projects filter;
 			 * when a project is closed, it may need to be removed from the view.
 			 */
-			runnables.add(getRefreshRunnable(resource.getParent()));
+			IContainer parent = resource.getParent();
+			if (parent != null) {
+				toRefresh.add(parent);
+			}
 		}
 		// Replacing a resource may affect its label and its children
 		if ((changeFlags & IResourceDelta.REPLACED) != 0) {
-			runnables.add(getRefreshRunnable(resource));
+			toRefresh.add(resource);
 			return;
+		}
+		if ((changeFlags & IResourceDelta.MARKERS) != 0) {
+			IProject project = resource.getProject();
+			if (project != null) {
+				toRefresh.add(project);
+				return;
+			}
 		}
 
 
 		// Handle changed children .
-		for (int i = 0; i < affectedChildren.length; i++) {
-			processDelta(affectedChildren[i], runnables);
+		for (IResourceDelta affectedChild : affectedChildren) {
+			processDelta(affectedChild, addAndRemoveRunnables, toRefresh);
 		}
 
 		// @issue several problems here:
@@ -249,8 +265,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		}
 		// heuristic test for items moving within same folder (i.e. renames)
 		final boolean hasRename = numMovedFrom > 0 && numMovedTo > 0;
-		
+
 		Runnable addAndRemove = new Runnable(){
+			@Override
 			public void run() {
 				if (viewer instanceof AbstractTreeViewer) {
 					AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
@@ -280,9 +297,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 				}
 			}
 		};
-		runnables.add(addAndRemove);
+		addAndRemoveRunnables.add(addAndRemove);
 	}
-	
+
 	/**
 	 * Return a runnable for refreshing a resource.
 	 * @param resource
@@ -290,22 +307,22 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 	 */
 	private Runnable getRefreshRunnable(final IResource resource) {
 		return new Runnable(){
+			@Override
 			public void run() {
 				((StructuredViewer) viewer).refresh(resource);
 			}
 		};
 	}
-	
+
 	/**
 	 * Run all of the runnables that are the widget updates
 	 * @param runnables
 	 */
-	private void runUpdates(Collection runnables) {
-		Iterator runnableIterator = runnables.iterator();
-		while(runnableIterator.hasNext()){
-			((Runnable)runnableIterator.next()).run();
+	private void runUpdates(Collection<Runnable> runnables) {
+		for (Runnable runnable : runnables) {
+			runnable.run();
 		}
-		
+
 	}
-	
+
 }

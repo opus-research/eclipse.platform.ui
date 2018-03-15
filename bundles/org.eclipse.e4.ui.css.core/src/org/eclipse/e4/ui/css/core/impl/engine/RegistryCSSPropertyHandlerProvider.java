@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2012 Brian de Alwis and others.
+ * Copyright (c) 2012, 2015 Brian de Alwis and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Brian de Alwis - cobbled together from other sources  
+ *     Brian de Alwis - cobbled together from other sources
  *     Angelo Zerr <angelo.zerr@gmail.com> - likely source of initial implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
@@ -52,7 +52,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 	private boolean hasDeprecatedProperties = false; // mild optimization for
 														// getCSSProperties()
 
-	private Map<String, Map<String, ICSSPropertyHandler>> propertyHandlerMap = new HashMap<String, Map<String, ICSSPropertyHandler>>();;
+	private Map<String, Map<String, ICSSPropertyHandler>> propertyHandlerMap = new HashMap<>();;
 
 	public RegistryCSSPropertyHandlerProvider(IExtensionRegistry registry) {
 		this.registry = registry;
@@ -81,7 +81,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 		if (extensions.length == 0) {
 			return false;
 		}
-		Map<String, Map<String, ICSSPropertyHandler>> handlersMap = new HashMap<String, Map<String, ICSSPropertyHandler>>();
+		Map<String, Map<String, ICSSPropertyHandler>> handlersMap = new HashMap<>();
 		for (IExtension e : extensions) {
 			for (IConfigurationElement ce : e.getConfigurationElements()) {
 				if (ce.getName().equals(ATTR_HANDLER)) {
@@ -109,7 +109,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 						if (adaptersMap == null) {
 							handlersMap
 									.put(adapter,
-											adaptersMap = new HashMap<String, ICSSPropertyHandler>());
+											adaptersMap = new HashMap<>());
 						}
 						if (!adaptersMap.containsKey(name)) {
 							Object t = ce
@@ -138,9 +138,10 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return true;
 	}
 
+	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
-		List<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
+		List<ICSSPropertyHandler> handlers = new ArrayList<>();
 		for (Map<String, ICSSPropertyHandler> perElement : propertyHandlerMap
 				.values()) {
 			ICSSPropertyHandler h = perElement.get(property);
@@ -151,36 +152,27 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return handlers;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.css.core.dom.properties.providers.
-	 * AbstractCSSPropertyHandlerProvider
-	 * #getDefaultCSSStyleDeclaration(org.eclipse
-	 * .e4.ui.css.core.engine.CSSEngine,
-	 * org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
-	 * org.w3c.dom.css.CSSStyleDeclaration)
-	 */
+	@Override
 	protected CSSStyleDeclaration getDefaultCSSStyleDeclaration(
 			CSSEngine engine, CSSStylableElement stylableElement,
 			CSSStyleDeclaration newStyle, String pseudoE) throws Exception {
 		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null)
 			return stylableElement.getDefaultStyleDeclaration(pseudoE);
 		if (newStyle != null) {
-			StringBuffer style = null;
+			StringBuilder style = null;
 			int length = newStyle.getLength();
 			for (int i = 0; i < length; i++) {
 				String propertyName = newStyle.item(i);
 				String[] compositePropertiesNames = engine
 						.getCSSCompositePropertiesNames(propertyName);
 				if (compositePropertiesNames != null) {
-					for (int j = 0; j < compositePropertiesNames.length; j++) {
-						propertyName = compositePropertiesNames[j];
+					for (String compositePropertyName : compositePropertiesNames) {
+						propertyName = compositePropertyName;
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {
 							if (style == null)
-								style = new StringBuffer();
+								style = new StringBuilder();
 							style.append(s);
 						}
 					}
@@ -189,7 +181,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 							propertyName, pseudoE);
 					if (s != null) {
 						if (style == null)
-							style = new StringBuffer();
+							style = new StringBuilder();
 						style.append(s);
 					}
 				}
@@ -205,9 +197,10 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return stylableElement.getDefaultStyleDeclaration(pseudoE);
 	}
 
+	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			Object element, String property) throws Exception {
-		List<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
+		List<ICSSPropertyHandler> handlers = new ArrayList<>();
 		Class<?> clazz = element.getClass();
 		while (clazz != Object.class) {
 			if (propertyHandlerMap.containsKey(clazz.getName())) {
@@ -222,9 +215,10 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return handlers;
 	}
 
+	@Override
 	public Collection<String> getCSSProperties(Object element) {
 		// don't include deprecated elements
-		Set<String> properties = new HashSet<String>();
+		Set<String> properties = new HashSet<>();
 		Class<?> clazz = element.getClass();
 		while (clazz != Object.class) {
 			Map<String, ICSSPropertyHandler> handlerMap = propertyHandlerMap
@@ -256,7 +250,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 			ICSSPropertyHandler {
 		private ICSSPropertyHandler delegate;
 		private String message;
-		private Set<String> logged = new HashSet<String>();
+		private Set<String> logged = new HashSet<>();
 
 		DeprecatedPropertyHandlerWrapper(ICSSPropertyHandler handler,
 				String message) {
@@ -264,6 +258,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 			this.message = message;
 		}
 
+		@Override
 		public boolean applyCSSProperty(Object element, String property,
 				CSSValue value, String pseudo, CSSEngine engine)
 				throws Exception {
@@ -272,6 +267,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 					engine);
 		}
 
+		@Override
 		public String retrieveCSSProperty(Object element, String property,
 				String pseudo, CSSEngine engine) throws Exception {
 			logIfNecessary(property);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import java.util.List;
  * can add matching contexts to this context.  This class may be instantiated
  * by clients.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class ObjectUndoContext extends UndoContext {
@@ -28,12 +28,12 @@ public final class ObjectUndoContext extends UndoContext {
 
 	private String label;
 
-	private List children = new ArrayList();
+	private List<IUndoContext> children = new ArrayList<>();
 
 	/**
 	 * Construct an operation context that represents the given object.
-	 * 
-	 * @param object 
+	 *
+	 * @param object
 	 *            the object to be represented.
 	 */
 	public ObjectUndoContext(Object object) {
@@ -43,10 +43,10 @@ public final class ObjectUndoContext extends UndoContext {
 	/**
 	 * Construct an operation context that represents the given object and has a
 	 * specialized label.
-	 * 
-	 * @param object 
+	 *
+	 * @param object
 	 *            the object to be represented.
-	 * @param label 
+	 * @param label
 	 *            the label for the context
 	 */
 	public ObjectUndoContext(Object object, String label) {
@@ -55,11 +55,7 @@ public final class ObjectUndoContext extends UndoContext {
 		this.label = label;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.operations.IUndoContext#getLabel()
-	 */
+	@Override
 	public String getLabel() {
 		if (label != null) {
 			return label;
@@ -72,7 +68,7 @@ public final class ObjectUndoContext extends UndoContext {
 
 	/**
 	 * Return the object that is represented by this context.
-	 * 
+	 *
 	 * @return the object represented by this context.
 	 */
 	public Object getObject() {
@@ -86,8 +82,8 @@ public final class ObjectUndoContext extends UndoContext {
 	 * allows components to create their own contexts for implementing
 	 * specialized behavior, yet have their operations appear in a more
 	 * global context.
-	 * 
-	 * @param context 
+	 *
+	 * @param context
 	 *            the context to be added as a match of this context
 	 */
 	public void addMatch(IUndoContext context) {
@@ -99,8 +95,8 @@ public final class ObjectUndoContext extends UndoContext {
 	 * no longer be interpreted as a match of this context when the history is
 	 * filtered for a particular context. This method has no effect if the
 	 * specified context was never previously added as a match.
-	 * 
-	 * @param context 
+	 *
+	 * @param context
 	 *            the context to be removed from the list of matches for this
 	 *            context
 	 */
@@ -108,12 +104,7 @@ public final class ObjectUndoContext extends UndoContext {
 		children.remove(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.operations.IUndoContext#matches(IUndoContext
-	 *      context)
-	 */
+	@Override
 	public boolean matches(IUndoContext context) {
 		// Check first for explicit matches that have been assigned.
 		if (children.contains(context)) {
@@ -126,13 +117,14 @@ public final class ObjectUndoContext extends UndoContext {
 		// Use the normal matching implementation
 		return super.matches(context);
 	}
-	
+
 	/**
 	 * The string representation of this operation.  Used for debugging purposes only.
 	 * This string should not be shown to an end user.
-	 * 
+	 *
 	 * @return The string representation.
 	 */
+	@Override
 	public String toString() {
 		return getLabel();
 	}

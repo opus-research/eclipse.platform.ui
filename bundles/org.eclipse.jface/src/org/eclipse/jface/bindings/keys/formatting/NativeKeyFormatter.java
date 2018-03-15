@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     SAP SE <christian.georgi@sap.com> - Bug 475629: Key modifier order on MacOS
  *******************************************************************************/
 
 package org.eclipse.jface.bindings.keys.formatting;
@@ -26,7 +27,7 @@ import org.eclipse.jface.util.Util;
  * format. This is typically what you would see on the menus for the given
  * platform and locale.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class NativeKeyFormatter extends AbstractKeyFormatter {
@@ -40,7 +41,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	/**
 	 * A look-up table for the string representations of various carbon keys.
 	 */
-	private final static HashMap CARBON_KEY_LOOK_UP = new HashMap();
+	private final static HashMap<String, String> CARBON_KEY_LOOK_UP = new HashMap<>();
 
 	/**
 	 * The resource bundle used by <code>format()</code> to translate formal
@@ -85,18 +86,19 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	 * Formats an individual key into a human readable format. This uses an
 	 * internationalization resource bundle to look up the key. This does the
 	 * platform-specific formatting for Carbon.
-	 * 
+	 *
 	 * @param key
 	 *            The key to format.
 	 * @return The key formatted as a string; should not be <code>null</code>.
 	 */
+	@Override
 	public final String format(final int key) {
 		final IKeyLookup lookup = KeyLookupFactory.getDefault();
 		final String name = lookup.formalNameLookup(key);
 
 		// TODO consider platform-specific resource bundles
-		if (Util.isMac()) {    	
-			String formattedName = (String) CARBON_KEY_LOOK_UP.get(name);
+		if (Util.isMac()) {
+			String formattedName = CARBON_KEY_LOOK_UP.get(name);
 			if (formattedName != null) {
 				return formattedName;
 			}
@@ -105,11 +107,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 		return super.format(key);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyDelimiter()
-	 */
+	@Override
 	protected String getKeyDelimiter() {
 		// We must do the look up every time, as our locale might change.
 		if (Util.isMac()) {
@@ -121,11 +119,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 				KeyStroke.KEY_DELIMITER);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
-	 */
+	@Override
 	protected String getKeyStrokeDelimiter() {
 		// We must do the look up every time, as our locale might change.
 		if (Util.isWindows()) {
@@ -138,11 +132,7 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 				KeySequence.KEY_STROKE_DELIMITER);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#sortModifierKeys(int)
-	 */
+	@Override
 	protected int[] sortModifierKeys(final int modifierKeys) {
 		final IKeyLookup lookup = KeyLookupFactory.getDefault();
 		final int[] sortedKeys = new int[4];
@@ -171,14 +161,16 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 			}
 
 		} else if (Util.isMac()) {
-			if ((modifierKeys & lookup.getShift()) != 0) {
-				sortedKeys[index++] = lookup.getShift();
-			}
+			// As per order in OS X HIG
+			// https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/OSXHIGuidelines/Keyboard.html
 			if ((modifierKeys & lookup.getCtrl()) != 0) {
 				sortedKeys[index++] = lookup.getCtrl();
 			}
 			if ((modifierKeys & lookup.getAlt()) != 0) {
 				sortedKeys[index++] = lookup.getAlt();
+			}
+			if ((modifierKeys & lookup.getShift()) != 0) {
+				sortedKeys[index++] = lookup.getShift();
 			}
 			if ((modifierKeys & lookup.getCommand()) != 0) {
 				sortedKeys[index++] = lookup.getCommand();

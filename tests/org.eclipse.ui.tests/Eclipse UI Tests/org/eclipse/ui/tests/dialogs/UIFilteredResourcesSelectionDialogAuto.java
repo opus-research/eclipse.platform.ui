@@ -11,8 +11,13 @@
 
 package org.eclipse.ui.tests.dialogs;
 
-import java.util.*;
-import org.eclipse.core.resources.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
@@ -26,7 +31,7 @@ public class UIFilteredResourcesSelectionDialogAuto extends
 
 	/**
 	 * Checks if content provider displays expected resources from the history.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testReadHistory() throws Exception {
@@ -38,15 +43,15 @@ public class UIFilteredResourcesSelectionDialogAuto extends
 		Object[] items = dialog.getHistoryItems();
 
 		assertEquals(historyResources.length, items.length);
-		Set itemsSet = new HashSet(historyResources.length);
+		Set<Object> itemsSet = new HashSet<>(historyResources.length);
 		itemsSet.addAll(Arrays.asList(items));
-		for (int i = 0; i < historyResources.length; i++) {
-			assertEquals(true, itemsSet.contains(historyResources[i]));
+		for (IResource historyResource : historyResources) {
+			assertEquals(true, itemsSet.contains(historyResource));
 		}
 
 		closeDialog(dialog);
 	}
-	
+
 	private static MockedFilteredResourcesSelectionDialog createDialog() {
 		final IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
@@ -63,6 +68,7 @@ public class UIFilteredResourcesSelectionDialogAuto extends
 		dialog.getShell().setLocation(window.getShell().getSize().x + 1, 0);
 		dialog.getShell().setSize(testDialogSize);
 		dialog.getShell().addShellListener(new ShellAdapter() {
+			@Override
 			public void shellClosed(ShellEvent e) {
 				e.doit = false;
 			}

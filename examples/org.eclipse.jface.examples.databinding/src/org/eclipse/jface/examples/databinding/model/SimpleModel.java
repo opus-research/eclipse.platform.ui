@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2005, 2006 David Orme <djo@coconut-palm-software.com>
- * 
+ * Copyright (C) 2005, 2015 David Orme <djo@coconut-palm-software.com>
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@
 package org.eclipse.jface.examples.databinding.model;
 
 import java.util.LinkedList;
+import java.util.List;
 
 
 public class SimpleModel {
@@ -27,10 +28,10 @@ public class SimpleModel {
 	}
 
 	// Now a PersonList property...
-	
-	LinkedList personList = new LinkedList();
-	
-	public LinkedList getPersonList() {
+
+	List<SimplePerson> personList = new LinkedList<>();
+
+	public List<SimplePerson> getPersonList() {
 		return personList;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 /**
  * This page will be added to the property page dialog
  * when the "Properties..." popup menu item is selected
- * for Readme files. 
+ * for Readme files.
  */
 public class ReadmeFilePropertyPage extends PropertyPage {
 
@@ -57,10 +57,8 @@ public class ReadmeFilePropertyPage extends PropertyPage {
         return composite;
     }
 
-    /** (non-Javadoc)
-     * Method declared on PreferencePage
-     */
-    public Control createContents(Composite parent) {
+    @Override
+	public Control createContents(Composite parent) {
 
         // ensure the page has no special buttons
         noDefaultAndApplyButton();
@@ -86,13 +84,12 @@ public class ReadmeFilePropertyPage extends PropertyPage {
 
             //
             createLabel(panel, MessageUtil.getString("Size")); //$NON-NLS-1$
-            InputStream contentStream = null;
-            try {
-                IFile file = (IFile) resource;
-                contentStream = file.getContents();
-                Reader in = new InputStreamReader(contentStream);
+            IFile file = (IFile) resource;
+            try (InputStream contentStream = file.getContents();
+                Reader in = new InputStreamReader(contentStream)){
+
                 int chunkSize = contentStream.available();
-                StringBuffer buffer = new StringBuffer(chunkSize);
+                StringBuilder buffer = new StringBuilder(chunkSize);
                 char[] readBuffer = new char[chunkSize];
                 int n = in.read(readBuffer);
 
@@ -112,14 +109,6 @@ public class ReadmeFilePropertyPage extends PropertyPage {
                     label = createLabel(panel, message);
             } catch (IOException e) {
                 label = createLabel(panel, MessageUtil.getString("<Unknown>")); //$NON-NLS-1$
-            } finally {
-                if (contentStream != null) {
-                    try {
-                        contentStream.close();
-                    } catch (IOException e) {
-                        // do nothing
-                    }
-                }
             }
             grabExcessSpace(label);
             createLabel(panel, MessageUtil.getString("Number_of_sections")); //$NON-NLS-1$
@@ -185,7 +174,8 @@ public class ReadmeFilePropertyPage extends PropertyPage {
     /** (non-Javadoc)
      * Method declared on PreferencePage
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         // nothing to do - read-only page
         return true;
     }

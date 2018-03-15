@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.ui.internal.ide.undo.ContainerDescription;
  * considered to be linked to the specified location. If a link location is not
  * specified, the folder will be created in the location specified by the
  * handle, and the entire containment path of the folder will be created if it
- * does not exist.  The folder should not already exist, and the existence 
+ * does not exist.  The folder should not already exist, and the existence
  * of the containment path should not be changed between the time this operation
  * is created and the time it is executed.
  * <p>
@@ -40,7 +40,7 @@ public class CreateFolderOperation extends AbstractCreateResourcesOperation {
 
 	/**
 	 * Create a CreateFolderOperation
-	 * 
+	 *
 	 * @param folderHandle
 	 *            the folder to be created
 	 * @param linkLocation
@@ -56,7 +56,7 @@ public class CreateFolderOperation extends AbstractCreateResourcesOperation {
 
 	/**
 	 * Create a CreateFolderOperation
-	 * 
+	 *
 	 * @param folderHandle
 	 *            the folder to be created
 	 * @param linkLocation

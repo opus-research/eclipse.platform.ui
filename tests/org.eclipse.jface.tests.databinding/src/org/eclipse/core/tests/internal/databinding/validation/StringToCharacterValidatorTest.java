@@ -24,11 +24,7 @@ public class StringToCharacterValidatorTest extends TestCase {
 	private StringToCharacterValidator validator;
 	private StringToCharacterValidator primitiveValidator;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		StringToCharacterConverter converter = StringToCharacterConverter
@@ -60,7 +56,7 @@ public class StringToCharacterValidatorTest extends TestCase {
 	}
 
 	public void testNonStringIsInvalid() throws Exception {
-		assertFalse(primitiveValidator.validate(new Integer(4)).isOK());
+		assertFalse(primitiveValidator.validate(Integer.valueOf(4)).isOK());
 	}
 
 	public void testLongerThanOneCharacterIsInvalid() throws Exception {

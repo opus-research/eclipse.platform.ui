@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -21,10 +21,10 @@ import org.w3c.dom.css.CSSValueList;
 public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 
 	List<CSSValue> values;
-	
+
 	public CSSValueListImpl(LexicalUnit parsePropertyValue) {
-		values = new ArrayList<CSSValue>();
-		
+		values = new ArrayList<>();
+
 		LexicalUnit unit = parsePropertyValue;
 		while(unit != null) {
 			values.add(CSSValueFactory.newPrimitiveValue(unit));
@@ -32,26 +32,17 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSValueList#getLength()
-	 */
+	@Override
 	public int getLength() {
 		return values.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSValueList#item(int)
-	 */
+	@Override
 	public CSSValue item(int index) {
 		return values.get(index);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSValue#getCssText()
-	 */
+	@Override
 	public String getCssText() {
 		StringBuilder buffer = new StringBuilder();
 		for (CSSValue value : values) {
@@ -61,21 +52,23 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 		return buffer.toString().trim();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSValue#getCssValueType()
-	 */
+	@Override
 	public short getCssValueType() {
 		return CSS_VALUE_LIST;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSValue#setCssText(java.lang.String)
-	 */
+	@Override
 	public void setCssText(String arg0) throws DOMException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");		
+		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (CSSValue cssValue : values) {
+			sb.append(cssValue.getCssText() + "\n");
+		}
+		return sb.toString();
 	}
 
 }

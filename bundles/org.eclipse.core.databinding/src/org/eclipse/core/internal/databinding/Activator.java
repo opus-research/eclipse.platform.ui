@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 Tom Schindl and others.
+ * Copyright (c) 2007, 2017 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.core.internal.databinding;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.databinding.util.ILogger;
 import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -25,7 +24,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class Activator implements BundleActivator {
 	/**
@@ -41,29 +40,26 @@ public class Activator implements BundleActivator {
 	public Activator() {
 	}
 
+	@Override
 	public void start(BundleContext context) throws Exception {
 		_frameworkLogTracker = new ServiceTracker(context, FrameworkLog.class.getName(), null);
 		_frameworkLogTracker.open();
 
-		Policy.setLog(new ILogger() {
-
-			public void log(IStatus status) {
-				ServiceTracker frameworkLogTracker = _frameworkLogTracker;
-				FrameworkLog log = frameworkLogTracker == null ? null : (FrameworkLog) frameworkLogTracker.getService();
-				if (log != null) {
-					log.log(createLogEntry(status));
-				} else {
-					// fall back to System.err
-					System.err.println(status.getPlugin() + " - " + status.getCode() + " - " + status.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
-					if( status.getException() != null ) {
-						status.getException().printStackTrace(System.err);
-					}
+		Policy.setLog(status -> {
+			ServiceTracker frameworkLogTracker = _frameworkLogTracker;
+			FrameworkLog log = frameworkLogTracker == null ? null : (FrameworkLog) frameworkLogTracker.getService();
+			if (log != null) {
+				log.log(createLogEntry(status));
+			} else {
+				// fall back to System.err
+				System.err.println(status.getPlugin() + " - " + status.getCode() + " - " + status.getMessage()); //$NON-NLS-1$//$NON-NLS-2$
+				if (status.getException() != null) {
+					status.getException().printStackTrace(System.err);
 				}
 			}
-
 		});
 	}
-	
+
 	// Code copied from PlatformLogWriter.getLog(). Why is logging an IStatus so
 	// hard?
 	FrameworkLogEntry createLogEntry(IStatus status) {
@@ -71,7 +67,7 @@ public class Activator implements BundleActivator {
 		ArrayList childlist = new ArrayList();
 
 		int stackCode = t instanceof CoreException ? 1 : 0;
-		// ensure a substatus inside a CoreException is properly logged 
+		// ensure a substatus inside a CoreException is properly logged
 		if (stackCode == 1) {
 			IStatus coreStatus = ((CoreException) t).getStatus();
 			if (coreStatus != null) {
@@ -80,9 +76,8 @@ public class Activator implements BundleActivator {
 		}
 
 		if (status.isMultiStatus()) {
-			IStatus[] children = status.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				childlist.add(createLogEntry(children[i]));
+			for (IStatus child : status.getChildren()) {
+				childlist.add(createLogEntry(child));
 			}
 		}
 
@@ -91,7 +86,8 @@ public class Activator implements BundleActivator {
 		return new FrameworkLogEntry(status.getPlugin(), status.getSeverity(), status.getCode(), status.getMessage(), stackCode, t, children);
 	}
 
-	
+
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		if (_frameworkLogTracker != null) {
 			_frameworkLogTracker.close();

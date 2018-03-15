@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,7 @@ final class Activity implements IActivity {
     private transient String string;
 
     private String description;
-    
+
     private boolean defaultEnabled;
 
 	private Expression expression;
@@ -69,7 +69,8 @@ final class Activity implements IActivity {
         this.id = id;
     }
 
-    public void addActivityListener(IActivityListener activityListener) {
+    @Override
+	public void addActivityListener(IActivityListener activityListener) {
         if (activityListener == null) {
 			throw new NullPointerException();
 		}
@@ -85,7 +86,8 @@ final class Activity implements IActivity {
         strongReferences.add(this);
     }
 
-    public int compareTo(Object object) {
+    @Override
+	public int compareTo(Object object) {
         Activity castedObject = (Activity) object;
 
         int compareTo = Util.compare(
@@ -117,7 +119,8 @@ final class Activity implements IActivity {
         return compareTo;
     }
 
-    public boolean equals(Object object) {
+    @Override
+	public boolean equals(Object object) {
         if (!(object instanceof Activity)) {
 			return false;
 		}
@@ -162,31 +165,37 @@ final class Activity implements IActivity {
 		}
     }
 
-    public Set getActivityRequirementBindings() {
+    @Override
+	public Set getActivityRequirementBindings() {
         return activityRequirementBindings;
     }
 
-    public Set getActivityPatternBindings() {
+    @Override
+	public Set getActivityPatternBindings() {
         return activityPatternBindings;
     }
 
-    public String getId() {
+    @Override
+	public String getId() {
         return id;
     }
 
-    public String getName() throws NotDefinedException {
+    @Override
+	public String getName() throws NotDefinedException {
         if (!defined) {
 			throw new NotDefinedException();
 		}
 
         return name;
     }
-    
-    public Expression getExpression() {
+
+    @Override
+	public Expression getExpression() {
     	return expression;
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR
                     + Util.hashCode(activityRequirementBindings);
@@ -204,11 +213,13 @@ final class Activity implements IActivity {
         return hashCode;
     }
 
-    public boolean isDefined() {
+    @Override
+	public boolean isDefined() {
         return defined;
     }
 
-    public boolean isEnabled() {
+    @Override
+	public boolean isEnabled() {
         return enabled;
     }
 
@@ -228,7 +239,8 @@ final class Activity implements IActivity {
         return false;
     }
 
-    public void removeActivityListener(IActivityListener activityListener) {
+    @Override
+	public void removeActivityListener(IActivityListener activityListener) {
         if (activityListener == null) {
 			throw new NullPointerException();
 		}
@@ -309,7 +321,7 @@ final class Activity implements IActivity {
 
         return false;
     }
-    
+
     void setExpression(Expression exp) {
     	expression = exp;
     }
@@ -325,9 +337,10 @@ final class Activity implements IActivity {
         return false;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         if (string == null) {
-            final StringBuffer stringBuffer = new StringBuffer();
+            final StringBuilder stringBuffer = new StringBuilder();
             stringBuffer.append('[');
             stringBuffer.append(activityRequirementBindings);
             stringBuffer.append(',');
@@ -347,24 +360,20 @@ final class Activity implements IActivity {
         return string;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.IActivity#getDescription()
-     */
-    public String getDescription() throws NotDefinedException {
+    @Override
+	public String getDescription() throws NotDefinedException {
         if (!defined) {
 			throw new NotDefinedException();
 		}
 
         return description;
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.IActivity#isDefaultEnabled()
-     */
-    public boolean isDefaultEnabled() {
+
+    @Override
+	public boolean isDefaultEnabled() {
         return defaultEnabled;
     }
-    
+
     boolean setDefaultEnabled(boolean defaultEnabled) {
         if (!Util.equals(defaultEnabled, this.defaultEnabled)) {
             this.defaultEnabled = defaultEnabled;
@@ -373,6 +382,6 @@ final class Activity implements IActivity {
             return true;
         }
 
-        return false;        
+        return false;
     }
 }

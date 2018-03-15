@@ -1,150 +1,141 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426460, 441150
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 466524
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import javax.inject.Inject;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Create a contribute part.
+ * Default SWT renderer responsible for an MPart. See
+ * {@link WorkbenchRendererFactory}
  */
 public class ContributedPartRenderer extends SWTPartRenderer {
 
 	@Inject
 	private IPresentationEngine engine;
 
-	@Optional
 	@Inject
+	@Optional
 	private Logger logger;
 
 	private MPart partToActivate;
 
-	private Listener activationListener = new Listener() {
-		public void handleEvent(Event event) {
-			// we only want to activate the part if the activated widget is
-			// actually bound to a model element
-			MPart part = (MPart) event.widget.getData(OWNING_ME);
-			if (part != null) {
-				try {
-					partToActivate = part;
-					activate(partToActivate);
-				} finally {
-					partToActivate = null;
-				}
+	private Listener activationListener = event -> {
+		// we only want to activate the part if the activated widget is
+		// actually bound to a model element
+		MPart part = (MPart) event.widget.getData(OWNING_ME);
+		if (part != null) {
+			try {
+				partToActivate = part;
+				activate(partToActivate);
+			} finally {
+				partToActivate = null;
 			}
 		}
 	};
 
+	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MPart) || !(parent instanceof Composite))
+		if (!(element instanceof MPart) || !(parent instanceof Composite)) {
 			return null;
+		}
 
-		Widget parentWidget = (Widget) parent;
-		Widget newWidget = null;
+		// retrieve context for this part
 		final MPart part = (MPart) element;
-
-		final Composite newComposite = new Composite((Composite) parentWidget,
-				SWT.NONE) {
-
-			/**
-			 * Field to determine whether we are currently in the midst of
-			 * granting focus to the part.
-			 */
-			private boolean beingFocused = false;
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.widgets.Composite#setFocus()
-			 */
-			@Override
-			public boolean setFocus() {
-				if (!beingFocused) {
-					try {
-						// we are currently asking the part to take focus
-						beingFocused = true;
-						// delegate an attempt to set the focus here to the
-						// part's implementation (if there is one)
-						Object object = part.getObject();
-						if (object != null) {
-							ContextInjectionFactory.invoke(object, Focus.class,
-									part.getContext(), null);
-							return true;
-						}
-						return super.setFocus();
-					} finally {
-						// we are done, unset our flag
-						beingFocused = false;
-					}
-				}
-
-				if (logger != null) {
-					String id = part.getElementId();
-					if (id == null) {
-						logger.warn(new IllegalStateException(),
-								"Blocked recursive attempt to activate part " //$NON-NLS-1$
-										+ id);
-					} else {
-						logger.warn(new IllegalStateException(),
-								"Blocked recursive attempt to activate part"); //$NON-NLS-1$
-					}
-				}
-
-				// already being focused, likely some strange recursive call,
-				// just return
-				return true;
-			}
-		};
-
-		newComposite.setLayout(new FillLayout(SWT.VERTICAL));
-
-		newWidget = newComposite;
-		bindWidget(element, newWidget);
-
-		// Create a context for this part
 		IEclipseContext localContext = part.getContext();
-		localContext.set(Composite.class.getName(), newComposite);
+		Widget parentWidget = (Widget) parent;
+		// retrieve existing Composite, e.g., for the e4 compatibility case
+		Composite partComposite = localContext.getLocal(Composite.class);
 
-		IContributionFactory contributionFactory = (IContributionFactory) localContext
-				.get(IContributionFactory.class.getName());
-		Object newPart = contributionFactory.create(part.getContributionURI(),
-				localContext);
+		// does the part already have a composite in its contexts?
+		if (partComposite == null) {
+
+			final Composite newComposite = new Composite((Composite) parentWidget, SWT.NONE) {
+
+				/**
+				 * Field to determine whether we are currently in the midst of
+				 * granting focus to the part.
+				 */
+				private boolean beingFocused = false;
+
+				@Override
+				public boolean setFocus() {
+					if (!beingFocused) {
+						try {
+							// we are currently asking the part to take focus
+							beingFocused = true;
+
+							// delegate an attempt to set the focus here to the
+							// part's implementation (if there is one)
+							Object object = part.getObject();
+							if (object != null && isEnabled()) {
+								IPresentationEngine pe = part.getContext().get(IPresentationEngine.class);
+								pe.focusGui(part);
+								return true;
+							}
+							return super.setFocus();
+						} finally {
+							// we are done, unset our flag
+							beingFocused = false;
+						}
+					}
+
+					// already being focused, likely some strange recursive
+					// call,
+					// just return
+					return true;
+				}
+			};
+			newComposite.setLayout(new FillLayout(SWT.VERTICAL));
+
+
+			partComposite = newComposite;
+		}
+		bindWidget(element, partComposite);
+
+		localContext.set(Composite.class, partComposite);
+
+		IContributionFactory contributionFactory = localContext.get(IContributionFactory.class);
+		Object newPart = contributionFactory.create(part.getContributionURI(), localContext);
 		part.setObject(newPart);
 
-		return newWidget;
+		return partComposite;
 	}
 
+	/**
+	 * @param part
+	 * @param description
+	 */
 	public static void setDescription(MPart part, String description) {
 		if (!(part.getWidget() instanceof Composite))
 			return;
@@ -185,12 +176,12 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 						Label separator = (Label) composite.getChildren()[1];
 						Control partCtrl = composite.getChildren()[2];
 
-						// if the label is not visible, give it a zero size
-						int labelHeight = label.isVisible() ? label
+						// if the label is empty, give it a zero size
+						int labelHeight = !label.getText().isEmpty() ? label
 								.computeSize(bounds.width, SWT.DEFAULT).y : 0;
 						label.setBounds(0, 0, bounds.width, labelHeight);
 
-						int separatorHeight = separator.isVisible() ? separator
+						int separatorHeight = labelHeight > 0 ? separator
 								.computeSize(bounds.width, SWT.DEFAULT).y : 0;
 						separator.setBounds(0, labelHeight, bounds.width,
 								separatorHeight);
@@ -212,13 +203,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#requiresFocus
-	 * (org.eclipse.e4.ui.model.application.ui.basic.MPart)
-	 */
 	@Override
 	protected boolean requiresFocus(MPart element) {
 		if (element == partToActivate) {
@@ -227,13 +211,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 		return super.requiresFocus(element);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.PartFactory#hookControllerLogic
-	 * (org.eclipse.e4.ui.model.application.MPart)
-	 */
 	@Override
 	public void hookControllerLogic(final MUIElement me) {
 		super.hookControllerLogic(me);
@@ -250,8 +227,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		if (element instanceof MToolBar) {
-			MUIElement container = (MUIElement) ((EObject) element)
-					.eContainer();
+			MUIElement container = modelService.getContainer(element);
 			MUIElement parent = container.getParent();
 			if (parent == null) {
 				MPlaceholder placeholder = container.getCurSharedRef();
@@ -282,6 +258,21 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 				engine.removeGui(menu);
 			}
 		}
-		super.disposeWidget(element);
+
+		Composite parent = null;
+		if (element.getWidget() instanceof Composite) {
+			parent = ((Composite) element.getWidget()).getParent();
+		}
+
+		if (parent != null) {
+			try {
+				parent.setRedraw(false);
+				super.disposeWidget(element);
+			} finally {
+				parent.setRedraw(true);
+			}
+		} else {
+			super.disposeWidget(element);
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Tobias Baumann <tobbaumann@gmail.com> - Bug 428323 - Correct lock tool bar action definition
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -20,23 +21,25 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.CloseAllSavedAction;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
-import org.eclipse.ui.internal.IntroAction;
 import org.eclipse.ui.internal.NavigationHistoryAction;
 import org.eclipse.ui.internal.OpenPreferencesAction;
 import org.eclipse.ui.internal.ToggleEditorsVisibilityAction;
+import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.actions.CommandAction;
 import org.eclipse.ui.internal.actions.DynamicHelpAction;
 import org.eclipse.ui.internal.actions.HelpContentsAction;
 import org.eclipse.ui.internal.actions.HelpSearchAction;
+import org.eclipse.ui.internal.intro.IntroDescriptor;
+import org.eclipse.ui.internal.intro.IntroMessages;
 
 /**
  * Access to standard actions provided by the workbench.
  * <p>
  * Most of the functionality of this class is provided by static methods and
  * fields. Example usage:
- * 
+ *
  * <pre>
  * MenuManager menu = ...;
  * ActionFactory.IWorkbenchAction closeEditorAction
@@ -48,7 +51,7 @@ import org.eclipse.ui.internal.actions.HelpSearchAction;
  * Clients may declare other classes that provide additional application-specific
  * action factories.
  * </p>
- * 
+ *
  * @since 3.0
  */
 public abstract class ActionFactory {
@@ -64,7 +67,7 @@ public abstract class ActionFactory {
          */
         public void dispose();
     }
-    
+
     private static class WorkbenchCommandAction extends CommandAction implements
 			IWorkbenchAction {
 		/**
@@ -84,11 +87,7 @@ public abstract class ActionFactory {
     public static final ActionFactory ABOUT = new ActionFactory("about", //$NON-NLS-1$
     		IWorkbenchCommandConstants.HELP_ABOUT) {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-		 */
+		@Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
@@ -123,11 +122,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory ACTIVATE_EDITOR = new ActionFactory(
             "activateEditor", IWorkbenchCommandConstants.WINDOW_ACTIVATE_EDITOR) {//$NON-NLS-1$
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -147,10 +144,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory BACK = new ActionFactory("back", //$NON-NLS-1$
     		IWorkbenchCommandConstants.NAVIGATE_BACK) {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -168,10 +164,8 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory BACKWARD_HISTORY = new ActionFactory(
             "backardHistory", IWorkbenchCommandConstants.NAVIGATE_BACKWARD_HISTORY) {//$NON-NLS-1$
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -187,10 +181,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory CLOSE = new ActionFactory("close",//$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_CLOSE) {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -209,10 +202,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory CLOSE_ALL = new ActionFactory("closeAll",//$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_CLOSE_ALL) {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -228,15 +220,14 @@ public abstract class ActionFactory {
 	/**
 	 * Workbench action (id: "closeOthers", commandId: "org.eclipse.ui.file.closeOthers"): Close all
 	 * editors except the one that is active. This action maintains its enablement state.
-	 * 
+	 *
 	 * @since 3.2
 	 */
     public static final ActionFactory CLOSE_OTHERS = new ActionFactory("closeOthers",//$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_CLOSE_OTHERS) {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -255,21 +246,20 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory CLOSE_ALL_PERSPECTIVES = new ActionFactory(
             "closeAllPerspectives", IWorkbenchCommandConstants.WINDOW_CLOSE_ALL_PERSPECTIVES) {//$NON-NLS-1$
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
 			WorkbenchCommandAction action = new WorkbenchCommandAction(
 					getCommandId(), window);
-            
+
             action.setId(getId());
             action.setText(WorkbenchMessages.CloseAllPerspectivesAction_text);
             action.setToolTipText(WorkbenchMessages.CloseAllPerspectivesAction_toolTip);
             window.getWorkbench().getHelpSystem().setHelp(action, IWorkbenchHelpContextIds.CLOSE_ALL_PAGES_ACTION);
-            
+
             return action;
         }
     };
@@ -280,10 +270,8 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory CLOSE_ALL_SAVED = new ActionFactory(
             "closeAllSaved") {//$NON-NLS-1$
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -299,12 +287,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory CLOSE_PERSPECTIVE = new ActionFactory(
     "closePerspective", IWorkbenchCommandConstants.WINDOW_CLOSE_PERSPECTIVE) {//$NON-NLS-1$
-    	/*
-    	 * (non-Javadoc)
-    	 * 
-    	 * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-    	 */
-    	public IWorkbenchAction create(IWorkbenchWindow window) {
+
+    	@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
     		if (window == null) {
     			throw new IllegalArgumentException();
     		}
@@ -326,7 +311,7 @@ public abstract class ActionFactory {
 	 * Workbench action (id: "intro", commandId: "org.eclipse.ui.help.quickStartAction"): Activate
 	 * the introduction extension. This action should not be instantiated if no intro is provided.
 	 * Use code like:
-	 * 
+	 *
 	 * <pre>
 	 * if (window.getWorkbench().getIntroManager().hasIntro()) {
 	 * 	introAction= ActionFactory.INTRO.create(window);
@@ -336,16 +321,30 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory INTRO = new ActionFactory("intro", //$NON-NLS-1$
     		IWorkbenchCommandConstants.HELP_WELCOME) {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
-            IWorkbenchAction action = new IntroAction(window);
-            action.setId(getId());
-            return action;
+
+			WorkbenchCommandAction action = new WorkbenchCommandAction(getCommandId(), window);
+
+			action.setId(getId());
+			action.setText(IntroMessages.Intro_action_text);
+			window.getWorkbench().getHelpSystem()
+					.setHelp(action, IWorkbenchHelpContextIds.INTRO_ACTION);
+			IntroDescriptor introDescriptor = ((Workbench) window.getWorkbench())
+					.getIntroDescriptor();
+			if (introDescriptor != null) {
+				action.setImageDescriptor(introDescriptor.getImageDescriptor());
+				String labelOverride = introDescriptor.getLabelOverride();
+				if (labelOverride != null) {
+					action.setText(labelOverride);
+				}
+			}
+
+			return action;
         }
     };
 
@@ -355,11 +354,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory COPY = new ActionFactory("copy", //$NON-NLS-1$
     		IWorkbenchCommandConstants.EDIT_COPY) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -383,11 +380,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory CUT = new ActionFactory("cut", //$NON-NLS-1$
     		IWorkbenchCommandConstants.EDIT_CUT) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -411,11 +406,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory DELETE = new ActionFactory("delete", //$NON-NLS-1$
     		IWorkbenchCommandConstants.EDIT_DELETE) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -443,11 +436,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory EDIT_ACTION_SETS = new ActionFactory(
             "editActionSets", IWorkbenchCommandConstants.WINDOW_CUSTOMIZE_PERSPECTIVE) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -458,7 +449,7 @@ public abstract class ActionFactory {
             action.setToolTipText(WorkbenchMessages.EditActionSetsAction_toolTip);
             window.getWorkbench().getHelpSystem().setHelp(action,
     				IWorkbenchHelpContextIds.EDIT_ACTION_SETS_ACTION);
-            
+
             return action;
         }
     };
@@ -469,11 +460,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory EXPORT = new ActionFactory("export", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_EXPORT) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -489,7 +478,7 @@ public abstract class ActionFactory {
                     .getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_EXPORT_WIZ));
             return action;
         }
-        
+
     };
 
 	/**
@@ -499,11 +488,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory FIND = new ActionFactory("find", //$NON-NLS-1$
     		IWorkbenchCommandConstants.EDIT_FIND_AND_REPLACE) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -526,11 +513,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory FORWARD = new ActionFactory("forward", //$NON-NLS-1$
     		IWorkbenchCommandConstants.NAVIGATE_FORWARD) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -548,11 +533,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory FORWARD_HISTORY = new ActionFactory(
             "forwardHistory", IWorkbenchCommandConstants.NAVIGATE_FORWARD_HISTORY) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -569,11 +552,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory GO_INTO = new ActionFactory("goInto", //$NON-NLS-1$
     		IWorkbenchCommandConstants.NAVIGATE_GO_INTO) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -591,15 +572,13 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory IMPORT = new ActionFactory("import", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_IMPORT) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
-            
+
 			WorkbenchCommandAction action = new WorkbenchCommandAction(
 					getCommandId(), window);
             action.setId(getId());
@@ -615,37 +594,41 @@ public abstract class ActionFactory {
     };
 
 	/**
-	 * Workbench action (id: "lockToolBar"): Lock/unlock the workbench window tool bar. This action
-	 * maintains its enablement state.
+	 * Workbench action (id: "lockToolBar"): Lock/unlock the workbench window
+	 * tool bar. This action maintains its enablement state.
 	 */
-    public static final ActionFactory LOCK_TOOL_BAR = new ActionFactory(
-            "lockToolBar") {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
-            if (window == null) {
-                throw new IllegalArgumentException();
-            }
-			WorkbenchCommandAction action = new WorkbenchCommandAction(
-					IWorkbenchCommandConstants.HELP_ABOUT, window);
-            action.setId(getId());
-            return action;
-        }
+	public static final ActionFactory LOCK_TOOL_BAR = new ActionFactory("lockToolBar", //$NON-NLS-1$
+			IWorkbenchCommandConstants.WINDOW_LOCK_TOOLBAR) {
+
+		@Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
+			if (window == null) {
+				throw new IllegalArgumentException();
+			}
+			WorkbenchCommandAction action = new WorkbenchCommandAction(getCommandId(), window);
+			action.setId(getId());
+			action.setToolTipText(WorkbenchMessages.LockToolBarAction_toolTip);
+			window.getWorkbench().getHelpSystem()
+					.setHelp(action, IWorkbenchHelpContextIds.LOCK_TOOLBAR_ACTION);
+			return action;
+		}
     };
 
 	/**
-	 * Workbench action (id: "maximize", commandId: "org.eclipse.ui.window.maximizePart"):
-	 * Maximize/restore the active part. This action maintains its enablement state.
+	 * Workbench action (id: "maximize", commandId:
+	 * "org.eclipse.ui.window.maximizePart"): Maximize/restore the active part.
+	 * This action maintains its enablement state.
+	 *
+	 * @deprecated you should not use this field, kept for compatibility
+	 *             reasons. use instead the command
+	 *             {@code org.eclipse.ui.window.maximizePart}.
 	 */
+	@Deprecated
     public static final ActionFactory MAXIMIZE = new ActionFactory("maximize", //$NON-NLS-1$
     		IWorkbenchCommandConstants.WINDOW_MAXIMIZE_ACTIVE_VIEW_OR_EDITOR) {
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -655,24 +638,27 @@ public abstract class ActionFactory {
             action.setToolTipText(WorkbenchMessages.MaximizePartAction_toolTip);
             window.getWorkbench().getHelpSystem().setHelp(action,
     				IWorkbenchHelpContextIds.MAXIMIZE_PART_ACTION);
-            
+
             return action;
         }
     };
 
 	/**
-	 * Workbench action (id: "minimize", commandId: "org.eclipse.ui.window.minimizePart"): Minimizes
-	 * the active part. This action maintains its enablement state.
-	 * 
+	 * Workbench action (id: "minimize", commandId:
+	 * "org.eclipse.ui.window.minimizePart"): Minimizes the active part. This
+	 * action maintains its enablement state.
+	 *
 	 * @since 3.1
+	 * @deprecated you should not use this field, that is kept for compatibility
+	 *             reasons. use instead the command
+	 *             {@code org.eclipse.ui.window.minimizePart}.
 	 */
+	@Deprecated
     public static final ActionFactory MINIMIZE = new ActionFactory("minimize", //$NON-NLS-1$
     		IWorkbenchCommandConstants.WINDOW_MINIMIZE_ACTIVE_VIEW_OR_EDITOR) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -692,11 +678,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory MOVE = new ActionFactory("move", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_MOVE) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -714,11 +698,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory NEW = new ActionFactory("new", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_NEW) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -742,16 +724,14 @@ public abstract class ActionFactory {
 	 * Workbench action (id: "newWizardDropDown"): Drop-down action which shows shows the new wizard
 	 * drop down, or opens the new wizard dialog when pressed. For use in the toolbar. This action
 	 * maintains its enablement state.
-	 * 
+	 *
 	 * @since 3.1
 	 */
     public static final ActionFactory NEW_WIZARD_DROP_DOWN = new ActionFactory(
             "newWizardDropDown") { //$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -767,11 +747,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory NEXT = new ActionFactory("next", //$NON-NLS-1$
     		IWorkbenchCommandConstants.NAVIGATE_NEXT) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -794,11 +772,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory NEXT_EDITOR = new ActionFactory(
             "nextEditor", IWorkbenchCommandConstants.WINDOW_NEXT_EDITOR) {//$NON-NLS-1$
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -811,7 +787,7 @@ public abstract class ActionFactory {
             // @issue missing action ids
 			window.getWorkbench().getHelpSystem().setHelp(action,
 					IWorkbenchHelpContextIds.CYCLE_EDITOR_FORWARD_ACTION);
-            
+
 			return action;
 		}
     };
@@ -827,11 +803,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory NEXT_PART = new ActionFactory("nextPart", //$NON-NLS-1$
     		IWorkbenchCommandConstants.WINDOW_NEXT_VIEW) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -858,11 +832,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory NEXT_PERSPECTIVE = new ActionFactory(
             "nextPerspective", IWorkbenchCommandConstants.WINDOW_NEXT_PERSPECTIVE) {//$NON-NLS-1$
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -884,12 +856,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory OPEN_NEW_WINDOW = new ActionFactory(
             "openNewWindow", IWorkbenchCommandConstants.WINDOW_NEW_WINDOW) {//$NON-NLS-1$
-        
-    	
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -902,7 +871,7 @@ public abstract class ActionFactory {
             		IWorkbenchHelpContextIds.OPEN_NEW_WINDOW_ACTION);
             return action;
         }
-        
+
     };
 
 	/**
@@ -911,11 +880,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PASTE = new ActionFactory("paste", //$NON-NLS-1$
     		IWorkbenchCommandConstants.EDIT_PASTE) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -939,11 +906,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PREFERENCES = new ActionFactory(
             "preferences", IWorkbenchCommandConstants.WINDOW_PREFERENCES) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -960,11 +925,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PREVIOUS = new ActionFactory("previous", //$NON-NLS-1$
     		IWorkbenchCommandConstants.NAVIGATE_PREVIOUS) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -987,11 +950,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PREVIOUS_EDITOR = new ActionFactory(
             "previousEditor", IWorkbenchCommandConstants.WINDOW_PREVIOUS_EDITOR) {//$NON-NLS-1$
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1019,11 +980,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PREVIOUS_PART = new ActionFactory(
             "previousPart", IWorkbenchCommandConstants.WINDOW_PREVIOUS_VIEW) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1050,11 +1009,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PREVIOUS_PERSPECTIVE = new ActionFactory(
             "previousPerspective", IWorkbenchCommandConstants.WINDOW_PREVIOUS_PERSPECTIVE) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1076,11 +1033,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PRINT = new ActionFactory("print", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_PRINT) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1105,11 +1060,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory PROPERTIES = new ActionFactory(
             "properties", IWorkbenchCommandConstants.FILE_PROPERTIES) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1127,11 +1080,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory QUIT = new ActionFactory("quit", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_EXIT) {
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1152,11 +1103,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory REDO = new ActionFactory("redo", //$NON-NLS-1$
     		IWorkbenchCommandConstants.EDIT_REDO) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1181,11 +1130,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory REFRESH = new ActionFactory("refresh", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_REFRESH) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1203,11 +1150,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory RENAME = new ActionFactory("rename", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_RENAME) {
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1225,11 +1170,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory RESET_PERSPECTIVE = new ActionFactory(
             "resetPerspective", IWorkbenchCommandConstants.WINDOW_RESET_PERSPECTIVE) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -1250,11 +1193,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory REVERT = new ActionFactory("revert", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_REVERT) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1272,11 +1213,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SAVE = new ActionFactory("save", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_SAVE) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1296,11 +1235,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SAVE_ALL = new ActionFactory("saveAll", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_SAVE_ALL) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1320,11 +1257,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SAVE_AS = new ActionFactory("saveAs", //$NON-NLS-1$
     		IWorkbenchCommandConstants.FILE_SAVE_AS) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1344,11 +1279,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SAVE_PERSPECTIVE = new ActionFactory(
             "savePerspective", IWorkbenchCommandConstants.WINDOW_SAVE_PERSPECTIVE_AS) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -1370,11 +1303,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SELECT_ALL = new ActionFactory(
             "selectAll", IWorkbenchCommandConstants.EDIT_SELECT_ALL) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1392,11 +1323,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SHOW_EDITOR = new ActionFactory(
             "showEditor") {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1412,11 +1341,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SHOW_OPEN_EDITORS = new ActionFactory(
             "showOpenEditors") {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1436,19 +1363,17 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SHOW_WORKBOOK_EDITORS = new ActionFactory(
             "showWorkBookEditors") {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
-            
+
             WorkbenchCommandAction action = new WorkbenchCommandAction("org.eclipse.ui.window.openEditorDropDown", window); //$NON-NLS-1$
             action.setId(getId());
             action.setText(WorkbenchMessages.WorkbookEditorsAction_label);
-            
+
             return action;
         }
     };
@@ -1456,17 +1381,13 @@ public abstract class ActionFactory {
 	/**
 	 * Workbench action (id: "showQuickAccess"): Shows a list of UI elements like editors, views,
 	 * perspectives etc.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	public static final ActionFactory SHOW_QUICK_ACCESS = new ActionFactory(
 			"showQuickAccess") { //$NON-NLS-1$
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-		 */
+		@Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
 			WorkbenchCommandAction action = new WorkbenchCommandAction("org.eclipse.ui.window.quickAccess", window); //$NON-NLS-1$
 			action.setId(getId());
@@ -1483,11 +1404,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SHOW_PART_PANE_MENU = new ActionFactory(
             "showPartPaneMenu") {//$NON-NLS-1$
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1505,11 +1424,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory SHOW_VIEW_MENU = new ActionFactory(
             "showViewMenu", IWorkbenchCommandConstants.WINDOW_SHOW_VIEW_MENU) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1528,11 +1445,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory UNDO = new ActionFactory("undo", //$NON-NLS-1$
     		IWorkbenchCommandConstants.EDIT_UNDO) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1556,11 +1471,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory UP = new ActionFactory("up", //$NON-NLS-1$
     		IWorkbenchCommandConstants.NAVIGATE_UP) {
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1578,11 +1491,9 @@ public abstract class ActionFactory {
 	 */
     public static final ActionFactory HELP_CONTENTS = new ActionFactory(
             "helpContents", IWorkbenchCommandConstants.HELP_HELP_CONTENTS) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1595,16 +1506,14 @@ public abstract class ActionFactory {
 	/**
 	 * Workbench action (id: "helpSearch", commandId: "org.eclipse.ui.help.helpSearch"): Open the
 	 * help search. This action is always enabled.
-	 * 
+	 *
 	 * @since 3.1
 	 */
     public static final ActionFactory HELP_SEARCH = new ActionFactory(
             "helpSearch", IWorkbenchCommandConstants.HELP_HELP_SEARCH) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1617,16 +1526,14 @@ public abstract class ActionFactory {
 	/**
 	 * Workbench action (id: "dynamicHelp", commandId: "org.eclipse.ui.help.dynamicHelp"): Open the
 	 * dynamic help. This action is always enabled.
-	 * 
+	 *
 	 * @since 3.1
 	 */
     public static final ActionFactory DYNAMIC_HELP = new ActionFactory(
             "dynamicHelp", IWorkbenchCommandConstants.HELP_DYNAMIC_HELP) {//$NON-NLS-1$
-        
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1639,20 +1546,18 @@ public abstract class ActionFactory {
 	/**
 	 * Workbench action (id: "openPerspectiveDialog", commandId: "org.eclipse.ui.perspectives.showPerspective"):
 	 * Open the Open Perspective dialog. This action is always enabled.
-	 * 
+	 *
 	 * @since 3.1
 	 */
     public static final ActionFactory OPEN_PERSPECTIVE_DIALOG = new ActionFactory(
             "openPerspectiveDialog", IWorkbenchCommandConstants.PERSPECTIVES_SHOW_PERSPECTIVE) {//$NON-NLS-1$
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
-			
+
 			WorkbenchCommandAction action = new WorkbenchCommandAction(
 					getCommandId(), window);
 			action.setId(getId());
@@ -1668,16 +1573,14 @@ public abstract class ActionFactory {
 	/**
 	 * Workbench action (id: "newEditor", commandId: "org.eclipse.ui.window.newEditor"): Open a new
 	 * editor on the active editor's input. This action maintains its enablement state.
-	 * 
+	 *
 	 * @since 3.1
 	 */
     public static final ActionFactory NEW_EDITOR = new ActionFactory(
             "newEditor", IWorkbenchCommandConstants.WINDOW_NEW_EDITOR) {//$NON-NLS-1$
-       
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
-         */
-        public IWorkbenchAction create(IWorkbenchWindow window) {
+
+        @Override
+		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1696,12 +1599,13 @@ public abstract class ActionFactory {
 	 * Workbench action (id: "toggleCoolbar"): Toggle the visibility of the coolbar and perspective
 	 * switcher. This will only enable visibility of the coolbar and perspective bar if the window
 	 * advisor creating the window allowed for their visibility initially.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	public static final ActionFactory TOGGLE_COOLBAR = new ActionFactory(
 			"toggleCoolbar") { //$NON-NLS-1$
 
+		@Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
@@ -1715,13 +1619,13 @@ public abstract class ActionFactory {
 			return action;
 		}
 	};
-    
+
     /**
 	 * Establishes bi-direction connections between the forward and backward
 	 * actions of a cycle pair.
 	 * <p>
 	 * Example usage:
-	 * 
+	 *
 	 * <pre>
 	 * ActionFactory.IWorkbenchAction nextEditorAction = ActionFactory.NEXT_EDITOR
 	 * 		.create(window);
@@ -1729,9 +1633,9 @@ public abstract class ActionFactory {
 	 * 		.create(window);
 	 * ActionFactory.linkCycleActionPair(nextEditorAction, previousEditorAction);
 	 * </pre>
-	 * 
+	 *
 	 * </p>
-	 * 
+	 *
 	 * @param next
 	 *            the action that moves forward
 	 * @param previous
@@ -1745,7 +1649,7 @@ public abstract class ActionFactory {
      * Id of actions created by this action factory.
      */
     private final String actionId;
-    
+
     /**
      * Optional ID for this action.
      */
@@ -1753,7 +1657,7 @@ public abstract class ActionFactory {
 
     /**
      * Creates a new workbench action factory with the given id.
-     * 
+     *
      * @param actionId
      *            the id of actions created by this action factory
      */
@@ -1763,7 +1667,7 @@ public abstract class ActionFactory {
 
 	/**
 	 * Create a new workbench action factory with the given IDs.
-	 * 
+	 *
 	 * @param actionId
 	 *            the id of actions created by this action factory
 	 * @param commandId
@@ -1788,7 +1692,7 @@ public abstract class ActionFactory {
      * opportunity to deregister its listeners and to perform any other
      * cleanup.
      * </p>
-     * 
+     *
      * @param window
      *            the workbench window
      * @return the workbench action
@@ -1797,7 +1701,7 @@ public abstract class ActionFactory {
 
     /**
      * Returns the id of this action factory.
-     * 
+     *
      * @return the id of actions created by this action factory
      */
     public String getId() {
@@ -1806,7 +1710,7 @@ public abstract class ActionFactory {
 
 	/**
 	 * Return the command id of this action factory.
-	 * 
+	 *
 	 * @return the command id of the action created by this action factory. May
 	 *         be <code>null</code>.
 	 * @since 3.5

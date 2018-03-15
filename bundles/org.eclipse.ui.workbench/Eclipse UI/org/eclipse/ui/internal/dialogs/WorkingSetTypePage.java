@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *        IBM Corporation - initial API and implementation 
+ *        IBM Corporation - initial API and implementation
  * 		  Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font should be
  *        activated and used by other components.
  *******************************************************************************/
@@ -17,13 +17,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -42,10 +37,10 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.WorkingSetDescriptor;
 
 /**
- * The working set type page is used in the new working set 
- * wizard to select from a list of plugin defined working set 
+ * The working set type page is used in the new working set
+ * wizard to select from a list of plugin defined working set
  * types.
- * 
+ *
  * @since 2.0
  */
 public class WorkingSetTypePage extends WizardPage {
@@ -69,25 +64,27 @@ public class WorkingSetTypePage extends WizardPage {
 	 */
 	public WorkingSetTypePage(WorkingSetDescriptor[] descriptors) {
 		super(
-				"workingSetTypeSelectionPage", WorkbenchMessages.WorkingSetTypePage_description, WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_WORKINGSET_WIZ)); //$NON-NLS-1$ 
+				"workingSetTypeSelectionPage", WorkbenchMessages.WorkingSetTypePage_description, WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_WORKINGSET_WIZ)); //$NON-NLS-1$
 		this.descriptors = descriptors;
 	}
 
     /**
 	 * Overrides method in WizardPage
-	 * 
+	 *
 	 * @see org.eclipse.jface.wizard.IWizardPage#canFlipToNextPage()
 	 */
-    public boolean canFlipToNextPage() {
+    @Override
+	public boolean canFlipToNextPage() {
         return isPageComplete();
     }
 
-    /** 
+    /**
      * Implements IDialogPage
-     * 
+     *
      * @see org.eclipse.jface.dialogs.IDialogPage#createControl(Composite)
      */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
         Font font = parent.getFont();
         Composite composite = new Composite(parent, SWT.NULL);
         composite.setLayout(new GridLayout());
@@ -109,42 +106,24 @@ public class WorkingSetTypePage extends WizardPage {
         typesListViewer.getTable().setLayoutData(data);
         typesListViewer.getTable().setFont(font);
         typesListViewer
-                .addSelectionChangedListener(new ISelectionChangedListener() {
-                    public void selectionChanged(SelectionChangedEvent event) {
-                        handleSelectionChanged();
-                    }
-                });
-        typesListViewer.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
-                handleDoubleClick();
-            }
-        });
+                .addSelectionChangedListener(event -> handleSelectionChanged());
+        typesListViewer.addDoubleClickListener(event -> handleDoubleClick());
         typesListViewer.setContentProvider(new ArrayContentProvider());
         typesListViewer.setLabelProvider(new LabelProvider() {
         	private ResourceManager images = new LocalResourceManager(
 					JFaceResources.getResources());
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
-			 */
+			@Override
 			public String getText(Object element) {
 				return ((WorkingSetDescriptor)element).getName();
 			}
-			
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
-			 */
+
+			@Override
 			public void dispose() {
 				images.dispose();
 				super.dispose();
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
-			 */
+			@Override
 			public Image getImage(Object element) {
 				ImageDescriptor imageDescriptor = ((WorkingSetDescriptor) element)
 						.getIcon();
@@ -156,25 +135,26 @@ public class WorkingSetTypePage extends WizardPage {
         setPageComplete(false);
     }
 
-    /** 
+    /**
      * Overrides method in DialogPage
-     * 
+     *
      * @see org.eclipse.jface.dialogs.IDialogPage#dispose()
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
     }
 
     /**
      * Returns the page id of the selected working set type.
-     * 
+     *
      * @return the page id of the selected working set type.
      */
     public String getSelection() {
         WorkingSetDescriptor descriptor = getSelectedWorkingSet();
         if (descriptor != null)
         	return descriptor.getId();
-        
+
         return null;
     }
 
@@ -185,16 +165,7 @@ public class WorkingSetTypePage extends WizardPage {
      * @since 3.4
 	 */
 	private WorkingSetDescriptor getSelectedWorkingSet() {
-		ISelection selection = typesListViewer.getSelection();
-        boolean hasSelection = selection != null
-                && selection.isEmpty() == false;
-
-        WorkingSetDescriptor descriptor = null;
-        if (hasSelection && selection instanceof IStructuredSelection) {
-            descriptor = (WorkingSetDescriptor) ((IStructuredSelection) selection)
-                    .getFirstElement();
-        }
-		return descriptor;
+		return (WorkingSetDescriptor) typesListViewer.getStructuredSelection().getFirstElement();
 	}
 
     /**
@@ -209,13 +180,13 @@ public class WorkingSetTypePage extends WizardPage {
      * Called when the selection has changed.
      */
     private void handleSelectionChanged() {
-        ISelection selection = typesListViewer.getSelection();
+		IStructuredSelection selection = typesListViewer.getStructuredSelection();
         boolean hasSelection = selection != null
                 && selection.isEmpty() == false;
 
         WorkingSetDescriptor descriptor = getSelectedWorkingSet();
 		setDescription(descriptor == null ? "" : descriptor.getDescription()); //$NON-NLS-1$
-        
+
         setPageComplete(hasSelection);
     }
 }

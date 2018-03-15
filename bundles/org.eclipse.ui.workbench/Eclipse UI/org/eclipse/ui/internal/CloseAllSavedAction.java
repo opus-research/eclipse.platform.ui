@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,26 +48,20 @@ public class CloseAllSavedAction extends PageEventAction implements
         setActionDefinitionId("org.eclipse.ui.file.closeAllSaved"); //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * Method declared on PageEventAction.
-     */
-    public void pageActivated(IWorkbenchPage page) {
+    @Override
+	public void pageActivated(IWorkbenchPage page) {
         super.pageActivated(page);
         updateState();
     }
 
-    /* (non-Javadoc)
-     * Method declared on PageEventAction.
-     */
-    public void pageClosed(IWorkbenchPage page) {
+    @Override
+	public void pageClosed(IWorkbenchPage page) {
         super.pageClosed(page);
         updateState();
     }
 
-    /* (non-Javadoc)
-     * Method declared on PartEventAction.
-     */
-    public void partClosed(IWorkbenchPart part) {
+    @Override
+	public void partClosed(IWorkbenchPart part) {
         super.partClosed(part);
         if (part instanceof IEditorPart) {
             part.removePropertyListener(this);
@@ -76,10 +70,8 @@ public class CloseAllSavedAction extends PageEventAction implements
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on PartEventAction.
-     */
-    public void partOpened(IWorkbenchPart part) {
+    @Override
+	public void partOpened(IWorkbenchPart part) {
         super.partOpened(part);
         if (part instanceof IEditorPart) {
             part.addPropertyListener(this);
@@ -88,10 +80,8 @@ public class CloseAllSavedAction extends PageEventAction implements
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertyListener.
-     */
-    public void propertyChanged(Object source, int propID) {
+    @Override
+	public void propertyChanged(Object source, int propID) {
         if (source instanceof IEditorPart) {
             if (propID == IEditorPart.PROP_DIRTY) {
                 updateState();
@@ -99,10 +89,8 @@ public class CloseAllSavedAction extends PageEventAction implements
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on Action.
-     */
-    public void run() {
+    @Override
+	public void run() {
         if (getWorkbenchWindow() == null) {
             // action has been dispose
             return;
@@ -132,10 +120,8 @@ public class CloseAllSavedAction extends PageEventAction implements
         setEnabled(false);
     }
 
-    /* (non-Javadoc)
-     * Method declared on PageEventAction.
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         for (Iterator it = partsWithListeners.iterator(); it.hasNext();) {
             IWorkbenchPart part = (IWorkbenchPart) it.next();

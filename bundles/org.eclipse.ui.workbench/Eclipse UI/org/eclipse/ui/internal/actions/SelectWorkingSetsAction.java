@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.internal.dialogs.SimpleWorkingSetSelectionDialog;
 
 /**
  * Action to select the visible working sets for a given workbench page.
- * 
+ *
  * @since 3.2
  */
 public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate  {
@@ -41,6 +41,7 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 			super(WorkbenchMessages.Edit);
 		}
 
+		@Override
 		public void run() {
 			SelectWorkingSetsAction.this.run(this);
 		}
@@ -56,8 +57,9 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 			setChecked(isWorkingSetEnabled(set));
 		}
 
+		@Override
 		public void runWithEvent(Event event) {
-			
+
 			Set newList = new HashSet(Arrays.asList(getWindow().getActivePage()
 					.getWorkingSets()));
 
@@ -67,8 +69,8 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 				// additive.
 				boolean modified = (event.stateMask & KeyLookupFactory
 						.getDefault().formalModifierLookup(IKeyLookup.M1_NAME)) != 0;
-				
-				if (modified) 
+
+				if (modified)
 					newList.clear();
 				newList.add(set);
 			} else {
@@ -81,14 +83,12 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 		}
 	}
 
+	@Override
 	protected void fillMenu(Menu menu) {
 		IWorkingSet[][] typedSets = splitSets();
 
-		for (int i = 0; i < typedSets.length; i++) {
-			IWorkingSet[] sets = typedSets[i];
-			for (int j = 0; j < sets.length; j++) {
-				IWorkingSet set = sets[j];
-
+		for (IWorkingSet[] sets : typedSets) {
+			for (IWorkingSet set : sets) {
 				// only add visible sets
 				// if (set.isVisible()) {
 				ActionContributionItem item = new ActionContributionItem(
@@ -112,14 +112,15 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 
 	private boolean isWorkingSetEnabled(IWorkingSet set) {
 		IWorkingSet[] enabledSets = getEnabledSets();
-		for (int i = 0; i < enabledSets.length; i++) {
-			if (enabledSets[i].equals(set)) {
+		for (IWorkingSet enabledSet : enabledSets) {
+			if (enabledSet.equals(set)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
+	@Override
 	public void run(IAction action) {
 		ConfigureWindowWorkingSetsDialog dialog = new ConfigureWindowWorkingSetsDialog(
 				getWindow());
@@ -133,14 +134,15 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 class ConfigureWindowWorkingSetsDialog extends SimpleWorkingSetSelectionDialog {
 
 	private IWorkbenchWindow window;
-	
+
 	protected ConfigureWindowWorkingSetsDialog(IWorkbenchWindow window) {
 		super(window.getShell(), null, window.getActivePage().getWorkingSets(), true);
 		this.window = window;
 		setTitle(WorkbenchMessages.WorkingSetSelectionDialog_title_multiSelect);
 		setMessage(WorkbenchMessages.WorkingSetSelectionDialog_message_multiSelect);
 	}
-	
+
+	@Override
 	protected void okPressed() {
 		super.okPressed();
 		window.getActivePage().setWorkingSets(getSelection());

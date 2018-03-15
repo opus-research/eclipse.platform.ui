@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,11 +35,7 @@ public class StringToDateValidator implements IValidator {
 		this.converter = converter;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.databinding.validation.IValidator#validate(java.lang.Object)
-	 */
+	@Override
 	public IStatus validate(Object value) {
 		if (value instanceof String && ((String)value).trim().length()==0) {
 			return Status.OK_STATUS;
@@ -53,18 +49,13 @@ public class StringToDateValidator implements IValidator {
 		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.core.internal.databinding.validation.WrappedConverterValidator#getErrorMessage()
-	 */
 	protected String getErrorMessage() {
 		Date sampleDate = new Date();
 
 		// FIXME We need to use the information from the
 		// converter, not use another instance of DateConversionSupport.
 		FormatUtil util = new FormatUtil();
-		StringBuffer samples = new StringBuffer();
+		StringBuilder samples = new StringBuilder();
 		for (int formatterIdx = 1; formatterIdx < util.numFormatters() - 2; formatterIdx++) {
 			samples.append('\'');
 			samples.append(util.format(sampleDate, formatterIdx));
@@ -77,30 +68,18 @@ public class StringToDateValidator implements IValidator {
 	}
 
 	private static class FormatUtil extends DateConversionSupport {
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.core.internal.databinding.conversion.DateConversionSupport#numFormatters()
-		 */
+
+		@Override
 		protected int numFormatters() {
 			return super.numFormatters();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.core.internal.databinding.conversion.DateConversionSupport#format(java.util.Date)
-		 */
+		@Override
 		protected String format(Date date) {
 			return super.format(date);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.core.internal.databinding.conversion.DateConversionSupport#format(java.util.Date,
-		 *      int)
-		 */
+		@Override
 		protected String format(Date date, int formatterIdx) {
 			return super.format(date, formatterIdx);
 		}

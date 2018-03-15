@@ -16,7 +16,7 @@ package org.eclipse.ui.forms.examples.internal.rcp;
 public	class NamedObject {
 	private String name;
 	protected SimpleModel model;
-	
+
 	public NamedObject(String name) {
 		this.name = name;
 	}
@@ -26,6 +26,7 @@ public	class NamedObject {
 	public String getName() {
 		return name;
 	}
+	@Override
 	public String toString() {
 		return getName();
 	}

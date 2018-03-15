@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.Preferences;
  * currently uses the round-about procedure of manually writing a preferences
  * file, and then loading it back into the application. In the future, it might
  * use a direct API.
- * 
+ *
  * @since 3.0
  */
 public abstract class PreferenceMutator {
@@ -37,7 +37,7 @@ public abstract class PreferenceMutator {
      * Sets a key binding in the currently running Eclipse application. It
      * accomplishes this by writing out an exported preferences file by hand,
      * and then importing it back into the application.
-     * 
+     *
      * @param commandId
      *           The command identifier to which the key binding should be
      *           associated; should not be <code>null</code>.
@@ -60,21 +60,20 @@ public abstract class PreferenceMutator {
         String key = "org.eclipse.ui.workbench/org.eclipse.ui.commands"; //$NON-NLS-1$
         String value = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<org.eclipse.ui.commands><activeKeyConfiguration/><keyBinding commandId=\"" + commandId + "\" keySequence=\"" + keySequenceText + "\"/></org.eclipse.ui.commands>"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         preferences.put(key, value);
-        
+
         String[] pluginIds = Platform.getExtensionRegistry().getNamespaces();
-		for (int i = 0; i < pluginIds.length; i++) {
-			preferences.put(pluginIds[i], new PluginVersionIdentifier(
-					(String) Platform.getBundle(pluginIds[i]).getHeaders().get(
+		for (String pluginId : pluginIds) {
+			preferences.put(pluginId, new PluginVersionIdentifier(
+					Platform.getBundle(pluginId).getHeaders().get(
 							org.osgi.framework.Constants.BUNDLE_VERSION)));
 		}
 
         // Export the preferences.
         File file = File.createTempFile("preferences", ".txt"); //$NON-NLS-1$//$NON-NLS-2$
         file.deleteOnExit();
-        BufferedOutputStream bos = new BufferedOutputStream(
-                new FileOutputStream(file));
-        preferences.store(bos, null);
-        bos.close();
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
+			preferences.store(bos, null);
+		}
 
         // Attempt to import the key binding.
         Preferences.importPreferences(new Path(file.getAbsolutePath()));

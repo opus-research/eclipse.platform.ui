@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Listener;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class ViewerObservableValueDecorator extends DecoratingObservableValue
 		implements IViewerObservableValue, Listener {
@@ -39,15 +39,18 @@ public class ViewerObservableValueDecorator extends DecoratingObservableValue
 		viewer.getControl().addListener(SWT.Dispose, this);
 	}
 
+	@Override
 	public void handleEvent(Event event) {
 		if (event.type == SWT.Dispose)
 			dispose();
 	}
 
+	@Override
 	public Viewer getViewer() {
 		return viewer;
 	}
 
+	@Override
 	public synchronized void dispose() {
 		if (viewer != null) {
 			Control control = viewer.getControl();

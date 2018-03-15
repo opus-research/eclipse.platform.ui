@@ -10,19 +10,17 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
-import java.util.Iterator;
-
-import junit.framework.TestCase;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.help.WorkbenchHelp;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
+
+import junit.framework.TestCase;
 
 public class UIPreferencesAuto extends TestCase {
 
@@ -41,17 +39,17 @@ public class UIPreferencesAuto extends TestCase {
         if (manager != null) {
             dialog = new PreferenceDialogWrapper(getShell(), manager);
             dialog.create();
-            WorkbenchHelp.setHelp(dialog.getShell(),
+            PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
                     IWorkbenchHelpContextIds.PREFERENCE_DIALOG);
 
-            for (Iterator iterator = manager.getElements(
-                    PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
-                IPreferenceNode node = (IPreferenceNode) iterator.next();
-                if (node.getId().equals(id)) {
-                    dialog.showPage(node);
-                    break;
-                }
+            for (Object element : manager.getElements(
+                    PreferenceManager.PRE_ORDER)) {
+            IPreferenceNode node = (IPreferenceNode) element;
+            if (node.getId().equals(id)) {
+			dialog.showPage(node);
+			break;
             }
+         }
         }
         return dialog;
     }
@@ -59,38 +57,38 @@ public class UIPreferencesAuto extends TestCase {
 
     public void testWorkbenchPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Workbench");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testAppearancePref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Views");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testDefaultTextEditorPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.TextEditor");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testFileEditorsPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileEditors");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testLocalHistoryPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.FileStates");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testPerspectivesPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.preferencePages.Perspectives");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     //Only really checking if this opens without an exception
     public void testFontEditorsPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.ui.tests.dialogs.FontFieldEditorTestPreferencePage");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
     public void testInfoProp() {
@@ -98,9 +96,9 @@ public class UIPreferencesAuto extends TestCase {
          * Commented out because it generates a failure
          * of expect and actual width values. Suspect this
          * is an SWT issue.
-         * 
+         *
          Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.info.file");
-         DialogCheck.assertDialogTexts(dialog, this);
+         DialogCheck.assertDialogTexts(dialog);
          */
     }
 
@@ -109,9 +107,9 @@ public class UIPreferencesAuto extends TestCase {
          * Commented out because it generates a failure
          * of expect and actual width values. Suspect this
          * is an SWT issue.
-         * 
+         *
          Dialog dialog = getPropertyDialog("org.eclipse.ui.propertypages.project.reference");
-         DialogCheck.assertDialogTexts(dialog, this);
+         DialogCheck.assertDialogTexts(dialog);
          */
     }
 
@@ -128,21 +126,21 @@ public class UIPreferencesAuto extends TestCase {
             dialog = new PreferenceDialogWrapper(getShell(), manager);
             dialog.create();
 
-            for (Iterator iterator = manager.getElements(
-                    PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
-                IPreferenceNode node = (IPreferenceNode) iterator.next();
-                if (node
-                        .getId()
-                        .equals(
-                                "org.eclipse.ui.tests.dialogs.EnableTestPreferencePage")) {
-                    dialog.showPage(node);
-                    EnableTestPreferencePage page = (EnableTestPreferencePage) dialog
-                            .getPage(node);
-                    page.flipState();
-                    page.flipState();
-                    break;
-                }
+            for (Object element : manager.getElements(
+                    PreferenceManager.PRE_ORDER)) {
+            IPreferenceNode node = (IPreferenceNode) element;
+            if (node
+			    .getId()
+			    .equals(
+			            "org.eclipse.ui.tests.dialogs.EnableTestPreferencePage")) {
+			dialog.showPage(node);
+			EnableTestPreferencePage page = (EnableTestPreferencePage) dialog
+			        .getPage(node);
+			page.flipState();
+			page.flipState();
+			break;
             }
+         }
         }
 
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,18 +27,14 @@ import org.eclipse.ui.keys.NaturalKey;
 /**
  * A key formatter providing a special compact format for displaying key
  * bindings.
- * 
+ *
  * @since 3.0
  */
 public class CompactKeyFormatter extends NativeKeyFormatter {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
-     */
-    public String format(KeySequence keySequence) {
-        StringBuffer stringBuffer = new StringBuffer();
+    @Override
+	public String format(KeySequence keySequence) {
+        StringBuilder stringBuffer = new StringBuilder();
 
         List keyStrokes = keySequence.getKeyStrokes();
         KeyStroke[] keyStrokeArray = (KeyStroke[]) keyStrokes
@@ -72,13 +68,8 @@ public class CompactKeyFormatter extends NativeKeyFormatter {
         return stringBuffer.toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.keys.KeyFormatter#formatKeyStroke(org.eclipse.ui.keys.KeyStroke)
-     */
     public String formatKeyStrokes(Set modifierKeys, List naturalKeys) {
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         String keyDelimiter = getKeyDelimiter();
 
         // Format the modifier keys, in sorted order.

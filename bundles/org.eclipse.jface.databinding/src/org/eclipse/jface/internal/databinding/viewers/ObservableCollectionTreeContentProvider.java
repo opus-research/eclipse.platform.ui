@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2017 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     Matthew Hall - initial API and implementation (bug 207858)
  *     Matthew Hall - bugs 226765, 239015, 222991, 263693, 263956, 226292,
  *                    266038
+ *     Conrad Groth - Bug 371756
  ******************************************************************************/
 
 package org.eclipse.jface.internal.databinding.viewers;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.IObservable;
@@ -30,9 +32,8 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.TreeStructureAdvisor;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -46,7 +47,7 @@ import org.eclipse.swt.widgets.Display;
  * {@link IObservableFactory observable collection factory} to provide the
  * elements of a tree. Each observable collection obtained from the factory is
  * observed such that changes in the collection are reflected in the viewer.
- * 
+ *
  * @since 1.2
  */
 public abstract class ObservableCollectionTreeContentProvider implements
@@ -96,7 +97,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	/**
 	 * Constructs an ObservableCollectionTreeContentProvider using the given
 	 * parent provider and collection factory.
-	 * 
+	 *
 	 * @param collectionFactory
 	 *            observable factory that produces an IObservableList of
 	 *            children for a given parent element.
@@ -107,11 +108,12 @@ public abstract class ObservableCollectionTreeContentProvider implements
 			TreeStructureAdvisor structureAdvisor) {
 		this.structureAdvisor = structureAdvisor;
 		display = Display.getDefault();
-		realm = SWTObservables.getRealm(display);
+		realm = DisplayRealm.getRealm(display);
 		viewerObservable = new WritableValue(realm);
 		viewerUpdater = null;
 
 		elementSetFactory = new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object target) {
 				return ObservableViewerElementSet.withComparer(realm, null,
 						getElementComparer((Viewer) target));
@@ -128,13 +130,14 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		this.collectionFactory = collectionFactory;
 	}
 
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (elementNodes != null && !elementNodes.isEmpty()) {
 			// Ensure we flush any observable collection listeners
 			TreeNode[] oldNodes = new TreeNode[elementNodes.size()];
 			elementNodes.values().toArray(oldNodes);
-			for (int i = 0; i < oldNodes.length; i++)
-				oldNodes[i].dispose();
+			for (TreeNode oldNode : oldNodes)
+				oldNode.dispose();
 			elementNodes.clear();
 			elementNodes = null;
 		}
@@ -144,6 +147,11 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		knownElements.clear();
 		if (realizedElements != null)
 			realizedElements.clear();
+
+		if (newInput != null) {
+			getElements(newInput);
+		}
+
 	}
 
 	private void setViewer(Viewer viewer) {
@@ -168,6 +176,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 				"This content provider only works with AbstractTreeViewer"); //$NON-NLS-1$
 	}
 
+	@Override
 	public Object getParent(Object element) {
 		if (structureAdvisor != null) {
 			Object parentFromAdvisor = structureAdvisor.getParent(element);
@@ -181,10 +190,12 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		return null;
 	}
 
+	@Override
 	public Object[] getElements(Object input) {
 		return getChildren(input, true);
 	}
 
+	@Override
 	public Object[] getChildren(Object element) {
 		return getChildren(element, false);
 	}
@@ -192,9 +203,9 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	private Object[] getChildren(Object element, boolean input) {
 		TreeNode node = getOrCreateNode(element, input);
 		Object[] children = node.getChildren().toArray();
-		for (int i = 0; i < children.length; i++)
-			getOrCreateNode(children[i], false).addParent(element);
-		knownElements.addAll(node.getChildren());
+		for (Object childElement : children) {
+			getOrCreateNode(childElement, false).addParent(element);
+		}
 		asyncUpdateRealizedElements();
 		return children;
 	}
@@ -210,7 +221,12 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		if (!realizedElements.equals(knownElements)) {
 			if (asyncUpdateRunnable == null) {
 				asyncUpdateRunnable = new Runnable() {
+					@Override
 					public void run() {
+						// If we've been disposed, exit early
+						if (knownElements == null) {
+							return;
+						}
 						asyncUpdatePending = false;
 						if (realizedElements != null) {
 							realizedElements.addAll(knownElements);
@@ -223,6 +239,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		}
 	}
 
+	@Override
 	public boolean hasChildren(Object element) {
 		if (structureAdvisor != null) {
 			Boolean hasChildren = structureAdvisor.hasChildren(element);
@@ -260,13 +277,14 @@ public abstract class ObservableCollectionTreeContentProvider implements
 				|| viewer.getControl().isDisposed();
 	}
 
+	@Override
 	public void dispose() {
 		if (elementNodes != null) {
 			if (!elementNodes.isEmpty()) {
 				TreeNode[] nodes = new TreeNode[elementNodes.size()];
 				elementNodes.values().toArray(nodes);
-				for (int i = 0; i < nodes.length; i++) {
-					nodes[i].dispose();
+				for (TreeNode node : nodes) {
+					node.dispose();
 				}
 				elementNodes.clear();
 			}
@@ -290,7 +308,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	 * before the viewer sees the added element, and notified about removals
 	 * after the element was removed from the viewer. This is intended for use
 	 * by label providers, as it will always return the items that need labels.
-	 * 
+	 *
 	 * @return unmodifiable observable set of items that will need labels
 	 */
 	public IObservableSet getKnownElements() {
@@ -301,7 +319,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	 * Returns the set of known elements which have been realized in the viewer.
 	 * Clients may track this set in order to perform custom actions on elements
 	 * while they are known to be present in the viewer.
-	 * 
+	 *
 	 * @return the set of known elements which have been realized in the viewer.
 	 * @since 1.3
 	 */
@@ -320,7 +338,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	 * Returns the set of all elements that would be removed from the known
 	 * elements set if the given elements were removed as children of the given
 	 * parent element.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent element of the elements being removed
 	 * @param elementsToBeRemoved
@@ -357,7 +375,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	 * Returns a listener which, when a collection change event is received,
 	 * updates the tree viewer through the {@link #viewerUpdater} field, and
 	 * maintains the adds and removes parents from the appropriate tree nodes.
-	 * 
+	 *
 	 * @param parentElement
 	 *            the element that is the parent element of all elements in the
 	 *            observable collection.
@@ -369,7 +387,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	/**
 	 * Registers the change listener to receive change events for the specified
 	 * observable collection.
-	 * 
+	 *
 	 * @param collection
 	 *            the collection to observe for changes
 	 * @param listener
@@ -381,7 +399,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	/**
 	 * Unregisters the change listener from receving change events for the
 	 * specified observable collection.
-	 * 
+	 *
 	 * @param collection
 	 *            the collection to stop observing.
 	 * @param listener
@@ -392,7 +410,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 
 	protected boolean equal(Object left, Object right) {
 		if (comparer == null)
-			return Util.equals(left, right);
+			return Objects.equals(left, right);
 		return comparer.equals(left, right);
 	}
 
@@ -468,10 +486,11 @@ public abstract class ObservableCollectionTreeContentProvider implements
 					children = Observables.emptyObservableSet(realm);
 				} else {
 					Assert
-							.isTrue(Util.equals(realm, children.getRealm()),
+							.isTrue(Objects.equals(realm, children.getRealm()),
 									"Children observable collection must be on the Display realm"); //$NON-NLS-1$
 					listener = createCollectionChangeListener(element);
 					addCollectionChangeListener(children, listener);
+					knownElements.addAll(children);
 				}
 			}
 		}

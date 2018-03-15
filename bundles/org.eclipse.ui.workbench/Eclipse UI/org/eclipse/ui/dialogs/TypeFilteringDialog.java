@@ -1,18 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation 
+ *     IBM Corporation - initial API and implementation
  *     Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font should be
  *       activated and used by other components.
- *     Markus Schorn <markus.schorn@windriver.com> - Fix for bug 136591 - 
+ *     Markus Schorn <markus.schorn@windriver.com> - Fix for bug 136591 -
  *       [Dialogs] TypeFilteringDialog appends unnecessary comma
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,8 +26,6 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -59,10 +59,10 @@ public class TypeFilteringDialog extends SelectionDialog {
 
     private final static int SIZING_SELECTION_WIDGET_WIDTH = 300;
 
-    private final static String TYPE_DELIMITER = WorkbenchMessages.TypesFiltering_typeDelimiter; 
+    private final static String TYPE_DELIMITER = WorkbenchMessages.TypesFiltering_typeDelimiter;
 
     //Define a title for the filter entry field.
-    private String filterTitle = WorkbenchMessages.TypesFiltering_otherExtensions; 
+    private String filterTitle = WorkbenchMessages.TypesFiltering_otherExtensions;
 
     Text userDefinedText;
 
@@ -78,16 +78,16 @@ public class TypeFilteringDialog extends SelectionDialog {
      */
     public TypeFilteringDialog(Shell parentShell, Collection preselections) {
         super(parentShell);
-        setTitle(WorkbenchMessages.TypesFiltering_title); 
+        setTitle(WorkbenchMessages.TypesFiltering_title);
         this.initialSelections = preselections;
-        setMessage(WorkbenchMessages.TypesFiltering_message); 
+        setMessage(WorkbenchMessages.TypesFiltering_message);
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
     /**
      * Creates a type filtering dialog using the supplied entries. Set the
      * initial selections to those whose extensions match the preselections.
-     * 
+     *
      * @param parentShell The shell to parent the dialog from.
      * @param preselections
      *            of String - a Collection of String to define the preselected
@@ -103,7 +103,7 @@ public class TypeFilteringDialog extends SelectionDialog {
 
     /**
      * Add the selection and deselection buttons to the dialog.
-     * 
+     *
      * @param composite
      *            org.eclipse.swt.widgets.Composite
      */
@@ -118,19 +118,11 @@ public class TypeFilteringDialog extends SelectionDialog {
         composite.setData(data);
         Button selectButton = createButton(buttonComposite,
                 IDialogConstants.SELECT_ALL_ID, WorkbenchMessages.WizardTransferPage_selectAll, false);
-        SelectionListener listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                listViewer.setAllChecked(true);
-            }
-        };
+        SelectionListener listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(true));
         selectButton.addSelectionListener(listener);
         Button deselectButton = createButton(buttonComposite,
-                IDialogConstants.DESELECT_ALL_ID, WorkbenchMessages.WizardTransferPage_deselectAll, false); 
-        listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                listViewer.setAllChecked(false);
-            }
-        };
+                IDialogConstants.DESELECT_ALL_ID, WorkbenchMessages.WizardTransferPage_deselectAll, false);
+        listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(false));
         deselectButton.addSelectionListener(listener);
     }
 
@@ -166,8 +158,7 @@ public class TypeFilteringDialog extends SelectionDialog {
         IFileEditorMapping editorMappings[] = ((EditorRegistry) PlatformUI
 				.getWorkbench().getEditorRegistry()).getUnifiedMappings();
         ArrayList selectedMappings = new ArrayList();
-        for (int i = 0; i < editorMappings.length; i++) {
-            IFileEditorMapping mapping = editorMappings[i];
+        for (IFileEditorMapping mapping : editorMappings) {
             //Check for both extension and label matches
             if (this.initialSelections.contains(mapping.getExtension())) {
                 listViewer.setChecked(mapping, true);
@@ -181,34 +172,28 @@ public class TypeFilteringDialog extends SelectionDialog {
         }
         //Now add in the ones not selected to the user defined list
         Iterator initialIterator = this.initialSelections.iterator();
-        StringBuffer entries = new StringBuffer();
+        StringBuilder entries = new StringBuilder();
         while (initialIterator.hasNext()) {
             String nextExtension = (String) initialIterator.next();
             if (!selectedMappings.contains(nextExtension)) {
             	if (entries.length() != 0) {
 					entries.append(',');
-            	}            		
+            	}
                 entries.append(nextExtension);
             }
         }
         this.userDefinedText.setText(entries.toString());
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.TYPE_FILTERING_DIALOG);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
         createMessageArea(composite);
@@ -233,7 +218,7 @@ public class TypeFilteringDialog extends SelectionDialog {
 
     /**
      * Create the group that shows the user defined entries for the dialog.
-     * 
+     *
      * @param parent
      *            the parent this is being created in.
      */
@@ -267,9 +252,9 @@ public class TypeFilteringDialog extends SelectionDialog {
             List wildcardEditors = new ArrayList();
             IFileEditorMapping[] allMappings = ((EditorRegistry)PlatformUI.getWorkbench()
                     .getEditorRegistry()).getUnifiedMappings();
-            for (int i = 0; i < allMappings.length; i++) {
-                if (allMappings[i].getName().equals("*")) { //$NON-NLS-1$
-					wildcardEditors.add(allMappings[i]);
+            for (IFileEditorMapping allMapping : allMappings) {
+                if (allMapping.getName().equals("*")) { //$NON-NLS-1$
+					wildcardEditors.add(allMapping);
 				}
             }
             currentInput = new IFileEditorMapping[wildcardEditors.size()];
@@ -290,13 +275,13 @@ public class TypeFilteringDialog extends SelectionDialog {
      * <code>Dialog</code> method builds a list of the selected elements for
      * later retrieval by the client and closes this dialog.
      */
-    protected void okPressed() {
+    @Override
+	protected void okPressed() {
         // Get the input children.
         IFileEditorMapping[] children = getInput();
         List list = new ArrayList();
         // Build a list of selected children.
-        for (int i = 0; i < children.length; ++i) {
-            IFileEditorMapping element = children[i];
+        for (IFileEditorMapping element : children) {
             if (listViewer.getChecked(element)) {
 				list.add(element.getExtension());
 			}

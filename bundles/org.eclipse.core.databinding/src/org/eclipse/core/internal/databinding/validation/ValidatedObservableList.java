@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2017 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,23 +21,20 @@ import java.util.ListIterator;
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IStaleListener;
 import org.eclipse.core.databinding.observable.ObservableTracker;
-import org.eclipse.core.databinding.observable.StaleEvent;
 import org.eclipse.core.databinding.observable.list.IListChangeListener;
 import org.eclipse.core.databinding.observable.list.IObservableList;
-import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ListDiff;
 import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.observable.list.ListDiffVisitor;
 import org.eclipse.core.databinding.observable.list.ObservableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
-import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class ValidatedObservableList extends ObservableList {
 	private IObservableList target;
@@ -51,29 +48,27 @@ public class ValidatedObservableList extends ObservableList {
 
 	private boolean updatingTarget = false;
 
-	private IListChangeListener targetChangeListener = new IListChangeListener() {
-		public void handleListChange(ListChangeEvent event) {
-			if (updatingTarget)
-				return;
-			IStatus status = (IStatus) validationStatus.getValue();
-			if (isValid(status)) {
-				if (stale) {
-					// this.stale means we are out of sync with target,
-					// so reset wrapped list to exactly mirror target
-					stale = false;
-					updateWrappedList(new ArrayList(target));
-				} else {
-					ListDiff diff = event.diff;
-					if (computeNextDiff) {
-						diff = Diffs.computeListDiff(wrappedList, target);
-						computeNextDiff = false;
-					}
-					applyDiff(diff, wrappedList);
-					fireListChange(diff);
-				}
+	private IListChangeListener targetChangeListener = event -> {
+		if (updatingTarget)
+			return;
+		IStatus status = (IStatus) validationStatus.getValue();
+		if (isValid(status)) {
+			if (stale) {
+				// this.stale means we are out of sync with target,
+				// so reset wrapped list to exactly mirror target
+				stale = false;
+				updateWrappedList(new ArrayList(target));
 			} else {
-				makeStale();
+				ListDiff diff = event.diff;
+				if (computeNextDiff) {
+					diff = Diffs.computeListDiff(wrappedList, target);
+					computeNextDiff = false;
+				}
+				applyDiff(diff, wrappedList);
+				fireListChange(diff);
 			}
+		} else {
+			makeStale();
 		}
 	};
 
@@ -81,26 +76,20 @@ public class ValidatedObservableList extends ObservableList {
 		return status.isOK() || status.matches(IStatus.INFO | IStatus.WARNING);
 	}
 
-	private IStaleListener targetStaleListener = new IStaleListener() {
-		public void handleStale(StaleEvent staleEvent) {
-			fireStale();
-		}
-	};
+	private IStaleListener targetStaleListener = staleEvent -> fireStale();
 
-	private IValueChangeListener validationStatusChangeListener = new IValueChangeListener() {
-		public void handleValueChange(ValueChangeEvent event) {
-			IStatus oldStatus = (IStatus) event.diff.getOldValue();
-			IStatus newStatus = (IStatus) event.diff.getNewValue();
-			if (stale && !isValid(oldStatus) && isValid(newStatus)) {
-				// this.stale means we are out of sync with target,
-				// reset wrapped list to exactly mirror target
-				stale = false;
-				updateWrappedList(new ArrayList(target));
+	private IValueChangeListener validationStatusChangeListener = event -> {
+		IStatus oldStatus = (IStatus) event.diff.getOldValue();
+		IStatus newStatus = (IStatus) event.diff.getNewValue();
+		if (stale && !isValid(oldStatus) && isValid(newStatus)) {
+			// this.stale means we are out of sync with target,
+			// reset wrapped list to exactly mirror target
+			stale = false;
+			updateWrappedList(new ArrayList(target));
 
-				// If the validation status becomes valid because of a change in
-				// target observable
-				computeNextDiff = true;
-			}
+			// If the validation status becomes valid because of a change in
+			// target observable
+			computeNextDiff = true;
 		}
 	};
 
@@ -146,14 +135,17 @@ public class ValidatedObservableList extends ObservableList {
 
 	private void applyDiff(ListDiff diff, final List list) {
 		diff.accept(new ListDiffVisitor() {
+			@Override
 			public void handleAdd(int index, Object element) {
 				list.add(index, element);
 			}
 
+			@Override
 			public void handleRemove(int index, Object element) {
 				list.remove(index);
 			}
 
+			@Override
 			public void handleReplace(int index, Object oldElement,
 					Object newElement) {
 				list.set(index, newElement);
@@ -161,11 +153,13 @@ public class ValidatedObservableList extends ObservableList {
 		});
 	}
 
+	@Override
 	public boolean isStale() {
 		ObservableTracker.getterCalled(this);
 		return stale || target.isStale();
 	}
 
+	@Override
 	public void add(int index, Object element) {
 		checkRealm();
 		wrappedList.add(index, element);
@@ -175,17 +169,20 @@ public class ValidatedObservableList extends ObservableList {
 		fireListChange(diff);
 	}
 
+	@Override
 	public boolean add(Object o) {
 		checkRealm();
 		add(wrappedList.size(), o);
 		return true;
 	}
 
+	@Override
 	public boolean addAll(Collection c) {
 		checkRealm();
 		return addAll(wrappedList.size(), c);
 	}
 
+	@Override
 	public boolean addAll(int index, Collection c) {
 		checkRealm();
 		Object[] elements = c.toArray();
@@ -201,6 +198,7 @@ public class ValidatedObservableList extends ObservableList {
 		return true;
 	}
 
+	@Override
 	public void clear() {
 		checkRealm();
 		if (isEmpty())
@@ -212,20 +210,24 @@ public class ValidatedObservableList extends ObservableList {
 		fireListChange(diff);
 	}
 
+	@Override
 	public Iterator iterator() {
 		getterCalled();
 		final ListIterator wrappedIterator = wrappedList.listIterator();
 		return new Iterator() {
 			Object last = null;
 
+			@Override
 			public boolean hasNext() {
 				return wrappedIterator.hasNext();
 			}
 
+			@Override
 			public Object next() {
 				return last = wrappedIterator.next();
 			}
 
+			@Override
 			public void remove() {
 				int index = wrappedIterator.previousIndex();
 				wrappedIterator.remove();
@@ -237,10 +239,12 @@ public class ValidatedObservableList extends ObservableList {
 		};
 	}
 
+	@Override
 	public ListIterator listIterator() {
 		return listIterator(0);
 	}
 
+	@Override
 	public ListIterator listIterator(int index) {
 		getterCalled();
 		final ListIterator wrappedIterator = wrappedList.listIterator(index);
@@ -248,6 +252,7 @@ public class ValidatedObservableList extends ObservableList {
 			int lastIndex = -1;
 			Object last = null;
 
+			@Override
 			public void add(Object o) {
 				wrappedIterator.add(o);
 				lastIndex = previousIndex();
@@ -257,34 +262,41 @@ public class ValidatedObservableList extends ObservableList {
 				fireListChange(diff);
 			}
 
+			@Override
 			public boolean hasNext() {
 				return wrappedIterator.hasNext();
 			}
 
+			@Override
 			public boolean hasPrevious() {
 				return wrappedIterator.hasPrevious();
 			}
 
+			@Override
 			public Object next() {
 				last = wrappedIterator.next();
 				lastIndex = previousIndex();
 				return last;
 			}
 
+			@Override
 			public int nextIndex() {
 				return wrappedIterator.nextIndex();
 			}
 
+			@Override
 			public Object previous() {
 				last = wrappedIterator.previous();
 				lastIndex = nextIndex();
 				return last;
 			}
 
+			@Override
 			public int previousIndex() {
 				return wrappedIterator.previousIndex();
 			}
 
+			@Override
 			public void remove() {
 				wrappedIterator.remove();
 				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
@@ -294,6 +306,7 @@ public class ValidatedObservableList extends ObservableList {
 				fireListChange(diff);
 			}
 
+			@Override
 			public void set(Object o) {
 				wrappedIterator.set(o);
 				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
@@ -306,6 +319,7 @@ public class ValidatedObservableList extends ObservableList {
 		};
 	}
 
+	@Override
 	public Object move(int oldIndex, int newIndex) {
 		checkRealm();
 		int size = wrappedList.size();
@@ -327,6 +341,7 @@ public class ValidatedObservableList extends ObservableList {
 		return element;
 	}
 
+	@Override
 	public Object remove(int index) {
 		checkRealm();
 		Object element = wrappedList.remove(index);
@@ -337,6 +352,7 @@ public class ValidatedObservableList extends ObservableList {
 		return element;
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		checkRealm();
 		int index = wrappedList.indexOf(o);
@@ -346,6 +362,7 @@ public class ValidatedObservableList extends ObservableList {
 		return true;
 	}
 
+	@Override
 	public boolean removeAll(Collection c) {
 		checkRealm();
 		List list = new ArrayList(wrappedList);
@@ -359,6 +376,7 @@ public class ValidatedObservableList extends ObservableList {
 		return changed;
 	}
 
+	@Override
 	public boolean retainAll(Collection c) {
 		checkRealm();
 		List list = new ArrayList(wrappedList);
@@ -372,6 +390,7 @@ public class ValidatedObservableList extends ObservableList {
 		return changed;
 	}
 
+	@Override
 	public Object set(int index, Object element) {
 		checkRealm();
 		Object oldElement = wrappedList.set(index, element);
@@ -383,6 +402,7 @@ public class ValidatedObservableList extends ObservableList {
 		return oldElement;
 	}
 
+	@Override
 	public synchronized void dispose() {
 		target.removeListChangeListener(targetChangeListener);
 		target.removeStaleListener(targetStaleListener);

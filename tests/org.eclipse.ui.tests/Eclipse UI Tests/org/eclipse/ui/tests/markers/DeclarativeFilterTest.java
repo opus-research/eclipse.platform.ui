@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ public abstract class DeclarativeFilterTest extends UITestCase {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param testName
 	 */
 	public DeclarativeFilterTest(String testName) {
@@ -43,17 +43,18 @@ public abstract class DeclarativeFilterTest extends UITestCase {
 
 	/**
 	 * Get the filter with id.
-	 * 
+	 *
 	 * @param id
 	 * @return ProblemFilter
 	 */
 	protected ProblemFilter getFilter(String id) {
-		Iterator filters = MarkerSupportRegistry.getInstance()
+		Iterator<ProblemFilter> filters = MarkerSupportRegistry.getInstance()
 				.getRegisteredFilters().iterator();
 		while (filters.hasNext()) {
-			ProblemFilter filter = (ProblemFilter) filters.next();
-			if (filter.getId().equals(id))
+			ProblemFilter filter = filters.next();
+			if (filter.getId().equals(id)) {
 				return filter;
+			}
 		}
 		return null;
 

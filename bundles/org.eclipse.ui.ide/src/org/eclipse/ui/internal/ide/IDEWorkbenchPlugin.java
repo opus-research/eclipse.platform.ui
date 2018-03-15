@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -20,9 +21,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IProduct;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -38,6 +41,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.registry.MarkerImageProviderRegistry;
 import org.eclipse.ui.internal.ide.registry.ProjectImageRegistry;
+import org.eclipse.ui.internal.ide.registry.UnassociatedEditorStrategyRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -50,18 +54,14 @@ import com.ibm.icu.text.MessageFormat;
  * This class is responsible for tracking various registries
  * font, preference, graphics, dialog store.
  *
- * This class is explicitly referenced by the 
+ * This class is explicitly referenced by the
  * IDE workbench plug-in's  "plugin.xml"
- * 
+ *
  * @since 3.0
  */
 public class IDEWorkbenchPlugin extends AbstractUIPlugin {
     // Default instance of the receiver
     private static IDEWorkbenchPlugin inst;
-
-    // Global workbench ui plugin flag. Only workbench implementation is allowed to use this flag
-    // All other plugins, examples, or test cases must *not* use this flag.
-    public static boolean DEBUG = false;
 
     /**
      * The IDE workbench plugin ID.
@@ -81,10 +81,8 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 
     public static final String PL_MARKER_RESOLUTION = "markerResolution"; //$NON-NLS-1$
 
-    public static final String PL_CAPABILITIES = "capabilities"; //$NON-NLS-1$
-
     public static final String PL_PROJECT_NATURE_IMAGES = "projectNatureImages"; //$NON-NLS-1$
-	
+
 	private final static String ICONS_PATH = "$nl$/icons/full/";//$NON-NLS-1$
 
 	private static final int PROBLEMS_VIEW_CREATION_DELAY= 6000;
@@ -98,6 +96,11 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
      * Marker image registry; lazily initialized.
      */
     private MarkerImageProviderRegistry markerImageProviderRegistry = null;
+
+	/**
+	 * Unassociated file/editor strategy registry; lazily initialized
+	 */
+	private UnassociatedEditorStrategyRegistry unassociatedEditorStrategyRegistry = null;
 
 	private ResourceManager resourceManager;
 
@@ -125,25 +128,20 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 		Bundle plugin = Platform.getBundle(element.getNamespace());
 		if (plugin.getState() == Bundle.ACTIVE) {
 			return element.createExecutableExtension(classAttribute);
-		} else {
-            final Object[] ret = new Object[1];
-            final CoreException[] exc = new CoreException[1];
-            BusyIndicator.showWhile(null, new Runnable() {
-                public void run() {
-                    try {
-                        ret[0] = element
-                                .createExecutableExtension(classAttribute);
-                    } catch (CoreException e) {
-                        exc[0] = e;
-                    }
-                }
-            });
-            if (exc[0] != null) {
-				throw exc[0];
-			} else {
-				return ret[0];
+		}
+		final Object[] ret = new Object[1];
+		final CoreException[] exc = new CoreException[1];
+		BusyIndicator.showWhile(null, () -> {
+			try {
+				ret[0] = element.createExecutableExtension(classAttribute);
+			} catch (CoreException e) {
+				exc[0] = e;
 			}
-        }
+		});
+		if (exc[0] != null) {
+			throw exc[0];
+		}
+		return ret[0];
     }
 
     /* Return the default instance of the receiver. This represents the runtime plugin.
@@ -166,14 +164,14 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 
     /**
      * Logs the given message to the platform log.
-     * 
+     *
      * If you have an exception in hand, call log(String, Throwable) instead.
-     * 
+     *
      * If you have a status object in hand call log(String, IStatus) instead.
-     * 
+     *
      * This convenience method is for internal use by the IDE Workbench only and
      * must not be called outside the IDE Workbench.
-     * 
+     *
      * @param message
      *            A high level UI message describing when the problem happened.
      */
@@ -184,12 +182,12 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 
     /**
      * Logs the given message and throwable to the platform log.
-     * 
+     *
      * If you have a status object in hand call log(String, IStatus) instead.
-     * 
+     *
      * This convenience method is for internal use by the IDE Workbench only and
      * must not be called outside the IDE Workbench.
-     * 
+     *
      * @param message
      *            A high level UI message describing when the problem happened.
      * @param t
@@ -199,15 +197,15 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         IStatus status = StatusUtil.newStatus(IStatus.ERROR, message, t);
         log(message, status);
     }
-    
+
     /**
      * Logs the given throwable to the platform log, indicating the class and
      * method from where it is being logged (this is not necessarily where it
      * occurred).
-     * 
+     *
      * This convenience method is for internal use by the IDE Workbench only and
      * must not be called outside the IDE Workbench.
-     * 
+     *
      * @param clazz
      *            The calling class.
      * @param methodName
@@ -217,16 +215,16 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
      */
     public static void log(Class clazz, String methodName, Throwable t) {
         String msg = MessageFormat.format("Exception in {0}.{1}: {2}", //$NON-NLS-1$
-                new Object[] { clazz.getName(), methodName, t });
+				clazz.getName(), methodName, t);
         log(msg, t);
     }
-    
+
     /**
      * Logs the given message and status to the platform log.
-     * 
+     *
      * This convenience method is for internal use by the IDE Workbench only and
      * must not be called outside the IDE Workbench.
-     * 
+     *
      * @param message
      *            A high level UI message describing when the problem happened.
      *            May be <code>null</code>.
@@ -245,10 +243,8 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         getDefault().getLog().log(status);
     }
 
-    /* (non-javadoc)
-     * Method declared on AbstractUIPlugin
-     */
-    protected void refreshPluginActions() {
+    @Override
+	protected void refreshPluginActions() {
         // do nothing
     }
 
@@ -276,11 +272,22 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         return markerImageProviderRegistry;
     }
 
+	/**
+	 * Returns the unassociated file/editor strategy registry for the workbench.
+	 *
+	 * @return the unassociated file/editor strategy registry
+	 */
+	public synchronized UnassociatedEditorStrategyRegistry getUnassociatedEditorStrategyRegistry() {
+		if (unassociatedEditorStrategyRegistry == null) {
+			unassociatedEditorStrategyRegistry = new UnassociatedEditorStrategyRegistry();
+		}
+		return unassociatedEditorStrategyRegistry;
+	}
 
     /**
      * Returns the about information of all known features,
      * omitting any features which are missing this information.
-     * 
+     *
      * @return a possibly empty list of about infos
      */
     public AboutInfo[] getFeatureInfos() {
@@ -290,28 +297,15 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         // add an entry for each bundle group
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
         if (providers != null) {
-			for (int i = 0; i < providers.length; ++i) {
-                IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
-                for (int j = 0; j < bundleGroups.length; ++j) {
-					infos.add(new AboutInfo(bundleGroups[j]));
+			for (IBundleGroupProvider provider : providers) {
+				for (IBundleGroup bundleGroup : provider.getBundleGroups()) {
+					infos.add(new AboutInfo(bundleGroup));
 				}
             }
 		}
 
         return (AboutInfo[]) infos.toArray(new AboutInfo[infos.size()]);
     }
-
-    /**
-     * Returns the about information of the primary feature.
-     * 
-     * @return info about the primary feature, or <code>null</code> if there 
-     * is no primary feature or if this information is unavailable
-     */
-    public AboutInfo getPrimaryInfo() {
-        IProduct product = Platform.getProduct();
-        return product == null ? null : new AboutInfo(product);
-    }
-	
 	/**
 	 * Get the workbench image with the given path relative to
 	 * ICON_PATH.
@@ -331,20 +325,15 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 		}
 		return resourceManager;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
+
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		if (resourceManager != null)
 			resourceManager.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 
@@ -357,29 +346,33 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 	 */
 	private void createProblemsViews() {
 		final Runnable r= new Runnable() {
+			@Override
 			public void run() {
 				IWorkbench workbench = PlatformUI.isWorkbenchRunning() ? PlatformUI.getWorkbench() : null;
-				if (workbench != null && (workbench.getDisplay().isDisposed() || PlatformUI.getWorkbench().isClosing()))
+				if (workbench != null && (workbench.getDisplay().isDisposed() || workbench.isClosing()))
 					return;
 
 				if (workbench == null || workbench.isStarting()) {
 					Display.getCurrent().timerExec(PROBLEMS_VIEW_CREATION_DELAY, this);
 					return;
 				}
-
-				IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-				for (int i= 0; i < windows.length; i++) {
-					IWorkbenchWindow window= windows[i];
+				// We can't access preferences store before scheduling the job
+				// because this would cause instance area to be initialized
+				// before user selected the workspace location.
+				// See bug 514297 and
+				// org.eclipse.core.internal.runtime.DataArea.assertLocationInitialized()
+				if (!getDefault().getPreferenceStore()
+						.getBoolean(IDEInternalPreferences.SHOW_PROBLEMS_VIEW_DECORATIONS_ON_STARTUP)) {
+					return;
+				}
+				for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
 					IWorkbenchPage activePage= window.getActivePage();
 					if (activePage == null)
 						continue;
-					IViewReference[] refs= activePage.getViewReferences();
-					for (int j= 0; j < refs.length; j++) {
-						IViewReference viewReference= refs[j];
+					for (IViewReference viewReference : activePage.getViewReferences()) {
 						if (IPageLayout.ID_PROBLEM_VIEW.equals(viewReference.getId()))
 							try {
-								if (viewReference.getPart(false) == null)
-									activePage.showView(viewReference.getId(), viewReference.getSecondaryId(), IWorkbenchPage.VIEW_CREATE);
+								activePage.showView(viewReference.getId(), viewReference.getSecondaryId(), IWorkbenchPage.VIEW_CREATE);
 							} catch (PartInitException e) {
 								log("Could not create Problems view", e.getStatus()); //$NON-NLS-1$
 							}
@@ -388,9 +381,29 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 			}
 		};
 		Display display = Display.getCurrent();
-		if (display != null)
+		if (display != null) {
 			display.timerExec(PROBLEMS_VIEW_CREATION_DELAY, r);
-		else
-			Display.getDefault().asyncExec(r);
+		} else {
+			Job job = new Job("Initializing Problems view") { //$NON-NLS-1$
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					IWorkbench workbench = PlatformUI.isWorkbenchRunning() ? PlatformUI.getWorkbench() : null;
+					if (workbench == null) {
+						// Workbench not created yet, so avoid using display to
+						// avoid crash like in bug 513901
+						schedule(PROBLEMS_VIEW_CREATION_DELAY);
+						return Status.OK_STATUS;
+					}
+					if (workbench.isClosing()) {
+						return Status.CANCEL_STATUS;
+					}
+					PlatformUI.getWorkbench().getDisplay().asyncExec(r);
+					return Status.OK_STATUS;
+				}
+			};
+			job.setSystem(true);
+			job.setUser(false);
+			job.schedule(PROBLEMS_VIEW_CREATION_DELAY);
+		}
 	}
 }

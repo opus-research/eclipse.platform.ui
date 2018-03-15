@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.log.Logger;
@@ -30,6 +31,7 @@ public final class WorkbenchLogger extends Logger {
 	protected DebugTrace trace;
 	protected FrameworkLog log;
 	private String bundleName;
+	private boolean isDebugEnabled;
 
 	/**
 	 * Creates a new workbench logger
@@ -38,16 +40,23 @@ public final class WorkbenchLogger extends Logger {
 	public WorkbenchLogger(@Optional @Named("logger.bundlename") String bundleName) {
 		super();
 		this.bundleName = bundleName == null ? Activator.PI_WORKBENCH : bundleName;
+		isDebugEnabled = Platform.inDebugMode();
 	}
 
+	@Override
 	public void debug(Throwable t) {
 		debug(t, null);
 	}
 
+	@Override
 	public void debug(Throwable t, String message) {
+		if (!isDebugEnabled()) {
+			return;
+		}
 		trace(t, message);
 	}
 
+	@Override
 	public void error(Throwable t, String message) {
 		log(new Status(IStatus.ERROR, bundleName, message, t));
 	}
@@ -57,7 +66,7 @@ public final class WorkbenchLogger extends Logger {
 	 */
 	private static FrameworkLogEntry getLog(IStatus status) {
 		Throwable t = status.getException();
-		ArrayList childlist = new ArrayList();
+		ArrayList<FrameworkLogEntry> childlist = new ArrayList<>();
 
 		int stackCode = t instanceof CoreException ? 1 : 0;
 		// ensure a substatus inside a CoreException is properly logged
@@ -70,38 +79,44 @@ public final class WorkbenchLogger extends Logger {
 
 		if (status.isMultiStatus()) {
 			IStatus[] children = status.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				childlist.add(getLog(children[i]));
+			for (IStatus element : children) {
+				childlist.add(getLog(element));
 			}
 		}
 
-		FrameworkLogEntry[] children = (FrameworkLogEntry[]) (childlist.size() == 0 ? null
-				: childlist.toArray(new FrameworkLogEntry[childlist.size()]));
+		FrameworkLogEntry[] children = childlist.size() == 0 ? null
+				: childlist.toArray(new FrameworkLogEntry[childlist.size()]);
 
 		return new FrameworkLogEntry(status.getPlugin(), status.getSeverity(), status.getCode(),
 				status.getMessage(), stackCode, t, children);
 	}
 
+	@Override
 	public void info(Throwable t, String message) {
 		log(new Status(IStatus.INFO, bundleName, message, t));
 	}
 
+	@Override
 	public boolean isDebugEnabled() {
-		return false;
+		return isDebugEnabled;
 	}
 
+	@Override
 	public boolean isErrorEnabled() {
 		return true;
 	}
 
+	@Override
 	public boolean isInfoEnabled() {
 		return true;
 	}
 
+	@Override
 	public boolean isTraceEnabled() {
 		return false;
 	}
 
+	@Override
 	public boolean isWarnEnabled() {
 		return true;
 	}
@@ -118,7 +133,7 @@ public final class WorkbenchLogger extends Logger {
 
 	/**
 	 * Sets the debug options service for this logger.
-	 * 
+	 *
 	 * @param options
 	 *            The debug options to be used by this logger
 	 */
@@ -137,6 +152,7 @@ public final class WorkbenchLogger extends Logger {
 		this.log = log;
 	}
 
+	@Override
 	public void trace(Throwable t, String message) {
 		if (trace != null) {
 			trace.trace(null, message, t);
@@ -147,6 +163,7 @@ public final class WorkbenchLogger extends Logger {
 		}
 	}
 
+	@Override
 	public void warn(Throwable t, String message) {
 		log(new Status(IStatus.WARNING, bundleName, message, t));
 	}

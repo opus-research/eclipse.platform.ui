@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,15 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     oliver.schaefer@mbtech-services.com - Fix for Bug 225051 [Snippets] Snippet010OwnerDraw - Wrong german flag
+ * 	   Lars Vogel <lars.vogel@gmail.com >- Bug 387367
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
@@ -44,8 +47,9 @@ public class Snippet010OwnerDraw {
 
 		shell.open();
 
-		while (!shell.isDisposed ()) {
-			if (!display.readAndDispatch ()) display.sleep ();
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
 		}
 		display.dispose();
 	}
@@ -62,7 +66,7 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Create a new instance of the receiver.
-		 * 
+		 *
 		 * @param countryName
 		 * @param worldCupYear
 		 */
@@ -72,10 +76,6 @@ public class Snippet010OwnerDraw {
 			baseName = englishName;
 		}
 
-		/**
-		 * @param index
-		 * @return
-		 */
 		public int getHeight(Event event) {
 			switch (event.index) {
 			case 0:
@@ -89,10 +89,6 @@ public class Snippet010OwnerDraw {
 			}
 		}
 
-		/**
-		 * @param index
-		 * @return
-		 */
 		public int getWidth(Event event) {
 
 			switch (event.index) {
@@ -112,12 +108,11 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Draw the flag in bounds.
-		 * 
+		 *
 		 * @param event
 		 */
 		protected void drawFlag(Event event) {
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_BLUE));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_BLUE));
 
 			Rectangle bounds = event.getBounds();
 			bounds.width += 100;
@@ -126,7 +121,7 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Draw the cup year
-		 * 
+		 *
 		 * @param event
 		 */
 		private void drawCupYear(Event event) {
@@ -136,26 +131,23 @@ public class Snippet010OwnerDraw {
 
 		/**
 		 * Draw the name of the receiver.
-		 * 
+		 *
 		 * @param event
 		 */
 		protected void drawName(Event event) {
 
-			StringBuffer buffer = getDisplayString();
+			StringBuilder buffer = getDisplayString();
 
 			Display display = viewer.getControl().getDisplay();
 			TextLayout layout = new TextLayout(display);
 			layout.setText(buffer.toString());
 
-			TextStyle plain = new TextStyle(JFaceResources
-					.getFont(JFaceResources.DEFAULT_FONT), display
-					.getSystemColor(SWT.COLOR_LIST_FOREGROUND), display
-					.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			TextStyle plain = new TextStyle(JFaceResources.getFont(JFaceResources.DEFAULT_FONT),
+					display.getSystemColor(SWT.COLOR_LIST_FOREGROUND),
+					display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
-			TextStyle italic = new TextStyle(JFaceResources.getFontRegistry()
-					.getItalic(JFaceResources.DEFAULT_FONT), display
-					.getSystemColor(SWT.COLOR_BLUE), display
-					.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+			TextStyle italic = new TextStyle(JFaceResources.getFontRegistry().getItalic(JFaceResources.DEFAULT_FONT),
+					display.getSystemColor(SWT.COLOR_BLUE), display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 			layout.setStyle(plain, 0, name.length() - 1);
 			layout.setStyle(italic, name.length(), buffer.length() - 1);
@@ -167,8 +159,8 @@ public class Snippet010OwnerDraw {
 		/**
 		 * @return
 		 */
-		private StringBuffer getDisplayString() {
-			StringBuffer buffer = new StringBuffer();
+		private StringBuilder getDisplayString() {
+			StringBuilder buffer = new StringBuilder();
 			buffer.append(name);
 			buffer.append(" (");
 			buffer.append(baseName);
@@ -205,33 +197,25 @@ public class Snippet010OwnerDraw {
 			super("Deutschland", "Germany", "1954 1974 1990");
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
-		 */
+		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
 			bounds.width += 100;
 			int stripeHeight = bounds.height / 3;
-			Rectangle stripe = new Rectangle(bounds.x, bounds.y, bounds.width,
-					stripeHeight);
+			Rectangle stripe = new Rectangle(bounds.x, bounds.y, bounds.width, stripeHeight);
 
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_BLACK));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_BLACK));
 			event.gc.fillRectangle(stripe);
 
 			stripe.y += stripeHeight;
 
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_RED));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_RED));
 			event.gc.fillRectangle(stripe);
 
 			stripe.y += stripeHeight;
 
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_YELLOW));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_YELLOW));
 			event.gc.fillRectangle(stripe);
 
 		}
@@ -244,33 +228,25 @@ public class Snippet010OwnerDraw {
 			super("\u00D6sterreich", "Austria", "TBD");
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
-		 */
+		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
 			bounds.width += 100;
 			int stripeHeight = bounds.height / 3;
-			Rectangle stripe = new Rectangle(bounds.x, bounds.y, bounds.width,
-					stripeHeight);
+			Rectangle stripe = new Rectangle(bounds.x, bounds.y, bounds.width, stripeHeight);
 
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_RED));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_RED));
 			event.gc.fillRectangle(stripe);
 
 			stripe.y += stripeHeight;
 
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_WHITE));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			event.gc.fillRectangle(stripe);
 
 			stripe.y += stripeHeight;
 
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_RED));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_RED));
 			event.gc.fillRectangle(stripe);
 
 		}
@@ -281,23 +257,36 @@ public class Snippet010OwnerDraw {
 			super("Blighty", "England", "1966");
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
-		 */
+		@Override
 		protected void drawFlag(Event event) {
 
 			Rectangle bounds = event.getBounds();
 			bounds.width += 100;
 
-			event.gc.setBackground(viewer.getControl().getDisplay()
-					.getSystemColor(SWT.COLOR_RED));
-			event.gc.fillRectangle(new Rectangle(bounds.width / 2 + bounds.x
-					- 5, bounds.y, 10, bounds.height));
-			event.gc.fillRectangle(new Rectangle(bounds.x, bounds.height / 2
-					+ bounds.y - 5, bounds.width, 10));
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_RED));
+			event.gc.fillRectangle(new Rectangle(bounds.width / 2 + bounds.x - 5, bounds.y, 10, bounds.height));
+			event.gc.fillRectangle(new Rectangle(bounds.x, bounds.height / 2 + bounds.y - 5, bounds.width, 10));
 
+		}
+	}
+
+	private class DenmarkEntry extends CountryEntry {
+		DenmarkEntry() {
+			super("Danmark", "Denmark", "TBD");
+		}
+
+		@Override
+		protected void drawFlag(Event event) {
+
+			Rectangle bounds = event.getBounds();
+			bounds.width += 100;
+
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_RED));
+			event.gc.fillRectangle(bounds);
+
+			event.gc.setBackground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			event.gc.fillRectangle(new Rectangle(bounds.width / 2 + bounds.x - 5, bounds.y, 10, bounds.height));
+			event.gc.fillRectangle(new Rectangle(bounds.x, bounds.height / 2 + bounds.y - 5, bounds.width, 10));
 		}
 	}
 
@@ -306,81 +295,38 @@ public class Snippet010OwnerDraw {
 	private CountryEntry[] entries;
 
 	public Snippet010OwnerDraw() {
-		entries = new CountryEntry[3];
+		entries = new CountryEntry[4];
 		entries[0] = new AustriaEntry();
 		entries[1] = new GermanyEntry();
 		entries[2] = new EnglandEntry();
+		entries[3] = new DenmarkEntry();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.FULL_SELECTION);
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		viewer.setContentProvider(new IStructuredContentProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
-			public void dispose() {
-			};
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-			 */
-			public Object[] getElements(Object inputElement) {
-				return entries;
-			};
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
-			public void inputChanged(org.eclipse.jface.viewers.Viewer viewer,
-					Object oldInput, Object newInput) {
-			}
-
-		});
 		createColumns();
 
 		viewer.setLabelProvider(new OwnerDrawLabelProvider() {
-	
-
+			@Override
 			protected void measure(Event event, Object element) {
 				CountryEntry country = (CountryEntry) element;
-
-				event.setBounds(new Rectangle(event.x, event.y, country.getWidth(event),
-						country.getHeight(event)));
-
+				event.setBounds(new Rectangle(event.x, event.y, country.getWidth(event), country.getHeight(event)));
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
-			 *      java.lang.Object)
-			 */
+			@Override
 			protected void paint(Event event, Object element) {
 				CountryEntry entry = (CountryEntry) element;
 				entry.draw(event);
 
 			}
 		});
-		
-		OwnerDrawLabelProvider.setUpOwnerDraw(viewer);
-		viewer.setInput(this);
-		GridData data = new GridData(GridData.GRAB_HORIZONTAL
-				| GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
+
+		GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
 
 		viewer.getControl().setLayoutData(data);
+		viewer.setInput(entries);
 
 		viewer.setSelection(new StructuredSelection(entries[1]));
 	}
@@ -399,7 +345,6 @@ public class Snippet010OwnerDraw {
 			layout.addColumnData(new ColumnPixelData(100));
 			tc.setText(getTitleFor(i));
 		}
-		;
 	}
 
 	/**
@@ -417,9 +362,4 @@ public class Snippet010OwnerDraw {
 		}
 		return "Unknown";
 	}
-
-	public void setFocus() {
-
-	}
-
 }

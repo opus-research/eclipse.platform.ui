@@ -1,16 +1,17 @@
 /**
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -31,6 +32,7 @@ import org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicPackageImp
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
@@ -51,6 +53,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -61,6 +64,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getContext <em>Context</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getVariables <em>Variables</em>}</li>
@@ -77,8 +81,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCommands <em>Commands</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getAddons <em>Addons</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCategories <em>Categories</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */
@@ -244,6 +248,18 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	protected EList<MCategory> categories;
 
 	/**
+	 * The cached value of the '{@link #getDialogs() <em>Dialogs</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getDialogs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<MDialog> dialogs;
+
+	protected Map<String, MCommand> elementIdToCommandMap;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -260,6 +276,31 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	@Override
 	protected EClass eStaticClass() {
 		return ApplicationPackageImpl.Literals.APPLICATION;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * This is specialized for the more specific element type known in this context.
+	 * @generated
+	 */
+	@Override
+	public List<MWindow> getChildren() {
+		if (children == null) {
+			children = new EObjectContainmentWithInverseEList<MWindow>(MWindow.class, this, ApplicationPackageImpl.APPLICATION__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT) { private static final long serialVersionUID = 1L; @Override public Class<?> getInverseFeatureClass() { return MUIElement.class; } };
+		}
+		return children;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * This is specialized for the more specific type known in this context.
+	 * @generated
+	 */
+	@Override
+	public void setSelectedElement(MWindow newSelectedElement) {
+		super.setSelectedElement(newSelectedElement);
 	}
 
 	/**
@@ -418,13 +459,38 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public List<MCommand> getCommands() {
 		if (commands == null) {
-			commands = new EObjectContainmentEList<MCommand>(MCommand.class, this, ApplicationPackageImpl.APPLICATION__COMMANDS);
+			commands = new EObjectContainmentEList<MCommand>(MCommand.class, this,
+					ApplicationPackageImpl.APPLICATION__COMMANDS) {
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				protected void didChange() {
+					elementIdToCommandMap = null;
+					super.didChange();
+				}
+			};
 		}
 		return commands;
+	}
+
+	public MCommand getCommand(String elementId) {
+		if (elementIdToCommandMap == null) {
+			Map<String, MCommand> result = new HashMap<String, MCommand>();
+			for (MCommand command : getCommands()) {
+				MCommand otherCommand = result.put(command.getElementId(), command);
+				if (otherCommand != null) {
+					result.put(command.getElementId(), otherCommand);
+				}
+			}
+
+			elementIdToCommandMap = result;
+		}
+		return elementIdToCommandMap.get(elementId);
 	}
 
 	/**
@@ -449,6 +515,18 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 			categories = new EObjectContainmentEList<MCategory>(MCategory.class, this, ApplicationPackageImpl.APPLICATION__CATEGORIES);
 		}
 		return categories;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public List<MDialog> getDialogs() {
+		if (dialogs == null) {
+			dialogs = new EObjectResolvingEList<MDialog>(MDialog.class, this, ApplicationPackageImpl.APPLICATION__DIALOGS);
+		}
+		return dialogs;
 	}
 
 	/**
@@ -526,6 +604,8 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return getAddons();
 			case ApplicationPackageImpl.APPLICATION__CATEGORIES:
 				return getCategories();
+			case ApplicationPackageImpl.APPLICATION__DIALOGS:
+				return getDialogs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -597,6 +677,10 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				getCategories().clear();
 				getCategories().addAll((Collection<? extends MCategory>)newValue);
 				return;
+			case ApplicationPackageImpl.APPLICATION__DIALOGS:
+				getDialogs().clear();
+				getDialogs().addAll((Collection<? extends MDialog>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -654,6 +738,9 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 			case ApplicationPackageImpl.APPLICATION__CATEGORIES:
 				getCategories().clear();
 				return;
+			case ApplicationPackageImpl.APPLICATION__DIALOGS:
+				getDialogs().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -696,6 +783,8 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return addons != null && !addons.isEmpty();
 			case ApplicationPackageImpl.APPLICATION__CATEGORIES:
 				return categories != null && !categories.isEmpty();
+			case ApplicationPackageImpl.APPLICATION__DIALOGS:
+				return dialogs != null && !dialogs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

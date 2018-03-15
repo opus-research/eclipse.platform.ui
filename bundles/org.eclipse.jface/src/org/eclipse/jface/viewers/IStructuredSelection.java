@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,7 +49,7 @@ public interface IStructuredSelection extends ISelection {
     /**
      * Returns the elements in this selection as a <code>List</code>.
      * <strong>Note</strong> In the default implementation of {@link #toList()} in
-     * {@link StructuredSelection} the returned list is not a copy of the elements of the 
+     * {@link StructuredSelection} the returned list is not a copy of the elements of the
      * receiver and modifying it will modify the contents of the selection.
      *
      * @return the selected elements as a list

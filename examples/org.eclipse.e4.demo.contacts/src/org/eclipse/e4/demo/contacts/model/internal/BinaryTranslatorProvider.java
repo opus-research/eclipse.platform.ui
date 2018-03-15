@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ public class BinaryTranslatorProvider extends TranslationService {
 		if (key == null)
 			return null;
 		char[] charArray = key.toCharArray();
-		StringBuffer tmp = new StringBuffer();
+		StringBuilder tmp = new StringBuilder();
 		tmp.append("0x");
 		for(int i = 0; i < charArray.length; i++) {
 			int value = charArray[i];

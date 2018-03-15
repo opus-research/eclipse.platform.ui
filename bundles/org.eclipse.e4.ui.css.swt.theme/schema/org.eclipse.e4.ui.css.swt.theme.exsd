@@ -20,6 +20,7 @@
          <sequence>
             <element ref="stylesheet" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="theme" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="themeAssociation" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -129,7 +130,7 @@
          <attribute name="os_version" type="string">
             <annotation>
                <documentation>
-                  the version the operating system  the theme is applicable for or empty to apply on all
+                  the version the operating system  the theme is applicable for or empty to apply on all. The value can be a comma-separated string to specify multiple versions.
                </documentation>
             </annotation>
          </attribute>
@@ -163,6 +164,41 @@
       </complexType>
    </element>
 
+   <element name="themeAssociation">
+      <complexType>
+         <attribute name="themeId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  an Eclipse CSS theme id
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.e4.ui.css.swt.theme/theme/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="colorAndFontId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  an Eclipse legacy Color and Font theme id
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.themes/theme/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="os_version" type="string">
+            <annotation>
+               <documentation>
+                  an optional attribute used to better match the themes
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.e4.ui.css.swt.theme/theme/@os_version"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <annotation>
       <appinfo>
          <meta.section type="since"/>
@@ -177,8 +213,8 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         A theme which only applies on Win32/WinXP:
-&lt;p&gt;
+         &lt;p&gt;
+A theme which only applies on Win32/WinXP:
 &lt;pre&gt;
 &lt;theme
   basestylesheeturi=&quot;css/e4_default_winxp_blu.css&quot;
@@ -190,12 +226,22 @@
 &lt;/pre&gt;
 &lt;/p&gt;
 
-A stylesheet contributed to all Systems:
 &lt;p&gt;
+A stylesheet contributed to all Systems:
 &lt;pre&gt;
 &lt;stylesheet
   uri=&quot;css/default.css&quot;&gt;
 &lt;/stylesheet&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+The CSS theme and the legacy Colors and Fonts association:
+&lt;pre&gt;
+&lt;themeAssociation
+ themeId=&quot;org.eclipse.e4.ui.css.theme.e4_classic&quot;
+ colorAndFontId=&quot;org.eclipse.ui.defaultTheme&quot;&gt; 
+&lt;/themeassociation&gt;
 &lt;/pre&gt;
 &lt;/p&gt;
       </documentation>

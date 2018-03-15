@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,14 +34,14 @@ public abstract class WorkbenchWizardSelectionPage extends WizardSelectionPage {
     public TableViewer wizardSelectionViewer;
 
     protected IStructuredSelection currentResourceSelection;
-    
+
     protected String triggerPointId;
 
     /**
      *	Create an instance of this class
      */
     public WorkbenchWizardSelectionPage(String name, IWorkbench aWorkbench,
-            IStructuredSelection currentSelection, AdaptableList elements, 
+            IStructuredSelection currentSelection, AdaptableList elements,
             String triggerPointId) {
         super(name);
         this.wizardElements = elements;
@@ -59,9 +59,8 @@ public abstract class WorkbenchWizardSelectionPage extends WizardSelectionPage {
      *	@param searchId the id to search on
      */
     protected WorkbenchWizardElement findWizard(String searchId) {
-        Object[] children = wizardElements.getChildren();
-        for (int i = 0; i < children.length; ++i) {
-            WorkbenchWizardElement currentWizard = (WorkbenchWizardElement) children[i];
+		for (Object element : wizardElements.getChildren()) {
+            WorkbenchWizardElement currentWizard = (WorkbenchWizardElement) element;
             if (currentWizard.getId().equals(searchId)) {
 				return currentWizard;
 			}
@@ -90,10 +89,8 @@ public abstract class WorkbenchWizardSelectionPage extends WizardSelectionPage {
         setSelectedNode(node);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.IWizardPage#getNextPage()
-     */
-    public IWizardPage getNextPage() { 
+    @Override
+	public IWizardPage getNextPage() {
         ITriggerPoint triggerPoint = getWorkbench().getActivitySupport()
         .getTriggerPointManager().getTriggerPoint(triggerPointId);
         if (triggerPoint == null || WorkbenchActivityHelper.allowUseOf(triggerPoint, getSelectedNode())) {

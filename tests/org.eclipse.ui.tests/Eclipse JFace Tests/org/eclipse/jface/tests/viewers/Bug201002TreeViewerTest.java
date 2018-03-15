@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007,2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ public class Bug201002TreeViewerTest extends ViewerTestCase {
 	public class MyModel {
 		public MyModel parent;
 
-		public ArrayList child = new ArrayList();
+		public ArrayList<MyModel> child = new ArrayList<>();
 
 		public int counter;
 
@@ -41,6 +41,7 @@ public class Bug201002TreeViewerTest extends ViewerTestCase {
 			this.counter = counter;
 		}
 
+		@Override
 		public String toString() {
 			String rv = "Item ";
 			if (parent != null) {
@@ -60,28 +61,34 @@ public class Bug201002TreeViewerTest extends ViewerTestCase {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.FULL_SELECTION);
 
 		treeViewer.setContentProvider(new ITreeContentProvider() {
 
+			@Override
 			public Object[] getElements(Object inputElement) {
 				return ((MyModel) inputElement).child.toArray();
 			}
 
+			@Override
 			public void dispose() {
 
 			}
 
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 
 			}
 
+			@Override
 			public Object[] getChildren(Object parentElement) {
 				return getElements(parentElement);
 			}
 
+			@Override
 			public Object getParent(Object element) {
 				if (element == null) {
 					return null;
@@ -90,6 +97,7 @@ public class Bug201002TreeViewerTest extends ViewerTestCase {
 				return ((MyModel) element).parent;
 			}
 
+			@Override
 			public boolean hasChildren(Object element) {
 				return ((MyModel) element).child.size() > 0;
 			}
@@ -99,14 +107,17 @@ public class Bug201002TreeViewerTest extends ViewerTestCase {
 				treeViewer.getTree()) });
 		treeViewer.setColumnProperties(new String[] { "0" });
 		treeViewer.setCellModifier(new ICellModifier() {
+			@Override
 			public boolean canModify(Object element, String property) {
 				return true;
 			}
 
+			@Override
 			public Object getValue(Object element, String property) {
 				return "";
 			}
 
+			@Override
 			public void modify(Object element, String property, Object value) {
 			}
 
@@ -117,11 +128,13 @@ public class Bug201002TreeViewerTest extends ViewerTestCase {
 		return treeViewer;
 	}
 
+	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
+	@Override
 	protected void setInput() {
 		MyModel root = new MyModel(0, null);
 		root.counter = 0;
@@ -145,7 +158,7 @@ public class Bug201002TreeViewerTest extends ViewerTestCase {
 	public void testBug201002() {
 		getTreeViewer().getTree().setTopItem(
 				getTreeViewer().getTree().getItem(0));
-		getTreeViewer().editElement(((MyModel)((MyModel)getTreeViewer().getInput()).child.get(90)).child.get(10), 0);
+		getTreeViewer().editElement(((MyModel)getTreeViewer().getInput()).child.get(90).child.get(10), 0);
 
 		// GTK-Issue where call to getTopItem() immediately
 		// afterwards will fail

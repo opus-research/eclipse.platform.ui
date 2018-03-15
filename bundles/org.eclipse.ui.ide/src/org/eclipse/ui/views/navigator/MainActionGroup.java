@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids <sdavids@gmx.de> - Collapse all action (25826)
  *     Sebastian Davids <sdavids@gmx.de> - Images for menu items (27481)
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.views.navigator;
 
@@ -20,12 +21,12 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.IShellProvider;
@@ -52,6 +53,7 @@ import org.eclipse.ui.operations.UndoRedoActionGroup;
  * This contains a few actions and several subgroups.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
+@Deprecated
 public class MainActionGroup extends ResourceNavigatorActionGroup {
 
     protected AddBookmarkAction addBookmarkAction;
@@ -61,7 +63,7 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
     protected PropertyDialogAction propertyDialogAction;
 
     protected ImportResourcesAction importAction;
-    
+
     protected ExportResourcesAction exportAction;
 
     protected CollapseAllAction collapseAllAction;
@@ -77,7 +79,7 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
     protected WorkingSetFilterActionGroup workingSetGroup;
 
     protected SortAndFilterActionGroup sortAndFilterGroup;
-    
+
     protected UndoRedoActionGroup undoRedoGroup;
 
     protected WorkspaceActionGroup workspaceGroup;
@@ -88,16 +90,12 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
 
     /**
      * Constructs the main action group.
-     * 
+     *
      * @param navigator the navigator view
      */
     public MainActionGroup(IResourceNavigator navigator) {
         super(navigator);
-        resourceChangeListener = new IResourceChangeListener() {
-            public void resourceChanged(IResourceChangeEvent event) {
-                handleResourceChanged(event);
-            }
-        };
+        resourceChangeListener = event -> handleResourceChanged(event);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(
                 resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
         makeSubGroups();
@@ -124,22 +122,17 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         if (delta == null) {
             return;
         }
-        IResourceDelta[] projDeltas = delta
-                .getAffectedChildren(IResourceDelta.CHANGED);
-        for (int i = 0; i < projDeltas.length; ++i) {
-            IResourceDelta projDelta = projDeltas[i];
+		for (IResourceDelta projectDelta : delta.getAffectedChildren(IResourceDelta.CHANGED)) {
             //changing the project open state or description will affect open/close/build action enablement
-            if ((projDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.DESCRIPTION)) != 0) {
-                if (sel.contains(projDelta.getResource())) {
+			if ((projectDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.DESCRIPTION)) != 0) {
+				if (sel.contains(projectDelta.getResource())) {
                     getNavigator().getSite().getShell().getDisplay().syncExec(
-                            new Runnable() {
-                                public void run() {
-                                    addTaskAction.selectionChanged(selection);
-                                    gotoGroup.updateActionBars();
-                                    refactorGroup.updateActionBars();
-                                    workspaceGroup.updateActionBars();
-                                }
-                            });
+                            () -> {
+							    addTaskAction.selectionChanged(selection);
+							    gotoGroup.updateActionBars();
+							    refactorGroup.updateActionBars();
+							    workspaceGroup.updateActionBars();
+							});
                 }
             }
         }
@@ -148,7 +141,8 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
     /**
      * Makes the actions contained directly in this action group.
      */
-    protected void makeActions() {
+    @Override
+	protected void makeActions() {
         IShellProvider provider = navigator.getSite();
 
         newWizardMenu = new NewWizardMenu(navigator.getSite().getWorkbenchWindow());
@@ -160,29 +154,28 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         importAction = new ImportResourcesAction(navigator.getSite()
                 .getWorkbenchWindow());
         importAction
-                .setDisabledImageDescriptor(getImageDescriptor("dtool16/import_wiz.gif")); //$NON-NLS-1$
+                .setDisabledImageDescriptor(getImageDescriptor("dtool16/import_wiz.png")); //$NON-NLS-1$
         importAction
-                .setImageDescriptor(getImageDescriptor("etool16/import_wiz.gif")); //$NON-NLS-1$		
+                .setImageDescriptor(getImageDescriptor("etool16/import_wiz.png")); //$NON-NLS-1$
 
         exportAction = new ExportResourcesAction(navigator.getSite()
                 .getWorkbenchWindow());
         exportAction
-                .setDisabledImageDescriptor(getImageDescriptor("dtool16/export_wiz.gif")); //$NON-NLS-1$
+                .setDisabledImageDescriptor(getImageDescriptor("dtool16/export_wiz.png")); //$NON-NLS-1$
         exportAction
-                .setImageDescriptor(getImageDescriptor("etool16/export_wiz.gif")); //$NON-NLS-1$		
-        
-        
+                .setImageDescriptor(getImageDescriptor("etool16/export_wiz.png")); //$NON-NLS-1$
+
         collapseAllAction = new CollapseAllAction(navigator,
                 ResourceNavigatorMessages.CollapseAllAction_title);
         collapseAllAction.setToolTipText(ResourceNavigatorMessages.CollapseAllAction_toolTip);
         collapseAllAction
-                .setImageDescriptor(getImageDescriptor("elcl16/collapseall.gif")); //$NON-NLS-1$
+                .setImageDescriptor(getImageDescriptor("elcl16/collapseall.png")); //$NON-NLS-1$
 
         toggleLinkingAction = new ToggleLinkingAction(navigator,
                 ResourceNavigatorMessages.ToggleLinkingAction_text);
         toggleLinkingAction.setToolTipText(ResourceNavigatorMessages.ToggleLinkingAction_toolTip);
         toggleLinkingAction
-                .setImageDescriptor(getImageDescriptor("elcl16/synced.gif"));//$NON-NLS-1$
+                .setImageDescriptor(getImageDescriptor("elcl16/synced.png"));//$NON-NLS-1$
     }
 
     /**
@@ -192,23 +185,21 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         gotoGroup = new GotoActionGroup(navigator);
         openGroup = new OpenActionGroup(navigator);
         refactorGroup = new RefactorActionGroup(navigator);
-        IPropertyChangeListener workingSetUpdater = new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
-                String property = event.getProperty();
+        IPropertyChangeListener workingSetUpdater = event -> {
+		    String property = event.getProperty();
 
-                if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
-                        .equals(property)) {
-                    IResourceNavigator navigator = getNavigator();
-                    Object newValue = event.getNewValue();
+		    if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
+		            .equals(property)) {
+		        IResourceNavigator navigator = getNavigator();
+		        Object newValue = event.getNewValue();
 
-                    if (newValue instanceof IWorkingSet) {
-                        navigator.setWorkingSet((IWorkingSet) newValue);
-                    } else if (newValue == null) {
-                        navigator.setWorkingSet(null);
-                    }
-                }
-            }
-        };
+		        if (newValue instanceof IWorkingSet) {
+		            navigator.setWorkingSet((IWorkingSet) newValue);
+		        } else if (newValue == null) {
+		            navigator.setWorkingSet(null);
+		        }
+		    }
+		};
         TreeViewer treeView = navigator.getViewer();
         Shell shell = treeView.getControl().getShell();
         workingSetGroup = new WorkingSetFilterActionGroup(shell,
@@ -216,15 +207,15 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         workingSetGroup.setWorkingSet(navigator.getWorkingSet());
         sortAndFilterGroup = new SortAndFilterActionGroup(navigator);
         workspaceGroup = new WorkspaceActionGroup(navigator);
-        IUndoContext workspaceContext= (IUndoContext)ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
+		IUndoContext workspaceContext = Adapters.adapt(ResourcesPlugin.getWorkspace(), IUndoContext.class);
 		undoRedoGroup= new UndoRedoActionGroup(getNavigator().getSite(), workspaceContext, true);
-
     }
-    
+
     /**
      * Extends the superclass implementation to set the context in the subgroups.
      */
-    public void setContext(ActionContext context) {
+    @Override
+	public void setContext(ActionContext context) {
         super.setContext(context);
         gotoGroup.setContext(context);
         openGroup.setContext(context);
@@ -237,10 +228,11 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
     /**
      * Fills the context menu with the actions contained in this group
      * and its subgroups.
-     * 
+     *
      * @param menu the context menu
      */
-    public void fillContextMenu(IMenuManager menu) {
+    @Override
+	public void fillContextMenu(IMenuManager menu) {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
 
@@ -278,7 +270,8 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
     /**
      * Adds the actions in this group and its subgroups to the action bars.
      */
-    public void fillActionBars(IActionBars actionBars) {
+    @Override
+	public void fillActionBars(IActionBars actionBars) {
         actionBars.setGlobalActionHandler(ActionFactory.PROPERTIES.getId(),
                 propertyDialogAction);
         actionBars.setGlobalActionHandler(IDEActionFactory.BOOKMARK.getId(),
@@ -307,7 +300,8 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
      * Updates the actions which were added to the action bars,
      * delegating to the subgroups as necessary.
      */
-    public void updateActionBars() {
+    @Override
+	public void updateActionBars() {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
         propertyDialogAction.setEnabled(selection.size() == 1);
@@ -326,7 +320,8 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
     /**
      * Runs the default action (open file) by delegating the open group.
      */
-    public void runDefaultAction(IStructuredSelection selection) {
+    @Override
+	public void runDefaultAction(IStructuredSelection selection) {
         openGroup.runDefaultAction(selection);
     }
 
@@ -334,16 +329,18 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
      * Handles a key pressed event by invoking the appropriate action,
      * delegating to the subgroups as necessary.
      */
-    public void handleKeyPressed(KeyEvent event) {
+    @Override
+	public void handleKeyPressed(KeyEvent event) {
         refactorGroup.handleKeyPressed(event);
         workspaceGroup.handleKeyPressed(event);
     }
 
     /**
-     * Extends the superclass implementation to dispose the 
+     * Extends the superclass implementation to dispose the
      * actions in this group and its subgroups.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(
                 resourceChangeListener);
 

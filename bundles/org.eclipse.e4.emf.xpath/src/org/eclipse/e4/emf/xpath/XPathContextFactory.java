@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BestSolution.at and others.
+ * Copyright (c) 2010, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import org.eclipse.e4.emf.internal.xpath.JXPathContextFactoryImpl;
 
 /**
  * Factory responsible to create an XPath-Context
- * 
+ *
  * @param <Type>
  *            the object type the XPath is created for
  */
@@ -22,7 +22,7 @@ public abstract class XPathContextFactory<Type extends Object> {
 
 	/**
 	 * Creates a new XPathContext with the specified object as the root node.
-	 * 
+	 *
 	 * @param contextBean
 	 *            Object
 	 * @return XPathContext
@@ -33,7 +33,7 @@ public abstract class XPathContextFactory<Type extends Object> {
 	 * Creates a new XPathContext with the specified bean as the root node and
 	 * the specified parent context. Variables defined in a parent context can
 	 * be referenced in XPaths passed to the child context.
-	 * 
+	 *
 	 * @param parentContext
 	 *            parent context
 	 * @param contextBean
@@ -48,6 +48,6 @@ public abstract class XPathContextFactory<Type extends Object> {
 	 * @return Create a new XPath-Factory
 	 */
 	public static <Type> XPathContextFactory<Type> newInstance() {
-		return new JXPathContextFactoryImpl<Type>();
+		return new JXPathContextFactoryImpl<>();
 	}
 }

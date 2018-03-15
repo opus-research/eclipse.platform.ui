@@ -36,14 +36,14 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 /**
  * Tests Bug 43321
- * 
+ *
  * @since 3.0
  */
 public class Bug43321Test extends UITestCase {
 
 	/**
 	 * Constructor for Bug43321Test.
-	 * 
+	 *
 	 * @param name
 	 *            The name of the test
 	 */
@@ -54,7 +54,7 @@ public class Bug43321Test extends UITestCase {
 	/**
 	 * Tests that non-check box items on the menu are not checked when activated
 	 * from the keyboard.
-	 * 
+	 *
 	 * @throws CommandException
 	 *             If execution of the handler fails.
 	 * @throws CoreException
@@ -79,7 +79,7 @@ public class Bug43321Test extends UITestCase {
 		editor.selectAndReveal(0, 1);
 
 		// Press "Ctrl+C" to perform a copy.
-		List keyStrokes = new ArrayList();
+		List<KeyStroke> keyStrokes = new ArrayList<>();
 		keyStrokes.add(KeyStroke.getInstance("CTRL+C")); //$NON-NLS-1$
 		Event event = new Event();
 		Workbench workbench = ((Workbench) window.getWorkbench());

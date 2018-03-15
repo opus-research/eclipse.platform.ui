@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,32 +7,25 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 503387
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
+import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
-import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
@@ -54,10 +47,16 @@ import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.ViewActionBuilder;
 import org.eclipse.ui.internal.ViewReference;
 import org.eclipse.ui.internal.WorkbenchPartReference;
+import org.eclipse.ui.internal.registry.ViewDescriptor;
+import org.eclipse.ui.internal.testing.ContributionInfoMessages;
+import org.eclipse.ui.testing.ContributionInfo;
 
 public class CompatibilityView extends CompatibilityPart {
 
 	private ViewReference reference;
+
+	@Inject
+	EModelService modelService;
 
 	@Inject
 	CompatibilityView(MPart part, ViewReference ref) {
@@ -69,25 +68,6 @@ public class CompatibilityView extends CompatibilityPart {
 		return (IViewPart) getPart();
 	}
 
-	@Override
-	void updateImages(MPart part) {
-		EModelService ms = part.getContext().get(EModelService.class);
-		MWindow topWin = ms.getTopLevelWindowFor(part);
-		List<MPlaceholder> partRefs = ms.findElements(topWin, part.getElementId(),
-				MPlaceholder.class, null);
-		for (MUIElement ref : partRefs) {
-			updateTabImages(ref);
-		}
-		part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-				wrapped.getTitleImage());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.CompatibilityPart#getReference()
-	 */
 	@Override
 	public WorkbenchPartReference getReference() {
 		return reference;
@@ -102,15 +82,9 @@ public class CompatibilityView extends CompatibilityPart {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.CompatibilityPart#createPartControl
-	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected boolean createPartControl(IWorkbenchPart legacyPart, Composite parent) {
+		clearMenuItems();
 		part.getContext().set(IViewPart.class, (IViewPart) legacyPart);
 
 		final IEclipseContext partContext = getModel().getContext();
@@ -126,9 +100,10 @@ public class CompatibilityView extends CompatibilityPart {
 		MenuManager mm = (MenuManager) actionBars.getMenuManager();
 		MMenu menu = getViewMenu();
 		if (menu == null) {
-			menu = MenuFactoryImpl.eINSTANCE.createMenu();
+			menu = modelService.createModelElement(MMenu.class);
 
-			// Only use the substring before the ':'
+			// If the id contains a ':' use the part before it as the descriptor
+			// id
 			String partId = part.getElementId();
 			int colonIndex = partId.indexOf(':');
 			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
@@ -148,15 +123,21 @@ public class CompatibilityView extends CompatibilityPart {
 		// Construct the toolbar (if necessary)
 		MToolBar toolbar = part.getToolbar();
 		if (toolbar == null) {
-			toolbar = MenuFactoryImpl.eINSTANCE.createToolBar();
+			toolbar = modelService.createModelElement(MToolBar.class);
 
-			// Only use the substring before the ':'
+			// If the id contains a ':' use the part before it as the descriptor
+			// id
 			String partId = part.getElementId();
 			int colonIndex = partId.indexOf(':');
 			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
 			toolbar.setElementId(descId);
 
 			part.setToolbar(toolbar);
+		} else {
+			// clear out the model entries so they can be re-created by
+			// contributions
+			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=402561
+			toolbar.getChildren().clear();
 		}
 		apr = rendererFactory.getRenderer(toolbar, parent);
 		if (apr instanceof ToolBarManagerRenderer) {
@@ -164,6 +145,12 @@ public class CompatibilityView extends CompatibilityPart {
 		}
 
 		super.createPartControl(legacyPart, parent);
+
+		ViewDescriptor desc = reference.getDescriptor();
+		if (desc != null && desc.getPluginId() != null) {
+			parent.setData(new ContributionInfo(desc.getPluginId(),
+					ContributionInfoMessages.ContributionInfo_View, null));
+		}
 
 		// dispose the tb, it will be re-created when the tab is shown
 		toolBarParent.dispose();
@@ -182,20 +169,23 @@ public class CompatibilityView extends CompatibilityPart {
 			// directly to the manager
 			((ToolBarManagerRenderer) apr).reconcileManagerToModel(tbm, toolbar);
 		}
-
+		final AtomicBoolean toolbarContributed = new AtomicBoolean();
 		final IContextFunction func = new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
+				if (toolbarContributed.get()) {
+					// fix for bug 448873: don't contribute to the toolbar twice
+					return null;
+				}
+				toolbarContributed.set(true);
 				final ViewActionBuilder actionBuilder = new ViewActionBuilder();
 				actionBuilder.readActionExtensions(getView());
 				ActionDescriptor[] actionDescriptors = actionBuilder.getExtendedActions();
 				if (actionDescriptors != null) {
 					IHandlerService hs = partContext.get(IHandlerService.class);
-					for (int i = 0; i < actionDescriptors.length; i++) {
-						ActionDescriptor actionDescriptor = actionDescriptors[i];
-
+					for (ActionDescriptor actionDescriptor : actionDescriptors) {
 						if (actionDescriptor != null) {
-							IAction action = actionDescriptors[i].getAction();
+							IAction action = actionDescriptor.getAction();
 
 							if (action != null && action.getActionDefinitionId() != null) {
 								hs.activateHandler(action.getActionDefinitionId(),
@@ -205,12 +195,7 @@ public class CompatibilityView extends CompatibilityPart {
 					}
 				}
 				actionBars.updateActionBars();
-				final Runnable dispose = new Runnable() {
-
-					public void run() {
-						actionBuilder.dispose();
-					}
-				};
+				final Runnable dispose = () -> actionBuilder.dispose();
 				return dispose;
 			}
 		};
@@ -218,7 +203,7 @@ public class CompatibilityView extends CompatibilityPart {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_FUNCTION, func);
 		} else {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_DISPOSE,
-					func.compute(partContext));
+					func.compute(partContext, null));
 		}
 
 		return true;
@@ -232,11 +217,11 @@ public class CompatibilityView extends CompatibilityPart {
 				renderer.clearModelToContribution(child, contribution);
 			}
 
-			if (child instanceof MOpaqueMenuSeparator) {
-				((MOpaqueMenuSeparator) child).setOpaqueItem(null);
+			if (OpaqueElementUtil.isOpaqueMenuSeparator(child)) {
+				OpaqueElementUtil.clearOpaqueItem(child);
 				it.remove();
-			} else if (child instanceof MOpaqueMenuItem) {
-				((MOpaqueMenuItem) child).setOpaqueItem(null);
+			} else if (OpaqueElementUtil.isOpaqueMenuItem(child)) {
+				OpaqueElementUtil.clearOpaqueItem(child);
 				it.remove();
 			} else if (child instanceof MMenu) {
 				MMenu submenu = (MMenu) child;
@@ -245,7 +230,7 @@ public class CompatibilityView extends CompatibilityPart {
 					renderer.clearModelToManager(submenu, manager);
 				}
 
-				if (child instanceof MOpaqueMenu) {
+				if (OpaqueElementUtil.isOpaqueMenu(child)) {
 					it.remove();
 				}
 				clearOpaqueMenuItems(renderer, submenu);
@@ -279,23 +264,28 @@ public class CompatibilityView extends CompatibilityPart {
 				ToolBarManager tbm = (ToolBarManager) actionBars.getToolBarManager();
 				ToolBarManagerRenderer tbmr = (ToolBarManagerRenderer) apr;
 				tbmr.clearModelToManager(toolbar, tbm);
-				// remove opaque mappings
-				for (Iterator<MToolBarElement> it = toolbar.getChildren().iterator(); it.hasNext();) {
-					MToolBarElement element = it.next();
-					if (element instanceof MOpaqueToolItem) {
-						IContributionItem item = tbmr.getContribution(element);
-						if (item != null) {
-							tbmr.clearModelToContribution(element, item);
-						}
-						// clear the reference
-						((MOpaqueToolItem) element).setOpaqueItem(null);
-						// remove the opaque item
-						it.remove();
-					}
-				}
+				clearOpaqueToolBarItems(tbmr, toolbar);
 			}
 		}
 
 		super.disposeSite(site);
 	}
+
+	private void clearOpaqueToolBarItems(ToolBarManagerRenderer tbmr, MToolBar toolbar) {
+		// remove opaque mappings
+		for (Iterator<MToolBarElement> it = toolbar.getChildren().iterator(); it.hasNext();) {
+			MToolBarElement element = it.next();
+			IContributionItem contribution = tbmr.getContribution(element);
+			if (contribution != null) {
+				tbmr.clearModelToContribution(element, contribution);
+			}
+			if (OpaqueElementUtil.isOpaqueToolItem(element)) {
+				// clear the reference
+				OpaqueElementUtil.clearOpaqueItem(element);
+				// remove the opaque item
+				it.remove();
+			}
+		}
+	}
+
 }

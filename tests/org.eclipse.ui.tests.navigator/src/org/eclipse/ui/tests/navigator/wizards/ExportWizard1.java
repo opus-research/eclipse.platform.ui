@@ -16,20 +16,22 @@ import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
 /**
  * Does nothing. Used to test the Capability-awareness of the <b>commonWizard</b> extension.
- * 
+ *
  * @since 3.2
  *
  */
 public class ExportWizard1 extends Wizard implements IExportWizard {
 
-	public ExportWizard1() { 
+	public ExportWizard1() {
 	}
 
-	public boolean performFinish() { 
+	@Override
+	public boolean performFinish() {
 		return false;
 	}
 
-	public void init(IWorkbench workbench, IStructuredSelection selection) { 
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
 
 	}
 

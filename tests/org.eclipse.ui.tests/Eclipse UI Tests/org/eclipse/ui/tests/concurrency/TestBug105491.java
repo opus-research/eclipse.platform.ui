@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,14 +11,20 @@
 package org.eclipse.ui.tests.concurrency;
 
 import java.lang.reflect.InvocationTargetException;
-import junit.framework.*;
-import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
+
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IThreadListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
+
+import junit.framework.TestCase;
 
 /**
  * Tests the following sequence of events:
@@ -29,33 +35,35 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  * 5) After passing the rule back to the UI thread, but before MC1 dies, the asyncExec is run.
  * 6) The asyncExec forks another model context (MC2), and blocks the UI thread in another event loop.
  * 7) MC2 tries to acquire the workspace lock and deadlocks, because at this point it has been transferred to the UI thread
- * 
+ *
  * NOTE: This bug has not yet been fixed.  This test illustrates the problem, but must
  * not be added to the parent test suite until the problem has been fixed.
  */
 public class TestBug105491 extends TestCase {
-	class TransferTestOperation extends WorkspaceModifyOperation implements IThreadListener {
+	class TransferTestOperation extends WorkspaceModifyOperation {
+		@Override
 		public void execute(final IProgressMonitor pm) {
 			//clients assume this would not deadlock because it runs in an asyncExec
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
-					ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
-					try {
-						dialog.run(true, false, new WorkspaceModifyOperation() {
-							protected void execute(IProgressMonitor monitor) {}
-						});
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-						fail(e.getMessage());
-					} catch (InterruptedException e) {
-						//ignore
-					}
+			Display.getDefault().asyncExec(() -> {
+				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
+				try {
+					dialog.run(true, false, new WorkspaceModifyOperation() {
+						@Override
+						protected void execute(IProgressMonitor monitor) {
+						}
+					});
+				} catch (InvocationTargetException e1) {
+					e1.printStackTrace();
+					fail(e1.getMessage());
+				} catch (InterruptedException e2) {
+					// ignore
 				}
 			});
 		}
 
+		@Override
 		public void threadChange(Thread thread) {
-			Platform.getJobManager().transferRule(workspace.getRoot(), thread);
+			Job.getJobManager().transferRule(workspace.getRoot(), thread);
 		}
 	}
 
@@ -73,18 +81,22 @@ public class TestBug105491 extends TestCase {
 	 * Performs the test
 	 */
 	public void testBug() throws CoreException {
-		workspace.run(new IWorkspaceRunnable() {
-			public void run(IProgressMonitor monitor) {
-				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
-				try {
-					dialog.run(true, false, new TransferTestOperation());
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-					fail(e.getMessage());
-				} catch (InterruptedException e) {
-					//ignore
-				}
+		if (Thread.interrupted()) {
+			fail("Thread was interrupted at start of test");
+		}
+		workspace.run((IWorkspaceRunnable) monitor -> {
+			ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
+			try {
+				dialog.run(true, false, new TransferTestOperation());
+			} catch (InvocationTargetException e1) {
+				e1.printStackTrace();
+				fail(e1.getMessage());
+			} catch (InterruptedException e2) {
+				// ignore
 			}
 		}, workspace.getRoot(), IResource.NONE, null);
+		if (Thread.interrupted()) {
+			fail("Thread was interrupted at end of test");
+		}
 	}
 }

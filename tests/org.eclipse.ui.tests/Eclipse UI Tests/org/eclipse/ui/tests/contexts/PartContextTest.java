@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,17 +28,17 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 /**
  * Test that the contexts activated through their local services are only in
  * play when their local service is active.
- * 
+ *
  * @since 3.2
  */
 public class PartContextTest extends UITestCase {
 	/**
-	 * 
+	 *
 	 */
 	public static final String PAGE_VIEW_ID = "org.eclipse.ui.tests.contexts.MockPageView";
 
 	/**
-	 * 
+	 *
 	 */
 	private static final String TEXT_EDITOR_ID = "org.eclipse.ui.DefaultTextEditor";
 
@@ -49,7 +49,7 @@ public class PartContextTest extends UITestCase {
 	}
 
 	public void testBasicContextActivation() throws Exception {
-		IContextService globalService = (IContextService) getWorkbench()
+		IContextService globalService = getWorkbench()
 				.getService(IContextService.class);
 
 		checkActiveContext(globalService, MockViewPart5.PART_CONTEXT_ID, false);
@@ -65,7 +65,7 @@ public class PartContextTest extends UITestCase {
 	}
 
 	public void testContextActivation() throws Exception {
-		IContextService globalService = (IContextService) getWorkbench()
+		IContextService globalService = getWorkbench()
 				.getService(IContextService.class);
 
 		checkActiveContext(globalService, MockViewPart5.PART_CONTEXT_ID, false);
@@ -73,7 +73,7 @@ public class PartContextTest extends UITestCase {
 		IWorkbenchWindow window = openTestWindow();
 		IWorkbenchPage page = window.getActivePage();
 		IViewPart view = page.showView(MockViewPart5.ID);
-		IContextService localService = (IContextService) view.getSite()
+		IContextService localService = view.getSite()
 				.getService(IContextService.class);
 
 		checkActiveContext(globalService, MockViewPart5.PART_CONTEXT_ID, true);
@@ -97,12 +97,14 @@ public class PartContextTest extends UITestCase {
 	}
 
 	public void testWindowContextActivation() throws Exception {
-		IContextService globalService = (IContextService) getWorkbench()
+		IContextService globalService = getWorkbench()
 				.getService(IContextService.class);
 		checkActiveContext(globalService, WINDOW_CONTEXT_ID, false);
 
 		IWorkbenchWindow window = openTestWindow();
-		IContextService localService = (IContextService) window
+		assertTrue(forceActive(window.getShell()));
+
+		IContextService localService = window
 				.getService(IContextService.class);
 		localService.activateContext(WINDOW_CONTEXT_ID);
 		checkActiveContext(globalService, WINDOW_CONTEXT_ID, true);
@@ -114,12 +116,12 @@ public class PartContextTest extends UITestCase {
 	/**
 	 * Test context activation while switching through the pages of a pagebook.
 	 * Exercises the NestableContextService.
-	 * 
+	 *
 	 * @throws Exception
 	 *             on error
 	 */
 	public void testPageBookPageContextActivation() throws Exception {
-		IContextService globalService = (IContextService) getWorkbench()
+		IContextService globalService = getWorkbench()
 				.getService(IContextService.class);
 		checkActiveContext(globalService, ContextPage.TEST_CONTEXT_ID, false);
 
@@ -172,14 +174,14 @@ public class PartContextTest extends UITestCase {
 
 	/**
 	 * Assert if the contextId is active in the contextService.
-	 * 
+	 *
 	 * @param contextService
 	 * @param contextId
 	 * @param isActive
 	 */
 	private void checkActiveContext(IContextService contextService,
 			String contextId, boolean isActive) {
-		Collection activeContexts = contextService.getActiveContextIds();
+		Collection<?> activeContexts = contextService.getActiveContextIds();
 		assertEquals(contextId, isActive, activeContexts.contains(contextId));
 	}
 }

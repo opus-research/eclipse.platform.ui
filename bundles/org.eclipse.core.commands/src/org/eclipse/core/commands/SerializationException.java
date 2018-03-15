@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.core.commands.common.CommandException;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public final class SerializationException extends CommandException {
@@ -31,18 +31,18 @@ public final class SerializationException extends CommandException {
 
 	/**
 	 * Creates a new instance of this class with the specified detail message.
-	 * 
+	 *
 	 * @param message
 	 *            the detail message; may be <code>null</code>.
 	 */
 	public SerializationException(final String message) {
 		super(message);
 	}
-	
+
 	/**
 	 * Creates a new instance of this class with the specified detail message
 	 * and cause.
-	 * 
+	 *
 	 * @param message
 	 *            the detail message; may be <code>null</code>.
 	 * @param cause

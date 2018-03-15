@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -35,7 +33,7 @@ public class ToolControlContribution extends ControlContribution {
 	private IContributionFactory contribFactory;
 
 	@Inject
-	EModelService modelService;
+	private EModelService modelService;
 
 	// private IEclipseContext parentContext;
 
@@ -43,13 +41,6 @@ public class ToolControlContribution extends ControlContribution {
 		super(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ControlContribution#createControl(org.eclipse
-	 * .swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createControl(Composite parent) {
 		IEclipseContext localContext = EclipseContextFactory.create();
@@ -65,12 +56,9 @@ public class ToolControlContribution extends ControlContribution {
 			final Object tcImpl = contribFactory.create(
 					model.getContributionURI(), parentContext, localContext);
 			model.setObject(tcImpl);
-			newComposite.addDisposeListener(new DisposeListener() {
-
-				public void widgetDisposed(DisposeEvent e) {
-					ContextInjectionFactory.uninject(tcImpl, parentContext);
-					model.setObject(null);
-				}
+			newComposite.addDisposeListener(e -> {
+				ContextInjectionFactory.uninject(tcImpl, parentContext);
+				model.setObject(null);
 			});
 		}
 

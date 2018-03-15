@@ -1,4 +1,4 @@
-/* Copyright (c) 2005, 2009 IBM Corporation and others.
+/* Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,8 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -27,7 +26,7 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.internal.util.Util;
 
 /**
- * 
+ *
  * @since 3.2
  */
 public class AggregateWorkingSet extends AbstractWorkingSet implements
@@ -41,7 +40,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	private boolean inElementConstruction = false;
 
 	/**
-	 * 
+	 *
 	 * @param name
 	 * @param label
 	 * @param components
@@ -57,7 +56,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	}
 
 	/**
-	 * 
+	 *
 	 * @param name
 	 * @param label
 	 * @param memento
@@ -86,7 +85,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * Takes the elements from all component working sets and sets them to be
 	 * the elements of this working set. Any duplicates are trimmed.
-	 * 
+	 *
 	 * @param fireEvent whether a working set change event should be fired
 	 */
 	private void constructElements(boolean fireEvent) {
@@ -97,7 +96,8 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 		inElementConstruction = true;
 		try {
-			Set elements = new HashSet();
+			// use *linked* set to maintain predictable elements order
+			Set<IAdaptable> elements = new LinkedHashSet<>();
 			IWorkingSet[] localComponents = getComponentsInternal();
 			for (int i = 0; i < localComponents.length; i++) {
 				IWorkingSet workingSet = localComponents[i];
@@ -112,12 +112,11 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 						System.arraycopy(components, i + 1, tmp, i, components.length - i - 1);
 					components = tmp;
 					workingSetMemento = null; // toss cached info
-					fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);						
+					fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
 					continue;
 				}
 			}
-			internalSetElements((IAdaptable[]) elements
-					.toArray(new IAdaptable[elements.size()]));
+			internalSetElements(elements.toArray(new IAdaptable[elements.size()]));
 			if (fireEvent) {
 				fireWorkingSetChanged(
 					IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
@@ -127,10 +126,12 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 	}
 
+	@Override
 	public String getId() {
 		return null;
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_WORKING_SETS);
@@ -139,9 +140,11 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * A no-op for aggregates - their contents should be derived.
 	 */
+	@Override
 	public void setElements(IAdaptable[] elements) {
 	}
 
+	@Override
 	public void setId(String id) {
 
 	}
@@ -149,6 +152,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * Aggregates are not editable.
 	 */
+	@Override
 	public boolean isEditable() {
 		return false;
 	}
@@ -156,10 +160,12 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * Aggregates should not generally be visible in the UI.
 	 */
+	@Override
 	public boolean isVisible() {
 		return false;
 	}
 
+	@Override
 	public void saveState(IMemento memento) {
 		if (workingSetMemento != null) {
 			// just re-save the previous memento if the working set has
@@ -172,20 +178,19 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 			memento.putString(AbstractWorkingSet.TAG_AGGREGATE, Boolean.TRUE
 					.toString());
 
-			IWorkingSet[] localComponents = getComponentsInternal();
-			for (int i = 0; i < localComponents.length; i++) {
-				IWorkingSet componentSet = localComponents[i];
-				memento.createChild(IWorkbenchConstants.TAG_WORKING_SET,
-						componentSet.getName());
+			for (IWorkingSet workingSet : getComponentsInternal()) {
+				memento.createChild(IWorkbenchConstants.TAG_WORKING_SET, workingSet.getName());
 			}
 		}
 	}
 
+	@Override
 	public void connect(IWorkingSetManager manager) {
 		manager.addPropertyChangeListener(this);
 		super.connect(manager);
 	}
 
+	@Override
 	public void disconnect() {
 		IWorkingSetManager connectedManager = getManager();
 		if (connectedManager != null)
@@ -195,9 +200,10 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 
 	/**
 	 * Return the component working sets.
-	 * 
+	 *
 	 * @return the component working sets
 	 */
+	@Override
 	public IWorkingSet[] getComponents() {
 		IWorkingSet[] localComponents = getComponentsInternal();
 		IWorkingSet[] copiedArray = new IWorkingSet[localComponents.length];
@@ -213,6 +219,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		return components;
 	}
 
+	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		String property = event.getProperty();
 		if (property.equals(IWorkingSetManager.CHANGE_WORKING_SET_REMOVE)) {
@@ -230,8 +237,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		} else if (property
 				.equals(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE)) {
 			IWorkingSet[] localComponents = getComponentsInternal();
-			for (int i = 0; i < localComponents.length; i++) {
-				IWorkingSet set = localComponents[i];
+			for (IWorkingSet set : localComponents) {
 				if (set.equals(event.getNewValue())) {
 					constructElements(true);
 					break;
@@ -240,6 +246,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 	}
 
+	@Override
 	void restoreWorkingSet() {
 		IWorkingSetManager manager = getManager();
 		if (manager == null) {
@@ -249,9 +256,8 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 				.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
 		ArrayList list = new ArrayList(workingSetReferences.length);
 
-		for (int i = 0; i < workingSetReferences.length; i++) {
-			IMemento setReference = workingSetReferences[i];
-			String setId = setReference.getID();
+		for (IMemento memento : workingSetReferences) {
+			String setId = memento.getID();
 			IWorkingSet set = manager.getWorkingSet(setId);
 			if (set != null) {
 				list.add(set);
@@ -262,6 +268,7 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		constructElements(false);
 	}
 
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -275,11 +282,13 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		return false;
 	}
 
+	@Override
 	public int hashCode() {
-		int hashCode = getName().hashCode() & getComponentsInternal().hashCode();
+		int hashCode = getName().hashCode() & java.util.Arrays.hashCode(getComponentsInternal());
 		return hashCode;
 	}
-	
+
+	@Override
 	public boolean isSelfUpdating() {
 		IWorkingSet[] localComponents = getComponentsInternal();
 		if (localComponents == null || localComponents.length == 0) {
@@ -292,15 +301,20 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 		return true;
 	}
-	
+
+	@Override
 	public boolean isAggregateWorkingSet() {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkingSet#adaptElements(org.eclipse.core.runtime.IAdaptable[])
-	 */
+	@Override
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		return new IAdaptable[0];
 	}
+
+	@Override
+	public String toString() {
+		return "AWS [name=" + getName() + ", components=" + Arrays.toString(getComponentsInternal()) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 }

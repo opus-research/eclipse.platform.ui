@@ -35,16 +35,14 @@ public class ViewWidgetFactory extends TestWidgetFactory {
     private String viewId;
     private Control ctrl;
     private IWorkbenchWindow window;
-    
+
     public ViewWidgetFactory(String viewId) {
         this.viewId = viewId;
         Assert.assertNotNull(viewId);
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#getMaxSize()
-     */
-    public Point getMaxSize() {
+
+    @Override
+	public Point getMaxSize() {
         return new Point(1024, 768);
     }
 
@@ -53,47 +51,39 @@ public class ViewWidgetFactory extends TestWidgetFactory {
 		MPart modelPart = site.getModel();
 		return (Composite) modelPart.getWidget();
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#init()
-     */
-    public void init() throws CoreException, WorkbenchException {
+
+    @Override
+	public void init() throws CoreException, WorkbenchException {
     	// open the view in a new window
         window = PlatformUI.getWorkbench().openWorkbenchWindow(EmptyPerspective.PERSP_ID, UITestCase.getPageInput());
 		IWorkbenchPage page = window.getActivePage();
         Assert.assertNotNull(page);
 
 		IViewPart part = page.showView(viewId, null, IWorkbenchPage.VIEW_ACTIVATE);
-        
+
         BasicPerformanceTest.waitForBackgroundJobs();
-        
+
 		ctrl = getControl(part);
-        
+
         Point size = getMaxSize();
         ctrl.setBounds(0,0,size.x, size.y);
         window.getShell().setSize(size);
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#getName()
-     */
-    public String getName() {
+
+    @Override
+	public String getName() {
         return "View " + viewId;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.performance.TestWidgetFactory#getControl()
-     */
-    public Composite getControl() throws CoreException, WorkbenchException {
+    @Override
+	public Composite getControl() throws CoreException, WorkbenchException {
         return (Composite)ctrl;
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.performance.layout.TestWidgetFactory#done()
-     */
-    public void done() throws CoreException, WorkbenchException {
+
+    @Override
+	public void done() throws CoreException, WorkbenchException {
     	window.close();
     	super.done();
     }
-    
+
 }

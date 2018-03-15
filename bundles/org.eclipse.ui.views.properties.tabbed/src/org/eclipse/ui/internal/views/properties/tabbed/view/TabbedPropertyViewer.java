@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2008 IBM Corporation and others.
+ * Copyright (c) 2001, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -22,11 +22,11 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
- * Viewer representing the property sheet page. On the left side it 
+ * Viewer representing the property sheet page. On the left side it
  * contains a list of tabs and on the right side it contains the
  * current selected tab.
- * 
- * @author Anthony Hunter 
+ *
+ * @author Anthony Hunter
  */
 public class TabbedPropertyViewer extends StructuredViewer {
 
@@ -36,7 +36,7 @@ public class TabbedPropertyViewer extends StructuredViewer {
 
 	/**
 	 * Constructor for TabbedPropertyViewer.
-	 * 
+	 *
 	 * @param list
 	 *            the TabbedPropertyList.
 	 */
@@ -71,20 +71,24 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		return list.getSelectionIndex();
 	}
 
+	@Override
 	protected Widget doFindInputItem(Object element) {
 		/* not implemented */
 		return null;
 	}
 
+	@Override
 	protected Widget doFindItem(Object element) {
 		/* not implemented */
 		return null;
 	}
 
+	@Override
 	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
 		/* not implemented */
 	}
 
+	@Override
 	protected List getSelectionFromWidget() {
 		int index = list.getSelectionIndex();
 		if (index == TabbedPropertyList.NONE) {
@@ -95,10 +99,12 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		return result;
 	}
 
+	@Override
 	protected void internalRefresh(Object element) {
 		/* not implemented */
 	}
 
+	@Override
 	public void reveal(Object element) {
 		/* not implemented */
 	}
@@ -107,6 +113,7 @@ public class TabbedPropertyViewer extends StructuredViewer {
 	 * We do not consider multiple selections. Only the first
 	 * element will represent the selection.
 	 */
+	@Override
 	protected void setSelectionToWidget(List l, boolean reveal) {
 		if (l == null || l.size() == 0) { // clear selection
 			list.deselectAll();
@@ -123,24 +130,26 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		}
 	}
 
+	@Override
 	public Control getControl() {
 		return list;
 	}
 
+	@Override
 	protected void inputChanged(Object input, Object oldInput) {
 		elements.clear();
 		Object[] children = getSortedChildren(getRoot());
 		list.removeAll();
-		for (int i = 0; i < children.length; i++) {
-			elements.add(children[i]);
-			mapElement(children[i], list);
+		for (Object child : children) {
+			elements.add(child);
+			mapElement(child, list);
 		}
 		list.setElements(children);
 	}
 
 	/**
 	 * Set the input for viewer.
-	 * 
+	 *
 	 * @param part
 	 *            the workbench part.
 	 * @param selection
@@ -153,7 +162,7 @@ public class TabbedPropertyViewer extends StructuredViewer {
 
 	/**
 	 * Get the current workbench part.
-	 * 
+	 *
 	 * @return the current workbench part.
 	 */
 	public IWorkbenchPart getWorkbenchPart() {

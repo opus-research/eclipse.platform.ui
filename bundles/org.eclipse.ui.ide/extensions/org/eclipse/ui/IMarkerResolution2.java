@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,11 @@ package org.eclipse.ui;
 
 import org.eclipse.swt.graphics.Image;
 
-/** 
- * Extends <code>IMarkerResolution</code>.  This interface should be used 
- * in place of <code>IMarkerResolution</code> if a description and/or image 
+/**
+ * Extends <code>IMarkerResolution</code>.  This interface should be used
+ * in place of <code>IMarkerResolution</code> if a description and/or image
  * are desired.
- * 
+ *
  * @since 3.0
  */
 public interface IMarkerResolution2 extends IMarkerResolution {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,12 +23,12 @@ import org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtPtConsta
 import org.eclipse.ui.navigator.ICommonFilterDescriptor;
 
 /**
- * 
+ *
  * Describes a <b>commonFilter</b> element under a
  * <b>org.eclipse.ui.navigator.navigatorContent</b> extension.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 		INavigatorContentExtPtConstants {
@@ -38,7 +38,7 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 	private Expression filterExpression;
 
 	private String id;
-	
+
 	protected CommonFilterDescriptor(IConfigurationElement anElement) {
 
 		element = anElement;
@@ -58,42 +58,46 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 	}
 
 	/**
-	 * 
+	 *
 	 * @return An identifier used to determine whether the filter is visible.
 	 *         May not be unique.
 	 */
+	@Override
 	public String getId() {
 		return id;
 	}
 
 	/**
-	 * 
+	 *
 	 * @return A translated name to identify the filter
 	 */
+	@Override
 	public String getName() {
 		return element.getAttribute(ATT_NAME);
 	}
 
 	/**
-	 * 
+	 *
 	 * @return A translated description to explain to the user what the defined
 	 *         filter will hide from the view.
 	 */
+	@Override
 	public String getDescription() {
 		return element.getAttribute(ATT_DESCRIPTION);
 	}
 
 	/**
-	 * 
+	 *
 	 * @return Indicates the filter should be in an "Active" state by default.
 	 */
+	@Override
 	public boolean isActiveByDefault() {
 		return Boolean.valueOf(element.getAttribute(ATT_ACTIVE_BY_DEFAULT))
 				.booleanValue();
 	}
 
 	/**
-	 * 
+	 *
 	 * @return Indicates the filter should be shown in the UI.
 	 */
 	public boolean isVisibleInUi() {
@@ -104,7 +108,7 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 	}
 
 	/**
-	 * 
+	 *
 	 * @return An instance of the ViewerFilter defined by the extension. Callers
 	 *         of this method are responsible for managing the instantiated
 	 *         filter.
@@ -113,6 +117,7 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 		final ViewerFilter[] filter = new ViewerFilter[1];
 
 		SafeRunner.run(new NavigatorSafeRunnable() {
+			@Override
 			public void run() throws Exception {
 				if (filterExpression != null) {
 					if (element.getAttribute(ATT_CLASS) != null) {
@@ -140,11 +145,7 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 		return SkeletonViewerFilter.INSTANCE;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
 	public String toString() {
 		return "CommonFilterDescriptor[" + getName() + " (" + getId() + ")]"; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.ui.views.markers.internal.ProblemFilter;
 
 /**
  * Test the loading and unloading of the marker support components.
- * 
+ *
  * @since 3.2
  */
 public class MarkerSupportTests extends DynamicTestCase {
@@ -81,11 +81,7 @@ public class MarkerSupportTests extends DynamicTestCase {
 		assertFalse(hasHierarchy());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
-	 */
+	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.markerSupport.DynamicTestsSubCategoryProvider";
 	}
@@ -93,7 +89,7 @@ public class MarkerSupportTests extends DynamicTestCase {
 	/**
 	 * Return whether or not there is a hierarchy for the dynamic type or if it
 	 * is using the default.
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean hasHierarchy() {
@@ -103,21 +99,22 @@ public class MarkerSupportTests extends DynamicTestCase {
 	}
 
 	private boolean hasMarkerGroup() {
-		Iterator groups = MarkerSupportRegistry.getInstance()
+		Iterator<MarkerGroup> groups = MarkerSupportRegistry.getInstance()
 		.getMarkerGroups().iterator();
-		
+
 		while (groups.hasNext()) {
-			MarkerGroup element = (MarkerGroup) groups.next();
-			if(element.getField().getDescription().equals("Dynamic Test Grouping"))
+			MarkerGroup element = groups.next();
+			if(element.getField().getDescription().equals("Dynamic Test Grouping")) {
 				return true;
+			}
 		}
-		
+
 		return false;
 	}
 
 	/**
 	 * Return whether or not there is a filter for the dynamic category
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean hasCategory() {
@@ -127,53 +124,38 @@ public class MarkerSupportTests extends DynamicTestCase {
 
 	/**
 	 * Return whether or not there is a filter for id.
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
 	private boolean hasFilter(String id) {
-		Iterator filters = MarkerSupportRegistry.getInstance()
+		Iterator<ProblemFilter> filters = MarkerSupportRegistry.getInstance()
 				.getRegisteredFilters().iterator();
 		while (filters.hasNext()) {
-			ProblemFilter filter = (ProblemFilter) filters.next();
-			if (id.equals(filter.getId()))
+			ProblemFilter filter = filters.next();
+			if (id.equals(filter.getId())) {
 				return true;
+			}
 		}
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
-	 */
+	@Override
 	protected String getExtensionId() {
 		return "newProblemFilter.testDynamicFilterAddition";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
-	 */
+	@Override
 	protected String getExtensionPoint() {
 		return MarkerSupportRegistry.MARKER_SUPPORT;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
-	 */
+	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newMarkerSupport";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getDeclaringNamespace()
-	 */
+	@Override
 	protected String getDeclaringNamespace() {
 		return IDEWorkbenchPlugin.IDE_WORKBENCH;
 	}

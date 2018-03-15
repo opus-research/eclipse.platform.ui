@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,9 +23,9 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * The PriorityConfigurationArea is the configuration area for the task
  * priority.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class PriorityConfigurationArea extends FilterConfigurationArea {
 
@@ -41,33 +41,21 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
-	 */
+	@Override
 	public void apply(MarkerFieldFilter filter) {
 		((PriorityMarkerFieldFilter) filter).selectedPriorities = priorities;
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createContents(Composite parent) {
-		
+
 		parent.setLayout(new GridLayout(3,false));
 
 		highButton = new Button(parent, SWT.CHECK);
 		highButton.setText(MarkerMessages.filtersDialog_priorityHigh);
 		highButton.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updatePriorities(PriorityMarkerFieldFilter.PRIORITY_HIGH,
 						highButton.getSelection());
@@ -78,11 +66,7 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 		normalButton = new Button(parent, SWT.CHECK);
 		normalButton.setText(MarkerMessages.filtersDialog_priorityNormal);
 		normalButton.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updatePriorities(PriorityMarkerFieldFilter.PRIORITY_NORMAL,
 						normalButton.getSelection());
@@ -92,11 +76,7 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 		lowButton = new Button(parent, SWT.CHECK);
 		lowButton.setText(MarkerMessages.filtersDialog_priorityLow);
 		lowButton.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updatePriorities(PriorityMarkerFieldFilter.PRIORITY_LOW,
 						lowButton.getSelection());
@@ -106,7 +86,7 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 
 	/**
 	 * Update he priorities set based on the constant and the selection value.
-	 * 
+	 *
 	 * @param constant
 	 * @param enabled
 	 */
@@ -119,9 +99,7 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
-	 */
+	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		priorities = ((PriorityMarkerFieldFilter) filter).selectedPriorities;
 
@@ -133,10 +111,8 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 				.setSelection((PriorityMarkerFieldFilter.PRIORITY_HIGH & priorities) > 0);
 
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#getTitle()
-	 */
+
+	@Override
 	public String getTitle() {
 		return MarkerMessages.filtersDialog_priorityTitle;
 	}

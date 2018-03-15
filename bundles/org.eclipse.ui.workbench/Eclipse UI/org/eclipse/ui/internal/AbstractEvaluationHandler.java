@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IEvaluationReference;
 import org.eclipse.ui.services.IEvaluationService;
@@ -21,7 +21,7 @@ import org.eclipse.ui.services.IEvaluationService;
 /**
  * This internal class serves as a foundation for any handler that would like
  * its enabled state controlled by core expressions and the IEvaluationService.
- * 
+ *
  * @since 3.3
  */
 public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
@@ -32,7 +32,7 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 
 	protected IEvaluationService getEvaluationService() {
 		if (evaluationService == null) {
-			evaluationService = (IEvaluationService) PlatformUI.getWorkbench()
+			evaluationService = PlatformUI.getWorkbench()
 					.getService(IEvaluationService.class);
 		}
 		return evaluationService;
@@ -51,15 +51,13 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 	 */
 	private IPropertyChangeListener getEnablementListener() {
 		if (enablementListener == null) {
-			enablementListener = new IPropertyChangeListener() {
-				public void propertyChange(PropertyChangeEvent event) {
-					if (event.getProperty() == PROP_ENABLED) {
-						if (event.getNewValue() instanceof Boolean) {
-							setEnabled(((Boolean) event.getNewValue())
-									.booleanValue());
-						} else {
-							setEnabled(false);
-						}
+			enablementListener = event -> {
+				if (event.getProperty() == PROP_ENABLED) {
+					if (event.getNewValue() instanceof Boolean) {
+						setEnabled(((Boolean) event.getNewValue())
+								.booleanValue());
+					} else {
+						setEnabled(false);
 					}
 				}
 			};
@@ -67,11 +65,7 @@ public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {
 		return enablementListener;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
-	 */
+	@Override
 	public void dispose() {
 		if (enablementRef != null) {
 			evaluationService.removeEvaluationListener(enablementRef);

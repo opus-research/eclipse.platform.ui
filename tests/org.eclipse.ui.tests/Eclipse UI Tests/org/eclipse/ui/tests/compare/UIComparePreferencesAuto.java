@@ -10,20 +10,18 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.compare;
 
-import java.util.Iterator;
-
-import junit.framework.TestCase;
-
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.help.WorkbenchHelp;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.tests.dialogs.PreferenceDialogWrapper;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
+
+import junit.framework.TestCase;
 
 public class UIComparePreferencesAuto extends TestCase {
 
@@ -42,24 +40,24 @@ public class UIComparePreferencesAuto extends TestCase {
         if (manager != null) {
             dialog = new PreferenceDialogWrapper(getShell(), manager);
             dialog.create();
-            WorkbenchHelp.setHelp(dialog.getShell(),
+            PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
                     IWorkbenchHelpContextIds.PREFERENCE_DIALOG);
 
-            for (Iterator iterator = manager.getElements(
-                    PreferenceManager.PRE_ORDER).iterator(); iterator.hasNext();) {
-                IPreferenceNode node = (IPreferenceNode) iterator.next();
-                if (node.getId().equals(id)) {
-                    dialog.showPage(node);
-                    break;
-                }
+            for (Object element : manager.getElements(
+                    PreferenceManager.PRE_ORDER)) {
+            IPreferenceNode node = (IPreferenceNode) element;
+            if (node.getId().equals(id)) {
+			dialog.showPage(node);
+			break;
             }
+         }
         }
         return dialog;
     }
 
     public void testCompareViewersPref() {
         Dialog dialog = getPreferenceDialog("org.eclipse.compare.internal.ComparePreferencePage");
-        DialogCheck.assertDialogTexts(dialog, this);
+        DialogCheck.assertDialogTexts(dialog);
     }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ import org.eclipse.ui.internal.wizards.datatransfer.WizardArchiveFileResourceExp
  * dialog.open();
  * </pre>
  * During the call to <code>open</code>, the wizard dialog is presented to the
- * user. When the user hits Finish, the user-selected workspace resources 
+ * user. When the user hits Finish, the user-selected workspace resources
  * are exported to the user-specified zip file, the dialog closes, and the call
  * to <code>open</code> returns.
  * </p>
@@ -64,19 +64,15 @@ public class ZipFileExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizard.
-     */
-    public void addPages() {
+    @Override
+	public void addPages() {
         super.addPages();
         mainPage = new WizardArchiveFileResourceExportPage1(selection);
         addPage(mainPage);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchWizard.
-     */
-    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    @Override
+	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.selection = currentSelection;
         List selectedResources = IDE.computeSelectedResources(currentSelection);
         if (!selectedResources.isEmpty()) {
@@ -88,10 +84,8 @@ public class ZipFileExportWizard extends Wizard implements IExportWizard {
         setNeedsProgressMonitor(true);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizard.
-     */
-    public boolean performFinish() {
+    @Override
+	public boolean performFinish() {
         return mainPage.finish();
     }
 }

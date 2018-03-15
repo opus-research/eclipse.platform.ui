@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,9 +23,9 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * CompletionConfigurationField is the field for the configuration of filters
  * based on configurations.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class CompletionConfigurationArea extends FilterConfigurationArea {
 
@@ -40,19 +40,13 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
-	 */
+	@Override
 	public void apply(MarkerFieldFilter filter) {
 		((CompletionFieldFilter) filter).setCompletion(completionState);
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createContents(Composite parent) {
 
 		GridLayout layout = new GridLayout(2, false);
@@ -63,11 +57,7 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 		completeButton = new Button(parent, SWT.CHECK);
 		completeButton.setText(MarkerMessages.filtersDialog_statusComplete);
 		completeButton.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateCompletion(CompletionFieldFilter.COMPLETED,
 						completeButton.getSelection());
@@ -78,11 +68,7 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 		incompleteButton = new Button(parent, SWT.CHECK);
 		incompleteButton.setText(MarkerMessages.filtersDialog_statusIncomplete);
 		incompleteButton.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateCompletion(CompletionFieldFilter.NOT_COMPLETED,
 						incompleteButton.getSelection());
@@ -94,7 +80,7 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 	/**
 	 * Update the completion value based on the constant and the selection
 	 * value.
-	 * 
+	 *
 	 * @param constant
 	 * @param enabled
 	 */
@@ -107,11 +93,7 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
-	 */
+	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		completionState = ((CompletionFieldFilter) filter).getCompletion();
 
@@ -121,10 +103,8 @@ public class CompletionConfigurationArea extends FilterConfigurationArea {
 				.setSelection((CompletionFieldFilter.NOT_COMPLETED & completionState) > 0);
 
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#getTitle()
-	 */
+
+	@Override
 	public String getTitle() {
 		return MarkerMessages.filtersDialog_completionTitle;
 	}

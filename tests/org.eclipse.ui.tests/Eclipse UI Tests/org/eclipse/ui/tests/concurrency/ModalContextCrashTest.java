@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,19 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.concurrency;
 
 import java.lang.reflect.InvocationTargetException;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.IThreadListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+
+import junit.framework.TestCase;
 
 /**
  * Makes ModalContext thread crash and hang the IDE
@@ -34,18 +35,24 @@ public class ModalContextCrashTest extends TestCase {
 		catch (InvocationTargetException e){
 			//We should get this
 		}
+		if (Thread.interrupted()) {
+			fail("Thread was interrupted at end of test");
+		}
 	}
 
 	private static final class CrashingRunnable implements IRunnableWithProgress, IThreadListener {
 
-		public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		@Override
+		public void run(IProgressMonitor monitor) {
 		}
 
+		@Override
 		public void threadChange(Thread thread) {
-			// only throw the exception in the finally block 
+			// only throw the exception in the finally block
 			// of ModalContextThread
-			if (Display.findDisplay(thread) != null)
+			if (Display.findDisplay(thread) != null) {
 				throw new RuntimeException("Simulated exception during threadChange");
+			}
 		}
 	}
 

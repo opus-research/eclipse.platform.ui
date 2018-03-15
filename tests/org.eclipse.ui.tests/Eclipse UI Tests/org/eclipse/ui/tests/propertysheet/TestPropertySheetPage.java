@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Versant  and others.
+ * Copyright (c) 2008, 2017 Versant  and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,44 +19,29 @@ import org.eclipse.ui.views.properties.PropertySheetPage;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class TestPropertySheetPage extends PropertySheetPage implements
-		IPropertySheetPage, IAdapterFactory {
+		IAdapterFactory {
 
 	private ISelection fSelection;
 	private IWorkbenchPart fPart;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
-	 * java.lang.Class)
-	 */
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
 		// singleton cleanup
 		fSelection = null;
 		fPart = null;
-		return this;
+		return (T) this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
-	 */
-	public Class[] getAdapterList() {
+	@Override
+	public Class<?>[] getAdapterList() {
 		return new Class[] { IPropertySheetPage.class };
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.views.properties.PropertySheetPage#selectionChanged(org
-	 * .eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-	 */
+	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		super.selectionChanged(part, selection);
 		fPart = part;

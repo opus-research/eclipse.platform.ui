@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ public final class HyperlinkEvent extends TypedEvent {
 	private int stateMask;
 	/**
 	 * Creates a new hyperlink
-	 * 
+	 *
 	 * @param widget
 	 *            event source
 	 * @param href
@@ -44,7 +44,7 @@ public final class HyperlinkEvent extends TypedEvent {
 	/**
 	 * The hyperlink reference that will be followed when the hyperlink is
 	 * activated.
-	 * 
+	 *
 	 * @return the hyperlink reference object
 	 */
 	public Object getHref() {
@@ -52,7 +52,7 @@ public final class HyperlinkEvent extends TypedEvent {
 	}
 	/**
 	 * The text of the hyperlink rendered in the source widget.
-	 * 
+	 *
 	 * @return the hyperlink label
 	 */
 	public String getLabel() {
@@ -61,7 +61,7 @@ public final class HyperlinkEvent extends TypedEvent {
 	/**
 	 * Returns the value of the keyboard state mask present when
 	 * the event occured, or SWT.NULL for no modifiers.
-	 * @return the keyboard state mask or <code>SWT.NULL</code>. 
+	 * @return the keyboard state mask or <code>SWT.NULL</code>.
 	 */
 	public int getStateMask() {
 		return stateMask;

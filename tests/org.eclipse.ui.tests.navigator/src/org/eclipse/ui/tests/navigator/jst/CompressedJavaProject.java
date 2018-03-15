@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,13 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Oakland Software Incorporated - Added to CNF tests
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator.jst;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -33,10 +33,12 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 		this.project = project;
 	}
 
+	@Override
 	public Image getImage() {
 		return null;
 	}
 
+	@Override
 	public String getLabel() {
 		return determineLabel();
 	}
@@ -58,6 +60,7 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 		return project;
 	}
 
+	@Override
 	public Object[] getChildren(ITreeContentProvider delegateContentProvider) {
 
 		List nonExternalSourceFolders = getNonExternalSourceFolders();
@@ -73,7 +76,6 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 	}
 
 	public List getNonExternalSourceFolders() {
-		List nonExternalSourceFolders = null;
 		Object[] sourceFolders;
 		try {
 			Object jProject = WebJavaContentProvider
@@ -81,13 +83,11 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 			Method m = WebJavaContentProvider.IJAVA_PROJECT_CLASS.getMethod(
 					"getPackageFragmentRoots", new Class[] {});
 			sourceFolders = (Object[]) m.invoke(jProject, new Object[] {});
-			nonExternalSourceFolders = new ArrayList(Arrays
+			return new ArrayList(Arrays
 					.asList(sourceFolders));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return nonExternalSourceFolders != null ? nonExternalSourceFolders
-				: Collections.EMPTY_LIST;
 	}
 
 	public CompressedJavaLibraries getCompressedJavaLibraries() {
@@ -97,7 +97,8 @@ public class CompressedJavaProject implements ICompressedNode, IAdaptable {
 
 	}
 
-	public Object getAdapter(Class adapter) {
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 

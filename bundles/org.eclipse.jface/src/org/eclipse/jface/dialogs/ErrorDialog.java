@@ -1,18 +1,24 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- * 		IBM Corporation - initial API and implementation 
+ * 		IBM Corporation - initial API and implementation
  * 		Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font should
  * 			be activated and used by other components.
- *      Krzysztof Daniel <krzysztof.daniel@gmail.com> Bug 96373 - [ErrorHandling] 
+ *      Krzysztof Daniel <krzysztof.daniel@gmail.com> Bug 96373 - [ErrorHandling]
  *          ErrorDialog details area becomes huge with multi-line strings
+ *      Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -42,7 +48,7 @@ import org.eclipse.swt.widgets.Shell;
  * <code>IStatus</code> object. If an error contains additional detailed
  * information then a Details button is automatically supplied, which shows or
  * hides an error details viewer when pressed by the user.
- * 
+ *
  * <p>
  * This dialog should be considered being a "local" way of error handling. It
  * cannot be changed or replaced by "global" error handling facility (
@@ -51,7 +57,7 @@ import org.eclipse.swt.widgets.Shell;
  * so until it is absolutely necessary, <code>StatusManager</code> should be
  * used.
  * </p>
- * 
+ *
  * @see org.eclipse.core.runtime.IStatus
  */
 public class ErrorDialog extends IconAndMessageDialog {
@@ -114,7 +120,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * dialog will only be displayed if there is at least one child status
 	 * matching the mask.
 	 * </p>
-	 * 
+	 *
 	 * @param parentShell
 	 *            the shell under which to create this dialog
 	 * @param dialogTitle
@@ -138,20 +144,19 @@ public class ErrorDialog extends IconAndMessageDialog {
 				.getString("Problem_Occurred") : //$NON-NLS-1$
 				dialogTitle;
 		this.message = message == null ? status.getMessage()
-				: JFaceResources
-						.format(
-								"Reason", new Object[] { message, status.getMessage() }); //$NON-NLS-1$
+				: JFaceResources.format("Reason", message, status.getMessage()); //$NON-NLS-1$
 		this.status = status;
 		this.displayMask = displayMask;
 	}
 
 	/*
-	 * (non-Javadoc) Method declared on Dialog. Handles the pressing of the Ok
-	 * or Details button in this dialog. If the Ok button was pressed then close
-	 * this dialog. If the Details button was pressed then toggle the displaying
-	 * of the error details area. Note that the Details button will only be
-	 * visible if the error being displayed specifies child details.
+	 * Handles the pressing of the Ok or Details button in this dialog. If the
+	 * Ok button was pressed then close this dialog. If the Details button was
+	 * pressed then toggle the displaying of the error details area. Note that
+	 * the Details button will only be visible if the error being displayed
+	 * specifies child details.
 	 */
+	@Override
 	protected void buttonPressed(int id) {
 		if (id == IDialogConstants.DETAILS_ID) {
 			// was the details button pressed?
@@ -161,19 +166,13 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared in Window.
-	 */
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(title);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// create OK and Details buttons
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
@@ -183,7 +182,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 	/**
 	 * Create the area for extra error support information.
-	 * 
+	 *
 	 * @param parent
 	 */
 	private void createSupportArea(Composite parent) {
@@ -192,7 +191,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		if (provider == null)
 			return;
-		
+
 		if(!provider.validFor(status)){
 			return;
 		}
@@ -215,7 +214,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 	/**
 	 * Create the details button if it should be included.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @since 3.2
@@ -232,12 +231,13 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * and lays out a composite. Subclasses that require a different dialog area
 	 * may either override this method, or call the <code>super</code>
 	 * implementation and add controls to the created composite.
-	 * 
+	 *
 	 * Note:  Since 3.4, the created composite no longer grabs excess vertical space.
 	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=72489.
 	 * If the old behavior is desired by subclasses, get the returned composite's
 	 * layout data and set grabExcessVerticalSpace to true.
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		// Create a composite with standard margins and spacing
 		// Add the messageArea to this composite so that as subclasses add widgets to the messageArea
@@ -262,9 +262,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 		return composite;
 	}
 
-	/*
-	 * @see IconAndMessageDialog#createDialogAndButtonArea(Composite)
-	 */
+	@Override
 	protected void createDialogAndButtonArea(Composite parent) {
 		super.createDialogAndButtonArea(parent);
 		if (this.dialogArea instanceof Composite) {
@@ -276,11 +274,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getImage()
-	 */
+	@Override
 	protected Image getImage() {
 		if (status != null) {
 			if (status.getSeverity() == IStatus.WARNING) {
@@ -297,11 +291,11 @@ public class ErrorDialog extends IconAndMessageDialog {
 	/**
 	 * Create this dialog's drop-down list component. The list is displayed
 	 * after the user presses details button. It is developer responsibility
-	 * to display details button if and only if there is some content on 
+	 * to display details button if and only if there is some content on
 	 * drop down list. The visibility of the details button is controlled by
 	 * {@link #shouldShowDetailsButton()}, which should also be overridden
 	 * together with this method.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @return the drop-down list component
@@ -323,16 +317,12 @@ public class ErrorDialog extends IconAndMessageDialog {
 		Menu copyMenu = new Menu(list);
 		MenuItem copyItem = new MenuItem(copyMenu, SWT.NONE);
 		copyItem.addSelectionListener(new SelectionListener() {
-			/*
-			 * @see SelectionListener.widgetSelected (SelectionEvent)
-			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
 			}
 
-			/*
-			 * @see SelectionListener.widgetDefaultSelected(SelectionEvent)
-			 */
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				copyToClipboard();
 			}
@@ -343,15 +333,13 @@ public class ErrorDialog extends IconAndMessageDialog {
 		return list;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Window.
-	 */
 	/**
 	 * Extends <code>Window.open()</code>. Opens an error dialog to display
 	 * the error. If you specified a mask to filter the displaying of these
 	 * children, the error dialog will only be displayed if there is at least
 	 * one child status matching the mask.
 	 */
+	@Override
 	public int open() {
 		if (!AUTOMATED_MODE && shouldDisplay(status, displayMask)) {
 			return super.open();
@@ -364,7 +352,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * Opens an error dialog to display the given error. Use this method if the
 	 * error object being displayed does not contain child items, or if you wish
 	 * to display all such items without filtering.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent shell of the dialog, or <code>null</code> if none
 	 * @param dialogTitle
@@ -393,7 +381,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * to specify a mask which will be used to filter the displaying of these
 	 * children. The error dialog will only be displayed if there is at least
 	 * one child status matching the mask.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell of the dialog, or <code>null</code> if none
 	 * @param title
@@ -426,23 +414,23 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * the child static of the status object and displays them in a list. The
 	 * format for each entry is status_path : status_message If the status's
 	 * path was null then it (and the colon) are omitted.
-	 * 
+	 *
 	 * @param listToPopulate
 	 *            The list to fill.
-	 * 
+	 *
 	 * @see #listContentExists()
 	 */
 	private void populateList(List listToPopulate) {
 		populateList(listToPopulate, status, 0,
 				shouldIncludeTopLevelErrorInDetails);
 	}
-	
+
 	/**
 	 * This method checks if any content will be placed on the list.
 	 * It mimics the behavior of {@link #populateList(List)}.
-	 * 
+	 *
 	 * @return true if {@link #populateList(List)} will add anything to a list
-	 * 
+	 *
 	 * @see #populateList(List)
 	 */
 	private boolean listContentExists() {
@@ -453,7 +441,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * Populate the list with the messages from the given status. Traverse the
 	 * children of the status deeply and also traverse CoreExceptions that
 	 * appear in the status.
-	 * 
+	 *
 	 * @param listToPopulate
 	 *            the list to populate
 	 * @param buildingStatus
@@ -473,23 +461,25 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 
 		Throwable t = buildingStatus.getException();
-		boolean isCoreException = t instanceof CoreException;
 		boolean incrementNesting = false;
 
 		if (includeStatus) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < nesting; i++) {
 				sb.append(NESTING_INDENT);
 			}
 			String message = buildingStatus.getMessage();
 			sb.append(message);
-			listToPopulate.add(sb.toString());
+			java.util.List<String> lines = readLines(sb.toString());
+			for (String line : lines) {
+				listToPopulate.add(line);
+			}
 			incrementNesting = true;
 		}
 
-		if (!isCoreException && t != null) {
+		if (!(t instanceof CoreException) && t != null) {
 			// Include low-level exception message
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < nesting; i++) {
 				sb.append(NESTING_INDENT);
 			}
@@ -508,7 +498,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 
 		// Look for a nested core exception
-		if (isCoreException) {
+		if (t instanceof CoreException) {
 			CoreException ce = (CoreException) t;
 			IStatus eStatus = ce.getStatus();
 			// Only print the exception message if it is not contained in the
@@ -520,15 +510,30 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		// Look for child status
 		IStatus[] children = buildingStatus.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			populateList(listToPopulate, children[i], nesting, true);
+		for (IStatus element : children) {
+			populateList(listToPopulate, element, nesting, true);
 		}
 	}
-	
+
+	private static java.util.List<String> readLines(final String s) {
+		java.util.List<String> lines = new ArrayList<>();
+		BufferedReader reader = new BufferedReader(new StringReader(s));
+		String line;
+		try {
+			while ((line = reader.readLine()) != null) {
+				if (line.length() > 0)
+					lines.add(line);
+			}
+		} catch (IOException e) {
+			// shouldn't get this
+		}
+		return lines;
+	}
+
 	/**
 	 * This method checks if {@link #populateList(List, IStatus, int, boolean)}
 	 * will add anything to the list.
-	 * 
+	 *
 	 * @param buildingStatus
 	 *            A status to be considered.
 	 * @param includeStatus
@@ -539,26 +544,24 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 */
 	private boolean listContentExists(IStatus buildingStatus,
 			boolean includeStatus) {
-		
+
 		if (!buildingStatus.matches(displayMask)) {
 			return false;
 		}
 
 		Throwable t = buildingStatus.getException();
-		boolean isCoreException = t instanceof CoreException;
-
 		if (includeStatus) {
 			return true;
 		}
 
-		if (!isCoreException && t != null) {
+		if (!(t instanceof CoreException) && t != null) {
 			return true;
 		}
-		
+
 		boolean result = false;
 
 		// Look for a nested core exception
-		if (isCoreException) {
+		if (t instanceof CoreException) {
 			CoreException ce = (CoreException) t;
 			IStatus eStatus = ce.getStatus();
 			// Gets exception message if it is not contained in the
@@ -570,16 +573,16 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		// Look for child status
 		IStatus[] children = buildingStatus.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			result |= listContentExists(children[i], true);
+		for (IStatus element : children) {
+			result |= listContentExists(element, true);
 		}
-		
+
 		return result;
 	}
 
 	/**
 	 * Returns whether the given status object should be displayed.
-	 * 
+	 *
 	 * @param status
 	 *            a status object
 	 * @param mask
@@ -593,8 +596,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 		if (children == null || children.length == 0) {
 			return status.matches(mask);
 		}
-		for (int i = 0; i < children.length; i++) {
-			if (children[i].matches(mask)) {
+		for (IStatus element : children) {
+			if (element.matches(mask)) {
 				return true;
 			}
 		}
@@ -630,13 +633,13 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 	/**
 	 * Put the details of the status of the error onto the stream.
-	 * 
+	 *
 	 * @param buildingStatus
 	 * @param buffer
 	 * @param nesting
 	 */
 	private void populateCopyBuffer(IStatus buildingStatus,
-			StringBuffer buffer, int nesting) {
+			StringBuilder buffer, int nesting) {
 		if (!buildingStatus.matches(displayMask)) {
 			return;
 		}
@@ -665,8 +668,8 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 
 		IStatus[] children = buildingStatus.getChildren();
-		for (int i = 0; i < children.length; i++) {
-			populateCopyBuffer(children[i], buffer, nesting + 1);
+		for (IStatus element : children) {
+			populateCopyBuffer(element, buffer, nesting + 1);
 		}
 	}
 
@@ -677,18 +680,14 @@ public class ErrorDialog extends IconAndMessageDialog {
 		if (clipboard != null) {
 			clipboard.dispose();
 		}
-		StringBuffer statusBuffer = new StringBuffer();
+		StringBuilder statusBuffer = new StringBuilder();
 		populateCopyBuffer(status, statusBuffer, 0);
 		clipboard = new Clipboard(list.getDisplay());
 		clipboard.setContents(new Object[] { statusBuffer.toString() },
 				new Transfer[] { TextTransfer.getInstance() });
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Window#close()
-	 */
+	@Override
 	public boolean close() {
 		if (clipboard != null) {
 			clipboard.dispose();
@@ -703,7 +702,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * method has been invoked and has returned the control for the content area
 	 * of the dialog. Invoking the method before the content area has been set
 	 * or after the dialog has been disposed will have no effect.
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	protected final void showDetailsArea() {
@@ -718,9 +717,9 @@ public class ErrorDialog extends IconAndMessageDialog {
 	/**
 	 * Return whether the Details button should be included. This method is
 	 * invoked once when the dialog is built. Default implementation is tight to
-	 * default implementation of {@link #createDropDownList(Composite)} and 
+	 * default implementation of {@link #createDropDownList(Composite)} and
 	 * displays details button if there is anything on the display list.
-	 * 
+	 *
 	 * @return whether the Details button should be included
 	 * @since 3.1
 	 * @see #createDropDownList(Composite)
@@ -733,7 +732,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * Set the status displayed by this error dialog to the given status. This
 	 * only affects the status displayed by the Details list. The message, image
 	 * and title should be updated by the subclass, if desired.
-	 * 
+	 *
 	 * @param status
 	 *            the status to be displayed in the details list
 	 * @since 3.1
@@ -758,20 +757,15 @@ public class ErrorDialog extends IconAndMessageDialog {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getColumnCount()
-	 */
+	@Override
 	int getColumnCount() {
 		if (Policy.getErrorSupportProvider() == null)
 			return 2;
 		return 3;
 	}
-	
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
-    protected boolean isResizable() {
+
+    @Override
+	protected boolean isResizable() {
     	return true;
     }
 

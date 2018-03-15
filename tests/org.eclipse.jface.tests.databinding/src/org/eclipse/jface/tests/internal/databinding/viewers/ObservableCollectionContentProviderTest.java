@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2017 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class ObservableCollectionContentProviderTest extends
 		AbstractDefaultRealmTestCase {
@@ -33,12 +33,14 @@ public class ObservableCollectionContentProviderTest extends
 	private TableViewer viewer;
 	ObservableListContentProvider contentProvider;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		viewer = new TableViewer(shell);
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		shell = null;
@@ -69,5 +71,15 @@ public class ObservableCollectionContentProviderTest extends
 		assertEquals(0, changeTracker.count);
 		assertEquals(1, disposeTracker.count);
 		assertTrue(knownElements.isDisposed());
+	}
+
+	public void testKnownElementsAreFilledOnSettingAFilledCollectionAsInput() {
+		final IObservableList input = new WritableList(Collections.singletonList("element"), null);
+		contentProvider = new ObservableListContentProvider();
+		contentProvider.inputChanged(viewer, null, input);
+
+		IObservableSet knownElements = contentProvider.getKnownElements();
+		assertEquals(1, knownElements.size());
+		assertTrue(knownElements.containsAll(input));
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.ui.tests.activities;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,21 +22,13 @@ import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.activities.ActivityEvent;
-import org.eclipse.ui.activities.ActivityManagerEvent;
-import org.eclipse.ui.activities.CategoryEvent;
 import org.eclipse.ui.activities.IActivity;
-import org.eclipse.ui.activities.IActivityListener;
-import org.eclipse.ui.activities.IActivityManagerListener;
 import org.eclipse.ui.activities.IActivityPatternBinding;
 import org.eclipse.ui.activities.IActivityRequirementBinding;
 import org.eclipse.ui.activities.ICategory;
 import org.eclipse.ui.activities.ICategoryActivityBinding;
-import org.eclipse.ui.activities.ICategoryListener;
 import org.eclipse.ui.activities.IIdentifier;
-import org.eclipse.ui.activities.IIdentifierListener;
 import org.eclipse.ui.activities.IWorkbenchActivitySupport;
-import org.eclipse.ui.activities.IdentifierEvent;
 import org.eclipse.ui.activities.NotDefinedException;
 import org.eclipse.ui.activities.WorkbenchTriggerPointAdvisor;
 import org.eclipse.ui.internal.activities.MutableActivityManager;
@@ -44,7 +36,7 @@ import org.eclipse.ui.tests.TestPlugin;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- * 
+ *
  * The dynamic test manipualtes the categories, activities and their definitions
  * and ensures that their content and their listeners are behaving properly.
  */
@@ -76,12 +68,12 @@ public class DynamicTest extends UITestCase {
     static final int ACTIVITY_ACTIVITY_BINDINGS_CHANGED = 9;
 
     static final int DESCRIPTION_CHANGED = 10;
-    
+
     static final int DEFAULT_ENABLED_CHANGED = 11;
 
     /**
      * Constructor.
-     * 
+     *
      * @param testName
      *            Test's name.
      */
@@ -94,7 +86,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test sizes of what has been read.
-     *  
+     *
      */
     public void testSizes() {
         assertTrue(activityManager.getDefinedCategoryIds().size() == 6);
@@ -104,13 +96,13 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test activity bindings.
-     *  
+     *
      */
     public void testActivityPatternBindings() {
         IActivity first_activity = activityManager
                 .getActivity((String) activityManager.getDefinedActivityIds()
                         .toArray()[0]);
-        Set initialPatternBindings = first_activity
+		Set<IActivityPatternBinding> initialPatternBindings = first_activity
                 .getActivityPatternBindings();
         // Add pattern binding
         String pattern = "org\\.eclipse\\.ui\\.myPattern/.*"; //$NON-NLS-1$
@@ -126,12 +118,12 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the enabled activities.
-     *  
+     *
      */
     public void testEnabledActivities() {
         // Add an enabled activity
-        Set compareSet;
-        Set copySet = new HashSet(activityManager.getEnabledActivityIds());
+		Set<String> compareSet;
+		Set copySet = new HashSet(activityManager.getEnabledActivityIds());
         copySet.add(activityManager.getDefinedActivityIds().toArray()[0]);
         activityManager.setEnabledActivityIds(copySet);
         compareSet = activityManager.getEnabledActivityIds();
@@ -145,36 +137,34 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the identifier listener.
-     *  
+     *
      */
     public void testIdentifiersListener() {
         final IIdentifier enabledIdentifier = activityManager
                 .getIdentifier("org.eclipse.pattern3"); //$NON-NLS-1$
         assertTrue(enabledIdentifier.isEnabled());
-        enabledIdentifier.addIdentifierListener(new IIdentifierListener() {
-            public void identifierChanged(IdentifierEvent identifierEvent) {
-                switch (listenerType) {
-                case ACTIVITY_ENABLED_CHANGED:
-                    assertTrue(identifierEvent.hasEnabledChanged());
-                    break;
-                case ACTIVITY_IDS_CHANGED:
-                    assertTrue(identifierEvent.hasActivityIdsChanged());
-                    break;
-                }
-                listenerType = -1;
-            }
-        });
+		enabledIdentifier.addIdentifierListener(identifierEvent -> {
+			switch (listenerType) {
+			case ACTIVITY_ENABLED_CHANGED:
+				assertTrue(identifierEvent.hasEnabledChanged());
+				break;
+			case ACTIVITY_IDS_CHANGED:
+				assertTrue(identifierEvent.hasActivityIdsChanged());
+				break;
+			}
+			listenerType = -1;
+		});
         // Test correcteness of identifier
         IIdentifier activitiesIdentifier = activityManager
                 .getIdentifier("org.eclipse.pattern4"); //$NON-NLS-1$
-        Set identifiedActivities = activitiesIdentifier.getActivityIds(); //$NON-NLS-1$
+		Set<String> identifiedActivities = activitiesIdentifier.getActivityIds(); // $NON-NLS-1$
         assertTrue(identifiedActivities.size() == 1);
         assertTrue(((String) identifiedActivities.toArray()[0])
                 .equals("org.eclipse.activity4")); //$NON-NLS-1$
         assertFalse(activitiesIdentifier.isEnabled());
         // Disable Enabled activity
         listenerType = 0;
-        Set copySet = new HashSet(activityManager.getEnabledActivityIds());
+		Set<String> copySet = new HashSet<>(activityManager.getEnabledActivityIds());
         copySet.remove(enabledIdentifier.getActivityIds().toArray()[0]);
         activityManager.setEnabledActivityIds(copySet);
         assertTrue(listenerType == -1);
@@ -189,7 +179,7 @@ public class DynamicTest extends UITestCase {
                 "org.eclipse.pattern3"); //$NON-NLS-1$ //$NON-NLS-2$
         assertTrue(listenerType == -1);
         // Test correctenesss of identifier
-        Set manipulatedIdentifiers = activityManager.getIdentifier(
+		Set<String> manipulatedIdentifiers = activityManager.getIdentifier(
                 "org.eclipse.pattern3").getActivityIds(); //$NON-NLS-1$
         assertTrue(manipulatedIdentifiers.size() == 2);
         // Remove pattern binding
@@ -203,33 +193,26 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the activity manager listener.
-     *  
+     *
      */
     public void testActivityManagerListener() {
-        activityManager
-                .addActivityManagerListener(new IActivityManagerListener() {
-                    public void activityManagerChanged(
-                            ActivityManagerEvent activityManagerEvent) {
-                        switch (listenerType) {
-                        case ENABLED_ACTIVITYIDS_CHANGED:
-                            assertTrue(activityManagerEvent
-                                    .haveEnabledActivityIdsChanged());
-                            break;
-                        case DEFINED_CATEGORYIDS_CHANGED:
-                            assertTrue(activityManagerEvent
-                                    .haveDefinedCategoryIdsChanged());
-                            break;
-                        case DEFINED_ACTIVITYIDS_CHANGED:
-                            assertTrue(activityManagerEvent
-                                    .haveDefinedActivityIdsChanged());
-                            break; 
-                        }
-                        listenerType = -1;
-                    }
-                });
+		activityManager.addActivityManagerListener(activityManagerEvent -> {
+			switch (listenerType) {
+			case ENABLED_ACTIVITYIDS_CHANGED:
+				assertTrue(activityManagerEvent.haveEnabledActivityIdsChanged());
+				break;
+			case DEFINED_CATEGORYIDS_CHANGED:
+				assertTrue(activityManagerEvent.haveDefinedCategoryIdsChanged());
+				break;
+			case DEFINED_ACTIVITYIDS_CHANGED:
+				assertTrue(activityManagerEvent.haveDefinedActivityIdsChanged());
+				break;
+			}
+			listenerType = -1;
+		});
         // Add an enabled activity
         listenerType = 2;
-        Set enabledSet = new HashSet(activityManager.getEnabledActivityIds());
+		Set<String> enabledSet = new HashSet<>(activityManager.getEnabledActivityIds());
         enabledSet.add("org.eclipse.activity19"); //$NON-NLS-1$
         activityManager.setEnabledActivityIds(enabledSet);
         assertTrue(listenerType == -1);
@@ -260,58 +243,50 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the activity listener.
-     *  
+     *
      */
     public void testActivityListener() {
+        final String activity_to_listen_name = "Activity 18"; //$NON-NLS-1$
         final IActivity activity_to_listen = activityManager
-                .getActivity((String) activityManager.getDefinedActivityIds()
-                        .toArray()[0]);
-        activity_to_listen.addActivityListener(new IActivityListener() {
-            public void activityChanged(ActivityEvent activityEvent) {
-                switch (listenerType) {
-                case DEFINED_CHANGED:
-                    assertTrue(activityEvent.hasDefinedChanged());
-                    break;
-                case ENABLED_CHANGED:
-                    assertTrue(activityEvent.hasEnabledChanged());
-                    break;
-                case NAME_CHANGED:
-                    assertTrue(activityEvent.hasNameChanged());
-                    break;
-                case PATTERN_BINDINGS_CHANGED:
-                    assertTrue(activityEvent
-                            .haveActivityPatternBindingsChanged());
-                    break;
-                case ACTIVITY_ACTIVITY_BINDINGS_CHANGED:
-                    assertTrue(activityEvent
-                            .haveActivityRequirementBindingsChanged());
-                    break;
-                case DESCRIPTION_CHANGED:
-                    assertTrue(activityEvent.hasDescriptionChanged());
-                    break;
-                case DEFAULT_ENABLED_CHANGED:
-                    assertTrue(activityEvent.hasDefaultEnabledChanged());
-                    break;
-                }
-                listenerType = -1;
-            }
-        });
+                .getActivity("org.eclipse.activity18"); //$NON-NLS-1$
+		activity_to_listen.addActivityListener(activityEvent -> {
+			switch (listenerType) {
+			case DEFINED_CHANGED:
+				assertTrue(activityEvent.hasDefinedChanged());
+				break;
+			case ENABLED_CHANGED:
+				assertTrue(activityEvent.hasEnabledChanged());
+				break;
+			case NAME_CHANGED:
+				assertTrue(activityEvent.hasNameChanged());
+				break;
+			case PATTERN_BINDINGS_CHANGED:
+				assertTrue(activityEvent.haveActivityPatternBindingsChanged());
+				break;
+			case ACTIVITY_ACTIVITY_BINDINGS_CHANGED:
+				assertTrue(activityEvent.haveActivityRequirementBindingsChanged());
+				break;
+			case DESCRIPTION_CHANGED:
+				assertTrue(activityEvent.hasDescriptionChanged());
+				break;
+			case DEFAULT_ENABLED_CHANGED:
+				assertTrue(activityEvent.hasDefaultEnabledChanged());
+				break;
+			}
+			listenerType = -1;
+		});
         // Remove activity and change name consequently
-        try {
-            fixedModelRegistry.removeActivity(activity_to_listen.getId(),
-                    activity_to_listen.getName());
-        } catch (NotDefinedException e) {
-            e.printStackTrace(System.err);
-        }
+        fixedModelRegistry.removeActivity(activity_to_listen.getId(),
+                activity_to_listen_name);
         assertTrue(listenerType == -1);
         // Add activity
         listenerType = 5;
         fixedModelRegistry.addActivity(activity_to_listen.getId(),
-                "Activity 18"); //$NON-NLS-1$ //$NON-NLS-2$
+                activity_to_listen_name);
         assertTrue(listenerType == -1);
         // Add to enabled activity
         listenerType = 6;
-        Set enabledSet = new HashSet(activityManager.getEnabledActivityIds());
+		Set<String> enabledSet = new HashSet<>(activityManager.getEnabledActivityIds());
         enabledSet.add(activity_to_listen.getId());
         activityManager.setEnabledActivityIds(enabledSet);
         assertTrue(listenerType == -1);
@@ -360,7 +335,7 @@ public class DynamicTest extends UITestCase {
         } catch (NotDefinedException e1) {
             fail(e1.getMessage());
         }
-        
+
         listenerType = DEFAULT_ENABLED_CHANGED;
         fixedModelRegistry.removeDefaultEnabledActivity(activity_to_listen.getId());
         assertTrue(listenerType == -1);
@@ -373,32 +348,29 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the category listener.
-     *  
+     *
      */
     public void testCategoryListener() {
         final ICategory category_to_listen = activityManager
                 .getCategory((String) activityManager.getDefinedCategoryIds()
                         .toArray()[0]);
-        category_to_listen.addCategoryListener(new ICategoryListener() {
-            public void categoryChanged(CategoryEvent categoryEvent) {
-                switch (listenerType) {
-                case DEFINED_CHANGED:
-                    assertTrue(categoryEvent.hasDefinedChanged());
-                    break;
-                case NAME_CHANGED:
-                    assertTrue(categoryEvent.hasNameChanged());
-                    break;
-                case PATTERN_BINDINGS_CHANGED:
-                    assertTrue(categoryEvent
-                            .haveCategoryActivityBindingsChanged());
-                    break;
-                case DESCRIPTION_CHANGED:
-                    //	assertTrue(categoryEvent.hasDescriptionChanged());
-                    break;
-                }
-                listenerType = -1;
-            }
-        });
+		category_to_listen.addCategoryListener(categoryEvent -> {
+			switch (listenerType) {
+			case DEFINED_CHANGED:
+				assertTrue(categoryEvent.hasDefinedChanged());
+				break;
+			case NAME_CHANGED:
+				assertTrue(categoryEvent.hasNameChanged());
+				break;
+			case PATTERN_BINDINGS_CHANGED:
+				assertTrue(categoryEvent.haveCategoryActivityBindingsChanged());
+				break;
+			case DESCRIPTION_CHANGED:
+				// assertTrue(categoryEvent.hasDescriptionChanged());
+				break;
+			}
+			listenerType = -1;
+		});
         // Remove category, and change name
         try {
             fixedModelRegistry.removeCategory(category_to_listen.getId(),
@@ -445,7 +417,7 @@ public class DynamicTest extends UITestCase {
         }
         assertTrue(listenerType == -1);
     }
-    
+
 	/**
 	 * Tests to ensure dynamism with regard to the extension registry.
 	 */
@@ -461,43 +433,27 @@ public class DynamicTest extends UITestCase {
 		// set to true when the activity/category in question have had an event
 		// fired
 		final boolean[] registryChanged = new boolean[] { false, false };
-		activity.addActivityListener(new IActivityListener() {
+		activity.addActivityListener(activityEvent -> registryChanged[0] = true);
+		category.addCategoryListener(categoryEvent -> {
+			System.err.println("categoryChanged");
+			registryChanged[1] = true;
 
-			public void activityChanged(ActivityEvent activityEvent) {
-				registryChanged[0] = true;
-
-			}
-		});
-		category.addCategoryListener(new ICategoryListener() {
-
-			public void categoryChanged(CategoryEvent categoryEvent) {
-				System.err.println("categoryChanged");
-				registryChanged[1] = true;
-
-			}
 		});
 
-		try {
-			String ACTIVITY = "<plugin><extension point=\"org.eclipse.ui.activities\">"
-					+ "<category id=\"dynamic.category\" name=\"Dynamic Activity Category\"/>"
-					+ "<activity id=\"dynamic.activity\" name=\"Dynamic Activity\"/>"
-					+ "<activity id=\"dynamic.parent\" name=\"Dynamic Parent Activity\"/>"
-					+ "<activityRequirementBinding requiredActivityId = \"dynamic.parent\" activityId = \"dynamic.activity\" />"
-					+ "<categoryActivityBinding categoryId = \"dynamic.category\" activityId = \"dynamic.activity\" />"
-					+ "<activityPatternBinding activityId=\"dynamic.activity\"  pattern=\"dynamic.activity/.*\"/>"
-					+ "<defaultEnablement id=\"dynamic.activity\"/>"
-					+ "</extension></plugin>";
-			byte[] bytes = ACTIVITY.toString().getBytes("UTF-8");
-			InputStream is = new ByteArrayInputStream(bytes);
-			IContributor contrib = ContributorFactoryOSGi
-					.createContributor(TestPlugin.getDefault().getBundle());
-			ExtensionRegistry registry = (ExtensionRegistry) RegistryFactory
-					.getRegistry();
-			if (!registry.addContribution(is, contrib, false, null, null,
-					registry.getTemporaryUserToken()))
-				throw new RuntimeException();
-		} catch (UnsupportedEncodingException e) {
-			fail(e.getMessage(), e);
+		String ACTIVITY = "<plugin><extension point=\"org.eclipse.ui.activities\">"
+				+ "<category id=\"dynamic.category\" name=\"Dynamic Activity Category\"/>"
+				+ "<activity id=\"dynamic.activity\" name=\"Dynamic Activity\"/>"
+				+ "<activity id=\"dynamic.parent\" name=\"Dynamic Parent Activity\"/>"
+				+ "<activityRequirementBinding requiredActivityId = \"dynamic.parent\" activityId = \"dynamic.activity\" />"
+				+ "<categoryActivityBinding categoryId = \"dynamic.category\" activityId = \"dynamic.activity\" />"
+				+ "<activityPatternBinding activityId=\"dynamic.activity\"  pattern=\"dynamic.activity/.*\"/>"
+				+ "<defaultEnablement id=\"dynamic.activity\"/>" + "</extension></plugin>";
+		byte[] bytes = ACTIVITY.toString().getBytes(StandardCharsets.UTF_8);
+		InputStream is = new ByteArrayInputStream(bytes);
+		IContributor contrib = ContributorFactoryOSGi.createContributor(TestPlugin.getDefault().getBundle());
+		ExtensionRegistry registry = (ExtensionRegistry) RegistryFactory.getRegistry();
+		if (!registry.addContribution(is, contrib, false, null, null, registry.getTemporaryUserToken())) {
+			throw new RuntimeException();
 		}
 
 		// spin the event loop and ensure that the changes come down the pipe.
@@ -507,9 +463,10 @@ public class DynamicTest extends UITestCase {
 				&& System.currentTimeMillis() < endTime) {
 
 			Display display = PlatformUI.getWorkbench().getDisplay();
-			if (display != null && !display.isDisposed())
-				while (display.readAndDispatch())
-					;
+			if (display != null && !display.isDisposed()) {
+				while (display.readAndDispatch()) {
+				}
+			}
 			display.sleep();
 
 		}
@@ -518,11 +475,10 @@ public class DynamicTest extends UITestCase {
 		assertTrue("Category Listener not called", registryChanged[1]);
 
 		assertTrue(activity.isDefined());
-		Set patternBindings = activity.getActivityPatternBindings();
+		Set<IActivityPatternBinding> patternBindings = activity.getActivityPatternBindings();
 		assertEquals(1, patternBindings.size());
 
-		IActivityPatternBinding patternBinding = (IActivityPatternBinding) patternBindings
-				.iterator().next();
+		IActivityPatternBinding patternBinding = patternBindings.iterator().next();
 
 		assertEquals("dynamic.activity/.*", patternBinding.getPattern()
 				.pattern());
@@ -534,20 +490,18 @@ public class DynamicTest extends UITestCase {
 			fail(e.getMessage(), e);
 		}
 
-		Set requirementBindings = activity.getActivityRequirementBindings();
+		Set<IActivityRequirementBinding> requirementBindings = activity.getActivityRequirementBindings();
 		assertEquals(1, requirementBindings.size());
 
-		IActivityRequirementBinding requirementBinding = (IActivityRequirementBinding) requirementBindings
-				.iterator().next();
+		IActivityRequirementBinding requirementBinding = requirementBindings.iterator().next();
 		assertEquals("dynamic.parent", requirementBinding
 				.getRequiredActivityId());
 		assertEquals("dynamic.activity", requirementBinding.getActivityId());
 
 		assertTrue(category.isDefined());
-		Set categoryBindings = category.getCategoryActivityBindings();
+		Set<ICategoryActivityBinding> categoryBindings = category.getCategoryActivityBindings();
 		assertEquals(1, categoryBindings.size());
-		ICategoryActivityBinding categoryBinding = (ICategoryActivityBinding) categoryBindings
-				.iterator().next();
+		ICategoryActivityBinding categoryBinding = categoryBindings.iterator().next();
 		assertEquals("dynamic.activity", categoryBinding.getActivityId());
 		assertEquals("dynamic.category", categoryBinding.getCategoryId());
 

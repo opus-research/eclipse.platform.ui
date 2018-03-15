@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 
 package org.eclipse.jface.tests.performance;
 
-import org.eclipse.jface.util.Assert;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -27,56 +28,50 @@ public class RefreshTestContentProvider implements IStructuredContentProvider {
 	static TestElement[] allElements;
 	public static int ELEMENT_COUNT = 10000;
 	TestElement[] currentElements;
-	
+
 	static{
 		allElements = new TestElement[ELEMENT_COUNT];
 		for (int i = 0; i < ELEMENT_COUNT; i++) {
-			allElements[i] = new TestElement(i);			
+			allElements[i] = new TestElement(i);
 		}
 	}
-	
+
 	void preSortElements(Viewer viewer, ViewerSorter sorter){
 		sorter.sort(viewer,currentElements);
-		
+
 	}
-	
+
 	public RefreshTestContentProvider(int size){
 		Assert.isTrue(size <= ELEMENT_COUNT);
 		setSize(size);
 	}
-	
+
 	/**
-	 * Set the size of the amount we are currently displaying 
+	 * Set the size of the amount we are currently displaying
 	 * to size.
 	 * @param size
 	 */
 	public void setSize(int size) {
-		
+
 		currentElements = new TestElement[size];
 		for (int i = 0; i < currentElements.length; i++) {
 			currentElements[i] = allElements[i];
 		}
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-	 */
+	@Override
 	public Object[] getElements(Object inputElement) {
 		return currentElements;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
+	@Override
 	public void dispose() {
 		currentElements = null;
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		//Do nothing here
 	}
@@ -88,15 +83,15 @@ public class RefreshTestContentProvider implements IStructuredContentProvider {
 	 */
 	public void refreshElements() {
 		for (int i = 0; i < ELEMENT_COUNT; i++) {
-			currentElements[i] = new TestElement(i + seed);			
+			currentElements[i] = new TestElement(i + seed);
 		}
 		seed += 257;
-		
-		
+
+
 	}
-	
+
 	public void cloneElements(){
-		currentElements = (TestElement [] )currentElements.clone();
+		currentElements = currentElements.clone();
 	}
 
 }

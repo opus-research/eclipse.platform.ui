@@ -63,13 +63,14 @@ public class ExamplesPlugin extends AbstractUIPlugin {
 		}
 	}
 
+	@Override
 	protected void initializeImageRegistry(ImageRegistry registry) {
 		registerImage(registry, IMG_FORM_BG, "form_banner.gif");
 		registerImage(registry, IMG_LARGE, "large_image.gif");
 		registerImage(registry, IMG_HORIZONTAL, "th_horizontal.gif");
 		registerImage(registry, IMG_VERTICAL, "th_vertical.gif");
-		registerImage(registry, IMG_SAMPLE, "sample.gif");
-		registerImage(registry, IMG_WIZBAN, "newprj_wiz.gif");
+		registerImage(registry, IMG_SAMPLE, "sample.png");
+		registerImage(registry, IMG_WIZBAN, "newprj_wiz.png");
 		registerImage(registry, IMG_LINKTO_HELP, "linkto_help.gif");
 		registerImage(registry, IMG_HELP_TOPIC, "topic.gif");
 		registerImage(registry, IMG_HELP_CONTAINER, "container_obj.gif");
@@ -131,6 +132,7 @@ public class ExamplesPlugin extends AbstractUIPlugin {
 	public ResourceBundle getResourceBundle() {
 		return resourceBundle;
 	}
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		try {
 			if (formColors != null) {

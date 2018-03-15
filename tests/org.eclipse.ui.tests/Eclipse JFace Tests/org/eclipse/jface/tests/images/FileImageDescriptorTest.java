@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -28,11 +26,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.tests.TestPlugin;
 import org.osgi.framework.Bundle;
 
+import junit.framework.TestCase;
+
 /**
  * Test loading a directory full of images.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class FileImageDescriptorTest extends TestCase {
 
@@ -40,7 +40,7 @@ public class FileImageDescriptorTest extends TestCase {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param name
 	 */
 	public FileImageDescriptorTest(String name) {
@@ -52,27 +52,28 @@ public class FileImageDescriptorTest extends TestCase {
 	 */
 	public void testFileImageDescriptorWorkbench() {
 
-		Class missing = null;
-		ArrayList images = new ArrayList();
+		Class<?> missing = null;
+		ArrayList<Image> images = new ArrayList<>();
 
 		Bundle bundle = TestPlugin.getDefault().getBundle();
-		Enumeration bundleEntries = bundle.getEntryPaths(IMAGES_DIRECTORY);
+		Enumeration<String> bundleEntries = bundle.getEntryPaths(IMAGES_DIRECTORY);
 
 		while (bundleEntries.hasMoreElements()) {
 			ImageDescriptor descriptor;
-			String localImagePath = (String) bundleEntries.nextElement();
+			String localImagePath = bundleEntries.nextElement();
 			URL[] files = FileLocator.findEntries(bundle, new Path(
 					localImagePath));
 
-			for (int i = 0; i < files.length; i++) {
+			for (URL file : files) {
 
 				// Skip any subdirectories added by version control
-				if (files[i].getPath().lastIndexOf('.') < 0)
+				if (file.getPath().lastIndexOf('.') < 0) {
 					continue;
+				}
 
 				try {
 					descriptor = ImageDescriptor.createFromFile(missing,
-							FileLocator.toFileURL(files[i]).getFile());
+							FileLocator.toFileURL(file).getFile());
 				} catch (IOException e) {
 					fail(e.getLocalizedMessage());
 					continue;
@@ -85,9 +86,9 @@ public class FileImageDescriptorTest extends TestCase {
 
 		}
 
-		Iterator imageIterator = images.iterator();
+		Iterator<Image> imageIterator = images.iterator();
 		while (imageIterator.hasNext()) {
-			((Image) imageIterator.next()).dispose();
+			imageIterator.next().dispose();
 		}
 
 	}
@@ -117,7 +118,7 @@ public class FileImageDescriptorTest extends TestCase {
 		Image image = descriptor.createImage(false);
 		assertTrue("Found an image but should be null", image == null);
 	}
-	
+
 	/**
 	 * Test for a missing file image descriptor.
 	 */

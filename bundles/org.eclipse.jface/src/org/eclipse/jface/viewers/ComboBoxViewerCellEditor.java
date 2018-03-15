@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Tom Schindl and others.
+ * Copyright (c) 2006, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,8 +25,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -74,9 +72,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		setValueValid(true);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on CellEditor.
-	 */
+	@Override
 	protected Control createControl(Composite parent) {
 
 		CCombo comboBox = new CCombo(parent, getStyle());
@@ -85,37 +81,38 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 
 		comboBox.addKeyListener(new KeyAdapter() {
 			// hook key pressed - see PR 14201
+			@Override
 			public void keyPressed(KeyEvent e) {
 				keyReleaseOccured(e);
 			}
 		});
 
 		comboBox.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 				applyEditorValueAndDeactivate();
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent event) {
-				ISelection selection = viewer.getSelection();
+				IStructuredSelection selection = viewer.getStructuredSelection();
 				if (selection.isEmpty()) {
 					selectedValue = null;
 				} else {
-					selectedValue = ((IStructuredSelection) selection)
-							.getFirstElement();
+					selectedValue = selection.getFirstElement();
 				}
 			}
 		});
 
-		comboBox.addTraverseListener(new TraverseListener() {
-			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_ESCAPE
-						|| e.detail == SWT.TRAVERSE_RETURN) {
-					e.doit = false;
-				}
+		comboBox.addTraverseListener(e -> {
+			if (e.detail == SWT.TRAVERSE_ESCAPE
+					|| e.detail == SWT.TRAVERSE_RETURN) {
+				e.doit = false;
 			}
 		});
 
 		comboBox.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent e) {
 				ComboBoxViewerCellEditor.this.focusLost();
 			}
@@ -131,13 +128,12 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @return the zero-based index of the current selection wrapped as an
 	 *         <code>Integer</code>
 	 */
+	@Override
 	protected Object doGetValue() {
 		return selectedValue;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on CellEditor.
-	 */
+	@Override
 	protected void doSetFocus() {
 		viewer.getControl().setFocus();
 	}
@@ -150,6 +146,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * to make sure the arrow button and some text is visible. The list of
 	 * CCombo will be wide enough to show its longest item.
 	 */
+	@Override
 	public LayoutData getLayoutData() {
 		LayoutData layoutData = super.getLayoutData();
 		if ((viewer.getControl() == null) || viewer.getControl().isDisposed()) {
@@ -170,6 +167,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @param value
 	 *            the new value
 	 */
+	@Override
 	protected void doSetValue(Object value) {
 	    Assert.isTrue(viewer != null);
 	    selectedValue = value;
@@ -206,6 +204,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @deprecated As of 3.7, replaced by
 	 *             {@link #setContentProvider(IStructuredContentProvider)}
 	 */
+	@Deprecated
 	public void setContenProvider(IStructuredContentProvider provider) {
 		viewer.setContentProvider(provider);
 	}
@@ -231,12 +230,11 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 */
 	void applyEditorValueAndDeactivate() {
 		// must set the selection before getting value
-		ISelection selection = viewer.getSelection();
+		IStructuredSelection selection = viewer.getStructuredSelection();
 		if (selection.isEmpty()) {
 			selectedValue = null;
 		} else {
-			selectedValue = ((IStructuredSelection) selection)
-					.getFirstElement();
+			selectedValue = selection.getFirstElement();
 		}
 
 		Object newValue = doGetValue();
@@ -245,30 +243,21 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		setValueValid(isValid);
 
 		if (!isValid) {
-			MessageFormat.format(getErrorMessage(),
-					new Object[] { selectedValue });
+			MessageFormat.format(getErrorMessage(), selectedValue);
 		}
 
 		fireApplyEditorValue();
 		deactivate();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.CellEditor#focusLost()
-	 */
+	@Override
 	protected void focusLost() {
 		if (isActivated()) {
 			applyEditorValueAndDeactivate();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.CellEditor#keyReleaseOccured(org.eclipse.swt.events.KeyEvent)
-	 */
+	@Override
 	protected void keyReleaseOccured(KeyEvent keyEvent) {
 		if (keyEvent.character == '\u001b') { // Escape character
 			fireCancelEditor();

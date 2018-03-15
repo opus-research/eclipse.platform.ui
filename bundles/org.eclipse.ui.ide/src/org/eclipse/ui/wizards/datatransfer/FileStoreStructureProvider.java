@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,9 +24,9 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  * FileStoreStructureProvider is the structure provider for {@link IFileStore}
  * based file structures.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class FileStoreStructureProvider implements IImportStructureProvider {
 
@@ -35,11 +35,7 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 	 */
 	public final static FileStoreStructureProvider INSTANCE = new FileStoreStructureProvider();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getChildren(java.lang.Object)
-	 */
+	@Override
 	public List getChildren(Object element) {
 		try {
 			return Arrays.asList(((IFileStore) element).childStores(EFS.NONE,
@@ -52,7 +48,7 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 
 	/**
 	 * Log the exception.
-	 * 
+	 *
 	 * @param exception
 	 */
 	private void logException(CoreException exception) {
@@ -60,11 +56,7 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getContents(java.lang.Object)
-	 */
+	@Override
 	public InputStream getContents(Object element) {
 		try {
 			return ((IFileStore) element).openInputStream(EFS.NONE,
@@ -75,29 +67,17 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getFullPath(java.lang.Object)
-	 */
+	@Override
 	public String getFullPath(Object element) {
 		return ((IFileStore) element).toURI().getSchemeSpecificPart();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getLabel(java.lang.Object)
-	 */
+	@Override
 	public String getLabel(Object element) {
 		return ((IFileStore) element).getName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#isFolder(java.lang.Object)
-	 */
+	@Override
 	public boolean isFolder(Object element) {
 		return ((IFileStore) element).fetchInfo().isDirectory();
 	}

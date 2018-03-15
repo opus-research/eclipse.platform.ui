@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -29,9 +28,9 @@ import org.eclipse.ui.internal.preferences.WorkbenchPreferenceExtensionNode;
 /**
  * A class that handles filtering preference node items based on a supplied
  * matching string.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class PreferencePatternFilter extends PatternFilter {
 
@@ -44,7 +43,7 @@ public class PreferencePatternFilter extends PatternFilter {
 
 	/**
 	 * Create a new instance of a PreferencePatternFilter
-	 * 
+	 *
 	 * @param isMatchItem
 	 */
 	public PreferencePatternFilter() {
@@ -77,24 +76,18 @@ public class PreferencePatternFilter extends PatternFilter {
 		return (String[]) keywordList.toArray(new String[keywordList.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.dialogs.PatternFilter#isElementSelectable(java.lang.Object)
-	 */
+	@Override
 	public boolean isElementSelectable(Object element) {
 		return element instanceof WorkbenchPreferenceExtensionNode;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.dialogs.PatternFilter#isElementVisible(org.eclipse.jface.viewers.Viewer, java.lang.Object)
-	 */
+	@Override
 	public boolean isElementVisible(Viewer viewer, Object element) {
 	    if (WorkbenchActivityHelper.restrictUseOf(
 	            element))
 	        return false;
-	    
-		// Preference nodes are not differentiated based on category since 
+
+		// Preference nodes are not differentiated based on category since
 		// categories are selectable nodes.
 		if (isLeafMatch(viewer, element)) {
 			return true;
@@ -107,14 +100,11 @@ public class PreferencePatternFilter extends PatternFilter {
 		// Will return true if any subnode of the element matches the search
 		if (filter(viewer, element, children).length > 0) {
 			return true;
-		}		
+		}
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.dialogs.PatternFilter#isLeafMatch(org.eclipse.jface.viewers.Viewer, java.lang.Object)
-	 * 
-	 */
+	@Override
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
 		IPreferenceNode node = (IPreferenceNode) element;
 		String text = node.getLabelText();
@@ -124,9 +114,8 @@ public class PreferencePatternFilter extends PatternFilter {
 		}
 
 		// Also need to check the keywords
-		String[] keywords = getKeywords(node);
-		for (int i = 0; i < keywords.length; i++){
-			if (wordMatches(keywords[i])) {
+		for (String keyword : getKeywords(node)) {
+			if (wordMatches(keyword)) {
 				return true;
 			}
 		}

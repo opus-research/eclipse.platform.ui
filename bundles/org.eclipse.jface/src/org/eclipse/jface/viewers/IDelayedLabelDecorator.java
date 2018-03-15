@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ public interface IDelayedLabelDecorator extends ILabelDecorator {
      * Prepare the element for decoration. If it is already decorated and ready for update
      * return true. If decoration is pending return false.
      * @param element The element to be decorated
-     * @param originalText The starting text. 
+     * @param originalText The starting text.
      * @return boolean <code>true</code> if the decoration is ready for this element
      */
 

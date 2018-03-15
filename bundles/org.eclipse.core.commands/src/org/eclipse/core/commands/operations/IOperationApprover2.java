@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.IStatus;
  * access occurring inside the implementation must be properly synchronized
  * using the techniques specified by the client's widget library.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public interface IOperationApprover2 extends IOperationApprover {
@@ -46,7 +46,7 @@ public interface IOperationApprover2 extends IOperationApprover {
 	 * will not be approved. Implementers should not assume that the execution
 	 * will be performed when the status is <code>OK</code>, since other
 	 * operation approvers may veto the execution.
-	 * 
+	 *
 	 * @param operation
 	 *            the operation to be executed
 	 * @param history

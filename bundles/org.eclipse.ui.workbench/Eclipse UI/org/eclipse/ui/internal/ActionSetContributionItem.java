@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,14 +36,22 @@ public class ActionSetContributionItem extends SubContributionItem implements
     /**
      * Returns the action set id.
      */
-    public String getActionSetId() {
+    @Override
+	public String getActionSetId() {
         return actionSetId;
     }
 
     /**
      * Sets the action set id.
      */
-    public void setActionSetId(String newActionSetId) {
+    @Override
+	public void setActionSetId(String newActionSetId) {
         actionSetId = newActionSetId;
     }
+
+	@Override
+	public String toString() {
+		return "ActionSetContributionItem [id=" + actionSetId + //$NON-NLS-1$
+				", visible=" + isVisible() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }

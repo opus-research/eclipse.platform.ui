@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.jface.bindings;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Objects;
 
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.jface.util.Util;
@@ -51,7 +52,7 @@ import org.eclipse.jface.util.Util;
  * </pre></code>
  * <p>
  * On GTK+, the "Ctrl+Shift+F" interferes with some native behaviour. To change
- * the binding, we first unbind the "Ctrl+Shift+F" key sequence by 
+ * the binding, we first unbind the "Ctrl+Shift+F" key sequence by
  * assigning it a null command on the gtk platform.  We then create a new binding
  * that maps the command to the "Esc Ctrl+F" key sequence.
  * </p>
@@ -62,7 +63,7 @@ import org.eclipse.jface.util.Util;
  * <p>
  * Bindings are intended to be immutable objects.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public abstract class Binding {
@@ -155,7 +156,7 @@ public abstract class Binding {
 
 	/**
 	 * Constructs a new instance of <code>Binding</code>.
-	 * 
+	 *
 	 * @param command
 	 *            The parameterized command to which this binding applies; this
 	 *            value may be <code>null</code> if the binding is meant to
@@ -207,7 +208,7 @@ public abstract class Binding {
 	/**
 	 * Tests whether this binding is intended to delete another binding. The
 	 * receiver must have a <code>null</code> command identifier.
-	 * 
+	 *
 	 * @param binding
 	 *            The binding to test; must not be <code>null</code>.
 	 *            This binding must be a <code>SYSTEM</code> binding.
@@ -216,17 +217,17 @@ public abstract class Binding {
 	 */
 	final boolean deletes(final Binding binding) {
 		boolean deletes = true;
-		deletes &= Util.equals(getContextId(), binding.getContextId());
-		deletes &= Util.equals(getTriggerSequence(), binding
+		deletes &= Objects.equals(getContextId(), binding.getContextId());
+		deletes &= Objects.equals(getTriggerSequence(), binding
 				.getTriggerSequence());
 		if (getLocale() != null) {
-			deletes &= !Util.equals(getLocale(), binding.getLocale());
+			deletes &= !Objects.equals(getLocale(), binding.getLocale());
 		}
 		if (getPlatform() != null) {
-			deletes &= !Util.equals(getPlatform(), binding.getPlatform());
+			deletes &= !Objects.equals(getPlatform(), binding.getPlatform());
 		}
 		deletes &= (binding.getType() == SYSTEM);
-		deletes &= Util.equals(getParameterizedCommand(), null);
+		deletes &= Objects.equals(getParameterizedCommand(), null);
 
 		return deletes;
 	}
@@ -234,12 +235,13 @@ public abstract class Binding {
 	/**
 	 * Tests whether this binding is equal to another object. Bindings are only
 	 * equal to other bindings with equivalent values.
-	 * 
+	 *
 	 * @param object
 	 *            The object with which to compare; may be <code>null</code>.
 	 * @return <code>true</code> if the object is a binding with equivalent
 	 *         values for all of its properties; <code>false</code> otherwise.
 	 */
+	@Override
 	public final boolean equals(final Object object) {
 		if (this == object) {
 			return true;
@@ -250,23 +252,23 @@ public abstract class Binding {
 		}
 
 		final Binding binding = (Binding) object;
-		if (!Util.equals(getParameterizedCommand(), binding
+		if (!Objects.equals(getParameterizedCommand(), binding
 				.getParameterizedCommand())) {
 			return false;
 		}
-		if (!Util.equals(getContextId(), binding.getContextId())) {
+		if (!Objects.equals(getContextId(), binding.getContextId())) {
 			return false;
 		}
-		if (!Util.equals(getTriggerSequence(), binding.getTriggerSequence())) {
+		if (!Objects.equals(getTriggerSequence(), binding.getTriggerSequence())) {
 			return false;
 		}
-		if (!Util.equals(getLocale(), binding.getLocale())) {
+		if (!Objects.equals(getLocale(), binding.getLocale())) {
 			return false;
 		}
-		if (!Util.equals(getPlatform(), binding.getPlatform())) {
+		if (!Objects.equals(getPlatform(), binding.getPlatform())) {
 			return false;
 		}
-		if (!Util.equals(getSchemeId(), binding.getSchemeId())) {
+		if (!Objects.equals(getSchemeId(), binding.getSchemeId())) {
 			return false;
 		}
 		return (getType() == binding.getType());
@@ -276,7 +278,7 @@ public abstract class Binding {
 	 * Returns the parameterized command to which this binding applies. If the
 	 * identifier is <code>null</code>, then this binding is "unbinding" an
 	 * existing binding.
-	 * 
+	 *
 	 * @return The fully-parameterized command; may be <code>null</code>.
 	 */
 	public final ParameterizedCommand getParameterizedCommand() {
@@ -285,7 +287,7 @@ public abstract class Binding {
 
 	/**
 	 * Returns the identifier of the context in which this binding applies.
-	 * 
+	 *
 	 * @return The context identifier; never <code>null</code>.
 	 */
 	public final String getContextId() {
@@ -297,7 +299,7 @@ public abstract class Binding {
 	 * <code>null</code>, then this binding applies to all locales. This
 	 * string is the same format as returned by
 	 * <code>Locale.getDefault().toString()</code>.
-	 * 
+	 *
 	 * @return The locale; may be <code>null</code>.
 	 */
 	public final String getLocale() {
@@ -308,7 +310,7 @@ public abstract class Binding {
 	 * Returns the platform on which this binding applies. If the platform is
 	 * <code>null</code>, then this binding applies to all platforms. This
 	 * string is the same format as returned by <code>SWT.getPlatform()</code>.
-	 * 
+	 *
 	 * @return The platform; may be <code>null</code>.
 	 */
 	public final String getPlatform() {
@@ -317,7 +319,7 @@ public abstract class Binding {
 
 	/**
 	 * Returns the identifier of the scheme in which this binding applies.
-	 * 
+	 *
 	 * @return The scheme identifier; never <code>null</code>.
 	 */
 	public final String getSchemeId() {
@@ -328,7 +330,7 @@ public abstract class Binding {
 	 * Returns the sequence of trigger for a given binding. The triggers can be
 	 * anything, but above all it must be hashable. This trigger sequence is
 	 * used by the binding manager to distinguish between different bindings.
-	 * 
+	 *
 	 * @return The object representing an input event that will trigger this
 	 *         binding; must not be <code>null</code>.
 	 */
@@ -338,7 +340,7 @@ public abstract class Binding {
 	 * Returns the type for this binding. As it stands now, this value will
 	 * either be <code>SYSTEM</code> or <code>USER</code>. In the future,
 	 * more types might be added.
-	 * 
+	 *
 	 * @return The type for this binding.
 	 */
 	public final int getType() {
@@ -348,9 +350,10 @@ public abstract class Binding {
 	/**
 	 * Computes the hash code for this key binding based on all of its
 	 * attributes.
-	 * 
+	 *
 	 * @return The hash code for this key binding.
 	 */
+	@Override
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL;
@@ -375,12 +378,13 @@ public abstract class Binding {
 	 * The string representation of this binding -- for debugging purposes only.
 	 * This string should not be shown to an end user. This should be overridden
 	 * by subclasses that add properties.
-	 * 
+	 *
 	 * @return The string representation; never <code>null</code>.
 	 */
+	@Override
 	public String toString() {
 		if (string == null) {
-			
+
 			final StringWriter sw = new StringWriter();
 			final BufferedWriter stringBuffer = new BufferedWriter(sw);
 			try {

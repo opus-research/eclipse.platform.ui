@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -36,37 +37,45 @@ public class DetachedDropAgent extends DropAgent {
 
 	@Override
 	public boolean canDrop(MUIElement dragElement, DnDInfo info) {
-		if (info.curElement != null)
+		if (info.curElement != null) {
 			return false;
+		}
 
 		if (dragElement instanceof MPart || dragElement instanceof MPlaceholder
-				|| dragElement instanceof MPartStack)
+				|| dragElement instanceof MPartStack) {
 			return true;
+		}
 
 		return false;
 	}
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
-		if (dragElement.getCurSharedRef() != null)
-			dragElement = dragElement.getCurSharedRef();
+		// Ensure that the stack is restored first if minimizdd
+		if (dragElement.getTags().contains(IPresentationEngine.MINIMIZED)) {
+			dragElement.getTags().remove(IPresentationEngine.MINIMIZED);
+		}
 
-		modelService.detach((MPartSashContainerElement) dragElement, curRect.x, curRect.y,
-				curRect.width, curRect.height);
+		if (dragElement.getCurSharedRef() != null) {
+			dragElement = dragElement.getCurSharedRef();
+		}
+
+		Rectangle rectangle = getRectangle(dragElement, info);
+
+		modelService.detach((MPartSashContainerElement) dragElement, rectangle.x, rectangle.y, rectangle.width,
+				rectangle.height);
+
+		// Fully re-activate the part since its location has changed
+		reactivatePart(dragElement);
+
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.workbench.ui.renderers.swt.dnd.DropAgent#getRectangle
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement,
-	 * org.eclipse.e4.workbench.ui.renderers.swt.dnd.CursorInfo)
-	 */
 	@Override
 	public Rectangle getRectangle(MUIElement dragElement, DnDInfo info) {
-		if (dragElement.getCurSharedRef() != null)
+		if (dragElement.getCurSharedRef() != null) {
 			dragElement = dragElement.getCurSharedRef();
+		}
 
 		if (dragElement instanceof MPartStack) {
 			Control ctrl = (Control) dragElement.getWidget();
@@ -89,40 +98,22 @@ public class DetachedDropAgent extends DropAgent {
 		return curRect;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#track(org.eclipse.e4.ui.model.application
-	 * .ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
-	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
-		if (info.curElement != null)
+		if (info.curElement != null) {
 			return false;
+		}
 
 		manager.frameRect(getRectangle(dragElement, info));
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragEnter(org.eclipse.e4.ui.model.
-	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
-	 */
 	@Override
 	public void dragEnter(MUIElement dragElement, DnDInfo info) {
 		super.dragEnter(dragElement, info);
 		dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_HAND));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave(org.eclipse.e4.ui.model.
-	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
-	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		manager.clearOverlay();

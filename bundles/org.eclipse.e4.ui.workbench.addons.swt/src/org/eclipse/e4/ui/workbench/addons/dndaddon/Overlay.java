@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013, 2014 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
 import java.util.ArrayList;
@@ -89,10 +99,11 @@ class Overlay {
 	public void removeAdornment(Adornment a) {
 		adornments.remove(a);
 
-		if (adornments.size() == 0)
+		if (adornments.size() == 0) {
 			overlayShell.setVisible(false);
-		else
+		} else {
 			overlayShell.redraw();
+		}
 	}
 
 	public void clear() {
@@ -116,6 +127,7 @@ class Overlay {
 
 		blue = new Color(baseShell.getDisplay(), 0, 0, 128);
 		overlayShell.addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent e) {
 				e.gc.setForeground(blue);
 				e.gc.setBackground(blue);
@@ -132,13 +144,15 @@ class Overlay {
 			adornment.updateRegion(region);
 		}
 		overlayShell.setRegion(region);
-		if (!overlayShell.getVisible())
+		if (!overlayShell.getVisible()) {
 			overlayShell.setVisible(true);
+		}
 	}
 
 	public void dispose() {
 		adornments.clear();
-		if (!overlayShell.isDisposed())
+		if (!overlayShell.isDisposed()) {
 			overlayShell.dispose();
+		}
 	}
 }

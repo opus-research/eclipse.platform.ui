@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,8 @@ public final class KdeKeyFormatter extends AbstractKeyFormatter {
     private final static class KdeModifierKeyComparator extends
             AbstractModifierKeyComparator {
 
-        protected int rank(ModifierKey modifierKey) {
+        @Override
+		protected int rank(ModifierKey modifierKey) {
             if (ModifierKey.ALT.equals(modifierKey)) {
                 return 0;
             }
@@ -46,17 +47,20 @@ public final class KdeKeyFormatter extends AbstractKeyFormatter {
     private final static ResourceBundle RESOURCE_BUNDLE = ResourceBundle
             .getBundle(KdeKeyFormatter.class.getName());
 
-    protected String getKeyDelimiter() {
+    @Override
+	protected String getKeyDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_DELIMITER_KEY,
                 KeyStroke.KEY_DELIMITER, false, false);
     }
 
-    protected String getKeyStrokeDelimiter() {
+    @Override
+	protected String getKeyStrokeDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_STROKE_DELIMITER_KEY,
                 KeySequence.KEY_STROKE_DELIMITER, false, false);
     }
 
-    protected Comparator getModifierKeyComparator() {
+    @Override
+	protected Comparator getModifierKeyComparator() {
         return MODIFIER_KEY_COMPARATOR;
     }
 }

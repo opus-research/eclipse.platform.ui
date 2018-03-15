@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - ongoing development
+ *     Red Hat Inc. (mistria) - Fixes suggested by FindBugs
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.dom.properties.providers;
 
@@ -31,15 +32,16 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 		AbstractCSSPropertyHandlerProvider {
 
 	// List of package names containing handlers class for properties
-	private List<String> packageNames = new ArrayList<String>();
+	private List<String> packageNames = new ArrayList<>();
 
 	// Map used as a cache for properties handlers found
-	private Map<String, List<ICSSPropertyHandler>> propertyToHandlersMap = new HashMap<String, List<ICSSPropertyHandler>>();
+	private Map<String, List<ICSSPropertyHandler>> propertyToHandlersMap = new HashMap<>();
 
 	/**
 	 * Return the list of PropertiesHandler corresponding to the property name
 	 * given as argument
 	 */
+	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
 
@@ -63,7 +65,7 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 //								+ ", with class=" + packageName + "."
 //								+ handlerClassName);
 					if (handlers == null)
-						handlers = new ArrayList<ICSSPropertyHandler>();
+						handlers = new ArrayList<>();
 					handlers.add(handler);
 				}
 			}
@@ -82,7 +84,7 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 	/**
 	 * Register a package path "name.name1." where to search for PropertyHandler
 	 * class
-	 * 
+	 *
 	 * @param packageName
 	 */
 	public void registerPackage(String packageName) {
@@ -92,13 +94,13 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 
 	protected Map<String, List<ICSSPropertyHandler>> getPropertyToHandlersMap() {
 		if (propertyToHandlersMap == null)
-			propertyToHandlersMap = new HashMap<String, List<ICSSPropertyHandler>>();
+			propertyToHandlersMap = new HashMap<>();
 		return propertyToHandlersMap;
 	}
 
 	/**
 	 * Reflexive method that return a property handler class
-	 * 
+	 *
 	 * @param packageName
 	 * @param handlerClassName
 	 * @return
@@ -126,48 +128,42 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 	 * Return the handler class name corresponding to the property label given
 	 * as argument A Property Handler Class Name is CSSPropertyXXXHandler (like
 	 * CSSPropertyBorderTopColorHandler)
-	 * 
+	 *
 	 * @param property
 	 * @return
 	 */
 	protected String getHandlerClassName(String property) {
-		String handlerClassName = "CSSProperty";
-		String[] s = StringUtils.split(property, "-");
-		for (int i = 0; i < s.length; i++) {
-			String p = s[i];
-			p = p.substring(0, 1).toUpperCase() + p.substring(1, p.length());
-			handlerClassName += p;
+		StringBuilder handlerClassName = new StringBuilder("CSSProperty"); //$NON-NLS-1$
+		String[] s = StringUtils.split(property, "-"); //$NON-NLS-1$
+		for (String p : s) {
+			handlerClassName.append(p.substring(0, 1).toUpperCase());
+			handlerClassName.append(p.substring(1));
 		}
-		handlerClassName += "Handler";
-		return handlerClassName;
+		handlerClassName.append("Handler"); //$NON-NLS-1$
+		return handlerClassName.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.e4.ui.css.core.dom.properties.providers.AbstractCSSPropertyHandlerProvider#getDefaultCSSStyleDeclaration(org.eclipse.e4.ui.css.core.engine.CSSEngine,
-	 *      org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
-     *      org.w3c.dom.css.CSSStyleDeclaration)
-	 */
+	@Override
 	protected CSSStyleDeclaration getDefaultCSSStyleDeclaration(
 			CSSEngine engine, CSSStylableElement stylableElement,
 			CSSStyleDeclaration newStyle, String pseudoE) throws Exception {
 		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null)
 			return stylableElement.getDefaultStyleDeclaration(pseudoE);
 		if (newStyle != null) {
-			StringBuffer style = null;
+			StringBuilder style = null;
 			int length = newStyle.getLength();
 			for (int i = 0; i < length; i++) {
 				String propertyName = newStyle.item(i);
 				String[] compositePropertiesNames = engine
 						.getCSSCompositePropertiesNames(propertyName);
 				if (compositePropertiesNames != null) {
-					for (int j = 0; j < compositePropertiesNames.length; j++) {
-						propertyName = compositePropertiesNames[j];
+					for (String compositePropertyName : compositePropertiesNames) {
+						propertyName = compositePropertyName;
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {
 							if (style == null)
-								style = new StringBuffer();
+								style = new StringBuilder();
 							style.append(s);
 						}
 					}
@@ -176,7 +172,7 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 							propertyName, pseudoE);
 					if (s != null) {
 						if (style == null)
-							style = new StringBuffer();
+							style = new StringBuilder();
 						style.append(s);
 					}
 				}
@@ -192,11 +188,13 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 		return stylableElement.getDefaultStyleDeclaration(pseudoE);
 	}
 
+	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			Object element, String property) throws Exception {
 		return getCSSPropertyHandlers(property);
 	}
 
+	@Override
 	public Collection<String> getCSSProperties(Object element) {
 		Map<String, List<ICSSPropertyHandler>> propertyHandlers = getPropertyToHandlersMap();
 		// FIXME: could walk the package names, look for the classes matching

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2017 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
  ******************************************************************************/
 package org.eclipse.jface.tests.fieldassist;
 
-import junit.framework.TestCase;
-
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -20,13 +18,15 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import junit.framework.TestCase;
+
 public abstract class AbstractFieldAssistTestCase extends TestCase {
 
 	/**
 	 * The window that is being tested.
 	 */
 	private AbstractFieldAssistWindow window;
-	
+
 	/**
 	 * A shell used to take focus away from the field assist window
 	 */
@@ -37,11 +37,8 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 	 */
 	private int originalShellCount;
 
-	/**
-	 * Sets up this field assist test case. Subclasses should extend but not
-	 * override.
-	 */
-	protected void setUp() throws Exception {
+	@Override
+	final protected void setUp() throws Exception {
 		super.setUp();
 		Display display = getDisplay();
 		anotherShell = new Shell(display);
@@ -53,11 +50,8 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 		assertNotNull(window);
 	}
 
-	/**
-	 * Tears down this field assist test case. Subclasses should extend but not
-	 * override.
-	 */
-	protected void tearDown() throws Exception {
+	@Override
+	final protected void tearDown() throws Exception {
 		if (window != null) {
 			spinEventLoop();
 		}
@@ -66,11 +60,12 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 
 		super.tearDown();
 	}
-	
+
 	protected Display getDisplay() {
 		Display display = Display.getCurrent();
-		if (display == null)
+		if (display == null) {
 			display = Display.getDefault();
+		}
 		return display;
 	}
 
@@ -101,7 +96,6 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 
 		Display disp = getDisplay();
 		while (disp.readAndDispatch()) {
-			;
 		}
 	}
 
@@ -133,17 +127,17 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 		window.getFieldAssistControl().setFocus();
 		spinEventLoop();
 	}
-	
+
 	/**
 	 * Send focus somewhere besides the field assist shell.
-	 * This involves optionally creating another shell.  If we 
+	 * This involves optionally creating another shell.  If we
 	 * create another shell, we need to adjust the originalShellCount
 	 */
 	protected void sendFocusElsewhere() {
 		anotherShell.setFocus();
 		spinEventLoop();
 	}
-	
+
 	/**
 	 * Sends focus to the field assist popup.
 	 */
@@ -155,7 +149,7 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 	/**
 	 * Sends an SWT KeyDown event for the specified character to the field
 	 * assist control.
-	 * 
+	 *
 	 * @param character
 	 *            the character that has been pressed
 	 */
@@ -171,7 +165,7 @@ public abstract class AbstractFieldAssistTestCase extends TestCase {
 
 	/**
 	 * Sends an SWT KeyDown event for the specified keystroke
-	 * 
+	 *
 	 * @param character
 	 *            the character that has been pressed
 	 */

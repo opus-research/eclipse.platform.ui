@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,7 @@ import org.eclipse.ui.keys.IBindingService;
  * <p>
  * A static class for accessing the registry and the preference store.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public class BindingPersistence extends PreferencePersistence {
@@ -81,7 +81,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * The index of the active scheme configuration elements in the indexed
 	 * array.
-	 * 
+	 *
 	 * @see BindingPersistence#read()
 	 */
 	private static final int INDEX_ACTIVE_SCHEME = 0;
@@ -89,7 +89,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * The index of the binding definition configuration elements in the indexed
 	 * array.
-	 * 
+	 *
 	 * @see BindingPersistence#read()
 	 */
 	private static final int INDEX_BINDING_DEFINITIONS = 1;
@@ -97,7 +97,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * The index of the scheme definition configuration elements in the indexed
 	 * array.
-	 * 
+	 *
 	 * @see BindingPersistence#read()
 	 */
 	private static final int INDEX_SCHEME_DEFINITIONS = 2;
@@ -195,7 +195,7 @@ public class BindingPersistence extends PreferencePersistence {
 	 * Converts a 2.1.x style key sequence (as parsed from the
 	 * <code>string</code> attribute of the <code>keyBinding</code>) to a
 	 * 3.1 key sequence.
-	 * 
+	 *
 	 * @param r21KeySequence
 	 *            The sequence of 2.1.x key strokes that should be converted
 	 *            into a 3.1 key sequence; never <code>null</code>.
@@ -214,7 +214,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * Converts a 2.1.x style key stroke (as parsed from the <code>string</code>
 	 * attribute of the <code>keyBinding</code> to a 3.1 key stroke.
-	 * 
+	 *
 	 * @param r21Stroke
 	 *            The 2.1.x stroke to convert; must never be <code>null</code>.
 	 * @return A 3.1 key stroke; never <code>null</code>.
@@ -226,7 +226,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * Returns the default scheme identifier for the currently running
 	 * application.
-	 * 
+	 *
 	 * @return The default scheme identifier (<code>String</code>); never
 	 *         <code>null</code>, but may be empty or point to an undefined
 	 *         scheme.
@@ -240,7 +240,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * Parses a 2.1.x <code>string</code> attribute of the
 	 * <code>keyBinding</code> element.
-	 * 
+	 *
 	 * @param string
 	 *            The string to parse; must not be <code>null</code>.
 	 * @return An array of integer values -- each integer representing a single
@@ -262,7 +262,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * Parses a single 2.1.x key stroke string, as provided by
 	 * <code>parse2_1Sequence</code>.
-	 * 
+	 *
 	 * @param string
 	 *            The string to parse; must not be <code>null</code>.
 	 * @return An single integer value representing this key stroke.
@@ -356,7 +356,7 @@ public class BindingPersistence extends PreferencePersistence {
 	 * <li>The registry.</li>
 	 * <li>The default default active scheme id.</li>
 	 * </ol>
-	 * 
+	 *
 	 * @param configurationElements
 	 *            The configuration elements from the commands extension point;
 	 *            must not be <code>null</code>.
@@ -467,7 +467,7 @@ public class BindingPersistence extends PreferencePersistence {
 
 	/**
 	 * Reads all of the binding definitions from the preferences.
-	 * 
+	 *
 	 * @param preferences
 	 *            The memento for the commands preferences key.
 	 * @param bindingManager
@@ -493,7 +493,6 @@ public class BindingPersistence extends PreferencePersistence {
 				if (commandId == null) {
 					commandId = readOptional(memento, ATT_COMMAND);
 				}
-				String viewParameter = null;
 				final Command command;
 				if (commandId != null) {
 					command = commandService.getCommand(commandId);
@@ -564,17 +563,8 @@ public class BindingPersistence extends PreferencePersistence {
 				final String platform = readOptional(memento, ATT_PLATFORM);
 
 				// Read out the parameters
-				final ParameterizedCommand parameterizedCommand;
-				if (command == null) {
-					parameterizedCommand = null;
-				} else if (viewParameter != null) { 
-					HashMap parms = new HashMap();
-					parms.put(ShowViewMenu.VIEW_ID_PARM, viewParameter);
-					parameterizedCommand = ParameterizedCommand.generateCommand(command, parms);
-				} else {
-					parameterizedCommand = readParameters(memento,
-							warningsToLog, command);
-				}
+				final ParameterizedCommand parameterizedCommand = command != null ? readParameters(
+						memento, warningsToLog, command) : null;
 
 				final Binding binding = new KeyBinding(keySequence,
 						parameterizedCommand, schemeId, contextId, locale,
@@ -590,7 +580,7 @@ public class BindingPersistence extends PreferencePersistence {
 
 	/**
 	 * Reads all of the binding definitions from the commands extension point.
-	 * 
+	 *
 	 * @param configurationElements
 	 *            The configuration elements in the commands extension point;
 	 *            must not be <code>null</code>, but may be empty.
@@ -615,7 +605,7 @@ public class BindingPersistence extends PreferencePersistence {
 		HashSet cocoaTempList = new HashSet();
 		// IViewRegistry viewRegistry =
 		// PlatformUI.getWorkbench().getViewRegistry();
-		
+
 		// the local cache for the sequence modifiers
 		IConfigurationElement[] sequenceModifiers = new IConfigurationElement[0];
 		if(configurationElementCount >0)
@@ -623,11 +613,11 @@ public class BindingPersistence extends PreferencePersistence {
 
 		for (int i = 0; i < configurationElementCount; i++) {
 			final IConfigurationElement configurationElement = configurationElements[i];
-			
+
 			// different extension. update the cache ...
 			if( i>0 && !configurationElement.getDeclaringExtension().equals(configurationElements[i-1].getDeclaringExtension()))
 				sequenceModifiers = getSequenceModifierElements(configurationElement);
-			
+
 			/*
 			 * Read out the command id. Doing this before determining if the key
 			 * binding is actually valid is a bit wasteful. However, it is
@@ -635,7 +625,7 @@ public class BindingPersistence extends PreferencePersistence {
 			 * errors.
 			 */
 			String commandId = readCommandId(configurationElement);
-			
+
 			String viewParameter = null;
 			final Command command;
 			if (commandId != null) {
@@ -656,7 +646,7 @@ public class BindingPersistence extends PreferencePersistence {
 			String schemeId = readSchemeId(configurationElement, warningsToLog, commandId);
 			if(isEmpty(schemeId))
 				continue;
-				
+
 			// Read out the context id.
 			String contextId = readContextId(configurationElement);
 
@@ -669,21 +659,21 @@ public class BindingPersistence extends PreferencePersistence {
 						configurationElement, commandId);
 				continue;
 			}
-			
 
-			
+
+
 			// Read out the key sequence.
 			KeySequence keySequence = readKeySequence(configurationElement, warningsToLog, commandId, keySequenceText);
 			if(keySequence == null)
 				continue;
 
 			// Read out the locale and platform.
-			
+
 			String locale = readNonEmptyAttribute(configurationElement, ATT_LOCALE);
 			String platform = readNonEmptyAttribute(configurationElement, ATT_PLATFORM);
 
 			// Read out the parameters, if any.
-			ParameterizedCommand parameterizedCommand = 
+			ParameterizedCommand parameterizedCommand =
 				readParameterizedCommand(warningsToLog, configurationElement, viewParameter, command);
 
 			List modifiedBindings = applyModifiers(keySequence, keySequenceText, platform, sequenceModifiers, parameterizedCommand, schemeId, contextId, locale, warningsToLog);
@@ -718,9 +708,9 @@ public class BindingPersistence extends PreferencePersistence {
 
 		logWarnings(
 				warningsToLog,
-				"Warnings while parsing the key bindings from the 'org.eclipse.ui.commands' extension point"); //$NON-NLS-1$
+				"Warnings while parsing the key bindings from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.bindings' extension point"); //$NON-NLS-1$
 	}
-	
+
 	private static List applyModifiers(KeySequence keySequence, String keySequenceText,
 			String platform, IConfigurationElement[] sequenceModifiers,
 			ParameterizedCommand parameterizedCommand, String schemeId,
@@ -728,9 +718,8 @@ public class BindingPersistence extends PreferencePersistence {
 
 		List bindings = new ArrayList();
 
-		for (int i = 0; i < sequenceModifiers.length; i++) {
+		for (IConfigurationElement sequenceModifier : sequenceModifiers) {
 
-			IConfigurationElement sequenceModifier = sequenceModifiers[i];
 			String findSequence = sequenceModifier.getAttribute(ATT_FIND);
 
 			if (keySequenceText.startsWith(findSequence)) {
@@ -739,12 +728,12 @@ public class BindingPersistence extends PreferencePersistence {
 				String platformsString = sequenceModifier.getAttribute(ATT_PLATFORMS);
 
 				String[] platforms = parseCommaSeparatedString(platformsString);
-				
+
 				try {
 					if (platform == null) {
 						addGenericBindings(keySequence, parameterizedCommand, schemeId, contextId, locale,
 								bindings, modifiedSequence, platforms);
-	
+
 					} else {
 						getBindingForPlatform(keySequence, platform,
 								parameterizedCommand, schemeId, contextId, locale,
@@ -762,7 +751,7 @@ public class BindingPersistence extends PreferencePersistence {
 				break;
 			}
 		}
-		
+
 		if(bindings.size() == 0) {
 			// no modifier was applied/error occurred  ...
 			KeyBinding binding = new KeyBinding(keySequence,
@@ -778,7 +767,7 @@ public class BindingPersistence extends PreferencePersistence {
 			String platform, ParameterizedCommand parameterizedCommand,
 			String schemeId, String contextId, String locale, List bindings,
 			String modifiedSequence, String[] platforms) throws ParseException {
-		
+
 		int j = 0;
 		for (; j < platforms.length; j++) {
 			if(platforms[j].equals(SWT.getPlatform())) {
@@ -802,27 +791,27 @@ public class BindingPersistence extends PreferencePersistence {
 	private static void addGenericBindings(KeySequence keySequence, ParameterizedCommand parameterizedCommand,
 			String schemeId, String contextId, String locale, List bindings,
 			String modifiedSequence, String[] platforms) throws ParseException {
-		
+
 
 		KeyBinding originalBinding = new KeyBinding(keySequence,
 				parameterizedCommand, schemeId, contextId, locale, null, null,
 				Binding.SYSTEM);
 		bindings.add(originalBinding);
-		
+
 		String platform = SWT.getPlatform();
 		boolean modifierExists = false;
-		for (int i = 0; i < platforms.length; i++) {
-			if(platforms[i].equals(platform)) {
+		for (String currentPlatform : platforms) {
+			if(currentPlatform.equals(platform)) {
 				modifierExists = true;
 				break;
 			}
 		}
-		
+
 		if(modifierExists) {
 			KeyBinding newBinding = new KeyBinding(KeySequence.getInstance(modifiedSequence),
 					parameterizedCommand, schemeId, contextId,
 					locale, SWT.getPlatform(), null, Binding.SYSTEM);
-	
+
 			KeyBinding deleteBinding = new KeyBinding(keySequence,
 					null, schemeId, contextId,
 					locale, SWT.getPlatform(), null, Binding.SYSTEM);
@@ -834,14 +823,12 @@ public class BindingPersistence extends PreferencePersistence {
 	}
 
 	private static IConfigurationElement[] getSequenceModifierElements(IConfigurationElement configurationElement) {
-		
+
 		IExtension extension = configurationElement.getDeclaringExtension();
-		IConfigurationElement[] configurationElements = extension.getConfigurationElements();
 		List modifierElements = new ArrayList();
-		for (int i = 0; i < configurationElements.length; i++) {
-			final IConfigurationElement anElement = configurationElements[i];
-			if(TAG_SEQUENCE_MODIFIER.equals(anElement.getName()))
-				modifierElements.add(anElement);
+		for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
+			if(TAG_SEQUENCE_MODIFIER.equals(configElement.getName()))
+				modifierElements.add(configElement);
 		}
 		return (IConfigurationElement[]) modifierElements.toArray(new IConfigurationElement[modifierElements.size()]);
 	}
@@ -858,7 +845,7 @@ public class BindingPersistence extends PreferencePersistence {
 
 
 	private static String readKeySequenceText(IConfigurationElement configurationElement) {
-		
+
 		String keySequenceText = configurationElement.getAttribute(ATT_SEQUENCE);
 		if (isEmpty(keySequenceText)) {
 			keySequenceText = configurationElement.getAttribute(ATT_KEY_SEQUENCE);
@@ -869,7 +856,7 @@ public class BindingPersistence extends PreferencePersistence {
 		return keySequenceText;
 
 	}
-	
+
 	private static KeySequence readKeySequence(IConfigurationElement configurationElement, List warningsToLog, String commandId, String keySequenceText) {
 
 		KeySequence keySequence = null;
@@ -913,7 +900,7 @@ public class BindingPersistence extends PreferencePersistence {
 		final ParameterizedCommand parameterizedCommand;
 		if (command == null) {
 			parameterizedCommand = null;
-		} else if (viewParameter != null) { 
+		} else if (viewParameter != null) {
 			HashMap parms = new HashMap();
 			parms.put(ShowViewMenu.VIEW_ID_PARM, viewParameter);
 			parameterizedCommand = ParameterizedCommand.generateCommand(command, parms);
@@ -925,9 +912,9 @@ public class BindingPersistence extends PreferencePersistence {
 	}
 
 	/**
-	 *  Reads the specified attribute from the configuration element. 
+	 *  Reads the specified attribute from the configuration element.
 	 *  If the value is an empty string, will return null.
-	 *  
+	 *
 	 * @param configurationElement
 	 * @return the attribute value
 	 */
@@ -938,8 +925,8 @@ public class BindingPersistence extends PreferencePersistence {
 		}
 		return attributeValue;
 	}
-	
-	
+
+
 	private static String readContextId(
 			final IConfigurationElement configurationElement) {
 		String contextId = configurationElement
@@ -958,9 +945,9 @@ public class BindingPersistence extends PreferencePersistence {
 		return contextId;
 	}
 
-	
+
 	private static String readSchemeId(IConfigurationElement configurationElement, List warningsToLog, String commandId) {
-		
+
 		String schemeId = configurationElement.getAttribute(ATT_SCHEME_ID);
 		if ((schemeId == null) || (schemeId.length() == 0)) {
 			schemeId = configurationElement
@@ -977,7 +964,7 @@ public class BindingPersistence extends PreferencePersistence {
 		}
 		return schemeId;
 	}
-	
+
 	private static String readCommandId(
 			final IConfigurationElement configurationElement) {
 		String commandId = configurationElement
@@ -990,14 +977,14 @@ public class BindingPersistence extends PreferencePersistence {
 		}
 		return commandId;
 	}
-	
+
 	private static boolean isEmpty(String string) {
 		return string == null || string.length() == 0;
 	}
 
 	/**
 	 * Reads all of the scheme definitions from the registry.
-	 * 
+	 *
 	 * @param configurationElements
 	 *            The configuration elements in the commands extension point;
 	 *            must not be <code>null</code>, but may be empty.
@@ -1015,8 +1002,8 @@ public class BindingPersistence extends PreferencePersistence {
 		// Undefine all the previous handle objects.
 		final HandleObject[] handleObjects = bindingManager.getDefinedSchemes();
 		if (handleObjects != null) {
-			for (int i = 0; i < handleObjects.length; i++) {
-				handleObjects[i].undefine();
+			for (HandleObject handleObject : handleObjects) {
+				handleObject.undefine();
 			}
 		}
 
@@ -1061,7 +1048,7 @@ public class BindingPersistence extends PreferencePersistence {
 	 * Writes the given active scheme and bindings to the preference store. Only
 	 * bindings that are of the <code>Binding.USER</code> type will be
 	 * written; the others will be ignored.
-	 * 
+	 *
 	 * @param activeScheme
 	 *            The scheme which should be persisted; may be <code>null</code>.
 	 * @param bindings
@@ -1114,7 +1101,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * Writes the active scheme to its own preference key. This key is used by
 	 * RCP applications as part of their plug-in customization.
-	 * 
+	 *
 	 * @param scheme
 	 *            The scheme to write to the preference store. If the scheme is
 	 *            <code>null</code>, then it is removed.
@@ -1137,7 +1124,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * Writes the active scheme to the memento. If the scheme is
 	 * <code>null</code>, then all schemes in the memento are removed.
-	 * 
+	 *
 	 * @param memento
 	 *            The memento to which the scheme should be written; must not be
 	 *            <code>null</code>.
@@ -1163,7 +1150,7 @@ public class BindingPersistence extends PreferencePersistence {
 	/**
 	 * Writes the binding to the memento. This creates a new child element on
 	 * the memento, and places the properties of the binding as its attributes.
-	 * 
+	 *
 	 * @param parent
 	 *            The parent memento for the binding element; must not be
 	 *            <code>null</code>.
@@ -1214,7 +1201,7 @@ public class BindingPersistence extends PreferencePersistence {
 
 	/**
 	 * Constructs a new instance of <code>BindingPersistence</code>.
-	 * 
+	 *
 	 * @param bindingManager
 	 *            The binding manager which should be populated with the values
 	 *            from the registry and preference store; must not be
@@ -1227,8 +1214,12 @@ public class BindingPersistence extends PreferencePersistence {
 			final CommandManager commandManager) {
 		this.bindingManager = bindingManager;
 		this.commandManager = commandManager;
+		// HACK.  Calling super.read() installs a required preferences change listener.
+		// See bug 266604.
+		super.read();
 	}
 
+	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		return false;
 	}
@@ -1268,10 +1259,11 @@ public class BindingPersistence extends PreferencePersistence {
 				}
 			}
 		}
-		
+
 		return true;
 	}
-	
+
+	@Override
 	protected final boolean isChangeImportant(final PropertyChangeEvent event) {
 		return EXTENSION_COMMANDS.equals(event.getProperty());
 	}
@@ -1280,11 +1272,12 @@ public class BindingPersistence extends PreferencePersistence {
 	 * Reads all of the binding information from the registry and from the
 	 * preference store.
 	 */
+	@Override
 	public final void read() {
 		super.read();
 		reRead();
 	}
-	
+
 	public void reRead() {
 		// Create the extension registry mementos.
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -1296,8 +1289,7 @@ public class BindingPersistence extends PreferencePersistence {
 		// Sort the bindings extension point based on element name.
 		final IConfigurationElement[] bindingsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_BINDINGS);
-		for (int i = 0; i < bindingsExtensionPoint.length; i++) {
-			final IConfigurationElement configurationElement = bindingsExtensionPoint[i];
+		for (final IConfigurationElement configurationElement : bindingsExtensionPoint) {
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -1318,8 +1310,7 @@ public class BindingPersistence extends PreferencePersistence {
 		// Sort the commands extension point based on element name.
 		final IConfigurationElement[] commandsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_COMMANDS);
-		for (int i = 0; i < commandsExtensionPoint.length; i++) {
-			final IConfigurationElement configurationElement = commandsExtensionPoint[i];
+		for (final IConfigurationElement configurationElement : commandsExtensionPoint) {
 			final String name = configurationElement.getName();
 
 			// Check if it is a binding definition.
@@ -1348,8 +1339,7 @@ public class BindingPersistence extends PreferencePersistence {
 		 */
 		final IConfigurationElement[] acceleratorConfigurationsExtensionPoint = registry
 				.getConfigurationElementsFor(EXTENSION_ACCELERATOR_CONFIGURATIONS);
-		for (int i = 0; i < acceleratorConfigurationsExtensionPoint.length; i++) {
-			final IConfigurationElement configurationElement = acceleratorConfigurationsExtensionPoint[i];
+		for (final IConfigurationElement configurationElement : acceleratorConfigurationsExtensionPoint) {
 			final String name = configurationElement.getName();
 
 			// Check if the name matches the accelerator configuration element

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,16 +20,17 @@ import org.eclipse.core.runtime.IStatus;
  * Clients may provide their own implementation to change how errors are logged
  * from within JFace Data Binding.
  * </p>
- * 
+ *
  * @see Policy#getLog()
  * @see Policy#setLog(ILogger)
  * @since 1.1
  */
+@FunctionalInterface
 public interface ILogger {
 
 	/**
 	 * Logs the given status.
-	 * 
+	 *
 	 * @param status
 	 *            the status to log
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     private static final String[] directoryNames = { "dir1", "dir2" };
 
     private static final String[] fileNames = { "file1.txt", "file2.txt" };
-    
+
     private String localDirectory;
 
     private IProject project;
@@ -62,18 +62,17 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         newFile.createNewFile();
     }
 
-    /*
-     * @see IOverwriteQuery#queryOverwrite(String)
-     */
-    public String queryOverwrite(String pathString) {
+    @Override
+	public String queryOverwrite(String pathString) {
         //Always return an empty String - we aren't
         //doing anything interesting
         return "";
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
-        Class testClass = Class
+		Class<?> testClass = Class
                 .forName("org.eclipse.ui.tests.datatransfer.ImportOperationTest");
         InputStream stream = testClass.getResourceAsStream("tests.ini");
         Properties properties = new Properties();
@@ -90,8 +89,8 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         File rootDirectory = new File(localDirectory);
         rootDirectory.mkdir();
         localDirectory = rootDirectory.getAbsolutePath();
-        for (int i = 0; i < directoryNames.length; i++) {
-            createSubDirectory(localDirectory, directoryNames[i]);
+        for (String directoryName : directoryNames) {
+            createSubDirectory(localDirectory, directoryName);
         }
     }
 
@@ -99,7 +98,8 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
      * Tear down. Delete the project we created and all of the
      * files on the file system.
      */
-    protected void doTearDown() throws Exception {
+    @Override
+	protected void doTearDown() throws Exception {
         super.doTearDown();
         try {
             project.delete(true, true, null);
@@ -117,7 +117,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testGetStatus() throws Exception {
         project = FileUtil.createProject("ImportGetStatus");
         File element = new File(localDirectory);
-        List importElements = new ArrayList();
+		List<File> importElements = new ArrayList<>();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -128,7 +128,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testImportList() throws Exception {
         project = FileUtil.createProject("ImportList");
         File element = new File(localDirectory);
-        List importElements = new ArrayList();
+		List<File> importElements = new ArrayList<>();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -150,7 +150,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         project = FileUtil.createProject("ImportSourceList");
         File element = new File(localDirectory + File.separator
                 + directoryNames[0]);
-        List importElements = new ArrayList();
+		List<File> importElements = new ArrayList<>();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 new File(localDirectory), FileSystemStructureProvider.INSTANCE,
@@ -162,7 +162,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testSetContext() throws Exception {
         project = FileUtil.createProject("ImportSetContext");
         File element = new File(localDirectory);
-        List importElements = new ArrayList();
+		List<File> importElements = new ArrayList<>();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -174,7 +174,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testSetCreateContainerStructure() throws Exception {
         project = FileUtil.createProject("ImportSetCreateContainerStructure");
         File element = new File(localDirectory);
-        List importElements = new ArrayList();
+		List<File> importElements = new ArrayList<>();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -191,9 +191,9 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
             IResource[] resources = ((IContainer) targetFolder).members();
             assertEquals("Import failed to import all directories",
                     directoryNames.length, resources.length);
-            for (int i = 0; i < resources.length; i++) {
-                assertTrue("Import failed", resources[i] instanceof IContainer);
-                verifyFolder((IContainer) resources[i]);
+            for (IResource resource : resources) {
+                assertTrue("Import failed", resource instanceof IContainer);
+                verifyFolder((IContainer) resource);
             }
         } catch (CoreException e) {
             fail(e.toString());
@@ -207,7 +207,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 new File(localDirectory), FileSystemStructureProvider.INSTANCE,
                 this);
-        List importElements = new ArrayList();
+		List<File> importElements = new ArrayList<>();
         importElements.add(element);
         operation.setFilesToImport(importElements);
         openTestWindow().run(true, true, operation);
@@ -217,7 +217,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
     public void testSetOverwriteResources() throws Exception {
         project = FileUtil.createProject("ImportSetOverwriteResources");
         File element = new File(localDirectory);
-        List importElements = new ArrayList();
+		List<File> importElements = new ArrayList<>();
         importElements.add(element);
         ImportOperation operation = new ImportOperation(project.getFullPath(),
                 FileSystemStructureProvider.INSTANCE, this, importElements);
@@ -229,7 +229,7 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
 
     /**
      * Verifies that all files were imported.
-     * 
+     *
      * @param folderCount number of folders that were imported
      */
     private void verifyFiles(int folderCount) {
@@ -242,9 +242,9 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
             IResource[] resources = ((IContainer) targetFolder).members();
             assertEquals("Import failed to import all directories",
                     folderCount, resources.length);
-            for (int i = 0; i < resources.length; i++) {
-                assertTrue("Import failed", resources[i] instanceof IContainer);
-                verifyFolder((IContainer) resources[i]);
+            for (IResource resource : resources) {
+                assertTrue("Import failed", resource instanceof IContainer);
+                verifyFolder((IContainer) resource);
             }
         } catch (CoreException e) {
             fail(e.toString());
@@ -259,12 +259,12 @@ public class ImportOperationTest extends UITestCase implements IOverwriteQuery {
             IResource[] files = folder.members();
             assertEquals("Import failed to import all files", fileNames.length,
                     files.length);
-            for (int j = 0; j < fileNames.length; j++) {
-                String fileName = fileNames[j];
+            for (String fileName : fileNames) {
                 int k;
                 for (k = 0; k < files.length; k++) {
-                    if (fileName.equals(files[k].getName()))
-                        break;
+                    if (fileName.equals(files[k].getName())) {
+						break;
+					}
                 }
                 assertTrue("Import failed to import file " + fileName,
                         k < fileNames.length);

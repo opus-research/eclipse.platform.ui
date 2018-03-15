@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,13 +20,13 @@ import org.eclipse.ui.services.IDisposable;
 
 /**
  * @since 3.4
- * 
+ *
  */
 public class SlavePageService implements IPageService, IDisposable {
 
 	private IPageService parent;
-	private ListenerList pageListeners = new ListenerList(ListenerList.IDENTITY);
-	private ListenerList perspectiveListeners = new ListenerList(
+	private ListenerList<IPageListener> pageListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList<IPerspectiveListener> perspectiveListeners = new ListenerList<>(
 			ListenerList.IDENTITY);
 
 	public SlavePageService(IPageService parent) {
@@ -37,41 +37,45 @@ public class SlavePageService implements IPageService, IDisposable {
 		this.parent = parent;
 	}
 
+	@Override
 	public void addPageListener(IPageListener listener) {
 		pageListeners.add(listener);
 		parent.addPageListener(listener);
 	}
 
+	@Override
 	public void addPerspectiveListener(IPerspectiveListener listener) {
 		perspectiveListeners.add(listener);
 		parent.addPerspectiveListener(listener);
 	}
 
+	@Override
 	public IWorkbenchPage getActivePage() {
 		return parent.getActivePage();
 	}
 
+	@Override
 	public void removePageListener(IPageListener listener) {
 		pageListeners.remove(listener);
 		parent.removePageListener(listener);
 	}
 
+	@Override
 	public void removePerspectiveListener(IPerspectiveListener listener) {
 		perspectiveListeners.remove(listener);
 		parent.removePerspectiveListener(listener);
 	}
 
+	@Override
 	public void dispose() {
-		Object[] listeners = pageListeners.getListeners();
-		
-		for(int i = 0; i < listeners.length; i++) {
-			parent.removePageListener((IPageListener) listeners[i]);
+
+		for (IPageListener listener : pageListeners) {
+			parent.removePageListener(listener);
 		}
 		pageListeners.clear();
-		
-		listeners = perspectiveListeners.getListeners();
-		for(int i = 0; i < listeners.length; i++) {
-			parent.removePerspectiveListener((IPerspectiveListener) listeners[i]);
+
+		for (IPerspectiveListener listener : perspectiveListeners) {
+			parent.removePerspectiveListener(listener);
 		}
 		perspectiveListeners.clear();
 	}

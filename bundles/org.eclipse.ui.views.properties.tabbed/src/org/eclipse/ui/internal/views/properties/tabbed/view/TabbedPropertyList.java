@@ -1,15 +1,18 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2009 IBM Corporation and others.
+ * Copyright (c) 2001, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Mariot Chauvin <mariot.chauvin@obeo.fr> - bug 259553
+ *     Amit Joglekar <joglekar@us.ibm.com> - Support for dynamic images (bug 385795)
  *******************************************************************************/
 package org.eclipse.ui.internal.views.properties.tabbed.view;
+
+import java.util.Map;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -34,6 +37,7 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
@@ -53,7 +57,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 /**
  * Shows the list of tabs in the tabbed property sheet page.
- * 
+ *
  * @author Anthony Hunter
  */
 public class TabbedPropertyList
@@ -68,6 +72,17 @@ public class TabbedPropertyList
 	private boolean focus = false;
 
 	private ListElement[] elements;
+
+	/**
+	 * This map specifies the number of dynamic images for a tab. It has a
+	 * ITabItem as key and number of dynamic images for the tab as value. It is
+	 * set using the setDynamicImageCount() method. It is used to calculate the
+	 * width of the widest tab by setting aside enough space for displaying the
+	 * dynamic images. Individual dynamic images are displayed/removed from a
+	 * tab by using the showDynamicImage() and hideDynamicImage() methods on the
+	 * tab's ListElement object.
+	 */
+	private Map tabToDynamicImageCountMap;
 
 	private int selectedElementIndex = NONE;
 
@@ -126,9 +141,13 @@ public class TabbedPropertyList
 
 		private boolean hover;
 
+		private Image[] dynamicImages;
+
+		private Color textColor = widgetForeground;
+
 		/**
 		 * Constructor for ListElement.
-		 * 
+		 *
 		 * @param parent
 		 *            the parent Composite.
 		 * @param tab
@@ -145,12 +164,14 @@ public class TabbedPropertyList
 
 			addPaintListener(new PaintListener() {
 
+				@Override
 				public void paintControl(PaintEvent e) {
 					paint(e);
 				}
 			});
 			addMouseListener(new MouseAdapter() {
 
+				@Override
 				public void mouseUp(MouseEvent e) {
 					if (!selected) {
 						select(getIndex(ListElement.this));
@@ -170,6 +191,7 @@ public class TabbedPropertyList
 			});
 			addMouseMoveListener(new MouseMoveListener() {
 
+				@Override
 				public void mouseMove(MouseEvent e) {
 					if (!hover) {
 						hover = true;
@@ -179,6 +201,7 @@ public class TabbedPropertyList
 			});
 			addMouseTrackListener(new MouseTrackAdapter() {
 
+				@Override
 				public void mouseExit(MouseEvent e) {
 					hover = false;
 					redraw();
@@ -187,8 +210,34 @@ public class TabbedPropertyList
 		}
 
 		/**
+		 * Constructor for ListElement.
+		 *
+		 * @param parent
+		 *            the parent Composite.
+		 * @param tab
+		 *            the tab item for the element.
+		 * @param dynamicImageCount
+		 *            number of dynamic images for this element
+		 * @param index
+		 *            the index in the list.
+		 */
+		public ListElement(Composite parent, final ITabItem tab,
+				int dynamicImageCount, int index) {
+			this(parent, tab, index);
+			/*
+			 * Dynamic images are not displayed initially, set all of them to
+			 * null. Clients should call showDynamicImage() method to display a
+			 * dynamic image.
+			 */
+			this.dynamicImages = new Image[dynamicImageCount];
+			for (int i = 0; i < dynamicImageCount; i++) {
+				this.dynamicImages[i] = null;
+			}
+		}
+
+		/**
 		 * Set selected value for this element.
-		 * 
+		 *
 		 * @param selected
 		 *            the selected value.
 		 */
@@ -198,8 +247,66 @@ public class TabbedPropertyList
 		}
 
 		/**
+		 * Show the dynamic image at specified index in dynamicImages array. The
+		 * image width should not be more than 16 pixels. The caller is
+		 * responsible for loading the image appropriately and managing it's
+		 * resources.
+		 *
+		 * @param index
+		 * @param image
+		 */
+		public void showDynamicImage(int index, Image image) {
+			if (index >= 0 && index < dynamicImages.length) {
+				if (dynamicImages[index] != image) {
+					dynamicImages[index] = image;
+					redraw();
+				}
+			}
+		}
+
+		/**
+		 * Hide the dynamic image at specified index in dynamicImages array. The
+		 * caller is responsible for managing image resources and disposing it
+		 * appropriately.
+		 *
+		 * @param index
+		 */
+		public void hideDynamicImage(int index) {
+			if (index >= 0 && index < dynamicImages.length) {
+				if (dynamicImages[index] != null) {
+					dynamicImages[index] = null;
+					redraw();
+				}
+			}
+		}
+
+		/**
+		 * Sets color to be used for drawing tab label text. The caller is
+		 * responsible for managing the color's resources and disposing it
+		 * appropriately after setDefaultTextColor() is later invoked.
+		 *
+		 * @param textColor
+		 */
+		public void setTextColor(Color textColor) {
+			if (textColor != null && !this.textColor.equals(textColor)) {
+				this.textColor = textColor;
+				redraw();
+			}
+		}
+
+		/**
+		 * Sets default color for tab label text
+		 */
+		public void setDefaultTextColor() {
+			if (!this.textColor.equals(widgetForeground)) {
+				this.textColor = widgetForeground;
+				redraw();
+			}
+		}
+
+		/**
 		 * Paint the element.
-		 * 
+		 *
 		 * @param e
 		 *            the paint event.
 		 */
@@ -242,6 +349,9 @@ public class TabbedPropertyList
 						bounds.height + 1);
 			}
 
+			/*
+			 * Add INDENT pixels to the left as a margin.
+			 */
 			int textIndent = INDENT;
 			FontMetrics fm = e.gc.getFontMetrics();
 			int height = fm.getHeight();
@@ -256,13 +366,13 @@ public class TabbedPropertyList
 					textIndent = textIndent - 3;
 				}
 				e.gc.drawImage(tab.getImage(), textIndent, textMiddle - 1);
-				textIndent = textIndent + 16 + 5;
+				textIndent = textIndent + 16 + 4;
 			} else if (tab.isIndented()) {
 				textIndent = textIndent + INDENT;
 			}
 
 			/* draw the text */
-			e.gc.setForeground(widgetForeground);
+			e.gc.setForeground(textColor);
 			if (selected) {
 				/* selected tab is bold font */
 				e.gc.setFont(JFaceResources.getFontRegistry().getBold(
@@ -276,6 +386,31 @@ public class TabbedPropertyList
 					+ point.x, bounds.height - 4);
 			}
 
+			/* Draw dynamic images, if any */
+			boolean hasDynamicImage = false;
+			for (Image dynamicImage : dynamicImages) {
+				if (dynamicImage != null && !dynamicImage.isDisposed()) {
+					hasDynamicImage = true;
+					break;
+				}
+			}
+			if (hasDynamicImage) {
+				int drawPosition = textIndent
+						+ e.gc.textExtent(tab.getText()).x + 4;
+				boolean addSpace = false;
+				for (Image dynamicImage : dynamicImages) {
+					if (dynamicImage != null && !dynamicImage.isDisposed()) {
+						if (addSpace) {
+							drawPosition = drawPosition + 3;
+						}
+						e.gc.drawImage(dynamicImage, drawPosition,
+								textMiddle - 1);
+						drawPosition = drawPosition + 16;
+						addSpace = true;
+					}
+				}
+			}
+
 			/* draw the bottom line on the tab for selected and default */
 			if (!hover) {
 				e.gc.setForeground(listBackground);
@@ -286,13 +421,14 @@ public class TabbedPropertyList
 
 		/**
 		 * Get the tab item.
-		 * 
+		 *
 		 * @return the tab item.
 		 */
 		public ITabItem getTabItem() {
 			return tab;
 		}
 
+		@Override
 		public String toString() {
 			return tab.getText();
 		}
@@ -307,7 +443,7 @@ public class TabbedPropertyList
 
 		/**
 		 * Constructor for TopNavigationElement.
-		 * 
+		 *
 		 * @param parent
 		 *            the parent Composite.
 		 */
@@ -315,12 +451,14 @@ public class TabbedPropertyList
 			super(parent, SWT.NO_FOCUS);
 			addPaintListener(new PaintListener() {
 
+				@Override
 				public void paintControl(PaintEvent e) {
 					paint(e);
 				}
 			});
 			addMouseListener(new MouseAdapter() {
 
+				@Override
 				public void mouseUp(MouseEvent e) {
 					if (isUpScrollRequired()) {
 						bottomVisibleIndex--;
@@ -337,7 +475,7 @@ public class TabbedPropertyList
 
 		/**
 		 * Paint the element.
-		 * 
+		 *
 		 * @param e
 		 *            the paint event.
 		 */
@@ -394,7 +532,7 @@ public class TabbedPropertyList
 
 		/**
 		 * Constructor for BottomNavigationElement.
-		 * 
+		 *
 		 * @param parent
 		 *            the parent Composite.
 		 */
@@ -402,12 +540,14 @@ public class TabbedPropertyList
 			super(parent, SWT.NO_FOCUS);
 			addPaintListener(new PaintListener() {
 
+				@Override
 				public void paintControl(PaintEvent e) {
 					paint(e);
 				}
 			});
 			addMouseListener(new MouseAdapter() {
 
+				@Override
 				public void mouseUp(MouseEvent e) {
 					if (isDownScrollRequired()) {
 						topVisibleIndex++;
@@ -424,7 +564,7 @@ public class TabbedPropertyList
 
 		/**
 		 * Paint the element.
-		 * 
+		 *
 		 * @param e
 		 *            the paint event.
 		 */
@@ -473,7 +613,7 @@ public class TabbedPropertyList
 
 	/**
 	 * Constructor for TabbedPropertyList.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent widget.
 	 * @param factory
@@ -492,6 +632,7 @@ public class TabbedPropertyList
 
 		this.addFocusListener(new FocusListener() {
 
+			@Override
 			public void focusGained(FocusEvent e) {
 				focus = true;
 				int i = getSelectionIndex();
@@ -500,6 +641,7 @@ public class TabbedPropertyList
 				}
 			}
 
+			@Override
 			public void focusLost(FocusEvent e) {
 				focus = false;
 				int i = getSelectionIndex();
@@ -510,12 +652,14 @@ public class TabbedPropertyList
 		});
 		this.addControlListener(new ControlAdapter() {
 
+			@Override
 			public void controlResized(ControlEvent e) {
 				computeTopAndBottomTab();
 			}
 		});
 		this.addTraverseListener(new TraverseListener() {
 
+			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS
 					|| e.detail == SWT.TRAVERSE_ARROW_NEXT) {
@@ -549,9 +693,18 @@ public class TabbedPropertyList
 	}
 
 	/**
+	 * Returns the number of elements in this list viewer.
+	 *
+	 * @return number of elements
+	 */
+	public int getNumberOfElements() {
+		return elements.length;
+	}
+
+	/**
 	 * Returns the element with the given index from this list viewer. Returns
 	 * <code>null</code> if the index is out of range.
-	 * 
+	 *
 	 * @param index
 	 *            the zero-based index
 	 * @return the element at the given index, or <code>null</code> if the
@@ -567,7 +720,7 @@ public class TabbedPropertyList
 	/**
 	 * Returns the zero-relative index of the item which is currently selected
 	 * in the receiver, or -1 if no item is selected.
-	 * 
+	 *
 	 * @return the index of the selected item
 	 */
 	public int getSelectionIndex() {
@@ -575,12 +728,20 @@ public class TabbedPropertyList
 	}
 
 	/**
+	 * @return zero-relative index of the widest item, or -1 if this list is
+	 *         empty.
+	 */
+	public int getWidestLabelIndex() {
+		return widestLabelIndex;
+	}
+
+	/**
 	 * Removes all elements from this list.
 	 */
 	public void removeAll() {
 		if (elements != null) {
-			for (int i = 0; i < elements.length; i++) {
-				elements[i].dispose();
+			for (ListElement element : elements) {
+				element.dispose();
 			}
 		}
 		elements = ELEMENTS_EMPTY;
@@ -591,8 +752,22 @@ public class TabbedPropertyList
 	}
 
 	/**
+	 * Sets a map containing an ITabItem as key and number of dynamic images as
+	 * value. It is used to calculate the width of the widest tab by setting
+	 * aside enough space (16 pixels per image) for displaying the dynamic
+	 * images. Individual dynamic images are displayed/removed from a tab by
+	 * using the showDynamicImage() and hideDynamicImage() methods on the tab's
+	 * ListElement object.
+	 *
+	 * @param tabToDynamicImageCountMap
+	 */
+	public void setDynamicImageCount(Map tabToDynamicImageCountMap) {
+		this.tabToDynamicImageCountMap = tabToDynamicImageCountMap;
+	}
+
+	/**
 	 * Sets the new list elements.
-	 * 
+	 *
 	 * @param children
 	 */
 	public void setElements(Object[] children) {
@@ -605,18 +780,20 @@ public class TabbedPropertyList
 		} else {
 			widestLabelIndex = 0;
 			for (int i = 0; i < children.length; i++) {
-				elements[i] = new ListElement(this, (ITabItem) children[i], i);
+				int dynamicImageCount = 0;
+				if (tabToDynamicImageCountMap != null
+						&& tabToDynamicImageCountMap.containsKey(children[i])) {
+					dynamicImageCount = ((Integer) tabToDynamicImageCountMap
+							.get(children[i])).intValue();
+				}
+				elements[i] = new ListElement(this, (ITabItem) children[i],
+						dynamicImageCount, i);
 				elements[i].setVisible(false);
 				elements[i].setLayoutData(null);
 
 				if (i != widestLabelIndex) {
-					String label = ((ITabItem) children[i]).getText();
-					int width = getTextDimension(label).x;
-					if (((ITabItem) children[i]).isIndented()) {
-						width = width + INDENT;
-					}
-					if (width > getTextDimension(((ITabItem) children[widestLabelIndex])
-							.getText()).x) {
+					int width = getTabWidth((ITabItem) children[i]);
+					if (width > getTabWidth((ITabItem) children[widestLabelIndex])) {
 						widestLabelIndex = i;
 					}
 				}
@@ -626,9 +803,43 @@ public class TabbedPropertyList
 		computeTopAndBottomTab();
 	}
 
+	private int getTabWidth(ITabItem tabItem) {
+		int width = getTextDimension(tabItem.getText()).x;
+		/*
+		 * To anticipate for the icon placement we should always keep the
+		 * space available after the label. So when the active tab includes
+		 * an icon the width of the tab doesn't change.
+		 */
+		if (tabItem.getImage() != null) {
+			width = width + 16 + 4;
+		}
+		if (tabItem.isIndented()) {
+			width = width + INDENT;
+		}
+		if (tabToDynamicImageCountMap != null) {
+			int dynamicImageCount = 0;
+			if (tabToDynamicImageCountMap.containsKey(tabItem)) {
+				dynamicImageCount = ((Integer) tabToDynamicImageCountMap
+						.get(tabItem)).intValue();
+			}
+			if (dynamicImageCount > 0) {
+				/*
+				 * Keep some space between tab's text and first dynamic image
+				 */
+				width = width + 4;
+				width = width + (dynamicImageCount * 16);
+				/*
+				 * Keep some space between consecutive dynamic images
+				 */
+				width = width + ((dynamicImageCount - 1) * 3);
+			}
+		}
+		return width;
+	}
+
 	/**
 	 * Selects one of the elements in the list.
-	 * 
+	 *
 	 * @param index
 	 *            the index of the element to select.
 	 */
@@ -678,27 +889,19 @@ public class TabbedPropertyList
 		return element.index;
 	}
 
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		Point result = super.computeSize(hHint, wHint, changed);
 		if (widestLabelIndex == -1) {
 			String properties_not_available = TabbedPropertyMessages.TabbedPropertyList_properties_not_available;
 			result.x = getTextDimension(properties_not_available).x + INDENT;
 		} else {
-			ITabItem widestTab = elements[widestLabelIndex].getTabItem();
-			int width = getTextDimension(widestTab.getText()).x + INDENT;
 			/*
-			 * To anticipate for the icon placement we should always keep the
-			 * space available after the label. So when the active tab includes
-			 * an icon the width of the tab doesn't change.
+			 * Add INDENT pixels to the left of the longest tab as a margin.
 			 */
-			if (widestTab.getImage() != null) {
-				width = width + 16 + 4;
-			}
-			if (widestTab.isIndented()) {
-				width = width + 10;
-			}
+			int width = getTabWidth(elements[widestLabelIndex].getTabItem()) + INDENT;
 			/*
-			 * Add 10 pixels to the right of the longest string as a margin.
+			 * Add 10 pixels to the right of the longest tab as a margin.
 			 */
 			result.x = width + 10;
 		}
@@ -707,7 +910,7 @@ public class TabbedPropertyList
 
 	/**
 	 * Get the dimensions of the provided string.
-	 * 
+	 *
 	 * @param text
 	 *            the string.
 	 * @return the dimensions of the provided string.
@@ -722,10 +925,79 @@ public class TabbedPropertyList
 		return point;
 	}
 
+	public void setListBackgroundColor(Color color) {
+		listBackground = color;
+	}
+
+	public Color getListBackgroundColor() {
+		return listBackground;
+	}
+
+	public void setWidgetBackgroundColor(Color color) {
+		widgetBackground = color;
+
+		RGB black = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK).getRGB();
+		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE).getRGB();
+
+		defaultGradientStart = factory.getColors().createColor("TabbedPropertyList.defaultTabGradientStart", //$NON-NLS-1$
+				FormColors.blend(widgetBackground.getRGB(), FormColors.blend(white, widgetNormalShadow.getRGB(), 20),
+						60));
+		defaultGradientEnd = factory.getColors().createColor("TabbedPropertyList.defaultTabGradientEnd", //$NON-NLS-1$
+				FormColors.blend(widgetBackground.getRGB(), widgetNormalShadow.getRGB(), 40));
+
+		bottomNavigationElementShadowStroke1 = factory.getColors().createColor("TabbedPropertyList.tabShadowStroke1", //$NON-NLS-1$
+				FormColors.blend(black, widgetBackground.getRGB(), 10));
+		bottomNavigationElementShadowStroke2 = factory.getColors().createColor("TabbedPropertyList.tabShadowStroke2", //$NON-NLS-1$
+				FormColors.blend(black, widgetBackground.getRGB(), 5));
+
+		hoverGradientStart = factory.getColors().createColor("TabbedPropertyList.hoverBackgroundGradientStart", //$NON-NLS-1$
+				FormColors.blend(white, widgetBackground.getRGB(), 20));
+		hoverGradientEnd = factory.getColors().createColor("TabbedPropertyList.hoverBackgroundGradientEnd", //$NON-NLS-1$
+				FormColors.blend(widgetNormalShadow.getRGB(), widgetBackground.getRGB(), 10));
+
+		indentedDefaultBackground = factory.getColors().createColor("TabbedPropertyList.indentedDefaultBackground", //$NON-NLS-1$
+				FormColors.blend(white, widgetBackground.getRGB(), 10));
+		indentedHoverBackground = factory.getColors().createColor("TabbedPropertyList.indentedHoverBackground", //$NON-NLS-1$
+				FormColors.blend(white, widgetBackground.getRGB(), 75));
+	}
+
+	public Color getWidgetBackgroundColor() {
+		return widgetBackground;
+	}
+
+	public void setWidgetForegroundColor(Color color) {
+		widgetForeground = color;
+	}
+
+	public Color getWidgetForegroundColor() {
+		return widgetForeground;
+	}
+
+	public void setWidgetNormalShadowColor(Color color) {
+		widgetNormalShadow = color;
+
+		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE).getRGB();
+
+		navigationElementShadowStroke = factory.getColors().createColor("TabbedPropertyList.shadowStroke", //$NON-NLS-1$
+				FormColors.blend(white, widgetNormalShadow.getRGB(), 55));
+	}
+
+	public Color getWidgetNormalShadowColor() {
+		return widgetNormalShadow;
+	}
+
+	public void setWidgetDarkShadowColor(Color color) {
+		widgetDarkShadow = color;
+	}
+
+	public Color getWidgetDarkShadowColor() {
+		return widgetDarkShadow;
+	}
+
 	/**
 	 * Initialize the colours used in the list.
 	 */
-	private void initColours() {
+	public void initColours() {
 		/*
 		 * Colour 3 COLOR_LIST_BACKGROUND
 		 */
@@ -756,8 +1028,6 @@ public class TabbedPropertyList
 		widgetNormalShadow = Display.getCurrent().getSystemColor(
 				SWT.COLOR_WIDGET_NORMAL_SHADOW);
 
-		RGB infoBackground = Display.getCurrent().getSystemColor(
-				SWT.COLOR_INFO_BACKGROUND).getRGB();
 		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE)
 				.getRGB();
 		RGB black = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK)
@@ -765,16 +1035,16 @@ public class TabbedPropertyList
 
 		/*
 		 * gradient in the default tab: start colour WIDGET_NORMAL_SHADOW 100% +
-		 * white 20% + INFO_BACKGROUND 60% end colour WIDGET_NORMAL_SHADOW 100% +
-		 * INFO_BACKGROUND 40%
+		 * white 20% + WIDGET_BACKGROUND 60% end colour WIDGET_NORMAL_SHADOW
+		 * 100% + WIDGET_BACKGROUND 40%
 		 */
 		defaultGradientStart = factory.getColors().createColor(
 				"TabbedPropertyList.defaultTabGradientStart", //$NON-NLS-1$
-				FormColors.blend(infoBackground, FormColors.blend(white,
+				FormColors.blend(widgetBackground.getRGB(), FormColors.blend(white,
 						widgetNormalShadow.getRGB(), 20), 60));
 		defaultGradientEnd = factory.getColors().createColor(
 				"TabbedPropertyList.defaultTabGradientEnd", //$NON-NLS-1$
-				FormColors.blend(infoBackground, widgetNormalShadow.getRGB(),
+				FormColors.blend(widgetBackground.getRGB(), widgetNormalShadow.getRGB(),
 						40));
 
 		navigationElementShadowStroke = factory.getColors().createColor(
@@ -811,11 +1081,11 @@ public class TabbedPropertyList
 	/**
 	 * Get the height of a tab. The height of the tab is the height of the text
 	 * plus buffer.
-	 * 
+	 *
 	 * @return the height of a tab.
 	 */
 	private int getTabHeight() {
-		int tabHeight = getTextDimension("").y + INDENT; //$NON-NLS-1$ 
+		int tabHeight = getTextDimension("").y + INDENT; //$NON-NLS-1$
 		if (tabsThatFitInComposite == 1) {
 			/*
 			 * if only one tab will fix, reduce the size of the tab height so
@@ -831,7 +1101,7 @@ public class TabbedPropertyList
 
 	/**
 	 * Determine if a downward scrolling is required.
-	 * 
+	 *
 	 * @return true if downward scrolling is required.
 	 */
 	private boolean isDownScrollRequired() {
@@ -841,7 +1111,7 @@ public class TabbedPropertyList
 
 	/**
 	 * Determine if an upward scrolling is required.
-	 * 
+	 *
 	 * @return true if upward scrolling is required.
 	 */
 	private boolean isUpScrollRequired() {
@@ -976,6 +1246,7 @@ public class TabbedPropertyList
 		final Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
 
+			@Override
 			public void getName(AccessibleEvent e) {
 				if (getSelectionIndex() != NONE) {
 					e.result = elements[getSelectionIndex()].getTabItem()
@@ -983,6 +1254,7 @@ public class TabbedPropertyList
 				}
 			}
 
+			@Override
 			public void getHelp(AccessibleEvent e) {
 				if (getSelectionIndex() != NONE) {
 					e.result = elements[getSelectionIndex()].getTabItem()
@@ -993,12 +1265,14 @@ public class TabbedPropertyList
 
 		accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
 
+			@Override
 			public void getChildAtPoint(AccessibleControlEvent e) {
 				Point pt = toControl(new Point(e.x, e.y));
 				e.childID = (getBounds().contains(pt)) ? ACC.CHILDID_SELF
 					: ACC.CHILDID_NONE;
 			}
 
+			@Override
 			public void getLocation(AccessibleControlEvent e) {
 				if (getSelectionIndex() != NONE) {
 					Rectangle location = elements[getSelectionIndex()]
@@ -1011,14 +1285,17 @@ public class TabbedPropertyList
 				}
 			}
 
+			@Override
 			public void getChildCount(AccessibleControlEvent e) {
 				e.detail = 0;
 			}
 
+			@Override
 			public void getRole(AccessibleControlEvent e) {
 				e.detail = ACC.ROLE_TABITEM;
 			}
 
+			@Override
 			public void getState(AccessibleControlEvent e) {
 				e.detail = ACC.STATE_NORMAL | ACC.STATE_SELECTABLE
 					| ACC.STATE_SELECTED | ACC.STATE_FOCUSED
@@ -1028,6 +1305,7 @@ public class TabbedPropertyList
 
 		addListener(SWT.Selection, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
 				if (isFocusControl()) {
 					accessible.setFocus(ACC.CHILDID_SELF);
@@ -1037,6 +1315,7 @@ public class TabbedPropertyList
 
 		addListener(SWT.FocusIn, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
 				accessible.setFocus(ACC.CHILDID_SELF);
 			}

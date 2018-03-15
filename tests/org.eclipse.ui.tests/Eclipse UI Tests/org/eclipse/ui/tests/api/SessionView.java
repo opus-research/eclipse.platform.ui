@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.PartInitException;
+import org.junit.Assert;
 
 /**
- * This view is used to test the creation and restoration of 
+ * This view is used to test the creation and restoration of
  * view state between sessions.
  */
 public class SessionView extends MockViewPart {
@@ -37,7 +36,8 @@ public class SessionView extends MockViewPart {
     /**
      * @see IViewPart#init(IViewSite, IMemento)
      */
-    public void init(IViewSite site, IMemento memento) throws PartInitException {
+    @Override
+	public void init(IViewSite site, IMemento memento) {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -45,7 +45,8 @@ public class SessionView extends MockViewPart {
     /**
      * Create an IMemento.
      */
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
         createMementoState(memento);
     }
 
@@ -74,19 +75,19 @@ public class SessionView extends MockViewPart {
     /**
      * Restore an IMemento.
      */
-    public void testMementoState(TestCase testCase) {
+	public void testMementoState() {
         // Verify that the memento was passed to us in
         // constructor.
         Assert.assertNotNull(memento);
 
-        // Read float.	
+        // Read float.
         Float bigFloat = memento.getFloat("float");
         Assert.assertNotNull(bigFloat);
         Assert.assertEquals(bigFloat.floatValue(), 0.50f, 0.0001);
 
-        // Read int.	
+        // Read int.
         Integer bigInt = memento.getInteger("integer");
-        Assert.assertEquals(bigInt, new Integer(50));
+        Assert.assertEquals(bigInt, Integer.valueOf(50));
 
         // Read string.
         String str = memento.getString("string");
@@ -96,7 +97,7 @@ public class SessionView extends MockViewPart {
         IMemento child = memento.getChild("single");
         Assert.assertNotNull(child);
         bigInt = child.getInteger("id");
-        Assert.assertEquals(bigInt, new Integer(1));
+        Assert.assertEquals(bigInt, Integer.valueOf(1));
 
         // Read multiple children.
         bigInt = memento.getInteger("multiple.count");
@@ -108,7 +109,7 @@ public class SessionView extends MockViewPart {
             child = children[nX];
             Assert.assertNotNull(child);
             bigInt = child.getInteger("id");
-            Assert.assertEquals(bigInt, new Integer(nX));
+            Assert.assertEquals(bigInt, Integer.valueOf(nX));
         }
     }
 }

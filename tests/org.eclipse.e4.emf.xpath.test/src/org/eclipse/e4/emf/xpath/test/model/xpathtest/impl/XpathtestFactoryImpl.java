@@ -31,7 +31,7 @@ public class XpathtestFactoryImpl extends EFactoryImpl implements XpathtestFacto
 	 */
 	public static XpathtestFactory init() {
 		try {
-			XpathtestFactory theXpathtestFactory = (XpathtestFactory)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/emf/xpathtest"); 
+			XpathtestFactory theXpathtestFactory = (XpathtestFactory)EPackage.Registry.INSTANCE.getEFactory(XpathtestPackage.eNS_URI);
 			if (theXpathtestFactory != null) {
 				return theXpathtestFactory;
 			}
@@ -63,6 +63,9 @@ public class XpathtestFactoryImpl extends EFactoryImpl implements XpathtestFacto
 			case XpathtestPackage.ROOT: return createRoot();
 			case XpathtestPackage.NODE: return createNode();
 			case XpathtestPackage.EXTENDED_NODE: return createExtendedNode();
+			case XpathtestPackage.MENU: return createMenu();
+			case XpathtestPackage.MENU_ITEM: return createMenuItem();
+			case XpathtestPackage.MENU_ELEMENT: return createMenuElement();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -73,6 +76,7 @@ public class XpathtestFactoryImpl extends EFactoryImpl implements XpathtestFacto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Root createRoot() {
 		RootImpl root = new RootImpl();
 		return root;
@@ -83,6 +87,7 @@ public class XpathtestFactoryImpl extends EFactoryImpl implements XpathtestFacto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Node createNode() {
 		NodeImpl node = new NodeImpl();
 		return node;
@@ -93,6 +98,7 @@ public class XpathtestFactoryImpl extends EFactoryImpl implements XpathtestFacto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public ExtendedNode createExtendedNode() {
 		ExtendedNodeImpl extendedNode = new ExtendedNodeImpl();
 		return extendedNode;
@@ -103,6 +109,40 @@ public class XpathtestFactoryImpl extends EFactoryImpl implements XpathtestFacto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
+	public Menu createMenu() {
+		MenuImpl menu = new MenuImpl();
+		return menu;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public MenuItem createMenuItem() {
+		MenuItemImpl menuItem = new MenuItemImpl();
+		return menuItem;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public MenuElement createMenuElement() {
+		MenuElementImpl menuElement = new MenuElementImpl();
+		return menuElement;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public XpathtestPackage getXpathtestPackage() {
 		return (XpathtestPackage)getEPackage();
 	}

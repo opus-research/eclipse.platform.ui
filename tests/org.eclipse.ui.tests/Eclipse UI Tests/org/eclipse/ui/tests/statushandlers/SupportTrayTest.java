@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,6 @@ package org.eclipse.ui.tests.statushandlers;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -32,62 +30,65 @@ import org.eclipse.ui.internal.statushandlers.StackTraceSupportArea;
 import org.eclipse.ui.internal.statushandlers.SupportTray;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 
-public class SupportTrayTest extends TestCase {
-	
+import junit.framework.TestCase;
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#tearDown()
-	 */
+public class SupportTrayTest extends TestCase {
+
+
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		Policy.setErrorSupportProvider(null);
 	}
 
 	private final class NullErrorSupportProvider extends ErrorSupportProvider {
+		@Override
 		public Control createSupportArea(Composite parent, IStatus status) {
 			return null;
 		}
 	}
 
 	private final class NullListener implements Listener {
+		@Override
 		public void handleEvent(Event event) {
-			
+
 		}
 	}
 
 	public void testDefaultSupportProviderEnablement(){
-		Map dialogState = new HashMap();
+		Map<Object, Object> dialogState = new HashMap<>();
 		Status status = new Status(IStatus.ERROR, "org.eclipse.ui.test",
 				"Message.", new NullPointerException());
 		StatusAdapter sa = new StatusAdapter(status);
 		dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, sa);
 		SupportTray st = new SupportTray(dialogState, new NullListener());
 		assertNull(st.providesSupport(sa));
-		
+
 		dialogState.put(IStatusDialogConstants.ENABLE_DEFAULT_SUPPORT_AREA, Boolean.TRUE);
 		assertNotNull(st.providesSupport(sa));
-		
+
 		assertTrue(st.getSupportProvider() instanceof StackTraceSupportArea);
 	}
-	
+
 	public void testJFacePolicySupportProvider(){
-		Map dialogState = new HashMap();
+		Map<Object, Object> dialogState = new HashMap<>();
 		StatusAdapter sa = new StatusAdapter(Status.OK_STATUS);
 		dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, sa);
 		SupportTray st = new SupportTray(dialogState, new NullListener());
-		
+
 		assertNull(st.providesSupport(sa));
-		
+
 		final IStatus[] _status = new IStatus[]{null};
-		
+
 		Policy.setErrorSupportProvider(new ErrorSupportProvider() {
-			
+
+			@Override
 			public Control createSupportArea(Composite parent, IStatus status) {
 				_status[0] = status;
 				return new Composite(parent, SWT.NONE);
 			}
 		});
-		
+
 		assertNotNull(st.providesSupport(sa));
 
 		TrayDialog td = null;
@@ -98,15 +99,16 @@ public class SupportTrayTest extends TestCase {
 			td.open();
 			td.openTray(st);
 		} finally {
-			if (td != null)
+			if (td != null) {
 				td.close();
+			}
 		}
 
 		assertEquals(Status.OK_STATUS, _status[0]);
 	}
-	
+
 	public void testJFacePolicyOverDefaultPreference() {
-		Map dialogState = new HashMap();
+		Map<Object, Object> dialogState = new HashMap<>();
 		StatusAdapter sa = new StatusAdapter(Status.OK_STATUS);
 		dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, sa);
 		SupportTray st = new SupportTray(dialogState, new NullListener());
@@ -122,15 +124,16 @@ public class SupportTrayTest extends TestCase {
 
 		assertEquals(provider, st.getSupportProvider());
 	}
-	
+
 	public void testSelfClosure(){
 		final TrayDialog td[] = new TrayDialog[] { null };
 		try {
 			td[0] = new TrayDialog(new Shell()) {
 			};
-			Map dialogState = new HashMap();
+			Map<Object, Object> dialogState = new HashMap<>();
 			dialogState.put(IStatusDialogConstants.CURRENT_STATUS_ADAPTER, new StatusAdapter(Status.OK_STATUS));
 			SupportTray st = new SupportTray(dialogState, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					td[0].closeTray();
 				}
@@ -139,8 +142,9 @@ public class SupportTrayTest extends TestCase {
 			td[0].open();
 			td[0].openTray(st);
 		} finally {
-			if (td != null)
+			if (td != null) {
 				td[0].close();
+			}
 		}
 	}
 

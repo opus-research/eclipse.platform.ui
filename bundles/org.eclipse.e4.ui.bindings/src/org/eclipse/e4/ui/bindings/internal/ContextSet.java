@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.commands.contexts.ContextManager;
 
 public class ContextSet {
-	public static ContextSet EMPTY = new ContextSet(Collections.EMPTY_LIST);
+	public static ContextSet EMPTY = new ContextSet(Collections.<Context> emptyList());
 
 	public static class CComp implements Comparator<Context> {
 		private ContextManager manager;
@@ -30,6 +30,7 @@ public class ContextSet {
 			this.manager = manager;
 		}
 
+		@Override
 		public int compare(Context o1, Context o2) {
 			if (o1.equals(o2)) {
 				return 0;
@@ -52,8 +53,7 @@ public class ContextSet {
 					parentId = context.getParentId();
 				}
 			} catch (NotDefinedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// ignore
 			}
 			return l;
 		}
@@ -80,11 +80,6 @@ public class ContextSet {
 		return contexts;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -96,11 +91,6 @@ public class ContextSet {
 		return contexts.equals(((ContextSet) o).contexts);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return contexts.hashCode();

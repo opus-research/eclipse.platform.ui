@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -32,15 +30,15 @@ import org.eclipse.swt.widgets.Layout;
  * <li>Center: fills the area remaining once the other controls have been
  * positioned</li>
  * </ol>
- * 
+ *
  * <strong>NOTE:</strong> <i>All</i> the child controls must exist. Also,
  * computeSize is not implemented because we expect this to be used in
  * situations (i.e. shells) where the outer bounds are always 'set', not
  * computed. Also, the interior structure of the center may contain overlapping
  * controls so it may not be capable of performing the calculation.
- * 
+ *
  * @author emoffatt
- * 
+ *
  */
 public class TrimmedPartLayout extends Layout {
 
@@ -49,7 +47,7 @@ public class TrimmedPartLayout extends Layout {
 	 * be placed between the bottom trim component and the bottom edge of the
 	 * client area. If there is no bottom trim component, the gutter serves as a
 	 * margin.
-	 * 
+	 *
 	 * The default value is 0.
 	 */
 	public int gutterBottom = 0;
@@ -58,7 +56,7 @@ public class TrimmedPartLayout extends Layout {
 	 * gutterLeft specifies the number of pixels of horizontal margin that will
 	 * be placed between the left trim component and the left edge of the client
 	 * area. If there is no left trim component, the gutter serves as a margin.
-	 * 
+	 *
 	 * The default value is 0.
 	 */
 	public int gutterLeft = 0;
@@ -67,7 +65,7 @@ public class TrimmedPartLayout extends Layout {
 	 * gutterTop specifies the number of pixels of vertical margin that will be
 	 * placed between the top trim component and the top edge of the client
 	 * area. If there is no top trim component, the gutter serves as a margin.
-	 * 
+	 *
 	 * The default value is 0.
 	 */
 	public int gutterTop = 0;
@@ -77,7 +75,7 @@ public class TrimmedPartLayout extends Layout {
 	 * be placed between the right trim component and the right edge of the
 	 * client area. If there is no right trim component, the gutter serves as a
 	 * margin.
-	 * 
+	 *
 	 * The default value is 0.
 	 */
 	public int gutterRight = 0;
@@ -91,7 +89,7 @@ public class TrimmedPartLayout extends Layout {
 	/**
 	 * This layout is used to support parts that want trim for their containing
 	 * composites.
-	 * 
+	 *
 	 * @param trimOwner
 	 */
 	public TrimmedPartLayout(Composite parent) {
@@ -99,19 +97,14 @@ public class TrimmedPartLayout extends Layout {
 		clientArea.setLayout(new FillLayout());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
-	 * , int, int, boolean)
-	 */
+	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
 		// We can't actually compute a size so return a default
 		return new Point(SWT.DEFAULT, SWT.DEFAULT);
 	}
 
+	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		Rectangle ca = composite.getClientArea();
 		Rectangle caRect = new Rectangle(ca.x, ca.y, ca.width, ca.height);
@@ -195,44 +188,28 @@ public class TrimmedPartLayout extends Layout {
 			if (top == null) {
 				top = new Composite(parent, SWT.NONE);
 				top.setLayout(new TrimBarLayout(true));
-				top.addDisposeListener(new DisposeListener() {
-					public void widgetDisposed(DisposeEvent e) {
-						top = null;
-					}
-				});
+				top.addDisposeListener(e -> top = null);
 			}
 			return top;
 		} else if (side == SWT.BOTTOM) {
 			if (bottom == null) {
 				bottom = new Composite(parent, SWT.NONE);
 				bottom.setLayout(new TrimBarLayout(true));
-				bottom.addDisposeListener(new DisposeListener() {
-					public void widgetDisposed(DisposeEvent e) {
-						bottom = null;
-					}
-				});
+				bottom.addDisposeListener(e -> bottom = null);
 			}
 			return bottom;
 		} else if (side == SWT.LEFT) {
 			if (left == null) {
 				left = new Composite(parent, SWT.NONE);
 				left.setLayout(new TrimBarLayout(false));
-				left.addDisposeListener(new DisposeListener() {
-					public void widgetDisposed(DisposeEvent e) {
-						left = null;
-					}
-				});
+				left.addDisposeListener(e -> left = null);
 			}
 			return left;
 		} else if (side == SWT.RIGHT) {
 			if (right == null) {
 				right = new Composite(parent, SWT.NONE);
 				right.setLayout(new TrimBarLayout(false));
-				right.addDisposeListener(new DisposeListener() {
-					public void widgetDisposed(DisposeEvent e) {
-						right = null;
-					}
-				});
+				right.addDisposeListener(e -> right = null);
 			}
 			return right;
 		}

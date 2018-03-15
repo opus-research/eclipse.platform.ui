@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,17 +17,20 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public abstract class WidgetImageValueProperty extends WidgetValueProperty {
+	@Override
 	public Object getValueType() {
 		return Image.class;
 	}
 
+	@Override
 	protected Object doGetValue(Object source) {
 		return doGetImageValue(source);
 	}
 
+	@Override
 	protected void doSetValue(Object source, Object value) {
 		doSetImageValue(source, (Image) value);
 	}

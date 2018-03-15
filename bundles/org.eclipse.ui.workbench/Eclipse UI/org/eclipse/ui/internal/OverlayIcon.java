@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,10 +41,8 @@ public class OverlayIcon extends CompositeImageDescriptor {
         fSize = size;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.resource.CompositeImageDescriptor#drawCompositeImage(int, int)
-     */
-    protected void drawCompositeImage(int width, int height) {
+    @Override
+	protected void drawCompositeImage(int width, int height) {
         ImageData bg;
         if (fBase == null || (bg = fBase.getImageData()) == null) {
 			bg = DEFAULT_IMAGE_DATA;
@@ -70,25 +68,18 @@ public class OverlayIcon extends CompositeImageDescriptor {
         drawImage(id, x, 0);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.resource.CompositeImageDescriptor#getSize()
-     */
-    protected Point getSize() {
+    @Override
+	protected Point getSize() {
         return fSize;
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return Util.hashCode(fBase) * 17 + Util.hashCode(fOverlay);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if (!(obj instanceof OverlayIcon)) {
 			return false;
 		}

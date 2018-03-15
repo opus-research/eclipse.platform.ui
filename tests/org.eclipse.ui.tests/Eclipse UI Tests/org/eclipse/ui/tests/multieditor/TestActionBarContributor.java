@@ -19,9 +19,7 @@ public class TestActionBarContributor extends EditorActionBarContributor {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorActionBarContributor#contributeToCoolBar(org.eclipse.jface.action.ICoolBarManager)
-	 */
+	@Override
 	public void contributeToCoolBar(ICoolBarManager coolBarManager) {
 		super.contributeToCoolBar(coolBarManager);
 	}

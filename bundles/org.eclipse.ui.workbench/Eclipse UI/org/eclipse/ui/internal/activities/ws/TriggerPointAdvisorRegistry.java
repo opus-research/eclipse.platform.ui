@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.internal.activities.ws;
 
 import java.util.ArrayList;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -32,14 +31,14 @@ public class TriggerPointAdvisorRegistry {
 	private static TriggerPointAdvisorRegistry instance;
 
 	/**
-	 * 
+	 *
 	 */
 	private TriggerPointAdvisorRegistry() {
 	}
 
 	/**
 	 * Return the instance of this registry.
-	 * 
+	 *
 	 * @return the instance of this registry
 	 */
 	public static TriggerPointAdvisorRegistry getInstance() {
@@ -52,7 +51,7 @@ public class TriggerPointAdvisorRegistry {
 
 	/**
 	 * Return the trigger point advisors.
-	 * 
+	 *
 	 * @return the advisors
 	 */
 	public TriggerPointAdvisorDescriptor[] getAdvisors() {
@@ -67,15 +66,15 @@ public class TriggerPointAdvisorRegistry {
 		extensions = RegistryReader.orderExtensions(extensions);
 
 		ArrayList list = new ArrayList(extensions.length);
-		for (int i = 0; i < extensions.length; i++) {
-			IConfigurationElement[] elements = extensions[i]
+		for (IExtension extension : extensions) {
+			IConfigurationElement[] elements = extension
 					.getConfigurationElements();
-			for (int j = 0; j < elements.length; j++) {
-				if (elements[j].getName().equals(
+			for (IConfigurationElement element : elements) {
+				if (element.getName().equals(
 						IWorkbenchRegistryConstants.TAG_TRIGGERPOINTADVISOR)) {
 					try {
 						TriggerPointAdvisorDescriptor descriptor = new TriggerPointAdvisorDescriptor(
-								elements[j]);
+								element);
 						list.add(descriptor);
 					} catch (IllegalArgumentException e) {
 						// log an error since its not safe to open a dialog here
@@ -94,7 +93,7 @@ public class TriggerPointAdvisorRegistry {
 
 	/**
 	 * Return the trigger point advisor bound to a given product.
-	 * 
+	 *
 	 * @param productId
 	 *            the product id
 	 * @return the advisor
@@ -116,9 +115,9 @@ public class TriggerPointAdvisorRegistry {
 		}
 
 		TriggerPointAdvisorDescriptor[] advisors = getAdvisors();
-		for (int i = 0; i < advisors.length; i++) {
-			if (advisors[i].getId().equals(targetIntroId)) {
-				return advisors[i];
+		for (TriggerPointAdvisorDescriptor advisor : advisors) {
+			if (advisor.getId().equals(targetIntroId)) {
+				return advisor;
 			}
 		}
 
@@ -132,21 +131,21 @@ public class TriggerPointAdvisorRegistry {
 	 */
 	private String getAdvisorForProduct(String targetProductId,
 			IExtension[] extensions) {
-		for (int i = 0; i < extensions.length; i++) {
-			IConfigurationElement[] elements = extensions[i]
+		for (IExtension extension : extensions) {
+			IConfigurationElement[] elements = extension
 					.getConfigurationElements();
-			for (int j = 0; j < elements.length; j++) {
-				if (elements[j].getName().equals(
+			for (IConfigurationElement element : elements) {
+				if (element.getName().equals(
 						IWorkbenchRegistryConstants.TAG_ADVISORPRODUCTBINDING)) {
-					String advisorId = elements[j]
+					String advisorId = element
 							.getAttribute(IWorkbenchRegistryConstants.ATT_ADVISORID);
-					String productId = elements[j]
+					String productId = element
 							.getAttribute(IWorkbenchRegistryConstants.ATT_PRODUCTID);
 
 					if (advisorId == null || productId == null) {
 						IStatus status = new Status(
 								IStatus.ERROR,
-								elements[j].getDeclaringExtension()
+								element.getDeclaringExtension()
 										.getNamespace(),
 								IStatus.ERROR,
 								"triggerPointAdvisorId and productId must be defined.", new IllegalArgumentException()); //$NON-NLS-1$

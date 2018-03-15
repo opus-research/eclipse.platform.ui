@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -30,8 +31,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -66,7 +65,7 @@ import org.eclipse.ui.internal.util.BundleUtility;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public final class ActionDelegateHandlerProxy implements ISelectionListener,
@@ -109,7 +108,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	private IViewActionDelegate viewDelegate = null;
 	private IObjectActionDelegate objectDelegate = null;
 	private IWorkbenchWindowActionDelegate windowDelegate = null;
-	
+
 	private IWorkbenchPart currentPart = null;
 
 	/**
@@ -136,7 +135,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	 * A collection of objects listening to changes to this manager. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private transient ListenerList listenerList = null;
+	private transient ListenerList<IHandlerListener> listenerList = null;
 
 	/**
 	 * The image style to use when selecting the images to display for this
@@ -162,7 +161,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	 * Constructs a new instance of <code>ActionDelegateHandlerProxy</code>
 	 * with all the information it needs to try to avoid loading until it is
 	 * needed.
-	 * 
+	 *
 	 * @param element
 	 *            The configuration element from which the real class can be
 	 *            loaded at run-time; must not be <code>null</code>.
@@ -223,26 +222,27 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		this.viewId = viewId;
 	}
 
+	@Override
 	public final void addHandlerListener(final IHandlerListener handlerListener) {
 		if (listenerList == null) {
-			listenerList = new ListenerList(ListenerList.IDENTITY);
+			listenerList = new ListenerList<>(ListenerList.IDENTITY);
 		}
 
 		listenerList.add(handlerListener);
 	}
 
+	@Override
 	public void addState(String id, State state) {
-		// TODO Auto-generated method stub
-
 	}
 
-	
+
+	@Override
 	public final void dispose() {
 		disposeDelegate();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void disposeDelegate() {
 		final IActionDelegate actDel = getDelegate();
@@ -261,6 +261,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		currentSelection = null;
 	}
 
+	@Override
 	public final Object execute(final ExecutionEvent event) {
 		final IAction action = getAction();
 		if (loadDelegate() && (action != null)) {
@@ -387,7 +388,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	/**
 	 * Retrieves the action corresponding to the currently active workbench
 	 * window, if any.
-	 * 
+	 *
 	 * @return The current action; <code>null</code> if there is no currently
 	 *         active workbench window.
 	 */
@@ -395,10 +396,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		if (action == null) {
 			action = new CommandLegacyActionWrapper(actionId, command, style,
 					window);
-			action.addPropertyChangeListener(new IPropertyChangeListener() {
-				public final void propertyChange(final PropertyChangeEvent event) {
-					// TODO Update the state somehow.
-				}
+			action.addPropertyChangeListener(event -> {
+				// TODO Update the state somehow.
 			});
 		}
 		return action;
@@ -407,20 +406,20 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	/**
 	 * Retrieves the delegate corresponding to the currently active workbench
 	 * window, if any. This does not trigger loading of the delegate.
-	 * 
+	 *
 	 * @return The current delegate; or <code>null</code> if none.
 	 */
 	public final IActionDelegate getDelegate() {
 		return delegate;
 	}
 
+	@Override
 	public State getState(String stateId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public String[] getStateIds() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -455,10 +454,12 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 		// Initialize the delegate.
 		final ISafeRunnable runnable = new ISafeRunnable() {
+			@Override
 			public final void handleException(final Throwable exception) {
 				// Do nothing.
 			}
 
+			@Override
 			public final void run() {
 				// Handle IActionDelegate2
 				if (delegate instanceof IActionDelegate2) {
@@ -485,10 +486,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		SafeRunner.run(runnable);
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.commands.IHandler2#setEnabled(java.lang.Object)
-	 */
+
+	@Override
 	public void setEnabled(Object evaluationContext) {
 		if (!(evaluationContext instanceof IEvaluationContext)) {
 			return;
@@ -505,7 +504,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				}
 			} catch (final CoreException e) {
 				// We will just fall through an let it return false.
-				final StringBuffer message = new StringBuffer(
+				final StringBuilder message = new StringBuilder(
 						"An exception occurred while evaluating the enabledWhen expression for "); //$NON-NLS-1$
 				if (delegate != null) {
 					message.append(delegate);
@@ -522,10 +521,12 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		updateDelegate(action, context);
 	}
 
+	@Override
 	public final boolean isEnabled() {
 		return (action == null) || action.isEnabledDisregardingCommand();
 	}
 
+	@Override
 	public final boolean isHandled() {
 		return true;
 	}
@@ -533,7 +534,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	/**
 	 * Checks if the declaring plugin has been loaded. This means that there
 	 * will be no need to delay creating the delegate.
-	 * 
+	 *
 	 * @return <code>true</code> if the bundle containing the delegate is
 	 *         already loaded -- making it safe to load the delegate.
 	 */
@@ -548,7 +549,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	/**
 	 * Loads the delegate, if possible. If the delegate is loaded, then the
 	 * member variables are updated accordingly.
-	 * 
+	 *
 	 * @return <code>true</code> if the delegate is now non-null;
 	 *         <code>false</code> otherwise.
 	 */
@@ -643,6 +644,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		}
 	}
 
+	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
 		if (listenerList != null) {
 			listenerList.remove(handlerListener);
@@ -653,9 +655,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		}
 	}
 
+	@Override
 	public void removeState(String stateId) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private final void selectionChanged(final ISelection selection) {
@@ -678,19 +679,22 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		refreshEnablement();
 	}
 
+	@Override
 	public final void selectionChanged(final IWorkbenchPart part,
 			final ISelection selection) {
 		selectionChanged(selection);
 
 	}
 
+	@Override
 	public final void selectionChanged(final SelectionChangedEvent event) {
 		final ISelection selection = event.getSelection();
 		selectionChanged(selection);
 	}
 
+	@Override
 	public final String toString() {
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append("ActionDelegateHandlerProxy("); //$NON-NLS-1$
 		buffer.append(getDelegate());
 		if (element != null) {
@@ -699,6 +703,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				final String className = element
 						.getAttribute(delegateAttributeName);
 				buffer.append(className);
+				final String namespaceId = element.getNamespaceIdentifier();
+				buffer.append(" in ").append(namespaceId); //$NON-NLS-1$
 			} catch (InvalidRegistryObjectException e) {
 				buffer.append(actionId);
 			}
@@ -707,54 +713,38 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		return buffer.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partActivated(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partActivated(IWorkbenchPartReference partRef) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partBroughtToTop(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partBroughtToTop(IWorkbenchPartReference partRef) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partClosed(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
 		if (currentPart != null && partRef.getPart(false) == currentPart) {
 			updateActivePart(null);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partDeactivated(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partDeactivated(IWorkbenchPartReference partRef) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partHidden(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partHidden(IWorkbenchPartReference partRef) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partInputChanged(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partInputChanged(IWorkbenchPartReference partRef) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partOpened(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IPartListener2#partVisible(org.eclipse.ui.IWorkbenchPartReference)
-	 */
+	@Override
 	public void partVisible(IWorkbenchPartReference partRef) {
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,10 +25,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- * 
+ *
  * @since 3.5
  * @author Prakash G.R.
- * 
+ *
  */
 public class MarkerTesterTest extends UITestCase {
 
@@ -39,43 +39,48 @@ public class MarkerTesterTest extends UITestCase {
 		super(testName);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		project = ResourcesPlugin.getWorkspace().getRoot().getProject("tests");
-		if (!project.exists())
+		if (!project.exists()) {
 			project.create(null);
+		}
 
-		if (!project.isOpen())
+		if (!project.isOpen()) {
 			project.open(null);
+		}
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
-		if (project.exists())
+		if (project.exists()) {
 			project.delete(true, null);
+		}
 	}
 
 	public void testSeverity() throws Exception {
 
 		IMarker errorMarker = project.createMarker(IMarker.PROBLEM);
-		Map attributes = new HashMap();
-		attributes.put(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
+		Map<String, Object> attributes = new HashMap<>();
+		attributes.put(IMarker.SEVERITY, Integer.valueOf(IMarker.SEVERITY_ERROR));
 		errorMarker.setAttributes(attributes);
 
 		EvaluationContext context = new EvaluationContext(null, errorMarker);
 		TestExpression testExpression = new TestExpression(MARKER_NAMESPACE,
-				"severity", null, new Integer(IMarker.SEVERITY_ERROR));
+				"severity", null, Integer.valueOf(IMarker.SEVERITY_ERROR));
 		EvaluationResult result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
 		IMarker warningMarker = project.createMarker(IMarker.PROBLEM);
-		attributes = new HashMap();
-		attributes.put(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_WARNING));
+		attributes = new HashMap<>();
+		attributes.put(IMarker.SEVERITY, Integer.valueOf(IMarker.SEVERITY_WARNING));
 		warningMarker.setAttributes(attributes);
 
 		context = new EvaluationContext(null, warningMarker);
 		testExpression = new TestExpression(MARKER_NAMESPACE, "severity", null,
-				new Integer(IMarker.SEVERITY_WARNING));
+				Integer.valueOf(IMarker.SEVERITY_WARNING));
 		result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
@@ -119,24 +124,24 @@ public class MarkerTesterTest extends UITestCase {
 	public void testPriority() throws Exception {
 
 		IMarker highPriority = project.createMarker(IMarker.PROBLEM);
-		Map attributes = new HashMap();
-		attributes.put(IMarker.PRIORITY, new Integer(IMarker.PRIORITY_HIGH));
+		Map<String, Object> attributes = new HashMap<>();
+		attributes.put(IMarker.PRIORITY, Integer.valueOf(IMarker.PRIORITY_HIGH));
 		highPriority.setAttributes(attributes);
 
 		EvaluationContext context = new EvaluationContext(null, highPriority);
 		TestExpression testExpression = new TestExpression(MARKER_NAMESPACE,
-				"priority", null, new Integer(IMarker.PRIORITY_HIGH));
+				"priority", null, Integer.valueOf(IMarker.PRIORITY_HIGH));
 		EvaluationResult result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
 		IMarker lowPriority = project.createMarker(IMarker.PROBLEM);
-		attributes = new HashMap();
-		attributes.put(IMarker.PRIORITY, new Integer(IMarker.PRIORITY_LOW));
+		attributes = new HashMap<>();
+		attributes.put(IMarker.PRIORITY, Integer.valueOf(IMarker.PRIORITY_LOW));
 		lowPriority.setAttributes(attributes);
 
 		context = new EvaluationContext(null, lowPriority);
 		testExpression = new TestExpression(MARKER_NAMESPACE, "priority", null,
-				new Integer(IMarker.PRIORITY_LOW));
+				Integer.valueOf(IMarker.PRIORITY_LOW));
 		result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 	}
@@ -144,7 +149,7 @@ public class MarkerTesterTest extends UITestCase {
 	public void testDone() throws Exception {
 
 		IMarker done = project.createMarker(IMarker.TASK);
-		Map attributes = new HashMap();
+		Map<String, Object> attributes = new HashMap<>();
 		attributes.put(IMarker.DONE, Boolean.TRUE);
 		done.setAttributes(attributes);
 
@@ -155,7 +160,7 @@ public class MarkerTesterTest extends UITestCase {
 		assertEquals(EvaluationResult.TRUE, result);
 
 		IMarker notDone = project.createMarker(IMarker.TASK);
-		attributes = new HashMap();
+		attributes = new HashMap<>();
 		attributes.put(IMarker.DONE, Boolean.FALSE);
 		notDone.setAttributes(attributes);
 
@@ -177,7 +182,7 @@ public class MarkerTesterTest extends UITestCase {
 	public void testMessage() throws Exception {
 
 		IMarker someTaskMarker = project.createMarker(IMarker.TASK);
-		Map attributes = new HashMap();
+		Map<String, String> attributes = new HashMap<>();
 		attributes.put(IMarker.MESSAGE, "Some nice message to test");
 		someTaskMarker.setAttributes(attributes);
 
@@ -212,13 +217,13 @@ public class MarkerTesterTest extends UITestCase {
 	public void testResourceType() throws Exception {
 
 		IMarker someTaskMarker = project.createMarker(IMarker.TASK);
-		Map attributes = new HashMap();
+		Map<String, String> attributes = new HashMap<>();
 		attributes.put(IMarker.MESSAGE, "Some nice message to test");
 		someTaskMarker.setAttributes(attributes);
 
 		EvaluationContext context = new EvaluationContext(null, someTaskMarker);
 		TestExpression testExpression = new TestExpression(MARKER_NAMESPACE,
-				"resourceType", null, new Integer(IResource.PROJECT));
+				"resourceType", null, Integer.valueOf(IResource.PROJECT));
 		EvaluationResult result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
@@ -226,13 +231,13 @@ public class MarkerTesterTest extends UITestCase {
 		folder.create(true, true, null);
 
 		IMarker someOtherMarker = folder.createMarker(IMarker.TASK);
-		attributes = new HashMap();
+		attributes = new HashMap<>();
 		attributes.put(IMarker.MESSAGE, "Some nice message to test");
 		someOtherMarker.setAttributes(attributes);
 
 		context = new EvaluationContext(null, someOtherMarker);
 		testExpression = new TestExpression(MARKER_NAMESPACE, "resourceType",
-				null, new Integer(IResource.FOLDER));
+				null, Integer.valueOf(IResource.FOLDER));
 		result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.tests.statushandlers;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.internal.registry.RegistryMessages;
 import org.eclipse.core.runtime.CoreException;
@@ -32,17 +30,20 @@ import org.eclipse.ui.internal.dialogs.ExportWizard;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
+import org.eclipse.ui.tests.harness.util.UITestCase;
+
+import junit.framework.TestCase;
 
 /**
  * Tests whether the errors in wizards are handled properly
- * 
+ *
  * @since 3.3
  */
 public class WizardsStatusHandlingTestCase extends TestCase {
 
 	private static int SEVERITY = IStatus.ERROR;
 
-	private static Class EXCEPTION_CLASS = CoreException.class;
+	private static Class<CoreException> EXCEPTION_CLASS = CoreException.class;
 
 	private static String MESSAGE = WorkbenchMessages.WorkbenchWizard_errorMessage;
 
@@ -93,9 +94,13 @@ public class WizardsStatusHandlingTestCase extends TestCase {
 	}
 
 	public void testWizardWithNoDefaultContructor() {
+		UITestCase.processEvents();
+
 		final CustomWizardDialog dialog = exportWizard();
 		dialog.setBlockOnOpen(false);
 		dialog.open();
+
+		UITestCase.processEvents();
 
 		// selecting FaultyExportWizard
 		IWizardPage currenPage = dialog.getCurrentPage();
@@ -108,12 +113,15 @@ public class WizardsStatusHandlingTestCase extends TestCase {
 			if (table.getItem(i).getText().equals(FAULTY_WIZARD_NAME)) {
 				table.select(i);
 				table.notifyListeners(SWT.Selection, new Event());
+				UITestCase.processEvents();
 				break;
 			}
 		}
 
 		// pressing "Next"
 		dialog.nextPressed2();
+
+		UITestCase.processEvents();
 		assertStatusAdapter(TestStatusHandler.getLastHandledStatusAdapter());
 		assertEquals(TestStatusHandler.getLastHandledStyle(),
 				StatusManager.SHOW);

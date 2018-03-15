@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.core.databinding.property.set.ISetProperty;
 /**
  * An {@link ISetProperty} extension interface with convenience methods for
  * creating nested bean properties.
- * 
+ *
  * @since 1.2
  * @noextend This interface is not intended to be extended by clients.
  * @noimplement This interface is not intended to be implemented by clients.
@@ -25,7 +25,7 @@ public interface IBeanSetProperty extends IBeanProperty, ISetProperty {
 	/**
 	 * Returns a master-detail combination of this property and the specified
 	 * value property.
-	 * 
+	 *
 	 * @param propertyName
 	 *            the value property to observe. May be nested e.g.
 	 *            "parent.name"
@@ -38,7 +38,7 @@ public interface IBeanSetProperty extends IBeanProperty, ISetProperty {
 	/**
 	 * Returns a master-detail combination of this property and the specified
 	 * value property.
-	 * 
+	 *
 	 * @param propertyName
 	 *            the value property to observe. May be nested e.g.
 	 *            "parent.name"
@@ -58,7 +58,7 @@ public interface IBeanSetProperty extends IBeanProperty, ISetProperty {
 	 * value for each element (values).
 	 * <p>
 	 * Example:
-	 * 
+	 *
 	 * <pre>
 	 * // Observes the set-typed &quot;children&quot; property of a Person object,
 	 * // where the elements are Person objects
@@ -69,7 +69,7 @@ public interface IBeanSetProperty extends IBeanProperty, ISetProperty {
 	 * // Observes a map of children objects to their respective names.
 	 * IBeanMapProperty childrenNames = children.values(name);
 	 * </pre>
-	 * 
+	 *
 	 * @param property
 	 *            the detail property to observe
 	 * @return a master-detail combination of this property and the specified

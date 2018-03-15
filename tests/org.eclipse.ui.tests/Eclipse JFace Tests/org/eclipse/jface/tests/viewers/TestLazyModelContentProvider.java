@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,63 +10,56 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
 
-import junit.framework.AssertionFailedError;
-
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILazyContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * The TestLazyModelContentProvider is the lazy version
  * of the model content provider.
  */
-public class TestLazyModelContentProvider extends TestModelContentProvider implements ILazyContentProvider, IContentProvider {
-	
+public class TestLazyModelContentProvider extends TestModelContentProvider implements ILazyContentProvider {
+
 	TableViewerTest test;
 	TestElement input;
-	
+
 	TestLazyModelContentProvider(TableViewerTest testObject){
 		test = testObject;
 		if(!(testObject instanceof VirtualLazyTableViewerTest)) {
 			throw new AssertionFailedError("TestLazyModelContentProvider only works with VirtualLazyTableViewerTest");
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILazyContentProvider#updateElements(int, int)
-	 */
+
+	@Override
 	public void updateElement(int index) {
-		
+
 		((VirtualLazyTableViewerTest)test).updateElementCalled(index);
 
 		if(input == null)
+		 {
 			return; //Nothing to update yet
-		
+		}
+
         ((TableViewer) test.fViewer).replace(input.getChildAt(index), index);
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.TestModelContentProvider#dispose()
-	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.TestModelContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
+
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		input = (TestElement) newInput;
 		((TableViewer)viewer).setItemCount(input==null?0:input.getChildCount());
 		super.inputChanged(viewer, oldInput, newInput);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.tests.viewers.TestModelContentProvider#getElements(java.lang.Object)
-	 */
+
+	@Override
 	public Object[] getElements(Object element) {
 		Assert.isTrue(false,"Should not ever call getElements if lazy");
 		return super.getElements(element);

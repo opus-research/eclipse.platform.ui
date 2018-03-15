@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,9 @@ import org.eclipse.ui.menus.UIElement;
 /**
  * An IHandler for a command that expects to provide feedback through the
  * registered element mechanism must implement this interface.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public interface IElementUpdater {
 	/**
@@ -31,7 +31,7 @@ public interface IElementUpdater {
 	 * or be replaced at any time. Everybody should go through the
 	 * ICommandService refreshElements(*) method.
 	 * </p>
-	 * 
+	 *
 	 * @param element
 	 *            An element for a specific UI element. Will not be
 	 *            <code>null</code>.

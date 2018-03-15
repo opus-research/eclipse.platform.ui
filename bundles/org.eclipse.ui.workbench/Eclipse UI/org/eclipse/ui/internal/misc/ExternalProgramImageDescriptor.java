@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ public class ExternalProgramImageDescriptor extends ImageDescriptor {
     public Program program;
 
     /**
-     * Creates a new ImageDescriptor. The image is loaded 
+     * Creates a new ImageDescriptor. The image is loaded
      * from a file with the given name <code>name</code>.
      */
     public ExternalProgramImageDescriptor(Program program) {
@@ -36,7 +36,8 @@ public class ExternalProgramImageDescriptor extends ImageDescriptor {
     /**
      * @see Object#equals
      */
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (!(o instanceof ExternalProgramImageDescriptor)) {
             return false;
         }
@@ -63,7 +64,8 @@ public class ExternalProgramImageDescriptor extends ImageDescriptor {
      * Returns an SWT Image that is described by the information
      * in this descriptor.  Each call returns a new Image.
      */
-    public ImageData getImageData() {
+    @Override
+	public ImageData getImageData() {
         ImageData data = null;
         ImageData defaultImage = WorkbenchImages.getImageDescriptor(
                 ISharedImages.IMG_OBJ_FILE).getImageData();
@@ -87,7 +89,8 @@ public class ExternalProgramImageDescriptor extends ImageDescriptor {
     /**
      * @see Object#hashCode
      */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         String programName = program.getName();
         if (programName == null) {
 			return program.hashCode();

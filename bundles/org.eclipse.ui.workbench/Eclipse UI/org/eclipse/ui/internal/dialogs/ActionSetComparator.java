@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,8 @@ public class ActionSetComparator extends ViewerComparator {
      * the first element is less than, equal to, or greater than
      * the second element.
      */
-    public int compare(Viewer viewer, Object e1, Object e2) {
+    @Override
+	public int compare(Viewer viewer, Object e1, Object e2) {
         if (e1 instanceof IActionSetDescriptor) {
             String str1 = DialogUtil.removeAccel(((IActionSetDescriptor) e1)
                     .getLabel());

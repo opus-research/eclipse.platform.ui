@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -98,7 +98,8 @@ public final class CategoryDefinition implements Comparable {
         this.description = description;
     }
 
-    public int compareTo(Object object) {
+    @Override
+	public int compareTo(Object object) {
         CategoryDefinition castedObject = (CategoryDefinition) object;
         int compareTo = Util.compare(id, castedObject.id);
 
@@ -113,7 +114,8 @@ public final class CategoryDefinition implements Comparable {
         return compareTo;
     }
 
-    public boolean equals(Object object) {
+    @Override
+	public boolean equals(Object object) {
         if (!(object instanceof CategoryDefinition)) {
 			return false;
 		}
@@ -122,11 +124,11 @@ public final class CategoryDefinition implements Comparable {
         if (!Util.equals(id, castedObject.id)) {
             return false;
         }
-        
+
         if (!Util.equals(name, castedObject.name)) {
             return false;
         }
-        
+
         return Util.equals(sourceId, castedObject.sourceId);
     }
 
@@ -142,7 +144,8 @@ public final class CategoryDefinition implements Comparable {
         return sourceId;
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(id);
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(name);
@@ -155,9 +158,10 @@ public final class CategoryDefinition implements Comparable {
         return hashCode;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         if (string == null) {
-            final StringBuffer stringBuffer = new StringBuffer();
+            final StringBuilder stringBuffer = new StringBuilder();
             stringBuffer.append('[');
             stringBuffer.append(id);
             stringBuffer.append(',');

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
@@ -66,11 +65,11 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
  */
 public class FileEditorsPreferencePage extends PreferencePage implements
         IWorkbenchPreferencePage, Listener {
-	
+
     private static final String DATA_EDITOR = "editor"; //$NON-NLS-1$
 
     private static final String DATA_FROM_CONTENT_TYPE = "type"; //$NON-NLS-1$
-    
+
 	protected Table resourceTypeTable;
 
     protected Button addResourceTypeButton;
@@ -96,7 +95,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * Add a new resource type to the collection shown in the top of the page.
      * This is typically called after the extension dialog is shown to the user.
-     * 
+     *
      * @param newName the new name
      * @param newExtension the new extension
      */
@@ -153,7 +152,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * Creates the page's UI content.
      */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
         imagesToDispose = new ArrayList();
         editorsToImages = new HashMap(50);
 
@@ -174,13 +174,13 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         PreferenceLinkArea contentTypeArea = new PreferenceLinkArea(pageComponent, SWT.NONE,
                 "org.eclipse.ui.preferencePages.ContentTypes", WorkbenchMessages.FileEditorPreference_contentTypesRelatedLink,//$NON-NLS-1$
                 (IWorkbenchPreferenceContainer) getContainer(),null);
-        
+
         data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
         contentTypeArea.getControl().setLayoutData(data);
 
         //layout the top table & its buttons
         Label label = new Label(pageComponent, SWT.LEFT);
-        label.setText(WorkbenchMessages.FileEditorPreference_fileTypes); 
+        label.setText(WorkbenchMessages.FileEditorPreference_fileTypes);
         data = new GridData();
         data.horizontalAlignment = GridData.FILL;
         data.horizontalSpan = 2;
@@ -209,9 +209,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         groupComponent.setLayoutData(data);
 
         addResourceTypeButton = new Button(groupComponent, SWT.PUSH);
-        addResourceTypeButton.setText(WorkbenchMessages.FileEditorPreference_add); 
+        addResourceTypeButton.setText(WorkbenchMessages.FileEditorPreference_add);
         addResourceTypeButton.addListener(SWT.Selection, this);
-        addResourceTypeButton.setLayoutData(data);
         setButtonLayoutData(addResourceTypeButton);
 
         removeResourceTypeButton = new Button(groupComponent, SWT.PUSH);
@@ -258,7 +257,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         setButtonLayoutData(addEditorButton);
 
         removeEditorButton = new Button(groupComponent, SWT.PUSH);
-        removeEditorButton.setText(WorkbenchMessages.FileEditorPreference_removeEditor); 
+        removeEditorButton.setText(WorkbenchMessages.FileEditorPreference_removeEditor);
         removeEditorButton.addListener(SWT.Selection, this);
         setButtonLayoutData(removeEditorButton);
 
@@ -284,10 +283,11 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * The preference page is going to be disposed. So deallocate all allocated
      * SWT resources that aren't disposed automatically by disposing the page
-     * (i.e fonts, cursors, etc). Subclasses should reimplement this method to 
+     * (i.e fonts, cursors, etc). Subclasses should reimplement this method to
      * release their own allocated SWT resources.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         if (imagesToDispose != null) {
             for (Iterator e = imagesToDispose.iterator(); e.hasNext();) {
@@ -307,7 +307,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * Hook method to get a page specific preference store. Reimplement this
      * method if a page don't want to use its parent's preference store.
      */
-    protected IPreferenceStore doGetPreferenceStore() {
+    @Override
+	protected IPreferenceStore doGetPreferenceStore() {
         return WorkbenchPlugin.getDefault().getPreferenceStore();
     }
 
@@ -315,18 +316,14 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         editorTable.removeAll();
         FileEditorMapping resourceType = getSelectedResourceType();
         if (resourceType != null) {
-            IEditorDescriptor[] array = resourceType.getEditors();
-            for (int i = 0; i < array.length; i++) {
-                IEditorDescriptor editor = array[i];
+			for (IEditorDescriptor editor : resourceType.getEditors()) {
                 TableItem item = new TableItem(editorTable, SWT.NULL);
                 item.setData(DATA_EDITOR, editor);
                 // Check if it is the default editor
                 String defaultString = null;
-                if (resourceType != null) {
-                    if (resourceType.getDefaultEditor() == editor && resourceType.isDeclaredDefaultEditor(editor)) {
-						defaultString = WorkbenchMessages.FileEditorPreference_defaultLabel;
-					}
-                }
+				if (resourceType.getDefaultEditor() == editor && resourceType.isDeclaredDefaultEditor(editor)) {
+					defaultString = WorkbenchMessages.FileEditorPreference_defaultLabel;
+				}
 
                 if (defaultString != null) {
                     item.setText(editor.getLabel() + " " + defaultString); //$NON-NLS-1$
@@ -335,45 +332,43 @@ public class FileEditorsPreferencePage extends PreferencePage implements
                 }
                 item.setImage(getImage(editor));
             }
-            
+
             // now add any content type editors
 			EditorRegistry registry = (EditorRegistry) WorkbenchPlugin
 					.getDefault().getEditorRegistry();
 			IContentType[] contentTypes = Platform.getContentTypeManager()
 					.findContentTypesFor(resourceType.getLabel());
-			for (int i = 0; i < contentTypes.length; i++) {
-				array = registry.getEditorsForContentType(contentTypes[i]);
-				for (int j = 0; j < array.length; j++) {
-					IEditorDescriptor editor = array[j];
+			for (IContentType contentType : contentTypes) {
+				for (IEditorDescriptor editor : registry.getEditorsForContentType(contentType)) {
 					// don't add duplicates
 					TableItem[] items = editorTable.getItems();
 					TableItem foundItem = null;
-					for (int k = 0; k < items.length; k++) {
-						if (items[k].getData(DATA_EDITOR).equals(editor)) {
-							foundItem = items[k];
+					for (TableItem item : items) {
+						if (item.getData(DATA_EDITOR).equals(editor)) {
+							foundItem = item;
 							break;
 						}
 					}
 					if (foundItem == null) {
 						TableItem item = new TableItem(editorTable, SWT.NULL);
 						item.setData(DATA_EDITOR, editor);
-						item.setData(DATA_FROM_CONTENT_TYPE, contentTypes[i]);
+						item.setData(DATA_FROM_CONTENT_TYPE, contentType);
 						setLockedItemText(item, editor.getLabel());
 						item.setImage(getImage(editor));
 					} else { // update the item to reflect its origin
-						foundItem.setData(DATA_FROM_CONTENT_TYPE, contentTypes[i]);
+						foundItem.setData(DATA_FROM_CONTENT_TYPE, contentType);
 						setLockedItemText(foundItem, foundItem.getText());
 					}
 				}
 			}
-            
+
         }
     }
 
     /**
 	 * Set the locked message on the item. Assumes the item has an instance of
 	 * IContentType in the data map.
-	 * 
+	 *
 	 * @param item the item to set
 	 * @param baseLabel the base label
 	 */
@@ -383,7 +378,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
 						baseLabel, ((IContentType) item
 								.getData(DATA_FROM_CONTENT_TYPE)).getName()));
 	}
-    
+
     /**
 	 * Place the existing resource types in the table
 	 */
@@ -415,7 +410,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         if (items.length == 1) {
             return (FileEditorMapping) items[0].getData();
         }
-        return null;        
+        return null;
     }
 
     protected IEditorDescriptor[] getAssociatedEditors() {
@@ -430,11 +425,12 @@ public class FileEditorsPreferencePage extends PreferencePage implements
 
             return (IEditorDescriptor[]) editorList
                     .toArray(new IEditorDescriptor[editorList.size()]);
-        } 
+        }
         return null;
     }
 
-    public void handleEvent(Event event) {
+    @Override
+	public void handleEvent(Event event) {
         if (event.widget == addResourceTypeButton) {
             promptForResourceType();
         } else if (event.widget == removeResourceTypeButton) {
@@ -456,7 +452,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * @see IWorkbenchPreferencePage
      */
-    public void init(IWorkbench aWorkbench) {
+    @Override
+	public void init(IWorkbench aWorkbench) {
         this.workbench = aWorkbench;
         noDefaultAndApplyButton();
     }
@@ -488,10 +485,11 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * This is a hook for sublcasses to do special things when the ok
      * button is pressed.
-     * For example reimplement this method if you want to save the 
+     * For example reimplement this method if you want to save the
      * page's data into the preference bundle.
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         TableItem[] items = resourceTypeTable.getItems();
         FileEditorMapping[] resourceTypes = new FileEditorMapping[items.length];
         for (int i = 0; i < items.length; i++) {
@@ -501,7 +499,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
                 .getEditorRegistry(); // cast to allow save to be called
         registry.setFileEditorMappings(resourceTypes);
         registry.saveAssociations();
-        
+
         PrefUtil.savePrefs();
         return true;
     }
@@ -566,10 +564,10 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         TableItem[] items = editorTable.getSelection();
         boolean defaultEditor = editorTable.getSelectionIndex() == 0;
         if (items.length > 0) {
-        	for (int i = 0; i < items.length; i++) {
+        	for (TableItem item : items) {
                 getSelectedResourceType().removeEditor(
-                        (EditorDescriptor) items[i].getData(DATA_EDITOR));
-                items[i].dispose();	
+                        (EditorDescriptor) item.getData(DATA_EDITOR));
+                item.dispose();
         	}
         }
         if (defaultEditor && editorTable.getItemCount() > 0) {
@@ -590,9 +588,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * Remove the type from the table
      */
     public void removeSelectedResourceType() {
-        TableItem[] items = resourceTypeTable.getSelection();
-        for (int i = 0; i < items.length; i++) {
-        	items[i].dispose();
+		for (TableItem item : resourceTypeTable.getSelection()) {
+        	item.dispose();
         }
         //Clear out the editors too
         editorTable.removeAll();
@@ -648,11 +645,11 @@ public class FileEditorsPreferencePage extends PreferencePage implements
 		removeEditorButton.setEnabled(areEditorsRemovable());
         defaultEditorButton.setEnabled(selectedEditors == 1);
     }
-    
+
     /**
 	 * Return whether the selected editors are removable. An editor is removable
 	 * if it was not submitted via a content-type binding.
-	 * 
+	 *
 	 * @return whether all the selected editors are removable or not
 	 * @since 3.1
 	 */
@@ -669,11 +666,11 @@ public class FileEditorsPreferencePage extends PreferencePage implements
 		}
 		return true;
 	}
-    
+
     /**
 	 * Return whether the given editor is removable. An editor is removable
 	 * if it is not submitted via a content-type binding.
-	 * 
+	 *
 	 * @param item the item to test
 	 * @return whether the selected editor is removable
 	 * @since 3.1

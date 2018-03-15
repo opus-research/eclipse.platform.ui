@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ package org.eclipse.core.commands;
  * attributes can be used to communicate extra information from the handler to
  * either the command or the command manager.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public interface IHandlerAttributes {

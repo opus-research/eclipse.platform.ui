@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,11 +24,11 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 /**
  * SessionRestoreTest runs the second half of our session
  * presistance tests.
- * 
+ *
  */
 public class DeprecatedSessionRestoreTest extends UITestCase {
 
-    /** 
+    /**
      * Construct an instance.
      */
     public DeprecatedSessionRestoreTest(String arg) {
@@ -83,7 +83,7 @@ public class DeprecatedSessionRestoreTest extends UITestCase {
         IViewPart view = page.findView(SessionView.VIEW_ID);
         assertNotNull(view);
         SessionView sessionView = (SessionView) view;
-        sessionView.testMementoState(this);
+		sessionView.testMementoState();
     }
 
     /**

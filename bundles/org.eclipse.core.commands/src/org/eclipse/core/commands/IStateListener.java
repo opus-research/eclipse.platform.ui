@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,14 +18,14 @@ package org.eclipse.core.commands;
  * <p>
  * Clients may implement, but must not extend this interface.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public interface IStateListener {
 
 	/**
 	 * Handles a change to the value in some state.
-	 * 
+	 *
 	 * @param state
 	 *            The state that has changed; never <code>null</code>. The
 	 *            value for this state has been updated to the new value.

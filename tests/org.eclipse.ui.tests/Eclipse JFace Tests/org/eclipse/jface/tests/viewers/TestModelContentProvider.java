@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IBasicPropertyConstants;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -23,10 +22,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 public class TestModelContentProvider implements ITestModelListener,
-        IStructuredContentProvider, ITreeContentProvider {
+		ITreeContentProvider {
     Viewer fViewer;
 
-    public void dispose() {
+    @Override
+	public void dispose() {
     }
 
     protected void doInsert(TestModelChange change) {
@@ -81,28 +81,34 @@ public class TestModelContentProvider implements ITestModelListener,
         }
     }
 
-    public Object[] getChildren(Object element) {
+    @Override
+	public Object[] getChildren(Object element) {
         TestElement testElement = (TestElement) element;
         int count = testElement.getChildCount();
         TestElement[] children = new TestElement[count];
-        for (int i = 0; i < count; ++i)
-            children[i] = testElement.getChildAt(i);
+        for (int i = 0; i < count; ++i) {
+			children[i] = testElement.getChildAt(i);
+		}
         return children;
     }
 
-    public Object[] getElements(Object element) {
+    @Override
+	public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
-    public Object getParent(Object element) {
+    @Override
+	public Object getParent(Object element) {
         return ((TestElement) element).getContainer();
     }
 
-    public boolean hasChildren(Object element) {
+    @Override
+	public boolean hasChildren(Object element) {
         return ((TestElement) element).getChildCount() > 0;
     }
 
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    @Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         fViewer = viewer;
         TestElement oldElement = (TestElement) oldInput;
         if (oldElement != null) {
@@ -118,7 +124,8 @@ public class TestModelContentProvider implements ITestModelListener,
         return ((TestElement) element).isDeleted();
     }
 
-    public void testModelChanged(TestModelChange change) {
+    @Override
+	public void testModelChanged(TestModelChange change) {
         switch (change.getKind()) {
         case TestModelChange.INSERT:
             doInsert(change);

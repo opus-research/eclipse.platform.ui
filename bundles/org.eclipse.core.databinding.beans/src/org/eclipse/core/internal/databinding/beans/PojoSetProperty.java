@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.core.databinding.property.set.SimpleSetProperty;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class PojoSetProperty extends SimpleSetProperty {
 	private final PropertyDescriptor propertyDescriptor;
@@ -44,10 +44,12 @@ public class PojoSetProperty extends SimpleSetProperty {
 				: elementType;
 	}
 
+	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
+	@Override
 	protected Set doGetSet(Object source) {
 		return asSet(BeanPropertyHelper
 				.readProperty(source, propertyDescriptor));
@@ -61,10 +63,12 @@ public class PojoSetProperty extends SimpleSetProperty {
 		return (Set) propertyValue;
 	}
 
+	@Override
 	protected void doSetSet(Object source, Set set, SetDiff diff) {
 		doSetSet(source, set);
 	}
 
+	@Override
 	protected void doSetSet(Object source, Set set) {
 		BeanPropertyHelper.writeProperty(source, propertyDescriptor,
 				convertSetToBeanPropertyType(set));
@@ -82,11 +86,13 @@ public class PojoSetProperty extends SimpleSetProperty {
 		return propertyValue;
 	}
 
+	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		return null;
 	}
 
+	@Override
 	public String toString() {
 		String s = BeanPropertyHelper.propertyName(propertyDescriptor) + "{}"; //$NON-NLS-1$
 		if (elementType != null)

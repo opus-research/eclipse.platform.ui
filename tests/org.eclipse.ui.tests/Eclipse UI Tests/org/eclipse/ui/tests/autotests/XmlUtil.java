@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2005 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,29 +36,29 @@ public class XmlUtil {
 
         return XMLMemento.createReadRoot(reader);
     }
-    
+
     public static IMemento read(URL toRead) throws WorkbenchException {
         try {
             return read(toRead.openStream());
         } catch (IOException e) {
-            throw new WorkbenchException(new Status(IStatus.ERROR, 
+            throw new WorkbenchException(new Status(IStatus.ERROR,
                     TestPlugin.getDefault().getBundle().getSymbolicName(),
                     IStatus.OK, null, e));
         }
     }
-    
+
     public static IMemento read(File toRead) throws WorkbenchException {
         FileInputStream input;
         try {
             input = new FileInputStream(toRead);
             return read(input);
         } catch (FileNotFoundException e) {
-            throw new WorkbenchException(new Status(IStatus.ERROR, 
+            throw new WorkbenchException(new Status(IStatus.ERROR,
                     TestPlugin.getDefault().getBundle().getSymbolicName(),
                     IStatus.OK, null, e));
         }
     }
-    
+
     public static void write(File file, XMLMemento data) throws WorkbenchException {
 
         FileOutputStream output;
@@ -68,15 +68,15 @@ public class XmlUtil {
             file.createNewFile();
 
             output = new FileOutputStream(file);
-            OutputStreamWriter writer = new OutputStreamWriter(output);
-            data.save(writer);
-            output.close();
+			try (OutputStreamWriter writer = new OutputStreamWriter(output)) {
+				data.save(writer);
+			}
         } catch (FileNotFoundException e) {
-            throw new WorkbenchException(new Status(IStatus.ERROR, 
+            throw new WorkbenchException(new Status(IStatus.ERROR,
                     TestPlugin.getDefault().getBundle().getSymbolicName(),
                     IStatus.OK, e.toString(), e));
         } catch (IOException e) {
-            throw new WorkbenchException(new Status(IStatus.ERROR, 
+            throw new WorkbenchException(new Status(IStatus.ERROR,
                     TestPlugin.getDefault().getBundle().getSymbolicName(),
                     IStatus.OK, e.toString(), e));
         }

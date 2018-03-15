@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ package org.eclipse.jface.viewers;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -52,12 +51,12 @@ public abstract class ColumnViewerEditor {
 
 	private ViewerCell cell;
 
-	private ListenerList editorActivationListener;
+	private ListenerList<ColumnViewerEditorActivationListener> editorActivationListener;
 
 	private ColumnViewerEditorActivationStrategy editorActivationStrategy;
 
 	private boolean inEditorDeactivation;
-	
+
 	private DisposeListener disposeListener;
 
 	/**
@@ -127,29 +126,28 @@ public abstract class ColumnViewerEditor {
 					.setEnableEditorActivationWithKeyboard(true);
 		}
 		this.feature = feature;
-		this.disposeListener = new DisposeListener() {
-
-			public void widgetDisposed(DisposeEvent e) {
-				if( viewer.isCellEditorActive() ) {
-					cancelEditing();
-				}
+		this.disposeListener = e -> {
+			if( viewer.isCellEditorActive() ) {
+				cancelEditing();
 			}
-			
 		};
 		initCellEditorListener();
 	}
 
 	private void initCellEditorListener() {
 		cellEditorListener = new ICellEditorListener() {
+			@Override
 			public void editorValueChanged(boolean oldValidState,
 					boolean newValidState) {
 				// Ignore.
 			}
 
+			@Override
 			public void cancelEditor() {
 				ColumnViewerEditor.this.cancelEditing();
 			}
 
+			@Override
 			public void applyEditorValue() {
 				ColumnViewerEditor.this.applyEditorValue();
 			}
@@ -175,12 +173,9 @@ public abstract class ColumnViewerEditor {
 					activationTime = 0;
 				}
 
-				if (editorActivationListener != null
-						&& !editorActivationListener.isEmpty()) {
-					Object[] ls = editorActivationListener.getListeners();
-					for (int i = 0; i < ls.length; i++) {
-						((ColumnViewerEditorActivationListener) ls[i])
-								.beforeEditorActivated(activationEvent);
+				if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
+					for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
+						ls.beforeEditorActivated(activationEvent);
 
 						// Was the activation canceled ?
 						if (activationEvent.cancel) {
@@ -212,6 +207,7 @@ public abstract class ColumnViewerEditor {
 				if (cellEditor.dependsOnExternalFocusListener()) {
 					if (focusListener == null) {
 						focusListener = new FocusAdapter() {
+							@Override
 							public void focusLost(FocusEvent e) {
 								applyEditorValue();
 							}
@@ -221,6 +217,7 @@ public abstract class ColumnViewerEditor {
 				}
 
 				mouseListener = new MouseAdapter() {
+					@Override
 					public void mouseDown(MouseEvent e) {
 						// time wrap?
 						// check for expiration of doubleClickTime
@@ -240,29 +237,23 @@ public abstract class ColumnViewerEditor {
 				}
 
 				if (tabeditingListener == null) {
-					tabeditingListener = new TraverseListener() {
-
-						public void keyTraversed(TraverseEvent e) {
-							if ((feature & DEFAULT) != DEFAULT) {
-								processTraverseEvent(cell.getColumnIndex(),
-										viewer.getViewerRowFromItem(cell
-												.getItem()), e);
-							}
+					tabeditingListener = e -> {
+						if ((feature & DEFAULT) != DEFAULT) {
+							processTraverseEvent(cell.getColumnIndex(),
+									viewer.getViewerRowFromItem(cell
+											.getItem()), e);
 						}
 					};
 				}
 
 				control.addTraverseListener(tabeditingListener);
 
-				if (editorActivationListener != null
-						&& !editorActivationListener.isEmpty()) {
-					Object[] ls = editorActivationListener.getListeners();
-					for (int i = 0; i < ls.length; i++) {
-						((ColumnViewerEditorActivationListener) ls[i])
-								.afterEditorActivated(activationEvent);
+				if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
+					for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
+						ls.afterEditorActivated(activationEvent);
 					}
 				}
-				
+
 				this.cell.getItem().addDisposeListener(disposeListener);
 
 				return true;
@@ -295,13 +286,9 @@ public abstract class ColumnViewerEditor {
 					ColumnViewerEditorDeactivationEvent tmp = new ColumnViewerEditorDeactivationEvent(
 							cell);
 					tmp.eventType = ColumnViewerEditorDeactivationEvent.EDITOR_SAVED;
-					if (editorActivationListener != null
-							&& !editorActivationListener.isEmpty()) {
-						Object[] ls = editorActivationListener.getListeners();
-						for (int i = 0; i < ls.length; i++) {
-
-							((ColumnViewerEditorActivationListener) ls[i])
-									.beforeEditorDeactivated(tmp);
+					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
+						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
+							ls.beforeEditorDeactivated(tmp);
 						}
 					}
 
@@ -333,15 +320,12 @@ public abstract class ColumnViewerEditor {
 					}
 					c.deactivate(tmp);
 
-					if (editorActivationListener != null
-							&& !editorActivationListener.isEmpty()) {
-						Object[] ls = editorActivationListener.getListeners();
-						for (int i = 0; i < ls.length; i++) {
-							((ColumnViewerEditorActivationListener) ls[i])
-									.afterEditorDeactivated(tmp);
+					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
+						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
+							ls.afterEditorDeactivated(tmp);
 						}
 					}
-					
+
 					if( ! this.cell.getItem().isDisposed() ) {
 						this.cell.getItem().removeDisposeListener(disposeListener);
 					}
@@ -367,13 +351,9 @@ public abstract class ColumnViewerEditor {
 					ColumnViewerEditorDeactivationEvent tmp = new ColumnViewerEditorDeactivationEvent(
 							cell);
 					tmp.eventType = ColumnViewerEditorDeactivationEvent.EDITOR_CANCELED;
-					if (editorActivationListener != null
-							&& !editorActivationListener.isEmpty()) {
-						Object[] ls = editorActivationListener.getListeners();
-						for (int i = 0; i < ls.length; i++) {
-
-							((ColumnViewerEditorActivationListener) ls[i])
-									.beforeEditorDeactivated(tmp);
+					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
+						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
+							ls.beforeEditorDeactivated(tmp);
 						}
 					}
 
@@ -402,19 +382,16 @@ public abstract class ColumnViewerEditor {
 					CellEditor oldEditor = cellEditor;
 					oldEditor.deactivate(tmp);
 
-					if (editorActivationListener != null
-							&& !editorActivationListener.isEmpty()) {
-						Object[] ls = editorActivationListener.getListeners();
-						for (int i = 0; i < ls.length; i++) {
-							((ColumnViewerEditorActivationListener) ls[i])
-									.afterEditorDeactivated(tmp);
+					if (editorActivationListener != null && !editorActivationListener.isEmpty()) {
+						for (ColumnViewerEditorActivationListener ls : editorActivationListener) {
+							ls.afterEditorDeactivated(tmp);
 						}
 					}
-					
+
 					if( ! this.cell.getItem().isDisposed() ) {
 						this.cell.getItem().addDisposeListener(disposeListener);
 					}
-					
+
 					this.cellEditor = null;
 					this.cell = null;
 
@@ -470,7 +447,7 @@ public abstract class ColumnViewerEditor {
 	void handleDoubleClickEvent() {
 		viewer.fireDoubleClick(new DoubleClickEvent(viewer, viewer
 				.getSelection()));
-		viewer.fireOpen(new OpenEvent(viewer, viewer.getSelection()));
+		viewer.fireOpen(new OpenEvent(viewer, viewer.getStructuredSelection()));
 	}
 
 	/**
@@ -483,7 +460,7 @@ public abstract class ColumnViewerEditor {
 	public void addEditorActivationListener(
 			ColumnViewerEditorActivationListener listener) {
 		if (editorActivationListener == null) {
-			editorActivationListener = new ListenerList();
+			editorActivationListener = new ListenerList<>();
 		}
 		editorActivationListener.add(listener);
 	}

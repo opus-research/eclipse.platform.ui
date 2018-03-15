@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,8 @@ final class Category implements ICategory {
         this.id = id;
     }
 
-    public void addCategoryListener(ICategoryListener categoryListener) {
+    @Override
+	public void addCategoryListener(ICategoryListener categoryListener) {
         if (categoryListener == null) {
 			throw new NullPointerException();
 		}
@@ -72,7 +73,8 @@ final class Category implements ICategory {
         strongReferences.add(this);
     }
 
-    public int compareTo(Object object) {
+    @Override
+	public int compareTo(Object object) {
         Category castedObject = (Category) object;
         int compareTo = Util.compare(
                 categoryActivityBindingsAsArray,
@@ -93,7 +95,8 @@ final class Category implements ICategory {
         return compareTo;
     }
 
-    public boolean equals(Object object) {
+    @Override
+	public boolean equals(Object object) {
         if (!(object instanceof Category)) {
 			return false;
 		}
@@ -103,15 +106,15 @@ final class Category implements ICategory {
                 castedObject.categoryActivityBindings)) {
             return false;
         }
-        
+
         if (!Util.equals(defined, castedObject.defined)) {
             return false;
         }
-        
+
         if (!Util.equals(id, castedObject.id)) {
             return false;
         }
-        
+
         return Util.equals(name, castedObject.name);
     }
 
@@ -128,15 +131,18 @@ final class Category implements ICategory {
 		}
     }
 
-    public Set getCategoryActivityBindings() {
+    @Override
+	public Set getCategoryActivityBindings() {
         return categoryActivityBindings;
     }
 
-    public String getId() {
+    @Override
+	public String getId() {
         return id;
     }
 
-    public String getName() throws NotDefinedException {
+    @Override
+	public String getName() throws NotDefinedException {
         if (!defined) {
 			throw new NotDefinedException();
 		}
@@ -144,7 +150,8 @@ final class Category implements ICategory {
         return name;
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR
                     + Util.hashCode(categoryActivityBindings);
@@ -159,11 +166,13 @@ final class Category implements ICategory {
         return hashCode;
     }
 
-    public boolean isDefined() {
+    @Override
+	public boolean isDefined() {
         return defined;
     }
 
-    public void removeCategoryListener(ICategoryListener categoryListener) {
+    @Override
+	public void removeCategoryListener(ICategoryListener categoryListener) {
         if (categoryListener == null) {
 			throw new NullPointerException();
 		}
@@ -217,9 +226,10 @@ final class Category implements ICategory {
         return false;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         if (string == null) {
-            final StringBuffer stringBuffer = new StringBuffer();
+            final StringBuilder stringBuffer = new StringBuilder();
             stringBuffer.append('[');
             stringBuffer.append(categoryActivityBindings);
             stringBuffer.append(',');
@@ -235,10 +245,8 @@ final class Category implements ICategory {
         return string;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.ICategory#getDescription()
-     */
-    public String getDescription() throws NotDefinedException {
+    @Override
+	public String getDescription() throws NotDefinedException {
         if (!defined) {
 			throw new NotDefinedException();
 		}

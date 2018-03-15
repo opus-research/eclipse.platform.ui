@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.tests.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.FileEditorMapping;
@@ -27,6 +28,7 @@ public class FileEditorMappingTest extends UITestCase {
 		super(testName);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
@@ -77,9 +79,9 @@ public class FileEditorMappingTest extends UITestCase {
 
 		assertEquals(mappingA, mappingB);
 
-		List defaultA = new ArrayList();
+		List<IEditorDescriptor> defaultA = new ArrayList<>();
 		defaultA.add(textEditor);
-		List defaultB = new ArrayList();
+		List<IEditorDescriptor> defaultB = new ArrayList<>();
 		defaultB.add(pdeEditor);
 
 		mappingA.setDefaultEditors(defaultA);
@@ -132,9 +134,9 @@ public class FileEditorMappingTest extends UITestCase {
 
 		assertEquals(mappingA.hashCode(), mappingB.hashCode());
 
-		List defaultA = new ArrayList();
+		List<IEditorDescriptor> defaultA = new ArrayList<>();
 		defaultA.add(textEditor);
-		List defaultB = new ArrayList();
+		List<IEditorDescriptor> defaultB = new ArrayList<>();
 		defaultB.add(pdeEditor);
 
 		mappingA.setDefaultEditors(defaultA);
@@ -145,13 +147,13 @@ public class FileEditorMappingTest extends UITestCase {
 	}
 
 	public void testClone() {
-		FileEditorMapping mapping = new FileEditorMapping("txt");		
+		FileEditorMapping mapping = new FileEditorMapping("txt");
 		assertEquals(mapping, mapping.clone());
-		
-		mapping.addEditor(textEditor);		
+
+		mapping.addEditor(textEditor);
 		assertEquals(mapping, mapping.clone());
-		
-		mapping.removeEditor(textEditor);		
+
+		mapping.removeEditor(textEditor);
 		assertEquals(mapping, mapping.clone());
 	}
 

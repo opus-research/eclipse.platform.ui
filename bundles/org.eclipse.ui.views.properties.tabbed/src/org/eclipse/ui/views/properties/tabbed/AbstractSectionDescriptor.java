@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyRegist
 /**
  * An abstract implementation of a section descriptor for the tabbed property
  * view.
- * 
+ *
  * @author Anthony Hunter
  * @since 3.4
  */
@@ -40,7 +40,7 @@ public abstract class AbstractSectionDescriptor implements ISectionDescriptor {
 
 	/**
 	 * Constructor for AbstractSectionDescriptor.
-	 * 
+	 *
 	 * @param typeMapper
 	 *            the type mapper for the section.
 	 */
@@ -53,6 +53,7 @@ public abstract class AbstractSectionDescriptor implements ISectionDescriptor {
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#appliesTo(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
+	@Override
 	public boolean appliesTo(IWorkbenchPart part, ISelection selection) {
 		return classFilter.appliesToSelection(this, selection);
 	}
@@ -60,6 +61,7 @@ public abstract class AbstractSectionDescriptor implements ISectionDescriptor {
 	/*
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getAfterSection()
 	 */
+	@Override
 	public String getAfterSection() {
 		return TOP;
 	}
@@ -67,6 +69,7 @@ public abstract class AbstractSectionDescriptor implements ISectionDescriptor {
 	/*
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getEnablesFor()
 	 */
+	@Override
 	public int getEnablesFor() {
 		return ENABLES_FOR_ANY;
 	}
@@ -74,10 +77,12 @@ public abstract class AbstractSectionDescriptor implements ISectionDescriptor {
 	/*
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getFilter()
 	 */
+	@Override
 	public IFilter getFilter() {
 		return null;
 	}
 
+	@Override
 	public List getInputTypes() {
 		return new ArrayList();
 	}

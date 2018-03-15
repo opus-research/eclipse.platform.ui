@@ -23,11 +23,7 @@ import com.ibm.icu.text.NumberFormat;
 public class IntegerToStringConverterTest extends TestCase {
 	private NumberFormat integerFormat;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -79,7 +75,7 @@ public class IntegerToStringConverterTest extends TestCase {
 	public void testIllegalArgumentExceptionIfSourceIsNotExpectedType() throws Exception {
 		IntegerToStringConverter converter = IntegerToStringConverter.fromByte(false);
 		try {
-			converter.convert(new Integer(1));
+			converter.convert(Integer.valueOf(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

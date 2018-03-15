@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.dialogs.IWorkingSetPage;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -41,7 +42,8 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         super(name);
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         fWizard = getWorkbench().getWorkingSetManager().createWorkingSetNewWizard(null);
         super.doSetUp();
     }
@@ -49,7 +51,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
     public void testTypePage() throws Throwable {
         IWizardPage page = fWizardDialog.getCurrentPage();
         WorkingSetDescriptor[] descriptors = getEditableWorkingSetDescriptors();
-        
+
         // the first page must be the type selection page iff there is more than one working set type
         assertEquals(descriptors.length > 1, (page instanceof WorkingSetTypePage));
 
@@ -59,7 +61,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         assertTrue(descriptors.length >= 2);
         if (page instanceof WorkingSetTypePage) {
             WorkingSetTypePage typePage = (WorkingSetTypePage) page;
-            List widgets = getWidgets((Composite) page.getControl(),
+			List<Widget> widgets = getWidgets((Composite) page.getControl(),
                     Table.class);
             Table table = (Table) widgets.get(0);
             /*
@@ -77,9 +79,9 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
             assertTrue(fWizard.canFinish() == false);
 
             /*
-             * Check page texts 
+             * Check page texts
              */
-            DialogCheck.assertDialogTexts(fWizardDialog, this);
+			DialogCheck.assertDialogTexts(fWizardDialog);
         }
     }
 
@@ -90,7 +92,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         IWizardPage defaultEditPage = registry.getDefaultWorkingSetPage();
         String defaultEditPageClassName = defaultEditPage.getClass().getName();
         WorkingSetDescriptor[] descriptors = getEditableWorkingSetDescriptors();
-        
+
         // the first page must be the type selection page iff there is more than one working set type
         assertEquals(descriptors.length > 1, (page instanceof WorkingSetTypePage));
 
@@ -99,13 +101,12 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
              * Select the default (Resource) working set type
              * and advance to edit page.
              */
-            List widgets = getWidgets((Composite) page.getControl(),
+			List<Widget> widgets = getWidgets((Composite) page.getControl(),
                     Table.class);
             Table table = (Table) widgets.get(0);
             TableItem[] items = table.getItems();
             String workingSetName = null;
-            for (int descriptorIndex = 0; descriptorIndex < descriptors.length; descriptorIndex++) {
-                WorkingSetDescriptor descriptor = descriptors[descriptorIndex];
+            for (WorkingSetDescriptor descriptor : descriptors) {
                 if (defaultEditPageClassName.equals(descriptor
                         .getPageClassName())) {
                     workingSetName = descriptor.getName();
@@ -138,7 +139,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         assertFalse(fWizard.canFinish());
         assertNull(page.getErrorMessage());
         assertNull(page.getMessage());
-        
+
         /*
          * Test page state with partial page input
          */
@@ -162,16 +163,16 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         IAdaptable[] workingSetItems = workingSet.getElements();
         assertEquals(WORKING_SET_NAME_1, workingSet.getName());
 
-        List widgets = getWidgets((Composite) page.getControl(), Tree.class);
+		List<Widget> widgets = getWidgets((Composite) page.getControl(), Tree.class);
         Tree tree = (Tree) widgets.get(0);
         assertEquals(workingSetItems.length, tree.getItemCount());
         assertTrue(ArrayUtil.contains(workingSetItems, p1));
         assertTrue(ArrayUtil.contains(workingSetItems, p2));
 
         /*
-         * Check page texts 
+         * Check page texts
          */
-        DialogCheck.assertDialogTexts(fWizardDialog, this);
+		DialogCheck.assertDialogTexts(fWizardDialog);
     }
 }
 

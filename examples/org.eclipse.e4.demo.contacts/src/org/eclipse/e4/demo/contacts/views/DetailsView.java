@@ -1,11 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Siemens AG and others.
- * 
- * All rights reserved. This program and the accompanying materials 
+ * Copyright (c) 2009, 2012 Siemens AG and others.
+ *
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html.
- * 
+ *
  * Contributors:
  *     Kai Tödter - initial implementation
  ******************************************************************************/
@@ -67,7 +67,7 @@ public class DetailsView {
 
 	@Persist
 	public void doSave(@Optional IProgressMonitor monitor) throws IOException,
-			InterruptedException {
+	InterruptedException {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
@@ -192,9 +192,9 @@ public class DetailsView {
 	}
 
 	private void updatePartTitle(Contact contact) {
-		StringBuffer title = new StringBuffer("Details of ");
+		StringBuilder title = new StringBuilder("Details of ");
 		title.append(contact.getFirstName()).append(' ')
-				.append(contact.getLastName());
+		.append(contact.getLastName());
 		uiItem.setLabel(title.toString());
 	}
 
@@ -205,10 +205,10 @@ public class DetailsView {
 			if (dirtyable.isDirty()) {
 				MessageDialog dialog = new MessageDialog(
 						detailComposite.getShell(), "Save vCard", null,
-						"The current vCard has been modified. Save changes?",
-						MessageDialog.CONFIRM, new String[] {
-								IDialogConstants.YES_LABEL,
-								IDialogConstants.NO_LABEL }, 0);
+						"Save changes in vCard?",
+						MessageDialog.CONFIRM, 0,
+						IDialogConstants.YES_LABEL,
+						IDialogConstants.NO_LABEL);
 				dialog.create();
 				ThemeUtil.applyDialogStyles(engine, dialog.getShell());
 				if (dialog.open() == Window.OK) {

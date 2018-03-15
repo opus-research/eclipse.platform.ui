@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Tom Schindl and others.
+ * Copyright (c) 2006, 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
+ *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *******************************************************************************/
 package org.eclipse.jface.snippets.dialogs;
 
@@ -25,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * A snippet to demonstrate a dialog with image buttons.
- * 
+ *
  */
 public class Snippet060DialogWithURLImageButtons {
 	private ImageRegistry registry;
@@ -50,6 +51,7 @@ public class Snippet060DialogWithURLImageButtons {
 				return desc;
 			}
 
+			@Override
 			protected Button createButton(Composite parent, int id,
 					String label, boolean defaultButton) {
 				Button b = super.createButton(parent, id, label, defaultButton);
@@ -58,9 +60,9 @@ public class Snippet060DialogWithURLImageButtons {
 					URL url;
 					try {
 						url = new URL(
-								"http://www.eclipse.org/home/images/enterprise.gif");
+								"http://www.eclipse.org/home/images/enterprise.gif"); //$NON-NLS-N$
 						b.setImage(ImageDescriptor.createFromURL(url)
-								.createImage()); //$NON-NLS-1$
+								.createImage());
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}

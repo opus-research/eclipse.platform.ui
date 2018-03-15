@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,8 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         this.match = match;
     }
 
-    public int compareTo(Object object) {
+    @Override
+	public int compareTo(Object object) {
         KeySequenceBinding castedObject = (KeySequenceBinding) object;
         int compareTo = Util.compare(match, castedObject.match);
 
@@ -64,7 +65,8 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         return compareTo;
     }
 
-    public boolean equals(Object object) {
+    @Override
+	public boolean equals(Object object) {
         if (!(object instanceof KeySequenceBinding)) {
 			return false;
 		}
@@ -73,11 +75,12 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         if (!Util.equals(keySequence, castedObject.keySequence)) {
             return false;
         }
-        
+
         return Util.equals(match, castedObject.match);
     }
 
-    public KeySequence getKeySequence() {
+    @Override
+	public KeySequence getKeySequence() {
         return keySequence;
     }
 
@@ -85,7 +88,8 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         return match;
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         if (!hashCodeComputed) {
             hashCode = HASH_INITIAL;
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(keySequence);
@@ -96,9 +100,10 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         return hashCode;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         if (string == null) {
-            final StringBuffer stringBuffer = new StringBuffer();
+            final StringBuilder stringBuffer = new StringBuilder();
             stringBuffer.append('[');
             stringBuffer.append(keySequence);
             stringBuffer.append(',');

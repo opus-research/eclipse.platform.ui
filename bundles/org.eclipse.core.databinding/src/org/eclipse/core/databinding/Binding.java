@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ package org.eclipse.core.databinding;
 
 import java.util.Collections;
 
-import org.eclipse.core.databinding.observable.DisposeEvent;
 import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Observables;
@@ -26,7 +25,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  * This abstract class represents a binding between a model and a target. Newly
  * created instances need to be added to a data binding context using
  * {@link #init(DataBindingContext)}.
- * 
+ *
  * @since 1.0
  */
 public abstract class Binding extends ValidationStatusProvider {
@@ -35,10 +34,10 @@ public abstract class Binding extends ValidationStatusProvider {
 	private IObservable target;
 	private IObservable model;
 	private IDisposeListener disposeListener;
-	
+
 	/**
 	 * Creates a new binding.
-	 * 
+	 *
 	 * @param target target observable
 	 * @param model model observable
 	 */
@@ -46,14 +45,14 @@ public abstract class Binding extends ValidationStatusProvider {
 		this.target = target;
 		this.model = model;
 	}
-	
+
 	/**
 	 * Initializes this binding with the given context and adds it to the list
 	 * of bindings of the context.
 	 * <p>
 	 * Subclasses may extend, but must call the super implementation.
 	 * </p>
-	 * 
+	 *
 	 * @param context
 	 */
 	public final void init(DataBindingContext context) {
@@ -62,23 +61,17 @@ public abstract class Binding extends ValidationStatusProvider {
 			throw new IllegalArgumentException("Target observable is disposed"); //$NON-NLS-1$
 		if (model.isDisposed())
 			throw new IllegalArgumentException("Model observable is disposed"); //$NON-NLS-1$
-		this.disposeListener = new IDisposeListener() {
-			public void handleDispose(DisposeEvent staleEvent) {
-				Binding.this.context.getValidationRealm().exec(new Runnable() {
-					public void run() {
-						if (!isDisposed())
-							dispose();
-					}
-				});
-			}
-		};
+		this.disposeListener = staleEvent -> Binding.this.context.getValidationRealm().exec(() -> {
+			if (!isDisposed())
+				dispose();
+		});
 		target.addDisposeListener(disposeListener);
 		model.addDisposeListener(disposeListener);
 		preInit();
 		context.addBinding(this);
 		postInit();
 	}
-	
+
 	/**
 	 * Called by {@link #init(DataBindingContext)} after setting
 	 * {@link #context} but before adding this binding to the context.
@@ -87,7 +80,7 @@ public abstract class Binding extends ValidationStatusProvider {
 	 * while running this method.
 	 */
 	protected abstract void preInit();
-	
+
 	/**
 	 * Called by {@link #init(DataBindingContext)} after adding this binding to
 	 * the context. Subclasses may use this method to perform initialization
@@ -109,24 +102,25 @@ public abstract class Binding extends ValidationStatusProvider {
 	 * by the time this call returns.
 	 */
 	public abstract void updateModelToTarget();
-	
+
 	/**
 	 * Validates the target's state at the next reasonable
 	 * opportunity. There is no guarantee that the validation status will have been updated
 	 * by the time this call returns.
 	 */
 	public abstract void validateTargetToModel();
-	
+
 	/**
 	 * Validates the model's state at the next reasonable
 	 * opportunity. There is no guarantee that the validation status will have been updated
 	 * by the time this call returns.
 	 */
 	public abstract void validateModelToTarget();
-	
+
 	/**
 	 * Disposes of this Binding. Subclasses may extend, but must call super.dispose().
 	 */
+	@Override
 	public void dispose() {
 		if (context != null) {
 			context.removeBinding(this);
@@ -155,13 +149,14 @@ public abstract class Binding extends ValidationStatusProvider {
 
 	/**
 	 * Returns the target observable
-	 * 
+	 *
 	 * @return the target observable
 	 */
 	public IObservable getTarget() {
 		return target;
 	}
 
+	@Override
 	public IObservableList getTargets() {
 		return Observables.staticObservableList(context.getValidationRealm(),
 				Collections.singletonList(target));
@@ -169,13 +164,14 @@ public abstract class Binding extends ValidationStatusProvider {
 
 	/**
 	 * Returns the model observable
-	 * 
+	 *
 	 * @return the model observable
 	 */
 	public IObservable getModel() {
 		return model;
 	}
 
+	@Override
 	public IObservableList getModels() {
 		return Observables.staticObservableList(context.getValidationRealm(),
 				Collections.singletonList(model));

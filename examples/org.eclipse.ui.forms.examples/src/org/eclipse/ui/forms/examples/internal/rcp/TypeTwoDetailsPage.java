@@ -29,18 +29,14 @@ public class TypeTwoDetailsPage implements IDetailsPage {
 	private TypeTwo input;
 	private Button flag1;
 	private Button flag2;
-	
+
 	public TypeTwoDetailsPage() {
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#initialize(org.eclipse.ui.forms.IManagedForm)
-	 */
+	@Override
 	public void initialize(IManagedForm mform) {
 		this.mform = mform;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#createContents(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createContents(Composite parent) {
 		TableWrapLayout layout = new TableWrapLayout();
 		layout.topMargin = 5;
@@ -63,17 +59,19 @@ public class TypeTwoDetailsPage implements IDetailsPage {
 		GridLayout glayout = new GridLayout();
 		glayout.marginWidth = glayout.marginHeight = 0;
 		client.setLayout(glayout);
-		
+
 		flag1 = toolkit.createButton(client, "Value of the flag1 property", SWT.CHECK);
 		flag1.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (input!=null)
 					input.setFlag1(flag1.getSelection());
 			}
 		});
-		
+
 		flag2 = toolkit.createButton(client, "Value of the flag2 property", SWT.CHECK);
 		flag2.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (input!=null)
 					input.setFlag2(flag2.getSelection());
@@ -85,9 +83,7 @@ public class TypeTwoDetailsPage implements IDetailsPage {
 		flag1.setSelection(input!=null && input.getFlag1());
 		flag2.setSelection(input!=null && input.getFlag2());
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#inputChanged(org.eclipse.jface.viewers.IStructuredSelection)
-	 */
+	@Override
 	public void selectionChanged(IFormPart part, ISelection selection) {
 		IStructuredSelection ssel = (IStructuredSelection)selection;
 		if (ssel.size()==1) {
@@ -97,38 +93,30 @@ public class TypeTwoDetailsPage implements IDetailsPage {
 			input = null;
 		update();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#commit()
-	 */
+	@Override
 	public void commit(boolean onSave) {
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		flag1.setFocus();
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#dispose()
-	 */
+	@Override
 	public void dispose() {
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#isDirty()
-	 */
+	@Override
 	public boolean isDirty() {
 		return false;
 	}
-	
+
+	@Override
 	public boolean isStale() {
 		return false;
 	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IDetailsPage#refresh()
-	 */
+	@Override
 	public void refresh() {
 		update();
 	}
+	@Override
 	public boolean setFormInput(Object input) {
 		return false;
 	}

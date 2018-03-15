@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,69 +45,82 @@ public class IPartServiceTest extends UITestCase {
     private IWorkbenchPartReference eventPartRef;
 
     class TestPartListener implements IPartListener {
-        public void partActivated(IWorkbenchPart part) {
+        @Override
+		public void partActivated(IWorkbenchPart part) {
             history.add("partActivated");
             eventPart = part;
         }
 
-        public void partBroughtToTop(IWorkbenchPart part) {
+        @Override
+		public void partBroughtToTop(IWorkbenchPart part) {
             history.add("partBroughtToTop");
             eventPart = part;
         }
 
-        public void partClosed(IWorkbenchPart part) {
+        @Override
+		public void partClosed(IWorkbenchPart part) {
             history.add("partClosed");
             eventPart = part;
         }
 
-        public void partDeactivated(IWorkbenchPart part) {
+        @Override
+		public void partDeactivated(IWorkbenchPart part) {
             history.add("partDeactivated");
             eventPart = part;
         }
 
-        public void partOpened(IWorkbenchPart part) {
+        @Override
+		public void partOpened(IWorkbenchPart part) {
             history.add("partOpened");
             eventPart = part;
         }
     }
 
     class TestPartListener2 implements IPartListener2 {
-        public void partActivated(IWorkbenchPartReference ref) {
+        @Override
+		public void partActivated(IWorkbenchPartReference ref) {
             history2.add("partActivated");
             eventPartRef = ref;
         }
 
-        public void partBroughtToTop(IWorkbenchPartReference ref) {
+        @Override
+		public void partBroughtToTop(IWorkbenchPartReference ref) {
             history2.add("partBroughtToTop");
             eventPartRef = ref;
         }
 
-        public void partClosed(IWorkbenchPartReference ref) {
+        @Override
+		public void partClosed(IWorkbenchPartReference ref) {
             history2.add("partClosed");
             eventPartRef = ref;
         }
 
-        public void partDeactivated(IWorkbenchPartReference ref) {
+        @Override
+		public void partDeactivated(IWorkbenchPartReference ref) {
             history2.add("partDeactivated");
             eventPartRef = ref;
         }
 
-        public void partOpened(IWorkbenchPartReference ref) {
+        @Override
+		public void partOpened(IWorkbenchPartReference ref) {
             history2.add("partOpened");
             eventPartRef = ref;
         }
 
-        public void partHidden(IWorkbenchPartReference ref) {
+        @Override
+		public void partHidden(IWorkbenchPartReference ref) {
             history2.add("partHidden");
             eventPartRef = ref;
         }
 
-        public void partVisible(IWorkbenchPartReference ref) {
+        @Override
+		public void partVisible(IWorkbenchPartReference ref) {
             history2.add("partVisible");
             eventPartRef = ref;
         }
 
-        public void partInputChanged(IWorkbenchPartReference ref) {
+        @Override
+		public void partInputChanged(IWorkbenchPartReference ref) {
             history2.add("partInputChanged");
             eventPartRef = ref;
         }
@@ -135,7 +148,8 @@ public class IPartServiceTest extends UITestCase {
         history2.clear();
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -175,19 +189,19 @@ public class IPartServiceTest extends UITestCase {
         assertTrue(history2.verifyOrder(new String[] { "partDeactivated",
                 "partHidden", "partClosed" }));
         assertEquals(getRef(view), eventPartRef);
-        
+
         fPage.removePartListener(partListener);
         fPage.removePartListener(partListener2);
     }
-    
+
     public void testLocalPartService() throws Throwable {
-    	IPartService service = (IPartService) fWindow
+    	IPartService service = fWindow
 				.getService(IPartService.class);
 
 		MockViewPart view = (MockViewPart) fPage.showView(MockViewPart.ID);
 		MockViewPart view2 = (MockViewPart) fPage.showView(MockViewPart.ID2);
 
-		IPartService slaveService = (IPartService) view.getSite()
+		IPartService slaveService = view.getSite()
 				.getService(IPartService.class);
 
 		assertTrue(service != slaveService);
@@ -214,7 +228,7 @@ public class IPartServiceTest extends UITestCase {
 		fPage.hideView(view2);
 		assertTrue(history.verifyOrder(new String[] { "partDeactivated",
 				"partActivated", "partClosed" }));
-		
+
 		// Hide view, listeners should be disposed
 		fPage.hideView(view);
 		clearEventState();
@@ -228,7 +242,7 @@ public class IPartServiceTest extends UITestCase {
     public void testAddPartListenerToWindow() throws Throwable {
         // From Javadoc: "Adds the given listener for part lifecycle events.
 		// Has no effect if an identical listener is already registered."
-		IPartService service = (IPartService) fWindow
+		IPartService service = fWindow
 				.getService(IPartService.class);
 		service.addPartListener(partListener);
 		service.addPartListener(partListener2);
@@ -254,7 +268,7 @@ public class IPartServiceTest extends UITestCase {
         assertTrue(history2.verifyOrder(new String[] { "partDeactivated",
                 "partHidden", "partClosed" }));
         assertEquals(getRef(view), eventPartRef);
-        
+
         service.removePartListener(partListener);
         service.removePartListener(partListener2);
     }
@@ -288,7 +302,7 @@ public class IPartServiceTest extends UITestCase {
 		// Has no affect if an identical listener is not registered."
 
 		// Add and remove listener.
-		IPartService service = (IPartService) fWindow
+		IPartService service = fWindow
 				.getService(IPartService.class);
 		service.addPartListener(partListener);
 		service.addPartListener(partListener2);
@@ -311,7 +325,8 @@ public class IPartServiceTest extends UITestCase {
 	 */
     public void testPartHiddenWhenClosedAndUnshared() throws Throwable {
         IPartListener2 listener = new TestPartListener2() {
-            public void partHidden(IWorkbenchPartReference ref) {
+            @Override
+			public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view we closed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -330,12 +345,13 @@ public class IPartServiceTest extends UITestCase {
 
     /**
      * Tests the partHidden method by closing a view when it is shared with another perspective.
-     * Includes regression test for: 
+     * Includes regression test for:
      *   Bug 60039 [ViewMgmt] (regression) IWorkbenchPage#findView returns non-null value after part has been closed
      */
     public void XXXtestPartHiddenWhenClosedAndShared() throws Throwable {
         IPartListener2 listener = new TestPartListener2() {
-            public void partHidden(IWorkbenchPartReference ref) {
+            @Override
+			public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view we closed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -364,7 +380,8 @@ public class IPartServiceTest extends UITestCase {
     public void testPartHiddenWhenObscured() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            public void partHidden(IWorkbenchPartReference ref) {
+            @Override
+			public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view that was obscured
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -390,7 +407,8 @@ public class IPartServiceTest extends UITestCase {
     public void testPartVisibleWhenOpenedUnshared() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            public void partVisible(IWorkbenchPartReference ref) {
+            @Override
+			public void partVisible(IWorkbenchPartReference ref) {
                 super.partVisible(ref);
                 // ensure that the notification is for the view we opened
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -414,7 +432,8 @@ public class IPartServiceTest extends UITestCase {
     public void testPartVisibleWhenOpenedShared() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            public void partVisible(IWorkbenchPartReference ref) {
+            @Override
+			public void partVisible(IWorkbenchPartReference ref) {
                 super.partVisible(ref);
                 // ensure that the notification is for the view we opened
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -444,10 +463,11 @@ public class IPartServiceTest extends UITestCase {
      * @throws Throwable
      */
     public void testPartHiddenBeforeClosing() throws Throwable {
-        
+
         final boolean[] eventReceived = {false, false};
         IPartListener2 listener = new TestPartListener2() {
-            public void partHidden(IWorkbenchPartReference ref) {
+            @Override
+			public void partHidden(IWorkbenchPartReference ref) {
                 super.partHidden(ref);
                 // ensure that the notification is for the view we revealed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -457,7 +477,8 @@ public class IPartServiceTest extends UITestCase {
                 eventReceived[0] = true;
                 assertFalse(eventReceived[1]);
             }
-            public void partClosed(IWorkbenchPartReference ref) {
+            @Override
+			public void partClosed(IWorkbenchPartReference ref) {
                 super.partClosed(ref);
                 // ensure that the notification is for the view we revealed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -479,7 +500,7 @@ public class IPartServiceTest extends UITestCase {
         assertTrue(eventReceived[0]);
         assertTrue(eventReceived[1]);
     }
-    
+
     /**
      * Tests the partVisible method by activating a view obscured by
      * another view in the same folder.
@@ -487,7 +508,8 @@ public class IPartServiceTest extends UITestCase {
     public void testPartVisibleWhenObscured() throws Throwable {
         final boolean[] eventReceived = { false };
         IPartListener2 listener = new TestPartListener2() {
-            public void partVisible(IWorkbenchPartReference ref) {
+            @Override
+			public void partVisible(IWorkbenchPartReference ref) {
                 super.partVisible(ref);
                 // ensure that the notification is for the view we revealed
                 assertEquals(MockViewPart.ID, ref.getId());
@@ -505,15 +527,15 @@ public class IPartServiceTest extends UITestCase {
         fPage.removePartListener(listener);
         assertTrue(eventReceived[0]);
     }
-    
+
 //    /**
 //     * Tests that when a partOpened is received for a view being shown,
 //     * the view is available via findView, findViewReference, getViews and getViewReferences.
-//     * 
+//     *
 //     * @since 3.1
 //     */
 // This does not work as expected.  See bug 93784.
-//  
+//
 //    public void testViewFoundWhenOpened() throws Throwable {
 //    	final String viewId = MockViewPart.ID;
 //        final boolean[] eventReceived = { false, false };
@@ -555,7 +577,7 @@ public class IPartServiceTest extends UITestCase {
     /**
      * Tests that when a partOpened is received for an editor being opened,
      * the editor is available via findEditor, getEditors, and getEditorReferences.
-     * 
+     *
      * @since 3.1
      */
     public void testEditorFoundWhenOpened() throws Throwable {
@@ -563,10 +585,11 @@ public class IPartServiceTest extends UITestCase {
 		IProject proj = FileUtil.createProject("IPartServiceTest");
 		IFile file = FileUtil.createFile("testEditorFoundWhenOpened.txt", proj);
 		final IEditorInput editorInput = new FileEditorInput(file);
-    	
+
         final boolean[] eventReceived = { false, false };
         IPartListener listener = new TestPartListener() {
-            public void partOpened(IWorkbenchPart part) {
+            @Override
+			public void partOpened(IWorkbenchPart part) {
                 super.partOpened(part);
                 // ensure that the notification is for the editor we opened
                 assertEquals(editorId, part.getSite().getId());
@@ -579,7 +602,8 @@ public class IPartServiceTest extends UITestCase {
             }
         };
         IPartListener2 listener2 = new TestPartListener2() {
-            public void partOpened(IWorkbenchPartReference ref) {
+            @Override
+			public void partOpened(IWorkbenchPartReference ref) {
                 super.partOpened(ref);
                 // ensure that the notification is for the editor we opened
                 assertEquals(editorId, ref.getId());

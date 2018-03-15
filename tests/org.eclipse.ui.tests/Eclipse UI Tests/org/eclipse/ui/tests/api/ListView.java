@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,6 @@ package org.eclipse.ui.tests.api;
 
 import java.util.ArrayList;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -26,6 +23,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPart;
+import org.junit.Assert;
 
 /**
  * An ElementViewPart shows a bunch of elements in a list
@@ -35,7 +34,7 @@ public class ListView extends MockViewPart implements IMenuListener {
 
     ListViewer viewer;
 
-    ArrayList input;
+	ArrayList<ListElement> input;
 
     MenuManager menuMgr;
 
@@ -50,13 +49,14 @@ public class ListView extends MockViewPart implements IMenuListener {
      */
     public ListView() {
         super();
-        input = new ArrayList();
+		input = new ArrayList<>();
     }
 
     /**
      * @see IWorkbenchPart#createPartControl(Composite)
      */
-    public void createPartControl(Composite parent) {
+    @Override
+	public void createPartControl(Composite parent) {
         callTrace.add("createPartControl");
 
         // Create viewer.
@@ -78,17 +78,19 @@ public class ListView extends MockViewPart implements IMenuListener {
     public void createPopupMenu() {
         // Create actions.
         addAction = new Action("Add Standard Items") {
-            public void run() {
+            @Override
+			public void run() {
                 addStandardItems();
             }
         };
         addAction.setId(ADD_ACTION_ID);
 
         // Create popup menu.
-        if (useStaticMenu())
-            createStaticPopupMenu();
-        else
-            createDynamicPopupMenu();
+        if (useStaticMenu()) {
+			createStaticPopupMenu();
+		} else {
+			createDynamicPopupMenu();
+		}
     }
 
     /**
@@ -121,20 +123,19 @@ public class ListView extends MockViewPart implements IMenuListener {
     }
 
     public void selectElement(ListElement el) {
-        if (el == null)
-            viewer.setSelection(new StructuredSelection());
-        else
-            viewer.setSelection(new StructuredSelection(el));
+        if (el == null) {
+			viewer.setSelection(new StructuredSelection());
+		} else {
+			viewer.setSelection(new StructuredSelection(el));
+		}
     }
 
     public MenuManager getMenuManager() {
         return menuMgr;
     }
 
-    /**
-     * @see IMenuListener#menuAboutToShow(IMenuManager)
-     */
-    public void menuAboutToShow(IMenuManager menuMgr) {
+    @Override
+	public void menuAboutToShow(IMenuManager menuMgr) {
         menuMgr.add(addAction);
         menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
@@ -142,7 +143,7 @@ public class ListView extends MockViewPart implements IMenuListener {
     /**
      * Tests that the menu mgr contains the expected actions.
      */
-    public void verifyActions(TestCase test, IMenuManager menuMgr) {
+	public void verifyActions(IMenuManager menuMgr) {
         Assert.assertNotNull(menuMgr.find(ADD_ACTION_ID));
     }
 

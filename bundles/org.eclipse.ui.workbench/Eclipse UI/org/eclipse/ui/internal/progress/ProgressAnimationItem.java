@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 440810
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
+import java.time.Duration;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -19,18 +23,16 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.util.Throttler;
 import org.eclipse.jface.util.Util;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.accessibility.AccessibleListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -75,9 +77,14 @@ public class ProgressAnimationItem extends AnimationItem implements
 	// ProgressBar flags
 	private int flags;
 
+	private AccessibleListener currentAccessibleListener;
+
+	private Throttler throttledRefresh = new Throttler(PlatformUI.getWorkbench().getDisplay(), Duration.ofMillis(100),
+			this::refresh);
+
 	/**
 	 * Create an instance of the receiver in the supplied region.
-	 * 
+	 *
 	 * @param region
 	 *            The ProgressRegion that contains the receiver.
 	 * @param flags
@@ -90,6 +97,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 		progressRegion = region;
 		mouseListener = new MouseAdapter() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				doAction();
 			}
@@ -112,7 +120,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 						StatusAdapter statusAdapter = StatusAdapterHelper
 								.getInstance().getStatusAdapter(ji);
 
-						if (statusAdapter == null) 
+						if (statusAdapter == null)
 							statusAdapter = new StatusAdapter(status);
 
 						StatusManager.getManager().handle(statusAdapter,
@@ -121,7 +129,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 						removeTopElement(ji);
 					}
 
-					execute(ji, job);
+					// To fix a bug (335543) introduced in 3.6.1.
+					// doAction() should return if progress region button was
+					// selected to open a job result action or command.
+					if (execute(ji, job)) {
+						return;
+					}
 				}
 			}
 		}
@@ -133,21 +146,23 @@ public class ProgressAnimationItem extends AnimationItem implements
 	/**
 	 * @param ji
 	 * @param job
+	 * @return <code>true</code> if Action or Command is executed
 	 */
-	private void execute(JobInfo ji, Job job) {
+	private boolean execute(JobInfo ji, Job job) {
 
 		Object prop = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		if (prop instanceof IAction && ((IAction) prop).isEnabled()) {
 			IAction action = (IAction) prop;
 			action.run();
 			removeTopElement(ji);
+			return true;
 		}
 
 		prop = job.getProperty(IProgressConstants2.COMMAND_PROPERTY);
 		if (prop instanceof ParameterizedCommand) {
 			ParameterizedCommand command = (ParameterizedCommand) prop;
 			IWorkbenchWindow window = getWindow();
-			IHandlerService service = (IHandlerService) window
+			IHandlerService service = window
 					.getService(IHandlerService.class);
 			Exception exception = null;
 			try {
@@ -169,8 +184,9 @@ public class ProgressAnimationItem extends AnimationItem implements
 				StatusManager.getManager().handle(status,
 						StatusManager.LOG | StatusManager.SHOW);
 			}
-
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -253,40 +269,38 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolButton.setToolTipText(tt);
     	toolbar.setVisible(true);
 		toolbar.getParent().layout(); // must layout
-		
-    	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-        	public void getName(AccessibleEvent e) {
-        		e.result = tt;
-        	}
-        });
+
+		if (currentAccessibleListener != null)
+			toolbar.getAccessible().removeAccessibleListener(currentAccessibleListener);
+		currentAccessibleListener = new AccessibleAdapter() {
+			@Override
+			public void getName(AccessibleEvent e) {
+				e.result = tt;
+			}
+		};
+		toolbar.getAccessible().addAccessibleListener(currentAccessibleListener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected Control createAnimationItem(Composite parent) {
 
 		if (okImage == null) {
 			Display display = parent.getDisplay();
 			noneImage = WorkbenchImages.getWorkbenchImageDescriptor(
-					"progress/progress_none.gif").createImage(display); //$NON-NLS-1$
+					"progress/progress_none.png").createImage(display); //$NON-NLS-1$
 			okImage = WorkbenchImages.getWorkbenchImageDescriptor(
-					"progress/progress_ok.gif").createImage(display); //$NON-NLS-1$
+					"progress/progress_ok.png").createImage(display); //$NON-NLS-1$
 			errorImage = WorkbenchImages.getWorkbenchImageDescriptor(
-					"progress/progress_error.gif").createImage(display); //$NON-NLS-1$
+					"progress/progress_error.png").createImage(display); //$NON-NLS-1$
 		}
 
 		top = new Composite(parent, SWT.NULL);
-		top.addDisposeListener(new DisposeListener() {
-			public void widgetDisposed(DisposeEvent e) {
-				FinishedJobs.getInstance().removeListener(
-						ProgressAnimationItem.this);
-				noneImage.dispose();
-				okImage.dispose();
-				errorImage.dispose();
-			}
+		top.addDisposeListener(e -> {
+			FinishedJobs.getInstance().removeListener(
+					ProgressAnimationItem.this);
+			noneImage.dispose();
+			okImage.dispose();
+			errorImage.dispose();
 		});
 
 		boolean isCarbon = Util.isMac();
@@ -323,11 +337,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolbar.setVisible(false);
 
 		toolButton = new ToolItem(toolbar, SWT.NONE);
-		toolButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				doAction();
-			}
-		});
+		toolButton.addSelectionListener(widgetSelectedAdapter(e -> doAction()));
 
 		if (isCarbon) {
 			new Label(top, SWT.NONE).setLayoutData(new GridData(4, 4));
@@ -345,20 +355,12 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return (flags & SWT.HORIZONTAL) != 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
-	 */
+	@Override
 	public Control getControl() {
 		return top;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
-	 */
+	@Override
 	void animationDone() {
 		super.animationDone();
 		animationRunning = false;
@@ -376,11 +378,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return animationRunning;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
-	 */
+	@Override
 	void animationStart() {
 		super.animationStart();
 		animationRunning = true;
@@ -391,22 +389,14 @@ public class ProgressAnimationItem extends AnimationItem implements
 		refresh();
 	}
 
+	@Override
 	public void removed(JobTreeElement info) {
-		final Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				refresh();
-			}
-		});
+		throttledRefresh.throttledExec();
 	}
 
+	@Override
 	public void finished(final JobTreeElement jte) {
-		final Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				refresh();
-			}
-		});
+		throttledRefresh.throttledExec();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 
     /**
      * Creates the action.
-     * 
+     *
      * @param viewer the viewer
      * @param name the name
      * @param clipboard the clipboard
@@ -48,7 +48,8 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
     /**
      * Performs this action.
      */
-    public void run() {
+    @Override
+	public void run() {
         // Get the selected property
         IStructuredSelection selection = (IStructuredSelection) getPropertySheet()
                 .getSelection();
@@ -60,7 +61,7 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
                 .getFirstElement();
 
         // Place text on the clipboard
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append(entry.getDisplayName());
         buffer.append("\t"); //$NON-NLS-1$
         buffer.append(entry.getValueAsString());
@@ -68,9 +69,9 @@ import org.eclipse.ui.internal.views.properties.PropertiesMessages;
         setClipboard(buffer.toString());
     }
 
-    /** 
+    /**
      * Updates enablement based on the current selection.
-     * 
+     *
      * @param sel the selection
      */
     public void selectionChanged(IStructuredSelection sel) {

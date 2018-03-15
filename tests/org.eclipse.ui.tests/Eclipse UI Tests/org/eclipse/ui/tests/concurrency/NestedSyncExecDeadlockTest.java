@@ -1,16 +1,16 @@
 /**********************************************************************
- * Copyright (c) 2004 Jeremiah Lott and others. All rights reserved.   This
+ * Copyright (c) 2004, 2017 Jeremiah Lott and others.
+ * All rights reserved.   This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors: 
+ *
+ * Contributors:
  *   Jeremiah Lott (jeremiah.lott@timesys.com) - Initial implementation
  *   IBM Added comments, removed printlns, and incorporated into platform test suites
  **********************************************************************/
 package org.eclipse.ui.tests.concurrency;
 
-import junit.framework.TestCase;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
+import junit.framework.TestCase;
+
 /**
  * This is a regression test for a case where a recursive attempt to syncExec
  * from within code that owns a lock would cause deadlock. See bug 76378 for details.
@@ -32,10 +34,9 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 public class NestedSyncExecDeadlockTest extends TestCase {
 
 	private class ResourceListener implements IResourceChangeListener {
+		@Override
 		public void resourceChanged(IResourceChangeEvent event) {
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-				}
+			Display.getDefault().syncExec(() -> {
 			});
 		}
 	}
@@ -56,35 +57,31 @@ public class NestedSyncExecDeadlockTest extends TestCase {
 	public void doTest(final long timeToSleep) throws Exception {
 		ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
 		dialog.run(true, false, new WorkspaceModifyOperation() {
+			@Override
 			public void execute(final IProgressMonitor pm) {
-				Display.getDefault().syncExec(new Runnable() {
-					public void run() {
-						try {
-							workspace.run(new IWorkspaceRunnable() {
-								public void run(IProgressMonitor mon) throws CoreException {
-									project.touch(null);
-									try {
-										// wait long enough to be sure to trigger notification
-										Thread.sleep(timeToSleep);
-									} catch (InterruptedException ex) {
-										ex.printStackTrace();
-									}
-								}
-							}, workspace.getRoot(), IResource.NONE, pm);
-							workspace.run(new IWorkspaceRunnable() {
-								public void run(IProgressMonitor mon) {
-								}
-							}, pm);
+				Display.getDefault().syncExec(() -> {
+					try {
+						workspace.run((IWorkspaceRunnable) mon -> {
+							project.touch(null);
+							try {
+								// wait long enough to be sure to trigger notification
+								Thread.sleep(timeToSleep);
+							} catch (InterruptedException ex) {
+								ex.printStackTrace();
+							}
+						}, workspace.getRoot(), IResource.NONE, pm);
+						workspace.run((IWorkspaceRunnable) mon -> {
+						}, pm);
 
-						} catch (CoreException ex) {
-							ex.printStackTrace();
-						}
+					} catch (CoreException ex) {
+						ex.printStackTrace();
 					}
 				});
 			}
 		});
 	}
 
+	@Override
 	protected void setUp() throws Exception {
 		project = workspace.getRoot().getProject("test-deadlock");
 
@@ -97,6 +94,7 @@ public class NestedSyncExecDeadlockTest extends TestCase {
 		workspace.addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		if (listener != null) {
 			workspace.removeResourceChangeListener(listener);
@@ -106,9 +104,15 @@ public class NestedSyncExecDeadlockTest extends TestCase {
 
 	public void testDeadlock() throws Exception {
 		doTest(1000 * 30); // 30 secs almost always locks
+		if (Thread.interrupted()) {
+			fail("Thread was interrupted at end of test");
+		}
 	}
 
 	public void testOK() throws Exception {
-		doTest(0); // 0 rarely locks		
+		doTest(0); // 0 rarely locks
+		if (Thread.interrupted()) {
+			fail("Thread was interrupted at end of test");
+		}
 	}
 }

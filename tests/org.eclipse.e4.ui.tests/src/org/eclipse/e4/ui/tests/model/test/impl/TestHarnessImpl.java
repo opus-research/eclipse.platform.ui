@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: TestHarnessImpl.java,v 1.12 2011/04/16 10:39:14 tschindl Exp $
+ * $Id: TestHarnessImpl.java,v 1.12 2011, 2015/04/16 10:39:14 tschindl Exp $
  */
 package org.eclipse.e4.ui.tests.model.test.impl;
 
@@ -25,6 +25,7 @@ import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MExpression;
 import org.eclipse.e4.ui.model.application.ui.MInput;
+import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -58,6 +59,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getDescription <em>Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getParameters <em>Parameters</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getCategory <em>Category</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getLocalizedCommandName <em>Localized Command Name</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getLocalizedDescription <em>Localized Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getContext <em>Context</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getVariables <em>Variables</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getProperties <em>Properties</em>}</li>
@@ -73,6 +76,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getCurSharedRef <em>Cur Shared Ref</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getVisibleWhen <em>Visible When</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getAccessibilityPhrase <em>Accessibility Phrase</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getLocalizedAccessibilityPhrase <em>Localized Accessibility Phrase</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getChildren <em>Children</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getSelectedElement <em>Selected Element</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getName <em>Name</em>}</li>
@@ -81,6 +85,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getLabel <em>Label</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getIconURI <em>Icon URI</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getTooltip <em>Tooltip</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getLocalizedLabel <em>Localized Label</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getLocalizedTooltip <em>Localized Tooltip</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#isDirty <em>Dirty</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.tests.model.test.impl.TestHarnessImpl#getSnippets <em>Snippets</em>}</li>
  * </ul>
@@ -138,6 +144,24 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * @ordered
 	 */
 	protected MCategory category;
+	/**
+	 * The default value of the '{@link #getLocalizedCommandName() <em>Localized Command Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocalizedCommandName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String LOCALIZED_COMMAND_NAME_EDEFAULT = null;
+	/**
+	 * The default value of the '{@link #getLocalizedDescription() <em>Localized Description</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocalizedDescription()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String LOCALIZED_DESCRIPTION_EDEFAULT = null;
 	/**
 	 * The default value of the '{@link #getContext() <em>Context</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -340,6 +364,15 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 */
 	protected String accessibilityPhrase = ACCESSIBILITY_PHRASE_EDEFAULT;
 	/**
+	 * The default value of the '{@link #getLocalizedAccessibilityPhrase() <em>Localized Accessibility Phrase</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocalizedAccessibilityPhrase()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String LOCALIZED_ACCESSIBILITY_PHRASE_EDEFAULT = null;
+	/**
 	 * The cached value of the '{@link #getChildren() <em>Children</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getChildren()
@@ -453,6 +486,24 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 */
 	protected String tooltip = TOOLTIP_EDEFAULT;
 	/**
+	 * The default value of the '{@link #getLocalizedLabel() <em>Localized Label</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocalizedLabel()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String LOCALIZED_LABEL_EDEFAULT = "";
+	/**
+	 * The default value of the '{@link #getLocalizedTooltip() <em>Localized Tooltip</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocalizedTooltip()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String LOCALIZED_TOOLTIP_EDEFAULT = "";
+	/**
 	 * The default value of the '{@link #isDirty() <em>Dirty</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #isDirty()
@@ -500,6 +551,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getCommandName() {
 		return commandName;
 	}
@@ -508,6 +560,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setCommandName(String newCommandName) {
 		String oldCommandName = commandName;
 		commandName = newCommandName;
@@ -519,6 +572,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getDescription() {
 		return description;
 	}
@@ -527,6 +581,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setDescription(String newDescription) {
 		String oldDescription = description;
 		description = newDescription;
@@ -538,6 +593,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public List<MCommandParameter> getParameters() {
 		if (parameters == null) {
 			parameters = new EObjectContainmentEList<MCommandParameter>(MCommandParameter.class, this, MTestPackage.TEST_HARNESS__PARAMETERS);
@@ -549,6 +605,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public MCategory getCategory() {
 		if (category != null && ((EObject)category).eIsProxy()) {
 			InternalEObject oldCategory = (InternalEObject)category;
@@ -573,6 +630,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setCategory(MCategory newCategory) {
 		MCategory oldCategory = category;
 		category = newCategory;
@@ -584,6 +642,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public IEclipseContext getContext() {
 		return context;
 	}
@@ -592,6 +651,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setContext(IEclipseContext newContext) {
 		IEclipseContext oldContext = context;
 		context = newContext;
@@ -603,6 +663,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public List<String> getVariables() {
 		if (variables == null) {
 			variables = new EDataTypeUniqueEList<String>(String.class, this, MTestPackage.TEST_HARNESS__VARIABLES);
@@ -614,6 +675,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Map<String, String> getProperties() {
 		if (properties == null) {
 			properties = new EcoreEMap<String,String>(ApplicationPackageImpl.Literals.STRING_TO_STRING_MAP, StringToStringMapImpl.class, this, MTestPackage.TEST_HARNESS__PROPERTIES);
@@ -625,6 +687,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getContributionURI() {
 		return contributionURI;
 	}
@@ -633,6 +696,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setContributionURI(String newContributionURI) {
 		String oldContributionURI = contributionURI;
 		contributionURI = newContributionURI;
@@ -644,6 +708,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Object getObject() {
 		return object;
 	}
@@ -652,6 +717,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setObject(Object newObject) {
 		Object oldObject = object;
 		object = newObject;
@@ -663,6 +729,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Object getWidget() {
 		return widget;
 	}
@@ -671,6 +738,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setWidget(Object newWidget) {
 		Object oldWidget = widget;
 		widget = newWidget;
@@ -682,6 +750,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Object getRenderer() {
 		return renderer;
 	}
@@ -690,6 +759,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setRenderer(Object newRenderer) {
 		Object oldRenderer = renderer;
 		renderer = newRenderer;
@@ -701,6 +771,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isToBeRendered() {
 		return toBeRendered;
 	}
@@ -709,6 +780,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setToBeRendered(boolean newToBeRendered) {
 		boolean oldToBeRendered = toBeRendered;
 		toBeRendered = newToBeRendered;
@@ -720,6 +792,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isOnTop() {
 		return onTop;
 	}
@@ -728,6 +801,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setOnTop(boolean newOnTop) {
 		boolean oldOnTop = onTop;
 		onTop = newOnTop;
@@ -739,6 +813,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isVisible() {
 		return visible;
 	}
@@ -747,6 +822,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setVisible(boolean newVisible) {
 		boolean oldVisible = visible;
 		visible = newVisible;
@@ -758,10 +834,11 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public MElementContainer<MUIElement> getParent() {
 		if (eContainerFeatureID() != MTestPackage.TEST_HARNESS__PARENT) return null;
-		return (MElementContainer<MUIElement>)eContainer();
+		return (MElementContainer<MUIElement>)eInternalContainer();
 	}
 
 	/**
@@ -778,6 +855,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setParent(MElementContainer<MUIElement> newParent) {
 		if (newParent != eInternalContainer() || (eContainerFeatureID() != MTestPackage.TEST_HARNESS__PARENT && newParent != null)) {
 			if (EcoreUtil.isAncestor(this, (EObject)newParent))
@@ -798,6 +876,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getContainerData() {
 		return containerData;
 	}
@@ -806,6 +885,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setContainerData(String newContainerData) {
 		String oldContainerData = containerData;
 		containerData = newContainerData;
@@ -817,6 +897,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public MPlaceholder getCurSharedRef() {
 		if (curSharedRef != null && ((EObject)curSharedRef).eIsProxy()) {
 			InternalEObject oldCurSharedRef = (InternalEObject)curSharedRef;
@@ -841,6 +922,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setCurSharedRef(MPlaceholder newCurSharedRef) {
 		MPlaceholder oldCurSharedRef = curSharedRef;
 		curSharedRef = newCurSharedRef;
@@ -852,6 +934,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public MExpression getVisibleWhen() {
 		return visibleWhen;
 	}
@@ -875,6 +958,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setVisibleWhen(MExpression newVisibleWhen) {
 		if (newVisibleWhen != visibleWhen) {
 			NotificationChain msgs = null;
@@ -893,6 +977,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getAccessibilityPhrase() {
 		return accessibilityPhrase;
 	}
@@ -901,6 +986,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setAccessibilityPhrase(String newAccessibilityPhrase) {
 		String oldAccessibilityPhrase = accessibilityPhrase;
 		accessibilityPhrase = newAccessibilityPhrase;
@@ -912,6 +998,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public List<MUIElement> getChildren() {
 		if (children == null) {
 			children = new EObjectContainmentWithInverseEList<MUIElement>(MUIElement.class, this, MTestPackage.TEST_HARNESS__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT);
@@ -923,6 +1010,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public MUIElement getSelectedElement() {
 		if (selectedElement != null && ((EObject)selectedElement).eIsProxy()) {
 			InternalEObject oldSelectedElement = (InternalEObject)selectedElement;
@@ -947,6 +1035,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setSelectedElement(MUIElement newSelectedElement) {
 		MUIElement oldSelectedElement = selectedElement;
 		selectedElement = newSelectedElement;
@@ -958,6 +1047,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -966,6 +1056,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
@@ -977,6 +1068,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getValue() {
 		return value;
 	}
@@ -985,6 +1077,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setValue(String newValue) {
 		String oldValue = value;
 		value = newValue;
@@ -996,6 +1089,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getInputURI() {
 		return inputURI;
 	}
@@ -1004,6 +1098,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setInputURI(String newInputURI) {
 		String oldInputURI = inputURI;
 		inputURI = newInputURI;
@@ -1015,6 +1110,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getLabel() {
 		return label;
 	}
@@ -1023,6 +1119,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setLabel(String newLabel) {
 		String oldLabel = label;
 		label = newLabel;
@@ -1034,6 +1131,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getIconURI() {
 		return iconURI;
 	}
@@ -1042,6 +1140,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setIconURI(String newIconURI) {
 		String oldIconURI = iconURI;
 		iconURI = newIconURI;
@@ -1053,6 +1152,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getTooltip() {
 		return tooltip;
 	}
@@ -1061,6 +1161,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setTooltip(String newTooltip) {
 		String oldTooltip = tooltip;
 		tooltip = newTooltip;
@@ -1072,6 +1173,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public boolean isDirty() {
 		return dirty;
 	}
@@ -1080,6 +1182,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setDirty(boolean newDirty) {
 		boolean oldDirty = dirty;
 		dirty = newDirty;
@@ -1092,6 +1195,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public List<MUIElement> getSnippets() {
 		if (snippets == null) {
 			snippets = new EObjectContainmentEList<MUIElement>(MUIElement.class, this, MTestPackage.TEST_HARNESS__SNIPPETS);
@@ -1104,8 +1208,21 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
+	public void updateLocalization() {
+		// TODO: implement this method
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public String getLocalizedLabel() {
-		// TODO: implement this method
+		// TODO: implement this method to return the 'Localized Label' attribute
 		// Ensure that you remove @generated or mark it @generated NOT
 		throw new UnsupportedOperationException();
 	}
@@ -1115,8 +1232,9 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getLocalizedTooltip() {
-		// TODO: implement this method
+		// TODO: implement this method to return the 'Localized Tooltip' attribute
 		// Ensure that you remove @generated or mark it @generated NOT
 		throw new UnsupportedOperationException();
 	}
@@ -1126,8 +1244,9 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getLocalizedAccessibilityPhrase() {
-		// TODO: implement this method
+		// TODO: implement this method to return the 'Localized Accessibility Phrase' attribute
 		// Ensure that you remove @generated or mark it @generated NOT
 		throw new UnsupportedOperationException();
 	}
@@ -1137,8 +1256,9 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getLocalizedCommandName() {
-		// TODO: implement this method
+		// TODO: implement this method to return the 'Localized Command Name' attribute
 		// Ensure that you remove @generated or mark it @generated NOT
 		throw new UnsupportedOperationException();
 	}
@@ -1148,8 +1268,9 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public String getLocalizedDescription() {
-		// TODO: implement this method
+		// TODO: implement this method to return the 'Localized Description' attribute
 		// Ensure that you remove @generated or mark it @generated NOT
 		throw new UnsupportedOperationException();
 	}
@@ -1227,6 +1348,10 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 			case MTestPackage.TEST_HARNESS__CATEGORY:
 				if (resolve) return getCategory();
 				return basicGetCategory();
+			case MTestPackage.TEST_HARNESS__LOCALIZED_COMMAND_NAME:
+				return getLocalizedCommandName();
+			case MTestPackage.TEST_HARNESS__LOCALIZED_DESCRIPTION:
+				return getLocalizedDescription();
 			case MTestPackage.TEST_HARNESS__CONTEXT:
 				return getContext();
 			case MTestPackage.TEST_HARNESS__VARIABLES:
@@ -1259,6 +1384,8 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				return getVisibleWhen();
 			case MTestPackage.TEST_HARNESS__ACCESSIBILITY_PHRASE:
 				return getAccessibilityPhrase();
+			case MTestPackage.TEST_HARNESS__LOCALIZED_ACCESSIBILITY_PHRASE:
+				return getLocalizedAccessibilityPhrase();
 			case MTestPackage.TEST_HARNESS__CHILDREN:
 				return getChildren();
 			case MTestPackage.TEST_HARNESS__SELECTED_ELEMENT:
@@ -1276,6 +1403,10 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				return getIconURI();
 			case MTestPackage.TEST_HARNESS__TOOLTIP:
 				return getTooltip();
+			case MTestPackage.TEST_HARNESS__LOCALIZED_LABEL:
+				return getLocalizedLabel();
+			case MTestPackage.TEST_HARNESS__LOCALIZED_TOOLTIP:
+				return getLocalizedTooltip();
 			case MTestPackage.TEST_HARNESS__DIRTY:
 				return isDirty();
 			case MTestPackage.TEST_HARNESS__SNIPPETS:
@@ -1500,6 +1631,10 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				return parameters != null && !parameters.isEmpty();
 			case MTestPackage.TEST_HARNESS__CATEGORY:
 				return category != null;
+			case MTestPackage.TEST_HARNESS__LOCALIZED_COMMAND_NAME:
+				return LOCALIZED_COMMAND_NAME_EDEFAULT == null ? getLocalizedCommandName() != null : !LOCALIZED_COMMAND_NAME_EDEFAULT.equals(getLocalizedCommandName());
+			case MTestPackage.TEST_HARNESS__LOCALIZED_DESCRIPTION:
+				return LOCALIZED_DESCRIPTION_EDEFAULT == null ? getLocalizedDescription() != null : !LOCALIZED_DESCRIPTION_EDEFAULT.equals(getLocalizedDescription());
 			case MTestPackage.TEST_HARNESS__CONTEXT:
 				return CONTEXT_EDEFAULT == null ? context != null : !CONTEXT_EDEFAULT.equals(context);
 			case MTestPackage.TEST_HARNESS__VARIABLES:
@@ -1530,6 +1665,8 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				return visibleWhen != null;
 			case MTestPackage.TEST_HARNESS__ACCESSIBILITY_PHRASE:
 				return ACCESSIBILITY_PHRASE_EDEFAULT == null ? accessibilityPhrase != null : !ACCESSIBILITY_PHRASE_EDEFAULT.equals(accessibilityPhrase);
+			case MTestPackage.TEST_HARNESS__LOCALIZED_ACCESSIBILITY_PHRASE:
+				return LOCALIZED_ACCESSIBILITY_PHRASE_EDEFAULT == null ? getLocalizedAccessibilityPhrase() != null : !LOCALIZED_ACCESSIBILITY_PHRASE_EDEFAULT.equals(getLocalizedAccessibilityPhrase());
 			case MTestPackage.TEST_HARNESS__CHILDREN:
 				return children != null && !children.isEmpty();
 			case MTestPackage.TEST_HARNESS__SELECTED_ELEMENT:
@@ -1546,6 +1683,10 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				return ICON_URI_EDEFAULT == null ? iconURI != null : !ICON_URI_EDEFAULT.equals(iconURI);
 			case MTestPackage.TEST_HARNESS__TOOLTIP:
 				return TOOLTIP_EDEFAULT == null ? tooltip != null : !TOOLTIP_EDEFAULT.equals(tooltip);
+			case MTestPackage.TEST_HARNESS__LOCALIZED_LABEL:
+				return LOCALIZED_LABEL_EDEFAULT == null ? getLocalizedLabel() != null : !LOCALIZED_LABEL_EDEFAULT.equals(getLocalizedLabel());
+			case MTestPackage.TEST_HARNESS__LOCALIZED_TOOLTIP:
+				return LOCALIZED_TOOLTIP_EDEFAULT == null ? getLocalizedTooltip() != null : !LOCALIZED_TOOLTIP_EDEFAULT.equals(getLocalizedTooltip());
 			case MTestPackage.TEST_HARNESS__DIRTY:
 				return dirty != DIRTY_EDEFAULT;
 			case MTestPackage.TEST_HARNESS__SNIPPETS:
@@ -1560,12 +1701,19 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 */
 	@Override
 	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
+		if (baseClass == MLocalizable.class) {
+			switch (derivedFeatureID) {
+				default: return -1;
+			}
+		}
 		if (baseClass == MCommand.class) {
 			switch (derivedFeatureID) {
 				case MTestPackage.TEST_HARNESS__COMMAND_NAME: return CommandsPackageImpl.COMMAND__COMMAND_NAME;
 				case MTestPackage.TEST_HARNESS__DESCRIPTION: return CommandsPackageImpl.COMMAND__DESCRIPTION;
 				case MTestPackage.TEST_HARNESS__PARAMETERS: return CommandsPackageImpl.COMMAND__PARAMETERS;
 				case MTestPackage.TEST_HARNESS__CATEGORY: return CommandsPackageImpl.COMMAND__CATEGORY;
+				case MTestPackage.TEST_HARNESS__LOCALIZED_COMMAND_NAME: return CommandsPackageImpl.COMMAND__LOCALIZED_COMMAND_NAME;
+				case MTestPackage.TEST_HARNESS__LOCALIZED_DESCRIPTION: return CommandsPackageImpl.COMMAND__LOCALIZED_DESCRIPTION;
 				default: return -1;
 			}
 		}
@@ -1596,6 +1744,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				case MTestPackage.TEST_HARNESS__CUR_SHARED_REF: return UiPackageImpl.UI_ELEMENT__CUR_SHARED_REF;
 				case MTestPackage.TEST_HARNESS__VISIBLE_WHEN: return UiPackageImpl.UI_ELEMENT__VISIBLE_WHEN;
 				case MTestPackage.TEST_HARNESS__ACCESSIBILITY_PHRASE: return UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
+				case MTestPackage.TEST_HARNESS__LOCALIZED_ACCESSIBILITY_PHRASE: return UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
 				default: return -1;
 			}
 		}
@@ -1624,6 +1773,8 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				case MTestPackage.TEST_HARNESS__LABEL: return UiPackageImpl.UI_LABEL__LABEL;
 				case MTestPackage.TEST_HARNESS__ICON_URI: return UiPackageImpl.UI_LABEL__ICON_URI;
 				case MTestPackage.TEST_HARNESS__TOOLTIP: return UiPackageImpl.UI_LABEL__TOOLTIP;
+				case MTestPackage.TEST_HARNESS__LOCALIZED_LABEL: return UiPackageImpl.UI_LABEL__LOCALIZED_LABEL;
+				case MTestPackage.TEST_HARNESS__LOCALIZED_TOOLTIP: return UiPackageImpl.UI_LABEL__LOCALIZED_TOOLTIP;
 				default: return -1;
 			}
 		}
@@ -1648,12 +1799,19 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 */
 	@Override
 	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
+		if (baseClass == MLocalizable.class) {
+			switch (baseFeatureID) {
+				default: return -1;
+			}
+		}
 		if (baseClass == MCommand.class) {
 			switch (baseFeatureID) {
 				case CommandsPackageImpl.COMMAND__COMMAND_NAME: return MTestPackage.TEST_HARNESS__COMMAND_NAME;
 				case CommandsPackageImpl.COMMAND__DESCRIPTION: return MTestPackage.TEST_HARNESS__DESCRIPTION;
 				case CommandsPackageImpl.COMMAND__PARAMETERS: return MTestPackage.TEST_HARNESS__PARAMETERS;
 				case CommandsPackageImpl.COMMAND__CATEGORY: return MTestPackage.TEST_HARNESS__CATEGORY;
+				case CommandsPackageImpl.COMMAND__LOCALIZED_COMMAND_NAME: return MTestPackage.TEST_HARNESS__LOCALIZED_COMMAND_NAME;
+				case CommandsPackageImpl.COMMAND__LOCALIZED_DESCRIPTION: return MTestPackage.TEST_HARNESS__LOCALIZED_DESCRIPTION;
 				default: return -1;
 			}
 		}
@@ -1684,6 +1842,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				case UiPackageImpl.UI_ELEMENT__CUR_SHARED_REF: return MTestPackage.TEST_HARNESS__CUR_SHARED_REF;
 				case UiPackageImpl.UI_ELEMENT__VISIBLE_WHEN: return MTestPackage.TEST_HARNESS__VISIBLE_WHEN;
 				case UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE: return MTestPackage.TEST_HARNESS__ACCESSIBILITY_PHRASE;
+				case UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE: return MTestPackage.TEST_HARNESS__LOCALIZED_ACCESSIBILITY_PHRASE;
 				default: return -1;
 			}
 		}
@@ -1712,6 +1871,8 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 				case UiPackageImpl.UI_LABEL__LABEL: return MTestPackage.TEST_HARNESS__LABEL;
 				case UiPackageImpl.UI_LABEL__ICON_URI: return MTestPackage.TEST_HARNESS__ICON_URI;
 				case UiPackageImpl.UI_LABEL__TOOLTIP: return MTestPackage.TEST_HARNESS__TOOLTIP;
+				case UiPackageImpl.UI_LABEL__LOCALIZED_LABEL: return MTestPackage.TEST_HARNESS__LOCALIZED_LABEL;
+				case UiPackageImpl.UI_LABEL__LOCALIZED_TOOLTIP: return MTestPackage.TEST_HARNESS__LOCALIZED_TOOLTIP;
 				default: return -1;
 			}
 		}
@@ -1737,10 +1898,14 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	 */
 	@Override
 	public int eDerivedOperationID(int baseOperationID, Class<?> baseClass) {
+		if (baseClass == MLocalizable.class) {
+			switch (baseOperationID) {
+				case UiPackageImpl.LOCALIZABLE___UPDATE_LOCALIZATION: return MTestPackage.TEST_HARNESS___UPDATE_LOCALIZATION;
+				default: return -1;
+			}
+		}
 		if (baseClass == MCommand.class) {
 			switch (baseOperationID) {
-				case CommandsPackageImpl.COMMAND___GET_LOCALIZED_COMMAND_NAME: return MTestPackage.TEST_HARNESS___GET_LOCALIZED_COMMAND_NAME;
-				case CommandsPackageImpl.COMMAND___GET_LOCALIZED_DESCRIPTION: return MTestPackage.TEST_HARNESS___GET_LOCALIZED_DESCRIPTION;
 				default: return -1;
 			}
 		}
@@ -1756,7 +1921,6 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 		}
 		if (baseClass == MUIElement.class) {
 			switch (baseOperationID) {
-				case UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE: return MTestPackage.TEST_HARNESS___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 				default: return -1;
 			}
 		}
@@ -1777,8 +1941,6 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 		}
 		if (baseClass == MUILabel.class) {
 			switch (baseOperationID) {
-				case UiPackageImpl.UI_LABEL___GET_LOCALIZED_LABEL: return MTestPackage.TEST_HARNESS___GET_LOCALIZED_LABEL;
-				case UiPackageImpl.UI_LABEL___GET_LOCALIZED_TOOLTIP: return MTestPackage.TEST_HARNESS___GET_LOCALIZED_TOOLTIP;
 				default: return -1;
 			}
 		}
@@ -1803,16 +1965,9 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	@Override
 	public Object eInvoke(int operationID, EList<?> arguments) throws InvocationTargetException {
 		switch (operationID) {
-			case MTestPackage.TEST_HARNESS___GET_LOCALIZED_LABEL:
-				return getLocalizedLabel();
-			case MTestPackage.TEST_HARNESS___GET_LOCALIZED_TOOLTIP:
-				return getLocalizedTooltip();
-			case MTestPackage.TEST_HARNESS___GET_LOCALIZED_ACCESSIBILITY_PHRASE:
-				return getLocalizedAccessibilityPhrase();
-			case MTestPackage.TEST_HARNESS___GET_LOCALIZED_COMMAND_NAME:
-				return getLocalizedCommandName();
-			case MTestPackage.TEST_HARNESS___GET_LOCALIZED_DESCRIPTION:
-				return getLocalizedDescription();
+			case MTestPackage.TEST_HARNESS___UPDATE_LOCALIZATION:
+				updateLocalization();
+				return null;
 		}
 		return super.eInvoke(operationID, arguments);
 	}
@@ -1825,7 +1980,7 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (commandName: ");
 		result.append(commandName);
 		result.append(", description: ");
@@ -1870,67 +2025,31 @@ public class TestHarnessImpl extends ApplicationElementImpl implements
 		return result.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalLabel()
-	 */
 	public String getLocalLabel() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.model.application.ui.MUILabel#setLocalLabel(java.lang
-	 * .String)
-	 */
 	public void setLocalLabel(String value) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalTooltip()
-	 */
 	public String getLocalTooltip() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.model.application.ui.MUILabel#setLocalTooltip(java.
-	 * lang.String)
-	 */
 	public void setLocalTooltip(String value) {
 		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.model.application.ui.MUILabel#getLocalImage()
-	 */
 	public Object getLocalImage() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.model.application.ui.MUILabel#setLocalImage(java.lang
-	 * .Object)
-	 */
 	public void setLocalImage(Object value) {
 		// TODO Auto-generated method stub
 

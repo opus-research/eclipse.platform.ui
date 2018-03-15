@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,9 @@
 
 package org.eclipse.ui.internal.ide;
 
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,17 +28,19 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -52,9 +57,9 @@ import org.eclipse.ui.preferences.SettingsTransfer;
 /**
  * The ChooseWorkspaceWithSettingsDialog is the dialog used to switch workspaces
  * with an optional settings export.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
@@ -75,11 +80,11 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	private static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_HELP_CONTEXT = "helpContext"; //$NON-NLS-1$
 
-	private Collection selectedSettings = new HashSet();
+	private Collection<IConfigurationElement> selectedSettings = new HashSet<>();
 
 	/**
 	 * Open a new instance of the receiver.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param launchData
 	 * @param suppressAskAgain
@@ -91,11 +96,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		super(parentShell, launchData, suppressAskAgain, centerOnMonitor);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.ide.ChooseWorkspaceDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control top = super.createDialogArea(parent);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
@@ -108,111 +109,92 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Create the controls for selecting the controls we are going to export.
-	 * 
+	 *
 	 * @param workArea
 	 */
 	private void createSettingsControls(Composite workArea) {
 		final FormToolkit toolkit = new FormToolkit(workArea.getDisplay());
-		workArea.addDisposeListener(new DisposeListener() {
-
-			public void widgetDisposed(DisposeEvent e) {
-				toolkit.dispose();
-				
-			}});
+		workArea.addDisposeListener(e -> toolkit.dispose());
 		final ScrolledForm form = toolkit.createScrolledForm(workArea);
-		form.setBackground(workArea.getBackground());
+		form.getBody().setBackground(workArea.getBackground());
 		form.getBody().setLayout(new GridLayout());
+		form.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-		form.setLayoutData(layoutData);
-		final ExpandableComposite expandable = toolkit
-				.createExpandableComposite(form.getBody(),
-						ExpandableComposite.TWISTIE);
-		expandable
-				.setText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SettingsGroupName);
-		expandable.setBackground(workArea.getBackground());
-		expandable.setLayout(new GridLayout());
-		expandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		expandable.addExpansionListener(new IExpansionListener() {
+		final ExpandableComposite copySettingsExpandable =
+				toolkit.createExpandableComposite(form.getBody(), ExpandableComposite.TWISTIE);
 
-			boolean notExpanded = true;
+		copySettingsExpandable.setText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SettingsGroupName);
+		copySettingsExpandable.setBackground(workArea.getBackground());
+		copySettingsExpandable.setLayout(new GridLayout());
+		copySettingsExpandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		copySettingsExpandable.addExpansionListener(new IExpansionListener() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.forms.events.IExpansionListener#expansionStateChanged(org.eclipse.ui.forms.events.ExpansionEvent)
-			 */
+			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(true);
-				if (e.getState() && notExpanded) {
-					getShell().setRedraw(false);
-					Rectangle shellBounds = getShell().getBounds();
-					int entriesToShow = Math.min(4, SettingsTransfer
-							.getSettingsTransfers().length);
-
-					shellBounds.height += convertHeightInCharsToPixels(entriesToShow)
-							+ IDialogConstants.VERTICAL_SPACING;
-					getShell().setBounds(shellBounds);
-					getShell().setRedraw(true);
-					notExpanded = false;
-				}
-
+				Point size = getInitialSize();
+				Shell shell = getShell();
+				shell.setBounds(getConstrainedShellBounds(
+						new Rectangle(shell.getLocation().x, shell.getLocation().y, size.x, size.y)));
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.ui.forms.events.IExpansionListener#expansionStateChanging(org.eclipse.ui.forms.events.ExpansionEvent)
-			 */
+			@Override
 			public void expansionStateChanging(ExpansionEvent e) {
 				// Nothing to do here
 
 			}
 		});
 
-		Composite sectionClient = toolkit.createComposite(expandable);
-		sectionClient.setLayout(new GridLayout());
+		Composite sectionClient = toolkit.createComposite(copySettingsExpandable);
 		sectionClient.setBackground(workArea.getBackground());
 
 		if (createButtons(toolkit, sectionClient))
-			expandable.setExpanded(true);
+			copySettingsExpandable.setExpanded(true);
 
-		expandable.setClient(sectionClient);
+		copySettingsExpandable.setClient(sectionClient);
 
 	}
 
 	/**
 	 * Create the buttons for the settings transfer.
-	 * 
+	 *
 	 * @param toolkit
 	 * @param sectionClient
 	 * @return boolean <code>true</code> if any were selected
 	 */
 	private boolean createButtons(FormToolkit toolkit, Composite sectionClient) {
-
-		IConfigurationElement[] settings = SettingsTransfer
-				.getSettingsTransfers();
-
 		String[] enabledSettings = getEnabledSettings(IDEWorkbenchPlugin
 				.getDefault().getDialogSettings()
 				.getSection(WORKBENCH_SETTINGS));
 
-		for (int i = 0; i < settings.length; i++) {
-			final IConfigurationElement settingsTransfer = settings[i];
-			final Button button = toolkit.createButton(sectionClient,
-					settings[i].getAttribute(ATT_NAME), SWT.CHECK);
+		RowLayout layout = new RowLayout(SWT.VERTICAL);
+		layout.marginLeft = 14;
+		layout.spacing = 6;
+		sectionClient.setLayout(layout);
 
-			String helpId = settings[i].getAttribute(ATT_HELP_CONTEXT);
+		for (final IConfigurationElement settingsTransfer : SettingsTransfer.getSettingsTransfers()) {
+			final Button button = toolkit.createButton(sectionClient,
+					settingsTransfer.getAttribute(ATT_NAME), SWT.CHECK);
+
+			ControlDecoration deco = new ControlDecoration(button, SWT.TOP | SWT.RIGHT);
+			Image image = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
+					.getImage();
+			deco.setDescriptionText(IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_copySettingsDecoLabel);
+			deco.setImage(image);
+
+			toggleDecoForSettingsImportButtons(button, deco);
+			getCombo().addModifyListener(e -> toggleDecoForSettingsImportButtons(button, deco));
+
+			String helpId = settingsTransfer.getAttribute(ATT_HELP_CONTEXT);
 
 			if (helpId != null)
-				PlatformUI.getWorkbench().getHelpSystem().setHelp(button,
-						helpId);
+				PlatformUI.getWorkbench().getHelpSystem().setHelp(button, helpId);
 
 			if (enabledSettings != null && enabledSettings.length > 0) {
 
-				String id = settings[i].getAttribute(ATT_ID);
-				for (int j = 0; j < enabledSettings.length; j++) {
-					if (enabledSettings[j].equals(id)) {
+				String id = settingsTransfer.getAttribute(ATT_ID);
+				for (String enabledSetting : enabledSettings) {
+					if (enabledSetting.equals(id)) {
 						button.setSelection(true);
 						selectedSettings.add(settingsTransfer);
 						break;
@@ -223,16 +205,14 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 			button.setBackground(sectionClient.getBackground());
 			button.addSelectionListener(new SelectionAdapter() {
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
-					if (button.getSelection())
+					if (button.getSelection()) {
 						selectedSettings.add(settingsTransfer);
-					else
+					} else {
 						selectedSettings.remove(settingsTransfer);
+					}
+					toggleDecoForSettingsImportButtons(button, deco);
 				}
 			});
 
@@ -240,9 +220,21 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		return enabledSettings != null && enabledSettings.length > 0;
 	}
 
+	private void toggleDecoForSettingsImportButtons(Button button, ControlDecoration deco) {
+		if (!button.getSelection()) {
+			deco.hide();
+			return;
+		}
+
+		if (Files.exists(Paths.get(getWorkspaceLocation()), LinkOption.NOFOLLOW_LINKS)) {
+			deco.show();
+		} else {
+			deco.hide();
+		}
+	}
 	/**
 	 * Get the settings for the receiver based on the entries in section.
-	 * 
+	 *
 	 * @param section
 	 * @return String[] or <code>null</code>
 	 */
@@ -255,13 +247,9 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.ide.ChooseWorkspaceDialog#okPressed()
-	 */
+	@Override
 	protected void okPressed() {
-		Iterator settingsIterator = selectedSettings.iterator();
+		Iterator<IConfigurationElement> settingsIterator = selectedSettings.iterator();
 		MultiStatus result = new MultiStatus(
 				PlatformUI.PLUGIN_ID,
 				IStatus.OK,
@@ -273,7 +261,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		int index = 0;
 
 		while (settingsIterator.hasNext()) {
-			IConfigurationElement elem = (IConfigurationElement) settingsIterator
+			IConfigurationElement elem = settingsIterator
 					.next();
 			result.add(transferSettings(elem, path));
 			selectionIDs[index] = elem.getAttribute(ATT_ID);
@@ -294,7 +282,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Save the ids of the selected elements.
-	 * 
+	 *
 	 * @param selectionIDs
 	 */
 	private void saveSettings(String[] selectionIDs) {
@@ -311,7 +299,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Take the values from element and execute the class for path.
-	 * 
+	 *
 	 * @param elem
 	 * @param path
 	 * @return IStatus the result of the settings transfer.
@@ -322,11 +310,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 		final IStatus[] exceptions = new IStatus[1];
 
 		SafeRunner.run(new ISafeRunnable() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.core.runtime.ISafeRunnable#run()
-			 */
+			@Override
 			public void run() throws Exception {
 
 				try {
@@ -339,11 +323,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
-			 */
+			@Override
 			public void handleException(Throwable exception) {
 				exceptions[0] = StatusUtil
 						.newStatus(
@@ -364,13 +344,8 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsStrategy()
-	 */
+	@Override
 	protected int getDialogBoundsStrategy() {
 		return DIALOG_PERSISTLOCATION;
 	}
-
 }

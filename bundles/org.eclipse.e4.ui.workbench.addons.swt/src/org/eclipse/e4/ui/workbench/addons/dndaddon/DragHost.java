@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -62,8 +72,9 @@ class DragHost {
 	private MWindow getWindow() {
 		MUIElement pe = originalParent;
 		while (pe != null && !(pe instanceof MApplication)) {
-			if (((Object) pe) instanceof MWindow)
+			if (pe instanceof MWindow) {
 				return (MWindow) pe;
+			}
 			pe = pe.getParent();
 		}
 
@@ -75,7 +86,6 @@ class DragHost {
 		((Shell) baseWindow.getWidget()).getDisplay().update();
 		dragWindow = MBasicFactory.INSTANCE.createWindow();
 		dragWindow.getTags().add(DragHostId);
-		formatModel(dragWindow);
 
 		// define the initial location and size for the window
 		Point cp = ((Shell) baseWindow.getWidget()).getDisplay()
@@ -102,16 +112,15 @@ class DragHost {
 		getShell().setVisible(true);
 	}
 
-	private void formatModel(MWindow dragWindow) {
-	}
-
 	public void drop(MElementContainer<MUIElement> newContainer, int itemIndex) {
-		if (dragElement.getParent() != null)
+		if (dragElement.getParent() != null) {
 			dragElement.getParent().getChildren().remove(dragElement);
-		if (itemIndex >= 0)
+		}
+		if (itemIndex >= 0) {
 			newContainer.getChildren().add(itemIndex, dragElement);
-		else
+		} else {
 			newContainer.getChildren().add(dragElement);
+		}
 
 		newContainer.setSelectedElement(dragElement);
 		if (dragElement.getWidget() instanceof ToolItem) {
@@ -122,12 +131,13 @@ class DragHost {
 					.layout(new Control[] { tb }, SWT.CHANGED | SWT.DEFER);
 		}
 
-		baseWindow.getChildren().remove(dragWindow);
+		baseWindow.getWindows().remove(dragWindow);
 
 		newContainer.setSelectedElement(dragElement);
 
-		if (getShell() != null)
+		if (getShell() != null) {
 			getShell().dispose();
+		}
 	}
 
 	public void cancel() {
@@ -139,7 +149,7 @@ class DragHost {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void dispose() {
 		// TODO Auto-generated method stub

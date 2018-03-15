@@ -18,7 +18,6 @@
             <element ref="fontDefinition" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="themeElementCategory" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="data" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="categoryPresentationBinding" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -283,9 +282,9 @@ Only one (or neither) of &lt;code&gt;value&lt;/code&gt; or &lt;code&gt;defaultsT
             Allows overriding of colors defined in &lt;code&gt;colorDefinition&lt;/code&gt; elements.  These colors will be applied when the theme is in use. The colors that are defined by workbench are:
 
 &lt;ul&gt;
-&lt;li&gt;org.eclipse.jface.preference.JFacePreference.ERROR_COLOR
-&lt;li&gt;org.eclipse.jface.preference.JFacePreference.HYPERLINK_COLOR
-&lt;li&gt;org.eclipse.jface.preference.JFacePreference.ACTIVE_HYPERLINK_COLOR
+&lt;li&gt;org.eclipse.jface.preference.JFacePreferences.ERROR_COLOR
+&lt;li&gt;org.eclipse.jface.preference.JFacePreferences.HYPERLINK_COLOR
+&lt;li&gt;org.eclipse.jface.preference.JFacePreferences.ACTIVE_HYPERLINK_COLOR
 &lt;/ul&gt;
          </documentation>
       </annotation>
@@ -543,36 +542,6 @@ Only one of &lt;code&gt;value&lt;/code&gt; or &lt;code&gt;colorFactory&lt;/code&
       </complexType>
    </element>
 
-   <element name="categoryPresentationBinding">
-      <annotation>
-         <documentation>
-            This element allows a category to be bound to a specific presentation as described by the &lt;code&gt;org.eclipse.ui.presentationFactory&lt;/code&gt; extension point.  If a category has any presentation bindings then it (and its children) is only configurable by the user if it is bound to the active presentation.  This is useful for removing unused items from user consideration.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="categoryId" type="string" use="required">
-            <annotation>
-               <documentation>
-                  the id of the category to bind
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.themes/themeElementCategory/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="presentationId" type="string" use="required">
-            <annotation>
-               <documentation>
-                  the id of the presentation to bind to
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.presentationFactories/factory/@id"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
    <annotation>
       <appinfo>
          <meta.section type="since"/>
@@ -687,7 +656,7 @@ Only one of &lt;code&gt;value&lt;/code&gt; or &lt;code&gt;colorFactory&lt;/code&
          <meta.section type="copyright"/>
       </appinfo>
       <documentation>
-         Copyright (c) 2003, 2011 IBM Corporation and others.&lt;br&gt;
+         Copyright (c) 2003, 2013 IBM Corporation and others.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
 available under the terms of the Eclipse Public License v1.0 which accompanies
 this distribution, and is available at &lt;a 

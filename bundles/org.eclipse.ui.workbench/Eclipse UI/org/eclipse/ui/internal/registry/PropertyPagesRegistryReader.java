@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,7 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 	public static final String ATT_FILTER_VALUE = "value";//$NON-NLS-1$
 
 	/**
-	 * Value "<code>selectionFilter</code>". Is an enum allowing propertyPages to 
+	 * Value "<code>selectionFilter</code>". Is an enum allowing propertyPages to
 	 * support multiple selection when enum value is <code>ATT_SELECTION_FILTER_MULTI</code>
 	 * @since 3.7
 	 */
@@ -88,7 +88,7 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 
 		/**
 		 * Create a new category node on the given reader for the property page.
-		 * 
+		 *
 		 * @param reader
 		 * @param propertyPage
 		 */
@@ -98,29 +98,17 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 			page = propertyPage;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader.CategoryNode#getLabelText()
-		 */
+		@Override
 		String getLabelText() {
 			return page.getPageName();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader.CategoryNode#getLabelText(java.lang.Object)
-		 */
+		@Override
 		String getLabelText(Object element) {
 			return ((RegistryPageContributor) element).getPageName();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader.CategoryNode#getNode()
-		 */
+		@Override
 		Object getNode() {
 			return page;
 		}
@@ -128,7 +116,7 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 
 	/**
 	 * The constructor.
-	 * 
+	 *
 	 * @param manager
 	 *            the manager
 	 */
@@ -169,7 +157,7 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 
 	/**
 	 * Register the contributor for all of the relevant classes.
-	 * 
+	 *
 	 * @param contributor
 	 * @param objectClassNames
 	 */
@@ -186,9 +174,10 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 
 	/**
 	 * Reads the next contribution element.
-	 * 
+	 *
 	 * public for dynamic UI
 	 */
+	@Override
 	public boolean readElement(IConfigurationElement element) {
 		if (element.getName().equals(TAG_PAGE)) {
 			processPageElement(element);
@@ -212,7 +201,7 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 
 	/**
 	 * Reads all occurances of propertyPages extension in the registry.
-	 * 
+	 *
 	 * @param registry
 	 *            the registry
 	 */
@@ -222,45 +211,26 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 		processNodes();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#add(java.lang.Object,
-	 *      java.lang.Object)
-	 */
+	@Override
 	void add(Object parent, Object node) {
 		((RegistryPageContributor) parent)
 				.addSubPage((RegistryPageContributor) node);
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#createCategoryNode(org.eclipse.ui.internal.registry.CategorizedPageRegistryReader,
-	 *      java.lang.Object)
-	 */
+	@Override
 	CategoryNode createCategoryNode(CategorizedPageRegistryReader reader,
 			Object object) {
 		return new PropertyCategoryNode(reader,
 				(RegistryPageContributor) object);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#findNode(java.lang.Object,
-	 *      java.lang.String)
-	 */
+	@Override
 	Object findNode(Object parent, String currentToken) {
 		return ((RegistryPageContributor) parent).getChild(currentToken);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#findNode(java.lang.String)
-	 */
+	@Override
 	Object findNode(String id) {
 		Iterator iterator = pages.iterator();
 		while (iterator.hasNext()) {
@@ -272,34 +242,18 @@ public class PropertyPagesRegistryReader extends CategorizedPageRegistryReader {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#getCategory(java.lang.Object)
-	 */
+	@Override
 	String getCategory(Object node) {
 		return ((RegistryPageContributor) node).getCategory();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#
-	 * invalidCategoryNodeMessage
-	 * (org.eclipse.ui.internal.registry.CategorizedPageRegistryReader
-	 * .CategoryNode)
-	 */
 	@Override
 	protected String invalidCategoryNodeMessage(CategoryNode categoryNode) {
 		RegistryPageContributor rpc = (RegistryPageContributor) categoryNode.getNode();
 		return "Invalid property category path: " + rpc.getCategory() + " (bundle: " + rpc.getPluginId() + ", propertyPage: " + rpc.getLocalId() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.registry.CategorizedPageRegistryReader#getNodes()
-	 */
+	@Override
 	Collection getNodes() {
 		return pages;
 	}

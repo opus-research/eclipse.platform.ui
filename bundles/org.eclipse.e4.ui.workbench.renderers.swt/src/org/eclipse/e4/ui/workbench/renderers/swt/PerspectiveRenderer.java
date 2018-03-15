@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -16,7 +17,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -28,10 +28,8 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class PerspectiveRenderer extends SWTPartRenderer {
 
-	public PerspectiveRenderer() {
-		super();
-	}
 
+	@Override
 	public Widget createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MPerspective)
 				|| !(parent instanceof Composite))
@@ -39,27 +37,17 @@ public class PerspectiveRenderer extends SWTPartRenderer {
 
 		Composite perspArea = new Composite((Composite) parent, SWT.NONE);
 		perspArea.setLayout(new FillLayout());
-		IStylingEngine stylingEngine = (IStylingEngine) getContext(element)
-				.get(IStylingEngine.SERVICE_NAME);
+		IStylingEngine stylingEngine = getContext(element).get(IStylingEngine.class);
 		stylingEngine.setClassname(perspArea, "perspectiveLayout"); //$NON-NLS-1$
 
 		return perspArea;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
-	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
-	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
-		// TODO Auto-generated method stub
 		super.processContents(container);
 
-		IPresentationEngine renderer = (IPresentationEngine) context
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = context.get(IPresentationEngine.class);
 
 		MPerspective persp = (MPerspective) ((MUIElement) container);
 		Shell shell = ((Composite) persp.getWidget()).getShell();
@@ -68,19 +56,12 @@ public class PerspectiveRenderer extends SWTPartRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		if (!(element instanceof MWindow))
 			return super.getUIContainer(element);
 
-		MPerspective persp = (MPerspective) ((EObject) element).eContainer();
+		MUIElement persp = modelService.getContainer(element);
 		if (persp.getWidget() instanceof Composite) {
 			Composite comp = (Composite) persp.getWidget();
 			return comp.getShell();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
@@ -27,9 +26,9 @@ import org.eclipse.ui.internal.e4.compatibility.E4Util;
 
 /**
  * A AbstractMultiEditor is a composite of editors.
- * 
+ *
  * This class is intended to be subclassed.
- * 		
+ *
  * @since 3.5
  */
 public abstract class AbstractMultiEditor extends EditorPart {
@@ -58,7 +57,7 @@ public abstract class AbstractMultiEditor extends EditorPart {
 	 * <p>
 	 * Subclasses may extend or reimplement this method.
 	 * </p>
-	 * 
+	 *
 	 * @param propId
 	 *            the id of the property that changed
 	 * @since 3.6
@@ -70,9 +69,9 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#doSave(IProgressMonitor)
      */
-    public void doSave(IProgressMonitor monitor) {
-        for (int i = 0; i < innerEditors.length; i++) {
-            IEditorPart e = innerEditors[i];
+    @Override
+	public void doSave(IProgressMonitor monitor) {
+        for (IEditorPart e : innerEditors) {
             e.doSave(monitor);
         }
     }
@@ -80,22 +79,24 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#doSaveAs()
      */
-    public void doSaveAs() {
+    @Override
+	public void doSaveAs() {
         //no-op
     }
 
     /*
      * @see IEditorPart#init(IEditorSite, IEditorInput)
      */
-    public void init(IEditorSite site, IEditorInput input)
+    @Override
+	public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         init(site, (MultiEditorInput) input);
     }
 
     /**
-     * @param site 
-     * @param input 
-     * @throws PartInitException  
+     * @param site
+     * @param input
+     * @throws PartInitException
 	 *
 	 * @see IEditorPart#init(IEditorSite, IEditorInput)
      */
@@ -111,9 +112,9 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#isDirty()
      */
-    public boolean isDirty() {
-        for (int i = 0; i < innerEditors.length; i++) {
-            IEditorPart e = innerEditors[i];
+    @Override
+	public boolean isDirty() {
+        for (IEditorPart e : innerEditors) {
             if (e.isDirty()) {
 				return true;
 			}
@@ -124,14 +125,16 @@ public abstract class AbstractMultiEditor extends EditorPart {
     /*
      * @see IEditorPart#isSaveAsAllowed()
      */
-    public boolean isSaveAsAllowed() {
+    @Override
+	public boolean isSaveAsAllowed() {
         return false;
     }
 
 	/*
      * @see IWorkbenchPart#setFocus()
      */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         innerEditors[activeEditorIndex].setFocus();
     }
 
@@ -153,9 +156,9 @@ public abstract class AbstractMultiEditor extends EditorPart {
 
 	/**
 	 * Set the inner editors.
-	 * 
+	 *
 	 * Should not be called by clients.
-	 * 
+	 *
 	 * @param children
 	 *            the inner editors of this multi editor
 	 * @noreference This method is not intended to be referenced by clients.
@@ -164,12 +167,8 @@ public abstract class AbstractMultiEditor extends EditorPart {
         innerEditors = children;
         activeEditorIndex = 0;
 
-		for (int i = 0; i < children.length; i++) {
-			children[i].addPropertyListener( new IPropertyListener() {
-				public void propertyChanged(Object source, int propId) {
-					handlePropertyChange(propId);
-				}
-			});
+		for (IEditorPart child : children) {
+			child.addPropertyListener( (source, propId) -> handlePropertyChange(propId));
 		}
 
         innerEditorsCreated();
@@ -182,7 +181,7 @@ public abstract class AbstractMultiEditor extends EditorPart {
 
     /**
      * Activates the given nested editor.
-     * 
+     *
      * @param part the nested editor
      * @since 3.0
      */
@@ -196,7 +195,7 @@ public abstract class AbstractMultiEditor extends EditorPart {
 
     /**
      * Returns the index of the given nested editor.
-     * 
+     *
      * @return the index of the nested editor
      * @since 3.0
      */
@@ -216,12 +215,15 @@ public abstract class AbstractMultiEditor extends EditorPart {
      */
     private void setupEvents() {
 		propagationListener = new IPartListener2() {
+			@Override
 			public void partActivated(IWorkbenchPartReference partRef) {
 			}
 
+			@Override
 			public void partBroughtToTop(IWorkbenchPartReference partRef) {
 			}
 
+			@Override
 			public void partClosed(IWorkbenchPartReference partRef) {
 				IWorkbenchPart part = partRef.getPart(false);
 				if (part == AbstractMultiEditor.this && innerEditors != null) {
@@ -230,9 +232,11 @@ public abstract class AbstractMultiEditor extends EditorPart {
 				}
 			}
 
+			@Override
 			public void partDeactivated(IWorkbenchPartReference partRef) {
 			}
 
+			@Override
 			public void partOpened(IWorkbenchPartReference partRef) {
 				IWorkbenchPart part = partRef.getPart(false);
 				if (part == AbstractMultiEditor.this && innerEditors != null) {
@@ -249,12 +253,15 @@ public abstract class AbstractMultiEditor extends EditorPart {
 				}
 			}
 
+			@Override
 			public void partHidden(IWorkbenchPartReference partRef) {
 			}
 
+			@Override
 			public void partVisible(IWorkbenchPartReference partRef) {
 			}
 
+			@Override
 			public void partInputChanged(IWorkbenchPartReference partRef) {
 			}
 		};
@@ -263,9 +270,10 @@ public abstract class AbstractMultiEditor extends EditorPart {
 
     /**
      * Release the added listener.
-     * 
+     *
      * @since 3.2
      */
+	@Override
 	public void dispose() {
 		getSite().getPage().removePartListener(propagationListener);
 		super.dispose();
@@ -274,7 +282,7 @@ public abstract class AbstractMultiEditor extends EditorPart {
 	/**
 	 * This method is called after createPartControl has been executed and
 	 * should return the container for the given inner editor.
-	 * 
+	 *
 	 * @param innerEditorReference
 	 *            a reference to the inner editor that is being created.
 	 * @return the container in which the inner editor's pane and part controls

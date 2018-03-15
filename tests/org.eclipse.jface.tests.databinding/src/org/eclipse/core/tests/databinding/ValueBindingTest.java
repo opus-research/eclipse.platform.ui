@@ -13,6 +13,9 @@
 
 package org.eclipse.core.tests.databinding;
 
+import static org.eclipse.core.databinding.UpdateValueStrategy.POLICY_NEVER;
+import static org.eclipse.core.databinding.UpdateValueStrategy.POLICY_UPDATE;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,6 +53,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	private List log;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -59,9 +63,16 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 		log = new ArrayList();
 	}
 
+	@Override
+	public void tearDown() throws Exception {
+		dbc.dispose();
+		model.dispose();
+		target.dispose();
+	}
+
 	/**
 	 * Bug 152543.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testNoUpdateTargetFromModel() throws Exception {
@@ -168,6 +179,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	public void testStatusesFromEveryPhaseAreReturned() throws Exception {
 		UpdateValueStrategy strategy = new UpdateValueStrategy() {
+			@Override
 			protected IStatus doSet(IObservableValue observableValue,
 					Object value) {
 				super.doSet(observableValue, value);
@@ -213,6 +225,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 				super("", String.class);
 			}
 
+			@Override
 			protected void fireValueChange(ValueDiff diff) {
 				super.fireValueChange(diff);
 			}
@@ -224,6 +237,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 		class Strategy extends UpdateValueStrategy {
 			int afterGetCount;
 
+			@Override
 			public IStatus validateAfterGet(Object value) {
 				afterGetCount++;
 				return super.validateAfterGet(value);
@@ -326,6 +340,14 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 				"model-convert", "model-after-convert" }), log);
 	}
 
+	/**
+	 * test for bug 491678
+	 */
+	public void testTargetValueIsSyncedToModelIfModelWasNotSyncedToTarget() {
+		bindLoggingValue(new UpdateValueStrategy(true, POLICY_UPDATE), new UpdateValueStrategy(true, POLICY_NEVER));
+		assertEquals(model.getValue(), target.getValue());
+	}
+
 	private void bindLoggingValue(UpdateValueStrategy targetToModel,
 			UpdateValueStrategy modelToTarget) {
 		// Set model and target to different values to ensure we get a change
@@ -334,11 +356,13 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 		target.setValue("2");
 
 		target.addValueChangeListener(new IValueChangeListener() {
+			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				log.add("target-set");
 			}
 		});
 		model.addValueChangeListener(new IValueChangeListener() {
+			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				log.add("model-set");
 			}
@@ -368,6 +392,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	private IValidator loggingValidator(final List log, final String message) {
 		return new IValidator() {
+			@Override
 			public IStatus validate(Object value) {
 				log.add(message);
 				return ValidationStatus.ok();
@@ -377,6 +402,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	private IConverter loggingConverter(final List log, final String message) {
 		return new Converter(null, null) {
+			@Override
 			public Object convert(Object fromObject) {
 				log.add(message);
 				return fromObject;
@@ -386,6 +412,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	private IValidator warningValidator() {
 		return new IValidator() {
+			@Override
 			public IStatus validate(Object value) {
 				return ValidationStatus.warning("");
 			}
@@ -394,6 +421,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	private IValidator infoValidator() {
 		return new IValidator() {
+			@Override
 			public IStatus validate(Object value) {
 				return ValidationStatus.info("");
 			}
@@ -402,6 +430,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	private IValidator errorValidator() {
 		return new IValidator() {
+			@Override
 			public IStatus validate(Object value) {
 				return ValidationStatus.error("");
 			}
@@ -410,6 +439,7 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 
 	private IValidator cancelValidator() {
 		return new IValidator() {
+			@Override
 			public IStatus validate(Object value) {
 				return ValidationStatus.cancel("");
 			}
@@ -417,16 +447,19 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 	}
 
 	private static class ObservableValueStub extends AbstractObservableValue {
+		@Override
 		protected Object doGetValue() {
 			// do nothing
 			return null;
 		}
 
+		@Override
 		public Object getValueType() {
 			// do nothing
 			return null;
 		}
 
+		@Override
 		protected void doSetValue(Object value) {
 
 		}

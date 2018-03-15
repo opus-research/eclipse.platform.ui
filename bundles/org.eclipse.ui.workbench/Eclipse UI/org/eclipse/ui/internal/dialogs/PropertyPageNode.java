@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,23 +51,22 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
      * it will be created by loading the class. If loading fails,
      * empty filler page will be created instead.
      */
-    public void createPage() {
+    @Override
+	public void createPage() {
         try {
             page = contributor.createPage(element);
         } catch (CoreException e) {
             // Just inform the user about the error. The details are
             // written to the log by now.
-            IStatus errStatus = StatusUtil.newStatus(e.getStatus(), WorkbenchMessages.PropertyPageNode_errorMessage); 
+            IStatus errStatus = StatusUtil.newStatus(e.getStatus(), WorkbenchMessages.PropertyPageNode_errorMessage);
             StatusManager.getManager().handle(errStatus, StatusManager.SHOW);
             page = new EmptyPropertyPage();
         }
         setPage(page);
     }
 
-    /** (non-Javadoc)
-     * Method declared on IPreferenceNode.
-     */
-    public void disposeResources() {
+    @Override
+	public void disposeResources() {
 
         if (page != null) {
             page.dispose();
@@ -82,7 +81,8 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
     /**
      * Returns page icon, if defined.
      */
-    public Image getLabelImage() {
+    @Override
+	public Image getLabelImage() {
         if (icon == null) {
             ImageDescriptor desc = contributor.getPageIcon();
             if (desc != null) {
@@ -95,7 +95,8 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
     /**
      * Returns page label as defined in the registry.
      */
-    public String getLabelText() {
+    @Override
+	public String getLabelText() {
         return contributor.getPageName();
     }
 

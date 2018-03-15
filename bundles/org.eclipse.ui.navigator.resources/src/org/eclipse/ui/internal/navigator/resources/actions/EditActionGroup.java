@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class EditActionGroup extends ActionGroup {
 
@@ -48,7 +48,7 @@ public class EditActionGroup extends ActionGroup {
 	private Shell shell;
 
 	/**
-	 * 
+	 *
 	 * @param aShell
 	 */
 	public EditActionGroup(Shell aShell) {
@@ -56,6 +56,7 @@ public class EditActionGroup extends ActionGroup {
 		makeActions();
 	}
 
+	@Override
 	public void dispose() {
 		if (clipboard != null) {
 			clipboard.dispose();
@@ -64,6 +65,7 @@ public class EditActionGroup extends ActionGroup {
 		super.dispose();
 	}
 
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 
@@ -83,6 +85,7 @@ public class EditActionGroup extends ActionGroup {
 		}
 	}
 
+	@Override
 	public void fillActionBars(IActionBars actionBars) {
 
 		if (textActionHandler == null) {
@@ -100,7 +103,7 @@ public class EditActionGroup extends ActionGroup {
 
 	/**
 	 * Handles a key pressed event by invoking the appropriate action.
-	 * 
+	 *
 	 * @param event
 	 *            The Key Event
 	 */
@@ -130,6 +133,7 @@ public class EditActionGroup extends ActionGroup {
 		copyAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_COPY);
 
 		IShellProvider sp = new IShellProvider() {
+			@Override
 			public Shell getShell() {
 				return shell;
 			}
@@ -141,6 +145,7 @@ public class EditActionGroup extends ActionGroup {
 		deleteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_DELETE);
 	}
 
+	@Override
 	public void updateActionBars() {
 		IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
 

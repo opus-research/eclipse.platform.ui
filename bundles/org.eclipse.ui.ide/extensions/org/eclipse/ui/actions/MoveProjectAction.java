@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.IShellProvider;
@@ -50,17 +49,18 @@ public class MoveProjectAction extends CopyProjectAction {
 
 	/**
 	 * Creates a new project move action and initializes it.
-	 * 
+	 *
 	 * @param shell
 	 *            the shell for any dialogs
-	 *  
+	 *
 	 * @deprecated {@link #MoveProjectAction(IShellProvider)}
 	 */
+	@Deprecated
 	public MoveProjectAction(Shell shell) {
 		super(shell, MOVE_TITLE);
 		initAction();
 	}
-	
+
 	/**
 	 * Creates a new project move action and initializes it.
 	 * @param provider
@@ -80,19 +80,21 @@ public class MoveProjectAction extends CopyProjectAction {
 	}
 	/**
 	 * Return the title of the errors dialog.
-	 * 
+	 *
 	 * @return java.lang.String
-	 * 
-	 * @deprecated As of 3.3, the error handling is performed by the undoable 
+	 *
+	 * @deprecated As of 3.3, the error handling is performed by the undoable
 	 * operation which handles the move.
 	 */
+	@Deprecated
+	@Override
 	protected String getErrorsTitle() {
 		return PROBLEMS_TITLE;
 	}
 
 	/**
 	 * Moves the project to the new values.
-	 * 
+	 *
 	 * @param project
 	 *            the project to move
 	 * @param newLocation
@@ -100,28 +102,26 @@ public class MoveProjectAction extends CopyProjectAction {
 	 * @return <code>true</code> if the copy operation completed, and
 	 *         <code>false</code> if it was abandoned part way
 	 */
-	boolean performMove(final IProject project, 
+	boolean performMove(final IProject project,
 			final URI newLocation) {
-		
-		IRunnableWithProgress op =  new IRunnableWithProgress() {
-    		public void run(IProgressMonitor monitor) {
-    			MoveProjectOperation op = new MoveProjectOperation(project, newLocation, IDEWorkbenchMessages.MoveProjectAction_moveTitle);
-    			op.setModelProviderIds(getModelProviderIds());
-    			try {
-    				PlatformUI.getWorkbench().getOperationSupport()
-    						.getOperationHistory().execute(op, monitor, 
-    								WorkspaceUndoUtil.getUIInfoAdapter(shellProvider.getShell()));
-    			} catch (ExecutionException e) {
-					if (e.getCause() instanceof CoreException) {
-						recordError((CoreException)e.getCause());
-					} else {
-						IDEWorkbenchPlugin.log(e.getMessage(), e);
-						displayError(e.getMessage());
-					}
-    			}
-    		}
-    	};
-		
+
+		IRunnableWithProgress op =  monitor -> {
+			MoveProjectOperation op1 = new MoveProjectOperation(project, newLocation, IDEWorkbenchMessages.MoveProjectAction_moveTitle);
+			op1.setModelProviderIds(getModelProviderIds());
+			try {
+				PlatformUI.getWorkbench().getOperationSupport()
+						.getOperationHistory().execute(op1, monitor,
+								WorkspaceUndoUtil.getUIInfoAdapter(shellProvider.getShell()));
+			} catch (ExecutionException e) {
+				if (e.getCause() instanceof CoreException) {
+					recordError((CoreException)e.getCause());
+				} else {
+					IDEWorkbenchPlugin.log(e.getMessage(), e);
+					displayError(e.getMessage());
+				}
+			}
+		};
+
 		try {
 			new ProgressMonitorJobsDialog(shellProvider.getShell()).run(true, true, op);
 		} catch (InterruptedException e) {
@@ -141,11 +141,12 @@ public class MoveProjectAction extends CopyProjectAction {
 	/**
 	 * Query for a new project destination using the parameters in the existing
 	 * project.
-	 * 
+	 *
 	 * @return Object[] or null if the selection is cancelled
 	 * @param project
 	 *            the project we are going to move.
 	 */
+	@Override
 	protected Object[] queryDestinationParameters(IProject project) {
 		ProjectLocationMoveDialog dialog = new ProjectLocationMoveDialog(shellProvider.getShell(),
 				project);
@@ -157,13 +158,14 @@ public class MoveProjectAction extends CopyProjectAction {
 	/**
 	 * Implementation of method defined on <code>IAction</code>.
 	 */
+	@Override
 	public void run() {
 
 		errorStatus = null;
 
 		IProject project = (IProject) getSelectedResources().get(0);
 
-		//Get the project name and location 
+		//Get the project name and location
 		Object[] destinationPaths = queryDestinationParameters(project);
 		if (destinationPaths == null) {
 			return;
@@ -171,10 +173,10 @@ public class MoveProjectAction extends CopyProjectAction {
 
 		// Ideally we would have gotten the URI directly from the
 		// ProjectLocationDialog, but for backward compatibility, we
-		// use the raw string and map back to a URI.  
+		// use the raw string and map back to a URI.
 		URI newLocation = URIUtil.toURI((String)destinationPaths[1]);
-		
-		
+
+
 		boolean completed = performMove(project, newLocation);
 
 		if (!completed) {

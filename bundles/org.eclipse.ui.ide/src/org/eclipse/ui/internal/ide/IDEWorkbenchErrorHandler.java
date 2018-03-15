@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -40,7 +41,7 @@ import com.ibm.icu.text.MessageFormat;
  * returned from IDEWorkbenchAdvisor#getWorkbenchErrorHandler(). All handled
  * statuses are checked against severity and logged using logging facility (by
  * superclass).
- * 
+ *
  * @since 3.3
  */
 public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
@@ -68,10 +69,10 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 	private static String MSG_FATAL_ERROR_Recursive = IDEWorkbenchMessages.FatalError_RecursiveError;
 
 	private static String MSG_FATAL_ERROR_Title = IDEWorkbenchMessages.InternalError;
-	
+
 	// cache handled statuses
-	private final Map map = Collections.synchronizedMap(new WeakHashMap()); 
- 	
+	private final Map map = Collections.synchronizedMap(new WeakHashMap());
+
 	/**
 	 * @param configurer
 	 */
@@ -79,12 +80,7 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 		workbenchConfigurer = configurer;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.statushandlers.WorkbenchErrorHandler#handle(org.eclipse.ui.statushandlers.StatusAdapter,
-	 *      int)
-	 */
+	@Override
 	public void handle(final StatusAdapter statusAdapter, int style) {
 
 		// if fatal error occurs, we will show the blocking error dialog anyway
@@ -112,11 +108,7 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 		if (isFatal(statusAdapter)) {
 			UIJob handlingExceptionJob = new UIJob("IDE Exception Handler") //$NON-NLS-1$
 			{
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-				 */
+				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					handleException(statusAdapter.getStatus().getException());
 					return new Status(
@@ -148,7 +140,7 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 			exceptionCount++;
 			if (exceptionCount > 1) {
 				dialog.updateMessage(MessageFormat.format(MSG_FATAL_ERROR,
-						new Object[] { MSG_FATAL_ERROR_Recursive }));
+						MSG_FATAL_ERROR_Recursive));
 				dialog.getShell().forceActive();
 			} else {
 				if (openQuestionDialog(t)) {
@@ -193,8 +185,7 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 
 			dialog = openInternalQuestionDialog(PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getShell(),
-					MSG_FATAL_ERROR_Title, MessageFormat.format(
-							MSG_FATAL_ERROR, new Object[] { msg }), detail, 1);
+					MSG_FATAL_ERROR_Title, MessageFormat.format(MSG_FATAL_ERROR, msg), detail, 1);
 
 			return dialog.open() == 0;
 		} catch (Throwable th) {
@@ -292,7 +283,7 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 
 		/**
 		 * Updates the dialog message
-		 * 
+		 *
 		 * @param message
 		 *            new message
 		 */

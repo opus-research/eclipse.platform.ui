@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.ui.PlatformUI;
  * This interface contains constants only; it is not intended to be implemented
  * or extended.
  * </p>
- * 
+ *
  */
 /*package*/interface IPropertiesHelpContextIds {
     public static final String PREFIX = PlatformUI.PLUGIN_ID + "."; //$NON-NLS-1$
@@ -39,7 +39,7 @@ import org.eclipse.ui.PlatformUI;
 
     public static final String PIN_ACTION = PREFIX
     		+ "properties_pin_action_context"; //$NON-NLS-1$;
-    
+
     // Views
     public static final String PROPERTY_SHEET_VIEW = PREFIX
             + "property_sheet_view_context"; //$NON-NLS-1$

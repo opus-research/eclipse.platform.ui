@@ -30,13 +30,13 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 	/**
 	 * Asserts the use case of specifying null on construction for the detail
 	 * type of the detail set.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testKeyValueTypeNull() throws Exception {
@@ -65,7 +65,7 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 
 	/**
 	 * Asserts that you can't change the type across multiple inner observables.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void testKeyValueTypeNotNull() throws Exception {
@@ -94,6 +94,7 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 		class OuterObservable extends WritableValue {
 			boolean disposed = false;
 
+			@Override
 			public synchronized void dispose() {
 				disposed = true;
 				super.dispose();
@@ -135,6 +136,7 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 		final IObservableMap[] detailObservable = new IObservableMap[1];
 
 		master.addValueChangeListener(new IValueChangeListener() {
+			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				detailObservable[0].dispose();
 			}
@@ -150,6 +152,7 @@ public class DetailObservableMapTest extends AbstractDefaultRealmTestCase {
 		Object keyType = Object.class;
 		Object valueType = Object.class;
 
+		@Override
 		public IObservable createObservable(Object target) {
 			return new WritableMap(keyType, valueType);
 		}

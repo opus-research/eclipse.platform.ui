@@ -20,11 +20,12 @@ import org.eclipse.core.commands.ExecutionException;
  */
 public class SubtractIntegerHandler extends AbstractHandler {
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Integer minuend = (Integer) event
 				.getObjectParameterForExecution(CommandParameterTypeTest.MINUEND);
 		Integer subtrahend = (Integer) event
 				.getObjectParameterForExecution(CommandParameterTypeTest.SUBTRAHEND);
-		return new Integer(minuend.intValue() - subtrahend.intValue());
+		return Integer.valueOf(minuend.intValue() - subtrahend.intValue());
 	}
 }
