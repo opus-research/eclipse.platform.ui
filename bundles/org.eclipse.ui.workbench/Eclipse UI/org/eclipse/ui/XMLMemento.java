@@ -369,7 +369,7 @@ public final class XMLMemento implements IMemento {
 		}
         String strValue = attr.getValue();
         try {
-			return Integer.valueOf(strValue);
+            return Integer.valueOf(strValue);
         } catch (NumberFormatException e) {
             WorkbenchPlugin
                     .log("Memento problem - invalid integer for key: " + key //$NON-NLS-1$
