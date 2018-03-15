@@ -53,11 +53,11 @@ public final class PreferenceStoreAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Double.class) {
-			return Double.valueOf(store.getDouble(propertyId));
+            return new Double(store.getDouble(propertyId));
         }
 
         if (propertyType == Float.class) {
-            return Float.valueOf(store.getFloat(propertyId));
+            return new Float(store.getFloat(propertyId));
         }
 
         if (propertyType == Integer.class) {
@@ -65,7 +65,7 @@ public final class PreferenceStoreAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Long.class) {
-            return Long.valueOf(store.getLong(propertyId));
+            return new Long(store.getLong(propertyId));
         }
 
         return null;
