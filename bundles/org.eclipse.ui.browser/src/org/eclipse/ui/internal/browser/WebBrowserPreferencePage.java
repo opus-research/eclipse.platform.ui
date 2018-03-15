@@ -99,6 +99,11 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		public Object[] getElements(Object inputElement) {
 			return input.getWebBrowsers().toArray();
 		}
+
+		@Override
+		public void dispose() {
+			// do nothing
+		}
 	}
 
 	class BrowserTableLabelProvider implements ITableLabelProvider {

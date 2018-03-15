@@ -57,7 +57,6 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -74,7 +73,6 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.GridData;
@@ -84,7 +82,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.event.Event;
@@ -361,11 +358,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 		}
 		// Force the shell onto the display if it would be invisible otherwise
-		Display display = Display.getCurrent();
-		Monitor closestMonitor = getClosestMonitor(display, Geometry.centerPoint(modelBounds));
-		Rectangle displayBounds = closestMonitor.getClientArea();
+		Rectangle displayBounds = Display.getCurrent().getBounds();
 		if (!modelBounds.intersects(displayBounds)) {
-			Geometry.moveInside(modelBounds, displayBounds);
+			Rectangle clientArea = Display.getCurrent().getClientArea();
+			modelBounds.x = clientArea.x;
+			modelBounds.y = clientArea.y;
 		}
 		wbwShell.setBounds(modelBounds);
 
@@ -443,46 +440,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 
 		return newWidget;
-	}
-
-	/**
-	 * TODO: Create an API for this method and delete this version. See bug
-	 * 491273
-	 *
-	 * Returns the monitor whose client area contains the given point. If no
-	 * monitor contains the point, returns the monitor that is closest to the
-	 * point. If this is ever made public, it should be moved into a separate
-	 * utility class.
-	 *
-	 * @param toSearch
-	 *            point to find (display coordinates)
-	 * @param toFind
-	 *            point to find (display coordinates)
-	 * @return the montor closest to the given point
-	 */
-	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
-		int closest = Integer.MAX_VALUE;
-
-		Monitor[] monitors = toSearch.getMonitors();
-		Monitor result = monitors[0];
-
-		for (int idx = 0; idx < monitors.length; idx++) {
-			Monitor current = monitors[idx];
-
-			Rectangle clientArea = current.getClientArea();
-
-			if (clientArea.contains(toFind)) {
-				return current;
-			}
-
-			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
-			if (distance < closest) {
-				closest = distance;
-				result = current;
-			}
-		}
-
-		return result;
 	}
 
 	private void setCloseHandler(MWindow window) {
@@ -792,7 +749,8 @@ public class WBWRenderer extends SWTPartRenderer {
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 			label.setText(SWTRenderersMessages.choosePartsToSave);
 
-			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.BORDER);
+			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
+					| SWT.BORDER);
 			GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 			data.heightHint = 250;
 			data.widthHint = 300;

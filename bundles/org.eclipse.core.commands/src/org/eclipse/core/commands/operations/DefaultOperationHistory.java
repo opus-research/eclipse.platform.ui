@@ -1120,7 +1120,7 @@ public final class DefaultOperationHistory implements IOperationHistory {
 		 * override this if a global limit is desired.
 		 */
 		Assert.isNotNull(context);
-		limits.put(context, Integer.valueOf(limit));
+		limits.put(context, new Integer(limit));
 		synchronized (undoRedoHistoryLock) {
 			forceUndoLimit(context, limit);
 			forceRedoLimit(context, limit);
