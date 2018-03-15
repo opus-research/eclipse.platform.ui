@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +37,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -86,12 +86,10 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.dialogs.WorkingSetGroup;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.dialogs.ImportExportWizard;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressManager.JobMonitor;
@@ -118,7 +116,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 	// Proposal part
 	private CheckboxTreeViewer tree;
 	private ControlDecoration proposalSelectionDecorator;
-	private Set<File> directoriesToImport;
+	private Set<File> alreadyExistingProjects;
+	private Set<File> notAlreadyExistingProjects;
 	private Label selectionSummary;
 	protected Map<File, List<ProjectConfigurator>> potentialProjects = Collections.emptyMap();
 	// Configuration part
@@ -184,7 +183,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		@Override
 		public Color getForeground(Object o) {
-			if (isExistingProject((File) o)) {
+			if (alreadyExistingProjects.contains(o)) {
 				return Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 			}
 			return null;
@@ -203,7 +202,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private class ProjectConfiguratorLabelProvider extends CellLabelProvider implements IColorProvider {
 		public String getText(Object o) {
 			File file = (File) o;
-			if (isExistingProject(file)) {
+			if (alreadyExistingProjects.contains(file)) {
 				return DataTransferMessages.SmartImportProposals_alreadyImportedAsProject_title;
 			}
 			List<ProjectConfigurator> configurators = SmartImportRootWizardPage.this.potentialProjects.get(file);
@@ -220,7 +219,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		@Override
 		public Color getForeground(Object o) {
-			if (isExistingProject((File) o)) {
+			if (alreadyExistingProjects.contains(o)) {
 				return Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 			}
 			return null;
@@ -286,36 +285,12 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		createWorkingSetsGroup(res);
 
-		createLink(res);
-
 		if (this.selection != null) {
 			rootDirectoryText.setText(this.selection.getAbsolutePath());
 			validatePage();
 		}
 
 		setControl(res);
-	}
-
-	private void createLink(Composite res) {
-		Link showOtherImportWizards = new Link(res, SWT.NONE);
-		showOtherImportWizards
-				.setText("<A>" + DataTransferMessages.SmartImportWizardPage_showOtherSpecializedImportWizard + "</A>"); //$NON-NLS-1$ //$NON-NLS-2$
-		showOtherImportWizards.setLayoutData(new GridData(SWT.END, SWT.END, true, true, 4, 1));
-		showOtherImportWizards.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				ImportExportWizard importWizard = new ImportExportWizard(ImportExportWizard.IMPORT);
-				importWizard.init(PlatformUI.getWorkbench(), new StructuredSelection(selection));
-				IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
-				IDialogSettings wizardSettings = workbenchSettings.getSection("ImportExportAction"); //$NON-NLS-1$
-				if (wizardSettings == null) {
-					wizardSettings = workbenchSettings.addNewSection("ImportExportAction"); //$NON-NLS-1$
-				}
-				importWizard.setDialogSettings(wizardSettings);
-				importWizard.addPages();
-				getWizard().getContainer().showPage(importWizard.getPages()[0]);
-			}
-		});
 	}
 
 	private void createWorkingSetsGroup(Composite parent) {
@@ -556,22 +531,18 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 			@Override
 			public boolean isChecked(Object element) {
-				return SmartImportRootWizardPage.this.directoriesToImport.contains(element);
+				return getWizard().getImportJob() == null || getWizard().getImportJob().getDirectoriesToImport() == null
+						|| getWizard().getImportJob().getDirectoriesToImport().contains(element);
 			}
 		});
 		tree.addCheckStateListener(new ICheckStateListener() {
 			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				if (isExistingProject((File) event.getElement())) {
+				if (SmartImportRootWizardPage.this.alreadyExistingProjects.contains(event.getElement())) {
 					tree.setChecked(event.getElement(), false);
-					return;
-				}
-				if (event.getChecked()) {
-					SmartImportRootWizardPage.this.directoriesToImport.add((File) event.getElement());
 				} else {
-					SmartImportRootWizardPage.this.directoriesToImport.remove(event.getElement());
+					proposalsSelectionChanged();
 				}
-				proposalsSelectionChanged();
 			}
 		});
 
@@ -603,15 +574,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		selectAllButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				for (TreeItem item : tree.getTree().getItems()) {
-					File dir = (File) item.getData();
-					if (isExistingProject(dir)) {
-						tree.setChecked(dir, false);
-					} else {
-						tree.setChecked(dir, true);
-						SmartImportRootWizardPage.this.directoriesToImport.add(dir);
-					}
-				}
+				tree.setCheckedElements(SmartImportRootWizardPage.this.notAlreadyExistingProjects.toArray());
 				proposalsSelectionChanged();
 			}
 		});
@@ -621,10 +584,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		deselectAllButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				for (Object item : tree.getCheckedElements()) {
-					tree.setChecked(item, false);
-					SmartImportRootWizardPage.this.directoriesToImport.remove(item);
-				}
+				tree.setCheckedElements(new Object[0]);
 				proposalsSelectionChanged();
 			}
 		});
@@ -638,7 +598,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 			final ViewerFilter existingProjectsFilter = new ViewerFilter() {
 				@Override
 				public boolean select(Viewer viewer, Object parentElement, Object element) {
-					return !isExistingProject((File) element);
+					return !alreadyExistingProjects.contains(element);
 				}
 			};
 
@@ -666,20 +626,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 		tree.setInput(Collections.emptyMap());
 
 		return res;
-	}
-
-	/**
-	 * @param element
-	 * @return
-	 */
-	protected boolean isExistingProject(File element) {
-		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-			IPath location = project.getLocation();
-			if (location != null && element.equals(location.toFile())) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	protected void validatePage() {
@@ -759,21 +705,25 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void proposalsSelectionChanged() {
 		if (getWizard().getImportJob() != null) {
-			if (potentialProjects.size() == 1 && potentialProjects.values().iterator().next().isEmpty()) {
+			Map<File, Collection<?>> input = (Map<File, Collection<?>>) tree.getInput();
+			if (input.size() == 1 && input.values().iterator().next().isEmpty()) {
 				getWizard().getImportJob().setDirectoriesToImport(null);
 				getWizard().getImportJob().setExcludedDirectories(null);
 				selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary,
 						0, tree.getCheckedElements().length));
 			} else {
+				Object[] selected = tree.getCheckedElements();
 				Set<File> excludedDirectories = new HashSet(((Map<File, ?>) this.tree.getInput()).keySet());
-				for (Object item : this.directoriesToImport) {
+				Set<File> selectedProjects = new HashSet<>();
+				for (Object item : selected) {
 					File directory = (File) item;
 					excludedDirectories.remove(directory);
+					selectedProjects.add(directory);
 				}
-				getWizard().getImportJob().setDirectoriesToImport(directoriesToImport);
+				getWizard().getImportJob().setDirectoriesToImport(selectedProjects);
 				getWizard().getImportJob().setExcludedDirectories(excludedDirectories);
 				selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary,
-						directoriesToImport.size(),
+						selectedProjects.size(),
 						potentialProjects.size()));
 			}
 		}
@@ -796,7 +746,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void refreshProposals() {
 		stopAndDisconnectCurrentWork();
-		this.potentialProjects = Collections.emptyMap();
+		SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
+		SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
+		SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
 		proposalsUpdated();
 		// compute new state
 		if (sourceIsValid()) {
@@ -815,6 +767,18 @@ public class SmartImportRootWizardPage extends WizardPage {
 					}
 					if (!potentialProjects.containsKey(importJob.getRoot())) {
 						potentialProjects.put(importJob.getRoot(), Collections.emptyList());
+					}
+
+					SmartImportRootWizardPage.this.notAlreadyExistingProjects = new HashSet<>(
+							potentialProjects.keySet());
+					SmartImportRootWizardPage.this.alreadyExistingProjects = new HashSet<>();
+					for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+						IPath location = project.getLocation();
+						if (location == null) {
+							continue;
+						}
+						SmartImportRootWizardPage.this.notAlreadyExistingProjects.remove(location.toFile());
+						SmartImportRootWizardPage.this.alreadyExistingProjects.add(location.toFile());
 					}
 					return Status.OK_STATUS;
 				}
@@ -890,13 +854,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	private void proposalsUpdated() {
 		tree.setInput(potentialProjects);
-		this.directoriesToImport = new HashSet<>();
-		for (File dir : potentialProjects.keySet()) {
-			if (!isExistingProject(dir)) {
-				directoriesToImport.add(dir);
-			}
-		}
-		tree.setCheckedElements(directoriesToImport.toArray(new Object[directoriesToImport.size()]));
+		tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
 		proposalsSelectionChanged();
 		validatePage();
 	}
