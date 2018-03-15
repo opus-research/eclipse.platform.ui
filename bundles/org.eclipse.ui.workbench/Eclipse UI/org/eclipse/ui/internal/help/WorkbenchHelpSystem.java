@@ -182,8 +182,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
-            for (Object object : objects) {
-                if (object == pluggableHelpUI) {
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] == pluggableHelpUI) {
                     isInitialized = false;
                     pluggableHelpUI = null;
                     helpCompatibilityWrapper = null;
@@ -485,7 +485,8 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 
 			private IConfigurationElement findElement(
 					String desiredHelpSystemId, IExtension[] extensions) {
-				for (IExtension extension : extensions) {
+				for (int i = 0; i < extensions.length; i++) {
+					IExtension extension = extensions[i];
 					if (desiredHelpSystemId.equals(extension.getUniqueIdentifier())) {
 						IConfigurationElement[] elements = extension
 								.getConfigurationElements();
@@ -605,9 +606,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(IAction action, final Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 		action.setHelpListener(event -> {
 			if (contexts != null && contexts.length > 0
@@ -685,9 +686,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(Control control, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 
 		control.setData(HELP_KEY, contexts);
@@ -738,9 +739,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(Menu menu, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 		menu.setData(HELP_KEY, contexts);
 		// ensure that the listener is only registered once
@@ -790,9 +791,9 @@ public final class WorkbenchHelpSystem implements IWorkbenchHelpSystem {
 	 */
 	@Deprecated
 	public void setHelp(MenuItem item, Object[] contexts) {
-		for (Object context : contexts) {
-			Assert.isTrue(context instanceof String
-					|| context instanceof IContext);
+		for (int i = 0; i < contexts.length; i++) {
+			Assert.isTrue(contexts[i] instanceof String
+					|| contexts[i] instanceof IContext);
 		}
 		item.setData(HELP_KEY, contexts);
 		// ensure that the listener is only registered once

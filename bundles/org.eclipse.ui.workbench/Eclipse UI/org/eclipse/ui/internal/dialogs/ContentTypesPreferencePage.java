@@ -157,33 +157,33 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 				String[] usernamefileSpecs, String[] preextfileSpecs,
 				String[] prenamefileSpecs) {
 			List returnValues = new ArrayList();
-			for (String usernamefileSpec : usernamefileSpecs) {
+			for (int i = 0; i < usernamefileSpecs.length; i++) {
 				Spec spec = new Spec();
-				spec.name = usernamefileSpec;
+				spec.name = usernamefileSpecs[i];
 				spec.isPredefined = false;
 				spec.sortValue = 0;
 				returnValues.add(spec);
 			}
 
-			for (String prenamefileSpec : prenamefileSpecs) {
+			for (int i = 0; i < prenamefileSpecs.length; i++) {
 				Spec spec = new Spec();
-				spec.name = prenamefileSpec;
+				spec.name = prenamefileSpecs[i];
 				spec.isPredefined = true;
 				spec.sortValue = 1;
 				returnValues.add(spec);
 			}
 
-			for (String userextfileSpec : userextfileSpecs) {
+			for (int i = 0; i < userextfileSpecs.length; i++) {
 				Spec spec = new Spec();
-				spec.ext = userextfileSpec;
+				spec.ext = userextfileSpecs[i];
 				spec.isPredefined = false;
 				spec.sortValue = 2;
 				returnValues.add(spec);
 			}
 
-			for (String preextfileSpec : preextfileSpecs) {
+			for (int i = 0; i < preextfileSpecs.length; i++) {
 				Spec spec = new Spec();
-				spec.ext = preextfileSpec;
+				spec.ext = preextfileSpecs[i];
 				spec.isPredefined = true;
 				spec.sortValue = 3;
 				returnValues.add(spec);
@@ -210,7 +210,8 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			List elements = new ArrayList();
 			IContentType baseType = (IContentType) parentElement;
 			IContentType[] contentTypes = manager.getAllContentTypes();
-			for (IContentType type : contentTypes) {
+			for (int i = 0; i < contentTypes.length; i++) {
+				IContentType type = contentTypes[i];
 				if (Util.equals(type.getBaseType(), baseType)) {
 					elements.add(type);
 				}
@@ -491,7 +492,8 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 						0, new IStatus[0],
 						WorkbenchMessages.ContentTypes_errorDialogMessage,
 						null);
-				for (Spec spec : specs) {
+				for (int i = 0; i < specs.length; i++) {
+					Spec spec = specs[i];
 					try {
 						if (spec.name != null) {
 							contentType.removeFileSpec(spec.name,

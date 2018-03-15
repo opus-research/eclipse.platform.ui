@@ -211,22 +211,22 @@ public class SlaveContextService implements IContextService {
 		// with this service.
 		if (!fContextManagerListeners.isEmpty()) {
 			Object[] array = fContextManagerListeners.toArray();
-			for (Object element : array) {
-				removeContextManagerListener((IContextManagerListener) element);
+			for (int i = 0; i < array.length; i++) {
+				removeContextManagerListener((IContextManagerListener) array[i]);
 			}
 			fContextManagerListeners.clear();
 		}
 		if (!fSourceProviders.isEmpty()) {
 			Object[] array = fSourceProviders.toArray();
-			for (Object element : array) {
-				removeSourceProvider((ISourceProvider) element);
+			for (int i = 0; i < array.length; i++) {
+				removeSourceProvider((ISourceProvider) array[i]);
 			}
 			fSourceProviders.clear();
 		}
 		if (!fRegisteredShells.isEmpty()) {
 			Object[] array = fRegisteredShells.toArray();
-			for (Object element : array) {
-				unregisterShell((Shell) element);
+			for (int i = 0; i < array.length; i++) {
+				unregisterShell((Shell) array[i]);
 			}
 			fRegisteredShells.clear();
 		}

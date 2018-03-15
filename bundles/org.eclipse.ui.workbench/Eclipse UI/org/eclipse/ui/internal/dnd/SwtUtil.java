@@ -57,8 +57,8 @@ public class SwtUtil {
         }
 
         Control[] children = parent.getChildren();
-        for (Control element : children) {
-            Control control = element;
+        for (int i = 0; i < children.length; i++) {
+            Control control = children[i];
 
             if (control == toTest) {
                 break;
@@ -223,7 +223,9 @@ public class SwtUtil {
             Rectangle someRectangle) {
         Monitor[] monitors = display.getMonitors();
 
-        for (Monitor mon : monitors) {
+        for (int idx = 0; idx < monitors.length; idx++) {
+            Monitor mon = monitors[idx];
+
             if (mon.getClientArea().intersects(someRectangle)) {
                 return true;
             }
