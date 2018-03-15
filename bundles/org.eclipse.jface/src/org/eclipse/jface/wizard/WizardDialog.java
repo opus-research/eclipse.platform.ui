@@ -1065,8 +1065,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 */
 	private void setDisplayCursor(Cursor c) {
 		Shell[] shells = getShell().getDisplay().getShells();
-		for (Shell shell2 : shells) {
-			shell2.setCursor(c);
+		for (Shell shell : shells) {
+			shell.setCursor(c);
 		}
 	}
 
