@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf Petter <ralf.petter@gmail.com> - Bug 510232
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 import org.eclipse.swt.SWT;
@@ -94,7 +93,7 @@ public class WrappedPageBook extends Composite {
 		if (page != null) {
 			if (!page.isDisposed()) {
 				//page.setVisible(true);
-				requestLayout();
+				layout(true);
 				page.setVisible(true);
 			}
 		}

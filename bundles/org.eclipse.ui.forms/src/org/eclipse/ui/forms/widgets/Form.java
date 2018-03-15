@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *      Ralf Petter <ralf.petter@gmail.com> - 510232
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -285,7 +284,7 @@ public class Form extends Composite {
 	 */
 	public void setText(String text) {
 		head.setText(text);
-		requestLayout();
+		layout();
 		redraw();
 	}
 
@@ -305,7 +304,7 @@ public class Form extends Composite {
 	 */
 	public void setImage(Image image) {
 		head.setImage(image);
-		requestLayout();
+		layout();
 		redraw();
 	}
 
@@ -448,7 +447,7 @@ public class Form extends Composite {
 	 */
 	public void setHeadClient(Control headClient) {
 		head.setHeadClient(headClient);
-		requestLayout();
+		layout();
 	}
 
 	/**
@@ -682,7 +681,7 @@ public class Form extends Composite {
 
 	public void setMessage(String newMessage, int newType, IMessage[] children) {
 		head.showMessage(newMessage, newType, children);
-		requestLayout();
+		layout();
 	}
 
 	/**

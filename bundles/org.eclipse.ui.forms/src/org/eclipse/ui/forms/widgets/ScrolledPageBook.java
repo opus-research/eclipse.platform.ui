@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *      Ralf Petter <ralf.petter@gmail.com> - Bug 510232
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 import java.util.Hashtable;
@@ -171,7 +170,7 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 			if (currentPage != null && currentPage != page) {
 				// switching pages - force layout
 				if (page instanceof Composite)
-					((Composite) page).requestLayout();
+					((Composite) page).layout(false);
 			}
 			currentPage = page;
 		} else {
