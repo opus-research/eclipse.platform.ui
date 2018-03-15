@@ -76,10 +76,8 @@ class Markers {
 		try {
 			inChange = true;
 			if (markerToEntryMap != null) {
-				synchronized (markerToEntryMap) {
-					markerToEntryMap.clear();
-					markerToEntryMap = null;
-				}
+				markerToEntryMap.clear();
+				markerToEntryMap = null;
 			}
 			markerCounts = null;
 			if (markerEntries.size() == 0) {
@@ -329,19 +327,16 @@ class Markers {
 	 */
 	public MarkerItem getMarkerItem(IMarker marker) {
 		if (markerToEntryMap == null) {
-			Map<IMarker, MarkerEntry> newMarkerToEntryMap = new HashMap<>();
+			markerToEntryMap = new HashMap<>();
 			for (MarkerEntry markerEntry : markerEntryArray) {
 				IMarker nextMarker = markerEntry.getMarker();
 				if (nextMarker != null) {
-					newMarkerToEntryMap.put(nextMarker, markerEntry);
+					markerToEntryMap.put(nextMarker, markerEntry);
 				}
 			}
-			markerToEntryMap = newMarkerToEntryMap;
 		}
-		synchronized (markerToEntryMap) {
-			if (markerToEntryMap.containsKey(marker)) {
-				return markerToEntryMap.get(marker);
-			}
+		if (markerToEntryMap.containsKey(marker)) {
+			return markerToEntryMap.get(marker);
 		}
 		return null;
 	}
