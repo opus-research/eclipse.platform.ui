@@ -85,6 +85,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -283,14 +284,17 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
             }
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
-            BusyIndicator.showWhile(null, () -> {
-			    try {
-			        ret[0] = element
-			                .createExecutableExtension(classAttribute);
-			    } catch (CoreException e) {
-			        exc[0] = e;
-			    }
-			});
+            BusyIndicator.showWhile(null, new Runnable() {
+                @Override
+				public void run() {
+                    try {
+                        ret[0] = element
+                                .createExecutableExtension(classAttribute);
+                    } catch (CoreException e) {
+                        exc[0] = e;
+                    }
+                }
+            });
             if (exc[0] != null) {
 				throw exc[0];
 			}
@@ -1161,7 +1165,12 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 */
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
-			bundleListener = event -> WorkbenchPlugin.this.bundleChanged(event);
+			bundleListener = new SynchronousBundleListener() {
+				@Override
+				public void bundleChanged(BundleEvent event) {
+					WorkbenchPlugin.this.bundleChanged(event);
+				}
+			};
 		}
 		return bundleListener;
 	}

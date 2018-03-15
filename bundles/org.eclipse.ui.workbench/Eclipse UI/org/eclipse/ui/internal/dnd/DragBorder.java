@@ -12,6 +12,8 @@ package org.eclipse.ui.internal.dnd;
 
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -66,17 +68,20 @@ public class DragBorder {
 		dragControl.moveAbove(null);
 
 		if (provideFrame) {
-			border.addPaintListener(e -> {
-				if (isHighlight) {
-					e.gc.setForeground(hilightColor);
-				}
-				else {
-					e.gc.setForeground(baseColor);
-				}
+			border.addPaintListener(new PaintListener() {
+				@Override
+				public void paintControl(PaintEvent e) {
+					if (isHighlight) {
+						e.gc.setForeground(hilightColor);
+					}
+					else {
+						e.gc.setForeground(baseColor);
+					}
 
-				// Draw a rectangle as our 'border'
-				Rectangle bb = border.getBounds();
-				e.gc.drawRectangle(0,0,bb.width-1, bb.height-1);
+					// Draw a rectangle as our 'border'
+					Rectangle bb = border.getBounds();
+					e.gc.drawRectangle(0,0,bb.width-1, bb.height-1);
+				}
 			});
 		}
 	}
