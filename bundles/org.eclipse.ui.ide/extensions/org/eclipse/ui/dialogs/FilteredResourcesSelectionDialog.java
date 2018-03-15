@@ -10,8 +10,7 @@
  *     James Blackburn (Broadcom Corp.) Bug 86973 Allow path pattern matching
  *     Anton Leherbauer (Wind River Systems, Inc.) - Bug 415099 Terminating with "<" or " " (space) does not work for extensions
  *     Mickael Istria (Red Hat Inc.) - Bug 460749: filter resources with same location
- *     Lucas Bullen (Red Hat Inc.) - Bug 520250/520251 highlight matches by CamelCase and pattern
- *                                 - Bug 525974: Open Resource sorting doesn't show perfect match first
+ *     Lucas Bullen (Red Hat Inc.) - Bug 525974: Open Resource sorting doesn't show perfect match first
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -653,23 +652,19 @@ public class FilteredResourcesSelectionDialog extends
 
 			IResource res = (IResource) element;
 			StyledString str = new StyledString(res.getName().trim());
-			String searchFieldString = ((Text) getPatternControl()).getText();
-			Styler boldStyler = new Styler() {
-				@Override
-				public void applyStyles(TextStyle textStyle) {
-					textStyle.font = JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);
-				}
-			};
 
-			int potentialIndex = str.getString().toLowerCase().indexOf(searchFieldString.toLowerCase());
-			final String wildcard = "*"; //$NON-NLS-1$
-			if (potentialIndex != -1) {
-				str.setStyle(potentialIndex, searchFieldString.length(), boldStyler);
-			} else if (searchFieldString.indexOf('?') != -1 || searchFieldString.indexOf('*') != -1) {
-				str = markRegions(str, String.join(wildcard, searchFieldString.split("(?=[\\.])")), boldStyler); //$NON-NLS-1$
-			} else {
-				String matchingString = String.join(wildcard, searchFieldString.split("(?=[A-Z\\.])")) + wildcard; //$NON-NLS-1$
-				str = markRegions(str, matchingString, boldStyler);
+			String searchFieldString = ((Text) getPatternControl()).getText();
+			searchFieldString = searchFieldString.replaceAll("\\*", ""); //$NON-NLS-1$//$NON-NLS-2$
+			searchFieldString = searchFieldString.replaceAll("\\?", ""); //$NON-NLS-1$//$NON-NLS-2$
+			Pattern p = Pattern.compile(searchFieldString, Pattern.CASE_INSENSITIVE); // $NON-NLS-1$
+			Matcher m = p.matcher(str);
+			if (m.find()) {
+				str.setStyle(m.start(), m.end() - m.start(), new Styler() {
+					@Override
+					public void applyStyles(TextStyle textStyle) {
+						textStyle.font = JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);
+					}
+				});
 			}
 
 			// extra info for duplicates
@@ -678,45 +673,17 @@ public class FilteredResourcesSelectionDialog extends
 				str.append(res.getParent().getFullPath().makeRelative().toString(), StyledString.QUALIFIER_STYLER);
 			}
 
+
+//Debugging:
+//			int pathDistance = pathDistance(res.getParent());
+//			if (pathDistance != Integer.MAX_VALUE / 2) {
+//				if (pathDistance > Integer.MAX_VALUE / 4)
+//					str.append(" (" + (pathDistance - Integer.MAX_VALUE / 4) + " folders up from current selection)", StyledString.QUALIFIER_STYLER);
+//				else
+//					str.append(" (" + pathDistance + " folders down from current selection)", StyledString.QUALIFIER_STYLER);
+//			}
+
 			return str;
-		}
-
-		private StyledString markRegions(StyledString styledString, String matchingString, Styler styler) {
-			String text = styledString.getString().toLowerCase();
-			matchingString = matchingString.toLowerCase();
-			StyledString updatedText = styledString;
-			int startingIndex = 0;
-			int currentIndex = 0;
-			String[] regions = matchingString.replaceAll("\\.", "\\\\.").split("(\\?)|\\*"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			boolean restart = false;
-
-			do {
-				for (String region : regions) {
-					if (region == null || region.isEmpty()) {
-						continue;
-					} else if (region.equals("?")) { //$NON-NLS-1$
-						currentIndex++;
-					} else {
-						int startlocation = indexOf(Pattern.compile(region), text.substring(currentIndex));
-						int length = region.replace("\\", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
-						if (startlocation == -1) {
-							currentIndex = ++startingIndex;
-							updatedText = styledString;
-							restart = true;
-							break;
-						}
-						updatedText.setStyle(startlocation + currentIndex, length, styler);
-						currentIndex += startlocation + length;
-					}
-				}
-			} while (restart && currentIndex < text.length());
-
-			return updatedText;
-		}
-
-		private int indexOf(Pattern pattern, String s) {
-			Matcher matcher = pattern.matcher(s);
-			return matcher.find() ? matcher.start() : -1;
 		}
 
 		@Override
