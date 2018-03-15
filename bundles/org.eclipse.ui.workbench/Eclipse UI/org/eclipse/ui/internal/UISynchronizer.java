@@ -19,6 +19,7 @@ import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 
 public class UISynchronizer extends Synchronizer {
     protected UILockListener lockListener;
+
     /**
 	 * Indicates that the UI is in startup mode and that no non-workbench
 	 * runnables should be invoked.
@@ -143,7 +144,7 @@ public class UISynchronizer extends Synchronizer {
             super.syncExec(runnable);
             return;
         }
-        Semaphore work = new Semaphore(runnable);
+        PendingSyncExec work = new PendingSyncExec(runnable);
         work.setOperationThread(Thread.currentThread());
         lockListener.addPendingWork(work);
         asyncExec(new Runnable() {
@@ -152,15 +153,10 @@ public class UISynchronizer extends Synchronizer {
                 lockListener.doPendingWork();
             }
         });
-        try {
-            //even if the UI was not blocked earlier, it might become blocked
-            //before it can serve the asyncExec to do the pending work
-            do {
-                if (lockListener.isUIWaiting()) {
-					lockListener.interruptUI(runnable);
-				}
-            } while (!work.acquire(1000));
-        } catch (InterruptedException e) {
-        }
-    }
+
+		try {
+			work.waitUntilExecuted(lockListener);
+		} catch (InterruptedException e) {
+		}
+	}
 }
