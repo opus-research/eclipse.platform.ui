@@ -22,7 +22,7 @@ import org.w3c.dom.css.CSSValue;
  */
 public class CSSPropertyTableHeaderHandler implements ICSSPropertyHandler {
 
-	private static final String SWT_TABLE_HEADER_FOREGROUND_COLOR = "swt-table-header-foreground-color"; //$NON-NLS-1$
+	private static final String SWT_TABLE_HEADER_COLOR = "swt-table-header-color"; //$NON-NLS-1$
 	private static final String SWT_TABLE_HEADER_BACKGROUND_COLOR = "swt-table-header-background-color"; //$NON-NLS-1$
 
 	@Override
@@ -33,10 +33,10 @@ public class CSSPropertyTableHeaderHandler implements ICSSPropertyHandler {
 		}
 		TableElement tableElement = (TableElement) element;
 		Table table = (Table) tableElement.getNativeWidget();
-		if (SWT_TABLE_HEADER_FOREGROUND_COLOR.equals(property)
+		if (SWT_TABLE_HEADER_COLOR.equals(property)
 				&& value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
 			Color newColor = (Color) engine.convert(value, Color.class, table.getDisplay());
-			tableElement.setTableHeaderForegroundColor(newColor);
+			tableElement.setTableHeaderColor(newColor);
 		} else if (SWT_TABLE_HEADER_BACKGROUND_COLOR.equals(property)
 				&& value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
 			Color newColor = (Color) engine.convert(value, Color.class, table.getDisplay());
