@@ -189,7 +189,6 @@ public class TrimStack {
 		if (imageObject != null && imageObject instanceof Image
 				&& !((Image) imageObject).isDisposed())
 			result = (Image) imageObject;
-
 		return result;
 	}
 
