@@ -133,7 +133,9 @@ public class PreferenceNode implements IPreferenceNode {
         Assert.isNotNull(className);
         try {
             Class<?> cl = Class.forName(className);
-            return cl.newInstance();
+            if (cl != null) {
+				return cl.newInstance();
+			}
         } catch (ClassNotFoundException e) {
             return null;
         } catch (InstantiationException e) {
@@ -143,6 +145,7 @@ public class PreferenceNode implements IPreferenceNode {
         } catch (NoSuchMethodError e) {
             return null;
         }
+        return null;
     }
 
     @Override
