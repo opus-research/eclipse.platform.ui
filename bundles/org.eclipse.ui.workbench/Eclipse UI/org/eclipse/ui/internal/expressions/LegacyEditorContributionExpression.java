@@ -109,7 +109,7 @@ public final class LegacyEditorContributionExpression extends
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("LegacyEditorContributionExpression("); //$NON-NLS-1$
 		buffer.append(activeEditorId);
 		buffer.append(',');

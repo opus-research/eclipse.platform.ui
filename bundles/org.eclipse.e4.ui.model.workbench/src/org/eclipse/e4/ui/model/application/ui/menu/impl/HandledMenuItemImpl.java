@@ -313,7 +313,7 @@ public class HandledMenuItemImpl extends MenuItemImpl implements MHandledMenuIte
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (wbCommand: "); //$NON-NLS-1$
 		result.append(wbCommand);
 		result.append(')');

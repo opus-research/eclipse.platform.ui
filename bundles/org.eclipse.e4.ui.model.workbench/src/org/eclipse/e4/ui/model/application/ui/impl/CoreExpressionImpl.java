@@ -208,7 +208,7 @@ public class CoreExpressionImpl extends ExpressionImpl implements MCoreExpressio
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (coreExpressionId: "); //$NON-NLS-1$
 		result.append(coreExpressionId);
 		result.append(", coreExpression: "); //$NON-NLS-1$

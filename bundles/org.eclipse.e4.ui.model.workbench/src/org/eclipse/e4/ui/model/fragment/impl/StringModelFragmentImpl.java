@@ -277,7 +277,7 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (featurename: "); //$NON-NLS-1$
 		result.append(featurename);
 		result.append(", parentElementId: "); //$NON-NLS-1$
