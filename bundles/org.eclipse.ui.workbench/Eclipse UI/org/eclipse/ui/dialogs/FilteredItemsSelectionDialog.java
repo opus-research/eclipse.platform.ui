@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -990,6 +990,18 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		if (filterJob.getState() != Job.RUNNING
 				&& refreshProgressMessageJob.getState() != Job.RUNNING)
 			refreshProgressMessageJob.scheduleProgressRefresh(null);
+	}
+
+	/**
+	 * @since 3.109
+	 */
+	public void sortStarted() {
+	}
+
+	/**
+	 * @since 3.109
+	 */
+	public void sortEnded() {
 	}
 
 	@Override
@@ -2619,7 +2631,9 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			}
 
 			synchronized (lastSortedItems) {
+				sortStarted();
 				Collections.sort(lastSortedItems, getHistoryComparator());
+				sortEnded();
 			}
 			return item;
 		}
@@ -2639,7 +2653,9 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				this.lastSortedItems.remove(item);
 			}
 			synchronized (lastSortedItems) {
+				sortStarted();
 				Collections.sort(lastSortedItems, getHistoryComparator());
+				sortEnded();
 			}
 			this.refresh();
 		}
@@ -2716,7 +2732,9 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				synchronized (lastSortedItems) {
 					lastSortedItems.clear();
 					lastSortedItems.addAll(items);
+					sortStarted();
 					Collections.sort(lastSortedItems, getHistoryComparator());
+					sortEnded();
 				}
 			}
 			return lastSortedItems.toArray();
