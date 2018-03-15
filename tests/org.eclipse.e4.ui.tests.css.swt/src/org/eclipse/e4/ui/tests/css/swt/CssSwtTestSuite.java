@@ -58,9 +58,7 @@ import org.junit.runners.Suite;
 	Bug419482Test.class,
 	ShellActiveTest.class,
 	InheritTest.class,
-	StyledTextScrollbarTest.class,
-	TableTest.class,
-	TreeTest.class})
+	StyledTextScrollbarTest.class })
 public class CssSwtTestSuite {
 
 }
