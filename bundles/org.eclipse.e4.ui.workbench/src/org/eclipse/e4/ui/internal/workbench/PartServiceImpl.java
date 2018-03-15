@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.InjectionException;
@@ -72,13 +71,6 @@ public class PartServiceImpl implements EPartService {
 	 * The part activation time of a part is stored in it's transient data.
 	 */
 	public static final String PART_ACTIVATION_TIME = "partActivationTime"; //$NON-NLS-1$
-
-	/**
-	 * The helper {@link ContextFunction} which can be set during perspective
-	 * change to the old perspective transient data. This helper should be
-	 * consulted if an active part is requested during perspective switch.
-	 */
-	public static final String PERSPECTIVE_CHANGE_HELPER = "perspectiveChangeHelper"; //$NON-NLS-1$
 
 	private EventHandler selectedHandler = new EventHandler() {
 		@Override
@@ -193,8 +185,6 @@ public class PartServiceImpl implements EPartService {
 	private ContextManager contextManager;
 
 	private PartActivationHistory partActivationHistory;
-
-	private MPerspective activePerspective;
 
 	private MPart activePart;
 
@@ -620,7 +610,6 @@ public class PartServiceImpl implements EPartService {
 		Assert.isNotNull(perspective);
 		MWindow window = getWindow();
 		if (window != null && isInContainer(window, perspective)) {
-			activePerspective = perspective;
 			perspective.getParent().setSelectedElement(perspective);
 			List<MPart> newPerspectiveParts = modelService.findElements(perspective, null,
 					MPart.class, null);
@@ -826,19 +815,6 @@ public class PartServiceImpl implements EPartService {
 
 	@Override
 	public MPart getActivePart() {
-		if (activePart != null) {
-			// See bug 489335: if we are middle in perspective switch code, we
-			// should be careful what do we return to the caller: so use a
-			// helper to help us to decide if our "active" part is really active
-			// in current context
-			if (activePerspective != null) {
-				ContextFunction helper = (ContextFunction) activePerspective.getTransientData()
-						.get(PERSPECTIVE_CHANGE_HELPER);
-				if (helper != null) {
-					return (MPart) helper.compute(activePerspective.getContext(), null);
-				}
-			}
-		}
 		return activePart;
 	}
 
@@ -1229,7 +1205,7 @@ public class PartServiceImpl implements EPartService {
 			activate(addedPart);
 			return addedPart;
 		case VISIBLE:
-			MPart activePart = this.activePart;
+			MPart activePart = getActivePart();
 			if (activePart == null
 					|| (activePart != addedPart && getParent(activePart) == getParent(addedPart))) {
 				delegateBringToTop(addedPart);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,9 +47,6 @@ import org.osgi.service.event.EventHandler;
  *
  */
 public abstract class LazyStackRenderer extends SWTPartRenderer {
-
-	static final String SELECTED_BEFORE = "SelectedBefore"; //$NON-NLS-1$
-
 	private EventHandler lazyLoader = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
@@ -71,15 +68,8 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				hideElementRecursive(oldSel);
 			}
 
-			MUIElement selectedElement = stack.getSelectedElement();
-			if (selectedElement != null) {
-				selectedElement.getTransientData().put(SELECTED_BEFORE, oldSel);
-				try {
-					lsr.showTab(selectedElement);
-				} finally {
-					selectedElement.getTransientData().remove(SELECTED_BEFORE);
-				}
-			}
+			if (stack.getSelectedElement() != null)
+				lsr.showTab(stack.getSelectedElement());
 		}
 	};
 
