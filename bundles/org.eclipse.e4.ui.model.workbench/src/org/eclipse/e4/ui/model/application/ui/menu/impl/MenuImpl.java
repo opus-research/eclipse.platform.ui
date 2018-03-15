@@ -326,7 +326,7 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (enabled: "); //$NON-NLS-1$
 		result.append(enabled);
 		result.append(')');

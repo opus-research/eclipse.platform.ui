@@ -245,12 +245,13 @@ public abstract class MenuElementImpl extends UIElementImpl implements MMenuElem
 
 	/**
 	 * <!-- begin-user-doc -->
-	 * This class does not support this feature.
 	 * <!-- end-user-doc -->
-	 * @generated NOT
+	 * @generated
 	 */
 	public String getLocalizedMnemonics() {
-		return null;
+		// TODO: implement this method
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -442,7 +443,7 @@ public abstract class MenuElementImpl extends UIElementImpl implements MMenuElem
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuffer result = new StringBuffer(super.toString());
+		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (label: "); //$NON-NLS-1$
 		result.append(label);
 		result.append(", iconURI: "); //$NON-NLS-1$

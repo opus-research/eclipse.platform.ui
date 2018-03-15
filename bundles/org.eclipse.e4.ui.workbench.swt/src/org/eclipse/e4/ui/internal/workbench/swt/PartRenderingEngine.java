@@ -116,6 +116,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	public static final String ENABLED_THEME_KEY = "themeEnabled";
 
+	private static boolean enableThemePreference;
 	private String factoryUrl;
 
 	IRendererFactory curFactory = null;
@@ -492,6 +493,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
+
+		IScopeContext[] contexts = new IScopeContext[] { DefaultScope.INSTANCE, InstanceScope.INSTANCE};
+		enableThemePreference = Platform.getPreferencesService().getBoolean("org.eclipse.e4.ui.workbench.renderers.swt",
+				ENABLED_THEME_KEY, true, contexts);
 
 		cssThemeChangedHandler = new StylingPreferencesHandler(context.get(Display.class));
 	}
@@ -1249,11 +1254,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
-
-		IScopeContext[] contexts = new IScopeContext[] { DefaultScope.INSTANCE, InstanceScope.INSTANCE };
-		boolean enableThemePreference = Platform.getPreferencesService()
-				.getBoolean("org.eclipse.e4.ui.workbench.renderers.swt", ENABLED_THEME_KEY, true, contexts);
-
 		if ("none".equals(cssTheme) || (!enableThemePreference)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override

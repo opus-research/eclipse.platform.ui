@@ -142,15 +142,15 @@ public class FileTool {
 		}
 	}
 
-	public static StringBuffer read(String fileName) throws IOException {
+	public static StringBuilder read(String fileName) throws IOException {
 		try (FileReader reader = new FileReader(fileName)) {
-			StringBuffer result = read(reader);
+			StringBuilder result = read(reader);
 			return result;
 		}
 	}
 
-	public static StringBuffer read(Reader reader) throws IOException {
-		StringBuffer s = new StringBuffer();
+	public static StringBuilder read(Reader reader) throws IOException {
+		StringBuilder s= new StringBuilder();
 		try {
 			char[] buffer= new char[8196];
 			int chars= reader.read(buffer);
@@ -167,7 +167,7 @@ public class FileTool {
 		return s;
 	}
 
-	public static void write(String fileName, StringBuffer content) throws IOException {
+	public static void write(String fileName, StringBuilder content) throws IOException {
 		try (Writer writer = new FileWriter(fileName)) {
 			writer.write(content.toString());
 		}
