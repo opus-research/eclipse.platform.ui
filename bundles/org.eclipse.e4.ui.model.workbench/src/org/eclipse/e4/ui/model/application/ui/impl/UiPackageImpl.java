@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -164,22 +164,13 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int DIRTYABLE__DIRTY = 0;
 
 	/**
-	 * The feature id for the '<em><b>Last Modified</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRTYABLE__LAST_MODIFIED = 1;
-
-	/**
 	 * The number of structural features of the '<em>Dirtyable</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIRTYABLE_FEATURE_COUNT = 2;
+	public static final int DIRTYABLE_FEATURE_COUNT = 1;
 
 	/**
 	 * The number of operations of the '<em>Dirtyable</em>' class.
@@ -1809,20 +1800,6 @@ public class UiPackageImpl extends EPackageImpl {
 	}
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.MDirtyable#getLastModified <em>Last Modified</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Last Modified</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.MDirtyable#getLastModified()
-	 * @see #getDirtyable()
-	 * @generated
-	 */
-	public EAttribute getDirtyable_LastModified() {
-		return (EAttribute)dirtyableEClass.getEStructuralFeatures().get(1);
-	}
-
-
-	/**
 	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.MInput <em>Input</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2341,7 +2318,6 @@ public class UiPackageImpl extends EPackageImpl {
 
 		dirtyableEClass = createEClass(DIRTYABLE);
 		createEAttribute(dirtyableEClass, DIRTYABLE__DIRTY);
-		createEAttribute(dirtyableEClass, DIRTYABLE__LAST_MODIFIED);
 
 		inputEClass = createEClass(INPUT);
 		createEAttribute(inputEClass, INPUT__INPUT_URI);
@@ -2472,7 +2448,6 @@ public class UiPackageImpl extends EPackageImpl {
 
 		initEClass(dirtyableEClass, MDirtyable.class, "Dirtyable", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getDirtyable_Dirty(), ecorePackage.getEBoolean(), "dirty", null, 0, 1, MDirtyable.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEAttribute(getDirtyable_LastModified(), ecorePackage.getEDate(), "lastModified", null, 0, 1, MDirtyable.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(inputEClass, MInput.class, "Input", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getInput_InputURI(), ecorePackage.getEString(), "inputURI", null, 0, 1, MInput.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
@@ -2599,14 +2574,6 @@ public class UiPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EAttribute DIRTYABLE__DIRTY = eINSTANCE.getDirtyable_Dirty();
-
-		/**
-		 * The meta object literal for the '<em><b>Last Modified</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		public static final EAttribute DIRTYABLE__LAST_MODIFIED = eINSTANCE.getDirtyable_LastModified();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.MInput <em>Input</em>}' class.

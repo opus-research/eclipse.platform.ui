@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,10 @@
  *     Steven Spungin <steven@spungin.tv> - Bug 436908
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799, 446864
  *     Snjezana Peco <snjezana.peco@redhat.com> - Bug 414888
- *     Axel Richard <axel.richard@obeo.fr> - Bug 486644
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
 
-import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -45,7 +43,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablePart;
-import org.eclipse.ui.ISaveablePart3;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPart2;
 import org.eclipse.ui.IWorkbenchPartConstants;
@@ -385,12 +382,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				case IWorkbenchPartConstants.PROP_INPUT:
 					WorkbenchPartReference ref = getReference();
 					((WorkbenchPage) ref.getSite().getPage()).firePartInputChanged(ref);
-					break;
-				case IWorkbenchPartConstants.PROP_LAST_MODIFIED:
-					ISaveablePart3 saveable3 = SaveableHelper.getSaveable3(wrapped);
-					if (saveable3 != null) {
-						((MDirtyable) part).setLastModified(new Date());
-					}
 					break;
 				}
 			}

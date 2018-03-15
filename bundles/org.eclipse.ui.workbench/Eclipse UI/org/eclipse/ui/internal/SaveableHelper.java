@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Axel Richard <axel.richard@obeo.fr> - Bug 486644
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -40,7 +39,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablePart2;
-import org.eclipse.ui.ISaveablePart3;
 import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISaveablesSource;
 import org.eclipse.ui.IWorkbenchPart;
@@ -518,15 +516,4 @@ public class SaveableHelper {
 		return getSaveable2(o) != null;
 	}
 
-	public static ISaveablePart3 getSaveable3(Object o) {
-		ISaveablePart saveable = getSaveable(o);
-		if (saveable instanceof ISaveablePart3) {
-			return (ISaveablePart3) saveable;
-		}
-		return Adapters.adapt(o, ISaveablePart3.class);
-	}
-
-	public static boolean isSaveable3(Object o) {
-		return getSaveable3(o) != null;
-	}
 }
