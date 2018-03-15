@@ -713,9 +713,6 @@ public class WorkbenchMessages extends NLS {
 	public static String EditorManager_reuseEditorDialogTitle;
 	public static String PinEditorAction_toolTip;
 	public static String WorkbenchPreference_reuseEditors;
-	public static String WorkbenchPreference_reuseDirtyEditorGroupTitle;
-	public static String WorkbenchPreference_promptToReuseEditor;
-	public static String WorkbenchPreference_openNewEditor;
 	public static String WorkbenchPreference_reuseEditorsThreshold;
 	public static String WorkbenchPreference_reuseEditorsThresholdError;
 	public static String WorkbenchPreference_recentFiles;
@@ -957,6 +954,8 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
+	public static String WorkbenchLayoutSettings_Name;
+	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
