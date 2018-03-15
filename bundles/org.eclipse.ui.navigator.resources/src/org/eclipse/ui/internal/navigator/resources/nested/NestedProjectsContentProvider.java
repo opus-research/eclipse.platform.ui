@@ -38,7 +38,6 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 
 	private Command projectPresetionCommand;
 	private CommonViewer viewer;
-	private Set<IContainer> parentsToRefresh = new HashSet<IContainer>();
 
 	public NestedProjectsContentProvider() {
 		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
@@ -48,8 +47,7 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 		} catch (ExecutionException ex) {
 			WorkbenchNavigatorPlugin.log(ex.getMessage(), new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.PLUGIN_ID, ex.getMessage(), ex));
 		}
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
-				IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	@Override
@@ -102,22 +100,13 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		if (event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource().getType() == IResource.PROJECT) {
-			IProject aboutToBeDeleted = (IProject) event.getResource();
-			IContainer parent = getParent(aboutToBeDeleted);
-			if (parent != null) {
-				parentsToRefresh.add(parent);
-			}
-		} else if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-			if (event.getDelta().getKind() == IResourceDelta.CHANGED
-					&& event.getDelta().getResource().getType() == IResource.ROOT) {
-				for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
-					if (delta.getResource().getType() == IResource.PROJECT && delta.getKind() == IResourceDelta.ADDED) {
-						IProject newProject = (IProject) delta.getResource();
-						IContainer parent = getParent(newProject);
-						if (parent != null) {
-							parentsToRefresh.add(parent);
-						}
+		if (event.getDelta().getKind() == IResourceDelta.CHANGED && event.getDelta().getResource().getType() == IResource.ROOT) {
+			final Set<IContainer> parentsToRefresh = new HashSet<IContainer>();
+			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
+				if (delta.getResource().getType() == IResource.PROJECT && delta.getKind() == IResourceDelta.ADDED) {
+					IProject newProject = (IProject)delta.getResource();
+					if (NestedProjectManager.getInstance().isShownAsNested(newProject)) {
+						parentsToRefresh.add(getParent(newProject));
 					}
 				}
 			}
@@ -128,7 +117,6 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 						for (IContainer parent : parentsToRefresh) {
 							NestedProjectsContentProvider.this.viewer.refresh(parent);
 						}
-						parentsToRefresh.clear();
 					}
 				});
 			}
