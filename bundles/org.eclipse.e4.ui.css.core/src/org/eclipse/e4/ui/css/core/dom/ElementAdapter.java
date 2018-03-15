@@ -122,7 +122,7 @@ public abstract class ElementAdapter implements Element, CSSStylableElement {
 
 	@Override
 	public boolean hasAttribute(String arg0) {
-		return getAttribute(arg0)!=null;
+		return false;
 	}
 
 	@Override
