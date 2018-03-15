@@ -446,12 +446,12 @@ public class BookmarkNavigator extends ViewPart {
      */
     void performDragSetData(DragSourceEvent event) {
         if (MarkerTransfer.getInstance().isSupportedType(event.dataType)) {
-            event.data = ((IStructuredSelection) viewer.getSelection())
+			event.data = viewer.getStructuredSelection()
                     .toArray();
             return;
         }
         if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
-            Object[] markers = ((IStructuredSelection) viewer.getSelection())
+			Object[] markers = viewer.getStructuredSelection()
                     .toArray();
             if (markers != null) {
                 StringBuffer buffer = new StringBuffer();
@@ -532,7 +532,7 @@ public class BookmarkNavigator extends ViewPart {
         }
 
         Scrollable scrollable = (Scrollable) viewer.getControl();
-        Object markers[] = ((IStructuredSelection) viewer.getSelection())
+		Object markers[] = viewer.getStructuredSelection()
                 .toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);

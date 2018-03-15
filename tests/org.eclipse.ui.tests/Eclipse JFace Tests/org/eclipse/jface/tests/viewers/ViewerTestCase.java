@@ -49,7 +49,7 @@ public abstract class ViewerTestCase extends TestCase {
 	}
 
 	protected void assertSelectionEquals(String message, TestElement expected) {
-	    ISelection selection = fViewer.getSelection();
+	    ISelection selection = fViewer.getStructuredSelection();
 	    assertTrue(selection instanceof IStructuredSelection);
 	    IStructuredSelection expectedSelection = new StructuredSelection(
 	            expected);
