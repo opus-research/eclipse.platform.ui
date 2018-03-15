@@ -49,8 +49,6 @@ import org.eclipse.ui.services.IEvaluationService;
  *
  */
 public final class EvaluationService implements IEvaluationService {
-	private static final boolean ENABLED_OPTIMIZATION = Boolean.getBoolean("evalServiceOpt"); //$NON-NLS-1$
-
 	public static final String DEFAULT_VAR = "org.eclipse.ui.internal.services.EvaluationService.default_var"; //$NON-NLS-1$
 	private static final String RE_EVAL = "org.eclipse.ui.internal.services.EvaluationService.evaluate"; //$NON-NLS-1$
 	private boolean evaluate = false;
@@ -80,11 +78,8 @@ public final class EvaluationService implements IEvaluationService {
 			}
 			// This ties tool item enablement to variable changes that can
 			// effect the enablement.
-			if (ENABLED_OPTIMIZATION) {
-				getEventBroker().send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
-			} else {
-				getEventBroker().post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
-			}
+			getEventBroker()
+					.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 			return true;
 		}
 	};
@@ -304,12 +299,7 @@ public final class EvaluationService implements IEvaluationService {
 			}
 		}
 		endSourceChange(sourceNames);
-		if (ENABLED_OPTIMIZATION) {
-			eventBroker.send(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
-		} else {
-			eventBroker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
-		}
-
+		eventBroker.post(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC, UIEvents.ALL_ELEMENT_ID);
 	}
 
 	/**

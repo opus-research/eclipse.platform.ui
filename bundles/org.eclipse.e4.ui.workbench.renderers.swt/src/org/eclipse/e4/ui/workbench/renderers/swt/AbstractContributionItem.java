@@ -542,32 +542,7 @@ public abstract class AbstractContributionItem extends ContributionItem {
 		return null;
 	}
 
-	private static final boolean ENABLED_OPTIMIZATION = Boolean.getBoolean("enabledWhenOpt"); //$NON-NLS-1$
-	private Runnable scheduledUpdate;
-
 	protected void updateItemEnablement() {
-		if (ENABLED_OPTIMIZATION) {
-			if (scheduledUpdate == null) {
-				Display current = Display.getCurrent();
-				if (current == null) {
-					_updateItemEnablement();
-				} else {
-					scheduledUpdate = () -> {
-						try {
-							_updateItemEnablement();
-						} finally {
-							scheduledUpdate = null;
-						}
-					};
-					current.asyncExec(scheduledUpdate);
-				}
-			}
-		} else {
-			_updateItemEnablement();
-		}
-	}
-
-	protected void _updateItemEnablement() {
 		if (!(modelItem.getWidget() instanceof ToolItem))
 			return;
 

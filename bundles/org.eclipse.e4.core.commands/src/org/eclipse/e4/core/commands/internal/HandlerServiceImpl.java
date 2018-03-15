@@ -14,7 +14,6 @@ package org.eclipse.e4.core.commands.internal;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import org.eclipse.core.commands.AbstractParameterValueConverter;
 import org.eclipse.core.commands.Command;
@@ -153,8 +152,6 @@ public class HandlerServiceImpl implements EHandlerService {
 	@Optional
 	Logger logger;
 
-	private static AtomicInteger CAN_EXECUTE_COUNT = new AtomicInteger();
-
 	@Override
 	public void activateHandler(String commandId, Object handler) {
 		String handlerId = H_ID + commandId;
@@ -173,7 +170,6 @@ public class HandlerServiceImpl implements EHandlerService {
 
 	@Override
 	public boolean canExecute(ParameterizedCommand command, IEclipseContext staticContext) {
-		System.err.println("HandlerServiceImpl#canExecute: " + CAN_EXECUTE_COUNT.incrementAndGet()); //$NON-NLS-1$
 		final IEclipseContext executionContext = getExecutionContext();
 		addParms(command, staticContext);
 		// executionContext.set(STATIC_CONTEXT, staticContext);
