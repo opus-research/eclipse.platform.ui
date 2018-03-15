@@ -14,9 +14,9 @@ package org.eclipse.ui.tests.forms.layout;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -63,6 +63,21 @@ public class TestColumnWrapLayout {
 		assertEquals(260, ColumnLayoutUtils.computeColumnHeight(3, sizes, 100, 100));
 	}
 
+	private class SizedComposite extends Composite {
+
+		int height;
+
+		public SizedComposite(Composite parent, int style, int height) {
+			super(parent, style);
+			this.height = height;
+		}
+
+		@Override
+		public Point computeSize(int wHint, int hHint, boolean changed) {
+			return new Point( 20, height);
+		}
+	}
+
 	/**
 	 * Test that labels with the WRAP property set do indeed wrap.
 	 */
@@ -71,7 +86,7 @@ public class TestColumnWrapLayout {
 		Display display = PlatformUI.getWorkbench().getDisplay();
 		Shell shell = new Shell(display);
 		shell.setSize(100, 300);
-		GridLayoutFactory.fillDefaults().applyTo(shell);
+		shell.setLayout(new GridLayout());
 		Composite inner = new Composite(shell, SWT.NULL);
 		ColumnLayout layout = new ColumnLayout();
 		layout.verticalSpacing = 5;
@@ -80,9 +95,9 @@ public class TestColumnWrapLayout {
 		layout.topMargin=2;
 		layout.bottomMargin=3;
 		inner.setLayout(layout);
-		ControlFactory.create(inner, 20, 20, 30);
-		ControlFactory.create(inner, 20, 20, 40);
-		ControlFactory.create(inner, 20, 20, 20);
+		new SizedComposite(inner, SWT.NULL, 30);
+		new SizedComposite(inner, SWT.NULL, 40);
+		new SizedComposite(inner, SWT.NULL, 20);
 		shell.layout(true);
 		assertEquals(70, inner.getSize().y);
 		shell.dispose();
