@@ -242,6 +242,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SavePerspective_text;
 	public static String SavePerspective_toolTip;
 	public static String SavePerspective_shellTitle;
+	public static String SavePerspective_saveButtonLabel;
 	public static String SavePerspectiveDialog_description;
 	public static String SavePerspective_name;
 	public static String SavePerspective_existing;
@@ -633,10 +634,6 @@ public class WorkbenchMessages extends NLS {
 	public static String Saving_Modifications;
 	public static String Save_All;
 	public static String Dont_Save;
-
-	public static String SaveableHelper_Save;
-	public static String SaveableHelper_Cancel;
-	public static String SaveableHelper_Dont_Save;
 
 
 	// ==============================================================================
