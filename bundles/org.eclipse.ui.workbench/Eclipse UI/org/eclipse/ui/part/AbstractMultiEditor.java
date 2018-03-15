@@ -71,7 +71,8 @@ public abstract class AbstractMultiEditor extends EditorPart {
      */
     @Override
 	public void doSave(IProgressMonitor monitor) {
-        for (IEditorPart e : innerEditors) {
+        for (int i = 0; i < innerEditors.length; i++) {
+            IEditorPart e = innerEditors[i];
             e.doSave(monitor);
         }
     }
@@ -114,7 +115,8 @@ public abstract class AbstractMultiEditor extends EditorPart {
      */
     @Override
 	public boolean isDirty() {
-        for (IEditorPart e : innerEditors) {
+        for (int i = 0; i < innerEditors.length; i++) {
+            IEditorPart e = innerEditors[i];
             if (e.isDirty()) {
 				return true;
 			}
@@ -167,8 +169,8 @@ public abstract class AbstractMultiEditor extends EditorPart {
         innerEditors = children;
         activeEditorIndex = 0;
 
-		for (IEditorPart element : children) {
-			element.addPropertyListener( (source, propId) -> handlePropertyChange(propId));
+		for (int i = 0; i < children.length; i++) {
+			children[i].addPropertyListener( (source, propId) -> handlePropertyChange(propId));
 		}
 
         innerEditorsCreated();

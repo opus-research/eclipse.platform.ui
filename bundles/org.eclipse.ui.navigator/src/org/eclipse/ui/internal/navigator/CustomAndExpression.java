@@ -49,9 +49,9 @@ public class CustomAndExpression extends Expression {
 			@Override
 			public void run() throws Exception {
 				fExpressions = new ArrayList<Expression>();
-				for (IConfigurationElement element2 : children) {
+				for (IConfigurationElement configurationElement : children) {
 					fExpressions.add(ElementHandler.getDefault().create(
-							ExpressionConverter.getDefault(), element2));
+							ExpressionConverter.getDefault(), configurationElement));
 				}
 			}
 		});
