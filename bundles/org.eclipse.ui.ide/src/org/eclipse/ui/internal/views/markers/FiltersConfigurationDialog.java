@@ -93,6 +93,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private Label limitsLabel;
 
 	private Object[] previouslyChecked = new Object[0];
+	private Group configComposite;
 
 	/**
 	 * Create a new instance of the receiver on builder.
@@ -143,7 +144,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		createAndOrButtons(composite);
 
-		Group configComposite = new Group(composite, SWT.NONE);
+		configComposite = new Group(composite, SWT.NONE);
 		configComposite.setText(MarkerMessages.MarkerConfigurationsLabel);
 
 		configComposite.setLayout(new GridLayout(3, false));
@@ -200,12 +201,30 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
+		updateConfigComposite(!showAll);
+	}
+
+	private void updateConfigComposite(boolean enabled) {
+		recursivelySetEnabled(configComposite, enabled);
+		if (enabled)
+			updateButtonEnablement(getSelectionFromTable());
+	}
+
+	private void recursivelySetEnabled(Control control, boolean enabled) {
+		if (control instanceof Composite) {
+			for (Control child : ((Composite) control).getChildren()) {
+				recursivelySetEnabled(child, enabled);
+			}
+		}
+		control.setEnabled(enabled);
 	}
 
 	private void updateShowAll(boolean showAll) {
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
+		updateConfigComposite(!showAll);
+
 		if (showAll) {
 			previouslyChecked = configsTable.getCheckedElements();
 			configsTable.setAllChecked(false);
