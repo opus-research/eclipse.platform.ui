@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.bindings.internal;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -247,22 +246,43 @@ public final class Util {
 	}
 
 	/**
-	 * Tests whether two arrays of objects are equal to each other. The arrays must
-	 * not be <code>null</code>, but their elements may be <code>null</code>.
+	 * Tests whether two arrays of objects are equal to each other. The arrays must not be
+	 * <code>null</code>, but their elements may be <code>null</code>.
 	 *
 	 * @param leftArray
-	 *            The left array to compare; may be <code>null</code>, and may be
-	 *            empty and may contain <code>null</code> elements.
+	 *            The left array to compare; may be <code>null</code>, and may be empty and may
+	 *            contain <code>null</code> elements.
 	 * @param rightArray
-	 *            The right array to compare; may be <code>null</code>, and may be
-	 *            empty and may contain <code>null</code> elements.
-	 * @return <code>true</code> if the arrays are equal length and the elements at
-	 *         the same position are equal; <code>false</code> otherwise.
-	 * @deprecated Use {@link Arrays#equals(Object[], Object[])}
+	 *            The right array to compare; may be <code>null</code>, and may be empty and may
+	 *            contain <code>null</code> elements.
+	 * @return <code>true</code> if the arrays are equal length and the elements at the same
+	 *         position are equal; <code>false</code> otherwise.
 	 */
-	@Deprecated
 	public static final boolean equals(final Object[] leftArray, final Object[] rightArray) {
-		return Arrays.equals(leftArray, rightArray);
+		if (leftArray == rightArray) {
+			return true;
+		}
+
+		if (leftArray == null) {
+			return (rightArray == null);
+		} else if (rightArray == null) {
+			return false;
+		}
+
+		if (leftArray.length != rightArray.length) {
+			return false;
+		}
+
+		for (int i = 0; i < leftArray.length; i++) {
+			final Object left = leftArray[i];
+			final Object right = rightArray[i];
+			final boolean equal = (left == null) ? (right == null) : (left.equals(right));
+			if (!equal) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
