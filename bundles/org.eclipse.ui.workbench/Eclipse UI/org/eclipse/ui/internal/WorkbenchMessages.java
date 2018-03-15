@@ -14,7 +14,7 @@
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811, 511198
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -242,6 +242,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SavePerspective_text;
 	public static String SavePerspective_toolTip;
 	public static String SavePerspective_shellTitle;
+	public static String SavePerspective_saveButtonLabel;
 	public static String SavePerspectiveDialog_description;
 	public static String SavePerspective_name;
 	public static String SavePerspective_existing;
@@ -254,6 +255,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ResetPerspective_text;
 	public static String ResetPerspective_toolTip;
 	public static String ResetPerspective_message;
+	public static String ResetPerspective_buttonLabel;
 	public static String ResetPerspective_title;
 	public static String RevertPerspective_note;
 
@@ -632,6 +634,11 @@ public class WorkbenchMessages extends NLS {
 	public static String Save_Resource;
 	public static String Saving_Modifications;
 	public static String Save_All;
+	public static String Dont_Save;
+
+	public static String SaveableHelper_Save;
+	public static String SaveableHelper_Cancel;
+	public static String SaveableHelper_Dont_Save;
 
 
 	// ==============================================================================
@@ -978,6 +985,7 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
+	public static String WorkbenchPreferences_Name;
 
 	// StatusDialog
 	public static String WorkbenchStatusDialog_SupportTooltip;
@@ -1006,6 +1014,8 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetGroup_WorkingSets_group;
 	public static String WorkingSetGroup_WorkingSetSelection_message;
 	public static String WorkingSetGroup_EnableWorkingSet_button;
+
+	public static String FilteredTableBaseHandler_Close;
 
 	// Util
 	public static String Util_List;
