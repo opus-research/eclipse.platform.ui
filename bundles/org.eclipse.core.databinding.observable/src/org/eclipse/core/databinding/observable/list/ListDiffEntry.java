@@ -39,12 +39,9 @@ public abstract class ListDiffEntry<E> {
 	 */
 	public abstract E getElement();
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		buffer
 			.append(this.getClass().getName())
 			.append("{position [") //$NON-NLS-1$
