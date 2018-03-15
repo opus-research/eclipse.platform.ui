@@ -13,7 +13,7 @@
 *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
 *     Christian Georgi (SAP SE)          -  bug 458811
 *     Mickael Istria (Red Hat Inc.) - Bug 486901
-*     Patrik Suzzi <psuzzi@gmail.com> - Bug 502050
+*     Patrik Suzzi <psuzzi@gmail.com> - Bug 502050, 508934
 *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -78,15 +78,15 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 	private IntegerFieldEditor saveInterval;
 
-	private StringFieldEditor workspaceName;
+	private StringFieldEditor strWorkspaceName;
 
-	private Button showLocationPathInTitle;
+	private Button btnShowWorkspacePath;
 
-	private Button showLocationNameInTitle;
+	private Button btnShowWorkspaceName;
 
-	private Button showPerspectiveNameInTitle;
+	private Button btnShowPerspectiveName;
 
-	private Button showProductNameInTitle;
+	private Button btnShowProductName;
 
 	private Button autoRefreshButton;
 
@@ -210,8 +210,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	 */
 	private void createWorkspaceLocationGroup(Composite composite) {
 
-		boolean showLocationIsSetOnCommandLine = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
-
 		// show workspace location in window title
 		boolean isShowLocation = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION);
 		boolean isShowName = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
@@ -231,33 +229,34 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		grpWindowTitle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		// show workspace name
-		showLocationNameInTitle = new Button(grpWindowTitle, SWT.CHECK);
-		showLocationNameInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationNameInWindowTitle);
-		showLocationNameInTitle.setSelection(isShowName);
+		btnShowWorkspaceName = new Button(grpWindowTitle, SWT.CHECK);
+		btnShowWorkspaceName.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationNameInWindowTitle);
+		btnShowWorkspaceName.setSelection(isShowName);
 
 		Composite compositeWsName = new Composite(grpWindowTitle, SWT.NONE);
 		compositeWsName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		workspaceName = new StringFieldEditor(IDEInternalPreferences.WORKSPACE_NAME,
+		strWorkspaceName = new StringFieldEditor(IDEInternalPreferences.WORKSPACE_NAME,
 				IDEWorkbenchMessages.IDEWorkspacePreference_workspaceName, compositeWsName);
 		gl = ((GridLayout) compositeWsName.getLayout());
 		gl.marginLeft = 15;
 		gl.marginHeight = 0;
 
-		workspaceName.setPreferenceStore(getIDEPreferenceStore());
-		workspaceName.load();
-		workspaceName.setPage(this);
+		strWorkspaceName.setPreferenceStore(getIDEPreferenceStore());
+		strWorkspaceName.load();
+		strWorkspaceName.setPage(this);
 
 		// show perspective name
-		showPerspectiveNameInTitle = new Button(grpWindowTitle, SWT.CHECK);
-		showPerspectiveNameInTitle
+		btnShowPerspectiveName = new Button(grpWindowTitle, SWT.CHECK);
+		btnShowPerspectiveName
 				.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showPerspectiveNameInWindowTitle);
-		showPerspectiveNameInTitle.setSelection(isShowPerspective);
+		btnShowPerspectiveName.setSelection(isShowPerspective);
 
 		// show full workspace path
-		showLocationPathInTitle = new Button(grpWindowTitle, SWT.CHECK);
-		showLocationPathInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle);
-		showLocationPathInTitle.setSelection(isShowLocation);
+		btnShowWorkspacePath = new Button(grpWindowTitle, SWT.CHECK);
+		btnShowWorkspacePath.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle);
+		// if location is forced, select the button
+		btnShowWorkspacePath.setSelection(forcedShowlocation || isShowLocation);
 
 		Composite compositeWsPath = new Composite(grpWindowTitle, SWT.NONE);
 		compositeWsPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -272,18 +271,20 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		Text workspacePath = new Text(compositeWsPath, SWT.READ_ONLY);
 		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		workspacePath.setText(TextProcessor.process(Platform.getLocation().toOSString()));
+		String location = (forcedShowlocation) ? commandLineLocation
+				: TextProcessor.process(Platform.getLocation().toOSString());
+		workspacePath.setText(location);
 		workspacePath.setSelection(workspacePath.getText().length());
 		workspacePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		// show product name
-		showProductNameInTitle = new Button(grpWindowTitle, SWT.CHECK);
-		showProductNameInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showProductNameInWindowTitle);
-		showProductNameInTitle.setSelection(isShowProduct);
+		btnShowProductName = new Button(grpWindowTitle, SWT.CHECK);
+		btnShowProductName.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showProductNameInWindowTitle);
+		btnShowProductName.setSelection(isShowProduct);
 
 		// disable location component if -showlocation forced
-		Stream.of(showLocationPathInTitle, locationLabel, workspacePath)
-				.forEach(c -> c.setEnabled(!showLocationIsSetOnCommandLine));
+		Stream.of(btnShowWorkspacePath, locationLabel, workspacePath)
+				.forEach(c -> c.setEnabled(!forcedShowlocation));
 	}
 
     /**
@@ -476,9 +477,16 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         return composite;
     }
 
+	/** true if showlocation is forced via command line */
+	boolean forcedShowlocation = false;
+	/** holds the valueof the command line forced location */
+	String commandLineLocation = null;
+
 	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
 		e4Context = workbench.getService(IEclipseContext.class);
+		forcedShowlocation = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
+		commandLineLocation = (String) e4Context.get(E4Workbench.FORCED_SHOW_LOCATION);
     }
 
     /**
@@ -501,11 +509,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		boolean showLocationName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
 		boolean showPerspectiveName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE);
 		boolean showProductName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE);
-		showLocationPathInTitle.setSelection(showLocationPath);
-		showLocationNameInTitle.setSelection(showLocationName);
-		showPerspectiveNameInTitle.setSelection(showPerspectiveName);
-		showProductNameInTitle.setSelection(showProductName);
-		workspaceName.loadDefault();
+		// if location is forced, select the button
+		btnShowWorkspacePath.setSelection(forcedShowlocation || showLocationPath);
+		btnShowWorkspaceName.setSelection(showLocationName);
+		btnShowPerspectiveName.setSelection(showPerspectiveName);
+		btnShowProductName.setSelection(showProductName);
+		strWorkspaceName.loadDefault();
 
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
         closeUnrelatedProjectButton.setSelection(closeUnrelatedProj);
@@ -577,12 +586,15 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
             }
         }
 
-		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationPathInTitle.getSelection());
-		store.setValue(IDEInternalPreferences.SHOW_LOCATION_NAME, showLocationNameInTitle.getSelection());
-		store.setValue(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE, showPerspectiveNameInTitle.getSelection());
-		store.setValue(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE, showProductNameInTitle.getSelection());
+		// store location if not forced by command line
+		if(!forcedShowlocation) {
+			store.setValue(IDEInternalPreferences.SHOW_LOCATION, btnShowWorkspacePath.getSelection());
+		}
+		store.setValue(IDEInternalPreferences.SHOW_LOCATION_NAME, btnShowWorkspaceName.getSelection());
+		store.setValue(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE, btnShowPerspectiveName.getSelection());
+		store.setValue(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE, btnShowProductName.getSelection());
 
-        workspaceName.store();
+        strWorkspaceName.store();
 
 		systemExplorer.store();
 
