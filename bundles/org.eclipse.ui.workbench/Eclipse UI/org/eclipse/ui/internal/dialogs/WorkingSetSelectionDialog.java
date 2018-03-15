@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,21 +21,11 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -164,12 +156,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
 		createMessageArea(composite);
 
-		SelectionListener listener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateButtonAvailability();
-			}
-		};
+		SelectionListener listener = widgetSelectedAdapter(e -> updateButtonAvailability());
 
 		buttonWindowSet = new Button(composite, SWT.RADIO);
 		buttonWindowSet.setText(WorkbenchMessages.WindowWorkingSets);
@@ -224,32 +211,20 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
         listViewer.addFilter(new WorkingSetFilter(getSupportedWorkingSetIds()));
 
-        listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
-                handleSelectionChanged();
-            }
-        });
-        listViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
-            	Object obj = ((IStructuredSelection) listViewer.getSelection())
-						.getFirstElement();
-				listViewer.setCheckedElements(new Object[] {obj});
-				buttonWindowSet.setSelection(false);
-				buttonNoSet.setSelection(false);
-				buttonSelectedSets.setSelection(true);
-            	okPressed();
-            }
-        });
-        listViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				// implicitly select the third radio button
-				buttonWindowSet.setSelection(false);
-				buttonNoSet.setSelection(false);
-				buttonSelectedSets.setSelection(true);
-			}
+        listViewer.addSelectionChangedListener(event -> handleSelectionChanged());
+        listViewer.addDoubleClickListener(event -> {
+			Object obj = listViewer.getStructuredSelection().getFirstElement();
+			listViewer.setCheckedElements(new Object[] {obj});
+			buttonWindowSet.setSelection(false);
+			buttonNoSet.setSelection(false);
+			buttonSelectedSets.setSelection(true);
+			okPressed();
+		});
+        listViewer.addCheckStateListener(event -> {
+			// implicitly select the third radio button
+			buttonWindowSet.setSelection(false);
+			buttonNoSet.setSelection(false);
+			buttonSelectedSets.setSelection(true);
 		});
 
         addModifyButtons(viewerComposite);
@@ -322,11 +297,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      */
     @Override
 	protected List getSelectedWorkingSets() {
-        ISelection selection = listViewer.getSelection();
-        if (selection instanceof IStructuredSelection) {
-			return ((IStructuredSelection) selection).toList();
-		}
-        return null;
+		return listViewer.getStructuredSelection().toList();
     }
 
     /**
@@ -390,10 +361,10 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 	 * @return the name
 	 */
     private String getAggregateIdForSets(IWorkingSet[] typedResult) {
-    		StringBuffer buffer = new StringBuffer();
+    		StringBuilder buffer = new StringBuilder();
     		buffer.append("Aggregate:"); //$NON-NLS-1$
-    		for (int i = 0; i < typedResult.length; i++) {
-			buffer.append(typedResult[i].getName()).append(':');
+    		for (IWorkingSet element : typedResult) {
+			buffer.append(element.getName()).append(':');
 		}
 		return buffer.toString();
 	}
@@ -419,8 +390,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
         while (iterator.hasNext()) {
             IWorkingSet editedWorkingSet = (IWorkingSet) iterator.next();
-            IWorkingSet originalWorkingSet = (IWorkingSet) getEditedWorkingSets()
-                    .get(editedWorkingSet);
+			IWorkingSet originalWorkingSet = getEditedWorkingSets().get(editedWorkingSet);
 
             if (editedWorkingSet.getName().equals(originalWorkingSet.getName()) == false) {
                 editedWorkingSet.setName(originalWorkingSet.getName());

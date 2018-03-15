@@ -49,8 +49,7 @@ public class NavigatorImages {
 	}
 
 	/**
-	 * Create and returns a image descriptor and adds the image to the
-	 * registery.
+	 * Create and returns a image descriptor and adds the image to the registry.
 	 *
 	 * @param prefix
 	 *            Icon dir structure.
@@ -75,7 +74,7 @@ public class NavigatorImages {
 	 * @return URL
 	 */
 	private static URL makeIconFileURL(String prefix, String name) {
-		StringBuffer buffer = new StringBuffer(prefix);
+		StringBuilder buffer = new StringBuilder(prefix);
 		buffer.append(name);
 		try {
 			return new URL(ICONS_LOCATION, buffer.toString());

@@ -11,6 +11,8 @@
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
  *     Robert Roth <robert.roth.off@gmail.com>
  *          - Fix for Bug 364736 Setting limit to 0 has no effect
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 498056
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 501523
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -20,6 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -59,6 +62,7 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersConfigurationDialog is the dialog for configuring the filters for the
+ * problems view
  *
  * @since 3.3
  *
@@ -76,14 +80,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private MarkerContentGenerator generator;
 
-	private boolean andFilters;
+	private boolean andFilters = false;
 
 	private Button removeButton;
 	private Button renameButton;
 
 	private Button allButton;
-	private Button andButton;
-	private Button orButton;
 
 	private Button limitButton;
 	private Text limitText;
@@ -96,6 +98,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private Object[] previouslyChecked = new Object[0];
 	private Group configComposite;
+	private Composite compositeLimits;
 
 	/**
 	 * Create a new instance of the receiver on builder.
@@ -107,7 +110,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		super(parentShell);
 		filterGroups = makeWorkingCopy(generator.getAllFilters());
 		this.generator = generator;
-		andFilters = generator.andFilters();
+		andFilters = false;
 	}
 
 	/**
@@ -144,15 +147,13 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		composite.setBackground(container.getBackground());
 
-		createAndOrButtons(composite);
+		createSelectAllButton(composite);
 
 		configComposite = new Group(composite, SWT.NONE);
 		configComposite.setText(MarkerMessages.MarkerConfigurationsLabel);
 
 		configComposite.setLayout(new GridLayout(3, false));
-		GridData configData = new GridData(GridData.FILL_BOTH);
-		configData.horizontalIndent = 20;
-		configComposite.setLayoutData(configData);
+		configComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		configComposite.setBackground(composite.getBackground());
 
 		createConfigs(configComposite);
@@ -186,14 +187,11 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			configsTable.setChecked(group, enabled);
 		}
 
-		andButton.setSelection(andFilters);
-		orButton.setSelection(!andFilters);
 		updateRadioButtonsFromTable();
 		int limits = generator.getMarkerLimits();
 		boolean limitsEnabled = generator.isMarkerLimitsEnabled();
 		limitButton.setSelection(limitsEnabled);
-		limitsLabel.setEnabled(limitsEnabled);
-		limitText.setEnabled(limitsEnabled);
+		updateLimitTextEnablement();
 		limitText.setText(Integer.toString(limits));
 		configsTable.getTable().setFocus();
 	}
@@ -201,40 +199,25 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private void updateRadioButtonsFromTable() {
 		boolean showAll = isShowAll();
 		allButton.setSelection(showAll);
-		andButton.setEnabled(!showAll);
-		orButton.setEnabled(!showAll);
 		updateConfigComposite(!showAll);
 	}
 
 	private void updateConfigComposite(boolean enabled) {
-		recursivelySetEnabled(configComposite, enabled);
 		if (enabled)
 			updateButtonEnablement(getSelectionFromTable());
 	}
 
-	/**
-	 * Recursively walk through the tree of components and set enabled state of
-	 * each control.
-	 *
-	 * @param control
-	 *            The root control
-	 * @param enabled
-	 *            Whether or not we're enabled.
-	 */
-	private void recursivelySetEnabled(Control control, boolean enabled) {
-		if (control instanceof Composite) {
-			for (Control child : ((Composite) control).getChildren()) {
-				recursivelySetEnabled(child, enabled);
-			}
-		}
-		control.setEnabled(enabled);
+	/** Update the enablement of limitText */
+	private void updateLimitTextEnablement() {
+		boolean useLimits = limitButton.getSelection();
+		limitsLabel.setEnabled(useLimits);
+		limitText.setEnabled(useLimits);
 	}
 
 	private void updateShowAll(boolean showAll) {
 		allButton.setSelection(showAll);
-		andButton.setEnabled(!showAll);
-		orButton.setEnabled(!showAll);
 		updateConfigComposite(!showAll);
+		updateLimitTextEnablement();
 
 		if (showAll) {
 			previouslyChecked = configsTable.getCheckedElements();
@@ -260,14 +243,17 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	 * @param parent
 	 */
 	private void createMarkerLimits(Composite parent) {
-		limitButton = new Button(parent, SWT.CHECK);
+		compositeLimits = new Composite(parent, SWT.NONE);
+		GridLayout glCompositeLimits = new GridLayout(3, false);
+		compositeLimits.setLayout(glCompositeLimits);
+
+		limitButton = new Button(compositeLimits, SWT.CHECK);
 		limitButton.setText(MarkerMessages.MarkerPreferences_MarkerLimits);
 		limitButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				limitsLabel.setEnabled(limitButton.getSelection());
-				limitText.setEnabled(limitButton.getSelection());
+				updateLimitTextEnablement();
 			}
 		});
 
@@ -481,7 +467,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		removeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeFilters(configsTable.getSelection());
+				removeFilters(configsTable.getStructuredSelection());
 			}
 		});
 		removeButton.setEnabled(false);
@@ -526,7 +512,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		};
 	}
 
-	private void createAndOrButtons(Composite parent) {
+	private void createSelectAllButton(Composite parent) {
 		allButton = new Button(parent, SWT.CHECK);
 		allButton.setText(MarkerMessages.ALL_Title);
 		allButton.addSelectionListener(new SelectionAdapter() {
@@ -536,29 +522,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		});
 
-		andButton = new Button(parent, SWT.RADIO);
-		andButton.setText(MarkerMessages.AND_Title);
-		andButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				andFilters = true;
-			}
-		});
-		GridData andData = new GridData();
-		andData.horizontalIndent = 20;
-		andButton.setLayoutData(andData);
-
-		orButton = new Button(parent, SWT.RADIO);
-		orButton.setText(MarkerMessages.OR_Title);
-		orButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				andFilters = false;
-			}
-		});
-		GridData orData = new GridData();
-		orData.horizontalIndent = 20;
-		orButton.setLayoutData(orData);
 	}
 
 	/**
@@ -598,6 +561,14 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		MarkerFieldFilterGroup config = new MarkerFieldFilterGroup(null, generator);
 		config.setName(newName);
 		return config;
+	}
+
+	@Override
+	protected void createButtonsForButtonBar(Composite parent) {
+		super.createButtonsForButtonBar(parent);
+		Button okButton = getButton(IDialogConstants.OK_ID);
+		okButton.setText(MarkerMessages.filtersDialog_applyAndCloseButton);
+		setButtonLayoutData(okButton);
 	}
 
 	/**
@@ -646,11 +617,11 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		List<MarkerFieldFilterGroup> selectedElements = new ArrayList<>();
 
 		if (selectedElementNames != null) {
-			for (int i = 0; i < selectedElementNames.length; i++) {
+			for (String selectedElementName : selectedElementNames) {
 				Iterator<MarkerFieldFilterGroup> filterGroupIterator = filterGroups.iterator();
 				while (filterGroupIterator.hasNext()) {
 					MarkerFieldFilterGroup group = filterGroupIterator.next();
-					if (Util.equals(group.getName(), selectedElementNames[i])) {
+					if (Util.equals(group.getName(), selectedElementName)) {
 						selectedElements.add(group);
 						break;
 					}
@@ -703,25 +674,25 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	@Override
 	protected void performDefaults() {
 		andFilters = false;
-		andButton.setSelection(andFilters);
-		orButton.setSelection(!andFilters);
 
 		filterGroups.clear();
-		filterGroups.addAll(generator.getDeclaredFilters());
+		List<MarkerFieldFilterGroup> declaredFilters = new ArrayList<>(generator.getDeclaredFilters());
+		filterGroups.addAll(declaredFilters);
 		configsTable.refresh();
-		configsTable.setSelection(new StructuredSelection(
-				filterGroups.size() > 1 ? filterGroups.iterator().next()
-						: new Object[0]));
+
+		for (MarkerFieldFilterGroup marker : declaredFilters) {
+			if (marker.isEnabled()) {
+				configsTable.setChecked(marker, true);
+			}
+		}
 
 		IPreferenceStore preferenceStore = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
 		boolean useMarkerLimits = preferenceStore.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
-		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 100;
+		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 1000;
 
 		limitButton.setSelection(useMarkerLimits);
-		limitsLabel.setEnabled(useMarkerLimits);
-		limitText.setEnabled(useMarkerLimits);
+		updateLimitTextEnablement();
 		limitText.setText(Integer.toString(markerLimits));
-
 		updateRadioButtonsFromTable();
 	}
 
@@ -772,9 +743,8 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private void setEnabled(boolean enabled, Control control) {
 		control.setEnabled(enabled);
 		if (control instanceof Composite) {
-			Control[] children = ((Composite) control).getChildren();
-			for (int i = 0; i < children.length; i++) {
-				setEnabled(enabled, children[i]);
+			for (Control child : ((Composite) control).getChildren()) {
+				setEnabled(enabled, child);
 			}
 		}
 	}

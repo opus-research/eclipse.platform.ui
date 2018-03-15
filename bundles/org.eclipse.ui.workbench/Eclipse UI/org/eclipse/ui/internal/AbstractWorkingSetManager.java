@@ -14,16 +14,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
@@ -90,13 +89,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 		}
 	}
 
-	private SortedSet<AbstractWorkingSet> workingSets = new TreeSet<>(new Comparator<AbstractWorkingSet>() {
-		@Override
-		public int compare(AbstractWorkingSet o1, AbstractWorkingSet o2) {
-			// Cast and compare directly
-			return o1.getUniqueId().compareTo(o2.getUniqueId());
-		}
-	});
+	private SortedSet<AbstractWorkingSet> workingSets = new TreeSet<>((o1, o2) -> o1.getUniqueId().compareTo(o2.getUniqueId()));
 
 	private List<IWorkingSet> recentWorkingSets = new ArrayList<>();
 
@@ -152,8 +145,8 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 			return registry.getNewPageWorkingSetDescriptors();
 		}
 		List<WorkingSetDescriptor> result = new ArrayList<>(supportedWorkingSetIds.length);
-		for (int i = 0; i < supportedWorkingSetIds.length; i++) {
-			WorkingSetDescriptor desc = registry.getWorkingSetDescriptor(supportedWorkingSetIds[i]);
+		for (String supportedWorkingSetId : supportedWorkingSetIds) {
+			WorkingSetDescriptor desc = registry.getWorkingSetDescriptor(supportedWorkingSetId);
 			if (desc != null && desc.isEditable()) {
 				result.add(desc);
 			}
@@ -372,25 +365,22 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 
         final PropertyChangeEvent event = new PropertyChangeEvent(this,
                 changeId, oldValue, newValue);
-		Runnable notifier = new Runnable() {
-			@Override
-			public void run() {
-				for (int i = 0; i < listeners.length; i++) {
-					final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
-					ISafeRunnable safetyWrapper = new ISafeRunnable() {
+		Runnable notifier = () -> {
+			for (Object listener : listeners) {
+				final IPropertyChangeListener propertyChangeListener = (IPropertyChangeListener) listener;
+				ISafeRunnable safetyWrapper = new ISafeRunnable() {
 
-						@Override
-						public void run() throws Exception {
-							listener.propertyChange(event);
-						}
+					@Override
+					public void run() throws Exception {
+						propertyChangeListener.propertyChange(event);
+					}
 
-						@Override
-						public void handleException(Throwable exception) {
-							// logged by the runner
-						}
-					};
-					SafeRunner.run(safetyWrapper);
-				}
+					@Override
+					public void handleException(Throwable exception) {
+						// logged by the runner
+					}
+				};
+				SafeRunner.run(safetyWrapper);
 			}
 		};
 		// Notifications are sent on the UI thread.
@@ -487,10 +477,8 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
      * @param memento the persistence store
      */
 	protected void restoreWorkingSetState(IMemento memento) {
-		IMemento[] children = memento.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
-
-		for (int i = 0; i < children.length; i++) {
-			AbstractWorkingSet workingSet = (AbstractWorkingSet) restoreWorkingSet(children[i]);
+		for (IMemento child : memento.getChildren(IWorkbenchConstants.TAG_WORKING_SET)) {
+			AbstractWorkingSet workingSet = (AbstractWorkingSet) restoreWorkingSet(child);
 			if (workingSet != null) {
 				internalAddWorkingSet(workingSet);
 			}
@@ -670,8 +658,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					synchronized (updaters) {
-						for (int i = 0; i < descriptors.length; i++) {
-							WorkingSetDescriptor descriptor = descriptors[i];
+						for (WorkingSetDescriptor descriptor : descriptors) {
 							List workingSets = getWorkingSetsForId(descriptor
 									.getId());
 							if (workingSets.size() == 0) {
@@ -704,8 +691,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 
 	private List getWorkingSetsForId(String id) {
 		List result= new ArrayList();
-    	for (Iterator iter= workingSets.iterator(); iter.hasNext();) {
-    		IWorkingSet ws= (IWorkingSet)iter.next();
+		for (IWorkingSet ws : workingSets) {
     		if (id.equals(ws.getId())) {
 				result.add(ws);
 			}
@@ -796,7 +782,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 		saveMruList(memento);
 
 		FileOutputStream stream = new FileOutputStream(stateFile);
-		OutputStreamWriter writer = new OutputStreamWriter(stream, "utf-8"); //$NON-NLS-1$
+		OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
 		memento.save(writer);
 		writer.close();
 
@@ -810,8 +796,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			Object object = objects[i];
+		for (Object object : objects) {
 			if (object instanceof IWorkingSetUpdater) {
 				removeUpdater((IWorkingSetUpdater)object);
 
@@ -869,8 +854,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 		// ideally this method would be in a static util class of some kind but
 		// we dont have any such beast for working sets and making one for one
 		// method is overkill.
-		for (int i = 0; i < workingSets.length; i++) {
-			final IWorkingSet workingSet = workingSets[i];
+		for (final IWorkingSet workingSet : workingSets) {
 			SafeRunner.run(new WorkingSetRunnable() {
 
 				@Override

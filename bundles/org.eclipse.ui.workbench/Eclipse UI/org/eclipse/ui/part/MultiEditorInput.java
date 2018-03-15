@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.part;
 
 import java.util.Arrays;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -103,7 +102,7 @@ public class MultiEditorInput implements IEditorInput {
      * @see IAdaptable#getAdapter(Class)
      */
     @Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
         return null;
     }
 
@@ -124,11 +123,11 @@ public class MultiEditorInput implements IEditorInput {
     @Override
 	public int hashCode() {
         int hash = 0;
-        for (int i = 0; i < editors.length; i++) {
-            hash = hash * 37 + editors[i].hashCode();
+        for (String editor : editors) {
+            hash = hash * 37 + editor.hashCode();
         }
-        for (int i = 0; i < input.length; i++) {
-            hash = hash * 37 + input[i].hashCode();
+        for (IEditorInput editorInput : input) {
+            hash = hash * 37 + editorInput.hashCode();
         }
         return hash;
     }

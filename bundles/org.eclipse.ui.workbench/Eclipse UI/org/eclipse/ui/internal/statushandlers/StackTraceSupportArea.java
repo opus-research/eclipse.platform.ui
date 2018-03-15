@@ -135,7 +135,7 @@ public class StackTraceSupportArea extends AbstractStatusAreaProvider {
 		if (list == null || list.isDisposed()) {
 			return ""; //$NON-NLS-1$
 		}
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String newLine = System.getProperty("line.separator"); //$NON-NLS-1$
 		for (int i = 0; i < list.getItemCount(); i++) {
 			sb.append(list.getItem(i));
@@ -150,9 +150,8 @@ public class StackTraceSupportArea extends AbstractStatusAreaProvider {
 			return;
 		}
 		list.add(t.toString());
-		StackTraceElement[] ste = t.getStackTrace();
-		for (int i = 0; i < ste.length; i++) {
-			list.add(ste[i].toString());
+		for (StackTraceElement stackTraceElement : t.getStackTrace()) {
+			list.add(stackTraceElement.toString());
 		}
 		if (t.getCause() != null) {
 			list.add(WorkbenchMessages.StackTraceSupportArea_CausedBy);

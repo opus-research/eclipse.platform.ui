@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,16 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
+import static org.eclipse.e4.ui.internal.workbench.swt.Policy.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Hashtable;
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -24,6 +28,7 @@ import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
+import org.eclipse.osgi.service.debug.DebugOptionsListener;
 import org.eclipse.osgi.service.debug.DebugTrace;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -36,15 +41,13 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class WorkbenchSWTActivator implements BundleActivator { // extends
-																// Plugin {
+public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListener {
 	public static final String PI_RENDERERS = "org.eclipse.e4.ui.workbench.swt"; //$NON-NLS-1$
 
 	private BundleContext context;
 	private ServiceTracker<?, PackageAdmin> pkgAdminTracker;
 	private ServiceTracker<?, Location> locationTracker;
 	private static WorkbenchSWTActivator activator;
-	private ServiceTracker<?, DebugOptions> debugTracker;
 	private DebugTrace trace;
 
 
@@ -68,6 +71,9 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
+		Hashtable<String, String> props = new Hashtable<>(2);
+		props.put(DebugOptions.LISTENER_SYMBOLICNAME, PI_RENDERERS);
+		context.registerService(DebugOptionsListener.class, this, props);
 	}
 
 	@Override
@@ -119,32 +125,18 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 	}
 
 	public static void trace(String option, String msg, Throwable error) {
-		final DebugOptions debugOptions = activator.getDebugOptions();
-		if (debugOptions.isDebugEnabled()
-				&& debugOptions.getBooleanOption(PI_RENDERERS + option, false)) {
-			System.out.println(msg);
-			if (error != null) {
-				error.printStackTrace(System.out);
-			}
-		}
 		activator.getTrace().trace(option, msg, error);
 	}
 
-	public DebugOptions getDebugOptions() {
-		if (debugTracker == null) {
-			if (context == null) {
-				return null;
-			}
-			debugTracker = new ServiceTracker<>(context, DebugOptions.class, null);
-			debugTracker.open();
-		}
-		return debugTracker.getService();
+	@Override
+	public void optionsChanged(DebugOptions options) {
+		trace = options.newDebugTrace(PI_RENDERERS);
+		DEBUG = options.getBooleanOption(PI_RENDERERS + DEBUG_FLAG, false);
+		DEBUG_MENUS = options.getBooleanOption(PI_RENDERERS + DEBUG_MENUS_FLAG, false);
+		DEBUG_RENDERER = options.getBooleanOption(PI_RENDERERS + DEBUG_RENDERER_FLAG, false);
 	}
 
 	public DebugTrace getTrace() {
-		if (trace == null) {
-			trace = getDebugOptions().newDebugTrace(PI_RENDERERS);
-		}
 		return trace;
 	}
 
@@ -227,7 +219,7 @@ public class WorkbenchSWTActivator implements BundleActivator { // extends
 		InputStream is = null;
 		try {
 			is = dsURL.openStream();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf-8")); //$NON-NLS-1$
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 			dialogSettings.load(reader);
 		} catch (IOException e) {
 			// load failed so ensure we have an empty settings

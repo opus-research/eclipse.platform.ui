@@ -17,13 +17,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -111,18 +106,8 @@ public class WorkingSetTypePage extends WizardPage {
         typesListViewer.getTable().setLayoutData(data);
         typesListViewer.getTable().setFont(font);
         typesListViewer
-                .addSelectionChangedListener(new ISelectionChangedListener() {
-                    @Override
-					public void selectionChanged(SelectionChangedEvent event) {
-                        handleSelectionChanged();
-                    }
-                });
-        typesListViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
-                handleDoubleClick();
-            }
-        });
+                .addSelectionChangedListener(event -> handleSelectionChanged());
+        typesListViewer.addDoubleClickListener(event -> handleDoubleClick());
         typesListViewer.setContentProvider(new ArrayContentProvider());
         typesListViewer.setLabelProvider(new LabelProvider() {
         	private ResourceManager images = new LocalResourceManager(
@@ -180,16 +165,7 @@ public class WorkingSetTypePage extends WizardPage {
      * @since 3.4
 	 */
 	private WorkingSetDescriptor getSelectedWorkingSet() {
-		ISelection selection = typesListViewer.getSelection();
-        boolean hasSelection = selection != null
-                && selection.isEmpty() == false;
-
-        WorkingSetDescriptor descriptor = null;
-        if (hasSelection && selection instanceof IStructuredSelection) {
-            descriptor = (WorkingSetDescriptor) ((IStructuredSelection) selection)
-                    .getFirstElement();
-        }
-		return descriptor;
+		return (WorkingSetDescriptor) typesListViewer.getStructuredSelection().getFirstElement();
 	}
 
     /**
@@ -204,7 +180,7 @@ public class WorkingSetTypePage extends WizardPage {
      * Called when the selection has changed.
      */
     private void handleSelectionChanged() {
-        ISelection selection = typesListViewer.getSelection();
+		IStructuredSelection selection = typesListViewer.getStructuredSelection();
         boolean hasSelection = selection != null
                 && selection.isEmpty() == false;
 

@@ -10,6 +10,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285, 472654, 495718
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476, 461573
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 442285, 487348
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497618
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -61,6 +62,7 @@ import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -72,19 +74,14 @@ import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -95,7 +92,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
@@ -153,6 +149,11 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	 */
 	private static final boolean MRU_CONTROLLED_BY_CSS_DEFAULT = false;
 
+	/*
+	 * JFace key for default workbench tab font
+	 */
+	private static final String TAB_FONT_KEY = "org.eclipse.ui.workbench.TAB_TEXT_FONT"; //$NON-NLS-1$
+
 	@Inject
 	@Preference(nodePath = "org.eclipse.e4.ui.workbench.renderers.swt")
 	private IEclipsePreferences preferences;
@@ -167,8 +168,8 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 	/**
 	 * Add this tag to prevent the next tab's activation from granting focus
-	 * toac the part. This is used to keep the focus on the CTF when traversing
-	 * the tabs using the keyboard.
+	 * toac the part. This is used to keep the focus on the CTabFolder when
+	 * traversing the tabs using the keyboard.
 	 */
 	private static final String INHIBIT_FOCUS = "InhibitFocus"; //$NON-NLS-1$
 
@@ -620,25 +621,25 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		int styleOverride = getStyleOverride(pStack);
 		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
-		final CTabFolder ctf = new CTabFolder(parentComposite, style);
-		ctf.setMRUVisible(getMRUValue(ctf));
+		final CTabFolder tabFolder = new CTabFolder(parentComposite, style);
+		tabFolder.setMRUVisible(getMRUValue(tabFolder));
 
 		// Adjust the minimum chars based on the location
 		int location = modelService.getElementLocation(element);
 		if ((location & EModelService.IN_SHARED_AREA) != 0) {
-			ctf.setMinimumCharacters(MIN_EDITOR_CHARS);
-			ctf.setUnselectedCloseVisible(true);
+			tabFolder.setMinimumCharacters(MIN_EDITOR_CHARS);
+			tabFolder.setUnselectedCloseVisible(true);
 		} else {
-			ctf.setMinimumCharacters(MIN_VIEW_CHARS);
-			ctf.setUnselectedCloseVisible(false);
+			tabFolder.setMinimumCharacters(MIN_VIEW_CHARS);
+			tabFolder.setUnselectedCloseVisible(false);
 		}
 
-		bindWidget(element, ctf); // ?? Do we need this ?
+		bindWidget(element, tabFolder); // ?? Do we need this ?
 
 		// Add a composite to manage the view's TB and Menu
-		addTopRight(ctf);
+		addTopRight(tabFolder);
 
-		return ctf;
+		return tabFolder;
 	}
 
 	private boolean getInitialMRUValue(Control control) {
@@ -671,9 +672,9 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		return actualValue;
 	}
 
-	private void updateMRUValue(CTabFolder ctf) {
-		boolean actualMRUValue = getMRUValue(ctf);
-		ctf.setMRUVisible(actualMRUValue);
+	private void updateMRUValue(CTabFolder tabFolder) {
+		boolean actualMRUValue = getMRUValue(tabFolder);
+		tabFolder.setMRUVisible(actualMRUValue);
 	}
 
 	@Override
@@ -683,20 +684,20 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	}
 
 	/**
-	 * @param ctf
+	 * @param tabFolder
 	 */
-	private void addTopRight(CTabFolder ctf) {
-		Composite trComp = new Composite(ctf, SWT.NONE);
+	private void addTopRight(CTabFolder tabFolder) {
+		Composite trComp = new Composite(tabFolder, SWT.NONE);
 		trComp.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_CYAN));
 		RowLayout rl = new RowLayout();
 		trComp.setLayout(rl);
 		rl.marginBottom = rl.marginTop = rl.marginRight = rl.marginLeft = 0;
-		ctf.setTopRight(trComp, SWT.RIGHT | SWT.WRAP);
+		tabFolder.setTopRight(trComp, SWT.RIGHT | SWT.WRAP);
 
 		// Initially it's not visible
 		trComp.setVisible(false);
 
-		// Create a TB for the view's drop-down menu
+		// Create a toolbar for the view's drop-down menu
 		ToolBar menuTB = new ToolBar(trComp, SWT.FLAT | SWT.RIGHT);
 		menuTB.setData(TAG_VIEW_MENU);
 		RowData rd = new RowData();
@@ -743,7 +744,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 	boolean adjusting = false;
 
-	public void adjustTopRight(final CTabFolder ctf) {
+	public void adjustTopRight(final CTabFolder tabFolder) {
 		if (adjusting)
 			return;
 
@@ -751,9 +752,9 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		try {
 			// Gather the parameters...old part, new part...
-			MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
+			MPartStack stack = (MPartStack) tabFolder.getData(OWNING_ME);
 			MUIElement element = stack.getSelectedElement();
-			MPart curPart = (MPart) ctf.getTopRight().getData(THE_PART_KEY);
+			MPart curPart = (MPart) tabFolder.getTopRight().getData(THE_PART_KEY);
 			MPart part = null;
 			if (element != null) {
 				part = (MPart) ((element instanceof MPart) ? element : ((MPlaceholder) element).getRef());
@@ -764,7 +765,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				curPart.getToolbar().setVisible(false);
 			}
 
-			Composite trComp = (Composite) ctf.getTopRight();
+			Composite trComp = (Composite) tabFolder.getTopRight();
 			Control[] kids = trComp.getChildren();
 
 			boolean needsTB = part != null && part.getToolbar() != null && part.getToolbar().isToBeRendered();
@@ -794,7 +795,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			ToolBar newViewTB = null;
 			if (needsTB && part != null && part.getObject() != null) {
 				part.getToolbar().setVisible(true);
-				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(), ctf.getTopRight(), part.getContext());
+				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(), tabFolder.getTopRight(), part.getContext());
 				// We can get calls during shutdown in which case the
 				// rendering engine will return 'null' because you can't
 				// render anything while a removeGui is taking place...
@@ -807,12 +808,12 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			}
 
 			if (needsMenu || needsTB) {
-				ctf.getTopRight().setData(THE_PART_KEY, part);
-				ctf.getTopRight().pack(true);
-				ctf.getTopRight().setVisible(true);
+				tabFolder.getTopRight().setData(THE_PART_KEY, part);
+				tabFolder.getTopRight().pack(true);
+				tabFolder.getTopRight().setVisible(true);
 			} else {
-				ctf.getTopRight().setData(THE_PART_KEY, null);
-				ctf.getTopRight().setVisible(false);
+				tabFolder.getTopRight().setData(THE_PART_KEY, null);
+				tabFolder.getTopRight().setVisible(false);
 			}
 
 			// Pack the result
@@ -820,7 +821,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		} finally {
 			adjusting = false;
 		}
-		updateMRUValue(ctf);
+		updateMRUValue(tabFolder);
 	}
 
 	@Override
@@ -841,15 +842,15 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			}
 		}
 
-		CTabFolder ctf = (CTabFolder) stack.getWidget();
+		CTabFolder tabFolder = (CTabFolder) stack.getWidget();
 
-		CTabItem cti = findItemForPart(element, stack);
-		if (cti != null) {
-			if (element.getWidget() != null && cti.getControl() != element.getWidget())
-				cti.setControl((Control) element.getWidget());
+		CTabItem tabItem = findItemForPart(element, stack);
+		if (tabItem != null) {
+			if (element.getWidget() != null && tabItem.getControl() != element.getWidget())
+				tabItem.setControl((Control) element.getWidget());
 			return;
 		}
-		updateMRUValue(ctf);
+		updateMRUValue(tabFolder);
 		int createFlags = SWT.NONE;
 		if (part != null && isClosable(part)) {
 			createFlags |= SWT.CLOSE;
@@ -857,23 +858,23 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		// Create the tab; we may have more visible tabs than currently shown
 		// (e.g., a result of calling partStack.getChildren().addAll(partList))
-		int index = Math.min(calcIndexFor(stack, element), ctf.getItemCount());
-		cti = new CTabItem(ctf, createFlags, index);
+		int index = Math.min(calcIndexFor(stack, element), tabFolder.getItemCount());
+		tabItem = new CTabItem(tabFolder, createFlags, index);
 
-		cti.setData(OWNING_ME, element);
-		cti.setText(getLabel(part, part.getLocalizedLabel()));
-		cti.setImage(getImage(part));
+		tabItem.setData(OWNING_ME, element);
+		tabItem.setText(getLabel(part, part.getLocalizedLabel()));
+		tabItem.setImage(getImage(part));
 
 		String toolTip = getToolTip(part);
 		if (toolTip == null)
 			toolTip = part.getLocalizedTooltip();
-		cti.setToolTipText(getToolTip(toolTip));
+		tabItem.setToolTipText(getToolTip(toolTip));
 		if (element.getWidget() != null) {
 			// The part might have a widget but may not yet have been placed
 			// under this stack, check this
-			Control ctrl = (Control) element.getWidget();
-			if (ctrl.getParent() == ctf)
-				cti.setControl((Control) element.getWidget());
+			Control control = (Control) element.getWidget();
+			if (control.getParent() == tabFolder)
+				tabItem.setControl((Control) element.getWidget());
 		}
 	}
 
@@ -905,14 +906,14 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			stack = element.getParent();
 		if (!(stack.getWidget() instanceof CTabFolder))
 			return null;
-		CTabFolder ctf = (CTabFolder) stack.getWidget();
-		if (ctf == null || ctf.isDisposed())
+		CTabFolder tabFolder = (CTabFolder) stack.getWidget();
+		if (tabFolder == null || tabFolder.isDisposed())
 			return null;
 
-		CTabItem[] items = ctf.getItems();
-		for (int i = 0; i < items.length; i++) {
-			if (items[i].getData(OWNING_ME) == element)
-				return items[i];
+		CTabItem[] items = tabFolder.getItems();
+		for (CTabItem item : items) {
+			if (item.getData(OWNING_ME) == element)
+				return item;
 		}
 		return null;
 	}
@@ -960,23 +961,23 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	public void hideChild(MElementContainer<MUIElement> parentElement, MUIElement child) {
 		super.hideChild(parentElement, child);
 
-		CTabFolder ctf = (CTabFolder) parentElement.getWidget();
-		if (ctf == null)
+		CTabFolder tabFolder = (CTabFolder) parentElement.getWidget();
+		if (tabFolder == null)
 			return;
 
 		// Check if we have to reset the currently active child for the stack
-		CTabItem cti = findItemForPart(child, parentElement);
-		if (cti == ctf.getSelection()) {
+		CTabItem tabItem = findItemForPart(child, parentElement);
+		if (tabItem == tabFolder.getSelection()) {
 			// If we're the only part we need to clear the top right...
-			if (ctf.getItemCount() == 1) {
-				adjustTopRight(ctf);
+			if (tabFolder.getItemCount() == 1) {
+				adjustTopRight(tabFolder);
 			}
 		}
 
 		// find the 'stale' tab for this element and dispose it
-		if (cti != null && !cti.isDisposed()) {
-			cti.setControl(null);
-			cti.dispose();
+		if (tabItem != null && !tabItem.isDisposed()) {
+			tabItem.setControl(null);
+			tabItem.dispose();
 		}
 	}
 
@@ -991,25 +992,22 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		final MElementContainer<MUIElement> stack = (MElementContainer<MUIElement>) me;
 
 		// Match the selected TabItem to its Part
-		final CTabFolder ctf = (CTabFolder) me.getWidget();
+		final CTabFolder tabFolder = (CTabFolder) me.getWidget();
 
 		// Handle traverse events for accessibility
-		ctf.addTraverseListener(new TraverseListener() {
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_ARROW_NEXT || e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
-					me.getTransientData().put(INHIBIT_FOCUS, true);
-				} else if (e.detail == SWT.TRAVERSE_RETURN) {
-					me.getTransientData().remove(INHIBIT_FOCUS);
-					CTabItem cti = ctf.getSelection();
-					if (cti != null) {
-						MUIElement stackElement = (MUIElement) cti.getData(OWNING_ME);
-						if (stackElement instanceof MPlaceholder)
-							stackElement = ((MPlaceholder) stackElement).getRef();
-						if ((stackElement instanceof MPart) && (ctf.isFocusControl())) {
-							MPart thePart = (MPart) stackElement;
-							renderer.focusGui(thePart);
-						}
+		tabFolder.addTraverseListener(e -> {
+			if (e.detail == SWT.TRAVERSE_ARROW_NEXT || e.detail == SWT.TRAVERSE_ARROW_PREVIOUS) {
+				me.getTransientData().put(INHIBIT_FOCUS, true);
+			} else if (e.detail == SWT.TRAVERSE_RETURN) {
+				me.getTransientData().remove(INHIBIT_FOCUS);
+				CTabItem cti = tabFolder.getSelection();
+				if (cti != null) {
+					MUIElement stackElement = (MUIElement) cti.getData(OWNING_ME);
+					if (stackElement instanceof MPlaceholder)
+						stackElement = ((MPlaceholder) stackElement).getRef();
+					if ((stackElement instanceof MPart) && (tabFolder.isFocusControl())) {
+						MPart thePart = (MPart) stackElement;
+						renderer.focusGui(thePart);
 					}
 				}
 			}
@@ -1017,33 +1015,30 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		// Detect activation...picks up cases where the user clicks on the
 		// (already active) tab
-		ctf.addListener(SWT.Activate, new org.eclipse.swt.widgets.Listener() {
-			@Override
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				if (event.detail == SWT.MouseDown) {
-					CTabFolder ctf = (CTabFolder) event.widget;
-					if (ctf.getSelection() == null)
-						return;
+		tabFolder.addListener(SWT.Activate, event -> {
+			if (event.detail == SWT.MouseDown) {
+				CTabFolder tabFolder1 = (CTabFolder) event.widget;
+				if (tabFolder1.getSelection() == null)
+					return;
 
-					// get the item under the cursor
-					Point cp = event.display.getCursorLocation();
-					cp = event.display.map(null, ctf, cp);
-					CTabItem overItem = ctf.getItem(cp);
+				// get the item under the cursor
+				Point cp = event.display.getCursorLocation();
+				cp = event.display.map(null, tabFolder1, cp);
+				CTabItem overItem = tabFolder1.getItem(cp);
 
-					// If the item we're over is *not* the current one do
-					// nothing (it'll get activated when the tab changes)
-					if (overItem == null || overItem == ctf.getSelection()) {
-						MUIElement uiElement = (MUIElement) ctf.getSelection().getData(OWNING_ME);
-						if (uiElement instanceof MPlaceholder)
-							uiElement = ((MPlaceholder) uiElement).getRef();
-						if (uiElement instanceof MPart)
-							activate((MPart) uiElement);
-					}
+				// If the item we're over is *not* the current one do
+				// nothing (it'll get activated when the tab changes)
+				if (overItem == null || overItem == tabFolder1.getSelection()) {
+					MUIElement uiElement = (MUIElement) tabFolder1.getSelection().getData(OWNING_ME);
+					if (uiElement instanceof MPlaceholder)
+						uiElement = ((MPlaceholder) uiElement).getRef();
+					if (uiElement instanceof MPart)
+						activate((MPart) uiElement);
 				}
 			}
 		});
 
-		ctf.addSelectionListener(new SelectionListener() {
+		tabFolder.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -1067,7 +1062,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
-				CTabItem item = ctf.getSelection();
+				CTabItem item = tabFolder.getSelection();
 				if (item != null) {
 					MUIElement ele = (MUIElement) item.getData(OWNING_ME);
 					if (ele.getParent().getSelectedElement() == ele) {
@@ -1081,7 +1076,11 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 			@Override
 			public void mouseUp(MouseEvent e) {
-				CTabItem item = ctf.getItem(new Point(e.x, e.y));
+				if (tabFolder.isDisposed()) {
+					// 517654: MouseUp may be sent after stack has been disposed
+					return;
+				}
+				CTabItem item = tabFolder.getItem(new Point(e.x, e.y));
 
 				// If the user middle clicks on a tab, close it
 				if (item != null && e.button == 2) {
@@ -1089,17 +1088,20 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				}
 
 				// If the user clicks on the tab or empty stack space, call
-				// setFocus()
+				// setFocus() to transfer it from the tabfolder to the client widget
 				if (e.button == 1) {
 					if (item == null) {
-						Rectangle clientArea = ctf.getClientArea();
+						Rectangle clientArea = tabFolder.getClientArea();
 						if (!clientArea.contains(e.x, e.y)) {
 							// User clicked in empty space
-							item = ctf.getSelection();
+							item = tabFolder.getSelection();
 						}
 					}
 
-					if (item != null) {
+					// but only transfer focus if we have it.
+					// If we don't own it, the widget has already the focus
+					// so don't set it second time
+					if (item != null && tabFolder.isFocusControl()) {
 						MUIElement ele = (MUIElement) item.getData(OWNING_ME);
 						if (ele.getParent().getSelectedElement() == ele) {
 							Control ctrl = (Control) ele.getWidget();
@@ -1111,7 +1113,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				}
 			}
 		};
-		ctf.addMouseListener(mouseListener);
+		tabFolder.addMouseListener(mouseListener);
 
 		CTabFolder2Adapter closeListener = new CTabFolder2Adapter() {
 			@Override
@@ -1122,76 +1124,96 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			@Override
 			public void showList(CTabFolderEvent event) {
 				event.doit = false;
-				showAvailableItems(stack, ctf);
+				showAvailableItems(stack, tabFolder);
 			}
 		};
-		ctf.addCTabFolder2Listener(closeListener);
+		tabFolder.addCTabFolder2Listener(closeListener);
 
-		ctf.addMenuDetectListener(new MenuDetectListener() {
-			@Override
-			public void menuDetected(MenuDetectEvent e) {
-				Point absolutePoint = new Point(e.x, e.y);
-				Point relativePoint = ctf.getDisplay().map(null, ctf, absolutePoint);
-				CTabItem eventTabItem = ctf.getItem(relativePoint);
+		tabFolder.addMenuDetectListener(e -> {
+			Point absolutePoint = new Point(e.x, e.y);
+			Point relativePoint = tabFolder.getDisplay().map(null, tabFolder, absolutePoint);
+			CTabItem eventTabItem = tabFolder.getItem(relativePoint);
 
-				// If click happened in empty area, still show the menu
-				if (eventTabItem == null) {
-					Rectangle clientArea = ctf.getClientArea();
-					if (!clientArea.contains(relativePoint)) {
-						eventTabItem = ctf.getSelection();
-					}
+			// If click happened in empty area, still show the menu
+			if (eventTabItem == null) {
+				Rectangle clientArea = tabFolder.getClientArea();
+				if (!clientArea.contains(relativePoint)) {
+					eventTabItem = tabFolder.getSelection();
 				}
+			}
 
-				if (eventTabItem != null) {
-					MUIElement uiElement = (MUIElement) eventTabItem.getData(AbstractPartRenderer.OWNING_ME);
-					MPart tabPart = (MPart) ((uiElement instanceof MPart) ? uiElement
-							: ((MPlaceholder) uiElement).getRef());
-					openMenuFor(tabPart, ctf, absolutePoint);
-				}
+			if (eventTabItem != null) {
+				MUIElement uiElement = (MUIElement) eventTabItem.getData(AbstractPartRenderer.OWNING_ME);
+				MPart tabPart = (MPart) ((uiElement instanceof MPart) ? uiElement
+						: ((MPlaceholder) uiElement).getRef());
+				openMenuFor(tabPart, tabFolder, absolutePoint);
 			}
 		});
 
-		ctf.addControlListener(new ControlAdapter() {
+		tabFolder.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
-				updateMRUValue(ctf);
+				updateMRUValue(tabFolder);
 			}
 		});
 	}
 
-	public void showAvailableItems(MElementContainer<?> stack, CTabFolder ctf) {
+	/**
+	 * Shows a popup dialog with the list of editors availavle in a given
+	 * {@link CTabFolder}. By default the popup origin will be located close to
+	 * the chevron location.
+	 *
+	 * @param stack
+	 * @param tabFolder
+	 */
+	public void showAvailableItems(MElementContainer<?> stack, CTabFolder tabFolder) {
+		showAvailableItems(stack, tabFolder, false);
+	}
+
+	/**
+	 * Shows a popup dialog with the list of editors available in the given
+	 * CTabFolder. If {@code forceCenter} enabled, the dialog is centered
+	 * horizontally; otherwise, the dialog origin is placed at chevron location.
+	 * he dialog is placed at
+	 *
+	 * @param stack
+	 * @param tabFolder
+	 * @param forceCenter
+	 *            center the dialog if true
+	 */
+	public void showAvailableItems(MElementContainer<?> stack, CTabFolder tabFolder, boolean forceCenter) {
 		IEclipseContext ctxt = getContext(stack);
-		final BasicPartList editorList = new BasicPartList(ctf.getShell(), SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
+		final BasicPartList editorList = new BasicPartList(tabFolder.getShell(), SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this, getMRUValueFromPreferences());
 		editorList.setInput();
 
 		Point size = editorList.computeSizeHint();
 		editorList.setSize(size.x, size.y);
 
-		Point location = ctf.toDisplay(getChevronLocation(ctf));
-		Monitor mon = ctf.getMonitor();
-		Rectangle bounds = mon.getClientArea();
-		if (location.x + size.x > bounds.x + bounds.width) {
-			location.x = bounds.x + bounds.width - size.x;
-		}
-		if (location.y + size.y > bounds.y + bounds.height) {
-			location.y = bounds.y + bounds.height - size.y;
+		Point location = null;
+		if (forceCenter) {
+			// placed to the center
+			Rectangle ca = tabFolder.getClientArea();
+			location = tabFolder.toDisplay(ca.x, ca.y);
+			location.x = Math.max(0, (location.x + ((ca.width - size.x) / 2)));
+			location.y = Math.max(0, (location.y + ((ca.height - size.y) / 3)));
+		} else {
+			// placed at chevron location
+			location = tabFolder.toDisplay(getChevronLocation(tabFolder));
+			Monitor mon = tabFolder.getMonitor();
+			Rectangle bounds = mon.getClientArea();
+			if (location.x + size.x > bounds.x + bounds.width) {
+				location.x = bounds.x + bounds.width - size.x;
+			}
+			if (location.y + size.y > bounds.y + bounds.height) {
+				location.y = bounds.y + bounds.height - size.y;
+			}
 		}
 		editorList.setLocation(location);
 
 		editorList.setVisible(true);
 		editorList.setFocus();
-		editorList.getShell().addListener(SWT.Deactivate, new Listener() {
-			@Override
-			public void handleEvent(org.eclipse.swt.widgets.Event event) {
-				editorList.getShell().getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						editorList.dispose();
-					}
-				});
-			}
-		});
+		editorList.getShell().addListener(SWT.Deactivate, event -> editorList.getShell().getDisplay().asyncExec(() -> editorList.dispose()));
 	}
 
 	private Point getChevronLocation(CTabFolder tabFolder) {
@@ -1257,34 +1279,34 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			return;
 		}
 
-		final CTabFolder ctf = (CTabFolder) getParentWidget(element);
-		CTabItem cti = findItemForPart(element, null);
-		if (cti == null) {
+		final CTabFolder tabFolder = (CTabFolder) getParentWidget(element);
+		CTabItem tabItem = findItemForPart(element, null);
+		if (tabItem == null) {
 			createTab(element.getParent(), element);
-			cti = findItemForPart(element, element.getParent());
+			tabItem = findItemForPart(element, element.getParent());
 		}
 		Control ctrl = (Control) element.getWidget();
-		if (ctrl != null && ctrl.getParent() != ctf) {
-			ctrl.setParent(ctf);
-			cti.setControl(ctrl);
+		if (ctrl != null && ctrl.getParent() != tabFolder) {
+			ctrl.setParent(tabFolder);
+			tabItem.setControl(ctrl);
 		} else if (element.getWidget() == null) {
 			Control tabCtrl = (Control) renderer.createGui(element);
-			cti.setControl(tabCtrl);
+			tabItem.setControl(tabCtrl);
 		}
 
 		ignoreTabSelChanges = true;
 		// Ensure that the newly selected control is correctly sized
-		if (cti.getControl() instanceof Composite) {
-			Composite ctiComp = (Composite) cti.getControl();
+		if (tabItem.getControl() instanceof Composite) {
+			Composite ctiComp = (Composite) tabItem.getControl();
 			// see bug 461573: call below is still needed to make view
 			// descriptions visible after unhiding the view with changed bounds
 			ctiComp.layout(false, true);
 		}
-		ctf.setSelection(cti);
+		tabFolder.setSelection(tabItem);
 		ignoreTabSelChanges = false;
 
 		// Show the new state
-		adjustTopRight(ctf);
+		adjustTopRight(tabFolder);
 	}
 
 	/**
@@ -1304,12 +1326,9 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		if (swtMenu == null)
 			return;
 
-		ctrl.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent e) {
-				if (!swtMenu.isDisposed()) {
-					swtMenu.dispose();
-				}
+		ctrl.addDisposeListener(e -> {
+			if (!swtMenu.isDisposed()) {
+				swtMenu.dispose();
 			}
 		});
 
@@ -1716,6 +1735,8 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	 */
 	@SuppressWarnings("javadoc")
 	public class TabStateHandler implements EventHandler {
+
+		@SuppressWarnings("restriction")
 		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
@@ -1729,19 +1750,21 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			MPart part = newValue instanceof MPlaceholder ? (MPart) ((MPlaceholder) newValue).getRef()
 					: (MPart) element;
 			CTabItem cti = findItemForPart(part);
-
 			if (cti == null) {
 				return;
 			}
 
+			boolean isCssEngineActive = isCssEngineActive(cti);
+			boolean isSelectedTab = cti == cti.getParent().getSelection();
+			boolean partActivatedEvent = newValue instanceof MPlaceholder;
+
 			if (CSSConstants.CSS_CONTENT_CHANGE_CLASS.equals(newValue)) {
 				part.getTags().remove(CSSConstants.CSS_CONTENT_CHANGE_CLASS);
-				if (cti != cti.getParent().getSelection()) {
-					part.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
+				if (!isSelectedTab) {
+					addHighlight(part, cti, isCssEngineActive);
 				}
-			} else if (newValue instanceof MPlaceholder // part gets active
-					&& part.getTags().contains(CSSConstants.CSS_HIGHLIGHTED_CLASS)) {
-				part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
+			} else if (partActivatedEvent && part.getTags().contains(CSSConstants.CSS_HIGHLIGHTED_CLASS)) {
+				removeHighlight(part, cti, isCssEngineActive);
 			}
 
 			String prevCssCls = WidgetElement.getCSSClass(cti);
@@ -1750,6 +1773,13 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			if (prevCssCls == null || !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
 				reapplyStyles(cti.getParent());
 			}
+
+			// Only update tab busy state if the CSS engine is not active
+			if (isCssEngineActive || partActivatedEvent) {
+				return;
+			}
+
+			updateBusyStateNoCss(cti, newValue, oldValue);
 		}
 
 		public boolean validateElement(Object element) {
@@ -1776,4 +1806,38 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 	}
 
+	@SuppressWarnings("restriction")
+	static boolean isCssEngineActive(CTabItem cti) {
+		return WidgetElement.getEngine(cti.getParent()) != null;
+	}
+
+	static void removeHighlight(MPart part, CTabItem cti, boolean cssEngineActive) {
+		part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
+		if (!cssEngineActive) {
+			cti.setFont(JFaceResources.getFontRegistry().get(TAB_FONT_KEY));
+		}
+	}
+
+	static void addHighlight(MPart part, CTabItem cti, boolean cssEngineActive) {
+		part.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
+		if (!cssEngineActive) {
+			cti.setFont(JFaceResources.getFontRegistry().getBold(TAB_FONT_KEY));
+		}
+	}
+
+	/**
+	 * Updates the visual for busy state of the part tab in case CSS engine is
+	 * not active
+	 */
+	static void updateBusyStateNoCss(CTabItem cti, Object newValue, Object oldValue) {
+		Font updatedFont = null;
+		if (CSSConstants.CSS_BUSY_CLASS.equals(newValue)) {
+			updatedFont = JFaceResources.getFontRegistry().getItalic(TAB_FONT_KEY);
+		} else if (CSSConstants.CSS_BUSY_CLASS.equals(oldValue)) {
+			updatedFont = JFaceResources.getFontRegistry().get(TAB_FONT_KEY);
+		}
+		if (updatedFont != null) {
+			cti.setFont(updatedFont);
+		}
+	}
 }

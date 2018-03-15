@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Adapters;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -118,12 +119,12 @@ public class ProjectReferencePage extends PropertyPage {
                 IProject[] projects = ((IWorkspace) o).getRoot().getProjects();
                 ArrayList referenced = new ArrayList(projects.length);
                 boolean found = false;
-                for (int i = 0; i < projects.length; i++) {
-                    if (!found && projects[i].equals(project)) {
+                for (IProject currentProject : projects) {
+                    if (!found && currentProject.equals(project)) {
                         found = true;
                         continue;
                     }
-                    referenced.add(projects[i]);
+                    referenced.add(currentProject);
                 }
 
                 // Add any referenced that do not exist in the workspace currently
@@ -167,7 +168,12 @@ public class ProjectReferencePage extends PropertyPage {
      * Initializes a ProjectReferencePage.
      */
     private void initialize() {
-		project = (IProject) Adapters.adapt(getElement(), IResource.class);
+		project = Adapters.adapt(getElement(), IProject.class);
+		if (project == null) {
+			IResource resource = Adapters.adapt(getElement(), IResource.class);
+			Assert.isNotNull(resource, "unable to adapt element to a project"); //$NON-NLS-1$
+			project = resource.getProject();
+		}
         noDefaultAndApplyButton();
         setDescription(NLS.bind(IDEWorkbenchMessages.ProjectReferencesPage_label, project.getName()));
     }

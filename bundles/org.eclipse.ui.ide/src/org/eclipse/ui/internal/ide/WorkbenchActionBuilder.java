@@ -10,7 +10,7 @@
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487570
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487570, 494289
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -77,6 +77,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * Adds actions to a workbench window.
  */
 public final class WorkbenchActionBuilder extends ActionBarAdvisor {
+
     private final IWorkbenchWindow window;
 
     // generic actions
@@ -342,11 +343,10 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 			if (delta == null) {
 				return;
 			}
-			IResourceDelta[] projectDeltas = delta.getAffectedChildren();
-			for (int i = 0; i < projectDeltas.length; i++) {
-				int kind = projectDeltas[i].getKind();
+			for (IResourceDelta projectDelta : delta.getAffectedChildren()) {
+				int kind = projectDelta.getKind();
 				//affected by projects being opened/closed or description changes
-				boolean changed = (projectDeltas[i].getFlags() & (IResourceDelta.DESCRIPTION | IResourceDelta.OPEN)) != 0;
+				boolean changed = (projectDelta.getFlags() & (IResourceDelta.DESCRIPTION | IResourceDelta.OPEN)) != 0;
 				if (kind != IResourceDelta.CHANGED || changed) {
 					updateBuildActions(false);
 					return;
@@ -491,7 +491,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         menu.add(getPrintItem());
         menu.add(new GroupMarker(IWorkbenchActionConstants.PRINT_EXT));
         menu.add(new Separator());
-        menu.add(openWorkspaceAction);
         menu.add(new GroupMarker(IWorkbenchActionConstants.OPEN_EXT));
         menu.add(new Separator());
         menu.add(importResourcesAction);
@@ -505,6 +504,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         menu.add(ContributionItemFactory.REOPEN_EDITORS.create(getWindow()));
         menu.add(new GroupMarker(IWorkbenchActionConstants.MRU));
         menu.add(new Separator());
+
+		menu.add(openWorkspaceAction);
 
         // If we're on OS X we shouldn't show this command in the File menu. It
 		// should be invisible to the user. However, we should not remove it -
@@ -1266,8 +1267,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
      * @return <code>true</code> if a welcome page was found, <code>false</code> if not
      */
     private boolean hasWelcomePage(AboutInfo[] infos) {
-        for (int i = 0; i < infos.length; i++) {
-            if (infos[i].getWelcomePageURL() != null) {
+        for (AboutInfo info : infos) {
+            if (info.getWelcomePageURL() != null) {
             	return true;
             }
         }
@@ -1281,8 +1282,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
      * @return <code>true</code> if tips and tricks were found, <code>false</code> if not
      */
     private boolean hasTipsAndTricks(AboutInfo[] infos) {
-        for (int i = 0; i < infos.length; i++) {
-            if (infos[i].getTipsAndTricksHref() != null) {
+        for (AboutInfo info : infos) {
+            if (info.getTipsAndTricksHref() != null) {
             	return true;
             }
         }
