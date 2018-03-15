@@ -20,9 +20,9 @@ import org.eclipse.ui.views.markers.internal.ProblemFilter;
 
 /**
  * DescriptionFieldFilter is the filter for descriptions.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
@@ -41,10 +41,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter#loadSettings(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void loadSettings(IMemento memento) {
 		String modifier = memento.getString(TAG_CONTAINS_MODIFIER);
 		if (modifier == null)
@@ -60,7 +59,6 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#loadLegacySettings(org.eclipse.ui.IMemento, org.eclipse.ui.internal.views.markers.MarkerContentGenerator)
 	 */
-	@Override
 	void loadLegacySettings(IMemento memento, MarkerContentGenerator generator) {
 
 		String setting = memento.getString(ProblemFilter.TAG_CONTAINS);
@@ -78,11 +76,10 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 		}
 	}
 
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#saveSettings(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void saveSettings(IMemento memento) {
 		memento.putString(TAG_CONTAINS_MODIFIER, containsModifier);
 		memento.putString(TAG_CONTAINS_TEXT, containsText);
@@ -92,7 +89,6 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#select(org.eclipse.ui.views.markers.MarkerItem)
 	 */
-	@Override
 	public boolean select(MarkerItem item) {
 		if (containsText.length() == 0)
 			return true;
@@ -104,11 +100,10 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	}
 
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#populateWorkingCopy(org.eclipse.ui.views.markers.MarkerFieldFilter)
 	 */
-	@Override
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);
 		DescriptionFieldFilter clone = (DescriptionFieldFilter) copy;
@@ -118,7 +113,7 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	/**
 	 * Return the contains modifier.
-	 *
+	 * 
 	 * @return One of {@link MarkerSupportConstants#CONTAINS_KEY} or
 	 *         {@link MarkerSupportConstants#DOES_NOT_CONTAIN_KEY}
 	 */
@@ -128,7 +123,7 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	/**
 	 * Set the contains modifier.
-	 *
+	 * 
 	 * @param containsString
 	 *            One of {@link MarkerSupportConstants#CONTAINS_KEY} or
 	 *            {@link MarkerSupportConstants#DOES_NOT_CONTAIN_KEY}
@@ -139,7 +134,7 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	/**
 	 * Return the text to apply the containsModifier to.
-	 *
+	 * 
 	 * @return String
 	 */
 	String getContainsText() {
@@ -148,7 +143,7 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	/**
 	 * Set the text to apply the containsModifier to.
-	 *
+	 * 
 	 * @param containsText
 	 *            String
 	 */
@@ -160,7 +155,6 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.MarkerFieldFilter#initialize(java.util.Map)
 	 */
-	@Override
 	public void initialize(Map values) {
 		super.initialize(values);
 		if (values.containsKey(MarkerSupportConstants.CONTAINS_KEY)) {
@@ -177,10 +171,9 @@ public class DescriptionFieldFilter extends CompatibilityFieldFilter {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.CompatibilityFieldFilter#initialize(org.eclipse.ui.views.markers.internal.ProblemFilter)
 	 */
-	@Override
 	public void initialize(ProblemFilter problemFilter) {
 		containsModifier = problemFilter.getContains() ? MarkerSupportConstants.CONTAINS_KEY
 				: MarkerSupportConstants.DOES_NOT_CONTAIN_KEY;

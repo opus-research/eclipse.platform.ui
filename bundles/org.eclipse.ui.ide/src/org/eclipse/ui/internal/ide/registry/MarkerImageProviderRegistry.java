@@ -66,8 +66,7 @@ public class MarkerImageProviderRegistry {
      */
     public MarkerImageProviderRegistry() {
         class MarkerImageReader extends IDERegistryReader {
-            @Override
-			protected boolean readElement(IConfigurationElement element) {
+            protected boolean readElement(IConfigurationElement element) {
                 if (element.getName().equals(TAG_PROVIDER)) {
                     addProvider(element);
                     return true;
@@ -136,14 +135,15 @@ public class MarkerImageProviderRegistry {
                                 return desc.imageDescriptor;
                             }
                             return desc.imageDescriptor;
+                        } else {
+                            if (desc.imageDescriptor == null) {
+                                //Create a image descriptor to be used until the plugin gets activated.
+                                desc.imagePath = (String) marker
+                                        .getAttribute(MARKER_ATT_KEY);
+                                desc.imageDescriptor = getImageDescriptor(desc);
+                            }
+                            return desc.imageDescriptor;
                         }
-						if (desc.imageDescriptor == null) {
-							// Create a image descriptor to be used until the
-							// plugin gets activated.
-							desc.imagePath = (String) marker.getAttribute(MARKER_ATT_KEY);
-							desc.imageDescriptor = getImageDescriptor(desc);
-						}
-						return desc.imageDescriptor;
                     } else if (desc.imageDescriptor != null) {
                         return desc.imageDescriptor;
                     }

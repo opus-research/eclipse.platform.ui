@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.statushandlers;
@@ -94,7 +93,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.statushandlers.AbstractStatusAreaProvider#createSupportArea
 	 * (org.eclipse.swt.widgets.Composite,
@@ -123,7 +122,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		text.setLayoutData(gd);
 		// There is no support for triggering commands in the dialogs. I am
 		// trying to emulate the workbench behavior as exactly as possible.
-		IBindingService binding = PlatformUI.getWorkbench()
+		IBindingService binding = (IBindingService) PlatformUI.getWorkbench()
 				.getService(IBindingService.class);
 		// find bindings for copy action
 		final TriggerSequence ts[] = binding
@@ -281,7 +280,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see
 			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
 			 * .swt.events.SelectionEvent)
@@ -356,7 +355,7 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 
 	/**
 	 * This method checks if status dialog holds more than one status.
-	 *
+	 * 
 	 * @return true if the dialog has one more than one status.
 	 */
 	private boolean isMulti() {

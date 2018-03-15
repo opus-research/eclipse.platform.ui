@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *        IBM Corporation - initial API and implementation
+ *        IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de>
  *     - Fix for bug 20510 - Add Bookmark action has wrong label in navigator or
  *       packages view
@@ -60,41 +60,38 @@ public class AddBookmarkAction extends SelectionListenerAction {
 	/**
 	 * Creates a new bookmark action. By default, prompts the user for the
 	 * bookmark name.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
-	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)}
+	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)} 
 	 */
-	@Deprecated
 	public AddBookmarkAction(Shell shell) {
 		this(shell, true);
 	}
 
 	/**
 	 * Creates a new bookmark action.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
 	 * @param promptForName
 	 *            whether to ask the user for the bookmark name
-	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)}
+	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)} 
 	 */
-	@Deprecated
 	public AddBookmarkAction(final Shell shell, boolean promptForName) {
 		super(IDEWorkbenchMessages.AddBookmarkLabel);
 		Assert.isNotNull(shell);
 		shellProvider = new IShellProvider() {
-			@Override
 			public Shell getShell() {
 				return shell;
 			} };
-
+			
 		initAction(promptForName);
 	}
-
+	
 	/**
 	 * Creates a new bookmark action.
-	 *
+	 * 
 	 * @param provider
 	 *            the shell provider for any dialogs. Must not be
 	 *            <code>null</code>
@@ -120,12 +117,14 @@ public class AddBookmarkAction extends SelectionListenerAction {
 		setId(ID);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	public void run() {
 		if (getSelectedResources().isEmpty())
 			return;
 
-		IResource resource= getSelectedResources().get(0);
+		IResource resource= (IResource)getSelectedResources().get(0);
 		if (resource != null) {
 			if (promptForName) {
 				BookmarkPropertiesDialog dialog= new BookmarkPropertiesDialog(shellProvider.getShell());
@@ -150,7 +149,6 @@ public class AddBookmarkAction extends SelectionListenerAction {
 	 * <code>SelectionListenerAction</code> method enables the action only if
 	 * the selection is not empty and contains just file resources.
 	 */
-	@Override
 	protected boolean updateSelection(IStructuredSelection selection) {
 		// @issue typed selections
 		return super.updateSelection(selection) && getSelectedResources().size() == 1;

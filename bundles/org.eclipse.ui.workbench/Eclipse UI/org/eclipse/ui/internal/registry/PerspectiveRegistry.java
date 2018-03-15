@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,17 +72,18 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 			String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 			descriptors.put(id, new PerspectiveDescriptor(id, element));
 		}
-
+		
 		List<MUIElement> snippets = application.getSnippets();
 		for (MUIElement snippet : snippets) {
 			if (snippet instanceof MPerspective) {
 				MPerspective perspective = (MPerspective) snippet;
 				String id = perspective.getElementId();
-
+				
 				// See if the clone is customizing an a predefined perspective without changing its name
 				PerspectiveDescriptor existingDescriptor = descriptors.get(id);
-
+				
 				if (existingDescriptor == null) {
+					// A custom perspective with its own name.
 					createDescriptor(perspective);
 				} else {
 					// A custom perspecitve with a name of a pre-defined perspective
@@ -113,9 +114,12 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 		 * ImageDescriptor.createFromURL(new
 		 * URI(perspective.getIconURI()).toURL());
 		 * newDescriptor.setImageDescriptor(img); } catch (MalformedURLException
-		 * | URISyntaxException e) { logger.warn(e, MessageFormat.format(
-		 * "Error on applying configured perspective icon: {0}", //$NON-NLS-1$
-		 * perspective.getIconURI())); } }
+		 * e) { logger.warn(e,
+		 * MessageFormat.format("Error on applying configured perspective icon: {0}"
+		 * , //$NON-NLS-1$ perspective.getIconURI())); } catch
+		 * (URISyntaxException e) { logger.warn(e,
+		 * MessageFormat.format("Error on applying configured perspective icon: {0}"
+		 * , //$NON-NLS-1$ perspective.getIconURI())); } }
 		 */
 
 		descriptors.put(id, newDescriptor);
@@ -132,7 +136,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPerspectiveRegistry#clonePerspective(java.lang.String,
 	 * java.lang.String, org.eclipse.ui.IPerspectiveDescriptor)
@@ -147,7 +151,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPerspectiveRegistry#deletePerspective(org.eclipse.ui.
 	 * IPerspectiveDescriptor)
@@ -171,7 +175,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/**
 	 * Deletes a list of perspectives
-	 *
+	 * 
 	 * @param perspToDelete
 	 */
 	public void deletePerspectives(ArrayList<IPerspectiveDescriptor> perspToDelete) {
@@ -183,7 +187,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPerspectiveRegistry#findPerspectiveWithId(java.lang.String
 	 * )
@@ -204,7 +208,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPerspectiveRegistry#findPerspectiveWithLabel(java.lang
 	 * .String)
@@ -224,7 +228,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IPerspectiveRegistry#getDefaultPerspective()
 	 */
 	@Override
@@ -243,7 +247,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IPerspectiveRegistry#getPerspectives()
 	 */
 	@Override
@@ -269,7 +273,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	 * Return <code>true</code> if a label is valid. This checks only the given
 	 * label in isolation. It does not check whether the given label is used by
 	 * any existing perspectives.
-	 *
+	 * 
 	 * @param label
 	 *            the label to test
 	 * @return whether the label is valid
@@ -285,7 +289,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPerspectiveRegistry#revertPerspective(org.eclipse.ui.
 	 * IPerspectiveDescriptor)
@@ -295,7 +299,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 		PerspectiveDescriptor perspective = (PerspectiveDescriptor) perspToRevert;
 		if (!perspective.isPredefined())
 			return;
-
+		
 		perspective.setHasCustomDefinition(false);
 		removeSnippet(application, perspective.getId());
 	}
@@ -315,7 +319,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#
 	 * removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
 	 */
@@ -326,7 +330,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension
 	 * (org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
@@ -339,7 +343,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/**
 	 * Create a new perspective.
-	 *
+	 * 
 	 * @param label
 	 *            the name of the new descriptor
 	 * @param originalDescriptor
@@ -359,9 +363,9 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 
 	/**
 	 * Return an id for the new descriptor.
-	 *
+	 * 
 	 * The id must encode the original id. id is of the form <originalId>.label
-	 *
+	 * 
 	 * @param label
 	 * @param originalDescriptor
 	 * @return the new id

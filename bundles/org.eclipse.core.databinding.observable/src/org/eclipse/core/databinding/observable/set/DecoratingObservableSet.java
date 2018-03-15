@@ -16,7 +16,7 @@ import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
 
 /**
  * An observable set which decorates another observable set.
- *
+ * 
  * @since 1.2
  */
 public class DecoratingObservableSet extends DecoratingObservableCollection
@@ -29,7 +29,7 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 	/**
 	 * Constructs a DecoratingObservableSet which decorates the given
 	 * observable.
-	 *
+	 * 
 	 * @param decorated
 	 *            the observable set being decorated
 	 * @param disposeDecoratedOnDispose
@@ -40,18 +40,15 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 		this.decorated = decorated;
 	}
 
-	@Override
 	public void clear() {
 		getterCalled();
 		decorated.clear();
 	}
 
-	@Override
 	public synchronized void addSetChangeListener(ISetChangeListener listener) {
 		addListener(SetChangeEvent.TYPE, listener);
 	}
 
-	@Override
 	public synchronized void removeSetChangeListener(ISetChangeListener listener) {
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
@@ -62,17 +59,14 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 		fireEvent(new SetChangeEvent(this, diff));
 	}
 
-	@Override
 	protected void fireChange() {
 		throw new RuntimeException(
 				"fireChange should not be called, use fireSetChange() instead"); //$NON-NLS-1$
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		if (setChangeListener == null) {
 			setChangeListener = new ISetChangeListener() {
-				@Override
 				public void handleSetChange(SetChangeEvent event) {
 					DecoratingObservableSet.this.handleSetChange(event);
 				}
@@ -82,7 +76,6 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 		super.firstListenerAdded();
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
 		if (setChangeListener != null) {
@@ -96,7 +89,7 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 	 * observable. By default, this method fires the set change event again,
 	 * with the decorating observable as the event source. Subclasses may
 	 * override to provide different behavior.
-	 *
+	 * 
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
@@ -104,7 +97,6 @@ public class DecoratingObservableSet extends DecoratingObservableCollection
 		fireSetChange(event.diff);
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (decorated != null && setChangeListener != null) {
 			decorated.removeSetChangeListener(setChangeListener);

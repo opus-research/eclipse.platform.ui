@@ -31,7 +31,7 @@ import org.eclipse.ui.internal.commands.CommandPersistence;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class CommandToModelProcessor {
 
@@ -54,6 +54,13 @@ public class CommandToModelProcessor {
 		CommandManager commandManager = context.get(CommandManager.class);
 		if (commandManager == null) {
 			HandlerServiceImpl.handlerGenerator = new ContextFunction() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.e4.core.contexts.ContextFunction#compute(org.
+				 * eclipse.e4.core.contexts.IEclipseContext, java.lang.String)
+				 */
 				@Override
 				public Object compute(IEclipseContext context, String contextKey) {
 					return new WorkbenchHandlerServiceHandler(contextKey);

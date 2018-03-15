@@ -26,7 +26,7 @@ import org.eclipse.core.internal.databinding.property.PropertyObservableUtil;
 /**
  * A list property for observing multiple list properties in sequence in a
  * combined list.
- *
+ * 
  * @since 1.2
  */
 public class MultiListProperty extends ListProperty {
@@ -36,7 +36,7 @@ public class MultiListProperty extends ListProperty {
 	/**
 	 * Constructs a MultiListProperty for observing the specified list
 	 * properties in sequence
-	 *
+	 * 
 	 * @param properties
 	 *            the list properties
 	 */
@@ -47,7 +47,7 @@ public class MultiListProperty extends ListProperty {
 	/**
 	 * Constructs a MultiListProperty for observing the specified list
 	 * properties in sequence.
-	 *
+	 * 
 	 * @param properties
 	 *            the list properties
 	 * @param elementType
@@ -58,12 +58,10 @@ public class MultiListProperty extends ListProperty {
 		this.elementType = elementType;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	protected List doGetList(Object source) {
 		List list = new ArrayList();
 		for (int i = 0; i < properties.length; i++)
@@ -71,20 +69,16 @@ public class MultiListProperty extends ListProperty {
 		return list;
 	}
 
-	@Override
 	protected void doUpdateList(final Object source, ListDiff diff) {
 		diff.accept(new ListDiffVisitor() {
-			@Override
 			public void handleAdd(int index, Object element) {
 				throw new UnsupportedOperationException();
 			}
 
-			@Override
 			public void handleMove(int oldIndex, int newIndex, Object element) {
 				throw new UnsupportedOperationException();
 			}
 
-			@Override
 			public void handleReplace(int index, Object oldElement,
 					Object newElement) {
 				int offset = 0;
@@ -107,7 +101,6 @@ public class MultiListProperty extends ListProperty {
 						+ ", size: " + offset); //$NON-NLS-1$
 			}
 
-			@Override
 			public void handleRemove(int index, Object element) {
 				int offset = 0;
 				for (int i = 0; i < properties.length; i++) {
@@ -128,7 +121,6 @@ public class MultiListProperty extends ListProperty {
 		});
 	}
 
-	@Override
 	public IObservableList observe(Realm realm, Object source) {
 		IObservableList[] lists = new IObservableList[properties.length];
 		for (int i = 0; i < lists.length; i++)

@@ -35,8 +35,7 @@ class FiltersAction extends TaskAction {
     /**
      * Performs this action.
      */
-    @Override
-	public void run() {
+    public void run() {
         FiltersDialog dialog = new FiltersDialog(getShell());
         TasksFilter filter = getTaskList().getFilter();
         dialog.setFilter(filter);

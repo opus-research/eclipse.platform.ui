@@ -51,7 +51,6 @@ import org.eclipse.ui.internal.ide.StatusUtil;
  * and Open/Close Project.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
 
     private BuildAction buildAction;
@@ -59,7 +58,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
     private OpenResourceAction openProjectAction;
 
     private CloseResourceAction closeProjectAction;
-
+    
     private CloseUnrelatedProjectsAction closeUnrelatedProjectsAction;
 
     private RefreshAction refreshAction;
@@ -68,8 +67,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
         super(navigator);
     }
 
-    @Override
-	public void fillActionBars(IActionBars actionBars) {
+    public void fillActionBars(IActionBars actionBars) {
         actionBars.setGlobalActionHandler(ActionFactory.REFRESH.getId(),
                 refreshAction);
         actionBars.setGlobalActionHandler(IDEActionFactory.BUILD_PROJECT
@@ -86,8 +84,8 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
      * Adds the build, open project, close project and refresh resource
      * actions to the context menu.
      * <p>
-     * The following conditions apply:
-     * 	build-only projects selected, auto build disabled, at least one
+     * The following conditions apply: 
+     * 	build-only projects selected, auto build disabled, at least one 
      * 		builder present
      * 	open project-only projects selected, at least one closed project
      * 	close project-only projects selected, at least one open project
@@ -100,17 +98,16 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
      * <p>
      * No disabled action should be on the context menu.
      * </p>
-     *
+     * 
      * @param menu context menu to add actions to
      */
-    @Override
-	public void fillContextMenu(IMenuManager menu) {
+    public void fillContextMenu(IMenuManager menu) {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
         boolean isProjectSelection = true;
         boolean hasOpenProjects = false;
         boolean hasClosedProjects = false;
-        boolean hasBuilder = true; // false if any project is closed or does not have builder
+        boolean hasBuilder = true; // false if any project is closed or does not have builder 
         Iterator resources = selection.iterator();
 
         while (resources.hasNext()
@@ -121,7 +118,8 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
             if (next instanceof IProject) {
 				project = (IProject) next;
 			} else if (next instanceof IAdaptable) {
-				project = ((IAdaptable) next).getAdapter(IProject.class);
+				project = (IProject) ((IAdaptable) next)
+                        .getAdapter(IProject.class);
 			}
 
             if (project == null) {
@@ -166,8 +164,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
     /**
      * Handles a key pressed event by invoking the appropriate action.
      */
-    @Override
-	public void handleKeyPressed(KeyEvent event) {
+    public void handleKeyPressed(KeyEvent event) {
         if (event.keyCode == SWT.F5 && event.stateMask == 0) {
             if (refreshAction.isEnabled()) {
                 refreshAction.refreshAll();
@@ -191,35 +188,31 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
 				return true;
 			}
         } catch (CoreException e) {
-            // Cannot determine if project has builders. Project is closed
+            // Cannot determine if project has builders. Project is closed 
             // or does not exist. Fall through to return false.
         }
         return false;
     }
 
-    @Override
-	protected void makeActions() {
+    protected void makeActions() {
         final IShellProvider provider = navigator.getSite();
         openProjectAction = new OpenResourceAction(provider);
         closeProjectAction = new CloseResourceAction(provider);
         closeUnrelatedProjectsAction = new CloseUnrelatedProjectsAction(provider);
         refreshAction = new RefreshAction(provider) {
-        	@Override
-			public void run() {
+        	public void run() {
         		final IStatus[] errorStatus = new IStatus[1];
         		errorStatus[0] = Status.OK_STATUS;
         		final WorkspaceModifyOperation op = (WorkspaceModifyOperation) createOperation(errorStatus);
         		WorkspaceJob job = new WorkspaceJob("refresh") { //$NON-NLS-1$
 
-        			@Override
-					public IStatus runInWorkspace(IProgressMonitor monitor)
+        			public IStatus runInWorkspace(IProgressMonitor monitor)
         					throws CoreException {
         				try {
         					op.run(monitor);
         					Shell shell = provider.getShell();
 							if (shell != null && !shell.isDisposed()) {
 								shell.getDisplay().asyncExec(new Runnable() {
-									@Override
 									public void run() {
 										TreeViewer viewer = navigator
 												.getViewer();
@@ -243,7 +236,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
         				}
         				return errorStatus[0];
         			}
-
+        			
         		};
         		ISchedulingRule rule = op.getRule();
         		if (rule != null) {
@@ -261,8 +254,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
                 IncrementalProjectBuilder.INCREMENTAL_BUILD);
     }
 
-    @Override
-	public void updateActionBars() {
+    public void updateActionBars() {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
         refreshAction.selectionChanged(selection);

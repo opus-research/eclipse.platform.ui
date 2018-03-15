@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -29,13 +29,13 @@ import org.eclipse.e4.ui.model.application.ui.MLocalizable;
  *
  * <p>
  * The following features are supported:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.commands.MCategory#getName <em>Name</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.commands.MCategory#getDescription <em>Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.commands.MCategory#getLocalizedName <em>Localized Name</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.commands.MCategory#getLocalizedDescription <em>Localized Description</em>}</li>
  * </ul>
+ * </p>
  *
  * @model
  * @generated

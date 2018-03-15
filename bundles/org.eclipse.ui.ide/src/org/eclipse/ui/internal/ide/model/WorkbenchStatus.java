@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.model;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
+
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.model.WorkbenchAdapter;
 
@@ -26,7 +26,7 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
 
     /**
      * Creates a workbench status for the given status.
-     *
+     * 
      * @param status the status
      */
     public WorkbenchStatus(IStatus status) {
@@ -38,10 +38,9 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
      * associated with this object. Returns <code>null</code> if
      * no such object can be found.
      */
-	@Override
-	public <T> T getAdapter(Class<T> adapterType) {
-		if (adapterType == IWorkbenchAdapter.class) {
-			return adapterType.cast(this);
+    public Object getAdapter(Class adapter) {
+        if (adapter == IWorkbenchAdapter.class) {
+			return this;
 		}
         return null;
     }
@@ -49,8 +48,7 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
     /**
      * Returns the children of this element.
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
         if (children == null) {
             IStatus[] childStatii = status.getChildren();
             children = new Object[childStatii.length];
@@ -64,14 +62,13 @@ public class WorkbenchStatus extends WorkbenchAdapter implements IAdaptable {
     /**
      * @see IWorkbenchAdapter#getLabel
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
         return status.getMessage();
     }
 
     /**
      * Returns the wrapped status object.
-     *
+     * 
      * @return the wrapped status object
      */
     public IStatus getStatus() {

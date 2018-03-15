@@ -154,7 +154,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create the group that shows the name, location, size and type.
-	 *
+	 * 
 	 * @param parent
 	 *            the composite the group will be created in
 	 * @param resource
@@ -163,7 +163,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 */
 	private Composite createBasicInfoGroup(Composite parent, IResource resource) {
 		initializeDialogUnits(parent);
-
+		
 		Composite basicInfoComposite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -252,12 +252,10 @@ public class ResourceInfoPage extends PropertyPage {
 			((GridData) locationTitle.getLayoutData()).verticalIndent = verticalIndent;
 			((GridData) locationValue.getLayoutData()).verticalIndent = verticalIndent;
 			editButton.addSelectionListener(new SelectionListener() {
-				@Override
 				public void widgetDefaultSelected(SelectionEvent e) {
 					editLinkLocation();
 				}
 
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					editLinkLocation();
 				}
@@ -338,7 +336,8 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	protected void editLinkLocation() {
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 		String locationFormat = resource.getPathVariableManager().convertFromUserEditableFormat(locationValue.getText(), true);
 		IPath location = Path.fromOSString(locationFormat);
 
@@ -357,7 +356,8 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void refreshLinkLocation() {
-		IResource resource = getElement().getAdapter(IResource.class);
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
 
 		String userEditableFormat = resource.getPathVariableManager().convertToUserEditableFormat(newResourceLocation.toOSString(), true);
 		locationValue.setText(userEditableFormat);
@@ -386,21 +386,21 @@ public class ResourceInfoPage extends PropertyPage {
 		}
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
 				IIDEHelpContextIds.RESOURCE_INFO_PROPERTY_PAGE);
 
 		// layout the page
-		IResource resource = getElement().getAdapter(IResource.class);
-
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
+		
 		if (resource == null) {
 			Label label = new Label(parent, SWT.NONE);
 			label.setText(IDEWorkbenchMessages.ResourceInfoPage_noResource);
 			return label;
 		}
-
+		
 		if (resource.getType() != IResource.PROJECT) {
 			ResourceAttributes attrs = resource.getResourceAttributes();
 			if (attrs != null) {
@@ -445,7 +445,11 @@ public class ResourceInfoPage extends PropertyPage {
 			encodingEditor.load();
 
 			encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+				 */
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 						setValid(encodingEditor.isValid());
@@ -459,7 +463,7 @@ public class ResourceInfoPage extends PropertyPage {
 				lineDelimiterEditor.doLoad();
 			}
 		}
-
+		
 		Dialog.applyDialogFont(composite);
 
 		return composite;
@@ -569,7 +573,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Return the label for the encoding field editor for the resource.
-	 *
+	 * 
 	 * @param resource -
 	 *            the resource to edit.
 	 * @return String
@@ -585,7 +589,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isEditable button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -601,7 +605,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isExecutable button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -617,7 +621,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isLocked button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -632,7 +636,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isArchive button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -648,7 +652,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the derived button and it's associated label as a child of parent
 	 * using the derived of the receiver. The Composite will be the parent of
 	 * the button.
-	 *
+	 * 
 	 * @param composite
 	 *            the parent of the button
 	 * @param resource
@@ -667,7 +671,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create a separator that goes across the entire page
-	 *
+	 * 
 	 * @param composite
 	 *            The parent of the seperator
 	 */
@@ -682,7 +686,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create the group that shows the read only state and the timestamp.
-	 *
+	 * 
 	 * @param parent
 	 *            the composite the group will be created in
 	 * @param resource
@@ -851,11 +855,11 @@ public class ResourceInfoPage extends PropertyPage {
 	/*
 	 * @see PreferencePage#performDefaults()
 	 */
-	@Override
 	protected void performDefaults() {
 
-		IResource resource = getElement().getAdapter(IResource.class);
-
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
+		
 		if (resource == null)
 			return;
 
@@ -882,7 +886,7 @@ public class ResourceInfoPage extends PropertyPage {
 		if (this.executableBox != null) {
 			this.executableBox.setSelection(false);
 		}
-
+		
 		// Nothing to update if we never made the box
 		if (this.archiveBox != null) {
 			this.archiveBox.setSelection(true);
@@ -924,7 +928,6 @@ public class ResourceInfoPage extends PropertyPage {
 	private IResourceChange getAttributesChange(final boolean changedAttrs[],
 			final boolean finalAttrs[]) {
 		return new IResourceChange() {
-			@Override
 			public String getMessage() {
 				String message = ""; //$NON-NLS-1$
 				if (changedAttrs[0])
@@ -939,7 +942,6 @@ public class ResourceInfoPage extends PropertyPage {
 				return message;
 			}
 
-			@Override
 			public void performChange(IResource resource) throws CoreException {
 				ResourceAttributes attrs = resource.getResourceAttributes();
 				if (attrs != null) {
@@ -958,7 +960,6 @@ public class ResourceInfoPage extends PropertyPage {
 	private IResourceChange getPermissionsChange(final int changedPermissions,
 			final int finalPermissions) {
 		return new IResourceChange() {
-			@Override
 			public String getMessage() {
 				// iterated with [j][i]
 				int permissionMasks[][] = new int[][] {
@@ -996,7 +997,6 @@ public class ResourceInfoPage extends PropertyPage {
 				return message;
 			}
 
-			@Override
 			public void performChange(IResource resource) {
 				int permissions = fetchPermissions(resource);
 				// add permissions
@@ -1015,7 +1015,6 @@ public class ResourceInfoPage extends PropertyPage {
 		final List/*<IResource>*/ toVisit = new ArrayList/*<IResource>*/();
 		visited.add(resource.getLocationURI());
 		resource.accept(new IResourceProxyVisitor() {
-			@Override
 			public boolean visit(IResourceProxy proxy) {
 				IResource childResource = proxy.requestResource();
 				URI uri = childResource.getLocationURI();
@@ -1051,7 +1050,6 @@ public class ResourceInfoPage extends PropertyPage {
 
 	private void scheduleRecursiveChangesJob(final IResource resource, final List/*<IResourceChange>*/ changes) {
 		new Job(IDEWorkbenchMessages.ResourceInfo_recursiveChangesJobName) {
-			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				try {
 					List/*<IResource>*/ toVisit = getResourcesToVisit(resource);
@@ -1093,11 +1091,11 @@ public class ResourceInfoPage extends PropertyPage {
 	/**
 	 * Apply the read only state and the encoding to the resource.
 	 */
-	@Override
 	public boolean performOk() {
 
-		IResource resource = getElement().getAdapter(IResource.class);
-
+		IResource resource = (IResource) getElement().getAdapter(
+				IResource.class);
+		
 		if (resource == null)
 			return true;
 

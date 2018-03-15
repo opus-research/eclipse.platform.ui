@@ -72,9 +72,9 @@ import org.eclipse.core.runtime.Status;
  * lock, it may be easier to implement syncExec and keep the default
  * implementation of asyncExec.
  * </p>
- *
+ * 
  * @since 1.0
- *
+ * 
  * @see IObservable
  */
 public abstract class Realm {
@@ -84,19 +84,19 @@ public abstract class Realm {
 	/**
 	 * Returns the default realm for the calling thread, or <code>null</code>
 	 * if no default realm has been set.
-	 *
+	 * 
 	 * @return the default realm, or <code>null</code>
 	 */
 	public static Realm getDefault() {
 		return (Realm) defaultRealm.get();
 	}
-
+	
 	/**
 	 * Sets the default realm for the calling thread, returning the current
 	 * default thread. This method is inherently unsafe, it is recommended to
 	 * use {@link #runWithDefault(Realm, Runnable)} instead. This method is
 	 * exposed to subclasses to facilitate testing.
-	 *
+	 * 
 	 * @param realm
 	 *            the new default realm, or <code>null</code>
 	 * @return the previous default realm, or <code>null</code>
@@ -115,17 +115,17 @@ public abstract class Realm {
 	abstract public boolean isCurrent();
 
 	private Thread workerThread;
-
+	
 	private volatile Timer timer;
 
 	Queue workQueue = new Queue();
-
+	
 	/**
 	 * Runs the given runnable. If an exception occurs within the runnable, it
 	 * is logged and not re-thrown. If the runnable implements
 	 * {@link ISafeRunnable}, the exception is passed to its
 	 * <code>handleException<code> method.
-	 *
+	 * 
 	 * @param runnable
 	 */
 	protected static void safeRun(final Runnable runnable) {
@@ -134,7 +134,6 @@ public abstract class Realm {
 			safeRunnable = (ISafeRunnable) runnable;
 		} else {
 			safeRunnable = new ISafeRunnable() {
-				@Override
 				public void handleException(Throwable exception) {
 					Policy
 							.getLog()
@@ -145,7 +144,6 @@ public abstract class Realm {
 											IStatus.OK,
 											"Unhandled exception: " + exception.getMessage(), exception)); //$NON-NLS-1$
 				}
-				@Override
 				public void run() throws Exception {
 					runnable.run();
 				}
@@ -164,7 +162,7 @@ public abstract class Realm {
 	 * exception handler method will be called if any exceptions occur while
 	 * running it. Otherwise, the exception will be logged.
 	 * </p>
-	 *
+	 * 
 	 * @param runnable
 	 */
 	public void exec(Runnable runnable) {
@@ -188,7 +186,7 @@ public abstract class Realm {
 	 * <p>
 	 * Subclasses should use {@link #safeRun(Runnable)} to run the runnable.
 	 * </p>
-	 *
+	 * 
 	 * @param runnable
 	 */
 	public void asyncExec(Runnable runnable) {
@@ -213,7 +211,7 @@ public abstract class Realm {
 	 * <p>
 	 * Subclasses should use {@link #safeRun(Runnable)} to run the runnable.
 	 * </p>
-	 *
+	 * 
 	 * @param milliseconds
 	 * @param runnable
 	 * @since 1.2
@@ -229,7 +227,6 @@ public abstract class Realm {
 					timer = new Timer(true);
 				}
 				timer.schedule(new TimerTask() {
-					@Override
 					public void run() {
 						asyncExec(runnable);
 					}
@@ -240,12 +237,11 @@ public abstract class Realm {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void ensureWorkerThreadIsRunning() {
 		if (workerThread == null) {
 			workerThread = new Thread() {
-				@Override
 				public void run() {
 					try {
 						while (true) {
@@ -283,7 +279,7 @@ public abstract class Realm {
 	 * Note: This class is not meant to be called by clients and therefore has
 	 * only protected access.
 	 * </p>
-	 *
+	 * 
 	 * @param runnable
 	 */
 	protected void syncExec(Runnable runnable) {
@@ -309,7 +305,6 @@ public abstract class Realm {
 			this.runnable = runnable;
 		}
 
-		@Override
 		public void run() {
 			try {
 				safeRun(runnable);
@@ -326,7 +321,7 @@ public abstract class Realm {
 	 * Sets the provided <code>realm</code> as the default for the duration of
 	 * {@link Runnable#run()} and resets the previous realm after completion.
 	 * Note that this will not set the given realm as the current realm.
-	 *
+	 * 
 	 * @param realm
 	 * @param runnable
 	 */

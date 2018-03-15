@@ -31,15 +31,15 @@ import org.eclipse.core.runtime.Assert;
  * Customer objects to their "last name" property of type String. The composite
  * map of map1 and map2 would then map Order objects to their customers' last
  * names.
- *
+ * 
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @since 1.1
- *
+ * 
  */
 public class CompositeMap extends ObservableMap {
 	// adds that need to go through the second map and thus will be picked up by
@@ -57,7 +57,6 @@ public class CompositeMap extends ObservableMap {
 
 	private IMapChangeListener firstMapListener = new IMapChangeListener() {
 
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			MapDiff diff = event.diff;
 			Set rangeSetAdditions = new HashSet();
@@ -117,27 +116,22 @@ public class CompositeMap extends ObservableMap {
 			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
 				fireMapChange(new MapDiff() {
 
-					@Override
 					public Set getAddedKeys() {
 						return adds;
 					}
 
-					@Override
 					public Set getChangedKeys() {
 						return changes;
 					}
 
-					@Override
 					public Object getNewValue(Object key) {
 						return wrappedMap.get(key);
 					}
 
-					@Override
 					public Object getOldValue(Object key) {
 						return oldValues.get(key);
 					}
 
-					@Override
 					public Set getRemovedKeys() {
 						return removes;
 					}
@@ -152,7 +146,6 @@ public class CompositeMap extends ObservableMap {
 
 	private IMapChangeListener secondMapListener = new IMapChangeListener() {
 
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			MapDiff diff = event.diff;
 			final Set adds = new HashSet();
@@ -236,27 +229,22 @@ public class CompositeMap extends ObservableMap {
 			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
 				fireMapChange(new MapDiff() {
 
-					@Override
 					public Set getAddedKeys() {
 						return adds;
 					}
 
-					@Override
 					public Set getChangedKeys() {
 						return changes;
 					}
 
-					@Override
 					public Object getNewValue(Object key) {
 						return newValues.get(key);
 					}
 
-					@Override
 					public Object getOldValue(Object key) {
 						return oldValues.get(key);
 					}
 
-					@Override
 					public Set getRemovedKeys() {
 						return removes;
 					}
@@ -284,7 +272,7 @@ public class CompositeMap extends ObservableMap {
 	 * <code>firstMap</code>, it cannot be passed in as an argument. Instead,
 	 * the second map will be created by calling
 	 * <code>secondMapFactory.createObservable(valueSet())</code>.
-	 *
+	 * 
 	 * @param firstMap
 	 *            the first map
 	 * @param secondMapFactory
@@ -309,7 +297,6 @@ public class CompositeMap extends ObservableMap {
 	/**
 	 * @since 1.2
 	 */
-	@Override
 	public Object getKeyType() {
 		return firstMap.getKeyType();
 	}
@@ -317,12 +304,10 @@ public class CompositeMap extends ObservableMap {
 	/**
 	 * @since 1.2
 	 */
-	@Override
 	public Object getValueType() {
 		return secondMap.getValueType();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 		if (firstMap != null) {

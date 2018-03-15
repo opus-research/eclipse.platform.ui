@@ -23,8 +23,7 @@ public class WorkbenchWorkspace extends WorkbenchAdapter {
      *  (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
         IWorkspace workspace = (IWorkspace) o;
         return workspace.getRoot().getProjects();
     }
@@ -33,16 +32,14 @@ public class WorkbenchWorkspace extends WorkbenchAdapter {
      *  (non-Javadoc)
      * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
     /**
      * getLabel method comment.
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
         //workspaces don't have a name
         return IDEWorkbenchMessages.Workspace;
     }

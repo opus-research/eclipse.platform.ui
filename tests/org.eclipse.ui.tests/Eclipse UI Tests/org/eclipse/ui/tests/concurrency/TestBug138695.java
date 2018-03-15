@@ -30,7 +30,9 @@ public class TestBug138695 extends TestCase {
 			super("Sample");
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		public IStatus runInUIThread(IProgressMonitor monitor) {
 			try {
 				Thread.sleep(100);
@@ -51,12 +53,16 @@ public class TestBug138695 extends TestCase {
 			fObject = lock;
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
 		public boolean contains(ISchedulingRule rule) {
 			return rule == this;
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
 		public boolean isConflicting(ISchedulingRule rule) {
 			if (rule instanceof SerialPerObjectRule) {
 				SerialPerObjectRule vup = (SerialPerObjectRule) rule;

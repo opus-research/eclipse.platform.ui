@@ -16,9 +16,9 @@ import org.eclipse.ui.views.markers.internal.ProblemFilter;
 /**
  * CompatibilityMarkerFieldFilterGroup is a filter group that uses a
  * {@link ProblemFilter}.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup {
 
@@ -26,7 +26,7 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 
 	/**
 	 * Create a new instance of the receiver based on the ProblemFilter.
-	 *
+	 * 
 	 * @param filter
 	 * @param cachedMarkerBuilder
 	 */
@@ -40,40 +40,36 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#getID()
 	 */
-	@Override
 	public String getID() {
 		return problemFilter.getId();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#getName()
 	 */
-	@Override
 	public String getName() {
 		return problemFilter.getName();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#isSystem()
 	 */
-	@Override
 	public boolean isSystem() {
 		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#makeWorkingCopy()
 	 */
-	@Override
 	MarkerFieldFilterGroup makeWorkingCopy() {
 
 		CompatibilityMarkerFieldFilterGroup clone = new CompatibilityMarkerFieldFilterGroup(
@@ -86,10 +82,9 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerFieldFilterGroup#calculateFilters()
 	 */
-	@Override
 	protected void calculateFilters() {
 		super.calculateFilters();
 		// Now initialize with the ProblemFilter

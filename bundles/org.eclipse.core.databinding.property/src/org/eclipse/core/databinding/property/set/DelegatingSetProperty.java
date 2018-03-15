@@ -23,7 +23,7 @@ import org.eclipse.core.databinding.property.ISimplePropertyListener;
 
 /**
  * @since 1.2
- *
+ * 
  */
 public abstract class DelegatingSetProperty extends SetProperty {
 	private final Object elementType;
@@ -41,7 +41,7 @@ public abstract class DelegatingSetProperty extends SetProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Repeated calls to this method with the same source object returns the
 	 * same delegate instance.
-	 *
+	 * 
 	 * @param source
 	 *            the property source (may be null)
 	 * @return the property to delegate to for the specified source object.
@@ -59,67 +59,55 @@ public abstract class DelegatingSetProperty extends SetProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Implementers must ensure that repeated calls to this method with the same
 	 * source object returns the same delegate instance.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @return the property to delegate to for the specified source object.
 	 */
 	protected abstract ISetProperty doGetDelegate(Object source);
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	protected Set doGetSet(Object source) {
 		return getDelegate(source).getSet(source);
 	}
 
-	@Override
 	protected void doSetSet(Object source, Set set) {
 		getDelegate(source).setSet(source, set);
 	}
 
-	@Override
 	protected void doUpdateSet(Object source, SetDiff diff) {
 		getDelegate(source).updateSet(source, diff);
 	}
 
-	@Override
 	public IObservableSet observe(Object source) {
 		return getDelegate(source).observe(source);
 	}
 
-	@Override
 	public IObservableSet observe(Realm realm, Object source) {
 		return getDelegate(source).observe(realm, source);
 	}
 
 	private class NullSetProperty extends SimpleSetProperty {
-		@Override
 		public Object getElementType() {
 			return elementType;
 		}
 
-		@Override
 		protected Set doGetSet(Object source) {
 			return Collections.EMPTY_SET;
 		}
 
-		@Override
 		protected void doSetSet(Object source, Set set, SetDiff diff) {
 		}
 
-		@Override
 		protected void doSetSet(Object source, Set set) {
 		}
 
-		@Override
 		protected void doUpdateSet(Object source, SetDiff diff) {
 		}
 
-		@Override
 		public INativePropertyListener adaptListener(
 				ISimplePropertyListener listener) {
 			return null;

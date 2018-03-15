@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005, 2007 db4objects Inc.  http://www.db4o.com
- *
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,11 @@ package org.eclipse.core.internal.databinding.conversion;
  */
 public class StringToBooleanConverter extends StringToBooleanPrimitiveConverter {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.binding.converter.IConverter#convert(java.lang.Object)
+	 */
 	public Object convert(Object source) {
 		String sourceString = (String) source;
 		if ("".equals(sourceString.trim())) { //$NON-NLS-1$
@@ -25,7 +29,6 @@ public class StringToBooleanConverter extends StringToBooleanPrimitiveConverter 
 		return super.convert(source);
 	}
 
-	@Override
 	public Object getToType() {
 		return Boolean.class;
 	}

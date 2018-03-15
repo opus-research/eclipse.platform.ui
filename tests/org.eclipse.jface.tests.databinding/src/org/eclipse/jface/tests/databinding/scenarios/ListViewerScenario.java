@@ -43,7 +43,6 @@ public class ListViewerScenario extends ScenariosTestCase {
 
 	private ListViewer listViewer;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		// do any setup work here
@@ -52,7 +51,6 @@ public class ListViewerScenario extends ScenariosTestCase {
 		catalog = SampleData.CATALOG_2005; // Lodging source
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		list.dispose();
 		list = null;

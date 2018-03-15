@@ -27,12 +27,10 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  */
 public class TransferRuleTest extends UITestCase {
 	class TestRule implements ISchedulingRule {
-		@Override
 		public boolean contains(ISchedulingRule rule) {
 			return rule == this;
 		}
 
-		@Override
 		public boolean isConflicting(ISchedulingRule rule) {
 			return rule == this;
 		}
@@ -50,12 +48,10 @@ public class TransferRuleTest extends UITestCase {
 			this.rule = aRule;
 		}
 
-		@Override
 		public void run(IProgressMonitor monitor) {
 			//if we already have an error don't run the rest of the test
-			if (error != null) {
+			if (error != null)
 				return;
-			}
 			try {
 				try {
 					//acquire the rule that was transferred (will hang if the rule transfer failed)
@@ -69,7 +65,6 @@ public class TransferRuleTest extends UITestCase {
 			}
 		}
 
-		@Override
 		public void threadChange(Thread thread) {
 			try {
 				Platform.getJobManager().transferRule(rule, thread);

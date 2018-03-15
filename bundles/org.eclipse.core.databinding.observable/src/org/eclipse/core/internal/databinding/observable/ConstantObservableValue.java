@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * An immutable {@link IObservableValue}.
- *
+ * 
  * @see WritableValue
  */
 public class ConstantObservableValue implements IObservableValue {
@@ -33,7 +33,7 @@ public class ConstantObservableValue implements IObservableValue {
 
 	/**
 	 * Construct a constant value of the given type, in the default realm.
-	 *
+	 * 
 	 * @param value
 	 *            immutable value
 	 * @param type
@@ -45,7 +45,7 @@ public class ConstantObservableValue implements IObservableValue {
 
 	/**
 	 * Construct a constant value of the given type, in the given realm.
-	 *
+	 * 
 	 * @param realm
 	 *            Realm
 	 * @param value
@@ -61,78 +61,63 @@ public class ConstantObservableValue implements IObservableValue {
 		ObservableTracker.observableCreated(this);
 	}
 
-	@Override
 	public Object getValueType() {
 		return type;
 	}
 
-	@Override
 	public Object getValue() {
 		ObservableTracker.getterCalled(this);
 		return value;
 	}
 
-	@Override
 	public void setValue(Object value) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public void addValueChangeListener(IValueChangeListener listener) {
 		// ignore
 	}
 
-	@Override
 	public void removeValueChangeListener(IValueChangeListener listener) {
 		// ignore
 	}
 
-	@Override
 	public void addChangeListener(IChangeListener listener) {
 		// ignore
 	}
 
-	@Override
 	public void addDisposeListener(IDisposeListener listener) {
 		// ignore
 	}
 
-	@Override
 	public void addStaleListener(IStaleListener listener) {
 		// ignore
 	}
 
-	@Override
 	public boolean isDisposed() {
 		return false;
 	}
 
-	@Override
 	public void dispose() {
 		// nothing to dispose
 	}
 
-	@Override
 	public Realm getRealm() {
 		return realm;
 	}
 
-	@Override
 	public boolean isStale() {
 		return false;
 	}
 
-	@Override
 	public void removeChangeListener(IChangeListener listener) {
 		// ignore
 	}
 
-	@Override
 	public void removeDisposeListener(IDisposeListener listener) {
 		// ignore
 	}
 
-	@Override
 	public void removeStaleListener(IStaleListener listener) {
 		// ignore
 	}

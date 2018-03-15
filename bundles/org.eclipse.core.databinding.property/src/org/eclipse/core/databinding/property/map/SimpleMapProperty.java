@@ -40,25 +40,23 @@ import org.eclipse.core.internal.databinding.property.map.SimplePropertyObservab
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- *
+ * 
  * @since 1.2
  */
 public abstract class SimpleMapProperty extends MapProperty {
-	@Override
 	public IObservableMap observe(Realm realm, Object source) {
 		return new SimplePropertyObservableMap(realm, source, this);
 	}
 
 	// Accessors
 
-	@Override
 	protected abstract Map doGetMap(Object source);
 
 	// Mutators
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param map
@@ -74,7 +72,7 @@ public abstract class SimpleMapProperty extends MapProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param map
@@ -85,13 +83,11 @@ public abstract class SimpleMapProperty extends MapProperty {
 	 */
 	protected abstract void doSetMap(Object source, Map map, MapDiff diff);
 
-	@Override
 	protected void doSetMap(Object source, Map map) {
 		MapDiff diff = Diffs.computeLazyMapDiff(doGetMap(source), map);
 		doSetMap(source, map, diff);
 	}
 
-	@Override
 	protected void doUpdateMap(Object source, MapDiff diff) {
 		Map map = new HashMap(doGetMap(source));
 		diff.applyTo(map);
@@ -108,7 +104,7 @@ public abstract class SimpleMapProperty extends MapProperty {
 	 * <p>
 	 * This method returns null if the source object has no listener APIs for
 	 * this property.
-	 *
+	 * 
 	 * @param listener
 	 *            the property listener to receive events
 	 * @return a native listener which parlays property change events to the

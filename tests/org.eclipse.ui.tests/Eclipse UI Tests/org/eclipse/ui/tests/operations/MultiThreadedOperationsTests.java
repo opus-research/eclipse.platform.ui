@@ -23,7 +23,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 /**
  * Runs the operations API tests and workbench operation history tests from
  * background threads
- *
+ * 
  * @since 3.1
  */
 public class MultiThreadedOperationsTests extends UITestCase {
@@ -39,7 +39,6 @@ public class MultiThreadedOperationsTests extends UITestCase {
 				super("Operations Test Job");
 			}
 
-			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				// System.out.println("Running OperationsAPITest from background job");
 				new TestSuite(OperationsAPITest.class).run(new TestResult());

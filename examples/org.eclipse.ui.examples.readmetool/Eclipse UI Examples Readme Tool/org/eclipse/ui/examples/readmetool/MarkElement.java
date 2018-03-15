@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,15 +13,13 @@ package org.eclipse.ui.examples.readmetool;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IAdaptable;
-
 import org.eclipse.jface.resource.ImageDescriptor;
-
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.views.properties.IPropertySource;
 
 /**
  * This class represents a marked location in the Readme
- * file text.
+ * file text.  
  *
  * TIP: By implementing the <code>IWorkbenchAdapter</code> interface,
  * we can easily add objects of this type to viewers and parts in
@@ -41,7 +39,7 @@ public class MarkElement implements IWorkbenchAdapter, IAdaptable {
 
     private int length;
 
-    private Vector<MarkElement> children;
+    private Vector children;
 
     /**
      * Creates a new MarkElement and stores parent element and
@@ -67,32 +65,37 @@ public class MarkElement implements IWorkbenchAdapter, IAdaptable {
      */
     private void addChild(MarkElement child) {
         if (children == null) {
-            children = new Vector<>();
+            children = new Vector();
         }
         children.add(child);
     }
 
-    @SuppressWarnings("unchecked")
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    /* (non-Javadoc)
+     * Method declared on IAdaptable
+     */
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class)
-            return (T)this;
+            return this;
         if (adapter == IPropertySource.class)
-            return (T)new MarkElementProperties(this);
+            return new MarkElementProperties(this);
         return null;
     }
 
-    @Override
-	public Object[] getChildren(Object object) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public Object[] getChildren(Object object) {
         if (children != null) {
             return children.toArray();
         }
         return new Object[0];
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
-        IWorkbenchAdapter parentElement = parent
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public ImageDescriptor getImageDescriptor(Object object) {
+        IWorkbenchAdapter parentElement = (IWorkbenchAdapter) parent
                 .getAdapter(IWorkbenchAdapter.class);
         if (parentElement != null) {
             return parentElement.getImageDescriptor(object);
@@ -100,8 +103,10 @@ public class MarkElement implements IWorkbenchAdapter, IAdaptable {
         return null;
     }
 
-    @Override
-	public String getLabel(Object o) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public String getLabel(Object o) {
         return headingName;
     }
 
@@ -121,8 +126,10 @@ public class MarkElement implements IWorkbenchAdapter, IAdaptable {
         return numberOfLines;
     }
 
-    @Override
-	public Object getParent(Object o) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter
+     */
+    public Object getParent(Object o) {
         return null;
     }
 

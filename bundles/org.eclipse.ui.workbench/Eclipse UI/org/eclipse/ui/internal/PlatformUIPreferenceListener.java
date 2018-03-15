@@ -39,9 +39,9 @@ import org.eclipse.ui.internal.util.PrefUtil;
  */
 public class PlatformUIPreferenceListener implements
 		IEclipsePreferences.IPreferenceChangeListener {
-
+	
 	private static PlatformUIPreferenceListener singleton;
-
+	
 	public static IEclipsePreferences.IPreferenceChangeListener getSingleton(){
 		if(singleton == null) {
 			singleton = new PlatformUIPreferenceListener();
@@ -49,6 +49,11 @@ public class PlatformUIPreferenceListener implements
 	    return singleton;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+	 */
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 
@@ -68,7 +73,7 @@ public class PlatformUIPreferenceListener implements
 
 			ProgressManager.getInstance().setShowSystemJobs(setting);
 		}
-
+		
 		if (IWorkbenchPreferenceConstants.DEFAULT_PERSPECTIVE_ID.equals(propertyName)) {
 			IWorkbench workbench = PlatformUI.getWorkbench();
 

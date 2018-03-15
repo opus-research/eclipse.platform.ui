@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * @since 1.0
- *
+ * 
  */
 public class DetailObservableValue extends AbstractObservableValue implements
 		IObserving {
@@ -35,7 +35,6 @@ public class DetailObservableValue extends AbstractObservableValue implements
 	private boolean updating = false;
 
 	private IValueChangeListener innerChangeListener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			if (!updating) {
 				fireValueChange(event.diff);
@@ -69,7 +68,6 @@ public class DetailObservableValue extends AbstractObservableValue implements
 		this.outerObservableValue = outerObservableValue;
 
 		outerObservableValue.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 				dispose();
 			}
@@ -85,7 +83,6 @@ public class DetailObservableValue extends AbstractObservableValue implements
 	}
 
 	IValueChangeListener outerChangeListener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			if (isDisposed())
 				return;
@@ -130,7 +127,6 @@ public class DetailObservableValue extends AbstractObservableValue implements
 		}
 	}
 
-	@Override
 	public void doSetValue(final Object value) {
 		if (innerObservableValue != null) {
 			ObservableTracker.setIgnore(true);
@@ -142,7 +138,6 @@ public class DetailObservableValue extends AbstractObservableValue implements
 		}
 	}
 
-	@Override
 	public Object doGetValue() {
 		if (innerObservableValue == null)
 			return null;
@@ -154,12 +149,10 @@ public class DetailObservableValue extends AbstractObservableValue implements
 		}
 	}
 
-	@Override
 	public Object getValueType() {
 		return detailType;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 
@@ -178,7 +171,6 @@ public class DetailObservableValue extends AbstractObservableValue implements
 		innerChangeListener = null;
 	}
 
-	@Override
 	public Object getObserved() {
 		if (innerObservableValue instanceof IObserving) {
 			return ((IObserving) innerObservableValue).getObserved();

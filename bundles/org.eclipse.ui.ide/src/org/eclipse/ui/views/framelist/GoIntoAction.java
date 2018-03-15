@@ -14,13 +14,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.views.framelist.FrameListMessages;
 
 /**
- * Generic "Go Into" action which goes to the frame for the current selection.
+ * Generic "Go Into" action which goes to the frame for the current selection. 
  */
 public class GoIntoAction extends FrameAction {
 
     /**
      * Constructs a new action for the specified frame list.
-     *
+     * 
      * @param frameList the frame list
      */
     public GoIntoAction(FrameList frameList) {
@@ -41,8 +41,7 @@ public class GoIntoAction extends FrameAction {
      * Calls <code>gotoFrame</code> on the frame list with a frame
      * representing the currently selected container.
      */
-    @Override
-	public void run() {
+    public void run() {
         Frame selectionFrame = getSelectionFrame(IFrameSource.FULL_CONTEXT);
         if (selectionFrame != null) {
             getFrameList().gotoFrame(selectionFrame);
@@ -53,8 +52,7 @@ public class GoIntoAction extends FrameAction {
      * Updates this action's enabled state.
      * This action is enabled only when there is a frame for the current selection.
      */
-    @Override
-	public void update() {
+    public void update() {
         super.update();
         Frame selectionFrame = getSelectionFrame(0);
         setEnabled(selectionFrame != null);

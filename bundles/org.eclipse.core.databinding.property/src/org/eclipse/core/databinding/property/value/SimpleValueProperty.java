@@ -39,14 +39,12 @@ import org.eclipse.core.internal.databinding.property.value.SimplePropertyObserv
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- *
+ * 
  * @since 1.2
  */
 public abstract class SimpleValueProperty extends ValueProperty {
-	@Override
 	protected abstract Object doGetValue(Object source);
 
-	@Override
 	protected abstract void doSetValue(Object source, Object value);
 
 	/**
@@ -57,7 +55,7 @@ public abstract class SimpleValueProperty extends ValueProperty {
 	 * <p>
 	 * This method returns null if the source object has no listener APIs for
 	 * this property.
-	 *
+	 * 
 	 * @param listener
 	 *            the property listener to receive events
 	 * @return a native listener which parlays property change events to the
@@ -68,22 +66,18 @@ public abstract class SimpleValueProperty extends ValueProperty {
 	public abstract INativePropertyListener adaptListener(
 			ISimplePropertyListener listener);
 
-	@Override
 	public IObservableValue observe(Realm realm, Object source) {
 		return new SimplePropertyObservableValue(realm, source, this);
 	}
 
-	@Override
 	public IObservableList observeDetail(IObservableList master) {
 		return new ListSimpleValueObservableList(master, this);
 	}
 
-	@Override
 	public IObservableMap observeDetail(IObservableSet master) {
 		return new SetSimpleValueObservableMap(master, this);
 	}
 
-	@Override
 	public IObservableMap observeDetail(IObservableMap master) {
 		return new MapSimpleValueObservableMap(master, this);
 	}

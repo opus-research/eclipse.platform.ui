@@ -144,8 +144,7 @@ public class UserElement extends OrganizationElement {
             .getString("false"); //$NON-NLS-1$
 
     static private class BooleanLabelProvider extends LabelProvider {
-        @Override
-		public String getText(Object element) {
+        public String getText(Object element) {
             String[] values = new String[] { P_VALUE_TRUE_LABEL,
                     P_VALUE_FALSE_LABEL };
             return values[((Integer) element).intValue()];
@@ -153,9 +152,9 @@ public class UserElement extends OrganizationElement {
     }
 
     //
-    static private Vector<PropertyDescriptor> descriptors;
+    static private Vector descriptors;
     static {
-        descriptors = new Vector<>();
+        descriptors = new Vector();
         PropertyDescriptor propertyDescriptor;
 
         ///
@@ -207,8 +206,7 @@ public class UserElement extends OrganizationElement {
         propertyDescriptor
                 .setFilterFlags(new String[] { IPropertySheetEntry.FILTER_ID_EXPERT });
         propertyDescriptor.setValidator(new ICellEditorValidator() {
-            @Override
-			public String isValid(Object value) {
+            public String isValid(Object value) {
                 if (value == null)
                     return MessageUtil.getString("salary_is_invalid"); //$NON-NLS-1$
                 //
@@ -242,7 +240,7 @@ public class UserElement extends OrganizationElement {
         descriptors.addElement(propertyDescriptor);
 
         //gets descriptors from parent, warning name-space collision may occur
-        Vector<PropertyDescriptor> parentDescriptors = OrganizationElement.getDescriptors();
+        Vector parentDescriptors = OrganizationElement.getDescriptors();
         for (int i = 0; i < parentDescriptors.size(); i++) {
             descriptors.addElement(parentDescriptors.elementAt(i));
         }
@@ -252,7 +250,7 @@ public class UserElement extends OrganizationElement {
      * Constructor. Default visibility only called from GroupElement.createSubGroup()
      * Creates a new UserElement within the passed parent GroupElement,
      * *
-     * @param name the name
+     * @param name the name 
      * @param parent the parent
      */
     UserElement(String name, GroupElement parent) {
@@ -280,8 +278,7 @@ public class UserElement extends OrganizationElement {
     /* (non-Javadoc)
      * Method declared on IWorkbenchAdapter
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
         return new Object[0];
     }
 
@@ -297,15 +294,14 @@ public class UserElement extends OrganizationElement {
     /**
      * Returns the descriptors
      */
-    static Vector<PropertyDescriptor> getDescriptors() {
+    static Vector getDescriptors() {
         return descriptors;
     }
 
     /* (non-Javadoc)
      * Method declared on IPropertySource
      */
-    @Override
-	public Object getEditableValue() {
+    public Object getEditableValue() {
         return this.toString();
     }
 
@@ -355,13 +351,12 @@ public class UserElement extends OrganizationElement {
     /* (non-Javadoc)
      * Method declared on IPropertySource
      */
-    @Override
-	public IPropertyDescriptor[] getPropertyDescriptors() {
-        return getDescriptors().toArray(
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        return (IPropertyDescriptor[]) getDescriptors().toArray(
                 new IPropertyDescriptor[getDescriptors().size()]);
     }
 
-    /**
+    /** 
      * The <code>Userment</code> implementation of this
      * <code>IPropertySource</code> method returns the following properties
      *
@@ -375,8 +370,7 @@ public class UserElement extends OrganizationElement {
      *  8) P_HAIRCOLOR, expects RGB
      *  9) P_EYECOLOR, expects RGB
      */
-    @Override
-	public Object getPropertyValue(Object propKey) {
+    public Object getPropertyValue(Object propKey) {
         if (propKey.equals(P_ID_ADDRESS))
             return getAddress();
         if (propKey.equals(P_ID_FULLNAME))
@@ -411,8 +405,7 @@ public class UserElement extends OrganizationElement {
     /* (non-Javadoc)
      * Method declared on IPropertySource
      */
-    @Override
-	public boolean isPropertySet(Object property) {
+    public boolean isPropertySet(Object property) {
         if (property.equals(P_ID_ADDRESS))
             return getAddress() != address_Default;
         if (property.equals(P_ID_FULLNAME))
@@ -437,16 +430,14 @@ public class UserElement extends OrganizationElement {
     /* (non-Javadoc)
      * Method declared on OrganizationElement
      */
-    @Override
-	public boolean isUser() {
+    public boolean isUser() {
         return true;
     }
 
     /* (non-Javadoc)
      * Method declared on IPropertySource
      */
-    @Override
-	public void resetPropertyValue(Object property) {
+    public void resetPropertyValue(Object property) {
         if (property.equals(P_ID_ADDRESS)) {
             setAddress(address_Default);
             return;
@@ -541,9 +532,9 @@ public class UserElement extends OrganizationElement {
         phoneNumber = newPhoneNumber;
     }
 
-    /**
+    /** 
      * The <code>OrganizationElement</code> implementation of this
-     * <code>IPropertySource</code> method
+     * <code>IPropertySource</code> method 
      * defines the following Setable properties
      *
      *	1) P_ADDRESS, expects Address
@@ -556,8 +547,7 @@ public class UserElement extends OrganizationElement {
      *  8) P_HAIRCOLOR, expects RGB
      *  9) P_EYECOLOR, expects RGB
      */
-    @Override
-	public void setPropertyValue(Object propKey, Object val) {
+    public void setPropertyValue(Object propKey, Object val) {
         // need to convert from String to domain objects
         if (propKey.equals(P_ID_ADDRESS)) {
             //setAddress((Address)val);

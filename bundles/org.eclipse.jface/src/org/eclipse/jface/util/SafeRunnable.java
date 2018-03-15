@@ -42,7 +42,7 @@ public abstract class SafeRunnable implements ISafeRunnable {
 
 	/**
 	 * Creates a new instance of SafeRunnable with the given error message.
-	 *
+	 * 
 	 * @param message
 	 *            the error message to use
 	 */
@@ -50,6 +50,11 @@ public abstract class SafeRunnable implements ISafeRunnable {
 		this.message = message;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.ISafeRunnable#handleException(java.lang.Throwable)
+	 */
 	@Override
 	public void handleException(Throwable e) {
 		// Workaround to avoid interactive error dialogs during
@@ -67,7 +72,7 @@ public abstract class SafeRunnable implements ISafeRunnable {
 
 	/**
 	 * Flag to avoid interactive error dialogs during automated testing.
-	 *
+	 * 
 	 * @param flag
 	 * @return true if errors should be ignored
 	 * @deprecated use getIgnoreErrors()
@@ -79,9 +84,9 @@ public abstract class SafeRunnable implements ISafeRunnable {
 
 	/**
 	 * Flag to avoid interactive error dialogs during automated testing.
-	 *
+	 * 
 	 * @return true if errors should be ignored
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	public static boolean getIgnoreErrors() {
@@ -90,7 +95,7 @@ public abstract class SafeRunnable implements ISafeRunnable {
 
 	/**
 	 * Flag to avoid interactive error dialogs during automated testing.
-	 *
+	 * 
 	 * @param flag
 	 *            set to true if errors should be ignored
 	 */
@@ -100,9 +105,9 @@ public abstract class SafeRunnable implements ISafeRunnable {
 
 	/**
 	 * Returns the safe runnable runner.
-	 *
+	 * 
 	 * @return the safe runnable runner
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public static ISafeRunnableRunner getRunner() {
@@ -114,7 +119,7 @@ public abstract class SafeRunnable implements ISafeRunnable {
 
 	/**
 	 * Creates the default safe runnable runner.
-	 *
+	 * 
 	 * @return the default safe runnable runner
 	 * @since 3.1
 	 */
@@ -150,7 +155,7 @@ public abstract class SafeRunnable implements ISafeRunnable {
 
 	/**
 	 * Sets the safe runnable runner.
-	 *
+	 * 
 	 * @param runner
 	 *            the runner to set, or <code>null</code> to reset to the
 	 *            default runner
@@ -164,7 +169,7 @@ public abstract class SafeRunnable implements ISafeRunnable {
 	 * Runs the given safe runnable using the safe runnable runner. This is a
 	 * convenience method, equivalent to:
 	 * <code>SafeRunnable.getRunner().run(runnable)</code>.
-	 *
+	 * 
 	 * @param runnable
 	 *            the runnable to run
 	 * @since 3.1

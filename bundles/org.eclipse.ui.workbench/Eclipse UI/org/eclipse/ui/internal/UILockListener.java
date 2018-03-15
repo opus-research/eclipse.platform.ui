@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM - Initial API and implementation
  *     Jeremiah Lott (jeremiah.lott@timesys.com) - fix for deadlock bug 76378
- *
+ *     
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -139,6 +139,11 @@ public class UILockListener extends LockListener {
         pendingWork.add(work);
     }
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.jobs.LockListener#canBlock()
+	 */
 	@Override
 	public boolean canBlock() {
 		return !isUI();

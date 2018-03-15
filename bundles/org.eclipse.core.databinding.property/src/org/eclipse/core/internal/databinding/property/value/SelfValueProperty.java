@@ -17,7 +17,7 @@ import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public final class SelfValueProperty extends SimpleValueProperty {
 	private final Object valueType;
@@ -29,21 +29,17 @@ public final class SelfValueProperty extends SimpleValueProperty {
 		this.valueType = valueType;
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return source;
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		return null;

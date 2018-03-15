@@ -29,7 +29,7 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 	/**
 	 * Returns a DuplexingObservableValue implementation with predefined values
 	 * to use if the list is empty or contains multiple different values.
-	 *
+	 * 
 	 * @param target
 	 *            the observable list
 	 * @param emptyValue
@@ -44,7 +44,6 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 	public static DuplexingObservableValue withDefaults(IObservableList target,
 			final Object emptyValue, final Object multiValue) {
 		return new DuplexingObservableValue(target) {
-			@Override
 			protected Object coalesceElements(Collection elements) {
 				if (elements.isEmpty())
 					return emptyValue;
@@ -85,13 +84,11 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 	}
 
 	private class PrivateInterface implements IChangeListener, IStaleListener {
-		@Override
 		public void handleChange(ChangeEvent event) {
 			if (!updating)
 				makeDirty();
 		}
 
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			if (!dirty) {
 				fireStale();
@@ -99,7 +96,6 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 		}
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		if (privateInterface == null)
 			privateInterface = new PrivateInterface();
@@ -107,7 +103,6 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 		target.addStaleListener(privateInterface);
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		target.removeChangeListener(privateInterface);
 		target.removeStaleListener(privateInterface);
@@ -122,12 +117,10 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 			// Fire the "dirty" event. This implementation recomputes the new
 			// value lazily.
 			fireValueChange(new ValueDiff() {
-				@Override
 				public Object getOldValue() {
 					return oldValue;
 				}
 
-				@Override
 				public Object getNewValue() {
 					return getValue();
 				}
@@ -135,13 +128,11 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 		}
 	}
 
-	@Override
 	public boolean isStale() {
 		getValue();
 		return target.isStale();
 	}
 
-	@Override
 	protected Object doGetValue() {
 		if (!hasListeners())
 			return coalesceElements(target);
@@ -158,7 +149,6 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 
 	protected abstract Object coalesceElements(Collection elements);
 
-	@Override
 	protected void doSetValue(Object value) {
 		final Object oldValue = cachedValue;
 
@@ -175,12 +165,10 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 		// value lazily.
 		if (hasListeners()) {
 			fireValueChange(new ValueDiff() {
-				@Override
 				public Object getOldValue() {
 					return oldValue;
 				}
 
-				@Override
 				public Object getNewValue() {
 					return getValue();
 				}
@@ -188,12 +176,10 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 		}
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
 
-	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		super.addChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
@@ -201,7 +187,6 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 		computeValueForListeners();
 	}
 
-	@Override
 	public synchronized void addValueChangeListener(
 			IValueChangeListener listener) {
 		super.addValueChangeListener(listener);
@@ -221,7 +206,6 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 	 */
 	private void computeValueForListeners() {
 		getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				// We are not currently listening.
 				if (hasListeners()) {
@@ -234,7 +218,6 @@ public abstract class DuplexingObservableValue extends AbstractObservableValue {
 		});
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (privateInterface != null && target != null) {
 			target.removeChangeListener(privateInterface);

@@ -23,7 +23,7 @@ import org.eclipse.core.internal.databinding.property.PropertyObservableUtil;
 /**
  * A set property for observing the union of multiple set properties a combined
  * set.
- *
+ * 
  * @since 1.2
  */
 public class UnionSetProperty extends SetProperty {
@@ -46,12 +46,10 @@ public class UnionSetProperty extends SetProperty {
 		this.elementType = elementType;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	protected Set doGetSet(Object source) {
 		Set set = new HashSet();
 		for (int i = 0; i < properties.length; i++)
@@ -59,19 +57,16 @@ public class UnionSetProperty extends SetProperty {
 		return set;
 	}
 
-	@Override
 	protected void doSetSet(Object source, Set set) {
 		throw new UnsupportedOperationException(
 				"UnionSetProperty is unmodifiable"); //$NON-NLS-1$
 	}
 
-	@Override
 	protected void doUpdateSet(Object source, SetDiff diff) {
 		throw new UnsupportedOperationException(
 				"UnionSetProperty is unmodifiable"); //$NON-NLS-1$
 	}
 
-	@Override
 	public IObservableSet observe(Realm realm, Object source) {
 		IObservableSet[] sets = new IObservableSet[properties.length];
 		for (int i = 0; i < sets.length; i++)

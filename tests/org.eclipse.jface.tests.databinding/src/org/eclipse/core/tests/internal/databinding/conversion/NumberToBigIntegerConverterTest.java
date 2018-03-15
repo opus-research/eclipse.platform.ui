@@ -23,19 +23,17 @@ import com.ibm.icu.text.NumberFormat;
  */
 public class NumberToBigIntegerConverterTest extends NumberToNumberTestHarness {
 	private NumberFormat numberFormat;
-
+	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetOutOfRangeNumber()
 	 */
-	@Override
 	protected Number doGetOutOfRangeNumber() {
 		return null;
 	}
@@ -43,7 +41,6 @@ public class NumberToBigIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
 	 */
-	@Override
 	protected IConverter doGetToBoxedTypeValidator(Class fromType) {
 		return new NumberToBigIntegerConverter(numberFormat, fromType);
 	}
@@ -51,7 +48,6 @@ public class NumberToBigIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToPrimitiveValidator(java.lang.Class)
 	 */
-	@Override
 	protected IConverter doGetToPrimitiveValidator(Class fromType) {
 		return null;  //no such thing
 	}
@@ -59,7 +55,6 @@ public class NumberToBigIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToType(boolean)
 	 */
-	@Override
 	protected Class doGetToType(boolean primitive) {
 		return (primitive) ? null : BigInteger.class;
 	}

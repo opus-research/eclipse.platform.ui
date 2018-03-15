@@ -21,12 +21,12 @@ import org.eclipse.swt.widgets.Control;
  * An {@link IControlContentAdapter} for SWT Combo controls. This is a
  * convenience class for easily creating a {@link ContentProposalAdapter} for
  * combo fields.
- *
+ * 
  * @since 3.2
  */
 public class ComboContentAdapter implements IControlContentAdapter,
 		IControlContentAdapter2 {
-
+	
 	/*
 	 * Set to <code>true</code> if we should compute the text
 	 * vertical bounds rather than just use the field size.
@@ -37,11 +37,22 @@ public class ComboContentAdapter implements IControlContentAdapter,
 	private static final boolean COMPUTE_TEXT_USING_CLIENTAREA = !Util.isCarbon();
 
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.taskassistance.IControlContentAdapter#getControlContents(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	public String getControlContents(Control control) {
 		return ((Combo) control).getText();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setControlContents(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String, int)
+	 */
 	@Override
 	public void setControlContents(Control control, String text,
 			int cursorPosition) {
@@ -50,6 +61,12 @@ public class ComboContentAdapter implements IControlContentAdapter,
 				.setSelection(new Point(cursorPosition, cursorPosition));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#insertControlContents(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String, int)
+	 */
 	@Override
 	public void insertControlContents(Control control, String text,
 			int cursorPosition) {
@@ -68,14 +85,24 @@ public class ComboContentAdapter implements IControlContentAdapter,
 		combo.setSelection(selection);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getCursorPosition(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	public int getCursorPosition(Control control) {
 		return ((Combo) control).getSelection().x;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getInsertionBounds(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	public Rectangle getInsertionBounds(Control control) {
-		// This doesn't take horizontal scrolling into affect.
+		// This doesn't take horizontal scrolling into affect. 
 		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=204599
 		Combo combo = (Combo) control;
 		int position = combo.getSelection().y;
@@ -92,6 +119,12 @@ public class ComboContentAdapter implements IControlContentAdapter,
 		return new Rectangle(extent.x, 0, 1, combo.getSize().y);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setCursorPosition(org.eclipse.swt.widgets.Control,
+	 *      int)
+	 */
 	@Override
 	public void setCursorPosition(Control control, int index) {
 		((Combo) control).setSelection(new Point(index, index));
@@ -99,7 +132,7 @@ public class ComboContentAdapter implements IControlContentAdapter,
 
 	/**
 	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter2#getSelection(org.eclipse.swt.widgets.Control)
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	@Override
@@ -110,7 +143,7 @@ public class ComboContentAdapter implements IControlContentAdapter,
 	/**
 	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter2#setSelection(org.eclipse.swt.widgets.Control,
 	 *      org.eclipse.swt.graphics.Point)
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	@Override

@@ -17,7 +17,6 @@ import org.eclipse.core.databinding.observable.IDecoratingObservable;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.ISWTObservable;
 import org.eclipse.jface.databinding.swt.ISWTObservableList;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
@@ -98,24 +97,24 @@ import org.eclipse.swt.widgets.Widget;
 public class SWTObservablesTest extends AbstractSWTTestCase {
 	private Shell shell;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
 		shell = getShell();
-		RealmTester.setDefault(DisplayRealm.getRealm(shell.getDisplay()));
+		RealmTester.setDefault(SWTObservables.getRealm(shell.getDisplay()));
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
 		RealmTester.setDefault(null);
 	}
 
-	@Override
-	protected Shell createShell() {
-		return new Shell(SWT.V_SCROLL);
+	protected Shell getShell() {
+		if (shell == null) {
+			shell = new Shell(SWT.V_SCROLL);
+		}
+		return shell;
 	}
 
 	public void testObserveForeground() throws Exception {

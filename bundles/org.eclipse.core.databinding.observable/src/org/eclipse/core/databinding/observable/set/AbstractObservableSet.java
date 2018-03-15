@@ -21,15 +21,15 @@ import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.Realm;
 
 /**
- *
+ * 
  * Abstract implementation of {@link IObservableSet}.
- *
+ * 
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public abstract class AbstractObservableSet extends AbstractObservable implements
@@ -40,88 +40,75 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 	protected AbstractObservableSet() {
 		this(Realm.getDefault());
 	}
-
-	@Override
+	
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
 	}
-
+	
 	protected AbstractObservableSet(Realm realm) {
 		super(realm);
 	}
-
-	@Override
+	
 	public synchronized void addSetChangeListener(ISetChangeListener listener) {
 		addListener(SetChangeEvent.TYPE, listener);
 	}
 
-	@Override
 	public synchronized void removeSetChangeListener(ISetChangeListener listener) {
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
 	protected abstract Set getWrappedSet();
-
+	
 	protected void fireSetChange(SetDiff diff) {
 		// fire general change event first
 		super.fireChange();
 
 		fireEvent(new SetChangeEvent(this, diff));
 	}
-
-	@Override
+	
 	public boolean contains(Object o) {
 		getterCalled();
 		return getWrappedSet().contains(o);
 	}
 
-	@Override
 	public boolean containsAll(Collection c) {
 		getterCalled();
 		return getWrappedSet().containsAll(c);
 	}
 
-	@Override
 	public boolean equals(Object o) {
 		getterCalled();
 		return getWrappedSet().equals(o);
 	}
 
-	@Override
 	public int hashCode() {
 		getterCalled();
 		return getWrappedSet().hashCode();
 	}
 
-	@Override
 	public boolean isEmpty() {
 		getterCalled();
 		return getWrappedSet().isEmpty();
 	}
 
-	@Override
 	public Iterator iterator() {
 		getterCalled();
 		final Iterator wrappedIterator = getWrappedSet().iterator();
 		return new Iterator() {
 
-			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}
 
-			@Override
 			public boolean hasNext() {
 				ObservableTracker.getterCalled(AbstractObservableSet.this);
 				return wrappedIterator.hasNext();
 			}
 
-			@Override
 			public Object next() {
 				ObservableTracker.getterCalled(AbstractObservableSet.this);
 				return wrappedIterator.next();
@@ -129,25 +116,21 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 		};
 	}
 
-	@Override
 	public int size() {
 		getterCalled();
 		return getWrappedSet().size();
 	}
 
-	@Override
 	public Object[] toArray() {
 		getterCalled();
 		return getWrappedSet().toArray();
 	}
 
-	@Override
 	public Object[] toArray(Object[] a) {
 		getterCalled();
 		return getWrappedSet().toArray(a);
 	}
 
-	@Override
 	public String toString() {
 		getterCalled();
 		return getWrappedSet().toString();
@@ -157,32 +140,26 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 		ObservableTracker.getterCalled(this);
 	}
 
-	@Override
 	public boolean add(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean addAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean removeAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public boolean retainAll(Collection c) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public void clear() {
 		throw new UnsupportedOperationException();
 	}
@@ -190,7 +167,6 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 	/**
 	 * @return Returns the stale state.
 	 */
-	@Override
 	public boolean isStale() {
 		getterCalled();
 		return stale;
@@ -212,7 +188,6 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 	}
 
 
-	@Override
 	protected void fireChange() {
 		throw new RuntimeException("fireChange should not be called, use fireSetChange() instead"); //$NON-NLS-1$
 	}

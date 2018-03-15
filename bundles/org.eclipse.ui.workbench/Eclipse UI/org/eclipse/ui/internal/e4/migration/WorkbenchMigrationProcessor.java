@@ -83,7 +83,7 @@ public class WorkbenchMigrationProcessor {
 			return;
 		}
 
-		defaultWindows = new ArrayList<>(application.getChildren());
+		defaultWindows = new ArrayList<MWindow>(application.getChildren());
 		application.getChildren().clear();
 		IEclipseContext builderContext = context.createChild();
 		IModelBuilderFactory builderFactory = ContextInjectionFactory.make(

@@ -32,7 +32,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * This class is <i>not</i> a strict implementation the {@link IObservableSet}
  * interface. It intentionally violates the {@link Set} contract, which requires
  * the use of {@link #equals(Object)} when comparing elements.
- *
+ * 
  * @since 1.2
  */
 public class IdentityObservableSet extends AbstractObservableSet {
@@ -41,7 +41,7 @@ public class IdentityObservableSet extends AbstractObservableSet {
 
 	/**
 	 * Constructs an IdentityObservableSet on the given {@link Realm}.
-	 *
+	 * 
 	 * @param realm
 	 *            the realm of the constructed set.
 	 * @param elementType
@@ -54,36 +54,30 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		this.elementType = elementType;
 	}
 
-	@Override
 	protected Set getWrappedSet() {
 		return wrappedSet;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	public Iterator iterator() {
 		getterCalled();
 		final Iterator wrappedIterator = wrappedSet.iterator();
 		return new Iterator() {
 			Object last;
 
-			@Override
 			public boolean hasNext() {
 				getterCalled();
 				return wrappedIterator.hasNext();
 			}
 
-			@Override
 			public Object next() {
 				getterCalled();
 				return last = wrappedIterator.next();
 			}
 
-			@Override
 			public void remove() {
 				getterCalled();
 				wrappedIterator.remove();
@@ -93,7 +87,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		};
 	}
 
-	@Override
 	public boolean add(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.add(o);
@@ -103,7 +96,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean addAll(Collection c) {
 		getterCalled();
 		Set additions = new IdentitySet();
@@ -118,7 +110,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.remove(o);
@@ -128,7 +119,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean removeAll(Collection c) {
 		getterCalled();
 		Set removals = new IdentitySet();
@@ -143,7 +133,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean retainAll(Collection c) {
 		getterCalled();
 		Set removals = new IdentitySet();
@@ -166,7 +155,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public void clear() {
 		getterCalled();
 		if (!wrappedSet.isEmpty()) {

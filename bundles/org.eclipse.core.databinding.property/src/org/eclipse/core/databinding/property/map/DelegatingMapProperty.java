@@ -23,7 +23,7 @@ import org.eclipse.core.databinding.property.ISimplePropertyListener;
 
 /**
  * @since 1.2
- *
+ * 
  */
 public abstract class DelegatingMapProperty extends MapProperty {
 	private final Object keyType;
@@ -43,7 +43,7 @@ public abstract class DelegatingMapProperty extends MapProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Repeated calls to this method with the same source object returns the
 	 * same delegate instance.
-	 *
+	 * 
 	 * @param source
 	 *            the property source (may be null)
 	 * @return the property to delegate to for the specified source object.
@@ -61,78 +61,64 @@ public abstract class DelegatingMapProperty extends MapProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Implementers must ensure that repeated calls to this method with the same
 	 * source object returns the same delegate instance.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @return the property to delegate to for the specified source object.
 	 */
 	protected abstract IMapProperty doGetDelegate(Object source);
 
-	@Override
 	public Object getKeyType() {
 		return keyType;
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
 
-	@Override
 	protected Map doGetMap(Object source) {
 		return getDelegate(source).getMap(source);
 	}
 
-	@Override
 	protected void doSetMap(Object source, Map map) {
 		getDelegate(source).setMap(source, map);
 	}
 
-	@Override
 	protected void doUpdateMap(Object source, MapDiff diff) {
 		getDelegate(source).updateMap(source, diff);
 	}
 
-	@Override
 	public IObservableMap observe(Object source) {
 		return getDelegate(source).observe(source);
 	}
 
-	@Override
 	public IObservableMap observe(Realm realm, Object source) {
 		return getDelegate(source).observe(realm, source);
 	}
 
 	private class NullMapProperty extends SimpleMapProperty {
-		@Override
 		protected Map doGetMap(Object source) {
 			return Collections.EMPTY_MAP;
 		}
 
-		@Override
 		protected void doSetMap(Object source, Map map, MapDiff diff) {
 		}
 
-		@Override
 		protected void doSetMap(Object source, Map map) {
 		}
 
-		@Override
 		protected void doUpdateMap(Object source, MapDiff diff) {
 		}
 
-		@Override
 		public INativePropertyListener adaptListener(
 				ISimplePropertyListener listener) {
 			return null;
 		}
 
-		@Override
 		public Object getKeyType() {
 			return keyType;
 		}
 
-		@Override
 		public Object getValueType() {
 			return valueType;
 		}

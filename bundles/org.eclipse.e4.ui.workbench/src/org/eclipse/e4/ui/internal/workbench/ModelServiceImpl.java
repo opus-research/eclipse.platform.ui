@@ -59,6 +59,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -67,6 +68,10 @@ import org.osgi.service.event.EventHandler;
  */
 public class ModelServiceImpl implements EModelService {
 	private static String HOSTED_ELEMENT = "HostedElement"; //$NON-NLS-1$
+
+	private static final String COMPATIBILITY_VIEW_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView"; //$NON-NLS-1$
+
+	private static final String TAG_LABEL = "label"; //$NON-NLS-1$
 
 	private IEclipseContext appContext;
 
@@ -148,9 +153,7 @@ public class ModelServiceImpl implements EModelService {
 		boolean classMatch = clazz == null ? true : clazz.isInstance(searchRoot);
 		if (classMatch && matcher.select(searchRoot)) {
 			if (!elements.contains(searchRoot)) {
-				@SuppressWarnings("unchecked")
-				T element = (T) searchRoot;
-				elements.add(element);
+				elements.add((T) searchRoot);
 			}
 		}
 		if (searchRoot instanceof MApplication && (searchFlags == ANYWHERE)) {
@@ -198,8 +201,8 @@ public class ModelServiceImpl implements EModelService {
 			if (searchRoot instanceof MPerspectiveStack) {
 				if ((searchFlags & IN_ANY_PERSPECTIVE) != 0) {
 					// Search *all* the perspectives
-					MElementContainer<? extends MUIElement> container = (MPerspectiveStack) searchRoot;
-					List<? extends MUIElement> children = container.getChildren();
+					MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
+					List<MUIElement> children = container.getChildren();
 					for (MUIElement child : children) {
 						findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 					}
@@ -218,7 +221,6 @@ public class ModelServiceImpl implements EModelService {
 					}
 				}
 			} else {
-				@SuppressWarnings("unchecked")
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
 				List<MUIElement> children = container.getChildren();
 				for (MUIElement child : children) {
@@ -341,7 +343,6 @@ public class ModelServiceImpl implements EModelService {
 			return 0;
 		}
 
-		@SuppressWarnings("unchecked")
 		MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
 		int count = 0;
 		List<MUIElement> kids = container.getChildren();
@@ -412,15 +413,14 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			getNullRefPlaceHolders(element, refWin, true);
+			handleNullRefPlaceHolders(element, refWin, true);
 		}
 
 		return element;
 	}
 
-	private List<MPlaceholder> getNullRefPlaceHolders(MUIElement element, MWindow refWin, boolean resolveAlways) {
-		// use appContext as MApplication.getContext() is null during the
-		// processing of
+	private void handleNullRefPlaceHolders(MUIElement element, MWindow refWin, boolean resolveAlways) {
+		// use appContext as MApplication.getContext() is null during the processing of
 		// the model processor classes
 		EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
 		// Re-resolve any placeholder references
@@ -446,16 +446,57 @@ public class ModelServiceImpl implements EModelService {
 				nullRefList.add(ph);
 			}
 		}
-		return nullRefList;
+		if (!resolveAlways) {
+			List<MPart> partList = findElements(element, null, MPart.class, null);
+			for (MPart part : partList) {
+				if (COMPATIBILITY_VIEW_URI.equals(part.getContributionURI())
+						&& part.getIconURI() == null) {
+					part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
+							ImageDescriptor.getMissingImageDescriptor().createImage());
+				}
+			}
+		}
+		for (MPlaceholder ph : nullRefList) {
+			replacePlaceholder(ph);
+		}
+		return;
 	}
 
 	/**
 	 * @param element
 	 * @param refWin
-	 * @return list of null referencing place holders
 	 */
-	public List<MPlaceholder> getNullRefPlaceHolders(MUIElement element, MWindow refWin) {
-		return getNullRefPlaceHolders(element, refWin, false);
+	public void handleNullRefPlaceHolders(MUIElement element, MWindow refWin) {
+		handleNullRefPlaceHolders(element, refWin, false);
+	}
+
+	private void replacePlaceholder(MPlaceholder ph) {
+		MPart part = createModelElement(MPart.class);
+		part.setElementId(ph.getElementId());
+		part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
+				ImageDescriptor.getMissingImageDescriptor().createImage());
+		String label = (String) ph.getTransientData().get(TAG_LABEL);
+		if (label != null) {
+			part.setLabel(label);
+		} else {
+			part.setLabel(getLabel(ph.getElementId()));
+		}
+		part.setContributionURI(COMPATIBILITY_VIEW_URI);
+		part.setCloseable(true);
+		MElementContainer<MUIElement> curParent = ph.getParent();
+		int curIndex = curParent.getChildren().indexOf(ph);
+		curParent.getChildren().remove(curIndex);
+		curParent.getChildren().add(curIndex, part);
+		if (curParent.getSelectedElement() == ph) {
+			curParent.setSelectedElement(part);
+		}
+	}
+
+	private String getLabel(String str) {
+		int index = str.lastIndexOf('.');
+		if (index == -1)
+			return str;
+		return str.substring(index + 1);
 	}
 
 	@Override
@@ -522,9 +563,7 @@ public class ModelServiceImpl implements EModelService {
 				element.setToBeRendered(true);
 			}
 
-			@SuppressWarnings("unchecked")
-			MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) parent;
-			container.setSelectedElement(element);
+			((MElementContainer<MUIElement>) parent).setSelectedElement(element);
 			if (window != parent) {
 				showElementInWindow(window, parent);
 			}
@@ -585,11 +624,7 @@ public class ModelServiceImpl implements EModelService {
 		int curIndex = curParent.getChildren().indexOf(element);
 
 		// Move the model element
-		if (index == -1) {
-			newParent.getChildren().add(element);
-		} else {
-			newParent.getChildren().add(index, element);
-		}
+		newParent.getChildren().add(index, element);
 
 		if (leavePlaceholder) {
 			MPlaceholder ph = MAdvancedFactory.INSTANCE.createPlaceholder();

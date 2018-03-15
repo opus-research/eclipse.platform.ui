@@ -1,45 +1,38 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2009, 2011 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430468
  *******************************************************************************/
 
 package org.eclipse.e4.ui.tests.css.core.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.impl.dom.Measure;
 import org.eclipse.e4.ui.tests.css.core.util.ParserTestUtil;
-import org.junit.Before;
-import org.junit.Test;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.css.CSSValueList;
 
-public class ValueTest {
+public class ValueTest extends TestCase {
 
 	private CSSEngine engine;
 
-	@Before
-	public void setUp() {
+	protected void setUp() throws Exception {
 		engine = ParserTestUtil.createEngine();
 	}
-
-	@Test
+	
 	public void testFloat() throws Exception {
 		CSSValue value = engine.parsePropertyValue("2.0");
 		assertTrue(value instanceof Measure);
 		assertEquals( "2.0", value.getCssText() );
 	}
 
-	@Test
 	public void testInt() throws Exception {
 		CSSValue value = engine.parsePropertyValue("34");
 		assertTrue(value instanceof Measure);
@@ -47,7 +40,6 @@ public class ValueTest {
 		assertEquals( "34", value.getCssText() );
 	}
 
-	@Test
 	public void testIdentifier() throws Exception {
 		CSSValue value = engine.parsePropertyValue("SomeWord");
 		assertTrue(value instanceof Measure);
@@ -55,47 +47,41 @@ public class ValueTest {
 		assertEquals( "SomeWord", value.getCssText() );
 	}
 
-	@Test
 	public void testPercent() throws Exception {
 		CSSValue value = engine.parsePropertyValue("30%");
 		assertTrue(value instanceof Measure);
 		assertEquals(((Measure) value).getPrimitiveType(), CSSPrimitiveValue.CSS_PERCENTAGE);
 		assertEquals( "30.0%", value.getCssText() );
 	}
-
-	@Test
+	
 	public void testPixel() throws Exception {
 		CSSValue value = engine.parsePropertyValue("26px");
 		assertTrue(value instanceof Measure);
 		assertEquals(((Measure) value).getPrimitiveType(), CSSPrimitiveValue.CSS_PX);
 		assertEquals( "26.0px", value.getCssText() );
 	}
-
-	@Test
+	
 	public void testInch() throws Exception {
 		CSSValue value = engine.parsePropertyValue("88in");
 		assertTrue(value instanceof Measure);
 		assertEquals(((Measure) value).getPrimitiveType(), CSSPrimitiveValue.CSS_IN);
 		assertEquals( "88.0in", value.getCssText() );
 	}
-
-	@Test
+	
 	public void testEm() throws Exception {
 		CSSValue value = engine.parsePropertyValue("75em");
 		assertTrue(value instanceof Measure);
 		assertEquals(((Measure) value).getPrimitiveType(), CSSPrimitiveValue.CSS_EMS);
 		assertEquals( "75.0em", value.getCssText() );
 	}
-
-	@Test
+	
 	public void testURI() throws Exception {
 		CSSValue value = engine.parsePropertyValue("url(./somepath/picture.gif)");
 		assertTrue(value instanceof Measure);
 		assertEquals(((Measure) value).getPrimitiveType(), CSSPrimitiveValue.CSS_URI);
 		assertEquals("url(./somepath/picture.gif)", value.getCssText());
 	}
-
-	@Test
+	
 	public void testList() throws Exception {
 		CSSValue value = engine.parsePropertyValue("34 34 34");
 		assertTrue(value instanceof CSSValueList);
@@ -114,7 +100,6 @@ public class ValueTest {
 		assertEquals("34 34 34", value.getCssText());
 	}
 
-	@Test
 	public void testCommaSeparatedList() throws Exception {
 		CSSValue value = engine.parsePropertyValue("34, 34, 34");
 		assertTrue(value instanceof CSSValueList);

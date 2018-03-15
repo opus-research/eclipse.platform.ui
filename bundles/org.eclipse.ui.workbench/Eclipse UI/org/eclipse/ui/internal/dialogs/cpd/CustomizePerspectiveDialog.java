@@ -2316,33 +2316,13 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		}
 	}
 
-	private boolean updateHiddenElements(List<ActionSet> items, String currentHidden, String prefix) {
-		List<String> changedAndVisible = new ArrayList<String>();
-		List<String> changedAndInvisible = new ArrayList<String>();
-		for (ActionSet actionSet : items) {
-			if (!actionSet.wasChanged()) {
-				continue;
-			}
-			if (actionSet.isActive()) {
-				changedAndVisible.add(actionSet.descriptor.getId());
-			} else {
-				changedAndInvisible.add(actionSet.descriptor.getId());
-			}
-		}
-		return updateHiddenElements(currentHidden, prefix, changedAndVisible, changedAndInvisible);
-	}
-
 	private boolean updateHiddenElements(DisplayItem items, String currentHidden, String prefix) {
+		boolean hasChanges = false;
+
 		List<String> changedAndVisible = new ArrayList<String>();
 		List<String> changedAndInvisible = new ArrayList<String>();
 		getChangedIds(items, changedAndInvisible, changedAndVisible);
 
-		return updateHiddenElements(currentHidden, prefix, changedAndVisible, changedAndInvisible);
-	}
-
-	private boolean updateHiddenElements(String currentHidden, String prefix, List<String> changedAndVisible,
-			List<String> changedAndInvisible) {
-		boolean hasChanges = false;
 		// Remove explicitly 'visible' elements from the current list
 		for (String id : changedAndVisible) {
 			String itemId = prefix + id;
@@ -2399,8 +2379,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		perspective.turnOnActionSets(toAdd.toArray(new IActionSetDescriptor[toAdd.size()]));
 		perspective.turnOffActionSets(toRemove.toArray(new IActionSetDescriptor[toRemove.size()]));
 
-		requiresUpdate |= updateHiddenElements(actionSets, windowPage.getHiddenItems(),
-				ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX);
 		// Menu and Toolbar Items
 		requiresUpdate |= updateHiddenElements(menuItems, windowPage.getHiddenItems(),
 				ModeledPageLayout.HIDDEN_MENU_PREFIX);

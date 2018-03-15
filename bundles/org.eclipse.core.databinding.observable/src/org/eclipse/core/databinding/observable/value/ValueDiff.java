@@ -17,7 +17,7 @@ import org.eclipse.core.databinding.observable.IDiff;
 
 /**
  * @since 1.0
- *
+ * 
  */
 public abstract class ValueDiff implements IDiff {
 	/**
@@ -36,7 +36,6 @@ public abstract class ValueDiff implements IDiff {
 	 */
 	public abstract Object getNewValue();
 
-	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ValueDiff) {
 			ValueDiff val = (ValueDiff) obj;
@@ -47,8 +46,7 @@ public abstract class ValueDiff implements IDiff {
 		}
 		return false;
 	}
-
-	@Override
+		
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -62,7 +60,6 @@ public abstract class ValueDiff implements IDiff {
 	/**
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		buffer
@@ -72,7 +69,7 @@ public abstract class ValueDiff implements IDiff {
 			.append("], newValue [") //$NON-NLS-1$
 			.append(getNewValue() != null ? getNewValue().toString() : "null") //$NON-NLS-1$
 			.append("]}"); //$NON-NLS-1$
-
+		
 		return buffer.toString();
 	}
 }
