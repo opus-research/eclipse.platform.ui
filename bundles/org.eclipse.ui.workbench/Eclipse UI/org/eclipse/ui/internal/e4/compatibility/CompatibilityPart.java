@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Steven Spungin <steven@spungin.tv> - Bug 436908
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799, 446864
  *     Snjezana Peco <snjezana.peco@redhat.com> - Bug 414888
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 503379
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -27,6 +26,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -127,7 +127,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent e) {
-			ESelectionService selectionService = part.getContext().get(ESelectionService.class);
+			ESelectionService selectionService = (ESelectionService) part.getContext().get(
+					ESelectionService.class.getName());
 			selectionService.setPostSelection(e.getSelection());
 		}
 	};
@@ -189,7 +190,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				} else {
 					selectionProvider.addSelectionChangedListener(postListener);
 				}
-				ESelectionService selectionService = part.getContext().get(ESelectionService.class);
+				ESelectionService selectionService = (ESelectionService) part.getContext().get(
+						ESelectionService.class.getName());
 				selectionService.setSelection(selectionProvider.getSelection());
 			}
 		}
@@ -343,12 +345,14 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		// Only update 'valid' parts
 		if (!(wrapped instanceof ErrorEditorPart) && !(wrapped instanceof ErrorViewPart)) {
 			part.setLabel(computeLabel());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY, wrapped.getTitleToolTip());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY, wrapped.getTitleImage());
+			part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
+					wrapped.getTitleToolTip());
+			part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
+					wrapped.getTitleImage());
 		}
 
 		ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
-		if (saveable != null && SaveableHelper.isDirtyStateSupported(wrapped)) {
+		if (saveable != null) {
 			part.setDirty(saveable.isDirty());
 		}
 
@@ -370,18 +374,9 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_DIRTY:
-					boolean supportsDirtyState = SaveableHelper.isDirtyStateSupported(wrapped);
-					if (!supportsDirtyState) {
-						part.setDirty(false);
-						return;
-					}
 					ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
 					if (saveable != null) {
-						part.setDirty(saveable.isDirty());
-					} else if (part.isDirty()) {
-						// reset if the wrapped legacy part do not exposes
-						// saveable adapter anymore, see bug 495567 comment 6
-						part.setDirty(false);
+						((MDirtyable) part).setDirty(saveable.isDirty());
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_INPUT:
@@ -390,7 +385,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 					break;
 				}
 			}
-
 		});
 	}
 
@@ -442,7 +436,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
-		ESelectionService selectionService = part.getContext().get(ESelectionService.class);
+		ESelectionService selectionService = (ESelectionService) part.getContext().get(
+				ESelectionService.class.getName());
 		selectionService.setSelection(e.getSelection());
 	}
 

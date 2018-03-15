@@ -74,7 +74,7 @@ import org.eclipse.ui.model.WorkbenchPartLabelProvider;
  */
 public class SaveablesList implements ISaveablesLifecycleListener {
 
-	private ListenerList<ISaveablesLifecycleListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	// event source (mostly ISaveablesSource) -> Set of Saveable
 	private Map<Object, Set<Saveable>> modelMap = new HashMap<>();
@@ -305,8 +305,10 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param event
 	 */
 	private void fireModelLifecycleEvent(SaveablesLifecycleEvent event) {
-		for (ISaveablesLifecycleListener listener : listeners) {
-			listener.handleLifecycleEvent(event);
+		Object[] listenerArray = listeners.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((ISaveablesLifecycleListener) listenerArray[i])
+					.handleLifecycleEvent(event);
 		}
 	}
 

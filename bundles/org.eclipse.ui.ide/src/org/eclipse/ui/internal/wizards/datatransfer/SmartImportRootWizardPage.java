@@ -10,13 +10,11 @@
  *     Snjezana Peco (Red Hat Inc.)
  *     Lars Vogel <Lars.Vogel@vogella.com>
  *     Rüdiger Herrmann <ruediger.herrmann@gmx.de>
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500836
  ******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +26,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -110,17 +107,14 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private class FolderForProjectsLabelProvider extends CellLabelProvider implements IColorProvider {
 		public String getText(Object o) {
 			File file = (File) o;
-			Path filePath = file.toPath();
-			Path rootPath = getWizard().getImportJob().getRoot().toPath();
-			if (filePath.startsWith(rootPath)) {
-				if (rootPath.getParent() != null) {
-					Path relative = rootPath.getParent().relativize(filePath);
-					if (relative.getNameCount() > 0) {
-						return relative.toString();
-					}
+			String label = file.getAbsolutePath();
+			File root = getWizard().getImportJob().getRoot();
+			if (label.startsWith(root.getAbsolutePath())) {
+				if (root.getParentFile() != null) {
+					label = label.substring(root.getParentFile().getAbsolutePath().length() + 1);
 				}
 			}
-			return filePath.toString();
+			return label;
 		}
 
 		@Override
@@ -681,12 +675,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 								potentialProjects.keySet());
 						SmartImportRootWizardPage.this.alreadyExistingProjects = new HashSet<>();
 						for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-							IPath location = project.getLocation();
-							if (location == null) {
-								continue;
-							}
-							SmartImportRootWizardPage.this.notAlreadyExistingProjects.remove(location.toFile());
-							SmartImportRootWizardPage.this.alreadyExistingProjects.add(location.toFile());
+							SmartImportRootWizardPage.this.notAlreadyExistingProjects
+									.remove(project.getLocation().toFile());
+							SmartImportRootWizardPage.this.alreadyExistingProjects.add(project.getLocation().toFile());
 						}
 					}
 				});

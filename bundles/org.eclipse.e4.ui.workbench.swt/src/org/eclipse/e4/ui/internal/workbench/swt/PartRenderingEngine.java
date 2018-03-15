@@ -117,7 +117,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	IRendererFactory curFactory = null;
 
-	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<>();
+	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<String, AbstractPartRenderer>();
 
 	org.eclipse.swt.widgets.Listener keyListener;
 
@@ -867,7 +867,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
 				// Bug 458460: Operate on a copy in case child nulls out parent
-				for (MUIElement child : new ArrayList<>(children)) {
+				for (MUIElement child : new ArrayList<MUIElement>(children)) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
@@ -1447,7 +1447,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
-				prefs = new HashSet<>();
+				prefs = new HashSet<IEclipsePreferences>();
 				BundleContext context = WorkbenchSWTActivator.getDefault().getContext();
 				for (Bundle bundle : context.getBundles()) {
 					if (bundle.getSymbolicName() != null) {
