@@ -563,13 +563,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 		preferences.addPreferenceChangeListener(this);
 		preferenceChange(null);
-
-		Display.getCurrent().disposeExec(new Runnable() {
-			@Override
-			public void run() {
-				viewMenuImage.dispose();
-			}
-		});
 	}
 
 	protected void updateTab(CTabItem cti, MPart part, String attName,
@@ -1423,6 +1416,13 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 					viewMenuMask.getImageData());
 			viewMenu.dispose();
 			viewMenuMask.dispose();
+
+			Display.getCurrent().disposeExec(new Runnable() {
+				@Override
+				public void run() {
+					viewMenuImage.dispose();
+				}
+			});
 		}
 		return viewMenuImage;
 	}
