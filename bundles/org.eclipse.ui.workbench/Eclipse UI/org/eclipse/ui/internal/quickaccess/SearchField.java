@@ -359,7 +359,9 @@ public class SearchField {
 				if (b.getParameterizedCommand() != null
 						&& QUICK_ACCESS_COMMAND_ID.equalsIgnoreCase(b.getParameterizedCommand().getId())) {
 					triggerSequence = b.getTriggerSequence();
-					break;
+					// NOTE: uncomment below will break the behavior in Linux.
+					// System.out.println("update: " + triggerSequence.format())
+					// break;
 				}
 			}
 		}
@@ -369,6 +371,7 @@ public class SearchField {
 
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
+		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
 
 		FontData[] fD = text.getFont().getFontData();
 		int round = (int) Math.round(fD[0].getHeight() * 0.8);
@@ -384,7 +387,6 @@ public class SearchField {
 		if (text == null || text.isDisposed())
 			return;
 
-		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
 		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, getQuickAccessTriggerSequenceFormat()));
 
 		GC gc = new GC(text);
