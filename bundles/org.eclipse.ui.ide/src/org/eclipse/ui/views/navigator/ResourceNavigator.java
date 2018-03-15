@@ -1085,8 +1085,8 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (childMem != null) {
                 ArrayList elements = new ArrayList();
                 IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-                for (IMemento element2 : elementMem) {
-                    Object element = container.findMember(element2
+                for (IMemento mem : elementMem) {
+                    Object element = container.findMember(mem
                             .getString(TAG_PATH));
                     if (element != null) {
                         elements.add(element);
@@ -1098,8 +1098,8 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (childMem != null) {
                 ArrayList list = new ArrayList();
                 IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-                for (IMemento element2 : elementMem) {
-                    Object element = container.findMember(element2
+                for (IMemento mem : elementMem) {
+                    Object element = container.findMember(mem
                             .getString(TAG_PATH));
                     if (element != null) {
                         list.add(element);

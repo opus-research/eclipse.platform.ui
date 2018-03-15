@@ -315,8 +315,8 @@ public class CleanDialog extends MessageDialog {
         } else {
 			SubMonitor subMonitor = SubMonitor.convert(monitor, IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName,
 					selection.length);
-			for (Object element : selection) {
-				((IProject) element).build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor.split(1));
+			for (int i = 0; i < selection.length; i++) {
+				((IProject) selection[i]).build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor.split(1));
             }
         }
     }

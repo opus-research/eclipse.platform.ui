@@ -103,7 +103,8 @@ public class ConfigurationLogUpdateSection implements ISystemSummarySection {
 			// won't worry too much about performance here and we will sort the query results
 			// afterwards, but before printing them out.
 			SortedSet sorted = new TreeSet();
-			for (BundleDescription bundle : bundles) {
+			for (int i = 0; i < bundles.length; i++) {
+				BundleDescription bundle = bundles[i];
 				String name = bundle.getName();
 				if (name == null)
 					name = bundle.getLocation();

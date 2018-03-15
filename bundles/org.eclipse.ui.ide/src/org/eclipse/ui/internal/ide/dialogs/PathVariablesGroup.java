@@ -593,12 +593,12 @@ public class PathVariablesGroup {
         String[] varNames = pathVariableManager.getPathVariableNames();
 
         tempPathVariables.clear();
-        for (String varName : varNames) {
+        for (int i = 0; i < varNames.length; i++) {
         	// hide the PARENT variable
-        	if (varName.equals(PARENT_VARIABLE_NAME))
+        	if (varNames[i].equals(PARENT_VARIABLE_NAME))
         		continue;
             try {
-				URI uri = pathVariableManager.getURIValue(varName);
+				URI uri = pathVariableManager.getURIValue(varNames[i]);
 				// the value may not exist any more
 				if (uri != null) {
 				    IPath value = URIUtil.toPath(uri);
@@ -607,7 +607,7 @@ public class PathVariablesGroup {
 				        if ((isFile && (variableType & IResource.FILE) != 0)
 				                || (isFile == false && (variableType & IResource.FOLDER) != 0)) {
 
-				            tempPathVariables.put(varName, value);
+				            tempPathVariables.put(varNames[i], value);
 				        }
 				    }
 				}
@@ -689,8 +689,8 @@ public class PathVariablesGroup {
     private void removeSelectedVariables() {
         // remove each selected element
         int[] selectedIndices = variableTable.getTable().getSelectionIndices();
-        for (int selectedIndice : selectedIndices) {
-            TableItem selectedItem = variableTable.getTable().getItem(selectedIndice);
+        for (int i = 0; i < selectedIndices.length; i++) {
+            TableItem selectedItem = variableTable.getTable().getItem(selectedIndices[i]);
             String varName = (String) selectedItem.getData();
             removedVariableNames.add(varName);
             tempPathVariables.remove(varName);
@@ -701,8 +701,8 @@ public class PathVariablesGroup {
 
     private boolean canChangeSelection() {
         int[] selectedIndices = variableTable.getTable().getSelectionIndices();
-        for (int selectedIndice : selectedIndices) {
-            TableItem selectedItem = variableTable.getTable().getItem(selectedIndice);
+        for (int i = 0; i < selectedIndices.length; i++) {
+            TableItem selectedItem = variableTable.getTable().getItem(selectedIndices[i]);
             String varName = (String) selectedItem.getData();
             if (isBuiltInVariable(varName))
                 return false;

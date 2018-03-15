@@ -43,8 +43,8 @@ public class MarkerShowInAdapter implements IAdapterFactory {
 		return adapterType.cast((IShowInSource) () -> {
 			IMarker[] markers = view.getSelectedMarkers();
 			Collection<IResource> resources = new HashSet<>();
-			for (IMarker marker : markers) {
-				resources.add(marker.getResource());
+			for (int i = 0; i < markers.length; i++) {
+				resources.add(markers[i].getResource());
 			}
 			return new ShowInContext(view.getViewerInput(), new StructuredSelection(resources.toArray()));
 		});

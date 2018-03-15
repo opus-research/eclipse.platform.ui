@@ -281,15 +281,14 @@ public class FinishedJobs extends EventManager {
 				}
 
 				if (toBeRemoved != null) {
-					for (JobTreeElement element2 : toBeRemoved) {
-						remove(element2);
+					for (JobTreeElement jobTreeElement : toBeRemoved) {
+						remove(jobTreeElement);
 					}
 				}
 
 				if (fire) {
-					Object l[] = getListeners();
-					for (Object element2 : l) {
-						KeptJobsListener jv = (KeptJobsListener) element2;
+					for (Object listener : getListeners()) {
+						KeptJobsListener jv = (KeptJobsListener) listener;
 						jv.finished(info);
 					}
 				}
