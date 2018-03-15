@@ -35,7 +35,7 @@ public class PerspectiveRenderer extends SWTPartRenderer {
 				|| !(parent instanceof Composite))
 			return null;
 
-		Composite perspArea = new Composite((Composite) parent, SWT.NONE);
+		Composite perspArea = new Composite((Composite) parent, SWT.NO_BACKGROUND);
 		perspArea.setLayout(new FillLayout());
 		IStylingEngine stylingEngine = getContext(element).get(IStylingEngine.class);
 		stylingEngine.setClassname(perspArea, "perspectiveLayout"); //$NON-NLS-1$

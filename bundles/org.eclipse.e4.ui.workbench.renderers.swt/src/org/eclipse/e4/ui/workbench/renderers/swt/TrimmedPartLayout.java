@@ -93,7 +93,7 @@ public class TrimmedPartLayout extends Layout {
 	 * @param trimOwner
 	 */
 	public TrimmedPartLayout(Composite parent) {
-		clientArea = new Composite(parent, SWT.NONE);
+		clientArea = new Composite(parent, SWT.NO_BACKGROUND);
 		clientArea.setLayout(new FillLayout());
 	}
 

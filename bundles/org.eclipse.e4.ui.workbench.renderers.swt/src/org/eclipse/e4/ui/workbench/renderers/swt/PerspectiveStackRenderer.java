@@ -48,7 +48,7 @@ public class PerspectiveStackRenderer extends LazyStackRenderer {
 		if (!(element instanceof MPerspectiveStack) || !(parent instanceof Composite))
 			return null;
 
-		Composite perspStack = new Composite((Composite) parent, SWT.NONE);
+		Composite perspStack = new Composite((Composite) parent, SWT.NO_BACKGROUND);
 		IStylingEngine stylingEngine = getContext(element).get(IStylingEngine.class);
 		stylingEngine.setClassname(perspStack, "perspectiveLayout"); //$NON-NLS-1$
 		perspStack.setLayout(new StackLayout());
