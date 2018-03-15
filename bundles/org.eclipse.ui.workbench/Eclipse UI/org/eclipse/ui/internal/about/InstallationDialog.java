@@ -104,7 +104,7 @@ public class InstallationDialog extends TrayDialog implements
 
 			GridLayout compositeLayout = (GridLayout) composite.getLayout();
 			compositeLayout.numColumns = visibleChildren;
-			composite.layout(true);
+			composite.requestLayout();
 		}
 
 		protected void setButtonLayoutData(FontMetrics metrics, Control button,

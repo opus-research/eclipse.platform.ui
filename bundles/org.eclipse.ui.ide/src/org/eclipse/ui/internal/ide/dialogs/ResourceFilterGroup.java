@@ -2125,7 +2125,7 @@ class FilterEditDialog extends TrayDialog {
 					filter.setArguments(""); //$NON-NLS-1$
 				setupPatternLine();
 				currentCustomFilterArgumentUI.selectionChanged();
-				getShell().layout(true);
+				getShell().requestLayout();
 				Point size = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 				Point shellSize = getShell().getSize();
 				size.x = Math.max(size.x, shellSize.x);
@@ -3147,7 +3147,7 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 
 		if (fContentAssistField != null)
 			fContentAssistField.setEnabled(filter.getId().equals(REGEX_FILTER_ID));
-		argumentComposite.layout(true);
+		argumentComposite.requestLayout();
 	}
 
 	private void createArgumentsArea(Font font, Composite composite) {

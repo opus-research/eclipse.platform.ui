@@ -155,7 +155,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 
 			// also hide the separator
 			c.getChildren()[1].setVisible(hasText);
-			c.layout();
+			c.requestLayout();
 		} else if (c.getChildren().length == 1) {
 			c.setLayout(new Layout() {
 
@@ -199,7 +199,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 			label.setText(description);
 			label.setToolTipText(description);
 			label.moveAbove(null);
-			c.layout();
+			c.requestLayout();
 		}
 	}
 

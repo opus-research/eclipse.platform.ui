@@ -550,7 +550,7 @@ public class MinMaxAddon {
 				ctf.setMaximizeVisible(true);
 				ctf.setMinimized(false);
 				ctf.setMaximized(false);
-				ctf.layout();
+				ctf.requestLayout();
 			}
 		}
 	}

@@ -57,7 +57,7 @@ public class WorkbenchPreview implements IThemePreview {
 	    if (!disposed) {
 	        setColorsAndFonts();
 	        //viewMessage.setSize(viewMessage.computeSize(SWT.DEFAULT, SWT.DEFAULT, true));
-	        viewForm.layout(true);
+	        viewForm.requestLayout();
 	    }
 	};
 

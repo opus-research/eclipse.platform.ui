@@ -76,7 +76,7 @@ public abstract class TrayDialog extends Dialog {
 					data.widthHint = data.widthHint + trayWidthIncrease;
 					shellWidth = newWidth;
 					if (!shell.isDisposed()) {
-						shell.layout();
+						shell.requestLayout();
 					}
 				}
 		  }
@@ -431,7 +431,7 @@ public abstract class TrayDialog extends Dialog {
 				int newWidth = clientArea1.width - event.x - (sash.getSize().x + rightSeparator.getSize().x);
 				if (newWidth != data.widthHint) {
 					data.widthHint = newWidth;
-					shell.layout();
+					shell.requestLayout();
 				}
 			}
 		});

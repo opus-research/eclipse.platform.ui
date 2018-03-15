@@ -2827,7 +2827,7 @@ STATUS_LINE_ID, model);
 		MTrimBar topTrim = getTopTrim();
 		if (topTrim != null) {
 			topTrim.setVisible(isToolbarVisible());
-			getShell().layout();
+			getShell().requestLayout();
 		}
 	}
 

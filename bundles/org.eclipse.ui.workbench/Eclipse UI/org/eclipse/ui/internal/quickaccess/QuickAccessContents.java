@@ -270,7 +270,7 @@ public abstract class QuickAccessContents {
 				infoLabel
 						.setText(NLS.bind(QuickAccessMessages.QuickAccess_PressKeyToShowAllMatches, sequence.format()));
 			}
-			infoLabel.getParent().layout(true);
+			infoLabel.getParent().requestLayout();
 		}
 	}
 

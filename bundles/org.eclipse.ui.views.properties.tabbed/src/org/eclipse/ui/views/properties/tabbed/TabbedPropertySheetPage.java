@@ -204,7 +204,7 @@ public class TabbedPropertySheetPage
 					tabComposite = createTabComposite();
 					tab.createControls(tabComposite,
 						TabbedPropertySheetPage.this);
-					// tabAreaComposite.layout(true);
+					// tabAreaComposite.requestLayout();
 					tabToComposite.put(tab, tabComposite);
 				}
 				// force widgets to be resized
@@ -220,7 +220,7 @@ public class TabbedPropertySheetPage
 
 				tab.refresh();
 			}
-			tabbedPropertyComposite.getTabComposite().layout(true);
+			tabbedPropertyComposite.getTabComposite().requestLayout();
 			currentTab = tab;
 			resizeScrolledComposite();
 

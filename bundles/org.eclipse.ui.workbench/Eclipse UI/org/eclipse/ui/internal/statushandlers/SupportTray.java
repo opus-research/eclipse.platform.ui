@@ -312,7 +312,7 @@ public class SupportTray extends DialogTray implements
 		if (supportArea != null && !supportArea.isDisposed()) {
 			if (lastSelectedStatus != null) {
 				createSupportArea(supportArea, lastSelectedStatus);
-				supportArea.layout(true);
+				supportArea.requestLayout();
 			}
 		}
 	}

@@ -130,7 +130,7 @@ class DragHost {
 		if (dragElement.getWidget() instanceof ToolItem) {
 			ToolItem ti = (ToolItem) dragElement.getWidget();
 			ToolBar tb = ti.getParent();
-			tb.layout(true);
+			tb.requestLayout();
 			tb.getParent()
 					.layout(new Control[] { tb }, SWT.CHANGED | SWT.DEFER);
 		}

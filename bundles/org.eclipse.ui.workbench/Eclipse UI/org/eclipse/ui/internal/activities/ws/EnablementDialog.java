@@ -304,7 +304,7 @@ public class EnablementDialog extends Dialog {
         setDetailButtonLabel();
         setDetailHints();
         setDetails();
-        ((Composite) getDialogArea()).layout(true);
+        ((Composite) getDialogArea()).requestLayout();
         getShell().setSize(getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 }

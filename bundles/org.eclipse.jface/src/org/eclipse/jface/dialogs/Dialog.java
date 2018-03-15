@@ -720,7 +720,7 @@ public abstract class Dialog extends Window {
 				if (defaultButton != null
 						&& isContained(buttonBar, defaultButton)) {
 					defaultButton.moveBelow(null);
-					defaultButton.getParent().layout();
+					defaultButton.getParent().requestLayout();
 				}
 			}
 		}

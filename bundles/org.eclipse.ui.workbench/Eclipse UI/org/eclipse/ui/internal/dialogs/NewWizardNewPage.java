@@ -678,7 +678,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
             descImageCanvas.setImage(null);
         }
 
-        descImageCanvas.getParent().layout(true);
+        descImageCanvas.getParent().requestLayout();
         filteredTree.getViewer().getTree().showSelection();
 
         IWizardContainer container = page.getWizard().getContainer();

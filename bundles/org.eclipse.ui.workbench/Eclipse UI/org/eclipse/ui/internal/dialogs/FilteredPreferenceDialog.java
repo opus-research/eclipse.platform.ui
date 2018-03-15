@@ -652,10 +652,10 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		if (hasAtMostOnePage()) {
 			Composite composite= getTreeViewer().getTree();
 			applyDialogFont(composite, dialogFont);
-			composite.layout(true);
+			composite.requestLayout();
 		} else {
 			applyDialogFont(filteredTree, dialogFont);
-			filteredTree.layout(true);
+			filteredTree.requestLayout();
 		}
 	}
 

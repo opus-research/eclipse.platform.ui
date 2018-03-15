@@ -243,7 +243,7 @@ public class SmartImportJobReportDialog extends ProgressMonitorFocusJobDialog {
 						errorsTable.getTable().update();
 						errorsLabel.setText(
 								NLS.bind(DataTransferMessages.SmartImportReport_importErrors, job.getErrors().size()));
-						res.layout(true);
+						res.requestLayout();
 					}
 				});
 			}

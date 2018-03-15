@@ -1154,7 +1154,7 @@ public class TabbedPropertyList
 
 		// layout so that we have enough space for the new labels
 		Composite grandparent = getParent().getParent();
-		grandparent.layout(true);
+		grandparent.requestLayout();
 		layout(true);
 	}
 
