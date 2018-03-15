@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import org.eclipse.jface.tests.viewers.ViewerTestCase;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.IColorDecorator;
 import org.eclipse.jface.viewers.IDecorationContext;
 import org.eclipse.jface.viewers.IFontProvider;
@@ -31,6 +30,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -154,12 +154,12 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 		viewer.setContentProvider(new IStructuredContentProvider() {
 			@Override
 			public void dispose() {
-			}
+			};
 
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return entries;
-			}
+			};
 
 			@Override
 			public void inputChanged(org.eclipse.jface.viewers.Viewer viewer,
@@ -461,7 +461,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 		 */
 		protected void drawName(Event event) {
 
-			StringBuilder buffer = getDisplayString();
+			StringBuffer buffer = getDisplayString();
 
 			Display display = fViewer.getControl().getDisplay();
 			TextLayout layout = new TextLayout(display);
@@ -489,8 +489,8 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 		/**
 		 * @return
 		 */
-		private StringBuilder getDisplayString() {
-			StringBuilder buffer = new StringBuilder();
+		private StringBuffer getDisplayString() {
+			StringBuffer buffer = new StringBuffer();
 			buffer.append(name);
 			buffer.append(" (");
 			buffer.append(baseName);

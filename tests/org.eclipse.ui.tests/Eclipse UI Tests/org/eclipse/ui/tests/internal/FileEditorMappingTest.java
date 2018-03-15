@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.ui.tests.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.FileEditorMapping;
@@ -79,9 +78,9 @@ public class FileEditorMappingTest extends UITestCase {
 
 		assertEquals(mappingA, mappingB);
 
-		List<IEditorDescriptor> defaultA = new ArrayList<>();
+		List defaultA = new ArrayList();
 		defaultA.add(textEditor);
-		List<IEditorDescriptor> defaultB = new ArrayList<>();
+		List defaultB = new ArrayList();
 		defaultB.add(pdeEditor);
 
 		mappingA.setDefaultEditors(defaultA);
@@ -134,9 +133,9 @@ public class FileEditorMappingTest extends UITestCase {
 
 		assertEquals(mappingA.hashCode(), mappingB.hashCode());
 
-		List<IEditorDescriptor> defaultA = new ArrayList<>();
+		List defaultA = new ArrayList();
 		defaultA.add(textEditor);
-		List<IEditorDescriptor> defaultB = new ArrayList<>();
+		List defaultB = new ArrayList();
 		defaultB.add(pdeEditor);
 
 		mappingA.setDefaultEditors(defaultA);

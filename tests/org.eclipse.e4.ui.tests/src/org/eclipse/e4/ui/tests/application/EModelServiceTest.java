@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
+import org.eclipse.e4.ui.model.application.ui.MElementContainer;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
@@ -49,8 +51,10 @@ public class EModelServiceTest extends UITest {
 
 		getEngine().createGui(window);
 
-		EModelService modelService = window.getContext().get(EModelService.class);
-		MPerspective foundPerspective = modelService.getPerspectiveFor(partStack);
+		EModelService modelService = window.getContext().get(
+				EModelService.class);
+		MPerspective foundPerspective = modelService
+				.getPerspectiveFor(partStack);
 		assertNotNull(foundPerspective);
 		assertEquals(perspective, foundPerspective);
 	}
@@ -79,8 +83,10 @@ public class EModelServiceTest extends UITest {
 
 		getEngine().createGui(window);
 
-		EModelService modelService = window.getContext().get(EModelService.class);
-		MPerspective foundPerspective = modelService.getPerspectiveFor(partStack);
+		EModelService modelService = window.getContext().get(
+				EModelService.class);
+		MPerspective foundPerspective = modelService
+				.getPerspectiveFor(partStack);
 		assertNotNull(foundPerspective);
 		assertEquals(perspective, foundPerspective);
 	}
@@ -113,8 +119,10 @@ public class EModelServiceTest extends UITest {
 
 		getEngine().createGui(window);
 
-		EModelService modelService = window.getContext().get(EModelService.class);
-		MPerspective foundPerspective = modelService.getPerspectiveFor(partStack);
+		EModelService modelService = window.getContext().get(
+				EModelService.class);
+		MPerspective foundPerspective = modelService
+				.getPerspectiveFor(partStack);
 		assertNotNull(foundPerspective);
 		assertEquals(perspective, foundPerspective);
 	}
@@ -133,7 +141,8 @@ public class EModelServiceTest extends UITest {
 
 		assertEquals(windowA, application.getSelectedElement());
 
-		EModelService modelService = applicationContext.get(EModelService.class);
+		EModelService modelService = applicationContext
+				.get(EModelService.class);
 		modelService.bringToTop(windowA);
 		assertEquals(windowA, application.getSelectedElement());
 
@@ -159,7 +168,8 @@ public class EModelServiceTest extends UITest {
 
 		assertEquals(windowB, application.getSelectedElement());
 
-		EModelService modelService = applicationContext.get(EModelService.class);
+		EModelService modelService = applicationContext
+				.get(EModelService.class);
 		modelService.bringToTop(windowA);
 		assertEquals(windowA, application.getSelectedElement());
 
@@ -185,7 +195,8 @@ public class EModelServiceTest extends UITest {
 
 		assertEquals(window, application.getSelectedElement());
 
-		EModelService modelService = applicationContext.get(EModelService.class);
+		EModelService modelService = applicationContext
+				.get(EModelService.class);
 		modelService.bringToTop(part);
 		assertTrue(part.isToBeRendered());
 		assertTrue(detachedWindow.isToBeRendered());
@@ -197,8 +208,10 @@ public class EModelServiceTest extends UITest {
 		MPart part = ems.createModelElement(MPart.class);
 		perspective.getChildren().add(part);
 
-		EModelService modelService = applicationContext.get(EModelService.class);
-		assertEquals(EModelService.NOT_IN_UI, modelService.getElementLocation(part));
+		EModelService modelService = applicationContext
+				.get(EModelService.class);
+		assertEquals(EModelService.NOT_IN_UI,
+				modelService.getElementLocation(part));
 	}
 
 	@Test
@@ -210,47 +223,66 @@ public class EModelServiceTest extends UITest {
 		MWindow innerWindow = ems.createModelElement(MWindow.class);
 		detachedWindow.getWindows().add(innerWindow);
 
-		EModelService modelService = applicationContext.get(EModelService.class);
-		assertEquals(EModelService.NOT_IN_UI, modelService.getElementLocation(innerWindow));
+		EModelService modelService = applicationContext
+				.get(EModelService.class);
+		assertEquals(EModelService.NOT_IN_UI,
+				modelService.getElementLocation(innerWindow));
 	}
 
 	@Test
 	public void testMoveWithoutIndexNoOtherElements() {
 		MWindow source = ems.createModelElement(MWindow.class);
+
+		// The following casts are necessary because BR 465292 and can be
+		// removed, once it is fixed
 		MWindow window = ems.createModelElement(MWindow.class);
+		MElementContainer<? extends MUIElement> erase1 = window;
+		MElementContainer<MUIElement> target = (MElementContainer<MUIElement>) erase1;
+
 		MPart part = ems.createModelElement(MPart.class);
 		source.getChildren().add(part);
+		MUIElement uiElement = part;
 		EModelService modelService = applicationContext.get(EModelService.class);
-		modelService.move(part, window);
-		assertEquals(part, window.getChildren().get(0));
+		modelService.move(uiElement, target);
+		assertEquals(part, target.getChildren().get(0));
 	}
 
 	@Test
 	public void testMoveWithoutIndexWithOneOtherElements() {
 		MWindow source = ems.createModelElement(MWindow.class);
+
+		// The following casts are necessary because BR 465292 and can be
+		// removed, once it is fixed
 		MWindow window = ems.createModelElement(MWindow.class);
+		MElementContainer<? extends MUIElement> erase1 = window;
+		MElementContainer<MUIElement> target = (MElementContainer<MUIElement>) erase1;
 		MPart part = ems.createModelElement(MPart.class);
 		MPart part2 = ems.createModelElement(MPart.class);
 		source.getChildren().add(part);
-		window.getChildren().add(part2);
+		target.getChildren().add(part2);
 		EModelService modelService = applicationContext.get(EModelService.class);
-		modelService.move(part, window);
-		assertSame(part, window.getChildren().get(1));
+		modelService.move(part, target);
+		assertSame(part, target.getChildren().get(1));
 	}
 
 	@Test
 	public void testMoveWithIndexWithTwoOtherElement() {
 		MWindow source = ems.createModelElement(MWindow.class);
+
+		// The following casts are necessary because BR 465292 and can be
+		// removed, once it is fixed
 		MWindow window = ems.createModelElement(MWindow.class);
+		MElementContainer<? extends MUIElement> erase1 = window;
+		MElementContainer<MUIElement> target = (MElementContainer<MUIElement>) erase1;
 		MPart part = ems.createModelElement(MPart.class);
 		MPart part2 = ems.createModelElement(MPart.class);
 		MPart part3 = ems.createModelElement(MPart.class);
 		source.getChildren().add(part);
-		window.getChildren().add(part2);
-		window.getChildren().add(part3);
+		target.getChildren().add(part2);
+		target.getChildren().add(part3);
 		EModelService modelService = applicationContext.get(EModelService.class);
-		modelService.move(part, window, 1);
-		assertSame(part, window.getChildren().get(1));
+		modelService.move(part, target, 1);
+		assertSame(part, target.getChildren().get(1));
 	}
 
 	@Test

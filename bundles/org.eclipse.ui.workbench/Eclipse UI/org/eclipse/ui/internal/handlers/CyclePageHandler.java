@@ -92,11 +92,12 @@ public class CyclePageHandler extends FilteredTableBaseHandler {
 	}
 
 	protected void addItemz(Table table, WorkbenchPage page) {
-		for (Object availablePage : pageSwitcher.getPages()) {
+		Object[] pages = pageSwitcher.getPages();
+		for (int i = 0; i < pages.length; i++) {
 			TableItem item = null;
 			item = new TableItem(table, SWT.NONE);
 			ImageDescriptor imageDescriptor = pageSwitcher
-					.getImageDescriptor(availablePage);
+					.getImageDescriptor(pages[i]);
 			if (imageDescriptor != null) {
 				if (lrm == null) {
 					lrm = new LocalResourceManager(JFaceResources
@@ -104,8 +105,8 @@ public class CyclePageHandler extends FilteredTableBaseHandler {
 				}
 				item.setImage(lrm.createImage(imageDescriptor));
 			}
-			item.setData(availablePage);
-			String name = pageSwitcher.getName(availablePage);
+			item.setData(pages[i]);
+			String name = pageSwitcher.getName(pages[i]);
 			if (name.length() > TEXT_LIMIT) {
 				name = name.substring(0, TEXT_LIMIT) + "..."; //$NON-NLS-1$
 			}
@@ -122,7 +123,8 @@ public class CyclePageHandler extends FilteredTableBaseHandler {
 	protected ParameterizedCommand getBackwardCommand() {
 		final ICommandService commandService = window
 				.getWorkbench().getService(ICommandService.class);
-		final Command command = commandService.getCommand(IWorkbenchCommandConstants.NAVIGATE_PREVIOUS_PAGE);
+		final Command command = commandService
+.getCommand(IWorkbenchCommandConstants.NAVIGATE_PREVIOUS_PAGE);
 		ParameterizedCommand commandF = new ParameterizedCommand(command, null);
 		return commandF;
 	}

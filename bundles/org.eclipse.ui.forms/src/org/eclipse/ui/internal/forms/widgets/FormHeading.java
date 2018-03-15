@@ -7,7 +7,6 @@
  *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ralf M Petter <ralf.petter@gmail.com> - Bug 509719
  *******************************************************************************/
 package org.eclipse.ui.internal.forms.widgets;
 
@@ -26,6 +25,8 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
@@ -87,8 +88,6 @@ public class FormHeading extends Canvas {
 
 	private SizeCache messageCache = new SizeCache();
 
-	private SizeCache titleRegionCache = new SizeCache();
-
 	private TitleRegion titleRegion;
 
 	private MessageRegion messageRegion;
@@ -125,11 +124,9 @@ public class FormHeading extends Canvas {
 	}
 
 	private class FormHeadingLayout extends Layout implements ILayoutExtension {
-		private static final int MIN_WIDTH = -2;
-
 		@Override
 		public int computeMinimumWidth(Composite composite, boolean flushCache) {
-			return layout(composite, false, 0, 0, MIN_WIDTH, SWT.DEFAULT, flushCache).x;
+			return computeSize(composite, 5, SWT.DEFAULT, flushCache).x;
 		}
 
 		@Override
@@ -152,8 +149,6 @@ public class FormHeading extends Canvas {
 
 		private Point layout(Composite composite, boolean move, int x, int y,
 				int width, int height, boolean flushCache) {
-			titleRegionCache.setControl(titleRegion);
-
 			Point tsize = null;
 			Point msize = null;
 			Point tbsize = null;
@@ -163,7 +158,6 @@ public class FormHeading extends Canvas {
 				clientCache.flush();
 				messageCache.flush();
 				toolbarCache.flush();
-				titleRegionCache.flush();
 			}
 			if (hasToolBar()) {
 				ToolBar tb = toolBarManager.getControl();
@@ -172,17 +166,17 @@ public class FormHeading extends Canvas {
 			}
 			if (headClient != null) {
 				clientCache.setControl(headClient);
-				int clientWidthHint = width;
-				if (clientWidthHint != SWT.DEFAULT && clientWidthHint != MIN_WIDTH) {
-					clientWidthHint -= HMARGIN * 2;
+				int cwhint = width;
+				if (cwhint != SWT.DEFAULT) {
+					cwhint -= HMARGIN * 2;
 					if (tbsize != null && getToolBarAlignment() == SWT.BOTTOM)
-						clientWidthHint -= tbsize.x + SPACING;
+						cwhint -= tbsize.x + SPACING;
 				}
-				clsize = computeSize(clientCache, clientWidthHint);
+				clsize = clientCache.computeSize(cwhint, SWT.DEFAULT);
 			}
 			int totalFlexWidth = width;
 			int flexWidth = totalFlexWidth;
-			if (totalFlexWidth != SWT.DEFAULT && totalFlexWidth != MIN_WIDTH) {
+			if (totalFlexWidth != SWT.DEFAULT) {
 				totalFlexWidth -= TITLE_HMARGIN * 2;
 				// complete right margin
 				if (hasToolBar() && getToolBarAlignment() == SWT.TOP
@@ -214,11 +208,11 @@ public class FormHeading extends Canvas {
 			 * SWT.DEFAULT); } }
 			 */
 			if (!hasMessageRegion()) {
-				tsize = computeSize(titleRegionCache, flexWidth);
+				tsize = titleRegion.computeSize(flexWidth, SWT.DEFAULT);
 			} else {
 				// Total flexible area in the first row is flexWidth.
 				// Try natural widths of title and
-				Point tsizeNatural = titleRegionCache.computeSize(SWT.DEFAULT,
+				Point tsizeNatural = titleRegion.computeSize(SWT.DEFAULT,
 						SWT.DEFAULT);
 				messageCache.setControl(messageRegion.getMessageControl());
 				Point msizeNatural = messageCache.computeSize(SWT.DEFAULT,
@@ -226,7 +220,7 @@ public class FormHeading extends Canvas {
 				// try to fit all
 				tsize = tsizeNatural;
 				msize = msizeNatural;
-				if (flexWidth != SWT.DEFAULT && flexWidth != MIN_WIDTH) {
+				if (flexWidth != SWT.DEFAULT) {
 					int needed = tsizeNatural.x + msizeNatural.x;
 					if (needed > flexWidth) {
 						// too big - try to limit the message
@@ -343,24 +337,6 @@ public class FormHeading extends Canvas {
 				}
 			}
 			return size;
-		}
-
-		/**
-		 * Computes the preferred or minimum size of the given client cache.
-		 *
-		 * @param clientCache
-		 *            size cache for the control whose size is being computed
-		 * @param wHint
-		 *            the width of the control, in pixels, or SWT.DEFAULT if the
-		 *            preferred size is being computed, or MIN_WIDTH if the minimum size
-		 *            is being computed
-		 */
-		private Point computeSize(SizeCache clientCache, int wHint) {
-			if (wHint == MIN_WIDTH) {
-				int minWidth = clientCache.computeMinimumWidth();
-				return clientCache.computeSize(minWidth, SWT.DEFAULT);
-			}
-			return clientCache.computeSize(wHint, SWT.DEFAULT);
 		}
 	}
 
@@ -792,10 +768,13 @@ public class FormHeading extends Canvas {
 			toolbar.setBackground(getBackground());
 			toolbar.setForeground(getForeground());
 			toolbar.setCursor(FormsResources.getHandCursor());
-			addDisposeListener(e -> {
-				if (toolBarManager != null) {
-					toolBarManager.dispose();
-					toolBarManager = null;
+			addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					if (toolBarManager != null) {
+						toolBarManager.dispose();
+						toolBarManager = null;
+					}
 				}
 			});
 		}
@@ -879,8 +858,10 @@ public class FormHeading extends Canvas {
 
 	private void updateGradientImage() {
 		Rectangle rect = getBounds();
-		Image oldGradientImage = gradientImage;
-		gradientImage = null;
+		if (gradientImage != null) {
+			FormImages.getInstance().markFinished(gradientImage, getDisplay());
+			gradientImage = null;
+		}
 		if (gradientInfo != null) {
 			gradientImage = FormImages.getInstance().getGradient(gradientInfo.gradientColors, gradientInfo.percents,
 					gradientInfo.vertical ? rect.height : rect.width, gradientInfo.vertical, getColor(COLOR_BASE_BG), getDisplay());
@@ -891,9 +872,6 @@ public class FormHeading extends Canvas {
 			GC gc = new GC(gradientImage);
 			gc.drawImage(backgroundImage, 0, 0);
 			gc.dispose();
-		}
-		if (oldGradientImage != null) {
-			FormImages.getInstance().markFinished(oldGradientImage, getDisplay());
 		}
 		setBackgroundImage(gradientImage);
 	}

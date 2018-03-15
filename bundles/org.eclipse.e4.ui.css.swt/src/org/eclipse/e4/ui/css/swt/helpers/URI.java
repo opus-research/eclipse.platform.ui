@@ -382,7 +382,7 @@ public final class URI
 /*
   private static String toBits(long l)
   {
-    StringBuilder result = new StringBuilder();
+    StringBuffer result = new StringBuffer();
     for (int i = 0; i < 64; i++)
     {
       boolean b = (l & 1L) != 0;
@@ -1037,8 +1037,9 @@ public final class URI
       //iri = iri || containsNonASCII(fragment);
     }
 
-    for (String segment : segments) {
-      hashCode ^= segment.hashCode();
+    for (int i = 0, len = segments.length; i < len; i++)
+    {
+      hashCode ^= segments[i].hashCode();
       //iri = iri || containsNonASCII(segments[i]);
     }
 
@@ -1798,7 +1799,7 @@ public final class URI
 		return null;
 	}
 
-    StringBuilder result = new StringBuilder();
+    StringBuffer result = new StringBuffer();
     if (hasAbsolutePath()) {
 		result.append(SEGMENT_SEPARATOR);
 	}
@@ -1837,7 +1838,7 @@ public final class URI
 		return null;
 	}
 
-    StringBuilder result = new StringBuilder();
+    StringBuffer result = new StringBuffer();
 
     if (hasAuthority())
     {
@@ -2424,7 +2425,7 @@ public final class URI
   {
     if (cachedToString == null)
     {
-      StringBuilder result = new StringBuilder();
+      StringBuffer result = new StringBuffer();
       if (!isRelative())
       {
         result.append(scheme);
@@ -2484,7 +2485,7 @@ public final class URI
   // showing each of the components.
   String toString(boolean includeSimpleForm)
   {
-    StringBuilder result = new StringBuilder();
+    StringBuffer result = new StringBuffer();
     if (includeSimpleForm) {
 		result.append(toString());
 	}
@@ -2538,7 +2539,7 @@ public final class URI
 		return null;
 	}
 
-    StringBuilder result = new StringBuilder();
+    StringBuffer result = new StringBuffer();
     char separator = File.separatorChar;
 
     if (hasAuthority())
@@ -2582,7 +2583,7 @@ public final class URI
   {
     if (isPlatform())
     {
-      StringBuilder result = new StringBuilder();
+      StringBuffer result = new StringBuffer();
       for (int i = 1, len = segments.length; i < len; i++)
       {
         result.append('/').append(decode ? URI.decode(segments[i]) : segments[i]);
@@ -2760,7 +2761,7 @@ public final class URI
     if (SEGMENT_EMPTY.equals(lastSegment)) {
 		return this;
 	}
-    StringBuilder newLastSegment = new StringBuilder(lastSegment);
+    StringBuffer newLastSegment = new StringBuffer(lastSegment);
     newLastSegment.append(FILE_EXTENSION_SEPARATOR);
     newLastSegment.append(fileExtension);
 
@@ -3011,7 +3012,7 @@ public final class URI
 		return null;
 	}
 
-    StringBuilder result = new StringBuilder();
+    StringBuffer result = new StringBuffer();
 
     int i = uri.indexOf(SCHEME_SEPARATOR);
     if (i != -1)
@@ -3054,7 +3055,7 @@ public final class URI
 		return null;
 	}
 
-    StringBuilder result = null;
+    StringBuffer result = null;
 
     for (int i = 0, len = value.length(); i < len; i++)
     {
@@ -3065,7 +3066,7 @@ public final class URI
       {
         if (result == null)
         {
-          result = new StringBuilder(value.substring(0, i));
+          result = new StringBuffer(value.substring(0, i));
         }
         appendEscaped(result, (byte)c);
       }
@@ -3087,9 +3088,9 @@ public final class URI
   }
 
   // Computes a three-character escape sequence for the byte, appending
-  // it to the StringBuilder.  Only characters up to 0xFF should be escaped;
+  // it to the StringBuffer.  Only characters up to 0xFF should be escaped;
   // all but the least significant byte will be ignored.
-  private static void appendEscaped(StringBuilder result, byte b)
+  private static void appendEscaped(StringBuffer result, byte b)
   {
     result.append(ESCAPE);
 
@@ -3297,7 +3298,7 @@ public final class URI
   {
     if (value == null) return null;
 
-    StringBuilder result = null;
+    StringBuffer result = null;
 
     for (int i = 0, length = value.length(); i < length; i++)
     {
@@ -3307,7 +3308,7 @@ public final class URI
       {
         if (result == null)
         {
-          result = new StringBuilder(value.substring(0, i));
+          result = new StringBuffer(value.substring(0, i));
         }
 
         try

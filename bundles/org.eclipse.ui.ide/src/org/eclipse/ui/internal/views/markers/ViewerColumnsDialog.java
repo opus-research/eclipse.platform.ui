@@ -101,8 +101,8 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 		visibleLocalVar.clear();
 		nonVisibleLocalVar.clear();
 		T data = null;
-		for (T columnObj : columnObjs) {
-			data = columnObj;
+		for (int i = 0; i < columnObjs.length; i++) {
+			data = columnObjs[i];
 			if (columnInfo.isColumnVisible(data)) {
 				updater.setColumnVisible(data, true);
 				updater.setColumnIndex(data, visibleLocalVar.size());
@@ -398,7 +398,7 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 	 *            event from the button click
 	 */
 	void handleDownButton(Event e) {
-		IStructuredSelection selection = visibleViewer.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) visibleViewer.getSelection();
 		@SuppressWarnings("unchecked")
 		List<T> selVCols = selection.toList();
 		List<T> allVCols = getVisible();
@@ -422,7 +422,7 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 	 *            event from the button click
 	 */
 	void handleUpButton(Event e) {
-		IStructuredSelection selection = visibleViewer.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) visibleViewer.getSelection();
 		@SuppressWarnings("unchecked")
 		List<T> selVCols = selection.toList();
 		List<T> allVCols = getVisible();
@@ -445,7 +445,7 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 	 *            event from the button click
 	 */
 	void handleToVisibleButton(Event e) {
-		IStructuredSelection selection = nonVisibleViewer.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) nonVisibleViewer.getSelection();
 		@SuppressWarnings("unchecked")
 		List<T> selVCols = selection.toList();
 		getNonVisible().removeAll(selVCols);
@@ -461,7 +461,7 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 		visibleViewer.setSelection(selection);
 		nonVisibleViewer.refresh();
 		handleVisibleSelection(selection);
-		handleNonVisibleSelection(nonVisibleViewer.getStructuredSelection());
+		handleNonVisibleSelection(nonVisibleViewer.getSelection());
 	}
 
 	/**
@@ -475,9 +475,9 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 			handleStatusUdpate(IStatus.INFO, MarkerMessages.MarkerPreferences_AtLeastOneVisibleColumn);
 			return;
 		}
-		IStructuredSelection structuredSelection = visibleViewer.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) visibleViewer.getSelection();
 		@SuppressWarnings("unchecked")
-		List<T> selVCols = structuredSelection.toList();
+		List<T> selVCols = selection.toList();
 		getVisible().removeAll(selVCols);
 		getNonVisible().addAll(selVCols);
 
@@ -486,10 +486,10 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 		updateIndices(getNonVisible());
 
 		nonVisibleViewer.refresh();
-		nonVisibleViewer.setSelection(structuredSelection);
+		nonVisibleViewer.setSelection(selection);
 		visibleViewer.refresh();
-		handleVisibleSelection(structuredSelection);
-		handleNonVisibleSelection(structuredSelection);
+		handleVisibleSelection(visibleViewer.getSelection());
+		handleNonVisibleSelection(nonVisibleViewer.getSelection());
 	}
 
 	void updateIndices(List<T> list) {
@@ -610,7 +610,7 @@ abstract class ViewerColumnsDialog<T> extends ViewerSettingsAndStatusDialog {
 		try {
 			int width = Integer.parseInt(widthText.getText());
 			@SuppressWarnings("unchecked")
-			T data = (T) visibleViewer.getStructuredSelection().getFirstElement();
+			T data = (T) ((IStructuredSelection) visibleViewer.getSelection()).getFirstElement();
 			if (data != null) {
 				IColumnUpdater<T> updater = getColumnUpdater();
 				updater.setColumnWidth(data, width);

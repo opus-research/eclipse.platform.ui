@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -398,7 +399,8 @@ public class DialogSettings implements IDialogSettings {
 			String[] value = entry.getValue();
             attributes.clear();
             if (value != null) {
-                for (String string : value) {
+                for (int index = 0; index < value.length; index++) {
+                    String string = value[index];
                     attributes.put(TAG_VALUE, string == null ? "" : string); //$NON-NLS-1$
                     out.printTag(TAG_ITEM, attributes, true);
                 }
@@ -406,8 +408,8 @@ public class DialogSettings implements IDialogSettings {
             out.endTag(TAG_LIST);
             attributes.clear();
         }
-        for (IDialogSettings iDialogSettings : sections.values()) {
-            ((DialogSettings) iDialogSettings).save(out);
+        for (Iterator<IDialogSettings> i = sections.values().iterator(); i.hasNext();) {
+            ((DialogSettings) i.next()).save(out);
         }
         out.endTag(TAG_SECTION);
     }
@@ -477,7 +479,7 @@ public class DialogSettings implements IDialogSettings {
     	}
 
     	private void printTag(String name, HashMap<String, String> parameters, boolean shouldTab, boolean newLine, boolean close) throws IOException {
-    		StringBuilder sb = new StringBuilder();
+    		StringBuffer sb = new StringBuffer();
     		sb.append('<');
     		sb.append(name);
     		if (parameters != null) {
@@ -519,7 +521,7 @@ public class DialogSettings implements IDialogSettings {
     		printTag(name, parameters, true, newLine, false);
     	}
 
-    	private static void appendEscapedChar(StringBuilder buffer, char c) {
+    	private static void appendEscapedChar(StringBuffer buffer, char c) {
     		String replacement = getReplacement(c);
     		if (replacement != null) {
     			buffer.append('&');
@@ -531,7 +533,7 @@ public class DialogSettings implements IDialogSettings {
     	}
 
     	private static String getEscaped(String s) {
-    		StringBuilder result = new StringBuilder(s.length() + 10);
+    		StringBuffer result = new StringBuffer(s.length() + 10);
     		for (int i = 0; i < s.length(); ++i) {
 				appendEscapedChar(result, s.charAt(i));
 			}

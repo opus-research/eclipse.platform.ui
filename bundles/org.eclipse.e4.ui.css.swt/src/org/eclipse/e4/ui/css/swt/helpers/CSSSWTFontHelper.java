@@ -417,7 +417,7 @@ public class CSSSWTFontHelper {
 
 	public static String getFontComposite(FontData fontData) {
 		if (fontData != null) {
-			StringBuilder composite = new StringBuilder();
+			StringBuffer composite = new StringBuffer();
 			// font-family
 			composite.append(getFontFamily(fontData));
 			composite.append(" ");

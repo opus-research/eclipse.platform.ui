@@ -17,6 +17,7 @@ package org.eclipse.ui.internal.ide.application;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -235,6 +236,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void preStartup() {
+
+		// Suspend background jobs while we startup
+		Job.getJobManager().suspend();
+
 		// Register the build actions
 		IProgressService service = PlatformUI.getWorkbench()
 				.getProgressService();
@@ -258,9 +263,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			initializeSettingsChangeListener();
 			Display.getCurrent().addListener(SWT.Settings,
 					settingsChangeListener);
-		} finally {
-			// Resume the job manager to allow background jobs to run.
-			// The job manager was suspended by the IDEApplication.start method.
+		} finally {// Resume background jobs after we startup
 			Job.getJobManager().resume();
 		}
 	}
@@ -411,8 +414,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 
 		// Do not refresh if it was already done by core on startup.
-		for (String commandLineArg : commandLineArgs) {
-			if (commandLineArg.equalsIgnoreCase("-refresh")) { //$NON-NLS-1$
+		for (int i = 0; i < commandLineArgs.length; i++) {
+			if (commandLineArgs[i].equalsIgnoreCase("-refresh")) { //$NON-NLS-1$
 				return;
 			}
 		}
@@ -585,9 +588,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		Map<String, AboutInfo> ids = new TreeMap<>();
 
 		IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-		for (IBundleGroupProvider provider : providers) {
-			IBundleGroup[] groups = provider.getBundleGroups();
-			for (IBundleGroup group : groups) {
+		for (int i = 0; i < providers.length; ++i) {
+			IBundleGroup[] groups = providers[i].getBundleGroups();
+			for (int j = 0; j < groups.length; ++j) {
+				IBundleGroup group = groups[j];
 				AboutInfo info = new AboutInfo(group);
 
 				String version = info.getVersionId();
@@ -635,8 +639,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// remove the previously known from the current set
 		if (previousFeaturesArray != null) {
-			for (String previousFeature : previousFeaturesArray) {
-				bundleGroups.remove(previousFeature);
+			for (int i = 0; i < previousFeaturesArray.length; ++i) {
+				bundleGroups.remove(previousFeaturesArray[i]);
 			}
 		}
 
@@ -896,27 +900,19 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	/**
-	 * Returns the location specified in command line when -showlocation is
-	 * defined. Otherwise returns null
-	 *
-	 * @return
-	 */
-	public String getCommandLineLocation() {
-		IEclipseContext context = getWorkbenchConfigurer().getWorkbench().getService(IEclipseContext.class);
-		return context != null ? (String) context.get(E4Workbench.FORCED_SHOW_LOCATION) : null;
-	}
-
-	/**
 	 * Returns the location to show in the window title, depending on a
-	 * {@link IDEInternalPreferences#SHOW_LOCATION} user preference. Note that
-	 * this may be overridden by the '-showlocation' command line argument.
+	 * {@link IDEInternalPreferences#SHOW_LOCATION} and
+	 * {@link IDEInternalPreferences#SHOW_LOCATION_NAME} user preferences.
+	 * Note that this may be overridden by the '-showlocation' command line
+	 * argument.
 	 *
 	 * @return the location string, or <code>null</code> if the location is not
 	 *         being shown
 	 */
 	public String getWorkspaceLocation() {
-		String location = getCommandLineLocation();
 		// read command line, which has priority
+		IEclipseContext context = getWorkbenchConfigurer().getWorkbench().getService(IEclipseContext.class);
+		String location = context != null ? (String) context.get(E4Workbench.FORCED_SHOW_LOCATION) : null;
 		if (location != null) {
 			return location;
 		}
@@ -924,6 +920,12 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION)) {
 			// show the full location
 			return Platform.getLocation().toOSString();
+		}
+		// show only name (SHOW_LOCATION_NAME)
+		String workspaceName = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
+				.getString(IDEInternalPreferences.WORKSPACE_NAME);
+		if (workspaceName != null && workspaceName.length() > 0) {
+			return workspaceName;
 		}
 		return null;
 	}
@@ -938,7 +940,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			if (!hasIntro()) {
 				Map<String, AboutInfo> m = getNewlyAddedBundleGroups();
 				ArrayList<AboutInfo> list = new ArrayList<>(m.size());
-				for (AboutInfo info : m.values()) {
+				for (Iterator<AboutInfo> i = m.values().iterator(); i.hasNext();) {
+					AboutInfo info = i.next();
 					if (info != null && info.getWelcomePerspectiveId() != null
 							&& info.getWelcomePageURL() != null) {
 						list.add(info);

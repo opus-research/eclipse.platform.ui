@@ -92,7 +92,12 @@ public class ContributionFactoryGenerator extends ContextFunction {
 		context.set(List.class, menuElements);
 
 		// return something disposable
-		return (Runnable) () -> root.release();
+		return new Runnable() {
+			@Override
+			public void run() {
+				root.release();
+			}
+		};
 	}
 
 	private MUIElement createUIElement(IContributionItem ici) {

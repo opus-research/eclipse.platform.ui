@@ -300,8 +300,8 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
         boolean shouldLinkAutomatically = false;
 		if (target.isVirtual()) {
 			shouldLinkAutomatically = true;
-			for (IResource source : sources) {
-				if (source.getType() != IResource.FILE) {
+			for (int i = 0; i < sources.length; i++) {
+				if (sources[0].getType() != IResource.FILE) {
 					shouldLinkAutomatically = false;
 					break;
 				}
@@ -368,8 +368,8 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
         boolean shouldLinkAutomatically = false;
 		if (target.isVirtual()) {
 			shouldLinkAutomatically = true;
-			for (IResource source : sources) {
-				if (source.isVirtual() || source.isLinked()) {
+			for (int i = 0; i < sources.length; i++) {
+				if (sources[0].isVirtual() || sources[0].isLinked()) {
 					shouldLinkAutomatically = false;
 					break;
 				}

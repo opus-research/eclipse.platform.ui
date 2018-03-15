@@ -56,7 +56,7 @@ public class SelectionData {
 		segments.clear();
 	}
 	public String getSelectionText() {
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (int i=0; i<segments.size(); i++) {
 			buf.append(segments.get(i));
 		}

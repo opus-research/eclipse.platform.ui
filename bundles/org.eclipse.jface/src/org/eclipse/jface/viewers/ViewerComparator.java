@@ -45,6 +45,8 @@ import org.eclipse.jface.util.Policy;
  */
 public class ViewerComparator {
 
+	private static final boolean DISABLE_FIX_FOR_364735 = Boolean.getBoolean("eclipse.disable.fix.for.bug364735"); //$NON-NLS-1$
+
 	/**
 	 * The comparator to use to sort a viewer's contents.
 	 */
@@ -147,7 +149,7 @@ public class ViewerComparator {
 					.getLabelProvider();
 			if (prov instanceof ILabelProvider) {
 				ILabelProvider lprov = (ILabelProvider) prov;
-				if (lprov instanceof DecoratingLabelProvider) {
+				if (lprov instanceof DecoratingLabelProvider && !DISABLE_FIX_FOR_364735) {
 					// Bug 364735: use the real label provider to avoid unstable
 					// sort behavior if the decoration is running while sorting.
 					// decorations are usually visual aids to the user and

@@ -77,8 +77,8 @@ public class ViewContextComputer implements IContextComputer {
 		}
 
         // copy the contexts into our list
-        for (Object ctx : contexts) {
-			contextList.add(ctx);
+        for (int i = 0; i < contexts.length; i++) {
+			contextList.add(contexts[i]);
 		}
     }
 
