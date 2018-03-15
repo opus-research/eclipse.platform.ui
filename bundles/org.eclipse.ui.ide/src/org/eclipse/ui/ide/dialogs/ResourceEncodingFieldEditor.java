@@ -177,7 +177,8 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	private boolean hasSameSeparateDerivedEncodings() {
 		return (separateDerivedEncodingsButton == null)
-				|| (separateDerivedEncodingsButton.getSelection() == getStoredSeparateDerivedEncodingsValue());
+				|| ((separateDerivedEncodingsButton != null) && (separateDerivedEncodingsButton
+						.getSelection() == getStoredSeparateDerivedEncodingsValue()));
 	}
 
 	@Override

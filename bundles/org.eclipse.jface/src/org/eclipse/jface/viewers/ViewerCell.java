@@ -289,7 +289,8 @@ public class ViewerCell {
 			if (columnIndex >= 0 && columnIndex < row.getColumnCount()) {
 				ViewerCell cell = row.getCellAtVisualIndex(columnIndex);
 				if (cell != null) {
-					while (columnIndex < row.getColumnCount() - 1
+					while (cell != null
+							&& columnIndex < row.getColumnCount() - 1
 							&& columnIndex > 0) {
 						if (cell.isVisible()) {
 							break;
