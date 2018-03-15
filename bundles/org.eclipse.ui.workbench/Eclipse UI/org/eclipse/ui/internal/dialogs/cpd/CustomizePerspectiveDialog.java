@@ -1392,7 +1392,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				return true;
 			}
 		}
-		return item.getIContributionItem() != null;
+		return item.getIContributionItem() != null && item.getIContributionItem().isVisible();
 	}
 
 	/**
