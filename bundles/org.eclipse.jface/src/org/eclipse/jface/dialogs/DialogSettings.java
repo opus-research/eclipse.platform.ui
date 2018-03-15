@@ -210,7 +210,7 @@ public class DialogSettings implements IDialogSettings {
                     "There is no setting associated with the key \"" + key + "\"");//$NON-NLS-1$ //$NON-NLS-2$
         }
 
-		return Long.valueOf(setting).longValue();
+        return new Long(setting).longValue();
     }
 
     @Override

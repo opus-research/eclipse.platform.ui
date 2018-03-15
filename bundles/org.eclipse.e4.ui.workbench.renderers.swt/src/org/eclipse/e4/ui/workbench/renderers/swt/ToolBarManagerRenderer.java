@@ -543,7 +543,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				record.sharedElements.clear();
 			}
 		}
-		clearModelToManager(toolbarModel, null);
 	}
 
 	/**
@@ -845,13 +844,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IContributionItem ici = getContribution(element);
 			clearModelToContribution(element, ici);
 		}
-		ToolBarManager removed = modelToManager.remove(model);
-		if (manager == null) {
-			managerToModel.remove(removed);
-		} else {
+		modelToManager.remove(model);
 			managerToModel.remove(manager);
-		}
-
 		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nTBMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());

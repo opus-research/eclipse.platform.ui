@@ -74,9 +74,6 @@ public class NavigatorFilterService implements INavigatorFilterService {
 							getFilterActivationPreferenceKey(), null);
 					String[] activeFilterIds = activatedFiltersPreferenceValue.split(DELIM);
 					for (String activeFilterId : activeFilterIds) {
-						if (activeFilterId.isEmpty()) {
-							continue;
-						}
 						activeFilters.add(activeFilterId);
 					}
 
@@ -106,10 +103,8 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			StringBuilder activatedFiltersPreferenceValue = new StringBuilder(DELIM);
 
 			for (String id : activeFilters) {
-				CommonFilterDescriptor filterDescriptor = dm.getFilterById(id);
-				if (filterDescriptor == null || !filterDescriptor.isVisibleInUi()) {
+				if (!dm.getFilterById(id).isVisibleInUi())
 					continue;
-				}
 				activatedFiltersPreferenceValue.append(id).append(DELIM);
 			}
 
