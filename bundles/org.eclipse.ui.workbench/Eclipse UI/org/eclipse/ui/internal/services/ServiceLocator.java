@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -77,7 +76,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	private IEclipseContext e4Context;
 
-	private Map<Class<?>, Object> servicesToDispose = new ConcurrentHashMap<>();
+	private Map<Class<?>, Object> servicesToDispose = new HashMap<>();
 
 	/**
 	 * Constructs a service locator with no parent.
