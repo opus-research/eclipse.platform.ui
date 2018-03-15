@@ -306,6 +306,7 @@ public class SearchField {
 	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
 
 	private String triggerSequenceFormat = null;
+
 	/**
 	 * FIXME this returns the correct binding, but we should get it using
 	 * {@code bindingService.getBestActiveBindingFormattedFor(QUICK_ACCESS_COMMAND_ID)}
@@ -329,7 +330,6 @@ public class SearchField {
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
 		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
-
 		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, getQuickAccessTriggerSequenceFormat()));
 
 		FontData[] fD = text.getFont().getFontData();
