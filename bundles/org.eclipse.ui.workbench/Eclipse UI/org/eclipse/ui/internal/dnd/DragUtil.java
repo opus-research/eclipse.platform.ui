@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.dnd;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -258,7 +259,7 @@ public class DragUtil {
 
                             if (!(currentRectangles.length == 1 && currentRectangles[0]
                                     .equals(snapTarget))) {
-								tracker.setRectangles(new Rectangle[] { Geometry.copy(snapTarget) });
+                                tracker.setRectangles(new Rectangle[] { snapTarget });
                             }
                         }
                     }
