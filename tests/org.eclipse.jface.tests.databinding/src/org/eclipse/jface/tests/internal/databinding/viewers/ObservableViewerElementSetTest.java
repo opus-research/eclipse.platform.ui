@@ -21,12 +21,10 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableColl
 import org.eclipse.jface.internal.databinding.viewers.ObservableViewerElementSet;
 import org.eclipse.jface.viewers.IElementComparer;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-public class ObservableViewerElementSetTest extends TestCase {
-	public static Test suite() {
+public class ObservableViewerElementSetTest {
+	public static junit.framework.Test suite() {
 		TestSuite suite = new TestSuite(ObservableViewerElementSetTest.class.getName());
 		suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));
 		return suite;

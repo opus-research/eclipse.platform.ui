@@ -13,6 +13,11 @@
 
 package org.eclipse.core.tests.internal.databinding.beans;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
@@ -21,9 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -42,6 +44,13 @@ import org.eclipse.jface.databinding.conformance.util.SetChangeEventTracker;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Display;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  * @since 1.1
@@ -58,7 +67,8 @@ public class JavaBeanObservableArrayBasedSetTest extends
 	private String propertyName;
 
 	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 
 		propertyName = "array";
@@ -71,14 +81,17 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		beanObservable = (IBeanObservable) set;
 	}
 
+	@Test
 	public void testGetObserved() throws Exception {
 		assertEquals(bean, beanObservable.getObserved());
 	}
 
+	@Test
 	public void testGetPropertyDescriptor() throws Exception {
 		assertEquals(propertyDescriptor, beanObservable.getPropertyDescriptor());
 	}
 
+	@Test
 	public void testRegistersListenerAfterFirstListenerIsAdded()
 			throws Exception {
 		assertFalse(bean.changeSupport.hasListeners(propertyName));
@@ -86,6 +99,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertTrue(bean.changeSupport.hasListeners(propertyName));
 	}
 
+	@Test
 	public void testRemovesListenerAfterLastListenerIsRemoved()
 			throws Exception {
 		SetChangeEventTracker listener = SetChangeEventTracker.observe(set);
@@ -95,6 +109,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertFalse(bean.changeSupport.hasListeners(propertyName));
 	}
 
+	@Test
 	public void testSetBeanProperty_FiresSetChangeEvents() throws Exception {
 		SetChangeEventTracker listener = SetChangeEventTracker.observe(set);
 
@@ -103,6 +118,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(1, listener.count);
 	}
 
+	@Test
 	public void testAdd_AddsElement() throws Exception {
 		assertEquals(0, set.size());
 
@@ -113,6 +129,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(element, bean.getArray()[0]);
 	}
 
+	@Test
 	public void testAdd_SetChangeEvent() throws Exception {
 		SetChangeEventTracker listener = SetChangeEventTracker.observe(set);
 		assertEquals(0, listener.count);
@@ -128,6 +145,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(Collections.EMPTY_SET, event.diff.getRemovals());
 	}
 
+	@Test
 	public void testAdd_FiresPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
 			@Override
@@ -137,6 +155,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		});
 	}
 
+	@Test
 	public void testRemove() throws Exception {
 		String element = "1";
 		set.add(element);
@@ -146,6 +165,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(0, bean.getArray().length);
 	}
 
+	@Test
 	public void testRemove_SetChangeEvent() throws Exception {
 		String element = "1";
 		set.add(element);
@@ -163,6 +183,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(Collections.EMPTY_SET, event.diff.getAdditions());
 	}
 
+	@Test
 	public void testRemovePropertyChangeEvent() throws Exception {
 		set.add("0");
 
@@ -174,6 +195,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		});
 	}
 
+	@Test
 	public void testAddAll() throws Exception {
 		Collection elements = Arrays.asList(new String[] { "1", "2" });
 		assertEquals(0, set.size());
@@ -183,6 +205,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(2, bean.getArray().length);
 	}
 
+	@Test
 	public void testAddAll_SetChangeEvent() throws Exception {
 		Collection elements = Arrays.asList(new String[] { "1", "2" });
 		assertEquals(0, set.size());
@@ -200,6 +223,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(Collections.EMPTY_SET, event.diff.getRemovals());
 	}
 
+	@Test
 	public void testAddAllPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
 			@Override
@@ -209,6 +233,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		});
 	}
 
+	@Test
 	public void testRemoveAll() throws Exception {
 		Collection elements = Arrays.asList(new String[] { "1", "2" });
 		set.addAll(elements);
@@ -219,6 +244,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(0, bean.getArray().length);
 	}
 
+	@Test
 	public void testRemoveAll_SetChangeEvent() throws Exception {
 		Collection elements = Arrays.asList(new String[] { "1", "2" });
 		set.addAll(elements);
@@ -234,6 +260,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(new HashSet(elements), event.diff.getRemovals());
 	}
 
+	@Test
 	public void testRemoveAllPropertyChangeEvent() throws Exception {
 		set.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
@@ -244,6 +271,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		});
 	}
 
+	@Test
 	public void testRetainAll() throws Exception {
 		set.addAll(Arrays.asList(new String[] { "0", "1", "2", "3" }));
 
@@ -255,6 +283,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertTrue(set.containsAll(Arrays.asList(new String[] { "1", "0" })));
 	}
 
+	@Test
 	public void testRetainAll_SetChangeEvent() throws Exception {
 		set.addAll(Arrays.asList(new String[] { "0", "1", "2", "3" }));
 
@@ -271,6 +300,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 				event.diff.getRemovals());
 	}
 
+	@Test
 	public void testRetainAllPropertyChangeEvent() throws Exception {
 		set.addAll(Arrays.asList(new String[] { "0", "1" }));
 
@@ -282,6 +312,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		});
 	}
 
+	@Test
 	public void testSetChangeEventFiresWhenNewSetIsSet() throws Exception {
 		Bean[] elements = new Bean[] { new Bean(), new Bean() };
 
@@ -292,6 +323,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		assertEquals(1, listener.count);
 	}
 
+	@Test
 	public void testSetBeanProperty_CorrectForNullOldAndNewValues() {
 		// The java bean spec allows the old and new values in a
 		// PropertyChangeEvent to be null, which indicates that an unknown
@@ -314,6 +346,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 				.getAdditions());
 	}
 
+	@Test
 	public void testModifyObservableSet_FiresSetChange() {
 		Bean bean = new Bean(new Object[] {});
 		IObservableSet observable = BeansObservables.observeSet(bean, "array");
@@ -327,6 +360,7 @@ public class JavaBeanObservableArrayBasedSetTest extends
 				.singleton("new"));
 	}
 
+	@Test
 	public void testSetBeanPropertyOutsideRealm_FiresEventInsideRealm() {
 		Bean bean = new Bean(new Object[0]);
 		CurrentRealm realm = new CurrentRealm(true);
@@ -385,12 +419,18 @@ public class JavaBeanObservableArrayBasedSetTest extends
 		}
 	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(
-				JavaBeanObservableArrayBasedSetTest.class.getName());
-		suite.addTestSuite(JavaBeanObservableArrayBasedSetTest.class);
-		suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));
-		return suite;
+	@Test
+	public void testSuite() throws Exception {
+		JUnitCore.runClasses(Suite.class);
+	}
+
+	@RunWith(AllTests.class)
+	public static class Suite {
+		public static junit.framework.Test suite() {
+			TestSuite suite = new TestSuite(JavaBeanObservableArrayBasedSetTest.class.getName());
+			suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));
+			return suite;
+		}
 	}
 
 	static class Delegate extends AbstractObservableCollectionContractDelegate {

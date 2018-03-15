@@ -13,6 +13,11 @@
 
 package org.eclipse.core.tests.internal.databinding.beans;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyDescriptor;
@@ -21,9 +26,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -44,6 +46,13 @@ import org.eclipse.jface.databinding.conformance.util.ListChangeEventTracker;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Display;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  * @since 1.1
@@ -59,7 +68,8 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	private String propertyName;
 
 	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 
 		propertyName = "list";
@@ -72,14 +82,17 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		beanObservable = (IBeanObservable) list;
 	}
 
+	@Test
 	public void testGetObserved() throws Exception {
 		assertEquals(bean, beanObservable.getObserved());
 	}
 
+	@Test
 	public void testGetPropertyDescriptor() throws Exception {
 		assertEquals(propertyDescriptor, beanObservable.getPropertyDescriptor());
 	}
 
+	@Test
 	public void testRegistersListenerAfterFirstListenerIsAdded()
 			throws Exception {
 		assertFalse(bean.changeSupport.hasListeners(propertyName));
@@ -87,6 +100,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertTrue(bean.changeSupport.hasListeners(propertyName));
 	}
 
+	@Test
 	public void testRemovesListenerAfterLastListenerIsRemoved()
 			throws Exception {
 		ListChangeEventTracker listener = new ListChangeEventTracker();
@@ -97,6 +111,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertFalse(bean.changeSupport.hasListeners(propertyName));
 	}
 
+	@Test
 	public void testFiresListChangeEvents() throws Exception {
 		ListChangeEventTracker listener = new ListChangeEventTracker();
 		list.addListChangeListener(listener);
@@ -106,6 +121,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, listener.count);
 	}
 
+	@Test
 	public void testAddAddsElement() throws Exception {
 		int count = list.size();
 		String element = "1";
@@ -116,6 +132,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(element, bean.getList().get(count));
 	}
 
+	@Test
 	public void testAddListChangeEvent() throws Exception {
 		ListChangeEventTracker listener = new ListChangeEventTracker();
 		list.addListChangeListener(listener);
@@ -133,6 +150,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				.singletonList("1"));
 	}
 
+	@Test
 	public void testAddFiresPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
 			@Override
@@ -142,6 +160,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testAddAtIndex() throws Exception {
 		String element = "1";
 		assertEquals(0, list.size());
@@ -150,6 +169,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(element, bean.getList().get(0));
 	}
 
+	@Test
 	public void testAddAtIndexListChangeEvent() throws Exception {
 		String element = "1";
 		assertEquals(0, list.size());
@@ -164,6 +184,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				.singletonList("1"));
 	}
 
+	@Test
 	public void testAddAtIndexPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
 			@Override
@@ -173,6 +194,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testClear() throws Exception {
 		String element = "1";
 		list.add(element);
@@ -187,6 +209,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(0, bean.getList().size());
 	}
 
+	@Test
 	public void testRemove() throws Exception {
 		String element = "1";
 		list.add(element);
@@ -196,6 +219,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(0, bean.getList().size());
 	}
 
+	@Test
 	public void testRemoveListChangeEvent() throws Exception {
 		String element = "1";
 		list.add(element);
@@ -214,6 +238,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				Collections.EMPTY_LIST);
 	}
 
+	@Test
 	public void testRemovePropertyChangeEvent() throws Exception {
 		list.add("0");
 
@@ -225,6 +250,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testRemoveAtIndex() throws Exception {
 		String element = "1";
 		list.add(element);
@@ -235,6 +261,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(0, bean.getList().size());
 	}
 
+	@Test
 	public void testRemoveAtIndexListChangeEvent() throws Exception {
 		String element = "1";
 		list.add(element);
@@ -253,6 +280,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				Collections.EMPTY_LIST);
 	}
 
+	@Test
 	public void testRemoveAtIndexPropertyChangeEvent() throws Exception {
 		list.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
@@ -263,6 +291,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testAddAll() throws Exception {
 		Collection elements = Arrays.asList(new String[] { "1", "2" });
 		assertEquals(0, list.size());
@@ -272,6 +301,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(2, bean.getList().size());
 	}
 
+	@Test
 	public void testAddAllListChangEvent() throws Exception {
 		List elements = Arrays.asList(new String[] { "1", "2" });
 		assertEquals(0, list.size());
@@ -290,6 +320,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				.asList(new String[] { "1", "2" }));
 	}
 
+	@Test
 	public void testAddAllPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
 			@Override
@@ -299,6 +330,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testAddAllAtIndex() throws Exception {
 		List elements = Arrays.asList(new String[] { "1", "2" });
 		list.addAll(elements);
@@ -312,6 +344,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(elements.get(1), bean.getList().get(1));
 	}
 
+	@Test
 	public void testAddAllAtIndexListChangeEvent() throws Exception {
 		List elements = Arrays.asList(new String[] { "1", "2" });
 		list.addAll(elements);
@@ -331,6 +364,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				.asList(new Object[] { "1", "2", "1", "2" }));
 	}
 
+	@Test
 	public void testAddAllAtIndexPropertyChangeEvent() throws Exception {
 		assertPropertyChangeEvent(bean, new Runnable() {
 			@Override
@@ -340,6 +374,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testRemoveAll() throws Exception {
 		list.addAll(Arrays.asList(new String[] { "1", "2", "3", "4" }));
 		assertEquals(4, bean.getList().size());
@@ -351,6 +386,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals("3", bean.getList().get(1));
 	}
 
+	@Test
 	public void testRemoveAllListChangeEvent() throws Exception {
 		List elements = Arrays.asList(new String[] { "1", "2" });
 		list.addAll(elements);
@@ -371,6 +407,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				Collections.EMPTY_LIST);
 	}
 
+	@Test
 	public void testRemoveAllPropertyChangeEvent() throws Exception {
 		list.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
@@ -381,6 +418,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testRetailAll() throws Exception {
 		List elements = Arrays.asList(new String[] { "0", "1", "2", "3" });
 		list.addAll(elements);
@@ -394,6 +432,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(elements.get(1), bean.getList().get(1));
 	}
 
+	@Test
 	public void testRetainAllListChangeEvent() throws Exception {
 		List elements = Arrays.asList(new String[] { "0", "1", "2", "3" });
 		list.addAll(elements);
@@ -413,6 +452,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				.asList(new Object[] { "0", "1" }));
 	}
 
+	@Test
 	public void testRetainAllPropertyChangeEvent() throws Exception {
 		list.addAll(Arrays.asList(new String[] { "0", "1" }));
 
@@ -424,6 +464,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testSet() throws Exception {
 		String oldElement = "old";
 		String newElement = "new";
@@ -435,6 +476,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(newElement, bean.getList().get(0));
 	}
 
+	@Test
 	public void testMove() throws Exception {
 		String element0 = "element0";
 		String element1 = "element1";
@@ -452,6 +494,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(element0, bean.getList().get(1));
 	}
 
+	@Test
 	public void testSetListChangeEvent() throws Exception {
 		String oldElement = "old";
 		String newElement = "new";
@@ -470,6 +513,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				Collections.singletonList(newElement));
 	}
 
+	@Test
 	public void testSetPropertyChangeEvent() throws Exception {
 		list.add("0");
 		assertPropertyChangeEvent(bean, new Runnable() {
@@ -480,6 +524,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
+	@Test
 	public void testListChangeEventFiresWhenNewListIsSet() throws Exception {
 		List elements = Arrays.asList(new String[] { "1", "2" });
 
@@ -491,6 +536,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(1, listener.count);
 	}
 
+	@Test
 	public void testConstructor_RegistersListener() throws Exception {
 		Bean bean = new Bean();
 		IObservableList observable = BeansObservables.observeList(Realm
@@ -501,6 +547,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertTrue(bean.hasListeners("list"));
 	}
 
+	@Test
 	public void testConstructor_SkipsRegisterListener() throws Exception {
 		Bean bean = new Bean();
 		IObservableList observable = PojoObservables.observeList(Realm
@@ -511,6 +558,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertFalse(bean.hasListeners("list"));
 	}
 
+	@Test
 	public void testSetBeanProperty_CorrectForNullOldAndNewValues() {
 		// The java bean spec allows the old and new values in a
 		// PropertyChangeEvent to be null, which indicates that an unknown
@@ -535,6 +583,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Collections.singletonList("new"), list);
 	}
 
+	@Test
 	public void testModifyObservableList_FiresListChange() {
 		Bean bean = new Bean(new ArrayList());
 		IObservableList observable = BeansObservables.observeList(bean, "list");
@@ -549,6 +598,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 				.singletonList(element));
 	}
 
+	@Test
 	public void testSetBeanPropertyOutsideRealm_FiresEventInsideRealm() {
 		Bean bean = new Bean(Collections.EMPTY_LIST);
 		CurrentRealm realm = new CurrentRealm(true);
@@ -571,6 +621,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	 * Makes sure that the list set on the Bean model after changing the
 	 * observable list is modifiable (see bugs 285307 and 301774).
 	 */
+	@Test
 	public void testUpdatedBeanListIsModifiable() {
 		Bean bean = new Bean(new ArrayList());
 		IObservableList observable = BeansObservables.observeList(bean, "list");
@@ -583,6 +634,7 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 	 * Makes sure that the list set on the Pojo model after changing the
 	 * observable list is modifiable (see bugs 285307 and 301774).
 	 */
+	@Test
 	public void testUpdatedPojoListIsModifiable() {
 		Bean bean = new Bean(new ArrayList());
 		IObservableList observable = PojoObservables.observeList(bean, "list");
@@ -629,12 +681,18 @@ public class JavaBeanObservableListTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(JavaBeanObservableListTest.class
-				.getName());
-		suite.addTestSuite(JavaBeanObservableListTest.class);
-		suite.addTest(MutableObservableListContractTest.suite(new Delegate()));
-		return suite;
+	@Test
+	public void testSuite() throws Exception {
+		JUnitCore.runClasses(Suite.class);
+	}
+
+	@RunWith(AllTests.class)
+	public static class Suite {
+		public static junit.framework.Test suite() {
+			TestSuite suite = new TestSuite(JavaBeanObservableListTest.class.getName());
+			suite.addTest(MutableObservableListContractTest.suite(new Delegate()));
+			return suite;
+		}
 	}
 
 	static class Delegate extends AbstractObservableCollectionContractDelegate {

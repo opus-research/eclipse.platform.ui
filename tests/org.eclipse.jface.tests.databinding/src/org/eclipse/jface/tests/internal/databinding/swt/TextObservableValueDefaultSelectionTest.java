@@ -14,10 +14,6 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -28,11 +24,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import junit.framework.TestSuite;
+
 /**
  * Tests for the DefaultSelection version of TextObservableValue.
  */
-public class TextObservableValueDefaultSelectionTest extends TestCase {
-	public static Test suite() {
+public class TextObservableValueDefaultSelectionTest {
+	public static junit.framework.Test suite() {
 		TestSuite suite = new TestSuite(TextObservableValueDefaultSelectionTest.class
 				.toString());
 		suite.addTest(SWTMutableObservableValueContractTest

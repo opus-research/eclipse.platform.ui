@@ -13,8 +13,9 @@
 
 package org.eclipse.core.tests.databinding.observable.value;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -25,6 +26,12 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValu
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Display;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -35,6 +42,7 @@ public class WritableValueTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
+	@Test
 	public void testConstructor() throws Exception {
 		WritableValue value = new WritableValue(DisplayRealm.getRealm(Display
 				.getDefault()));
@@ -42,6 +50,7 @@ public class WritableValueTest extends AbstractDefaultRealmTestCase {
 		assertNull(value.getValueType());
 	}
 
+	@Test
 	public void testWithValueType() throws Exception {
 		Object elementType = String.class;
 		WritableValue value = WritableValue.withValueType(elementType);
@@ -50,11 +59,18 @@ public class WritableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(elementType, value.getValueType());
 	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(WritableValueTest.class.getName());
-		suite.addTestSuite(WritableValueTest.class);
-		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
-		return suite;
+	@Test
+	public void testSuite() throws Exception {
+		JUnitCore.runClasses(Suite.class);
+	}
+
+	@RunWith(AllTests.class)
+	public static class Suite {
+		public static junit.framework.Test suite() {
+			TestSuite suite = new TestSuite(WritableValueTest.class.getName());
+			suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
+			return suite;
+		}
 	}
 
 	/* package */static class Delegate extends

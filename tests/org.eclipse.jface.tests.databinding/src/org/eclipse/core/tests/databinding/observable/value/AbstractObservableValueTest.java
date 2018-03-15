@@ -11,18 +11,20 @@
 
 package org.eclipse.core.tests.databinding.observable.value;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
 import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
+import org.junit.Test;
 
 /**
  * @since 3.2
  */
-public class AbstractObservableValueTest extends TestCase {
+public class AbstractObservableValueTest {
+	@Test
 	public void testSetValueRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -37,6 +39,7 @@ public class AbstractObservableValueTest extends TestCase {
 		});
 	}
 
+	@Test
 	public void testSetValueInvokesDoSetValue() throws Exception {
 		class ValueStub extends ObservableValueStub {
 			int doSetValue;
@@ -58,6 +61,7 @@ public class AbstractObservableValueTest extends TestCase {
 		assertEquals("doSetValue should have been invoked", 1, stub.doSetValue);
 	}
 
+	@Test
 	public void testFireValueChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override

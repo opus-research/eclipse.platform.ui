@@ -11,25 +11,27 @@
 
 package org.eclipse.core.tests.internal.databinding.conversion;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.eclipse.core.internal.databinding.conversion.IntegerToStringConverter;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.ibm.icu.text.NumberFormat;
 
 /**
  * @since 1.1
  */
-public class IntegerToStringConverterTest extends TestCase {
+public class IntegerToStringConverterTest {
 	private NumberFormat integerFormat;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
+	@Before
+	public void setUp() throws Exception {
 		integerFormat = NumberFormat.getIntegerInstance();
 	}
 
+	@Test
 	public void testFromTypeShort() throws Exception {
 		assertEquals(Short.class, IntegerToStringConverter.fromShort(false)
 				.getFromType());
@@ -41,11 +43,13 @@ public class IntegerToStringConverterTest extends TestCase {
 				.getFromType());
 	}
 
+	@Test
 	public void testToTypeIsStringClass() throws Exception {
 		assertEquals(String.class, IntegerToStringConverter.fromShort(false)
 				.getToType());
 	}
 
+	@Test
 	public void testConvertShortToString() throws Exception {
 		Short value = new Short((short) 1);
 		String expected = integerFormat.format(value);
@@ -56,6 +60,7 @@ public class IntegerToStringConverterTest extends TestCase {
 		assertEquals(expected, result);
 	}
 
+	@Test
 	public void testConvertByteToString() throws Exception {
 		Byte value = new Byte((byte) 1);
 		String expected = integerFormat.format(value);
@@ -66,12 +71,14 @@ public class IntegerToStringConverterTest extends TestCase {
 		assertEquals(expected, result);
 	}
 
+	@Test
 	public void testNullSourceConvertsToEmptyString() throws Exception {
 		IntegerToStringConverter converter = IntegerToStringConverter
 				.fromByte(false);
 		assertEquals("", converter.convert(null));
 	}
 
+	@Test
 	public void testIllegalArgumentExceptionIfSourceIsNotExpectedType() throws Exception {
 		IntegerToStringConverter converter = IntegerToStringConverter.fromByte(false);
 		try {

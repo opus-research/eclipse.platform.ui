@@ -11,10 +11,10 @@
  ******************************************************************************/
 package org.eclipse.core.tests.databinding.observable.set;
 
-import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.Collections;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
@@ -24,10 +24,17 @@ import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.databinding.conformance.MutableObservableSetContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
+import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+
+import junit.framework.TestSuite;
 
 /**
  */
 public class WritableSetTest extends AbstractDefaultRealmTestCase {
+	@Test
 	public void testWithElementType() throws Exception {
 		Object elementType = String.class;
 		WritableSet set = WritableSet.withElementType(elementType);
@@ -36,11 +43,18 @@ public class WritableSetTest extends AbstractDefaultRealmTestCase {
 		assertEquals(elementType, set.getElementType());
 	}
 
-	public static Test suite() {
-		TestSuite suite = new TestSuite(WritableSetTest.class.getName());
-		suite.addTestSuite(WritableSetTest.class);
-		suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));
-		return suite;
+	@Test
+	public void testSuite() throws Exception {
+		JUnitCore.runClasses(Suite.class);
+	}
+
+	@RunWith(AllTests.class)
+	public static class Suite {
+		public static junit.framework.Test suite() {
+			TestSuite suite = new TestSuite(WritableSetTest.class.getName());
+			suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));
+			return suite;
+		}
 	}
 
 	private static class Delegate extends
