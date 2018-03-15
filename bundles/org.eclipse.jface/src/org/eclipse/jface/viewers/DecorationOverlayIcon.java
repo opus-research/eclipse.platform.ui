@@ -11,21 +11,24 @@
 package org.eclipse.jface.viewers;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageDataProvider;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * A <code>DecorationOverlayIcon</code> is an image descriptor that can be used
  * to overlay decoration images on to the 4 corner quadrants of a base image.
  * The four quadrants are {@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
  * {@link IDecoration#BOTTOM_LEFT} and {@link IDecoration#BOTTOM_RIGHT}. Additionally,
- * the overlay can be used to provide an underlay corresponding to {@link IDecoration#UNDERLAY}.
+ * the overlay can be used to provide an underlay corresponding to {@link IDecoration#UNDERLAY},
+ * and to replace the base image with {@link IDecoration#REPLACE} (if supported by the context).
  *
  * @since 3.3
  * @see IDecoration
@@ -37,56 +40,80 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     // the overlay images
     private ImageDescriptor[] overlays;
 
-	// This imageData of the base image
-	private Supplier<ImageData> baseImageData;
+	private ImageDataProvider baseImageDataProvider;
 
-	// The size of the base image (that's also the size of this composite image)
+	/**
+	 * The size of the base image (that's also the size of this composite image)
+	 */
 	private Supplier<Point> size;
 
     /**
      * Create the decoration overlay for the base image using the array of
      * provided overlays. The indices of the array correspond to the values
-     * of the 5 overlay constants defined on {@link IDecoration}
+     * of the 6 overlay constants defined on {@link IDecoration}
      * ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT}
-     * and{@link IDecoration#UNDERLAY}).
+     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT},
+     * {@link IDecoration#UNDERLAY}, and {@link IDecoration#REPLACE}).
      *
      * @param baseImage the base image
-     * @param overlaysArray the overlay images
+     * @param overlaysArray the overlay images, may contain null values
      * @param sizeValue the size of the resulting image
      */
     public DecorationOverlayIcon(Image baseImage,
             ImageDescriptor[] overlaysArray, Point sizeValue) {
 		this.referenceImageOrDescriptor = baseImage;
         this.overlays = overlaysArray;
-		this.baseImageData = new Supplier<ImageData>() {
-			private ImageData value;
+		this.baseImageDataProvider = new ImageDataProvider() {
+			ImageData cached;
+			int cachedZoom;
+
 			@Override
-			public ImageData get() {
-				if (value == null) {
-					value = baseImage.getImageData();
+			public ImageData getImageData(int zoom) {
+				if (zoom == cachedZoom) {
+					return cached;
 				}
-				return value;
+				// Can't use zoom == getZoomLevel() because SWT on Cocoa asks for 100% image even on Retina screen!
+				if (isAtCurrentZoom(baseImage, zoom)) {
+					cached = baseImage.getImageDataAtCurrentZoom();
+				} else if (zoom == 100) {
+					cached = baseImage.getImageData();
+				} else {
+					// strange zoom value, should not happen
+					zoom = 0;
+					cached = null;
+				}
+				cachedZoom = zoom;
+				return cached;
+			}
+
+			private /*static*/ boolean isAtCurrentZoom(Image image, int zoom) {
+				// Implementation is a workaround for missing Image#getCurrentZoom().
+				Rectangle bounds= image.getBounds();
+				Rectangle boundsInPixels= image.getBoundsInPixels();
+				//TODO: Probably has off-by-one problems at fractional zoom levels:
+				return bounds.width == scaleDown(boundsInPixels.width, zoom)
+						|| bounds.height == scaleDown(boundsInPixels.height, zoom);
+			}
+
+			private /*static*/ int scaleDown(int value, int zoom) {
+				// @see SWT's internal DPIUtil#autoScaleDown(int)
+				float scaleFactor = zoom / 100f;
+				return Math.round(value / scaleFactor);
 			}
 		};
-		this.size = new Supplier<Point>() {
-			@Override
-			public Point get() {
-				return sizeValue;
-			}
-		};
+		this.size = () -> sizeValue;
     }
 
     /**
      * Create the decoration overlay for the base image using the array of
      * provided overlays. The indices of the array correspond to the values
-     * of the 5 overlay constants defined on {@link IDecoration}
+     * of the 6 overlay constants defined on {@link IDecoration}
      * ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT}
-     * and {@link IDecoration#UNDERLAY}).
+     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT},
+     * {@link IDecoration#UNDERLAY}, and {@link IDecoration#REPLACE}).
      *
      * @param baseImage the base image
-     * @param overlaysArray the overlay images
+     * @param overlaysArray the overlay images, may contain null values
      */
     public DecorationOverlayIcon(Image baseImage, ImageDescriptor[] overlaysArray) {
     	this(baseImage, overlaysArray, new Point(baseImage.getBounds().width, baseImage.getBounds().height));
@@ -126,22 +153,15 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 			int quadrant) {
 		this.referenceImageOrDescriptor = baseImageDescriptor;
 		this.overlays = createArrayFrom(overlayImageDescriptor, quadrant);
-		this.size = new Supplier<Point>() {
-			@Override
-			public Point get() {
-				ImageData data = baseImageData.get();
-				return new Point(data.width, data.height);
+		this.baseImageDataProvider = asImageDataProvider(baseImageDescriptor);
+		this.size = () -> {
+			int zoomLevel = getZoomLevel();
+			if (zoomLevel != 0) {
+				ImageData data = baseImageDataProvider.getImageData(zoomLevel);
+				return new Point(autoScaleDown(data.width), autoScaleDown(data.height));
 			}
-		};
-		this.baseImageData = new Supplier<ImageData>() {
-			private ImageData value;
-			@Override
-			public ImageData get() {
-				if (value == null) {
-					value = baseImageDescriptor.getImageData();
-				}
-				return value;
-			}
+			ImageData data = baseImageDataProvider.getImageData(100);
+			return new Point(data.width, data.height);
 		};
 	}
 
@@ -169,29 +189,38 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
             if (overlay == null) {
 				continue;
 			}
-            ImageData overlayData = overlay.getImageData();
-            //Use the missing descriptor if it is not there.
-            if (overlayData == null) {
-				overlayData = ImageDescriptor.getMissingImageDescriptor()
-                        .getImageData();
-			}
+			ImageDataProvider overlayImageProvider = asImageDataProvider(overlay);
+
             switch (i) {
             case IDecoration.TOP_LEFT:
-                drawImage(overlayData, 0, 0);
+				drawImage(overlayImageProvider, 0, 0);
                 break;
             case IDecoration.TOP_RIGHT:
-				drawImage(overlayData, getSize().x - overlayData.width, 0);
+				int overlayWidth = computeInPoints(overlayImageProvider, data -> data.width);
+				drawImage(overlayImageProvider, getSize().x - overlayWidth, 0);
                 break;
             case IDecoration.BOTTOM_LEFT:
-				drawImage(overlayData, 0, getSize().y - overlayData.height);
+				int overlayHeight = computeInPoints(overlayImageProvider, data -> data.width);
+				drawImage(overlayImageProvider, 0, getSize().y - overlayHeight);
                 break;
             case IDecoration.BOTTOM_RIGHT:
-				drawImage(overlayData, getSize().x - overlayData.width, getSize().y
-                        - overlayData.height);
+				overlayWidth = computeInPoints(overlayImageProvider, data -> data.width);
+				overlayHeight = computeInPoints(overlayImageProvider, data -> data.height);
+				drawImage(overlayImageProvider, getSize().x - overlayWidth, getSize().y - overlayHeight);
                 break;
             }
         }
     }
+
+	private int computeInPoints(ImageDataProvider overlayImageProvider, ToIntFunction<ImageData> computer) {
+		ImageData overlayData = overlayImageProvider.getImageData(getZoomLevel());
+		if (overlayData != null) {
+			int valueInPixels = computer.applyAsInt(overlayData);
+			return autoScaleDown(valueInPixels);
+		}
+		overlayData = overlayImageProvider.getImageData(100);
+		return computer.applyAsInt(overlayData);
+	}
 
     @Override
 	public boolean equals(Object o) {
@@ -199,7 +228,7 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 			return false;
 		}
         DecorationOverlayIcon other = (DecorationOverlayIcon) o;
-		return Objects.equals(referenceImageOrDescriptor, other.referenceImageOrDescriptor)
+		return referenceImageOrDescriptor.equals(other.referenceImageOrDescriptor)
                 && Arrays.equals(overlays, other.overlays);
     }
 
@@ -216,19 +245,72 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 
     @Override
 	protected void drawCompositeImage(int width, int height) {
+		//TODO: Bug 372956: [Decorators] [JFace] CompositeImageDescriptor throws NPE during Decoration
+		// Check ImageDescriptor#getImageData() for null.
     	if (overlays.length > IDecoration.UNDERLAY) {
 	        ImageDescriptor underlay = overlays[IDecoration.UNDERLAY];
 	        if (underlay != null) {
-				drawImage(underlay.getImageData(), 0, 0);
+				drawImage(asImageDataProvider(underlay), 0, 0);
 			}
     	}
     	if (overlays.length > IDecoration.REPLACE && overlays[IDecoration.REPLACE] != null) {
-    		drawImage(overlays[IDecoration.REPLACE].getImageData(), 0, 0);
+    		drawImage(asImageDataProvider(overlays[IDecoration.REPLACE]), 0, 0);
     	} else {
-			drawImage(baseImageData.get(), 0, 0);
+			drawImage(baseImageDataProvider, 0, 0);
     	}
         drawOverlays(overlays);
+
+//		ImageData zonk = new ImageData(4, 7, 1, new PaletteData(new RGB(255, 0, 255), new RGB(0, 0, 0)));
+//		drawImage(zoom -> zoom == 100 ? zonk : null, 1, 1);
     }
+
+	/**
+	 * Returns an ImageDataProvider that is backed by the given ImageDescriptor.
+	 * <p>
+	 * The last returned ImageData is cached, i.e. consecutive calls to
+	 * {@link ImageDataProvider#getImageData(int)} with the same zoom level are cheap.
+	 * </p>
+	 * <p>
+	 * The {@link ImageDescriptor#getMissingImageDescriptor()} is returned if the
+	 * image descriptor provides a null image data.
+	 * </p>
+	 *
+	 * @param descriptor an ImageDescriptor
+	 * @return an ImageDataProvider based on the given descriptor
+	 */
+	private static ImageDataProvider asImageDataProvider(ImageDescriptor descriptor) {
+		return new ImageDataProvider() {
+			ImageData cached;
+			int cachedZoom;
+
+			@Override
+			public ImageData getImageData(int zoom) {
+				if (zoom == cachedZoom) {
+					return cached;
+				}
+				ImageData zoomed = descriptor.getImageData(zoom);
+				if (zoomed != null) {
+					cached = zoomed;
+					cachedZoom = zoom;
+					return zoomed;
+				}
+				if (zoom == 100) {
+					return ImageDescriptor.getMissingImageDescriptor().getImageData(100);
+				}
+
+				ImageData data100 = descriptor.getImageData(100);
+				if (data100 != null) {
+					// 100% is available => caller will have to scale this one
+					cached = data100;
+					cachedZoom = 100;
+					return null;
+				}
+				// 100% is not available, but requested zoom != 100
+				//  => caller will have to scale missing image descriptor
+				return null;
+			}
+		};
+	}
 
     @Override
 	protected Point getSize() {
@@ -237,7 +319,8 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 
     @Override
 	protected int getTransparentPixel() {
-		return baseImageData.get().transparentPixel;
+		//TODO: getImageData(100) can be inefficient
+		return baseImageDataProvider.getImageData(100).transparentPixel;
     }
 
 }
