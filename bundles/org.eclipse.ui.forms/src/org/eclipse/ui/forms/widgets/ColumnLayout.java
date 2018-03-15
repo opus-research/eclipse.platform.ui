@@ -71,52 +71,104 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 	 */
 	public int rightMargin = 5;
 
+	private LayoutCache cache = new LayoutCache();
+
+	private final static int MIN_SIZE = -2;
+
 	/**
 	 * Creates a new instance of the column layout.
 	 */
 	public ColumnLayout() {
 	}
 
-	@Override
-	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
-		if (wHint == 0)
-			return computeSize(composite, wHint, hHint, minNumColumns);
-		else if (wHint == SWT.DEFAULT)
-			return computeSize(composite, wHint, hHint, maxNumColumns);
-		else
-			return computeSize(composite, wHint, hHint, -1);
+	private void updateCache(Composite composite, boolean flushCache) {
+		Control[] children = composite.getChildren();
+		if (flushCache) {
+			cache.flush();
+		}
+		cache.setControls(children);
 	}
 
-	private Point computeSize(Composite parent, int wHint, int hHint, int ncolumns) {
+	@Override
+	protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
+		updateCache(composite, flushCache);
+		return computeSize(composite, wHint, hHint);
+	}
+
+	/**
+	 * Given a desired number of columns, this returns a clamped result that falls
+	 * within the specified by the minimum and maximum number of columns.
+	 */
+	private int clampNumColumns(Composite parent, int desiredNumColumns) {
+		int ncolumns = desiredNumColumns;
+		ncolumns = Math.min(ncolumns, parent.getChildren().length);
+		ncolumns = Math.min(ncolumns, maxNumColumns);
+		ncolumns = Math.max(ncolumns, minNumColumns);
+		ncolumns = Math.max(ncolumns, 1);
+		return ncolumns;
+	}
+
+	private int computeOptimalNumColumnsForWidth(Composite parent, int width) {
+		if (minNumColumns >= maxNumColumns || parent.getChildren().length <= minNumColumns) {
+			return clampNumColumns(parent, minNumColumns);
+		}
+
 		Control[] children = parent.getChildren();
-		int cwidth = 0;
+		int minColWidth = 0;
+
+		for (int i = 0; i < children.length; i++) {
+			// To maximize the number of columns:
+			int nextWidth = computeMinimumWidth(i);
+
+			// To minimize the number of columns:
+			// int nextWidth = computeControlSize(i, SWT.DEFAULT).x;
+
+			minColWidth = Math.max(minColWidth, nextWidth);
+		}
+
+		return clampNumColumns(parent,
+				(width - leftMargin - rightMargin + horizontalSpacing) / (minColWidth + horizontalSpacing));
+	}
+
+	private int computeColumnWidthForNumColumns(int layoutWidth, int numColumns) {
+		return ((layoutWidth - leftMargin - rightMargin) - (numColumns - 1) * horizontalSpacing) / numColumns;
+	}
+
+	/**
+	 *
+	 */
+	private Point computeSize(Composite parent, int wHint, int hHint) {
+		Control[] children = parent.getChildren();
 		int cheight = 0;
 		Point[] sizes = new Point[children.length];
 
-		int cwHint = SWT.DEFAULT;
-		if (ncolumns != -1) {
-			cwHint = wHint - leftMargin - rightMargin - (ncolumns - 1) * horizontalSpacing;
-			if (cwHint <= 0)
-				cwHint = 0;
-			else
-				cwHint /= ncolumns;
+		int columnWidth = 0;
+		int nColumns;
+		if (wHint == SWT.DEFAULT) {
+			nColumns = clampNumColumns(parent, maxNumColumns);
+
+			for (int i = 0; i < children.length; i++) {
+				columnWidth = Math.max(columnWidth, computeControlSize(i, SWT.DEFAULT).x);
+			}
+		} else if (wHint == MIN_SIZE) {
+			nColumns = clampNumColumns(parent, 0);
+
+			for (int i = 0; i < children.length; i++) {
+				columnWidth = Math.max(columnWidth, computeMinimumWidth(i));
+			}
+		} else {
+			nColumns = computeOptimalNumColumnsForWidth(parent, wHint);
+			columnWidth = computeColumnWidthForNumColumns(wHint, nColumns);
 		}
 
 		for (int i = 0; i < children.length; i++) {
-			sizes[i] = computeControlSize(children[i], cwHint);
-			cwidth = Math.max(cwidth, sizes[i].x);
+			sizes[i] = computeControlSize(i, columnWidth);
 			cheight += sizes[i].y;
 		}
-		if (ncolumns == -1) {
-			// must compute
-			ncolumns = (wHint - leftMargin - rightMargin - horizontalSpacing) / (cwidth + horizontalSpacing);
-			ncolumns = Math.min(ncolumns, children.length);
-			ncolumns = Math.max(ncolumns, minNumColumns);
-			ncolumns = Math.min(ncolumns, maxNumColumns);
-		}
-		int perColHeight = ColumnLayoutUtils.computeColumnHeight(ncolumns, sizes, cheight, verticalSpacing);
+
+		int perColHeight = ColumnLayoutUtils.computeColumnHeight(nColumns, sizes, cheight, verticalSpacing);
 		int colHeight = 0;
-		int[] heights = new int[ncolumns];
+		int[] heights = new int[nColumns];
 		int ncol = 0;
 
 		boolean fillIn = false;
@@ -126,7 +178,7 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 			if (i>0 && colHeight + childHeight > perColHeight) {
 				heights[ncol] = colHeight;
 				ncol++;
-				if (ncol == ncolumns || fillIn) {
+				if (ncol == nColumns || fillIn) {
 					// overflow - start filling in
 					fillIn = true;
 					ncol = findShortestColumn(heights);
@@ -140,21 +192,60 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 		heights[ncol] = Math.max(heights[ncol],colHeight);
 
 		Point size = new Point(0, 0);
-		for (int i = 0; i < ncolumns; i++) {
+		for (int i = 0; i < nColumns; i++) {
 			size.y = Math.max(size.y, heights[i]);
 		}
-		size.x = cwidth * ncolumns + (ncolumns - 1) * horizontalSpacing;
+		size.x = columnWidth * nColumns + (nColumns - 1) * horizontalSpacing;
 		size.x += leftMargin + rightMargin;
-		//System.out.println("ColumnLayout: whint="+wHint+", size.x="+size.x);
 		size.y += topMargin + bottomMargin;
+		if (hHint != SWT.DEFAULT) {
+			size.y = hHint;
+		}
 		return size;
 	}
 
-	private Point computeControlSize(Control c, int wHint) {
+	private int computeMinimumWidth(int i) {
+		SizeCache sc = cache.getCache(i);
+		return sc.computeMinimumWidth();
+	}
+
+	private Point computeControlSize(int controlIndex, int wHint) {
+		Control c = cache.getCache(controlIndex).getControl();
 		ColumnLayoutData cd = (ColumnLayoutData) c.getLayoutData();
-		int widthHint = cd != null ? cd.widthHint : wHint;
-		int heightHint = cd != null ? cd.heightHint : SWT.DEFAULT;
-		return c.computeSize(widthHint, heightHint);
+
+		int widthHint;
+		int heightHint = SWT.DEFAULT;
+		// Assume fill alignment if there is no layout data attached
+		if (cd != null) {
+			// If using non-fill alignment and there is a width hint specified in both the argument and the layout data,
+			// use whichever one is smaller.
+			if (cd.horizontalAlignment == SWT.FILL) {
+				// If width is unbounded, apply a width hint iff requested in the layout data
+				if (wHint == SWT.DEFAULT) {
+					widthHint = cd.widthHint;
+				} else {
+					widthHint = wHint;
+				}
+			} else {
+				// If not using fill alignment, make a first attempt at computing the size
+				// without considering the
+				// column width
+				widthHint = cd.widthHint;
+			}
+			heightHint = cd.heightHint;
+		} else {
+			widthHint = wHint;
+		}
+		Point result = cache.computeSize(controlIndex, widthHint, heightHint);
+
+		// If using non-fill alignment, it's possible that the result is larger than the
+		// column width. In that case,
+		// constrain the width and try again.
+		if (cd != null && wHint != SWT.DEFAULT && result.x > wHint) {
+			result = cache.computeSize(controlIndex, wHint, heightHint);
+		}
+
+		return result;
 	}
 
 	private int findShortestColumn(int[] heights) {
@@ -171,32 +262,23 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 
 	@Override
 	protected void layout(Composite parent, boolean flushCache) {
+		updateCache(parent, flushCache);
 		Control[] children = parent.getChildren();
 		Rectangle carea = parent.getClientArea();
-		int cwidth = 0;
+		int nColumns = computeOptimalNumColumnsForWidth(parent, carea.width);
+		int columnWidth = computeColumnWidthForNumColumns(carea.width, nColumns);
+
 		int cheight = 0;
 		Point[] sizes = new Point[children.length];
 		for (int i = 0; i < children.length; i++) {
-			sizes[i] = computeControlSize(children[i], SWT.DEFAULT);
-			cwidth = Math.max(cwidth, sizes[i].x);
+			sizes[i] = computeControlSize(i, columnWidth);
 			cheight += sizes[i].y;
 		}
-		int ncolumns = (carea.width - leftMargin - rightMargin + horizontalSpacing) / (cwidth + horizontalSpacing);
-		ncolumns = Math.min(ncolumns, children.length);
-		ncolumns = Math.max(ncolumns, minNumColumns);
-		ncolumns = Math.min(ncolumns, maxNumColumns);
-		int realWidth = (carea.width - leftMargin - rightMargin + horizontalSpacing) / ncolumns - horizontalSpacing;
-//		int childrenPerColumn = children.length / ncolumns;
-//		if (children.length % ncolumns != 0)
-//			childrenPerColumn++;
-//		int colWidth = 0;
 
-		int fillWidth = Math.max(cwidth, realWidth);
-		int perColHeight = ColumnLayoutUtils.computeColumnHeight(ncolumns, sizes, cheight, verticalSpacing);
-
+		int perColHeight = ColumnLayoutUtils.computeColumnHeight(nColumns, sizes, cheight, verticalSpacing);
 
 		int colHeight = 0;
-		int[] heights = new int[ncolumns];
+		int[] heights = new int[nColumns];
 		int ncol = 0;
 		int x = leftMargin;
 		boolean fillIn = false;
@@ -206,21 +288,21 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 			Point csize = sizes[i];
 			ColumnLayoutData cd = (ColumnLayoutData) child.getLayoutData();
 			int align = cd != null ? cd.horizontalAlignment : ColumnLayoutData.FILL;
-			int childWidth = align == ColumnLayoutData.FILL ? fillWidth : csize.x;
+			int childWidth = csize.x;
 
 			if (i>0 && colHeight + csize.y > perColHeight) {
 				heights[ncol] = colHeight;
-				if (fillIn || ncol == ncolumns-1) {
+				if (fillIn || ncol == nColumns - 1) {
 					// overflow - start filling in
 					fillIn = true;
 					ncol = findShortestColumn(heights);
 
-					x = leftMargin + ncol * (fillWidth + horizontalSpacing);
+					x = leftMargin + ncol * (columnWidth + horizontalSpacing);
 
 				}
 				else {
 					ncol++;
-					x += fillWidth + horizontalSpacing;
+					x += columnWidth + horizontalSpacing;
 				}
 				colHeight = heights[ncol];
 			}
@@ -234,10 +316,10 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 					child.setBounds(x, topMargin+colHeight, childWidth, csize.y);
 					break;
 				case ColumnLayoutData.RIGHT :
-					child.setBounds(x + fillWidth - childWidth, topMargin+colHeight, childWidth, csize.y);
+				child.setBounds(x + columnWidth - childWidth, topMargin + colHeight, childWidth, csize.y);
 					break;
 				case ColumnLayoutData.CENTER :
-					child.setBounds(x + fillWidth / 2 - childWidth / 2, topMargin+colHeight, childWidth, csize.y);
+				child.setBounds(x + columnWidth / 2 - childWidth / 2, topMargin + colHeight, childWidth, csize.y);
 					break;
 			}
 
@@ -252,6 +334,7 @@ public final class ColumnLayout extends Layout implements ILayoutExtension {
 
 	@Override
 	public int computeMinimumWidth(Composite parent, boolean changed) {
-		return computeSize(parent, 0, SWT.DEFAULT, changed).x;
+		updateCache(parent, changed);
+		return computeSize(parent, MIN_SIZE, SWT.DEFAULT).x;
 	}
 }
