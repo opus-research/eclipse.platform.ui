@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 IBM Corporation and others.
+ * Copyright (c) 2014, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,6 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
-import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,8 +48,8 @@ import org.eclipse.ui.part.ViewPart;
 public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 		ISaveablePart {
 
-	WritableList saveables = new WritableList();
-	IObservableValue dirty = new ComputedValue() {
+	WritableList<Saveable> saveables = new WritableList<>();
+	IObservableValue<?> dirty = new ComputedValue<Object>() {
 		@Override
 		protected Object calculate() {
 			for (Object obj : saveables) {
@@ -63,7 +62,7 @@ public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 		}
 	};
 	private TableViewer viewer;
-	private IObservableValue selection;
+	private IObservableValue<?> selection;
 
 	public ViewWithSaveables() {
 	}
@@ -149,12 +148,7 @@ public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 			};
 		}
 		getSite().setSelectionProvider(viewer);
-		dirty.addValueChangeListener(new IValueChangeListener() {
-			@Override
-			public void handleValueChange(ValueChangeEvent event) {
-				firePropertyChange(ISaveablePart.PROP_DIRTY);
-			}
-		});
+		dirty.addValueChangeListener(event -> firePropertyChange(ISaveablePart.PROP_DIRTY));
 		GridLayoutFactory.fillDefaults().numColumns(4).equalWidth(false)
 				.generateLayout(parent);
 	}
@@ -196,7 +190,7 @@ public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 
 	@Override
 	public Saveable[] getSaveables() {
-		return (Saveable[]) saveables.toArray(new Saveable[saveables.size()]);
+		return saveables.toArray(new Saveable[saveables.size()]);
 	}
 
 	@Override
@@ -226,7 +220,7 @@ public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 
 	class MySaveable extends Saveable {
 
-		private IObservableValue myDirty = new WritableValue(Boolean.FALSE,
+		private IObservableValue<Boolean> myDirty = new WritableValue<>(Boolean.FALSE,
 				Boolean.TYPE);
 
 		@Override
@@ -261,10 +255,10 @@ public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 
 		@Override
 		public boolean isDirty() {
-			return ((Boolean) myDirty.getValue()).booleanValue();
+			return myDirty.getValue().booleanValue();
 		}
 
-		IObservableValue getDirty() {
+		IObservableValue<Boolean> getDirty() {
 			return myDirty;
 		}
 
@@ -274,18 +268,13 @@ public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 
 	}
 
-	class DirtyObservableMap extends ComputedObservableMap {
+	class DirtyObservableMap extends ComputedObservableMap<Object, Object> {
 
-		Map writableValueToElement = new HashMap();
+		Map<IObservableValue<Boolean>, MySaveable> writableValueToElement = new HashMap<>();
 
-		private IValueChangeListener valueChangeListener = new IValueChangeListener() {
-			@Override
-			public void handleValueChange(ValueChangeEvent event) {
-				fireMapChange(Diffs.createMapDiffSingleChange(
-						writableValueToElement.get(event.getSource()),
-						event.diff.getOldValue(), event.diff.getNewValue()));
-			}
-		};
+		private IValueChangeListener<Boolean> valueChangeListener = event -> fireMapChange(
+				Diffs.createMapDiffSingleChange(
+				writableValueToElement.get(event.getSource()), event.diff.getOldValue(), event.diff.getNewValue()));
 
 		public DirtyObservableMap(IObservableSet knownElements) {
 			super(knownElements);
@@ -310,7 +299,7 @@ public class ViewWithSaveables extends ViewPart implements ISaveablesSource,
 		@Override
 		protected void hookListener(Object key) {
 			MySaveable saveable = (MySaveable) key;
-			IObservableValue oValue = saveable.getDirty();
+			IObservableValue<Boolean> oValue = saveable.getDirty();
 			writableValueToElement.put(oValue, saveable);
 			oValue.addValueChangeListener(valueChangeListener);
 		}
