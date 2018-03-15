@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ui.monitoring;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 /**
  * Definitions of the preference constants.
  *
@@ -55,6 +57,38 @@ public class PreferenceConstants {
 	 * message if all stack frames of the thread match the filter.
 	 */
 	public static final String NONINTERESTING_THREAD_FILTER = "noninteresting_thread_filter"; //$NON-NLS-1$
+
+	/**
+	 * If true, enables the monitoring of jobs which do not check for cancellation often enough.
+	 */
+	public static final String JOB_MONITORING_ENABLED = "job_monitoring_enabled"; //$NON-NLS-1$
+
+	/**
+	 * Time between two calls of {@link IProgressMonitor#isCanceled()} that took longer than the specified duration in milliseconds are logged as warning.
+	 */
+	public static final String JOB_MONITORING_WARNING_THRESHOLD_MILLIS = "job_monitoring_warning_threshold"; //$NON-NLS-1$
+
+	/**
+	 * Time between two calls of {@link IProgressMonitor#isCanceled()} that took longer than the specified duration in milliseconds are logged as errors.
+	 */
+	public static final String JOB_MONITORING_ERROR_THRESHOLD_MILLIS = "job_monitoring_error_threshold"; //$NON-NLS-1$
+
+	/**
+	 * Maximum number of stack trace samples to write out to the log.
+	 */
+	public static final String JOB_MONITORING_MAX_STACK_SAMPLES = "job_monitoring_max_stack_sample"; //$NON-NLS-1$
+
+	/**
+	 * If true, all user jobs which don't check for cancellation will be reported as errors, independently of how
+	 * fast they go. Otherwise, they will be reported as warning or error whether they execute faster than the error or
+	 * warning thresholds, accordingly.
+	 */
+	public static final String JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB = "job_monitoring_log_cancellable_user_job"; //$NON-NLS-1$
+
+	/**
+	 * If true, system jobs which  don't check for cancellation but run faster than the warning threshold won't be log.
+	 */
+	public static final String JOB_MONITORING_DO_NOT_LOG_FAST_SYSTEM_JOB = "job_monitoring_do_not_log_fast_system_job"; //$NON-NLS-1$
 
 	private PreferenceConstants() {}
 }
