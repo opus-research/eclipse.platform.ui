@@ -81,10 +81,10 @@ public class ModelAssembler {
 		List<MApplicationElement> addedElements = new ArrayList<>();
 
 		// run processors which are marked to run before fragments
-		runProcessors(extensions, initial, false);
+		// runProcessors(extensions, initial, false);
 		processFragments(extensions, imports, addedElements, initial);
-		// run processors which are marked to run after fragments
-		runProcessors(extensions, initial, true);
+		// // run processors which are marked to run after fragments
+		// runProcessors(extensions, initial, true);
 
 		resolveImports(imports, addedElements);
 	}
@@ -221,19 +221,22 @@ public class ModelAssembler {
 	 * @param extensions
 	 * @param afterFragments
 	 */
-	private void runProcessors(IExtension[] extensions, boolean initial, boolean afterFragments) {
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] ces = extension.getConfigurationElements();
-			for (IConfigurationElement ce : ces) {
-				boolean parseBoolean = Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
-				if ("processor".equals(ce.getName()) && afterFragments != parseBoolean) { //$NON-NLS-1$
-					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$
-						runProcessor(ce);
-					}
-				}
-			}
-		}
-	}
+	// private void runProcessors(IExtension[] extensions, boolean initial,
+	// boolean afterFragments) {
+	// for (IExtension extension : extensions) {
+	// IConfigurationElement[] ces = extension.getConfigurationElements();
+	// for (IConfigurationElement ce : ces) {
+	// boolean parseBoolean =
+	// Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
+	// if ("processor".equals(ce.getName()) && afterFragments != parseBoolean) {
+	// //$NON-NLS-1$
+	// if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$
+	// runProcessor(ce);
+	// }
+	// }
+	// }
+	// }
+	// }
 
 	private void runProcessor(IConfigurationElement ce) {
 		IEclipseContext localContext = EclipseContextFactory.create();
