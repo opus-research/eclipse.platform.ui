@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -133,7 +133,8 @@ public class Perspective {
             if (desc != null) {
 				outputList.add(desc);
 			} else {
-				WorkbenchPlugin.log("Unable to find Action Set: " + id);//$NON-NLS-1$
+				// plugin with actionSet was removed
+				// we remember then so it's available when added back
 			}
         }
     }
@@ -362,12 +363,12 @@ public class Perspective {
     	}
     }
     
-    public IActionSetDescriptor[] getAlwaysOnActionSets() {
-        return (IActionSetDescriptor[]) alwaysOnActionSets.toArray(new IActionSetDescriptor[alwaysOnActionSets.size()]);
+	public List<IActionSetDescriptor> getAlwaysOnActionSets() {
+		return alwaysOnActionSets;
     }
     
-    public IActionSetDescriptor[] getAlwaysOffActionSets() {
-        return (IActionSetDescriptor[]) alwaysOffActionSets.toArray(new IActionSetDescriptor[alwaysOffActionSets.size()]);
+	public List<IActionSetDescriptor> getAlwaysOffActionSets() {
+		return alwaysOffActionSets;
     }
 	
 	/**	@return a Collection of IDs of items to be hidden from the menu bar	*/

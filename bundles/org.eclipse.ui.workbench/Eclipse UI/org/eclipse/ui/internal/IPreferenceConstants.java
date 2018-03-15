@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,20 @@ public interface IPreferenceConstants {
 
     //Boolean: true = open after delay
     public static final String OPEN_AFTER_DELAY = "OPEN_AFTER_DELAY"; //$NON-NLS-1$
+
+	// Boolean: true = bidi support enabled; false = bidi support disabled
+	public static final String BIDI_SUPPORT = "BIDI_SUPPORT"; //$NON-NLS-1$
+
+	// String: Text direction. May have the following values: "ltr", "rtl",
+	// "auto", and "".
+	public static final String TEXT_DIRECTION = "TEXT_DIRECTION"; //$NON-NLS-1$
+
+	// String: Layout direction. May have the following values:
+	// SWT.LEFT_TO_RIGHT, SWT.RIGHT_TO_LEFT, and SWT.NONE.
+	public static final String LAYOUT_DIRECTION = "LAYOUT_DIRECTION"; //$NON-NLS-1$
+
+	// String: Unicode locale extensions
+	public static final String NL_EXTENSIONS = "NL_EXTENSIONS"; //$NON-NLS-1$
 
     //Do we show color icons in toolbars?
     public static final String COLOR_ICONS = "COLOR_ICONS"; //$NON-NLS-1$
@@ -245,5 +259,20 @@ public interface IPreferenceConstants {
 	 * @since 3.105
 	 */
 	public static final String WORKBENCH_SAVE_INTERVAL = "WORKBENCH_SAVE_INTERVAL"; //$NON-NLS-1$
+
+	/**
+	 * This preference is the threshold value to determine whether a document is
+	 * large or not. When the user tries to open a file larger than the
+	 * threshold, then EditorSelectionDialog will be opened, suggesting the user
+	 * to open with an external editor.
+	 * <p>
+	 * This preference is a <code>long</code> value that represents the
+	 * threshold in bytes. The default value is <code>0</code> meaning no
+	 * prompting on editor opening.
+	 * </p>
+	 *
+	 * @since 3.7
+	 */
+	public static final String LARGE_DOC_SIZE_FOR_EDITORS = "LARGE_DOC_SIZE_FOR_EDITORS"; //$NON-NLS-1$
 
 }

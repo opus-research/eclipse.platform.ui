@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import org.eclipse.jface.preference.PreferenceLabelProvider;
+import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
@@ -18,7 +20,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * This PreferenceBoldLabelProvider will bold those elements which really match
  * the search contents
  */
-public class PreferenceBoldLabelProvider extends PreferenceLabelProviderWithTooltip {
+public class PreferenceBoldLabelProvider extends PreferenceLabelProvider implements IFontProvider {
 
 	private FilteredTree filterTree;
 
@@ -29,6 +31,7 @@ public class PreferenceBoldLabelProvider extends PreferenceLabelProviderWithTool
 		this.filterForBoldElements= filterTree.getPatternFilter();
 	}
 
+	@Override
 	public Font getFont(Object element) {
 		return FilteredTree.getBoldFont(element, filterTree,
 				filterForBoldElements);

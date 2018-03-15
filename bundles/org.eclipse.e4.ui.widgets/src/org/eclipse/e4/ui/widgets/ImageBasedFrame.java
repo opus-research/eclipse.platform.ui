@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2012, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
-
 package org.eclipse.e4.ui.widgets;
 
 import org.eclipse.swt.SWT;
@@ -28,7 +27,13 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 
+
 public class ImageBasedFrame extends Canvas {
+	//TODO: Change to the public after API freeze
+	private static final String HANDLE_IMAGE= "handleImage"; //$NON-NLS-1$
+
+	private static final String FRAME_IMAGE= "frameImage"; //$NON-NLS-1$
+	
 	private Control framedControl;
 
 	private boolean draggable = true;
@@ -104,13 +109,13 @@ public class ImageBasedFrame extends Canvas {
 		setSize(computeSize(-1, -1));
 
 		if (toWrap instanceof ToolBar) {
-			id = "TB";// ((ToolBar) toWrap).getItem(0).getToolTipText();
+			id = "TB";// ((ToolBar) toWrap).getItem(0).getToolTipText(); //$NON-NLS-1$
 		}
 	}
 
 	public Rectangle getHandleRect() {
 		Rectangle handleRect = new Rectangle(0, 0, 0, 0);
-		if (!draggable)
+		if (!draggable || handle.isDisposed())
 			return handleRect;
 
 		if (vertical) {
@@ -129,6 +134,9 @@ public class ImageBasedFrame extends Canvas {
 
 	@Override
 	public Point computeSize(int wHint, int hHint) {
+		if (framedControl == null || framedControl.isDisposed())
+			return new Point(0, 0);
+		
 		if (vertical) {
 			int width = w1 + framedControl.getSize().x + w3;
 			int height = h1 + handleHeight + framedControl.getSize().y + h3;
@@ -141,6 +149,14 @@ public class ImageBasedFrame extends Canvas {
 	}
 
 	protected void drawFrame(PaintEvent e) {
+		if (handle.isDisposed() || (imageCache != null && imageCache.isDisposed())) {
+			reskin(SWT.NONE);
+			return;
+		}
+		
+		if (framedControl == null || framedControl.isDisposed())
+			return;
+		
 		Point inner = framedControl.getSize();
 		int handleWidth = (handle != null && !vertical) ? handle.getBounds().width
 				: 0;
@@ -308,10 +324,14 @@ public class ImageBasedFrame extends Canvas {
 
 	public void setImages(Image frameImage, Integer[] frameInts,
 			Image handleImage) {
-		if (frameImage != null)
+		if (frameImage != null) {
 			imageCache = frameImage;
-		if (handleImage != null)
+			setData(FRAME_IMAGE, frameImage);
+		}
+		if (handleImage != null) {
 			handle = handleImage;
+			setData(HANDLE_IMAGE, handleImage);
+		}
 
 		if (frameInts != null) {
 			w1 = frameInts[0];

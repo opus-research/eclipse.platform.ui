@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -38,11 +39,14 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageListener;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
@@ -90,8 +94,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 
     private IWorkbenchAction newWindowAction;
     
-    private IWorkbenchAction newEditorAction;
-
     private IWorkbenchAction helpContentsAction;
 
     private IWorkbenchAction helpSearchAction;
@@ -221,6 +223,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     private IPropertyChangeListener propPrefListener;
 
     private IPageListener pageListener;
+	private IPartListener partListener;
 
     private IResourceChangeListener resourceListener;
     
@@ -275,6 +278,37 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         };
         getWindow().addPageListener(pageListener);
 
+		partListener = new IPartListener() {
+
+			@Override
+			public void partOpened(IWorkbenchPart part) {
+			}
+
+			@Override
+			public void partDeactivated(IWorkbenchPart part) {
+			}
+
+			@Override
+			public void partClosed(IWorkbenchPart part) {
+			}
+
+			@Override
+			public void partActivated(IWorkbenchPart part) {
+				if (!(part instanceof IEditorPart)) {
+					return;
+				}
+				// update the "toggled" state based on the current editor
+				ICommandService commandService = window.getService(ICommandService.class);
+				commandService.refreshElements(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR, null);
+			}
+
+			@Override
+			public void partBroughtToTop(IWorkbenchPart part) {
+			}
+
+		};
+		getWindow().getPartService().addPartListener(partListener);
+
         prefListener = new Preferences.IPropertyChangeListener() {
             public void propertyChange(Preferences.PropertyChangeEvent event) {
                 if (event.getProperty().equals(
@@ -295,9 +329,11 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
                     if (window.getShell() != null
                             && !window.getShell().isDisposed()) {
                         // this property change notification could be from a non-ui thread
-                        window.getShell().getDisplay().syncExec(new Runnable() {
+						window.getShell().getDisplay().asyncExec(new Runnable() {
                             public void run() {
-                                updatePinActionToolbar();
+								if (window.getShell() != null && !window.getShell().isDisposed()) {
+									updatePinActionToolbar();
+								}
                             }
                         });
                     }
@@ -620,7 +656,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         addMacWindowMenuItems(menu);
         
         menu.add(newWindowAction);
-		menu.add(newEditorAction);
 		
         menu.add(new Separator());
         addPerspectiveActions(menu);
@@ -798,6 +833,10 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             window.removePageListener(pageListener);
             pageListener = null;
         }
+		if (partListener != null) {
+			window.getPartService().removePartListener(partListener);
+			partListener = null;
+		}
         if (prefListener != null) {
             ResourcesPlugin.getPlugin().getPluginPreferences()
                     .removePropertyChangeListener(prefListener);
@@ -825,7 +864,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         saveAction = null;
         saveAllAction = null;
         newWindowAction = null;
-		newEditorAction = null;
         helpContentsAction = null;
         helpSearchAction = null;
 		dynamicHelpAction = null;
@@ -975,18 +1013,11 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         newWindowAction.setText(IDEWorkbenchMessages.Workbench_openNewWindow);
         register(newWindowAction);
 
-		newEditorAction = ActionFactory.NEW_EDITOR.create(window);
-		register(newEditorAction);
-
         undoAction = ActionFactory.UNDO.create(window);
         register(undoAction);
 
         redoAction = ActionFactory.REDO.create(window);
         register(redoAction);
-
-
-
-
 
 
         closeAction = ActionFactory.CLOSE.create(window);
@@ -1377,9 +1408,24 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             IDEWorkbenchPlugin.log("Navigate toolbar is missing"); //$NON-NLS-1$
             return;
         }
-
+		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+		boolean reuseEditors = store.getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN);
+		IContributionItem pinItem = toolBarManager.find(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR);
+		if (pinItem != null) {
+			pinItem.setVisible(reuseEditors);
+		}
+		toolBarManager.markDirty();
         toolBarManager.update(false);
         toolBarItem.update(ICoolBarManager.SIZE);
+		window.getShell().getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (window.getShell() != null && !window.getShell().isDisposed()) {
+					ICommandService commandService = window.getService(ICommandService.class);
+					commandService.refreshElements(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR, null);
+				}
+			}
+		});
     }
     
     private IContributionItem getPinEditorItem() {

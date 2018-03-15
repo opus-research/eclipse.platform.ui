@@ -94,6 +94,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 * 
 	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#isSupportedType(org.eclipse.swt.dnd.TransferData)
 	 */
+	@Override
 	public boolean isSupportedType(TransferData aTransferType) {
 		return super.isSupportedType(aTransferType)
 				|| FileTransfer.getInstance().isSupportedType(aTransferType);
@@ -105,6 +106,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#validateDrop(java.lang.Object,
 	 *      int, org.eclipse.swt.dnd.TransferData)
 	 */
+	@Override
 	public IStatus validateDrop(Object target, int aDropOperation,
 			TransferData transferType) {
 
@@ -200,6 +202,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#handleDrop(CommonDropAdapter,
 	 *      DropTargetEvent, Object)
 	 */
+	@Override
 	public IStatus handleDrop(CommonDropAdapter aDropAdapter,
 			DropTargetEvent aDropTargetEvent, Object aTarget) {
 
@@ -260,6 +263,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#validatePluginTransferDrop(org.eclipse.jface.viewers.IStructuredSelection,
 	 *      java.lang.Object)
 	 */
+	@Override
 	public IStatus validatePluginTransferDrop(
 			IStructuredSelection aDragSelection, Object aDropTarget) {
 		if (!(aDropTarget instanceof IResource)) {
@@ -308,6 +312,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#handlePluginTransferDrop(org.eclipse.jface.viewers.IStructuredSelection, java.lang.Object)
 	 */
+	@Override
 	public IStatus handlePluginTransferDrop(IStructuredSelection aDragSelection, Object aDropTarget) {
 
 		IContainer target = getActualTarget((IResource) aDropTarget);
@@ -363,12 +368,12 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 * @return the resource selection from the LocalSelectionTransfer
 	 */
 	private IResource[] getSelectedResources(IStructuredSelection selection) {
-		ArrayList selectedResources = new ArrayList();
+		ArrayList<IResource> selectedResources = new ArrayList<IResource>();
 
-		for (Iterator i = selection.iterator(); i.hasNext();) {
+		for (Iterator<?> i = selection.iterator(); i.hasNext();) {
 			Object o = i.next();
 			if (o instanceof IResource) {
-				selectedResources.add(o);
+				selectedResources.add((IResource)o);
 			} else if (o instanceof IAdaptable) {
 				IAdaptable a = (IAdaptable) o;
 				IResource r = (IResource) a.getAdapter(IResource.class);
@@ -377,8 +382,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 				}
 			}
 		}
-		return (IResource[]) selectedResources
-				.toArray(new IResource[selectedResources.size()]);
+		return selectedResources.toArray(new IResource[selectedResources.size()]);
 	}
 
 	/**
@@ -494,6 +498,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 				
 				returnStatus = null;
 				IRunnableWithProgress checkOp = new IRunnableWithProgress() {
+					@Override
 					public void run(IProgressMonitor monitor) {
 						try {
 						refactoringStatus = refactoring.checkAllConditions(monitor);
@@ -524,6 +529,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 						CheckConditionsOperation.ALL_CONDITIONS);
 
 				final IWorkspaceRunnable r = new IWorkspaceRunnable() {
+					@Override
 					public void run(IProgressMonitor monitor) throws CoreException {
 						op.run(monitor);
 					}
@@ -531,6 +537,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 
 				returnStatus = null;
 				IRunnableWithProgress refactorOp = new IRunnableWithProgress() {
+					@Override
 					public void run(IProgressMonitor monitor) {
 						try {
 							ResourcesPlugin.getWorkspace().run(r, ResourcesPlugin.getWorkspace().getRoot(), IWorkspace.AVOID_UPDATE, monitor);
@@ -578,6 +585,7 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 		// Otherwise the drag source (e.g., Windows Explorer) will be blocked
 		// while the operation executes. Fixes bug 16478.
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				getShell().forceActive();
 				new CopyFilesAndFoldersOperation(getShell()).copyOrLinkFiles(names, target, currentOperation);

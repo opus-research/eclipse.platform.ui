@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,12 +13,11 @@ package org.eclipse.jface.viewers;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.graphics.TextStyle;
-
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.graphics.TextStyle;
 
 /**
  * A mutable string with styled ranges. All ranges mark substrings of the string
@@ -141,12 +140,13 @@ public class StyledString {
 	public String getString() {
 		return fBuffer.toString();
 	}
-	
+
 	/**
 	 * Returns the string of this {@link StyledString}.
-	 * 
+	 *
 	 * @return the current string of this {@link StyledString}.
 	 */
+	@Override
 	public String toString() {
 		return getString();
 	}
@@ -504,6 +504,7 @@ public class StyledString {
 			this.style = style;
 		}
 
+		@Override
 		public String toString() {
 			return "Offset " + offset + ", style: " + style; //$NON-NLS-1$//$NON-NLS-2$
 		}
@@ -520,6 +521,7 @@ public class StyledString {
 			return (StyleRun) get(index);
 		}
 
+		@Override
 		public void removeRange(int fromIndex, int toIndex) {
 			super.removeRange(fromIndex, toIndex);
 		}
@@ -535,6 +537,7 @@ public class StyledString {
 			fBackgroundColorName = backgroundColorName;
 		}
 
+		@Override
 		public void applyStyles(TextStyle textStyle) {
 			ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 			if (fForegroundColorName != null) {

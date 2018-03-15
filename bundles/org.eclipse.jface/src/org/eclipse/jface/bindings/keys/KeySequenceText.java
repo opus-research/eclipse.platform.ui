@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -116,6 +116,7 @@ public final class KeySequenceText {
 		 * @param event
 		 *            The triggering event; must not be <code>null</code>.
 		 */
+		@Override
 		public void handleEvent(Event event) {
 			KeyStroke[] keyStrokes = getKeySequence().getKeyStrokes();
 
@@ -345,6 +346,7 @@ public final class KeySequenceText {
 		 * @param event
 		 *            The trigger event; must not be <code>null</code>.
 		 */
+		@Override
 		public void handleEvent(Event event) {
 			switch (event.detail) {
 			case SWT.TRAVERSE_ESCAPE:
@@ -408,6 +410,7 @@ public final class KeySequenceText {
 		 * @param event
 		 *            Ignored.
 		 */
+		@Override
 		public void focusGained(FocusEvent event) {
 			Display.getCurrent().addFilter(SWT.Traverse, filter);
 			filtering = true;
@@ -419,6 +422,7 @@ public final class KeySequenceText {
 		 * @param event
 		 *            Ignored.
 		 */
+		@Override
 		public void focusLost(FocusEvent event) {
 			Display.getCurrent().removeFilter(SWT.Traverse, filter);
 			filtering = false;
@@ -446,6 +450,7 @@ public final class KeySequenceText {
 		 * @param event
 		 *            The triggering event; ignored.
 		 */
+		@Override
 		public void modifyText(ModifyEvent event) {
 			try {
 				// The original sequence.
@@ -473,6 +478,7 @@ public final class KeySequenceText {
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.TAB
 				| SWT.SHIFT));
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.BS));
+		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.DEL));
 		List trappedKeyList = new ArrayList(trappedKeys);
 		TRAPPED_KEYS = Collections.unmodifiableList(trappedKeyList);
 	}
@@ -548,6 +554,7 @@ public final class KeySequenceText {
 					"Lucida Grande", 13, SWT.NORMAL); //$NON-NLS-1$
 			text.setFont(font);
 			text.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					font.dispose();
 				}
@@ -561,6 +568,7 @@ public final class KeySequenceText {
 		final TraversalFilterManager traversalFilterManager = new TraversalFilterManager();
 		text.addFocusListener(traversalFilterManager);
 		text.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				traversalFilterManager.dispose();
 			} 

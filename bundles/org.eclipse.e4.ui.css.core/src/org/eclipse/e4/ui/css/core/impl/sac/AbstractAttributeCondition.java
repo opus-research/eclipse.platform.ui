@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation 
+   Copyright 2002  The Apache Software Foundation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -43,10 +43,11 @@ public abstract class AbstractAttributeCondition implements AttributeCondition,
 
 	/**
 	 * Indicates whether some other object is "equal to" this one.
-	 * 
+	 *
 	 * @param obj
 	 *            the reference object with which to compare.
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || (obj.getClass() != getClass())) {
 			return false;
@@ -57,9 +58,10 @@ public abstract class AbstractAttributeCondition implements AttributeCondition,
 
 	/**
 	 * equal objects should have equal hashCodes.
-	 * 
+	 *
 	 * @return hashCode of this AbstractAttributeCondition
 	 */
+	@Override
 	public int hashCode() {
 		return value == null ? -1 : value.hashCode();
 	}
@@ -67,6 +69,7 @@ public abstract class AbstractAttributeCondition implements AttributeCondition,
 	/**
 	 * Returns the specificity of this condition.
 	 */
+	@Override
 	public int getSpecificity() {
 		return 1 << 8;
 	}
@@ -75,6 +78,7 @@ public abstract class AbstractAttributeCondition implements AttributeCondition,
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.AttributeCondition#getValue()}.
 	 */
+	@Override
 	public String getValue() {
 		return value;
 	}

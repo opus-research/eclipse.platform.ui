@@ -20,10 +20,10 @@ import org.w3c.dom.css.CSSValue;
  * <li>CSS Value to {@link Boolean}</li>.
  * <li>{@link Boolean} to String CSS Value</li>
  * </ul>
- * 
+ *
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- * 
+ *
  */
 public class CSSValueBooleanConverterImpl extends AbstractCSSValueConverter {
 
@@ -33,6 +33,7 @@ public class CSSValueBooleanConverterImpl extends AbstractCSSValueConverter {
 		super(Boolean.class);
 	}
 
+	@Override
 	public Object convert(CSSValue value, CSSEngine engine, Object context)
 			throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
@@ -43,6 +44,7 @@ public class CSSValueBooleanConverterImpl extends AbstractCSSValueConverter {
 		return Boolean.FALSE;
 	}
 
+	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		if (value instanceof Boolean) {

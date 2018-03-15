@@ -8,6 +8,7 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - ongoing development
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.dom;
 
@@ -47,6 +48,7 @@ public class ViewCSSImpl implements ViewCSS {
 	 * <b>DOM</b>: Implements {@link
 	 * org.w3c.dom.views.AbstractView#getDocument()}.
 	 */
+	@Override
 	public DocumentView getDocument() {
 		return null;
 	}
@@ -55,6 +57,7 @@ public class ViewCSSImpl implements ViewCSS {
 	 * <b>DOM</b>: Implements {@link
 	 * org.w3c.dom.css.ViewCSS#getComputedStyle(Element,String)}.
 	 */
+	@Override
 	public CSSStyleDeclaration getComputedStyle(Element elt, String pseudoElt) {
 		// Loop for CSS StyleSheet list parsed
 		StyleSheetList styleSheetList = documentCSS.getStyleSheets();
@@ -63,14 +66,14 @@ public class ViewCSSImpl implements ViewCSS {
 			CSSStyleSheet styleSheet = (CSSStyleSheet) styleSheetList.item(i);
 			CSSStyleDeclaration styleDeclaration = getComputedStyle(styleSheet,
 					elt, pseudoElt);
-			if (styleDeclaration != null)
+			if (styleDeclaration != null) {
 				return styleDeclaration;
+			}
 		}
 		return null;
 	}
 
-	public CSSStyleDeclaration getComputedStyle(CSSStyleSheet styleSheet,
-			Element elt, String pseudoElt) {
+	public CSSStyleDeclaration getComputedStyle(CSSStyleSheet styleSheet, Element elt, String pseudoElt) {
 		List styleDeclarations = null;
 		StyleWrapper firstStyleDeclaration = null;
 		CSSRuleList ruleList = styleSheet.getCssRules();
@@ -78,8 +81,7 @@ public class ViewCSSImpl implements ViewCSS {
 		int position = 0;
 		for (int i = 0; i < length; i++) {
 			CSSRule rule = ruleList.item(i);
-			switch (rule.getType()) {
-			case CSSRule.STYLE_RULE: {
+			if (rule.getType() == CSSRule.STYLE_RULE) {
 				CSSStyleRule styleRule = (CSSStyleRule) rule;
 				if (rule instanceof ExtendedCSSRule) {
 					ExtendedCSSRule r = (ExtendedCSSRule) rule;
@@ -87,7 +89,7 @@ public class ViewCSSImpl implements ViewCSS {
 					// Loop for SelectorList
 					int l = selectorList.getLength();
 					for (int j = 0; j < l; j++) {
-						Selector selector = (Selector) selectorList.item(j);
+						Selector selector = selectorList.item(j);
 						if (selector instanceof ExtendedSelector) {
 							ExtendedSelector extendedSelector = (ExtendedSelector) selector;
 							if (extendedSelector.match(elt, pseudoElt)) {
@@ -104,8 +106,7 @@ public class ViewCSSImpl implements ViewCSS {
 									// match the current element
 									if (styleDeclarations == null) {
 										styleDeclarations = new ArrayList();
-										styleDeclarations
-												.add(firstStyleDeclaration);
+										styleDeclarations.add(firstStyleDeclaration);
 									}
 									styleDeclarations.add(wrapper);
 								}
@@ -119,7 +120,6 @@ public class ViewCSSImpl implements ViewCSS {
 					// TODO : CSS rule is not ExtendedCSSRule,
 					// Manage this case...
 				}
-			}
 			}
 		}
 		if (styleDeclarations != null) {

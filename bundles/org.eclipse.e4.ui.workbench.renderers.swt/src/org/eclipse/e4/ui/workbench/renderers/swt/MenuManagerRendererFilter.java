@@ -27,6 +27,7 @@ import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
+import org.eclipse.e4.ui.internal.workbench.swt.MenuService;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -37,7 +38,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.swt.modeling.MenuService;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
@@ -71,6 +71,7 @@ public class MenuManagerRendererFilter implements Listener {
 	private class SafeWrapper implements ISafeRunnable {
 		Event event;
 
+		@Override
 		public void handleException(Throwable e) {
 			if (e instanceof Error) {
 				// errors are deadly, we shouldn't ignore these
@@ -82,6 +83,7 @@ public class MenuManagerRendererFilter implements Listener {
 			}
 		}
 
+		@Override
 		public void run() throws Exception {
 			safeHandleEvent(event);
 		}
@@ -89,6 +91,7 @@ public class MenuManagerRendererFilter implements Listener {
 
 	private SafeWrapper safeWrapper = new SafeWrapper();
 
+	@Override
 	public void handleEvent(final Event event) {
 		// wrap the handling in a SafeRunner so that exceptions do not prevent
 		// the menu from being shown

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Timo Kinnunen <timo.kinnunen@gmail.com> - Bug 431924
  *******************************************************************************/
 
 package org.eclipse.ui.internal.preferences;
@@ -14,9 +15,8 @@ package org.eclipse.ui.internal.preferences;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-
+import java.util.Map.Entry;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferenceNodeVisitor;
@@ -39,7 +39,7 @@ public class WorkingCopyPreferences extends EventManager implements
 
 	private static final String TRUE = "true"; //$NON-NLS-1$
 
-	private final Map temporarySettings;
+	private final Map<String, Object> temporarySettings;
 	private final IEclipsePreferences original;
 	private boolean removed = false;
 	private org.eclipse.ui.preferences.WorkingCopyManager manager;
@@ -52,7 +52,7 @@ public class WorkingCopyPreferences extends EventManager implements
 		super();
 		this.original = original;
 		this.manager = manager;
-		this.temporarySettings = new HashMap();
+		this.temporarySettings = new HashMap<String, Object>();
 	}
 
 	/*
@@ -69,6 +69,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences#addNodeChangeListener(org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener)
 	 */
+	@Override
 	public void addNodeChangeListener(INodeChangeListener listener) {
 		// no-op - working copy nodes don't fire node change events
 	}
@@ -76,6 +77,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences#removeNodeChangeListener(org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener)
 	 */
+	@Override
 	public void removeNodeChangeListener(INodeChangeListener listener) {
 		// no-op - working copy nodes don't fire node change events
 	}
@@ -83,6 +85,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences#addPreferenceChangeListener(org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener)
 	 */
+	@Override
 	public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
 		checkRemoved();
 		addListenerObject(listener);
@@ -91,6 +94,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences#removePreferenceChangeListener(org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener)
 	 */
+	@Override
 	public void removePreferenceChangeListener(IPreferenceChangeListener listener) {
 		checkRemoved();
 		removeListenerObject(listener);
@@ -99,6 +103,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#removeNode()
 	 */
+	@Override
 	public void removeNode() throws BackingStoreException {
 		checkRemoved();
 
@@ -122,6 +127,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#node(java.lang.String)
 	 */
+	@Override
 	public Preferences node(String path) {
 		checkRemoved();
 		return manager.getWorkingCopy((IEclipsePreferences) getOriginal().node(path));
@@ -130,6 +136,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences#accept(org.eclipse.core.runtime.preferences.IPreferenceNodeVisitor)
 	 */
+	@Override
 	public void accept(IPreferenceNodeVisitor visitor) throws BackingStoreException {
 		checkRemoved();
 		if (!visitor.visit(this)) {
@@ -144,6 +151,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#put(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public void put(String key, String value) {
 		checkRemoved();
 		if (key == null || value == null) {
@@ -175,6 +183,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#get(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public String get(String key, String defaultValue) {
 		checkRemoved();
 		return internalGet(key, defaultValue);
@@ -194,6 +203,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#remove(java.lang.String)
 	 */
+	@Override
 	public void remove(String key) {
 		checkRemoved();
 		if (key == null) {
@@ -215,11 +225,12 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#clear()
 	 */
+	@Override
 	public void clear() {
 		checkRemoved();
-		for (Iterator i = temporarySettings.keySet().iterator(); i.hasNext();) {
-			String key = (String) i.next();
-			Object value = temporarySettings.get(key);
+		for (Entry<String, Object> entry : temporarySettings.entrySet()) {
+			String key = entry.getKey();
+			Object value = entry.getValue();
 			if (value != null) {
 				temporarySettings.put(key, null);
 				firePropertyChangeEvent(key, value, null);
@@ -230,6 +241,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#putInt(java.lang.String, int)
 	 */
+	@Override
 	public void putInt(String key, int value) {
 		checkRemoved();
 		if (key == null) {
@@ -251,6 +263,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#getInt(java.lang.String, int)
 	 */
+	@Override
 	public int getInt(String key, int defaultValue) {
 		checkRemoved();
 		String value = internalGet(key, null);
@@ -268,6 +281,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#putLong(java.lang.String, long)
 	 */
+	@Override
 	public void putLong(String key, long value) {
 		checkRemoved();
 		if (key == null) {
@@ -289,6 +303,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#getLong(java.lang.String, long)
 	 */
+	@Override
 	public long getLong(String key, long defaultValue) {
 		checkRemoved();
 		String value = internalGet(key, null);
@@ -306,6 +321,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#putBoolean(java.lang.String, boolean)
 	 */
+	@Override
 	public void putBoolean(String key, boolean value) {
 		checkRemoved();
 		if (key == null) {
@@ -327,6 +343,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#getBoolean(java.lang.String, boolean)
 	 */
+	@Override
 	public boolean getBoolean(String key, boolean defaultValue) {
 		checkRemoved();
 		String value = internalGet(key, null);
@@ -336,6 +353,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#putFloat(java.lang.String, float)
 	 */
+	@Override
 	public void putFloat(String key, float value) {
 		checkRemoved();
 		if (key == null) {
@@ -357,6 +375,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#getFloat(java.lang.String, float)
 	 */
+	@Override
 	public float getFloat(String key, float defaultValue) {
 		checkRemoved();
 		String value = internalGet(key, null);
@@ -374,6 +393,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#putDouble(java.lang.String, double)
 	 */
+	@Override
 	public void putDouble(String key, double value) {
 		checkRemoved();
 		if (key == null) {
@@ -395,6 +415,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#getDouble(java.lang.String, double)
 	 */
+	@Override
 	public double getDouble(String key, double defaultValue) {
 		checkRemoved();
 		String value = internalGet(key, null);
@@ -412,6 +433,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#putByteArray(java.lang.String, byte[])
 	 */
+	@Override
 	public void putByteArray(String key, byte[] value) {
 		checkRemoved();
 		if (key == null || value == null) {
@@ -433,6 +455,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#getByteArray(java.lang.String, byte[])
 	 */
+	@Override
 	public byte[] getByteArray(String key, byte[] defaultValue) {
 		checkRemoved();
 		String value = internalGet(key, null);
@@ -442,16 +465,25 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#keys()
 	 */
+	@Override
 	public String[] keys() throws BackingStoreException {
 		checkRemoved();
-		HashSet allKeys = new HashSet(Arrays.asList(getOriginal().keys()));
-		allKeys.addAll(temporarySettings.keySet());
-		return (String[]) allKeys.toArray(new String[allKeys.size()]);
+		HashSet<String> allKeys = new HashSet<String>(Arrays.asList(getOriginal().keys()));
+		for (Entry<String, Object> entry : temporarySettings.entrySet()) {
+			String key = entry.getKey();
+			if (entry.getValue() != null) {
+				allKeys.add(key);
+			} else {
+				allKeys.remove(key);
+			}
+		}
+		return allKeys.toArray(new String[allKeys.size()]);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#childrenNames()
 	 */
+	@Override
 	public String[] childrenNames() throws BackingStoreException {
 		checkRemoved();
 		return getOriginal().childrenNames();
@@ -460,6 +492,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#parent()
 	 */
+	@Override
 	public Preferences parent() {
 		checkRemoved();
 		return manager.getWorkingCopy((IEclipsePreferences) getOriginal().parent());
@@ -468,6 +501,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#nodeExists(java.lang.String)
 	 */
+	@Override
 	public boolean nodeExists(String pathName) throws BackingStoreException {
 		// short circuit for this node
 		if (pathName.length() == 0) {
@@ -479,6 +513,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#name()
 	 */
+	@Override
 	public String name() {
 		return getOriginal().name();
 	}
@@ -486,6 +521,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#absolutePath()
 	 */
+	@Override
 	public String absolutePath() {
 		return getOriginal().absolutePath();
 	}
@@ -493,6 +529,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#flush()
 	 */
+	@Override
 	public void flush() throws BackingStoreException {
 		if (removed) {
 			getOriginal().removeNode();
@@ -500,9 +537,9 @@ public class WorkingCopyPreferences extends EventManager implements
 		}
 		checkRemoved();
 		// update underlying preferences
-		for (Iterator i = temporarySettings.keySet().iterator(); i.hasNext();) {
-			String key = (String) i.next();
-			String value = (String) temporarySettings.get(key);
+		for (Entry<String, Object> entry : temporarySettings.entrySet()) {
+			String key = entry.getKey();
+			String value = (String) entry.getValue();
 			if (value == null) {
 				getOriginal().remove(key);
 			} else {
@@ -519,6 +556,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	/* (non-Javadoc)
 	 * @see org.osgi.service.prefs.Preferences#sync()
 	 */
+	@Override
 	public void sync() throws BackingStoreException {
 		checkRemoved();
 		// forget our settings

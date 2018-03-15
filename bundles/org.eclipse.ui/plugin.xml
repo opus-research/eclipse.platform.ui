@@ -722,6 +722,80 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+F7">
       </key>
+      <key
+            commandId="org.eclipse.ui.window.splitEditor"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+_"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+         <parameter
+               id="Splitter.isHorizontal"
+               value="true">
+         </parameter>
+      </key>
+      <key
+            locale="ja"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+_"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      <key
+      		locale="ja"
+            commandId="org.eclipse.ui.window.splitEditor"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+M2+-"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+         <parameter
+               id="Splitter.isHorizontal"
+               value="true">
+         </parameter>
+      </key>
+      <key
+            platform="carbon"
+            commandId=""
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+_"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      <key
+            platform="carbon"
+            commandId="org.eclipse.ui.window.splitEditor"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="Command+Shift+-"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+         <parameter
+               id="Splitter.isHorizontal"
+               value="true">
+         </parameter>
+      </key>
+      <key
+            commandId="org.eclipse.ui.window.splitEditor"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+{"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+         <parameter
+               id="Splitter.isHorizontal"
+               value="false">
+         </parameter>
+      </key>
+      <key
+            platform="carbon"
+            commandId=""
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+{"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+      <key
+            platform="carbon"
+            commandId="org.eclipse.ui.window.splitEditor"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="Command+Shift+["
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+         <parameter
+               id="Splitter.isHorizontal"
+               value="false">
+         </parameter>
+      </key>
+
    </extension>
    
    <extension
@@ -1023,6 +1097,19 @@
             categoryId="org.eclipse.ui.category.window"
             id="org.eclipse.ui.window.newEditor" />
       <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="org.eclipse.ui.internal.SplitHandler"
+            description="%command.splitEditor.description"
+            id="org.eclipse.ui.window.splitEditor"
+            name="%command.splitEditor.name">
+            <commandParameter
+                  id="Splitter.isHorizontal"
+                  name="%command.splitEditor.orientation.name"
+                  optional="false"
+                  values="org.eclipse.ui.internal.SplitValues">
+            </commandParameter>
+      </command>
+      <command
             name="%command.openEditorDropDown.name"
             description="%command.openEditorDropDown.description"
             categoryId="org.eclipse.ui.category.window"
@@ -1320,83 +1407,83 @@
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.eclipse.ui.edit.copy"
-            disabledIcon="$nl$/icons/full/dtool16/copy_edit.gif"
-            icon="$nl$/icons/full/etool16/copy_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/copy_edit.png"
+            icon="$nl$/icons/full/etool16/copy_edit.png"/>
       <image
             commandId="org.eclipse.ui.edit.cut"
-            disabledIcon="$nl$/icons/full/dtool16/cut_edit.gif"
-            icon="$nl$/icons/full/etool16/cut_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/cut_edit.png"
+            icon="$nl$/icons/full/etool16/cut_edit.png"/>
       <image
             commandId="org.eclipse.ui.edit.delete"
-            disabledIcon="$nl$/icons/full/dtool16/delete_edit.gif"
-            icon="$nl$/icons/full/etool16/delete_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/delete_edit.png"
+            icon="$nl$/icons/full/etool16/delete_edit.png"/>
       <image
             commandId="org.eclipse.ui.edit.paste"
-            disabledIcon="$nl$/icons/full/dtool16/paste_edit.gif"
-            icon="$nl$/icons/full/etool16/paste_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/paste_edit.png"
+            icon="$nl$/icons/full/etool16/paste_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.print"
-            disabledIcon="$nl$/icons/full/dtool16/print_edit.gif"
-            icon="$nl$/icons/full/etool16/print_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/print_edit.png"
+            icon="$nl$/icons/full/etool16/print_edit.png"/>
       <image
             commandId="org.eclipse.ui.edit.undo"
-            disabledIcon="$nl$/icons/full/dtool16/undo_edit.gif"
-            icon="$nl$/icons/full/etool16/undo_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/undo_edit.png"
+            icon="$nl$/icons/full/etool16/undo_edit.png"/>
       <image
             commandId="org.eclipse.ui.edit.redo"
-            disabledIcon="$nl$/icons/full/dtool16/redo_edit.gif"
-            icon="$nl$/icons/full/etool16/redo_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/redo_edit.png"
+            icon="$nl$/icons/full/etool16/redo_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.save"
-            disabledIcon="$nl$/icons/full/dtool16/save_edit.gif"
-            icon="$nl$/icons/full/etool16/save_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/save_edit.png"
+            icon="$nl$/icons/full/etool16/save_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.saveAll"
-            disabledIcon="$nl$/icons/full/dtool16/saveall_edit.gif"
-            icon="$nl$/icons/full/etool16/saveall_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/saveall_edit.png"
+            icon="$nl$/icons/full/etool16/saveall_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.saveAs"
-            disabledIcon="$nl$/icons/full/dtool16/saveas_edit.gif"
-            icon="$nl$/icons/full/etool16/saveas_edit.gif"/>
+            disabledIcon="$nl$/icons/full/dtool16/saveas_edit.png"
+            icon="$nl$/icons/full/etool16/saveas_edit.png"/>
       <image
             commandId="org.eclipse.ui.file.refresh"
-            disabledIcon="$nl$/icons/full/dlcl16/refresh_nav.gif"
-            icon="$nl$/icons/full/elcl16/refresh_nav.gif"/>
+            disabledIcon="$nl$/icons/full/dlcl16/refresh_nav.png"
+            icon="$nl$/icons/full/elcl16/refresh_nav.png"/>
       <image
             commandId="org.eclipse.ui.file.export"
-            disabledIcon="$nl$/icons/full/dtool16/export_wiz.gif"
-            icon="$nl$/icons/full/etool16/export_wiz.gif">
+            disabledIcon="$nl$/icons/full/dtool16/export_wiz.png"
+            icon="$nl$/icons/full/etool16/export_wiz.png">
       </image>
       <image
             commandId="org.eclipse.ui.file.import"
-            disabledIcon="$nl$/icons/full/dtool16/import_wiz.gif"
-            icon="$nl$/icons/full/etool16/import_wiz.gif">
+            disabledIcon="$nl$/icons/full/dtool16/import_wiz.png"
+            icon="$nl$/icons/full/etool16/import_wiz.png">
       </image>
       <image
             commandId="org.eclipse.ui.navigate.collapseAll"
-            disabledIcon="$nl$/icons/full/dlcl16/collapseall.gif"
-            icon="$nl$/icons/full/elcl16/collapseall.gif">
+            disabledIcon="$nl$/icons/full/dlcl16/collapseall.png"
+            icon="$nl$/icons/full/elcl16/collapseall.png">
       </image>
       <image
             commandId="org.eclipse.ui.navigate.expandAll"
-            icon="$nl$/icons/full/elcl16/expandall.gif">
+            icon="$nl$/icons/full/elcl16/expandall.png">
       </image>
       <image
             commandId="org.eclipse.ui.newWizard"
-            disabledIcon="$nl$/icons/full/dtool16/new_wiz.gif"
-            icon="$nl$/icons/full/etool16/new_wiz.gif">
+            disabledIcon="$nl$/icons/full/dtool16/new_wiz.png"
+            icon="$nl$/icons/full/etool16/new_wiz.png">
       </image>
       <image
             commandId="org.eclipse.ui.perspectives.showPerspective"
-            icon="$nl$/icons/full/eview16/new_persp.gif">
+            icon="$nl$/icons/full/eview16/new_persp.png">
       </image>
       <image
             commandId="org.eclipse.ui.help.helpContents"
-            icon="$nl$/icons/full/etool16/help_contents.gif">
+            icon="$nl$/icons/full/etool16/help_contents.png">
       </image>
       <image
             commandId="org.eclipse.ui.help.helpSearch"
-            icon="$nl$/icons/full/etool16/help_search.gif">
+            icon="$nl$/icons/full/etool16/help_search.png">
       </image>
    </extension>
    
@@ -1488,14 +1575,6 @@
             id="org.eclipse.ui.workbench.TAB_TEXT_FONT">
          <description>
             %FontsPreference.TitleFontDescription
-         </description>
-      </fontDefinition>
-      <fontDefinition
-            label="%FontsPreference.ViewMessageFont"
-            categoryId="org.eclipse.ui.presentation.default"
-            id="org.eclipse.ui.workbench.VIEW_MESSAGE_TEXT_FONT">
-         <description>
-            %FontsPreference.ViewMessageFontDescription
          </description>
       </fontDefinition>
       <colorDefinition

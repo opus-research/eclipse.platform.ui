@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *                                                 fix for 159597, refactoring (bug 153993),
  *                                                 widget-independency (bug 154329), fix for 187826, 191468
  *     Peter Centgraf - bug 251575
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -115,6 +116,7 @@ public class TableViewer extends AbstractTableViewer {
 		hookControl(table);
 	}
 
+	@Override
 	public Control getControl() {
 		return table;
 	}
@@ -128,6 +130,7 @@ public class TableViewer extends AbstractTableViewer {
 		return table;
 	}
 
+	@Override
 	protected ColumnViewerEditor createViewerEditor() {
 		return new TableViewerEditor(this, null,
 				new ColumnViewerEditorActivationStrategy(this),
@@ -154,10 +157,12 @@ public class TableViewer extends AbstractTableViewer {
 	 * @see Table#setSelection(int[])
 	 * @see Table#showSelection()
 	 */
+	@Override
 	public void setSelection(ISelection selection, boolean reveal) {
 		super.setSelection(selection, reveal);
 	}
 
+	@Override
 	protected ViewerRow getViewerRowFromItem(Widget item) {
 		if (cachedRow == null) {
 			cachedRow = new TableViewerRow((TableItem) item);
@@ -176,6 +181,7 @@ public class TableViewer extends AbstractTableViewer {
 	 * @return ViewerRow
 	 * @since 3.3
 	 */
+	@Override
 	protected ViewerRow internalCreateNewRowPart(int style, int rowIndex) {
 		TableItem item;
 
@@ -188,6 +194,7 @@ public class TableViewer extends AbstractTableViewer {
 		return getViewerRowFromItem(item);
 	}
 
+	@Override
 	protected Item getItemAt(Point p) {
 		TableItem[] selection = table.getSelection();
 
@@ -206,46 +213,57 @@ public class TableViewer extends AbstractTableViewer {
 
 	// Methods to provide widget independency
 
+	@Override
 	protected int doGetItemCount() {
 		return table.getItemCount();
 	}
 
+	@Override
 	protected int doIndexOf(Item item) {
 		return table.indexOf((TableItem) item);
 	}
 
+	@Override
 	protected void doSetItemCount(int count) {
 		table.setItemCount(count);
 	}
 
+	@Override
 	protected Item[] doGetItems() {
 		return table.getItems();
 	}
 
+	@Override
 	protected int doGetColumnCount() {
 		return table.getColumnCount();
 	}
 
+	@Override
 	protected Widget doGetColumn(int index) {
 		return table.getColumn(index);
 	}
 
+	@Override
 	protected Item doGetItem(int index) {
 		return table.getItem(index);
 	}
 
+	@Override
 	protected Item[] doGetSelection() {
 		return table.getSelection();
 	}
 
+	@Override
 	protected int[] doGetSelectionIndices() {
 		return table.getSelectionIndices();
 	}
 
+	@Override
 	protected void doClearAll() {
 		table.clearAll();
 	}
 
+	@Override
 	protected void doResetItem(Item item) {
 		TableItem tableItem = (TableItem) item;
 		int columnCount = Math.max(1, table.getColumnCount());
@@ -257,26 +275,32 @@ public class TableViewer extends AbstractTableViewer {
 		}
 	}
 
+	@Override
 	protected void doRemove(int start, int end) {
 		table.remove(start, end);
 	}
 
+	@Override
 	protected void doRemoveAll() {
 		table.removeAll();
 	}
 
+	@Override
 	protected void doRemove(int[] indices) {
 		table.remove(indices);
 	}
 
+	@Override
 	protected void doShowItem(Item item) {
 		table.showItem((TableItem) item);
 	}
 
+	@Override
 	protected void doDeselectAll() {
 		table.deselectAll();
 	}
 
+	@Override
 	protected void doSetSelection(Item[] items) {
 		Assert.isNotNull(items, "Items-Array can not be null"); //$NON-NLS-1$
 
@@ -286,18 +310,22 @@ public class TableViewer extends AbstractTableViewer {
 		table.setSelection(t);
 	}
 
+	@Override
 	protected void doShowSelection() {
 		table.showSelection();
 	}
 
+	@Override
 	protected void doSetSelection(int[] indices) {
 		table.setSelection(indices);
 	}
 
+	@Override
 	protected void doClear(int index) {
 		table.clear(index);
 	}
 
+	@Override
 	protected void doSelect(int[] indices) {
 		table.select(indices);
 	}
@@ -339,6 +367,7 @@ public class TableViewer extends AbstractTableViewer {
 		}
 
 		preservingSelection(new Runnable() {
+			@Override
 			public void run() {
 				internalRefresh(element, updateLabels);
 			}
@@ -371,10 +400,8 @@ public class TableViewer extends AbstractTableViewer {
 	public void refresh(boolean updateLabels, boolean reveal) {
 		refresh(getRoot(), updateLabels, reveal);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.AbstractTableViewer#remove(java.lang.Object[])
-	 */
+
+	@Override
 	public void remove(Object[] elements) {
 		assertElementsNotNull(elements);
 		if (checkBusy())
@@ -391,14 +418,12 @@ public class TableViewer extends AbstractTableViewer {
 			elementToBeRemoved = elements[0];
 		} else {
 			elementsToBeRemoved = new CustomHashtable(getComparer());
-			for (int i = 0; i < elements.length; i++) {
-				Object element = elements[i];
+			for (Object element : elements) {
 				elementsToBeRemoved.put(element, element);
 			}
 		}
 		int[] selectionIndices = doGetSelectionIndices();
-		for (int i = 0; i < selectionIndices.length; i++) {
-			int index = selectionIndices[i];
+		for (int index : selectionIndices) {
 			Item item = doGetItem(index);
 			Object data = item.getData();
 			if (data != null) {
@@ -419,6 +444,7 @@ public class TableViewer extends AbstractTableViewer {
 		}
 	}
 	
+	@Override
 	protected Widget doFindItem(Object element) {
 		IContentProvider contentProvider = getContentProvider();
 		if (contentProvider instanceof IIndexableLazyContentProvider) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -99,7 +99,8 @@ public final class Scheme extends NamedHandleObject implements Comparable {
      * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public final int compareTo(final Object object) {
+    @Override
+	public final int compareTo(final Object object) {
         final Scheme scheme = (Scheme) object;
         int compareTo = Util.compare(this.id, scheme.id);
         if (compareTo == 0) {
@@ -245,7 +246,8 @@ public final class Scheme extends NamedHandleObject implements Comparable {
      * 
      * @return The string representation; never <code>null</code>.
      */
-    public final String toString() {
+    @Override
+	public final String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append("Scheme("); //$NON-NLS-1$
@@ -269,7 +271,8 @@ public final class Scheme extends NamedHandleObject implements Comparable {
      * the name, description and parent identifier to <code>null</code>.
      * Notification is sent to all listeners.
      */
-    public final void undefine() {
+    @Override
+	public final void undefine() {
         string = null;
 
         final boolean definedChanged = defined;

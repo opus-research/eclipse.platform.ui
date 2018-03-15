@@ -43,10 +43,12 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 	
 	private static class TreeLayoutListener implements TreeListener {
 
+		@Override
 		public void treeCollapsed(TreeEvent e) {
 			update((Tree) e.widget);
 		}
 
+		@Override
 		public void treeExpanded(TreeEvent e) {
 			update((Tree) e.widget);
 		}
@@ -54,6 +56,7 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 		private void update(final Tree tree) {
 			tree.getDisplay().asyncExec(new Runnable() {
 
+				@Override
 				public void run() {
 					if (!tree.isDisposed()) {
 						tree.update();
@@ -68,6 +71,7 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 	
 	private static final TreeLayoutListener listener = new TreeLayoutListener();
 	
+	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		super.layout(composite, flushCache);
 		if( addListener ) {
@@ -81,6 +85,7 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 	 * 
 	 * @since 3.5
 	 */
+	@Override
 	protected int getColumnCount(Scrollable tree) {
 		return ((Tree) tree).getColumnCount();
 	}
@@ -90,6 +95,7 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 	 * 
 	 * @since 3.5
 	 */
+	@Override
 	protected void setColumnWidths(Scrollable tree, int[] widths) {
 		TreeColumn[] columns = ((Tree) tree).getColumns();
 		for (int i = 0; i < widths.length; i++) {
@@ -102,6 +108,7 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 	 * 
 	 * @since 3.5
 	 */
+	@Override
 	protected ColumnLayoutData getLayoutData(Scrollable tableTree, int columnIndex) {
 		TreeColumn column = ((Tree) tableTree).getColumn(columnIndex);
 		return (ColumnLayoutData) column.getData(LAYOUT_DATA);
@@ -112,6 +119,7 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 	 * 
 	 * @since 3.5
 	 */
+	@Override
 	protected void updateColumnData(Widget column) {
 		TreeColumn tColumn = (TreeColumn) column;
 		Tree t = tColumn.getParent();

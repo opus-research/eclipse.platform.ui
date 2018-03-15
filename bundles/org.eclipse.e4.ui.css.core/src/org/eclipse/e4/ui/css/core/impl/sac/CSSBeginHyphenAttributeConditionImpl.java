@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation 
+   Copyright 2002  The Apache Software Foundation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ public class CSSBeginHyphenAttributeConditionImpl extends
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.Condition#getConditionType()}.
 	 */
+	@Override
 	public short getConditionType() {
 		return SAC_BEGIN_HYPHEN_ATTRIBUTE_CONDITION;
 	}
@@ -48,6 +49,7 @@ public class CSSBeginHyphenAttributeConditionImpl extends
 	/**
 	 * Tests whether this condition matches the given element.
 	 */
+	@Override
 	public boolean match(Element e, String pseudoE) {
 		return e.getAttribute(getLocalName()).startsWith(getValue());
 	}
@@ -55,6 +57,7 @@ public class CSSBeginHyphenAttributeConditionImpl extends
 	/**
 	 * Returns a text representation of this object.
 	 */
+	@Override
 	public String toString() {
 		return '[' + getLocalName() + "|=\"" + getValue() + "\"]";
 	}

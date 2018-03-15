@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -68,18 +69,22 @@ public class SashLayout extends Layout {
 		this.host = host;
 
 		host.addMouseTrackListener(new MouseTrackListener() {
+			@Override
 			public void mouseHover(MouseEvent e) {
 			}
 
+			@Override
 			public void mouseExit(MouseEvent e) {
 				host.setCursor(null);
 			}
 
+			@Override
 			public void mouseEnter(MouseEvent e) {
 			}
 		});
 
 		host.addMouseMoveListener(new MouseMoveListener() {
+			@Override
 			public void mouseMove(final MouseEvent e) {
 				if (!draggingSashes) {
 					// Set the cursor feedback
@@ -112,14 +117,17 @@ public class SashLayout extends Layout {
 		});
 
 		host.addMouseListener(new MouseListener() {
+			@Override
 			public void mouseUp(MouseEvent e) {
 				host.setCapture(false);
 				draggingSashes = false;
 			}
 
+			@Override
 			public void mouseDown(MouseEvent e) {
-				if (e.button != 1)
+				if (e.button != 1) {
 					return;
+				}
 
 				sashesToDrag = getSashRects(e.x, e.y);
 				if (sashesToDrag.size() > 0) {
@@ -128,11 +136,13 @@ public class SashLayout extends Layout {
 				}
 			}
 
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 			}
 		});
 
 		host.addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent e) {
 				// for (SashRect sr : sashes) {
 				// Color color;
@@ -146,10 +156,6 @@ public class SashLayout extends Layout {
 				// }
 			}
 		});
-	}
-
-	public void setRootElemenr(MUIElement newRoot) {
-		root = newRoot;
 	}
 
 	@Override
@@ -228,17 +234,10 @@ public class SashLayout extends Layout {
 
 	protected List<SashRect> getSashRects(int x, int y) {
 		List<SashRect> srs = new ArrayList<SashRect>();
-		boolean inSash = false;
-		for (SashRect sr : sashes) {
-			if (sr.rect.contains(x, y))
-				inSash = true;
-		}
-		if (!inSash)
-			return srs;
-
 		Rectangle target = new Rectangle(x - 5, y - 5, 10, 10);
 		for (SashRect sr : sashes) {
-			if (sr.rect.intersects(target))
+			if (!sr.container.getTags().contains(IPresentationEngine.NO_MOVE)
+					&& sr.rect.intersects(target))
 				srs.add(sr);
 		}
 		return srs;
