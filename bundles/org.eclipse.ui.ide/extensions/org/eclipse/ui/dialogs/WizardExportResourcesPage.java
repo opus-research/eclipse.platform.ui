@@ -583,14 +583,13 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
      */
     protected void setupBasedOnInitialSelections() {
 
-		for (Object object : IDE.computeSelectedResources(this.initialResourceSelection)) {
-			if (object instanceof IResource) {
-				IResource currentResource = (IResource) object;
-				if (currentResource.getType() == IResource.FILE) {
-					this.resourceGroup.initialCheckListItem(currentResource);
-				} else {
-					this.resourceGroup.initialCheckTreeItem(currentResource);
-				}
+        Iterator it = this.initialResourceSelection.iterator();
+        while (it.hasNext()) {
+            IResource currentResource = (IResource) it.next();
+            if (currentResource.getType() == IResource.FILE) {
+				this.resourceGroup.initialCheckListItem(currentResource);
+			} else {
+				this.resourceGroup.initialCheckTreeItem(currentResource);
 			}
         }
     }
