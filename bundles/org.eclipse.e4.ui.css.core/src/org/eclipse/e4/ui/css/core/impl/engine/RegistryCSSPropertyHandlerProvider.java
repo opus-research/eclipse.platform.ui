@@ -29,14 +29,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.properties.ICSSPropertyHandler;
-import org.eclipse.e4.ui.css.core.dom.properties.ICSSPropertyHandler2;
 import org.eclipse.e4.ui.css.core.dom.properties.providers.AbstractCSSPropertyHandlerProvider;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 
 public class RegistryCSSPropertyHandlerProvider extends
-AbstractCSSPropertyHandlerProvider {
+		AbstractCSSPropertyHandlerProvider {
 	private static final String ATTR_COMPOSITE = "composite";
 	private static final String ATTR_ADAPTER = "adapter";
 	private static final String ATTR_NAME = "name";
@@ -51,96 +50,9 @@ AbstractCSSPropertyHandlerProvider {
 
 	private IExtensionRegistry registry;
 	private boolean hasDeprecatedProperties = false; // mild optimization for
-	// getCSSProperties()
+														// getCSSProperties()
 
 	private Map<String, Map<String, ICSSPropertyHandler>> propertyHandlerMap = new HashMap<>();;
-
-	private class LazyPropertyHander implements ICSSPropertyHandler, ICSSPropertyHandler2 {
-		IConfigurationElement ce;
-		Object handler = null;
-
-		boolean loaded = false;
-		private String name;
-
-		public LazyPropertyHander(String name, IConfigurationElement ce) {
-			this.name = name;
-			this.ce = ce;
-		}
-
-		@Override
-		public boolean applyCSSProperty(Object element, String property, CSSValue value, String pseudo,
-				CSSEngine engine) throws Exception {
-			if (!loaded) {
-				load();
-			}
-			if (handler == null) {
-				// an error occurred during loading (e.g. class is not an
-				// instance of ICSSPropertyHandler)
-				return false;
-			}
-			return ((ICSSPropertyHandler) handler).applyCSSProperty(element, property, value, pseudo, engine);
-		}
-
-		@Override
-		public String retrieveCSSProperty(Object element, String property, String pseudo, CSSEngine engine)
-				throws Exception {
-			if (!loaded) {
-				load();
-			}
-			if (handler == null) {
-				// an error occurred during loading (e.g. class is not an
-				// instance of ICSSPropertyHandler)
-				return null;
-			}
-			return ((ICSSPropertyHandler) handler).retrieveCSSProperty(element, property, pseudo, engine);
-		}
-
-		@Override
-		public void onAllCSSPropertiesApplyed(Object element, CSSEngine engine) throws Exception {
-			if (!loaded) {
-				load();
-			}
-			if (handler == null) {
-				// an error occurred during loading (e.g. class is not an
-				// instance of ICSSPropertyHandler)
-				return;
-			}
-			if (handler instanceof ICSSPropertyHandler2) {
-				ICSSPropertyHandler2 handler2 = (ICSSPropertyHandler2) handler;
-				handler2.onAllCSSPropertiesApplyed(element, engine);
-			}
-		}
-
-		@Override
-		public void onAllCSSPropertiesApplyed(Object element, CSSEngine engine, String pseudo) throws Exception {
-			if (!loaded) {
-				load();
-			}
-			if (handler == null) {
-				// an error occurred during loading (e.g. class is not an
-				// instance of ICSSPropertyHandler)
-				return;
-			}
-			if (handler instanceof ICSSPropertyHandler2) {
-				ICSSPropertyHandler2 handler2 = (ICSSPropertyHandler2) handler;
-				handler2.onAllCSSPropertiesApplyed(element, engine, pseudo);
-			}
-		}
-
-		private void load() {
-			try {
-				Object t = ce.createExecutableExtension(ATTR_HANDLER);
-
-				if (t instanceof ICSSPropertyHandler) {
-					handler = t;
-				} else {
-					logError("invalid property handler for " + name);
-				}
-			} catch (CoreException e1) {
-				logError("invalid property handler for " + name + ": " + e1);
-			}
-		}
-	}
 
 	public RegistryCSSPropertyHandlerProvider(IExtensionRegistry registry) {
 		this.registry = registry;
@@ -191,18 +103,33 @@ AbstractCSSPropertyHandlerProvider {
 						}
 
 					}
-					Map<String, ICSSPropertyHandler> adaptersMap = handlersMap.get(adapter);
-					if (adaptersMap == null) {
-						handlersMap.put(adapter, adaptersMap = new HashMap<>());
-					}
-					if (!adaptersMap.containsKey(name)) {
-						ICSSPropertyHandler handler = new LazyPropertyHander(name, ce);
-						for (int i = 0; i < names.length; i++) {
-							if (deprecated[i] != null) {
-								handler = new DeprecatedPropertyHandlerWrapper(handler, deprecated[i]);
-							}
-							adaptersMap.put(names[i], handler);
+					try {
+						Map<String, ICSSPropertyHandler> adaptersMap = handlersMap
+								.get(adapter);
+						if (adaptersMap == null) {
+							handlersMap
+									.put(adapter,
+											adaptersMap = new HashMap<>());
 						}
+						if (!adaptersMap.containsKey(name)) {
+							Object t = ce
+									.createExecutableExtension(ATTR_HANDLER);
+							if (t instanceof ICSSPropertyHandler) {
+								for (int i = 0; i < names.length; i++) {
+									adaptersMap
+											.put(names[i],
+													deprecated[i] == null ? (ICSSPropertyHandler) t
+															: new DeprecatedPropertyHandlerWrapper(
+																	(ICSSPropertyHandler) t,
+																	deprecated[i]));
+								}
+							} else {
+								logError("invalid property handler for " + name);
+							}
+						}
+					} catch (CoreException e1) {
+						logError("invalid property handler for " + name + ": "
+								+ e1);
 					}
 				}
 			}
@@ -229,9 +156,8 @@ AbstractCSSPropertyHandlerProvider {
 	protected CSSStyleDeclaration getDefaultCSSStyleDeclaration(
 			CSSEngine engine, CSSStylableElement stylableElement,
 			CSSStyleDeclaration newStyle, String pseudoE) throws Exception {
-		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null) {
+		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null)
 			return stylableElement.getDefaultStyleDeclaration(pseudoE);
-		}
 		if (newStyle != null) {
 			StringBuffer style = null;
 			int length = newStyle.getLength();
@@ -245,9 +171,8 @@ AbstractCSSPropertyHandlerProvider {
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {
-							if (style == null) {
+							if (style == null)
 								style = new StringBuffer();
-							}
 							style.append(s);
 						}
 					}
@@ -255,9 +180,8 @@ AbstractCSSPropertyHandlerProvider {
 					String s = getCSSPropertyStyle(engine, stylableElement,
 							propertyName, pseudoE);
 					if (s != null) {
-						if (style == null) {
+						if (style == null)
 							style = new StringBuffer();
-						}
 						style.append(s);
 					}
 				}
@@ -323,7 +247,7 @@ AbstractCSSPropertyHandlerProvider {
 	}
 
 	private class DeprecatedPropertyHandlerWrapper implements
-	ICSSPropertyHandler {
+			ICSSPropertyHandler {
 		private ICSSPropertyHandler delegate;
 		private String message;
 		private Set<String> logged = new HashSet<>();
@@ -337,7 +261,7 @@ AbstractCSSPropertyHandlerProvider {
 		@Override
 		public boolean applyCSSProperty(Object element, String property,
 				CSSValue value, String pseudo, CSSEngine engine)
-						throws Exception {
+				throws Exception {
 			logIfNecessary(property);
 			return delegate.applyCSSProperty(element, property, value, pseudo,
 					engine);
