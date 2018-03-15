@@ -22,6 +22,7 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Layout;
 import org.osgi.service.event.Event;
 
 /**
@@ -71,7 +72,13 @@ public class SashRenderer extends SWTPartRenderer {
 		}
 
 		Composite s = (Composite) pscModel.getWidget();
-		s.requestLayout();
+		Layout layout = s.getLayout();
+		if (layout instanceof SashLayout) {
+			if (((SashLayout) layout).layoutUpdateInProgress) {
+				return;
+			}
+		}
+		s.layout(true, true);
 	}
 
 	@Override
