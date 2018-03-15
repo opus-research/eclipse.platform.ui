@@ -8,4 +8,13 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/eclipse/jface/internal/databinding/observable/WidgetCompositeSideEffect.java" type="org.eclipse.jface.internal.databinding.observable.WidgetCompositeSideEffect">
+        <filter id="574668824">
+            <message_arguments>
+                <message_argument value="ICompositeSideEffect"/>
+                <message_argument value="WidgetCompositeSideEffect"/>
+                <message_argument value="ISideEffect"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>
