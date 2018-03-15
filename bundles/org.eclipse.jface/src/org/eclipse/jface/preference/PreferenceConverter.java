@@ -92,15 +92,12 @@ public class PreferenceConverter {
 
 	static {
 		Display display = Display.getDefault();
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				// Ensure that the deprecated FONTDATA_DEFAULT_DEFAULT and
-				// FONTDATA_ARRAY_DEFAULT values
-				// are initialized as soon as possible
-				FONTDATA_ARRAY_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault();
-				FONTDATA_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault()[0];
-			}
+		display.asyncExec(() -> {
+			// Ensure that the deprecated FONTDATA_DEFAULT_DEFAULT and
+			// FONTDATA_ARRAY_DEFAULT values
+			// are initialized as soon as possible
+			FONTDATA_ARRAY_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault();
+			FONTDATA_DEFAULT_DEFAULT = getFontDataArrayDefaultDefault()[0];
 		});
 	}
 
@@ -528,9 +525,9 @@ public class PreferenceConverter {
      */
     public static String getStoredRepresentation(FontData[] fontData) {
         StringBuffer buffer = new StringBuffer();
-        for (int i = 0; i < fontData.length; i++) {
-            if (fontData[i] != null) {
-                buffer.append(fontData[i].toString());
+        for (FontData element : fontData) {
+            if (element != null) {
+                buffer.append(element.toString());
                 buffer.append(ENTRY_SEPARATOR);
             }
         }

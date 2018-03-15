@@ -19,6 +19,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -109,6 +110,10 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 		IResource currentTopLevelResource = null;
 		for (IResource resource : resourcesToRefresh) {
+			if (resource == null) {
+				// paranoia, see bug 509821
+				continue;
+			}
 			if (currentTopLevelResource == null
 					|| !currentTopLevelResource.getFullPath().isPrefixOf(resource.getFullPath())) {
 				currentTopLevelResource = resource;
@@ -162,10 +167,9 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		// and trying to map the change to a remove and add is too dicey.
 		// The case is: folder A renamed to existing file B, answering yes to
 		// overwrite B.
-		IResourceDelta[] affectedChildren = delta
-				.getAffectedChildren(IResourceDelta.CHANGED);
-		for (int i = 0; i < affectedChildren.length; i++) {
-			if ((affectedChildren[i].getFlags() & IResourceDelta.TYPE) != 0) {
+		IResourceDelta[] affectedChildren = delta.getAffectedChildren(IResourceDelta.CHANGED);
+		for (IResourceDelta affectedChild : affectedChildren) {
+			if ((affectedChild.getFlags() & IResourceDelta.TYPE) != 0) {
 				toRefresh.add(resource);
 				return;
 			}
@@ -177,17 +181,13 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		int changeFlags = delta.getFlags();
 		if ((changeFlags & (IResourceDelta.OPEN | IResourceDelta.SYNC
 				| IResourceDelta.TYPE | IResourceDelta.DESCRIPTION)) != 0) {
-//			Runnable updateRunnable =  new Runnable(){
-//				public void run() {
-//					((StructuredViewer) viewer).update(resource, null);
-//				}
-//			};
-//			runnables.add(updateRunnable);
-
 			/* support the Closed Projects filter;
 			 * when a project is closed, it may need to be removed from the view.
 			 */
-			toRefresh.add(resource.getParent());
+			IContainer parent = resource.getParent();
+			if (parent != null) {
+				toRefresh.add(parent);
+			}
 		}
 		// Replacing a resource may affect its label and its children
 		if ((changeFlags & IResourceDelta.REPLACED) != 0) {
@@ -195,14 +195,17 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 			return;
 		}
 		if ((changeFlags & IResourceDelta.MARKERS) != 0) {
-			toRefresh.add(resource.getProject());
-			return;
+			IProject project = resource.getProject();
+			if (project != null) {
+				toRefresh.add(project);
+				return;
+			}
 		}
 
 
 		// Handle changed children .
-		for (int i = 0; i < affectedChildren.length; i++) {
-			processDelta(affectedChildren[i], addAndRemoveRunnables, toRefresh);
+		for (IResourceDelta affectedChild : affectedChildren) {
+			processDelta(affectedChild, addAndRemoveRunnables, toRefresh);
 		}
 
 		// @issue several problems here:

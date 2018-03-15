@@ -62,8 +62,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -166,8 +164,8 @@ public class SearchField {
 				new EditorProvider(), new ViewProvider(application, window),
 				new PerspectiveProvider(), commandProvider, new ActionProvider(),
 				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
-		for (int i = 0; i < providers.length; i++) {
-			providerMap.put(providers[i].getId(), providers[i]);
+		for (QuickAccessProvider provider : providers) {
+			providerMap.put(provider.getId(), provider);
 		}
 		restoreDialog();
 
@@ -241,12 +239,7 @@ public class SearchField {
 			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
-				table.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						checkFocusLost(table, txtQuickAccess);
-					}
-				});
+				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
 				activated = false;
 			}
 
@@ -265,20 +258,10 @@ public class SearchField {
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close
 				// the shell
-				table.getDisplay().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						checkFocusLost(table, txtQuickAccess);
-					}
-				});
+				table.getDisplay().asyncExec(() -> checkFocusLost(table, txtQuickAccess));
 			}
 		});
-		txtQuickAccess.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				showList();
-			}
-		});
+		txtQuickAccess.addModifyListener(e -> showList());
 		txtQuickAccess.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -455,19 +438,17 @@ public class SearchField {
 		Monitor[] monitors = toSearch.getMonitors();
 		Monitor result = monitors[0];
 
-		for (int idx = 0; idx < monitors.length; idx++) {
-			Monitor current = monitors[idx];
-
-			Rectangle clientArea = current.getClientArea();
+		for (Monitor currentMonitor : monitors) {
+			Rectangle clientArea = currentMonitor.getClientArea();
 
 			if (clientArea.contains(toFind)) {
-				return current;
+				return currentMonitor;
 			}
 
 			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
 			if (distance < closest) {
 				closest = distance;
-				result = current;
+				result = currentMonitor;
 			}
 		}
 
