@@ -13,8 +13,6 @@
 
 package org.eclipse.jface.tests.databinding.scenarios;
 
-import static org.junit.Assert.assertEquals;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
@@ -25,12 +23,10 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.tests.databinding.BindingTestSuite;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Combo;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -98,8 +94,7 @@ public class ComboUpdatingTest extends ScenariosTestCase {
 	}
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		getComposite().setLayout(new FillLayout());
 		comboEditable = new Combo(getComposite(), SWT.DROP_DOWN);
@@ -109,7 +104,6 @@ public class ComboUpdatingTest extends ScenariosTestCase {
 	//-------------------------------------------------------------------------
 
 	private static final String NEXT = "Next";
-	@Test
 	public void testBindText() throws Exception {
         getDbc().bindValue(SWTObservables.observeText(comboEditable), BeansObservables.observeValue(this, "text"));
 		spinEventLoop(0);
@@ -119,9 +113,10 @@ public class ComboUpdatingTest extends ScenariosTestCase {
 		assertEquals("Should find new value in text", NEXT, text);
 	}
 
-	@Test
-	@Ignore
 	public void testBindItems_listHasSameItems_editable() throws Exception {
+		if (BindingTestSuite.failingTestsDisabled(this)) {
+			return;
+		}
 		text = "Apple";
 
         getDbc().bindValue(SWTObservables.observeText(comboEditable), BeansObservables.observeValue(this, PROP_TEXT));
@@ -146,8 +141,7 @@ public class ComboUpdatingTest extends ScenariosTestCase {
 		assertEquals("Should find value of text", "Banana", text);
 	}
 
-//	@Test
-	// public void testBindItems_listHasSameItems_readOnly() throws Exception {
+//	public void testBindItems_listHasSameItems_readOnly() throws Exception {
 //		text = "Apple";
 //		ComboObservableValue value = (ComboObservableValue) getDbc().createObservable(new Property(comboReadOnly, PROP_TEXT));
 //		getDbc().bind(value.getItems(), new Property(this, PROP_CHOICES), null);
@@ -171,9 +165,10 @@ public class ComboUpdatingTest extends ScenariosTestCase {
 //		assertEquals("Should find value of text", "Banana", text);
 //	}
 
-	@Test
-	@Ignore
 	public void testBindItems_listHasDifferentItems_editable() throws Exception {
+		if (BindingTestSuite.failingTestsDisabled(this)) {
+			return;
+		}
 
         getDbc().bindValue(SWTObservables.observeText(comboEditable), BeansObservables.observeValue(this, PROP_TEXT));
 
@@ -198,9 +193,7 @@ public class ComboUpdatingTest extends ScenariosTestCase {
 		assertEquals("Should find value of text", "Banana", text);
 	}
 
-//	@Test
-	// public void testBindItems_listHasDifferentItems_readOnly() throws
-	// Exception {
+//	public void testBindItems_listHasDifferentItems_readOnly() throws Exception {
 //		ComboObservableValue value = (ComboObservableValue) getDbc().createObservable(new Property(comboReadOnly, PROP_TEXT));
 //		getDbc().bind(value, new Property(this, PROP_TEXT), null);
 //		spinEventLoop(0);

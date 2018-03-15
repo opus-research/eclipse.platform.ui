@@ -12,12 +12,6 @@
  *******************************************************************************/
 package org.eclipse.core.tests.databinding;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
@@ -36,29 +30,25 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	private DataBindingContext dbc;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		dbc = new DataBindingContext();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		if (dbc != null) {
 			dbc.dispose();
 		}
 		super.tearDown();
 	}
 
-	@Test
 	public void testDisposeBindings() throws Exception {
 		Binding binding = new BindingStub();
 		binding.init(dbc);
@@ -69,7 +59,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 				.isDisposed());
 	}
 
-	@Test
 	public void testBindValue() throws Exception {
 		IObservableValue target = WritableValue.withValueType(String.class);
 		IObservableValue model = WritableValue.withValueType(String.class);
@@ -79,7 +68,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 				.getName().endsWith("ValueBinding"));
 	}
 
-	@Test
 	public void testBindList() throws Exception {
 		IObservableList target = WritableList.withElementType(Object.class);
 		IObservableList model = WritableList.withElementType(Object.class);
@@ -95,7 +83,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testValidationError() throws Exception {
 		WritableValue targetObservable = WritableValue
 				.withValueType(String.class);
@@ -143,7 +130,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testBindValueAddBinding() throws Exception {
 		WritableValue targetValue = WritableValue.withValueType(String.class);
 		WritableValue modelValue = WritableValue.withValueType(String.class);
@@ -165,7 +151,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testBindListAddBinding() throws Exception {
 		WritableList targetList = new WritableList(new ArrayList(),
 				Object.class);
@@ -181,7 +166,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 		assertEquals(binding, dbc.getBindings().get(0));
 	}
 
-	@Test
 	public void testGetBindingsImmutability() throws Exception {
 		BindingStub binding = new BindingStub();
 		binding.init(dbc);
@@ -193,7 +177,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Test
 	public void testRemoveBinding() throws Exception {
 		BindingStub binding = new BindingStub();
 		binding.init(dbc);
@@ -212,7 +195,6 @@ public class DatabindingContextTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testValidateTargetAfterValueBindingCreation() throws Exception {
 		WritableValue target = new WritableValue("", String.class);
 		WritableValue model = new WritableValue("2", String.class);

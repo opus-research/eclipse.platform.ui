@@ -1,15 +1,11 @@
 package org.eclipse.core.tests.internal.databinding;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import junit.framework.TestCase;
 
 import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.internal.databinding.BindingStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.junit.Before;
-import org.junit.Test;
 
 /*******************************************************************************
  * Copyright (c) 2007 IBM Corporation and others.
@@ -25,15 +21,16 @@ import org.junit.Test;
 /**
  * @since 1.1
  */
-public class BindingStatusTest {
+public class BindingStatusTest extends TestCase {
 	private BindingStatus bindingStatus;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
 		bindingStatus = BindingStatus.ok();
 	}
 
-	@Test
 	public void testMessageIsFromStatus() throws Exception {
 		String message = "error message";
 		IStatus status = ValidationStatus.error(message);
@@ -42,7 +39,6 @@ public class BindingStatusTest {
 		assertEquals(message, bindingStatus.getMessage());
 	}
 
-	@Test
 	public void testExceptionIsFromStatus() throws Exception {
 		IllegalArgumentException e = new IllegalArgumentException();
 		Status status = new Status(0, Policy.JFACE_DATABINDING, 0, "", e);
@@ -51,7 +47,6 @@ public class BindingStatusTest {
 		assertEquals(e, bindingStatus.getException());
 	}
 
-	@Test
 	public void testPluginIsFromStatus() throws Exception {
 		String plugin = "test";
 		Status status = new Status(0, plugin, 0, "", null);
@@ -60,7 +55,6 @@ public class BindingStatusTest {
 		assertEquals(plugin, bindingStatus.getPlugin());
 	}
 
-	@Test
 	public void testCodeIsFromStatus() throws Exception {
 		int code = 1;
 		Status status = new Status(0, Policy.JFACE_DATABINDING, code, "", null);
@@ -69,7 +63,6 @@ public class BindingStatusTest {
 		assertEquals(code, status.getCode());
 	}
 
-	@Test
 	public void testSeverityIsFromStatus() throws Exception {
 		IStatus status = ValidationStatus.error("");
 
@@ -77,7 +70,6 @@ public class BindingStatusTest {
 		assertEquals(IStatus.ERROR, status.getSeverity());
 	}
 
-	@Test
 	public void testLowerSeverityDoesNotOverwriteGreaterSeverity() throws Exception {
 		String info = "info";
 		String error = "error";
@@ -96,7 +88,6 @@ public class BindingStatusTest {
 		assertEquals(IStatus.INFO, children[1].getSeverity());
 	}
 
-	@Test
 	public void testEqual() throws Exception {
 		BindingStatus status1 = BindingStatus.ok();
 		BindingStatus status2 = BindingStatus.ok();
@@ -104,7 +95,6 @@ public class BindingStatusTest {
 		assertEquals(status1, status2);
 	}
 
-	@Test
 	public void testNotEqual() throws Exception {
 		BindingStatus status1 = BindingStatus.ok();
 		BindingStatus status2 = BindingStatus.ok();
@@ -113,7 +103,6 @@ public class BindingStatusTest {
 		assertFalse(status1.equals(status2));
 	}
 
-	@Test
 	public void testHashCode() throws Exception {
 		BindingStatus status1 = BindingStatus.ok();
 		BindingStatus status2 = BindingStatus.ok();
@@ -121,7 +110,6 @@ public class BindingStatusTest {
 		assertEquals(status1.hashCode(), status2.hashCode());
 	}
 
-	@Test
 	public void testOkInitializesStatus() throws Exception {
 		BindingStatus status = BindingStatus.ok();
 		assertEquals(Policy.JFACE_DATABINDING, status.getPlugin());

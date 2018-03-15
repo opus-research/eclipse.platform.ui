@@ -12,9 +12,6 @@
 
 package org.eclipse.core.tests.databinding.observable.value;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.Calendar;
 import java.util.Date;
 
@@ -22,8 +19,6 @@ import org.eclipse.core.databinding.observable.value.DateAndTimeObservableValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 1.0
@@ -35,8 +30,8 @@ public class DateAndTimeObservableValueTest extends
 	private IObservableValue time;
 	private IObservableValue dateAndTime;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		date = WritableValue.withValueType(Date.class);
@@ -71,21 +66,18 @@ public class DateAndTimeObservableValueTest extends
 		return calendar.getTime();
 	}
 
-	@Test
 	public void testGetValue_NullDateNullResult() {
 		date.setValue(null);
 		time.setValue(time(12, 27, 17));
 		assertNull(dateAndTime.getValue());
 	}
 
-	@Test
 	public void testGetValue_NullTimeClearsTime() {
 		date.setValue(date(2009, 3, 3));
 		time.setValue(null);
 		assertEquals(timestamp(2009, 3, 3, 0, 0, 0), dateAndTime.getValue());
 	}
 
-	@Test
 	public void testGetValue() {
 		date.setValue(timestamp(2009, 3, 3, 12, 30, 33));
 
@@ -94,7 +86,6 @@ public class DateAndTimeObservableValueTest extends
 		assertEquals(timestamp(2009, 3, 3, 23, 59, 59), dateAndTime.getValue());
 	}
 
-	@Test
 	public void testSetValue() {
 		date.setValue(date(2009, 3, 3));
 		time.setValue(time(12, 32, 55));
@@ -105,7 +96,6 @@ public class DateAndTimeObservableValueTest extends
 		assertEquals(time(2, 3, 5), time.getValue());
 	}
 
-	@Test
 	public void testSetValue_NullNullsDateClearsTime() {
 		date.setValue(date(2009, 3, 3));
 		time.setValue(time(12, 25, 34));
@@ -115,7 +105,6 @@ public class DateAndTimeObservableValueTest extends
 		assertEquals(time(0, 0, 0), time.getValue());
 	}
 
-	@Test
 	public void testSetValue_PreserveTimeOfDateAndDateOfTime() {
 		date.setValue(timestamp(2009, 3, 3, 12, 32, 55));
 		time.setValue(timestamp(2009, 3, 3, 12, 32, 55));

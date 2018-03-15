@@ -11,22 +11,18 @@
 
 package org.eclipse.jface.tests.examples.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.examples.databinding.model.SimplePerson;
-import org.junit.Test;
 
 /**
  * @since 3.2
  *
  */
-public class PersonTests {
-	@Test
+public class PersonTests extends TestCase {
 	public void testSetName() {
 		SimplePerson person = new SimplePerson();
 		Listener listener = new Listener();

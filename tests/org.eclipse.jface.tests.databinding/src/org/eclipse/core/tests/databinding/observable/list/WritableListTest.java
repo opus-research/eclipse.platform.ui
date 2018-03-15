@@ -13,15 +13,15 @@
 
 package org.eclipse.core.tests.databinding.observable.list;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
@@ -33,28 +33,16 @@ import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.swt.widgets.Display;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  */
-public class WritableListTest {
-
-	@Before
-	public void setUp() throws Exception {
-		RealmTester.setDefault(new CurrentRealm(true));
-	}
-
-	@After
-	public void tearDown() throws Exception {
+public class WritableListTest extends TestCase {
+	@Override
+	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
-	@Test
 	public void testSetRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -66,7 +54,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testAddRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -77,7 +64,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testAddByIndexRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -88,7 +74,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testAddAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -99,7 +84,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testAddAllByIndexRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -110,7 +94,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testRemoveRealmChecks() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 		final WritableList list = new WritableList();
@@ -126,7 +109,6 @@ public class WritableListTest {
 		RealmTester.setDefault(null);
 	}
 
-	@Test
 	public void testRemoveByIndexRealmChecks() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 		final WritableList list = new WritableList();
@@ -143,7 +125,6 @@ public class WritableListTest {
 		RealmTester.setDefault(null);
 	}
 
-	@Test
 	public void testRemoveAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -154,7 +135,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testRetainAllRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -165,7 +145,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testClearRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -176,7 +155,6 @@ public class WritableListTest {
 		});
 	}
 
-	@Test
 	public void testNullElementType() throws Exception {
 		RealmTester.setDefault(DisplayRealm.getRealm(Display.getDefault()));
 		WritableList writableList = new WritableList();
@@ -186,7 +164,6 @@ public class WritableListTest {
 		assertNull(writableList.getElementType());
 	}
 
-	@Test
 	public void testWithElementType() throws Exception {
 		RealmTester.setDefault(DisplayRealm.getRealm(Display.getDefault()));
 
@@ -197,7 +174,6 @@ public class WritableListTest {
 		assertEquals(elementType, list.getElementType());
 	}
 
-	@Test
 	public void testListConstructorsDoNotCopy_1() {
 		RealmTester.setDefault(new CurrentRealm(true));
 		List list = new ArrayList(Arrays.asList(new Object[] { "a", "b", "c" }));
@@ -208,7 +184,6 @@ public class WritableListTest {
 		assertEquals(3, wlist.size());
 	}
 
-	@Test
 	public void testListConstructorsDoNotCopy_2() {
 		List list = new ArrayList(Arrays.asList(new Object[] { "a", "b", "c" }));
 		WritableList wlist = new WritableList(new CurrentRealm(true), list,
@@ -219,7 +194,6 @@ public class WritableListTest {
 		assertEquals(3, wlist.size());
 	}
 
-	@Test
 	public void testCollectionConstructorsCopy_1() {
 		RealmTester.setDefault(new CurrentRealm(true));
 		List list = new ArrayList(Arrays.asList(new Object[] { "a", "b", "c" }));
@@ -230,7 +204,6 @@ public class WritableListTest {
 		assertEquals(2, wlist.size());
 	}
 
-	@Test
 	public void testCollectionConstructorsCopy_2() {
 		List list = new ArrayList(Arrays.asList(new Object[] { "a", "b", "c" }));
 		WritableList wlist = new WritableList(new CurrentRealm(true),
@@ -241,8 +214,9 @@ public class WritableListTest {
 		assertEquals(2, wlist.size());
 	}
 
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(WritableListTest.class.getName());
+		suite.addTestSuite(WritableListTest.class);
 		suite.addTest(MutableObservableListContractTest.suite(new Delegate()));
 		return suite;
 	}

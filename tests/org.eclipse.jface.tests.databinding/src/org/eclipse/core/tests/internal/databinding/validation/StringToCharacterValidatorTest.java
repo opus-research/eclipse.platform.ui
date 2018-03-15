@@ -11,24 +11,22 @@
 
 package org.eclipse.core.tests.internal.databinding.validation;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
 import org.eclipse.core.internal.databinding.conversion.StringToCharacterConverter;
 import org.eclipse.core.internal.databinding.validation.StringToCharacterValidator;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 1.1
  */
-public class StringToCharacterValidatorTest {
+public class StringToCharacterValidatorTest extends TestCase {
 
 	private StringToCharacterValidator validator;
 	private StringToCharacterValidator primitiveValidator;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
 		StringToCharacterConverter converter = StringToCharacterConverter
 				.toCharacter(false);
 		StringToCharacterConverter primitiveConverter = StringToCharacterConverter
@@ -37,37 +35,30 @@ public class StringToCharacterValidatorTest {
 		primitiveValidator = new StringToCharacterValidator(primitiveConverter);
 	}
 
-	@Test
 	public void testValidatesCharacter() throws Exception {
 		assertTrue(validator.validate("X").isOK());
 	}
 
-	@Test
 	public void testValidatesCharacterPrimitive() throws Exception {
 		assertTrue(primitiveValidator.validate("X").isOK());
 	}
 
-	@Test
 	public void testNullCharacterIsValid() throws Exception {
 		assertTrue(validator.validate(null).isOK());
 	}
 
-	@Test
 	public void testEmptyStringCharacterIsValid() throws Exception {
 		assertTrue(validator.validate("").isOK());
 	}
 
-	@Test
 	public void testNullCharacterIsInvalidForPrimitive() throws Exception {
 		assertFalse(primitiveValidator.validate(null).isOK());
 	}
 
-	@Test
 	public void testNonStringIsInvalid() throws Exception {
 		assertFalse(primitiveValidator.validate(Integer.valueOf(4)).isOK());
 	}
 
-	@Test
 	public void testLongerThanOneCharacterIsInvalid() throws Exception {
 		assertFalse(primitiveValidator.validate("XYZ").isOK());
 	}

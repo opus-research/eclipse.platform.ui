@@ -12,10 +12,6 @@
 
 package org.eclipse.jface.tests.databinding.viewers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,9 +30,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTestCase {
 	private Shell shell;
@@ -45,8 +38,8 @@ public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTe
 	private ObservableSetTreeContentProvider contentProvider;
 	private Object input;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		tree = new Tree(shell, SWT.NONE);
@@ -54,8 +47,8 @@ public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTe
 		input = new Object();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		shell.dispose();
 		tree = null;
 		viewer = null;
@@ -69,7 +62,6 @@ public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTe
 		viewer.setInput(input);
 	}
 
-	@Test
 	public void testConstructor_NullArgumentThrowsException() {
 		try {
 			initContentProvider(null);
@@ -78,7 +70,6 @@ public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTe
 		}
 	}
 
-	@Test
 	public void testGetElements_ChangesFollowObservedList() {
 		final IObservableSet elements = new WritableSet();
 		final Object input = new Object();
@@ -104,7 +95,6 @@ public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTe
 		assertTrue(elementList.containsAll(Arrays.asList(new Object[] { element0, element1 })));
 	}
 
-	@Test
 	public void testViewerUpdate_RemoveElementAfterMutation() {
 		IElementComparer comparer = new IElementComparer() {
 			@Override
@@ -136,7 +126,6 @@ public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTe
 		assertEquals(0, tree.getItemCount());
 	}
 
-	@Test
 	public void testInputChanged_ClearsKnownElements() {
 		input = new Object();
 		final Object input2 = new Object();
@@ -163,7 +152,6 @@ public class ObservableSetTreeContentProviderTest extends AbstractDefaultRealmTe
 		assertEquals(Collections.EMPTY_SET, knownElements);
 	}
 
-	@Test
 	public void testInputChanged_ClearsRealizedElements() {
 		input = new Object();
 		final Object input2 = new Object();

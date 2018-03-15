@@ -10,12 +10,10 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143, 461063, 495917
  *     Friederike Schertel <friederike@schertel.org> - Bug 478336
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 504089
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.core.commands.Command;
@@ -25,10 +23,17 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 
 /**
  * This handler is used to switch between parts using the keyboard.
@@ -39,11 +44,10 @@ import org.eclipse.ui.commands.ICommandService;
  * @since 3.3
  *
  */
-public class CycleViewHandler extends FilteredTableBaseHandler {
+public class CycleViewHandler extends CycleBaseHandler {
 
 	@Override
-	protected Object getInput(WorkbenchPage page) {
-		List<IWorkbenchPartReference> refs = new ArrayList<>();
+	protected void addItems(Table table, WorkbenchPage page) {
 
 		EPartService partService = page.getWorkbenchWindow().getService(EPartService.class);
 		EModelService modelService = page.getWorkbenchWindow().getService(EModelService.class);
@@ -65,25 +69,58 @@ public class CycleViewHandler extends FilteredTableBaseHandler {
 			if (!partService.isPartOrPlaceholderInPerspective(part.getElementId(), currentPerspective)) {
 				return;
 			}
+
 			if (part.getTags().contains("Editor")) { //$NON-NLS-1$
 				if (includeEditor.getAndSet(false)) {
-					refs.add(findReference(part));
+					createEditorItem(table, page, part);
 				}
 			} else {
-				refs.add(findReference(part));
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(part.getLabel());
+				IWorkbenchWindow iwbw = page.getWorkbenchWindow();
+				if (iwbw instanceof WorkbenchWindow) {
+					WorkbenchWindow wbw = (WorkbenchWindow) iwbw;
+					if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
+						SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
+						item.setImage(r.getImage(part));
+					}
+				}
+				item.setData(part);
 			}
 		});
-		return refs;
 
 	}
 
-	protected IWorkbenchPartReference findReference(MPart part) {
-		IWorkbenchPartReference ref = null;
-		Object tData = part.getTransientData().get(IWorkbenchPartReference.class.getName());
-		if (tData instanceof IWorkbenchPartReference) {
-			ref = ((IWorkbenchPartReference) tData);
+	private void createEditorItem(Table table, WorkbenchPage page, MPart part) {
+		Object object = part.getObject();
+		TableItem item = new TableItem(table, SWT.NONE);
+		item.setText(WorkbenchMessages.CyclePartAction_editor);
+		if (object instanceof CompatibilityEditor) {
+			IEditorPart editor = ((CompatibilityEditor) object).getEditor();
+			item.setImage(editor.getTitleImage());
+			if (editor.getSite() instanceof PartSite) {
+				item.setData(((PartSite) editor.getSite()).getPartReference());
+				return;
+			}
+		} else {
+			item.setImage(getImage(page, part));
 		}
-		return ref;
+		item.setData(part);
+	}
+
+	private Image getImage(WorkbenchPage page, MPart part) {
+		Object renderer = part.getRenderer();
+		if (renderer instanceof SWTPartRenderer) {
+			SWTPartRenderer partRenderer = (SWTPartRenderer) renderer;
+			return partRenderer.getImage(part);
+		}
+		WorkbenchWindow wbw = (WorkbenchWindow) page.getWorkbenchWindow();
+		if (wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
+			SWTPartRenderer partRenderer = (SWTPartRenderer) wbw.getModel().getRenderer();
+			return partRenderer.getImage(part);
+		}
+
+		return null;
 	}
 
 	@Override

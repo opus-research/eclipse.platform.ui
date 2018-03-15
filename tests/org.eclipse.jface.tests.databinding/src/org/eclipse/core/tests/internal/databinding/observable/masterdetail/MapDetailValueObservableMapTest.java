@@ -11,14 +11,11 @@
 
 package org.eclipse.core.tests.internal.databinding.observable.masterdetail;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -29,7 +26,6 @@ import org.eclipse.core.internal.databinding.observable.masterdetail.MapDetailVa
 import org.eclipse.jface.databinding.conformance.util.MapChangeEventTracker;
 import org.eclipse.jface.examples.databinding.model.SimplePerson;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Test;
 
 /**
  * @since 1.3
@@ -37,7 +33,13 @@ import org.junit.Test;
 public class MapDetailValueObservableMapTest extends
 		AbstractDefaultRealmTestCase {
 
-	@Test
+	public static Test suite() {
+		TestSuite suite = new TestSuite(
+				MapDetailValueObservableMapTest.class.getName());
+		suite.addTestSuite(MapDetailValueObservableMapTest.class);
+		return suite;
+	}
+
 	public void testGetKeyType() {
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
 				new WritableMap(SimplePerson.class, SimplePerson.class),
@@ -46,7 +48,6 @@ public class MapDetailValueObservableMapTest extends
 		assertSame(SimplePerson.class, mdom.getKeyType());
 	}
 
-	@Test
 	public void testGetValueType() {
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
 				new WritableMap(), BeansObservables.valueFactory("name"),
@@ -55,7 +56,6 @@ public class MapDetailValueObservableMapTest extends
 		assertSame(String.class, mdom.getValueType());
 	}
 
-	@Test
 	public void testGetObserved() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -65,7 +65,6 @@ public class MapDetailValueObservableMapTest extends
 		assertSame(masterMap, mdom.getObserved());
 	}
 
-	@Test
 	public void testMasterSetInitiallyNotEmpty() {
 		WritableMap masterMap = new WritableMap();
 		SimplePerson person = new SimplePerson();
@@ -79,7 +78,6 @@ public class MapDetailValueObservableMapTest extends
 		assertEquals(person.getName(), mdom.get(person));
 	}
 
-	@Test
 	public void testAddRemove() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -113,7 +111,6 @@ public class MapDetailValueObservableMapTest extends
 		assertTrue(mdom.isEmpty());
 	}
 
-	@Test
 	public void testChangeDetail() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -134,7 +131,6 @@ public class MapDetailValueObservableMapTest extends
 		assertEquals(p2.getName(), mdom.get(p1));
 	}
 
-	@Test
 	public void testPut() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -153,7 +149,6 @@ public class MapDetailValueObservableMapTest extends
 		assertEquals(person.getName(), mdom.get(person));
 	}
 
-	@Test
 	public void testContainsValue() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -173,7 +168,6 @@ public class MapDetailValueObservableMapTest extends
 		assertFalse(mdom.containsValue(person.getName()));
 	}
 
-	@Test
 	public void testRemove() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -200,7 +194,6 @@ public class MapDetailValueObservableMapTest extends
 		assertTrue(mdom.containsKey(p2));
 	}
 
-	@Test
 	public void testDetailObservableChangeEvent() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -239,7 +232,6 @@ public class MapDetailValueObservableMapTest extends
 		assertEquals("new name", changeTracker.event.diff.getNewValue(person));
 	}
 
-	@Test
 	public void testMasterNull() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
@@ -251,7 +243,6 @@ public class MapDetailValueObservableMapTest extends
 		assertNull(mdom.get(null));
 	}
 
-	@Test
 	public void testDetailObservableValuesAreDisposed() {
 		final Map detailObservables = new HashMap();
 		IObservableFactory detailValueFactory = new IObservableFactory() {
@@ -301,7 +292,6 @@ public class MapDetailValueObservableMapTest extends
 				.isDisposed());
 	}
 
-	@Test
 	public void testDisposeOnMasterDisposed() {
 		WritableMap masterMap = new WritableMap();
 		MapDetailValueObservableMap mdom = new MapDetailValueObservableMap(
