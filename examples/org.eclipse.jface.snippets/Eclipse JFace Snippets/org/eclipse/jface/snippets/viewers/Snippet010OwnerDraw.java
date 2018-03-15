@@ -136,7 +136,7 @@ public class Snippet010OwnerDraw {
 		 */
 		protected void drawName(Event event) {
 
-			StringBuilder buffer = getDisplayString();
+			StringBuffer buffer = getDisplayString();
 
 			Display display = viewer.getControl().getDisplay();
 			TextLayout layout = new TextLayout(display);
@@ -159,8 +159,8 @@ public class Snippet010OwnerDraw {
 		/**
 		 * @return
 		 */
-		private StringBuilder getDisplayString() {
-			StringBuilder buffer = new StringBuilder();
+		private StringBuffer getDisplayString() {
+			StringBuffer buffer = new StringBuffer();
 			buffer.append(name);
 			buffer.append(" (");
 			buffer.append(baseName);
