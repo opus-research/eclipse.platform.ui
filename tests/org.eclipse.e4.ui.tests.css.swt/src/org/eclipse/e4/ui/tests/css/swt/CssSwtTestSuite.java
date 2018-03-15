@@ -38,7 +38,6 @@ import org.junit.runners.Suite;
 	EclipsePreferencesHelperTest.class,
 	CSSSWTWidgetTest.class,
 	LabelTest.class,
-	LinkTest.class,
 	CTabFolderTest.class,
 	CTabItemTest.class,
 	IdClassLabelColorTest.class,
@@ -57,7 +56,8 @@ import org.junit.runners.Suite;
 	Bug459961Test.class,
 	Bug419482Test.class,
 	ShellActiveTest.class,
-	InheritTest.class })
+	InheritTest.class,
+	StyledTextScrollbarTest.class })
 public class CssSwtTestSuite {
 
 }

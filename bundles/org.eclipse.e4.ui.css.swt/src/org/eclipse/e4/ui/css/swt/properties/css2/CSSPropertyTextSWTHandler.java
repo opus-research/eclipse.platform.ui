@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.css.CSSValue;
@@ -72,13 +71,6 @@ public class CSSPropertyTextSWTHandler extends AbstractCSSPropertyTextHandler {
 					CSSSWTColorHelper.setSelectionForeground(folder, newColor);
 				} else {
 					CSSSWTColorHelper.setForeground(folder, newColor);
-				}
-			} else if (widget instanceof Link) {
-				Link link = (Link) widget;
-				if ("link".equals(pseudo)) {
-					link.setLinkForeground(newColor);
-				} else {
-					CSSSWTColorHelper.setForeground(link, newColor);
 				}
 			} else if (widget instanceof Control) {
 				CSSSWTColorHelper.setForeground((Control) widget, newColor);

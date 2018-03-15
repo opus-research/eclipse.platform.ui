@@ -15,11 +15,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Label;
 import org.junit.Test;
 
 public class LabelTest extends CSSSWTTestCase {
 
+	static final RGB RED = new RGB(255, 0, 0);
+	static final RGB GREEN = new RGB(0, 255, 0);
+	static final RGB BLUE = new RGB(0, 0, 255);
 
 	@Test
 	public void testColor() {
