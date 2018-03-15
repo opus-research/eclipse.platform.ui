@@ -14,6 +14,8 @@ package org.eclipse.core.tests.databinding.observable.map;
 
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.DisposeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -26,28 +28,24 @@ import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.map.MapDiff;
 import org.eclipse.jface.databinding.conformance.util.CurrentRealm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
  */
-public class AbstractObservableMapTest {
+public class AbstractObservableMapTest extends TestCase {
 	private AbstractObservableMapStub map;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 		map = new AbstractObservableMapStub();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
-	@Test
 	public void testIsStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -57,7 +55,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testSetStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -67,7 +64,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testFireStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -77,7 +73,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testFireChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -87,7 +82,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testFireMapChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
 			@Override
@@ -97,7 +91,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testAddListChangeListener_AfterDispose() {
 		map.dispose();
 		map.addMapChangeListener(new IMapChangeListener() {
@@ -108,7 +101,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testRemoveListChangeListener_AfterDispose() {
 		map.dispose();
 		map.removeMapChangeListener(new IMapChangeListener() {
@@ -119,7 +111,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testAddChangeListener_AfterDispose() {
 		map.dispose();
 		map.addChangeListener(new IChangeListener() {
@@ -130,7 +121,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testRemoveChangeListener_AfterDispose() {
 		map.dispose();
 		map.removeChangeListener(new IChangeListener() {
@@ -141,7 +131,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testAddStaleListener_AfterDispose() {
 		map.dispose();
 		map.addStaleListener(new IStaleListener() {
@@ -152,7 +141,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testRemoveStaleListener_AfterDispose() {
 		map.dispose();
 		map.removeStaleListener(new IStaleListener() {
@@ -163,7 +151,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testAddDisposeListener_AfterDispose() {
 		map.dispose();
 		map.addDisposeListener(new IDisposeListener() {
@@ -174,7 +161,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testRemoveDisposeListener_AfterDispose() {
 		map.dispose();
 		map.removeDisposeListener(new IDisposeListener() {
@@ -185,7 +171,6 @@ public class AbstractObservableMapTest {
 		});
 	}
 
-	@Test
 	public void testHasListeners_AfterDispose() {
 		map.dispose();
 		map.hasListeners();

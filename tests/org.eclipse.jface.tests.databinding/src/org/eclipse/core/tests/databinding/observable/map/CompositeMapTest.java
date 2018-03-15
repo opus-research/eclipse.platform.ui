@@ -11,10 +11,6 @@
 
 package org.eclipse.core.tests.databinding.observable.map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.lang.reflect.Method;
 import java.util.Collections;
 
@@ -30,8 +26,6 @@ import org.eclipse.jface.databinding.conformance.util.MapChangeEventTracker;
 import org.eclipse.jface.examples.databinding.model.SimpleCart;
 import org.eclipse.jface.examples.databinding.model.SimplePerson;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -53,8 +47,8 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		}
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		persons = new WritableSet();
 		first = BeansObservables.observeMap(persons,
@@ -68,7 +62,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		});
 	}
 
-	@Test
 	public void testAddToFirstMap() {
 		MapChangeEventTracker tracker = new MapChangeEventTracker();
 		composedMap.addMapChangeListener(tracker);
@@ -85,7 +78,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Integer.valueOf(42), composedMap.get(newPerson));
 	}
 
-	@Test
 	public void testAddSharedToFirstMap() {
 		SimplePerson person1 = new SimplePerson("p1", "a1", "c1", "s1");
 		person1.getCart().setNumItems(42);
@@ -106,7 +98,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Integer.valueOf(42), composedMap.get(person1));
 	}
 
-	@Test
 	public void testRemoveFromFirstMap() {
 		MapChangeEventTracker tracker = new MapChangeEventTracker();
 		SimplePerson newPerson = new SimplePerson("p1", "a1", "c1", "s1");
@@ -125,7 +116,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertFalse("newPerson should be removed", composedMap.containsKey(newPerson));
 	}
 
-	@Test
 	public void testRemoveSharedFromFirstMap() {
 		SimplePerson person1 = new SimplePerson("p1", "a1", "c1", "s1");
 		person1.getCart().setNumItems(42);
@@ -148,7 +138,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Integer.valueOf(42), composedMap.get(person1));
 	}
 
-	@Test
 	public void testChangeInFirstMap() {
 		SimplePerson person1 = new SimplePerson("p1", "a1", "c1", "s1");
 		person1.getCart().setNumItems(42);
@@ -167,7 +156,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Integer.valueOf(0), composedMap.get(person1));
 	}
 
-	@Test
 	public void testChangeInFirstMapToShared() {
 		SimplePerson person0 = new SimplePerson("p0", "a0", "c0", "s0");
 		person0.getCart().setNumItems(13);
@@ -189,7 +177,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Integer.valueOf(13), composedMap.get(person1));
 	}
 
-	@Test
 	public void testChangeInFirstMapFromShared() {
 		SimplePerson person0 = new SimplePerson("p0", "a0", "c0", "s0");
 		person0.getCart().setNumItems(13);
@@ -211,7 +198,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Integer.valueOf(0), composedMap.get(person1));
 	}
 
-	@Test
 	public void testChangeInSecondMap() {
 		SimplePerson person0 = new SimplePerson("p0", "a0", "c0", "s0");
 		person0.getCart().setNumItems(13);
@@ -230,7 +216,6 @@ public class CompositeMapTest extends AbstractDefaultRealmTestCase {
 		assertEquals(Integer.valueOf(42), composedMap.get(person0));
 	}
 
-	@Test
 	public void testDispose() {
 		SimplePerson person0 = new SimplePerson("p0", "a0", "c0", "s0");
 		person0.getCart().setNumItems(13);

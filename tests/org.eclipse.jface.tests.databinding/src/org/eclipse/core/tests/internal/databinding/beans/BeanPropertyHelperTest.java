@@ -12,19 +12,17 @@
 
 package org.eclipse.core.tests.internal.databinding.beans;
 
-import static org.junit.Assert.assertEquals;
-
 import java.beans.PropertyDescriptor;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.internal.databinding.beans.BeanPropertyHelper;
-import org.junit.Test;
 
 /**
  * @since 3.2
  *
  */
-public class BeanPropertyHelperTest {
-	@Test
+public class BeanPropertyHelperTest extends TestCase {
 	public void testGetPropertyDescriptor_ClassProperty()
 			throws SecurityException, NoSuchMethodException {
 		PropertyDescriptor pd = BeanPropertyHelper.getPropertyDescriptor(
@@ -35,7 +33,6 @@ public class BeanPropertyHelperTest {
 				pd.getWriteMethod());
 	}
 
-	@Test
 	public void testGetPropertyDescriptor_InterfaceProperty()
 			throws SecurityException, NoSuchMethodException {
 		PropertyDescriptor pd = BeanPropertyHelper.getPropertyDescriptor(
@@ -46,7 +43,6 @@ public class BeanPropertyHelperTest {
 				pd.getWriteMethod());
 	}
 
-	@Test
 	public void testGetPropertyDescriptor_SuperInterfaceProperty()
 			throws SecurityException, NoSuchMethodException {
 		PropertyDescriptor pd = BeanPropertyHelper.getPropertyDescriptor(

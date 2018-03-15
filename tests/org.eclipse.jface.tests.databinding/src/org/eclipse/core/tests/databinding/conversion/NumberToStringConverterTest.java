@@ -12,32 +12,31 @@
 
 package org.eclipse.core.tests.databinding.conversion;
 
-import static org.junit.Assert.assertEquals;
-
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.databinding.conversion.NumberToStringConverter;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.ibm.icu.text.NumberFormat;
 
 /**
  * @since 1.1
  */
-public class NumberToStringConverterTest {
+public class NumberToStringConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private NumberFormat integerFormat;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
 		numberFormat = NumberFormat.getNumberInstance();
 		integerFormat = NumberFormat.getIntegerInstance();
 	}
 
-	@Test
 	public void testFromTypes() throws Exception {
 		assertEquals("Integer.class", Integer.class, NumberToStringConverter
 				.fromInteger(false).getFromType());
@@ -65,13 +64,11 @@ public class NumberToStringConverterTest {
 				NumberToStringConverter.fromByte(false).getFromType());
 	}
 
-	@Test
 	public void testToTypeIsStringClass() throws Exception {
 		assertEquals(String.class, NumberToStringConverter.fromInteger(false)
 				.getToType());
 	}
 
-	@Test
 	public void testConvertIntegerToString() throws Exception {
 		Integer input = Integer.valueOf(1000);
 		String expected = integerFormat.format(input.longValue());
@@ -82,7 +79,6 @@ public class NumberToStringConverterTest {
 		assertEquals(expected, result);
 	}
 
-	@Test
 	public void testConvertDoubleToString() throws Exception {
 		Double input = new Double(1000.1d);
 		String expected = numberFormat.format(input.doubleValue());
@@ -93,7 +89,6 @@ public class NumberToStringConverterTest {
 		assertEquals(expected, result);
 	}
 
-	@Test
 	public void testConvertFloatToString() throws Exception {
 		Float input = new Float(1000.1f);
 		String expected = numberFormat.format(input.floatValue());
@@ -104,7 +99,6 @@ public class NumberToStringConverterTest {
 		assertEquals(expected, result);
 	}
 
-	@Test
 	public void testConvertLongToString() throws Exception {
 		Long input = new Long(1000l);
 		String expected = integerFormat.format(input.longValue());
@@ -115,7 +109,6 @@ public class NumberToStringConverterTest {
 		assertEquals(expected, result);
 	}
 
-	@Test
 	public void testConvertBigIntegerToString() throws Exception {
 		BigInteger input = BigInteger.valueOf(1000);
 		String expected = integerFormat.format(input);
@@ -155,7 +148,6 @@ public class NumberToStringConverterTest {
 		}
 		throw new IllegalArgumentException("ICU not present. Cannot reliably format large BigDecimal values; needed for testing. Java platforms prior to 1.5 fail to format/parse these decimals correctly.");
 	}
-	@Test
 	public void testConvertBigDecimalToString() throws Exception {
 		NumberToStringConverter converter = NumberToStringConverter.fromBigDecimal();
 		// Test 1: Decimal
@@ -184,7 +176,6 @@ public class NumberToStringConverterTest {
 
 	}
 
-	@Test
 	public void testNullSourceConvertsToEmptyString() throws Exception {
 		NumberToStringConverter converter = NumberToStringConverter
 				.fromInteger(false);

@@ -19,24 +19,28 @@ import org.eclipse.jface.databinding.conformance.ObservableListContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.delegate.IObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.SuiteBuilder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  *
  */
-@RunWith(AllTests.class)
 public class EmptyObservableListTest {
-
-	public static junit.framework.Test suite() {
-		return new SuiteBuilder().addObservableContractTest(ImmutableObservableListContractTest.class, new Delegate())
-				.build();
+	public static Test suite() {
+		TestSuite suite = new TestSuite(EmptyObservableListTest.class.getName());
+		suite.addTest(ImmutableObservableListContractTest.suite(new Delegate()));
+		return suite;
 	}
 
 	public static class ImmutableObservableListContractTest extends
 			ObservableListContractTest {
+		public static Test suite(IObservableCollectionContractDelegate delegate) {
+			return new SuiteBuilder().addObservableContractTest(
+					ImmutableObservableListContractTest.class, delegate)
+					.build();
+		}
 
 		public ImmutableObservableListContractTest(
 				IObservableCollectionContractDelegate delegate) {
@@ -49,140 +53,117 @@ public class EmptyObservableListTest {
 		}
 
 		@Override
-		@Test
-	public void testGet_GetterCalled() {
+		public void testGet_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testSubList_GetterCalled() {
+		public void testSubList_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ChangeEvent() {
+		public void testChange_ChangeEvent() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_EventObservable() {
+		public void testChange_EventObservable() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ObservableRealmIsTheCurrentRealm() {
+		public void testChange_ObservableRealmIsTheCurrentRealm() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_RealmCheck() {
+		public void testChange_RealmCheck() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testRemoveChangeListener_RemovesListener() {
+		public void testRemoveChangeListener_RemovesListener() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIndexOf_GetterCalled() {
+		public void testIndexOf_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testLastIndexOf_GetterCalled() {
+		public void testLastIndexOf_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testListIterator_GetterCalled() {
+		public void testListIterator_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testListIteratorAtIndex_GetterCalled() {
+		public void testListIteratorAtIndex_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testContains_GetterCalled() {
+		public void testContains_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testContainsAll_GetterCalled() {
+		public void testContainsAll_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testEquals_GetterCalled() {
+		public void testEquals_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testHashCode_GetterCalled() {
+		public void testHashCode_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsEmpty_GetterCalled() {
+		public void testIsEmpty_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIterator_GetterCalled() {
+		public void testIterator_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testSize_GetterCalled() throws Exception {
+		public void testSize_GetterCalled() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testToArray_GetterCalled() throws Exception {
+		public void testToArray_GetterCalled() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testToArrayWithObjectArray_GetterCalled() throws Exception {
+		public void testToArrayWithObjectArray_GetterCalled() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsStale_GetterCalled() throws Exception {
+		public void testIsStale_GetterCalled() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsDisposed() throws Exception {
+		public void testIsDisposed() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testAddDisposeListener_HandleDisposeInvoked() {
+		public void testAddDisposeListener_HandleDisposeInvoked() {
 			// disabled
 		}
 	}

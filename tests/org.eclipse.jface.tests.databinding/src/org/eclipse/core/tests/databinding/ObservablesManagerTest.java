@@ -12,9 +12,6 @@
 
 package org.eclipse.core.tests.databinding;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.ObservablesManager;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -22,9 +19,6 @@ import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @since 3.2
@@ -33,22 +27,21 @@ import org.junit.Test;
 public class ObservablesManagerTest extends AbstractDefaultRealmTestCase {
 	private DataBindingContext dbc;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		dbc = new DataBindingContext();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		if (dbc != null) {
 			dbc.dispose();
 		}
 		super.tearDown();
 	}
 
-	@Test
 	public void testOnlyModelIsDisposed() throws Exception {
 		IObservableValue targetOv = new WritableValue();
 		IObservableValue modelOv = new WritableValue();
@@ -63,7 +56,6 @@ public class ObservablesManagerTest extends AbstractDefaultRealmTestCase {
 		assertTrue(modelOv.isDisposed());
 	}
 
-	@Test
 	public void testOnlyTargetIsDisposed() throws Exception {
 		IObservableValue targetOv = new WritableValue();
 		IObservableValue modelOv = new WritableValue();
@@ -78,7 +70,6 @@ public class ObservablesManagerTest extends AbstractDefaultRealmTestCase {
 		assertFalse(modelOv.isDisposed());
 	}
 
-	@Test
 	public void testTargetAndModelIsDisposed() throws Exception {
 		IObservableValue targetOv = new WritableValue();
 		IObservableValue modelOv = new WritableValue();
@@ -93,7 +84,6 @@ public class ObservablesManagerTest extends AbstractDefaultRealmTestCase {
 		assertTrue(modelOv.isDisposed());
 	}
 
-	@Test
 	public void testDispose_Bug277966_NPEWhenManagedObservableAlreadyDisposed() {
 		ObservablesManager manager = new ObservablesManager();
 

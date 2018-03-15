@@ -11,16 +11,15 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.databinding.scenarios;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.examples.databinding.model.SampleData;
-import org.eclipse.jface.tests.databinding.BindingTestSetup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
@@ -28,17 +27,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 
 /**
  * Abstract base class of the JFace binding scenario test classes.
  */
-abstract public class ScenariosTestCase {
-
-	@Rule
-	public BindingTestSetup testSetup = new BindingTestSetup();
+abstract public class ScenariosTestCase extends TestCase {
 
 	private Composite composite;
 	private DataBindingContext dbc;
@@ -61,7 +54,7 @@ abstract public class ScenariosTestCase {
 			return shell;
 		}
 		Shell result = BindingScenariosTestSuite.getShell();
-		if (result == null || result.isDisposed()) {
+		if (result == null) {
 			display = Display.getDefault();
 			if (Display.getDefault() == null) {
 				display = new Display();
@@ -71,8 +64,7 @@ abstract public class ScenariosTestCase {
 			shell.setLayout(new FillLayout());
 			result = shell;
 		}
-		result.setText(getClass().getSimpleName()); // In the case that the
-													// shell() becomes
+		result.setText(getName()); // In the case that the shell() becomes
 		// visible.
 		return result;
 	}
@@ -114,8 +106,8 @@ abstract public class ScenariosTestCase {
 		button.notifyListeners(SWT.Selection, null);
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		realm = DisplayRealm.getRealm(Display.getDefault());
 		RealmTester.setDefault(realm);
 
@@ -128,8 +120,8 @@ abstract public class ScenariosTestCase {
 		dummyText.setText("dummy");
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		realm = null;
 		getShell().setVisible(false); // same Shell may be reUsed across tests
 		composite.dispose();

@@ -13,9 +13,8 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -30,10 +29,6 @@ import org.eclipse.jface.tests.databinding.AbstractSWTTestCase;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -44,8 +39,7 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 	private ValueChangeEventTracker listener;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		Shell shell = getShell();
@@ -54,7 +48,6 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 		listener = new ValueChangeEventTracker();
 	}
 
-	@Test
 	public void testSelection_ChangeNotifiesObservable() throws Exception {
 		observableValue.addValueChangeListener(listener);
 		button.setSelection(true);
@@ -67,7 +60,6 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 				listener.count);
 	}
 
-	@Test
 	public void testSelection_NoChange() throws Exception {
 		button.setSelection(true);
 		button.notifyListeners(SWT.Selection, null);
@@ -82,7 +74,6 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 				0, listener.count);
 	}
 
-	@Test
 	public void testSetValue_NullConvertedToFalse() {
 		button.setSelection(true);
 		assertEquals(Boolean.TRUE, observableValue.getValue());
@@ -91,7 +82,6 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 		assertEquals(Boolean.FALSE, observableValue.getValue());
 	}
 
-	@Test
 	public void testDispose() throws Exception {
 		ValueChangeEventTracker testCounterValueChangeListener = new ValueChangeEventTracker();
 		observableValue.addValueChangeListener(testCounterValueChangeListener);
@@ -114,9 +104,12 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 		assertEquals(1, testCounterValueChangeListener.count);
 	}
 
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(ButtonObservableValueTest.class.getName());
-		suite.addTest(SWTMutableObservableValueContractTest.suite(new Delegate()));
+	public static Test suite() {
+		TestSuite suite = new TestSuite(ButtonObservableValueTest.class
+				.getName());
+		suite.addTestSuite(ButtonObservableValueTest.class);
+		suite.addTest(SWTMutableObservableValueContractTest
+				.suite(new Delegate()));
 		return suite;
 	}
 
