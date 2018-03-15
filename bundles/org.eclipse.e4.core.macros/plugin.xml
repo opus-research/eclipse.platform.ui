@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="macroCommandCreators" name="%extension-point.macroCommandCreators.name" schema="schema/macroCommandCreators.exsd"/>
+   <extension-point id="macroListeners" name="%extension-point.macroListeners.name" schema="schema/macroListeners.exsd"/>
+</plugin>
