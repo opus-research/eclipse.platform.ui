@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500420
+ *     Sopot Cela <scela@redhat.com> - Bug 502004
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -121,7 +122,7 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 			try {
 				ImageDescriptor img = ImageDescriptor.createFromURL(new URI(perspective.getIconURI()).toURL());
 				newDescriptor.setImageDescriptor(img);
-			} catch (MalformedURLException | URISyntaxException e) {
+			} catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
 				logger.warn(e, MessageFormat.format("Error on applying configured perspective icon: {0}", //$NON-NLS-1$
 						perspective.getIconURI()));
 			}
@@ -325,12 +326,18 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 		String label = p.getLabel();
 		int index = id.lastIndexOf('.');
 		// Custom perspectives store the user defined names in their labels
+		String trimE4 = label.trim();
+		String trimE3 = label.replace(' ', '_').trim();
 		if (id.endsWith(label)) {
 			index = id.lastIndexOf(label) - 1;
+		} else if (id.endsWith(trimE4)) {
+			index = id.lastIndexOf(trimE4) - 1;
+		} else if (id.endsWith(trimE3)) {
+			index = id.lastIndexOf(trimE3) - 1;
 		}
-		if (index == -1) {
-			return id;
+		if (index >= 0 && index < id.length()) {
+			return id.substring(0, index);
 		}
-		return id.substring(0, index);
+		return id;
 	}
 }
