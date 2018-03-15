@@ -14,8 +14,6 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -26,6 +24,8 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
@@ -118,11 +118,21 @@ public class TypeFilteringDialog extends SelectionDialog {
         composite.setData(data);
         Button selectButton = createButton(buttonComposite,
                 IDialogConstants.SELECT_ALL_ID, WorkbenchMessages.WizardTransferPage_selectAll, false);
-        SelectionListener listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(true));
+        SelectionListener listener = new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                listViewer.setAllChecked(true);
+            }
+        };
         selectButton.addSelectionListener(listener);
         Button deselectButton = createButton(buttonComposite,
                 IDialogConstants.DESELECT_ALL_ID, WorkbenchMessages.WizardTransferPage_deselectAll, false);
-        listener = widgetSelectedAdapter(e -> listViewer.setAllChecked(false));
+        listener = new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                listViewer.setAllChecked(false);
+            }
+        };
         deselectButton.addSelectionListener(listener);
     }
 
