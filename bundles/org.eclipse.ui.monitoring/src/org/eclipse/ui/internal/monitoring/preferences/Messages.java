@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Google, Inc and others.
+ * Copyright (c) 2014, 2016 Google, Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ public final class Messages extends NLS {
 	public static String FilterInputDialog_note_label;
 	public static String FilterInputDialog_title;
 	public static String FilterInputDialog_ui_thread_filter_message;
+	public static String MonitoringMainPreferencePage_label;
 	public static String MonitoringPreferenceListener_preference_error_header;
 	public static String MonitoringPreferenceListener_preference_error;
 	public static String MonitoringPreferencePage_add_ui_thread_filter_button_label;
@@ -37,6 +38,12 @@ public final class Messages extends NLS {
 	public static String MonitoringPreferencePage_remove_noninteresting_thread_filter_button_label;
 	public static String MonitoringPreferencePage_ui_thread_filter_label;
 	public static String MonitoringPreferencePage_warning_threshold_label;
+
+	public static String CancelabilityMonitorPreferencePage_enable_monitoring_label;
+	public static String CancelabilityMonitorPreferencePage_warning_threshold_label;
+	public static String CancelabilityMonitorPreferencePage_error_threshold_label;
+	public static String CancelabilityMonitorPreferencePage_max_stack_samples_label;
+	public static String CancelabilityMonitorPreferencePage_log_non_cancelable_user_job_label;
 
 	private Messages() {
 		// Do not instantiate.
