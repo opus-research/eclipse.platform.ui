@@ -183,7 +183,7 @@ final class Identifier implements IIdentifier {
     @Override
 	public String toString() {
         if (string == null) {
-            final StringBuilder stringBuffer = new StringBuilder();
+            final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');
             stringBuffer.append(activityIds);
             stringBuffer.append(',');

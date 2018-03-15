@@ -633,7 +633,7 @@ return true;
 	 */
 	private void reportResult(IResource[] selectedResources,
 			ArrayList/* <String> */report, String title) {
-		StringBuilder message = new StringBuilder();
+		StringBuffer message = new StringBuffer();
 		Iterator/* <String> */stringIt = report.iterator();
 		while (stringIt.hasNext()) {
 			message.append(stringIt.next());
@@ -902,7 +902,7 @@ return true;
 			else
 				variableName = variableName.substring(0, variableName.length() -1); // remove the tailing ':'
 		}
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < variableName.length(); i++) {
 			char c = variableName.charAt(i);
 			if (Character.isLetterOrDigit(c) || (c == '_'))
