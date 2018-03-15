@@ -119,6 +119,7 @@ abstract class DragAgent {
 				dropAgent.dragEnter(dragElement, info);
 			else {
 				dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_NO));
+				dndManager.clearOverlay();
 			}
 		}
 	}
@@ -150,6 +151,7 @@ abstract class DragAgent {
 	 *            determines if a drop operation should be performed if possible
 	 */
 	public void dragFinished(boolean performDrop, DnDInfo info) {
+		dndManager.clearOverlay();
 		boolean isNoDrop = dndManager.getDragShell().getCursor() == Display.getCurrent()
 				.getSystemCursor(SWT.CURSOR_NO);
 		if (performDrop && dropAgent != null && !isNoDrop) {

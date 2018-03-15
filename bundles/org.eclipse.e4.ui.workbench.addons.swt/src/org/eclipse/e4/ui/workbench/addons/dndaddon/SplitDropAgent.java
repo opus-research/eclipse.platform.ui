@@ -157,7 +157,7 @@ public class SplitDropAgent extends DropAgent {
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		if (dndManager.getFeedbackStyle() != DnDManager.SIMPLE)
 			unDock(dragElement);
-		dndManager.clearOverlay();
+		// dndManager.clearOverlay();
 		clearFeedback();
 		curDockLocation = NOWHERE;
 
