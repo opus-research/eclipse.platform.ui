@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,7 +75,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
@@ -633,7 +632,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			windowContext.set(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, this);
 			windowContext.set(ISources.ACTIVE_WORKBENCH_WINDOW_SHELL_NAME, getShell());
-			EContextService cs = windowContext.get(EContextService.class);
+			EContextService cs = (EContextService) windowContext.get(EContextService.class
+					.getName());
 			cs.activateContext(IContextService.CONTEXT_ID_WINDOW);
 			cs.getActiveContextIds();
 
@@ -1983,14 +1983,7 @@ STATUS_LINE_ID, model);
 			// Null out the progress region. Bug 64024.
 			progressRegion = null;
 
-			// Opposite of setup() and fill()
 			MWindow window = model;
-			if (window.getMainMenu() != null) {
-				MMenu mainMenu = window.getMainMenu();
-				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory.getRenderer(mainMenu, null);
-				cleanupMenuManagerRec(renderer, mainMenu);
-			}
-
 			engine.removeGui(model);
 
 			MElementContainer<MUIElement> parent = window.getParent();
@@ -2018,16 +2011,6 @@ STATUS_LINE_ID, model);
 			menuRestrictions.clear();
 		}
 		return true;
-	}
-
-	private void cleanupMenuManagerRec(MenuManagerRenderer renderer, MMenu m) {
-		for (MMenuElement e : m.getChildren()) {
-			// renderer.clearModelToContribution(e, null);
-			if (e instanceof MMenu) {
-				cleanupMenuManagerRec(renderer, (MMenu) e);
-			}
-		}
-		renderer.clearModelToManager(m, null);
 	}
 
 	/**
@@ -2230,7 +2213,7 @@ STATUS_LINE_ID, model);
 				manager.setCancelEnabled(wasCancelEnabled);
 
 				// re-enable the main menu if necessary
-				if (enableMainMenu && model != null && model.getMainMenu() != null) {
+				if (enableMainMenu) {
 					Menu mainMenu = (Menu) model.getMainMenu().getWidget();
 					mainMenu.setEnabled(true);
 				}
@@ -2749,7 +2732,7 @@ STATUS_LINE_ID, model);
 
 	@Override
 	public IExtensionTracker getExtensionTracker() {
-		return model.getContext().get(IExtensionTracker.class);
+		return (IExtensionTracker) model.getContext().get(IExtensionTracker.class.getName());
 	}
 
 	/**

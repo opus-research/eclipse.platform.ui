@@ -381,7 +381,8 @@ public class EModelServiceFindTest {
 	@Test
 	public void testFindAddons() {
 		MApplication application = createApplication();
-		EModelService modelService = application.getContext().get(EModelService.class);
+		EModelService modelService = (EModelService) application.getContext()
+				.get(EModelService.class.getName());
 		assertNotNull(modelService);
 
 		MAddon addon = MApplicationFactory.INSTANCE.createAddon();

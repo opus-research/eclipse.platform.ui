@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,7 +54,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.bindings.TriggerSequence;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.internal.provisional.action.ToolBarContributionItem2;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -263,7 +262,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 		@Override
 		public String toString() {
-			return super.toString() + (item == null ? "" : (" [" + item.getId() + "]")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			return super.toString() + item == null ? "" : (" [" + item.getId() + "]"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 
@@ -543,16 +542,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		shell.setText(title);
 		window.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.ACTION_SET_SELECTION_DIALOG);
-	}
-
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-
-		Button okButton = createButton(parent, IDialogConstants.OK_ID,
-				WorkbenchMessages.CustomizePerspectiveDialog_okButtonLabel, true);
-		okButton.setFocus();
-
-		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	@Override
@@ -2182,7 +2171,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 
 	private static ParameterizedCommand generateParameterizedCommand(final MHandledItem item,
 			final IEclipseContext lclContext) {
-		ECommandService cmdService = lclContext.get(ECommandService.class);
+		ECommandService cmdService = (ECommandService) lclContext.get(ECommandService.class
+				.getName());
 		Map<String, Object> parameters = null;
 		List<MParameter> modelParms = item.getParameters();
 		if (modelParms != null && !modelParms.isEmpty()) {
@@ -2201,7 +2191,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		String text = item.getLocalizedTooltip();
 		if (item instanceof MHandledItem) {
 			MHandledItem handledItem = (MHandledItem) item;
-			EBindingService bs = context.get(EBindingService.class);
+			EBindingService bs = (EBindingService) context.get(EBindingService.class.getName());
 			ParameterizedCommand cmd = handledItem.getWbCommand();
 			if (cmd == null) {
 				cmd = generateParameterizedCommand(handledItem, context);

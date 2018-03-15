@@ -1246,7 +1246,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 				// we're on a 64 bit platform so invoke it with a long
 				splashShell = (Shell) method.invoke(null, new Object[] {
-						display, Long.valueOf(splashHandle) });
+						display, new Long(splashHandle) });
 			} catch (NoSuchMethodException e2) {
 				// cant find either method - don't do anything.
 			}
@@ -1418,7 +1418,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (editorRegistry == null) {
-					editorRegistry = new EditorRegistry(Platform.getContentTypeManager());
+					editorRegistry = new EditorRegistry();
 				}
 				return editorRegistry;
 			}
