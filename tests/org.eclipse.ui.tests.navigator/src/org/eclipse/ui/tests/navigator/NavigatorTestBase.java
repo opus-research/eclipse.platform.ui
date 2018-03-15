@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 506931 - [CommonNavigator] A quick filter possibility
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
 
@@ -69,8 +68,6 @@ public class NavigatorTestBase {
 	public static final String TEST_VIEWER_INHERITED = "org.eclipse.ui.tests.navigator.InheritedTestView";
 	public static final String TEST_VIEWER_NON_COMMONVIEWER = "org.eclipse.ui.tests.navigator.NonCommonViewerTestViewer";
 	public static final String TEST_VIEWER_FILTER = "org.eclipse.ui.tests.navigator.FilterTestView";
-	public static final String TEST_VIEWER_SEARCHFILTER = "org.eclipse.ui.tests.navigator.SearchFilterTestView";
-	public static final String TEST_VIEWER_SEARCHFILTER_HIDDEN = "org.eclipse.ui.tests.navigator.SearchFilterHiddenTestView";
 	public static final String TEST_VIEWER_INITIAL_ACTIVATION = "org.eclipse.ui.tests.navigator.InitialActivationView";
 	public static final String TEST_VIEWER_LINK_HELPER = "org.eclipse.ui.tests.navigator.TestLinkHelperView";
 

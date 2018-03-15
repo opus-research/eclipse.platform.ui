@@ -10,7 +10,7 @@
  *     Fair Issac Corp - bug 287103 - NCSLabelProvider does not properly handle overrides
  *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
  *     C. Sean Young <csyoung@google.com> - Bug 436645
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 506931 - [CommonNavigator] A quick filter possibility
+ *
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator;
 
@@ -28,8 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		ProgrammaticOpenTest.class, PipelineTest.class, PipelineChainTest.class, JstPipelineTest.class,
 		LabelProviderTest.class, SorterTest.class, ViewerTest.class, CdtTest.class, M12Tests.class,
 		FirstClassM1Tests.class, LinkHelperTest.class, ResourceTransferTest.class, EvaluationCacheTest.class,
-		NestedResourcesTests.class, PathComparatorTest.class, SearchFilterHiddenTest.class,
-		SearchFilterProjectExplorerTest.class, SearchFilterTest.class
+		NestedResourcesTests.class, PathComparatorTest.class
 		// DnDTest.class, // DnDTest.testSetDragOperation() fails
 		// PerformanceTest.class // Does not pass on all platforms see bug 264449
 })
