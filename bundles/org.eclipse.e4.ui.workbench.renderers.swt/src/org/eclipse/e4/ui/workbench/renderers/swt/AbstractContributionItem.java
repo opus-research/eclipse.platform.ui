@@ -11,6 +11,8 @@
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
@@ -99,6 +101,10 @@ public abstract class AbstractContributionItem extends ContributionItem {
 	 * update was logged the first time.
 	 */
 	private boolean logged = false;
+
+	private Map<IEclipseContext, Integer> scheduledUpdate = new HashMap<>();
+
+	private static final boolean QUEUE_ENABLED = !Boolean.getBoolean("platform.enablement.optimization.disabled"); //$NON-NLS-1$
 
 	/**
 	 *
@@ -542,8 +548,40 @@ public abstract class AbstractContributionItem extends ContributionItem {
 		return null;
 	}
 
-
 	protected void updateItemEnablement() {
+		if (QUEUE_ENABLED) {
+			IEclipseContext context = getContext(modelItem).getActiveLeaf();
+			if (!scheduledUpdate.containsKey(context)) {
+				// Perform the action immediately so that Computation like RATs
+				// work appropriately
+				performUpdateItemEnablement();
+				// Schedule reset of state
+				Display current = Display.getCurrent();
+				Runnable r = () -> {
+					scheduledUpdate.remove(context);
+				};
+				current.asyncExec(r);
+				scheduledUpdate.put(context, Integer.valueOf(0));
+			} else if (scheduledUpdate.get(context).intValue() == 0) {
+				// Another request has been issued - Schedule a runnable to
+				// execute
+				// at the end
+				scheduledUpdate.put(context, Integer.valueOf(1));
+				Display current = Display.getCurrent();
+				Runnable r = () -> {
+					performUpdateItemEnablement();
+				};
+				current.asyncExec(r);
+			} else {
+				// Skip all other update requests
+			}
+		} else {
+			performUpdateItemEnablement();
+		}
+
+	}
+
+	private void performUpdateItemEnablement() {
 		if (!(modelItem.getWidget() instanceof ToolItem))
 			return;
 
