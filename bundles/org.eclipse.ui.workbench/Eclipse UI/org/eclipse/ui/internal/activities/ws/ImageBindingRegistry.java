@@ -38,15 +38,16 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 		super();
 		this.tag = tag;
 		IExtension [] extensions = getExtensionPointFilter().getExtensions();
-		for (IExtension extension : extensions) {
-			addExtension(PlatformUI.getWorkbench().getExtensionTracker(), extension);
+		for (int i = 0; i < extensions.length; i++) {
+			addExtension(PlatformUI.getWorkbench().getExtensionTracker(), extensions[i]);
 		}
 	}
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement [] elements = extension.getConfigurationElements();
-		for (IConfigurationElement element : elements) {
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
 			if (element.getName().equals(tag)) {
 				String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 				String file = element.getAttribute(IWorkbenchRegistryConstants.ATT_ICON);
@@ -55,7 +56,8 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 					continue; //ignore - malformed
 				}
 				if (registry.getDescriptor(id) == null) { // first come, first serve
-					ImageDescriptor descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(element.getNamespace(), file);
+					ImageDescriptor descriptor = AbstractUIPlugin
+							.imageDescriptorFromPlugin(element.getNamespaceIdentifier(), file);
 					if (descriptor != null) {
 						registry.put(id, descriptor);
 						tracker.registerObject(extension, id, IExtensionTracker.REF_WEAK);
@@ -78,9 +80,9 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (Object object : objects) {
-			if (object instanceof String) {
-				registry.remove((String) object);
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] instanceof String) {
+				registry.remove((String) objects[i]);
 			}
 		}
 	}
