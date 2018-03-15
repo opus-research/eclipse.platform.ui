@@ -8,14 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.e4.ui.internal.workbench;
+package org.eclipse.e4.ui.bindings.internal;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import org.eclipse.swt.SWT;
 
 /**
  * <p>
@@ -25,12 +23,6 @@ import java.util.TreeSet;
  * @since 3.1
  */
 public final class Util {
-
-	/**
-	 * An unmodifiable, empty, sorted set. This value is guaranteed to never change and never be
-	 * <code>null</code>.
-	 */
-	public static final SortedSet<?> EMPTY_SORTED_SET = Collections.unmodifiableSortedSet(new TreeSet<>());
 
 	/**
 	 * A common zero-length string. It avoids needing write <code>NON-NLS</code> next to code
@@ -106,6 +98,8 @@ public final class Util {
 	/**
 	 * Compares to comparable objects -- defending against <code>null</code>.
 	 *
+	 * @param <T>
+	 *
 	 * @param left
 	 *            The left object to compare; may be <code>null</code>.
 	 * @param right
@@ -113,7 +107,8 @@ public final class Util {
 	 * @return The result of the comparison. <code>null</code> is considered to be the least
 	 *         possible value.
 	 */
-	public static final <T extends Comparable<T>> int compare(final T left, final T right) {
+	@SuppressWarnings("unchecked")
+	public static final <T> int compare(final Comparable<T> left, final Comparable<T> right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -121,7 +116,7 @@ public final class Util {
 		} else if (right == null) {
 			return 1;
 		} else {
-			return left.compareTo(right);
+			return left.compareTo((T) right);
 		}
 	}
 
@@ -135,7 +130,7 @@ public final class Util {
 	 * @return The result of the comparison. <code>null</code> is considered to be the least
 	 *         possible value. A shorter array is considered less than a longer array.
 	 */
-	public static final <T extends Comparable<T>> int compare(final T[] left, final T[] right) {
+	public static final <T> int compare(final Comparable<T>[] left, final Comparable<T>[] right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -175,7 +170,8 @@ public final class Util {
 	 * @return The result of the comparison. <code>null</code> is considered to be the least
 	 *         possible value. A shorter list is considered less than a longer list.
 	 */
-	public static final <T extends Comparable<T>> int compare(final List<T> left, final List<T> right) {
+	public static final <T> int compare(final List<Comparable<T>> left,
+			final List<Comparable<T>> right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -429,17 +425,15 @@ public final class Util {
 	}
 
 	/**
-	 * Foundation replacement for <code>String#replaceAll(String,
-	 * String)</code>, but <strong>without support for regular expressions</strong>.
+	 * Foundation replacement for String.replaceAll(*).
 	 *
 	 * @param src
-	 *            the original string
+	 *            the starting string.
 	 * @param find
-	 *            the string to find
+	 *            the string to find.
 	 * @param replacement
-	 *            the replacement string
-	 * @return the new string, with all occurrences of <code>find</code> replaced by
-	 *         <code>replacement</code> (not using regular expressions)
+	 *            the string to replace.
+	 * @return The new string.
 	 * @since 3.4
 	 */
 	public static final String replaceAll(String src, String find, String replacement) {
@@ -468,6 +462,187 @@ public final class Util {
 			buf.append(src.substring(beginIndex, (idx == -1 ? len : idx)));
 		}
 		return buf.toString();
+	}
+
+	//
+	// Methods for working with the windowing system
+	//
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_WIN32 = "win32";//$NON-NLS-1$
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_MOTIF = "motif";//$NON-NLS-1$
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_GTK = "gtk";//$NON-NLS-1$
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_PHOTON = "photon";//$NON-NLS-1$
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_CARBON = "carbon";//$NON-NLS-1$
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_COCOA = "cocoa";//$NON-NLS-1$
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_WPF = "wpf";//$NON-NLS-1$
+
+	/**
+	 * Windowing system constant.
+	 *
+	 * @since 3.5
+	 */
+	public static final String WS_UNKNOWN = "unknown";//$NON-NLS-1$
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for windows platforms
+	 * @since 3.5
+	 */
+	public static final boolean isWindows() {
+		final String ws = SWT.getPlatform();
+		return WS_WIN32.equals(ws) || WS_WPF.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for mac platforms
+	 * @since 3.5
+	 */
+	public static final boolean isMac() {
+		final String ws = SWT.getPlatform();
+		return WS_CARBON.equals(ws) || WS_COCOA.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for linux platform
+	 * @since 3.5
+	 */
+	public static final boolean isLinux() {
+		final String ws = SWT.getPlatform();
+		return WS_GTK.equals(ws) || WS_MOTIF.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for gtk platforms
+	 * @since 3.5
+	 */
+	public static final boolean isGtk() {
+		final String ws = SWT.getPlatform();
+		return WS_GTK.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for motif platforms
+	 * @since 3.5
+	 */
+	public static final boolean isMotif() {
+		final String ws = SWT.getPlatform();
+		return WS_MOTIF.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for photon platforms
+	 * @since 3.5
+	 */
+	public static final boolean isPhoton() {
+		final String ws = SWT.getPlatform();
+		return WS_PHOTON.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for carbon platforms
+	 * @since 3.5
+	 */
+	public static final boolean isCarbon() {
+		final String ws = SWT.getPlatform();
+		return WS_CARBON.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for the cocoa platform.
+	 * @since 3.5
+	 */
+	public static final boolean isCocoa() {
+		final String ws = SWT.getPlatform();
+		return WS_COCOA.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for WPF
+	 * @since 3.5
+	 */
+	public static final boolean isWpf() {
+		final String ws = SWT.getPlatform();
+		return WS_WPF.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return <code>true</code> for win32
+	 * @since 3.5
+	 */
+	public static final boolean isWin32() {
+		final String ws = SWT.getPlatform();
+		return WS_WIN32.equals(ws);
+	}
+
+	/**
+	 * Common WS query helper method.
+	 *
+	 * @return the SWT windowing platform string.
+	 * @see SWT#getPlatform()
+	 * @since 3.5
+	 */
+	public static final String getWS() {
+		return SWT.getPlatform();
 	}
 
 	/**

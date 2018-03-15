@@ -459,7 +459,7 @@ public class FilteredTree extends Composite {
 						&& initialText.equals(text);
 				if (initial) {
 					patternFilter.setPattern(null);
-				} else {
+				} else if (text != null) {
 					patternFilter.setPattern(text);
 				}
 
@@ -1038,7 +1038,7 @@ public class FilteredTree extends Composite {
 						&& initialText.equals(filterText);
 				if (initial) {
 					filter.setPattern(null);
-				} else {
+				} else if (filterText != null) {
 					filter.setPattern(filterText);
 				}
 			}

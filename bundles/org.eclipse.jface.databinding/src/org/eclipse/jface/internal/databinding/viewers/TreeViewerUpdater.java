@@ -12,8 +12,7 @@
 
 package org.eclipse.jface.internal.databinding.viewers;
 
-import java.util.Objects;
-
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -179,7 +178,7 @@ public class TreeViewerUpdater {
 	}
 
 	private boolean eq(IElementComparer comparer, Object o1, Object o2) {
-		return comparer == null ? Objects.equals(o1, o2) : comparer.equals(o1, o2);
+		return comparer == null ? Util.equals(o1, o2) : comparer.equals(o1, o2);
 	}
 
 	/**
