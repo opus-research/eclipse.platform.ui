@@ -224,8 +224,6 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		model.add("first");
 
 		Assert.assertEquals(0, latch.getCount());
-
-		Policy.setLog(null);
 	}
 
 	/**
