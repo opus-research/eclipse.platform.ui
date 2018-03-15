@@ -277,19 +277,17 @@ public class NavigatorContentDescriptorManager {
 
 		Image image = null;
 		if (contentDescriptor != null) {
-			String iconPath = contentDescriptor.getIcon();
-			if (iconPath != null) {
-				String prefix = contentDescriptor.getId() == null ? "" : contentDescriptor.getId(); //$NON-NLS-1$
-				String iconKey = prefix + "::" + iconPath; //$NON-NLS-1$
-				image = getImageRegistry().get(iconKey);
+			String icon = contentDescriptor.getIcon();
+			if (icon != null) {
+				image = getImageRegistry().get(icon);
 				if (image == null || image.isDisposed()) {
 					ImageDescriptor imageDescriptor = AbstractUIPlugin
 							.imageDescriptorFromPlugin(contentDescriptor
-							.getContribution().getPluginId(), iconPath);
+							.getContribution().getPluginId(), icon);
 					if (imageDescriptor != null) {
 						image = imageDescriptor.createImage();
 						if (image != null) {
-							getImageRegistry().put(iconKey, image);
+							getImageRegistry().put(icon, image);
 						}
 					}
 				}

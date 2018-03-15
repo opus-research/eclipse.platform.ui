@@ -23,6 +23,7 @@ import java.util.Observable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.IMemento;
@@ -46,14 +47,18 @@ public class BrowserManager extends Observable {
 	}
 
 	private BrowserManager() {
-		pcl = event -> {
-			String property = event.getKey();
-			if (!ignorePreferenceChanges && property.equals("browsers")) { //$NON-NLS-1$
-				loadBrowsers();
-			}
-			if (!property.equals(WebBrowserPreference.PREF_INTERNAL_WEB_BROWSER_HISTORY)) {
-				setChanged();
-				notifyObservers();
+		pcl = new IEclipsePreferences.IPreferenceChangeListener() {
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event) {
+				String property = event.getKey();
+				if (!ignorePreferenceChanges && property.equals("browsers")) { //$NON-NLS-1$
+					loadBrowsers();
+				}
+				if (!property.equals(WebBrowserPreference.PREF_INTERNAL_WEB_BROWSER_HISTORY)) {
+					setChanged();
+					notifyObservers();
+				}
 			}
 		};
 

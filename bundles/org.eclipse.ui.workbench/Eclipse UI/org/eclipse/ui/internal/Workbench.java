@@ -323,18 +323,14 @@ public final class Workbench extends EventManager implements IWorkbench,
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
 			String bundleName;
-			boolean worked = false;
-			// Note: no calls to any non-trivial Eclipse code outside this class
-			// should be made inside the synchronized block below. Such calls
-			// can cause deadlocks on startup, see bug 502095.
-			// Progress monitor calls *are* non-trivial.
+
 			synchronized (this) {
 				if (eventType == BundleEvent.STARTING) {
 					starting.add(bundleName = event.getBundle().getSymbolicName());
 				} else if (eventType == BundleEvent.STARTED) {
 					progressCount++;
 					if (progressCount <= maximumProgressCount) {
-						worked = true;
+						progressMonitor.worked(1);
 					}
 					int index = starting.lastIndexOf(event.getBundle().getSymbolicName());
 					if (index >= 0) {
@@ -348,9 +344,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 					return; // uninteresting event
 				}
 			}
-			if (worked) {
-				progressMonitor.worked(1);
-			}
+
 			if (bundleName != null) {
 				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
 				progressMonitor.subTask(taskName);
@@ -2324,7 +2318,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		// TODO Correctly order service initialization
 		// there needs to be some serious consideration given to
 		// the services, and hooking them up in the correct order
-		final IEvaluationService evaluationService = serviceLocator
+		final IEvaluationService evaluationService = (IEvaluationService) serviceLocator
 				.getService(IEvaluationService.class);
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
@@ -2525,7 +2519,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 					return;
 				}
 
-				final IHandlerService handlerService = getService(IHandlerService.class);
+				final IHandlerService handlerService = (IHandlerService) getService(IHandlerService.class);
 
 				try {
 					handlerService.executeCommand(commandId, event);
@@ -3539,12 +3533,12 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 
 	@Override
-	public final <T> T getService(final Class<T> key) {
+	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
 
 	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 

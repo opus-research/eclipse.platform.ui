@@ -27,7 +27,7 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	private boolean readOnly;
 	private CSSRule parentRule;
-	private List<CSSProperty> properties = new ArrayList<>();
+	private List<CSSProperty> properties = new ArrayList<CSSProperty>();
 	private CSSPropertyList cssPropertyListView;
 
 	public CSSStyleDeclarationImpl(CSSRule parentRule) {
@@ -159,10 +159,5 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 				return property;
 		}
 		return null;
-	}
-
-	@Override
-	public String toString() {
-		return getCssText();
 	}
 }
