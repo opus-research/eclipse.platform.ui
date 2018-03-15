@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 436247
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
- *     Mickael Istria (Red Hat Inc.) - Theme and fontregistry rather than pref
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -519,8 +518,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
                     if (!ColorsAndFontsPreferencePage.equals(def.getCategoryId(), myCategory)) {
                     	if (isDefault(themeElement))
-							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
-               			return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
+							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), new Object[] { themeElement.getName(), def.getName() }); //$NON-NLS-1$
+               			return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), new Object[] { themeElement.getName(), def.getName() }); //$NON-NLS-1$
                     }
                 }
             }
@@ -594,7 +593,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	 * made by the user. These changes need to be stored into the preference
 	 * store.
 	 */
-	private Map<ColorDefinition, RGB> colorPreferencesToSet = new HashMap<>(7);
+	private Map<ColorDefinition, RGB> colorPreferencesToSet = new HashMap<ColorDefinition, RGB>(7);
 
     private CascadingColorRegistry colorRegistry;
 
@@ -671,7 +670,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	 * explicitly made by the user. These changes need to be stored into the
 	 * preference store.
 	 */
-	private Map<FontDefinition, FontData[]> fontPreferencesToSet = new HashMap<>(
+	private Map<FontDefinition, FontData[]> fontPreferencesToSet = new HashMap<FontDefinition, FontData[]>(
 			7);
 
     private CascadingFontRegistry fontRegistry;
@@ -683,12 +682,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	/**
 	 * Map of definition id->FontData[] capturing the temporary changes caused
 	 * by a 'defaultsTo' font change.
-	 * 
-	 * @deprecated in this page, we should only care about preferences,
-	 *             preference to fontValues synchronization in registry is
-	 *             handled in the ThemeAPI and listeners
 	 */
-	@Deprecated
     private Map fontValuesToSet = new HashMap(7);
 
     /**
@@ -1539,7 +1533,7 @@ getPreferenceStore(),
 	}
 
     @Override
-	public void performDefaults() {
+	protected void performDefaults() {
         performColorDefaults();
         performFontDefaults();
 		updateControls();
@@ -1671,19 +1665,21 @@ getPreferenceStore(),
         }
     }
 
-	private void setDescendantRegistryValues(FontDefinition definition, FontData[] datas, boolean reset) {
+    private void setDescendantRegistryValues(FontDefinition definition, FontData[] datas) {
         FontDefinition[] children = getDescendantFonts(definition);
+
         for (int i = 0; i < children.length; i++) {
             if (isDefault(children[i])) {
-				setFontPreferenceValue(children[i], datas, reset);
+                setDescendantRegistryValues(children[i], datas);
+                setRegistryValue(children[i], datas);
+                fontValuesToSet.put(children[i].getId(), datas);
+				fontPreferencesToSet.remove(children[i]);
             }
         }
     }
 
 	protected void setFontPreferenceValue(FontDefinition definition, FontData[] datas, boolean reset) {
-		// descendant values must be computed and set before updating current,
-		// or isDefault will miss them
-		setDescendantRegistryValues(definition, datas, reset);
+        setDescendantRegistryValues(definition, datas);
 		fontPreferencesToSet.put(definition, datas);
 		setRegistryValue(definition, datas);
 		updateDefinitionState(definition, reset);

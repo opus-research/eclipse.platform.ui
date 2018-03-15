@@ -32,7 +32,6 @@ public class FastTableViewerRefreshTest extends TableViewerRefreshTest {
 		openBrowser();
 
 		exercise(new TestRunnable() {
-			@Override
 			public void run() {
 				startMeasuring();
 				for (int i = 0; i < 10; i++) {
@@ -59,7 +58,6 @@ public class FastTableViewerRefreshTest extends TableViewerRefreshTest {
 
 		exercise(
 				new TestRunnable() {
-					@Override
 					public void run() {
 						startMeasuring();
 						for (int i = 0; i < 10; i++) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *  Patrik Suzzi <psuzzi@gmail.com> - Bug 485133
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -41,7 +40,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -133,7 +132,8 @@ import org.eclipse.ui.statushandlers.StatusManager;
  *
  * @since 3.3
  */
-public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog {
+public abstract class FilteredItemsSelectionDialog extends
+		SelectionStatusDialog {
 
 	private static final String DIALOG_BOUNDS_SETTINGS = "DialogBoundsSettings"; //$NON-NLS-1$
 
@@ -592,7 +592,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
      * @since 3.5
      */
 	protected void fillContextMenu(IMenuManager menuManager) {
-		List selectedElements = list.getStructuredSelection().toList();
+		List selectedElements= ((StructuredSelection)list.getSelection()).toList();
 
 		Object item= null;
 
@@ -789,9 +789,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		details = new DetailsContentViewer(content, SWT.BORDER | SWT.FLAT);
 		details.setVisible(toggleStatusLineAction.isChecked());
-		details.setContentProvider(new IContentProvider() {
-			// intentionally empty
-		});
+		details.setContentProvider(new NullContentProvider());
 		details.setLabelProvider(getDetailsLabelProvider());
 
 		applyDialogFont(content);
@@ -2093,16 +2091,22 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				lastCompletedFilter = null;
 				lastCompletedResult = null;
 
-				SubMonitor subMonitor = SubMonitor.convert(monitor,
+				SubProgressMonitor subMonitor = null;
+				if (monitor != null) {
+					monitor
+							.beginTask(
 									WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
 									100);
+					subMonitor = new SubProgressMonitor(monitor, 95);
 
-				fillContentProvider(contentProvider, itemsFilter, subMonitor.split(95));
+				}
+
+				fillContentProvider(contentProvider, itemsFilter, subMonitor);
 
 				if (monitor != null && !monitor.isCanceled()) {
-					subMonitor.worked(2);
+					monitor.worked(2);
 					contentProvider.rememberResult(itemsFilter);
-					subMonitor.worked(3);
+					monitor.worked(3);
 				}
 			}
 
@@ -2812,41 +2816,61 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		 * @param monitor
 		 *            progress monitor
 		 */
-		public void reloadCache(boolean checkDuplicates, IProgressMonitor monitor) {
+		public void reloadCache(boolean checkDuplicates,
+				IProgressMonitor monitor) {
+
 			reset = false;
 
-			// the work is divided into two actions of the same length
-			int totalWork = checkDuplicates ? 200 : 100;
+			if (monitor != null) {
+				// the work is divided into two actions of the same length
+				int totalWork = checkDuplicates ? 200 : 100;
 
-			SubMonitor subMonitor = SubMonitor.convert(monitor,
-					WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob, totalWork);
+				monitor
+						.beginTask(
+								WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob,
+								totalWork);
+			}
 
 			// the TableViewer's root (the input) is treated as parent
 
-			lastFilteredItems = Arrays.asList(getFilteredItems(list.getInput(), subMonitor.split(100)));
+			lastFilteredItems = Arrays.asList(getFilteredItems(list.getInput(),
+					monitor != null ? new SubProgressMonitor(monitor, 100)
+							: null));
 
-			if (reset || subMonitor.isCanceled()) {
+			if (reset || (monitor != null && monitor.isCanceled())) {
+				if (monitor != null)
+					monitor.done();
 				return;
 			}
 
 			if (checkDuplicates) {
-				checkDuplicates(subMonitor.split(100));
+				checkDuplicates(monitor);
 			}
+			if (monitor != null)
+				monitor.done();
 		}
 
 		private void checkDuplicates(IProgressMonitor monitor) {
 			synchronized (lastFilteredItems) {
-				SubMonitor subMonitor = SubMonitor.convert(monitor,
-						WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob_checkDuplicates,
-						lastFilteredItems.size());
-				HashMap<String, Object> helperMap = new HashMap<>();
+				IProgressMonitor subMonitor = null;
+				int reportEvery = lastFilteredItems.size() / 20;
+				if (monitor != null) {
+					subMonitor = new SubProgressMonitor(monitor, 100);
+					subMonitor
+							.beginTask(
+									WorkbenchMessages.FilteredItemsSelectionDialog_cacheRefreshJob_checkDuplicates,
+									5);
+				}
+				HashMap helperMap = new HashMap();
 				for (int i = 0; i < lastFilteredItems.size(); i++) {
-					if (reset || subMonitor.isCanceled())
+					if (reset
+							|| (subMonitor != null && subMonitor.isCanceled()))
 						return;
 					Object item = lastFilteredItems.get(i);
 
 					if (!(item instanceof ItemsListSeparator)) {
-						Object previousItem = helperMap.put(getElementName(item), item);
+						Object previousItem = helperMap.put(
+								getElementName(item), item);
 						if (previousItem != null) {
 							setDuplicateElement(previousItem, true);
 							setDuplicateElement(item, true);
@@ -2855,7 +2879,9 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 						}
 					}
 
-					subMonitor.worked(1);
+					if (subMonitor != null && reportEvery != 0
+							&& (i + 1) % reportEvery == 0)
+						subMonitor.worked(1);
 				}
 				helperMap.clear();
 			}
@@ -2956,6 +2982,21 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			// currently filters are only added when dialog is restored
 			// if it is changed, refreshing the whole TableViewer should be
 			// added
+		}
+
+	}
+
+	/**
+	 * A content provider that does nothing.
+	 */
+	private class NullContentProvider implements IContentProvider {
+
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
 	}

@@ -9,10 +9,10 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431340, 431348, 426535, 433234, 431868, 472654
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799, 466230
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -21,10 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +29,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -41,7 +36,6 @@ import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -142,7 +136,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
@@ -246,7 +239,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 	}
 
-	ArrayList<MPart> activationList = new ArrayList<>();
+	ArrayList<MPart> activationList = new ArrayList<MPart>();
 
 	/**
 	 * Cached perspective stack for this workbench page.
@@ -254,7 +247,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private MPerspectiveStack _perspectiveStack;
 
 	/** Ids of parts used as Show In targets, maintained in MRU order */
-	private List<String> mruShowInPartIds = new ArrayList<>();
+	private List<String> mruShowInPartIds = new ArrayList<String>();
 
 	/**
 	 * Deactivate the last editor's action bars if another type of editor has //
@@ -385,7 +378,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 				ViewReference viewReference = getViewReference(part);
 				if (viewReference != null) {
-					E4PartWrapper legacyPart = E4PartWrapper.getE4PartWrapper(part);
+					E4PartWrapper legacyPart = new E4PartWrapper(part);
 					try {
 						viewReference.initialize(legacyPart);
 					} catch (PartInitException e) {
@@ -424,7 +417,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return Adapters.adapt(sourcePart, IShowInSource.class);
+		return Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {
@@ -501,10 +494,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return -1;
 	}
 
-	private List<ViewReference> viewReferences = new ArrayList<>();
-	private List<EditorReference> editorReferences = new ArrayList<>();
+	private List<ViewReference> viewReferences = new ArrayList<ViewReference>();
+	private List<EditorReference> editorReferences = new ArrayList<EditorReference>();
 
-	private List<IPerspectiveDescriptor> sortedPerspectives = new ArrayList<>();
+	private List<IPerspectiveDescriptor> sortedPerspectives = new ArrayList<IPerspectiveDescriptor>();
 
 	private ListenerList partListenerList = new ListenerList();
 	private ListenerList partListener2List = new ListenerList();
@@ -571,7 +564,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 					}
 
             		// room for optimization here
-				List<IWorkingSet> newList = new ArrayList<>(Arrays.asList(workingSets));
+				List<IWorkingSet> newList = new ArrayList<IWorkingSet>(Arrays.asList(workingSets));
 				if (newList.remove(event.getOldValue())) {
 					setWorkingSets(newList.toArray(new IWorkingSet[newList.size()]));
 				}
@@ -602,7 +595,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		private IEditorPart topEditor;
 
-		private List<IActionSetDescriptor> oldActionSets = new ArrayList<>();
+		private List<IActionSetDescriptor> oldActionSets = new ArrayList<IActionSetDescriptor>();
 
 		/**
 		 * Updates the contributions given the new part as the active part.
@@ -781,7 +774,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		 */
 		private List<IActionSetDescriptor> calculateActionSets(IWorkbenchPart part,
 				IEditorPart editor) {
-			List<IActionSetDescriptor> newActionSets = new ArrayList<>();
+			List<IActionSetDescriptor> newActionSets = new ArrayList<IActionSetDescriptor>();
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
@@ -1094,7 +1087,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	private List<EditorReference> getOrderedEditorReferences() {
 
-		List<EditorReference> editorRefs = new ArrayList<>();
+		List<EditorReference> editorRefs = new ArrayList<EditorReference>();
 		List<MPart> visibleEditors = modelService.findElements(window,
 				CompatibilityEditor.MODEL_ELEMENT_ID, MPart.class, null);
 		for (MPart editor : visibleEditors) {
@@ -1114,7 +1107,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	private List<EditorReference> getSortedEditorReferences(boolean allPerspectives) {
-		List<EditorReference> sortedReferences = new ArrayList<>();
+		List<EditorReference> sortedReferences = new ArrayList<EditorReference>();
 		for (MPart part : activationList) {
 			for (EditorReference ref : editorReferences) {
 				if (ref.getModel() == part) {
@@ -1135,7 +1128,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
 			List<MPart> placeholders = modelService.findElements(window,
 					CompatibilityEditor.MODEL_ELEMENT_ID, MPart.class, null, scope);
-			List<EditorReference> visibleReferences = new ArrayList<>();
+			List<EditorReference> visibleReferences = new ArrayList<EditorReference>();
 			for (EditorReference reference : sortedReferences) {
 				for (MPart placeholder : placeholders) {
 					if (reference.getModel() == placeholder && placeholder.isToBeRendered()) {
@@ -1395,7 +1388,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		// Check if we're being asked to close any parts that are already closed
 		// or cannot
 		// be closed at this time
-		ArrayList<IEditorReference> editorRefs = new ArrayList<>();
+		ArrayList<IEditorReference> editorRefs = new ArrayList<IEditorReference>();
 		for (int i = 0; i < refArray.length; i++) {
 			IEditorReference reference = refArray[i];
 
@@ -1655,7 +1648,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		// check to ensure this perspective actually exists in this window
 		if (persp != null) {
 			if (saveParts) {
-				List<IWorkbenchPart> partsToSave = new ArrayList<>();
+				List<IWorkbenchPart> partsToSave = new ArrayList<IWorkbenchPart>();
 				// retrieve all parts under the specified perspective
 				List<MPart> parts = modelService.findElements(persp, null, MPart.class, null);
 				if (!parts.isEmpty()) {
@@ -1749,7 +1742,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	public void closeAllPerspectives(boolean saveEditors, boolean closePage) {
 		boolean okToProceed = closeAllEditors(true);
 		if (okToProceed) {
-			List<MPerspective> kids = new ArrayList<>(_perspectiveStack.getChildren());
+			List<MPerspective> kids = new ArrayList<MPerspective>(_perspectiveStack.getChildren());
 			MPerspective curPersp = _perspectiveStack.getSelectedElement();
 			for (MPerspective persp : kids) {
 				if (persp != curPersp) {
@@ -2120,7 +2113,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *         stack will not be returned
 	 */
 	private IEditorPart findActiveEditor() {
-		List<MPart> candidates = new ArrayList<>(activationList);
+		List<MPart> candidates = new ArrayList<MPart>(activationList);
 		MUIElement area = findSharedArea();
 		if (area instanceof MPlaceholder) {
 			area = ((MPlaceholder) area).getRef();
@@ -2228,7 +2221,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public IEditorPart[] getDirtyEditors() {
-		List<IEditorPart> dirtyEditors = new ArrayList<>();
+		List<IEditorPart> dirtyEditors = new ArrayList<IEditorPart>();
 		for (IEditorReference editorRef : editorReferences) {
 			IEditorPart editor = editorRef.getEditor(false);
 			if (editor != null && editor.isDirty()) {
@@ -2250,13 +2243,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		switch (matchFlags) {
 		case MATCH_INPUT:
-			List<IEditorReference> editorRefs = new ArrayList<>();
+			List<IEditorReference> editorRefs = new ArrayList<IEditorReference>();
 			for (EditorReference editorRef : filteredReferences) {
 				checkEditor(input, editorRefs, editorRef);
 			}
 			return editorRefs.toArray(new IEditorReference[editorRefs.size()]);
 		case MATCH_ID:
-			editorRefs = new ArrayList<>();
+			editorRefs = new ArrayList<IEditorReference>();
 			for (IEditorReference editorRef : filteredReferences) {
 				if (editorId.equals(editorRef.getId())) {
 					editorRefs.add(editorRef);
@@ -2266,7 +2259,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		default:
 			if ((matchFlags & IWorkbenchPage.MATCH_ID) != 0
 					&& (matchFlags & IWorkbenchPage.MATCH_INPUT) != 0) {
-				editorRefs = new ArrayList<>();
+				editorRefs = new ArrayList<IEditorReference>();
 				for (EditorReference editorRef : filteredReferences) {
 					if (editorRef.getId().equals(editorId)) {
 						checkEditor(input, editorRefs, editorRef);
@@ -2359,7 +2352,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return new IWorkbenchPartReference[0];
 		}
 
-		List<IWorkbenchPartReference> sortedReferences = new ArrayList<>();
+		List<IWorkbenchPartReference> sortedReferences = new ArrayList<IWorkbenchPartReference>();
 		IViewReference[] viewReferences = getViewReferences(allPerspectives);
 		List<EditorReference> editorReferences = getSortedEditorReferences(allPerspectives);
 
@@ -2417,7 +2410,7 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public String getLabel() {
         String label = WorkbenchMessages.WorkbenchPage_UnknownLabel;
-        IWorkbenchAdapter adapter = Adapters.adapt(input, IWorkbenchAdapter.class);
+        IWorkbenchAdapter adapter = Util.getAdapter(input, IWorkbenchAdapter.class);
         if (adapter != null) {
 			label = adapter.getLabel(input);
 		}
@@ -2475,7 +2468,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 */
 	public ArrayList<?> getShowInPartIds() {
 		MPerspective perspective = getPerspectiveStack().getSelectedElement();
-		return new ArrayList<>(ModeledPageLayout.getIds(perspective,
+		return new ArrayList<String>(ModeledPageLayout.getIds(perspective,
 				ModeledPageLayout.SHOW_IN_PART_TAG));
 	}
 
@@ -2524,11 +2517,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			Set<MUIElement> parts = new HashSet<>();
+			Set<MUIElement> parts = new HashSet<MUIElement>();
 			List<MPlaceholder> placeholders = modelService.findElements(window, null, MPlaceholder.class, null, scope);
 			parts.addAll(placeholders);
 			parts.addAll(modelService.findElements(window, null, MPart.class, null, scope));
-			List<IViewReference> visibleReferences = new ArrayList<>();
+			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
 				MPart model = reference.getModel();
 				// The part may be linked in either directly or via a
@@ -2700,9 +2693,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 		broker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, firingHandler);
 		broker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, childrenHandler);
 
-		// Bug 479126 PERSPECTIVE_BAR_EXTRAS setting not taken into account
-		createPerspectiveBarExtras();
-
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
@@ -2743,6 +2733,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			Object widget = area.getWidget();
 			if (widget instanceof Control) {
 				installAreaDropSupport((Control) widget);
+				break;
 			}
 		}
 	}
@@ -2764,7 +2755,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 				workingSetMem = XMLMemento.createReadRoot(new StringReader(workingSetMemString));
 				IMemento[] workingSetChildren = workingSetMem
 						.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
-				List<IWorkingSet> workingSetList = new ArrayList<>(workingSetChildren.length);
+				List<IWorkingSet> workingSetList = new ArrayList<IWorkingSet>(workingSetChildren.length);
 				for (int i = 0; i < workingSetChildren.length; i++) {
 					IWorkingSet set = getWorkbenchWindow().getWorkbench().getWorkingSetManager()
 							.getWorkingSet(workingSetChildren[i].getID());
@@ -2812,7 +2803,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			getWindowModel().getPersistedState().remove(IWorkbenchConstants.TAG_WORKING_SET);
 		}
 
-		List<String> workingSetNames = new ArrayList<>(workingSets.length);
+		List<String> workingSetNames = new ArrayList<String>(workingSets.length);
 		for (IWorkingSet workingSet : workingSets) {
 			workingSetNames.add(workingSet.getName());
 		}
@@ -2881,7 +2872,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
 			reader.setIncludeOnlyTags(new String[] { IWorkbenchRegistryConstants.TAG_ACTION_SET });
 			reader.extendLayout(null, id, modelLayout);
-			return new ArrayList<>(ModeledPageLayout.getIds(temporary, ModeledPageLayout.ACTION_SET_TAG));
+			return new ArrayList<String>(ModeledPageLayout.getIds(temporary, ModeledPageLayout.ACTION_SET_TAG));
 		}
 		return null;
 	}
@@ -2958,8 +2949,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 			// legacyWindow.getCoolBarManager2()).updateAll(true);
 			// legacyWindow.menuManager.updateAll(true);
 
-			List<MPart> hiddenParts = new ArrayList<>();
-			List<MPart> visibleParts = new ArrayList<>();
+			List<MPart> hiddenParts = new ArrayList<MPart>();
+			List<MPart> visibleParts = new ArrayList<MPart>();
 
 			List<MPartStack> oldStacks = getPartStacks(oldPersp);
 			List<MPartStack> newStacks = getPartStacks(newPersp);
@@ -2982,7 +2973,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 				}
 			}
 
-			List<MPart> ignoredParts = new ArrayList<>();
+			List<MPart> ignoredParts = new ArrayList<MPart>();
 			for (MPart hiddenPart : hiddenParts) {
 				if (visibleParts.contains(hiddenPart)) {
 					ignoredParts.add(hiddenPart);
@@ -3041,7 +3032,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public boolean isPageZoomed() {
-		List<String> maxTag = new ArrayList<>();
+		List<String> maxTag = new ArrayList<String>();
 		maxTag.add(IPresentationEngine.MAXIMIZED);
 		List<Object> maxElements = modelService.findElements(window, null, null, maxTag);
 		return maxElements.size() > 0;
@@ -3417,8 +3408,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 					CompatibilityEditor.MODEL_ELEMENT_ID, MPart.class, null));
 		}
 
-		List<MPart> dirtyParts = new ArrayList<>();
-		List<IWorkbenchPart> partsToSave = new ArrayList<>();
+		List<MPart> dirtyParts = new ArrayList<MPart>();
+		List<IWorkbenchPart> partsToSave = new ArrayList<IWorkbenchPart>();
 		// iterate over the list of parts to find dirty parts
 		for (MPart currentPart : perspectiveParts) {
 			if (currentPart.isDirty()) {
@@ -3511,7 +3502,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			persp.getChildren().remove(0);
 		}
 
-		List<MWindow> existingDetachedWindows = new ArrayList<>();
+		List<MWindow> existingDetachedWindows = new ArrayList<MWindow>();
 		existingDetachedWindows.addAll(persp.getWindows());
 
 		// Move any detached windows from template to perspective
@@ -3595,7 +3586,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *         's on this page
 	 */
 	public ISaveablePart[] getDirtyParts() {
-		List<ISaveablePart> result = new ArrayList<>(3);
+		List<ISaveablePart> result = new ArrayList<ISaveablePart>(3);
 		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
 		for (int i = 0; i < allParts.length; i++) {
 			IWorkbenchPartReference reference = allParts[i];
@@ -3616,7 +3607,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *         {@link ISaveablePart})
 	 */
 	public IWorkbenchPart[] getDirtyWorkbenchParts() {
-		List<IWorkbenchPart> result = new ArrayList<>(3);
+		List<IWorkbenchPart> result = new ArrayList<IWorkbenchPart>(3);
 		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
 		for (int i = 0; i < allParts.length; i++) {
 			IWorkbenchPartReference reference = allParts[i];
@@ -3638,7 +3629,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return true;
 		}
 		// saveAll below expects a mutable list
-		List<IWorkbenchPart> dirtyParts = new ArrayList<>(parts.length);
+		List<IWorkbenchPart> dirtyParts = new ArrayList<IWorkbenchPart>(parts.length);
 		for (int i = 0; i < parts.length; i++) {
 			dirtyParts.add(parts[i]);
 		}
@@ -3651,7 +3642,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			boolean addNonPartSources, final IRunnableContext runnableContext,
 			final IWorkbenchWindow workbenchWindow) {
 		// clone the input list
-		dirtyParts = new ArrayList<>(dirtyParts);
+		dirtyParts = new ArrayList<IWorkbenchPart>(dirtyParts);
 
 		if (closing) {
 			// if the parts are going to be closed, then we only save those that
@@ -3784,8 +3775,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 */
 	private static List<Saveable> convertToSaveables(List<IWorkbenchPart> parts, boolean closing,
 			boolean addNonPartSources) {
-		ArrayList<Saveable> result = new ArrayList<>();
-		HashSet<Saveable> seen = new HashSet<>();
+		ArrayList<Saveable> result = new ArrayList<Saveable>();
+		HashSet<Saveable> seen = new HashSet<Saveable>();
 		for (IWorkbenchPart part : parts) {
 			Saveable[] saveables = getSaveables(part);
 			for (int j = 0; j < saveables.length; j++) {
@@ -3850,7 +3841,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 */
 	private static boolean closingLastPartShowingModel(Saveable model, List<IWorkbenchPart> closingParts,
 			IWorkbenchPage page) {
-		HashSet<IWorkbenchPart> closingPartsWithSameModel = new HashSet<>();
+		HashSet<IWorkbenchPart> closingPartsWithSameModel = new HashSet<IWorkbenchPart>();
 		for (IWorkbenchPart part : closingParts) {
 			Saveable[] models = getSaveables(part);
 			if (Arrays.asList(models).contains(model)) {
@@ -3858,7 +3849,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			}
 		}
 		IWorkbenchPartReference[] pagePartRefs = ((WorkbenchPage) page).getSortedParts();
-		HashSet<IWorkbenchPart> pagePartsWithSameModels = new HashSet<>();
+		HashSet<IWorkbenchPart> pagePartsWithSameModels = new HashSet<IWorkbenchPart>();
 		for (int i = 0; i < pagePartRefs.length; i++) {
 			IWorkbenchPartReference partRef = pagePartRefs[i];
 			IWorkbenchPart part = partRef.getPart(false);
@@ -3961,7 +3952,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 	}
 
-	private HashMap<MPerspective, Perspective> modelToPerspectiveMapping = new HashMap<>();
+	private HashMap<MPerspective, Perspective> modelToPerspectiveMapping = new HashMap<MPerspective, Perspective>();
 
 	private Perspective getPerspective(MPerspective mperspective) {
 		if (mperspective == null) {
@@ -4006,16 +3997,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 		PerspectiveDescriptor pd = new PerspectiveDescriptor(perspId, label, null);
 		PerspectiveDescriptor newDesc = reg.createPerspective(newDescId, pd);
-		if (mperspective.getIconURI() != null) {
-			try {
-				ImageDescriptor img = ImageDescriptor.createFromURL(new URI(mperspective.getIconURI()).toURL());
-				newDesc.setImageDescriptor(img);
-			} catch (MalformedURLException | URISyntaxException e) {
-				WorkbenchPlugin.log(MessageFormat.format("Error on applying configured perspective icon: {0}", //$NON-NLS-1$
-						mperspective.getIconURI(), e));
-			}
-		}
-
 		mperspective.setElementId(newDesc.getId());
 		mperspective.setLabel(newDesc.getLabel());
 		sortedPerspectives.add(newDesc);
@@ -4061,8 +4042,21 @@ public class WorkbenchPage implements IWorkbenchPage {
 				perspective.getId(), window);
 
 		if (modelPerspective == null) {
+
 			// couldn't find the perspective, create a new one
-			modelPerspective = createPerspective(perspective);
+			modelPerspective = modelService.createModelElement(MPerspective.class);
+
+			// tag it with the same id
+			modelPerspective.setElementId(perspective.getId());
+
+			// instantiate the perspective
+			IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
+			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
+					partService, modelPerspective, perspective, this, true);
+			factory.createInitialLayout(modelLayout);
+			PerspectiveTagger.tagPerspective(modelPerspective, modelService);
+			PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
+			reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
 		}
 
 		((ModelServiceImpl) modelService).handleNullRefPlaceHolders(modelPerspective, window);
@@ -4092,27 +4086,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
-	}
-
-	/**
-	 * @param perspective
-	 * @return never null
-	 */
-	private MPerspective createPerspective(IPerspectiveDescriptor perspective) {
-		MPerspective modelPerspective = modelService.createModelElement(MPerspective.class);
-
-		// tag it with the same id
-		modelPerspective.setElementId(perspective.getId());
-
-		// instantiate the perspective
-		IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
-		ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
-				partService, modelPerspective, perspective, this, true);
-		factory.createInitialLayout(modelLayout);
-		PerspectiveTagger.tagPerspective(modelPerspective, modelService);
-		PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
-		reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
-		return modelPerspective;
 	}
 
 	void perspectiveActionSetChanged(Perspective perspective, IActionSetDescriptor descriptor,
@@ -4396,7 +4369,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 				MPerspectiveStack.class, null).get(0);
 		IPerspectiveRegistry registry = PlatformUI.getWorkbench().getPerspectiveRegistry();
 
-		ArrayList<IPerspectiveDescriptor> tmp = new ArrayList<>(
+		ArrayList<IPerspectiveDescriptor> tmp = new ArrayList<IPerspectiveDescriptor>(
 				perspectiveStack.getChildren().size());
 		for (MPerspective persp : perspectiveStack.getChildren()) {
 			String perspectiveId = persp.getElementId();
@@ -4464,7 +4437,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 				final MUIElement topPart = selectedElement instanceof MPlaceholder ? ((MPlaceholder) selectedElement)
 						.getRef() : null;
 
-				List<CompatibilityView> stack = new ArrayList<>();
+				List<CompatibilityView> stack = new ArrayList<CompatibilityView>();
 				for (Object child : parent.getChildren()) {
 					MPart siblingPart = child instanceof MPart ? (MPart) child
 							: (MPart) ((MPlaceholder) child).getRef();
@@ -4596,7 +4569,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		// filter out any duplicates if necessary
 		if (newWorkingSets.length > 1) {
-			Set<IWorkingSet> setOfSets = new HashSet<>();
+			Set<IWorkingSet> setOfSets = new HashSet<IWorkingSet>();
 			for (int i = 0; i < newWorkingSets.length; i++) {
 				if (newWorkingSets[i] == null) {
 					throw new IllegalArgumentException();
@@ -4889,7 +4862,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		if (selectedElement != null) {
 			Collection<MPart> parts = modelService.findElements(selectedElement, null, MPart.class,
 					null);
-			List<MPart> visibleParts = new ArrayList<>(parts.size());
+			List<MPart> visibleParts = new ArrayList<MPart>(parts.size());
 			for (MPart part : parts) {
 				if (isVisible(selectedElement, part)) {
 					visibleParts.add(part);
@@ -4950,33 +4923,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 				});
 			}
 		}
-		else if (client != null) {
-			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
-						.get(E4PartWrapper.E4_WRAPPER_KEY);
-				final IWorkbenchPartReference partReference = getReference(workbenchPart);
-
-				if (partReference != null) {
-					for (final Object listener : partListenerList.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener) listener).partActivated(workbenchPart);
-							}
-						});
-					}
-
-					for (final Object listener : partListener2List.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener2) listener).partActivated(partReference);
-							}
-						});
-					}
-				}
-			}
-		}
 	}
 
 	private void firePartDeactivated(MPart part) {
@@ -5001,32 +4947,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 						((IPartListener2) listener).partDeactivated(partReference);
 					}
 				});
-			}
-		} else if (client != null) {
-			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
-						.get(E4PartWrapper.E4_WRAPPER_KEY);
-				final IWorkbenchPartReference partReference = getReference(workbenchPart);
-
-				if (partReference != null) {
-					for (final Object listener : partListenerList.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener) listener).partDeactivated(workbenchPart);
-							}
-						});
-					}
-
-					for (final Object listener : partListener2List.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener2) listener).partDeactivated(partReference);
-							}
-						});
-					}
-				}
 			}
 		}
 	}
@@ -5171,7 +5091,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 	}
 
-	private WeakHashMap<MPart, Integer> partEvents = new WeakHashMap<>();
+	private WeakHashMap<MPart, Integer> partEvents = new WeakHashMap<MPart, Integer>();
 	private static final int FIRE_PART_VISIBLE = 0x1;
 	private static final int FIRE_PART_BROUGHTTOTOP = 0x2;
 
@@ -5374,7 +5294,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private IPathEditorInput getPathEditorInput(IEditorInput input) {
 		if (input instanceof IPathEditorInput)
 			return (IPathEditorInput) input;
-		return Adapters.adapt(input, IPathEditorInput.class);
+		return Util.getAdapter(input, IPathEditorInput.class);
 	}
 
 	/**
@@ -5467,6 +5387,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 	};
 
+	/**
+	 * this should work with hide and show editors.
+	 */
+	public void resetHiddenEditors() {
+		E4Util.unsupported("resetHiddenEditors not supported yet"); //$NON-NLS-1$
+	}
+
 	public String getHiddenItems() {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective == null)
@@ -5529,14 +5456,14 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return;
 
 		List<String> tags = persp.getTags();
-		List<String> existingNewWizards = new ArrayList<>();
+		List<String> existingNewWizards = new ArrayList<String>();
 		for (Iterator<String> iterator = tags.iterator(); iterator.hasNext();) {
 			String string = iterator.next();
 			if (string.contains(tagPrefix))
 				existingNewWizards.add(string);
 		}
 
-		List<String> newWizards = new ArrayList<>(wizards.size());
+		List<String> newWizards = new ArrayList<String>(wizards.size());
 		for (Iterator<String> iterator = wizards.iterator(); iterator.hasNext();) {
 			String wizardName = iterator.next();
 			newWizards.add(tagPrefix + wizardName);
@@ -5569,43 +5496,4 @@ public class WorkbenchPage implements IWorkbenchPage {
 			firePartDeactivated(part);
 		}
 	}
-
-	/**
-	 * Add ToolItems for perspectives specified in "PERSPECTIVE_BAR_EXTRAS"
-	 */
-	private void createPerspectiveBarExtras() {
-		String persps = PrefUtil.getAPIPreferenceStore()
-				.getString(IWorkbenchPreferenceConstants.PERSPECTIVE_BAR_EXTRAS);
-		// e3 allowed spaces and commas as separator
-		String[] parts = persps.split("[, ]"); //$NON-NLS-1$
-		Set<String> perspSet = new LinkedHashSet<>();
-		for (String part : parts) {
-			part = part.trim();
-			if (!part.isEmpty())
-				perspSet.add(part);
-		}
-
-		for (String perspId : perspSet) {
-			MPerspective persp = (MPerspective) modelService.find(perspId, window);
-			if (persp != null)
-				continue; // already in stack, i.e. has already been added above
-			IPerspectiveDescriptor desc = getDescriptorFor(perspId);
-			if (desc == null)
-				continue; // this perspective does not exist
-			persp = createPerspective(desc);
-			persp.setLabel(desc.getLabel());
-			getPerspectiveStack().getChildren().add(persp);
-			// "add" fires Event, causes creation of ToolItem on perspective bar
-		}
-	}
-
-	private IPerspectiveDescriptor getDescriptorFor(String id) {
-		IPerspectiveRegistry perspectiveRegistry = getWorkbenchWindow().getWorkbench().getPerspectiveRegistry();
-		if (perspectiveRegistry instanceof PerspectiveRegistry) {
-			return ((PerspectiveRegistry) perspectiveRegistry).findPerspectiveWithId(id, false);
-		}
-
-		return perspectiveRegistry.findPerspectiveWithId(id);
-	}
-
 }

@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -262,12 +261,12 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
 
         final MessageDialog dialog = new MessageDialog(getContainer()
                 .getShell(), IDEWorkbenchMessages.Question,
-                null, messageString, MessageDialog.QUESTION, 0,
+                null, messageString, MessageDialog.QUESTION, new String[] {
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
                         IDialogConstants.NO_TO_ALL_LABEL,
-                        IDialogConstants.CANCEL_LABEL) {
+                        IDialogConstants.CANCEL_LABEL }, 0) {
         	@Override
 			protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
@@ -276,7 +275,12 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
         String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
         //run in syncExec because callback is from an operation,
         //which is probably not running in the UI thread.
-        getControl().getDisplay().syncExec(() -> dialog.open());
+        getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+			public void run() {
+                dialog.open();
+            }
+        });
         return dialog.getReturnCode() < 0 ? CANCEL : response[dialog
                 .getReturnCode()];
     }
@@ -291,9 +295,9 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
     protected boolean queryYesNoQuestion(String message) {
         MessageDialog dialog = new MessageDialog(getContainer().getShell(),
                 IDEWorkbenchMessages.Question,
-                (Image) null, message, MessageDialog.NONE, 0,
-                IDialogConstants.YES_LABEL,
-                IDialogConstants.NO_LABEL) {
+                (Image) null, message, MessageDialog.NONE,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL }, 0) {
         	@Override
 			protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;

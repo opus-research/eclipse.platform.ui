@@ -59,11 +59,9 @@ public class MozillaBrowser extends AbstractWebBrowser {
 		return executable;
 	}
 
-	String getParameters() {
-		return parameters;
-	}
-
-	@Override
+	/*
+	 * @see IBrowser#displayURL(String)
+	 */
 	public void openURL(URL url2) {
 		String url = null;
 		if (url2 != null) {
@@ -165,7 +163,6 @@ public class MozillaBrowser extends AbstractWebBrowser {
 			return false;
 		}
 
-		@Override
 		public void run() {
 			// if browser is opening, wait until it fully opens
 			waitForBrowser();

@@ -24,14 +24,18 @@ public class TestJobRule implements ISchedulingRule {
 		jobOrder = order;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+	 */
 	public boolean contains(ISchedulingRule rule) {
 		if (rule instanceof IResource || rule instanceof TestJobRule)
 			return true;
 		return false;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+	 */
 	public boolean isConflicting(ISchedulingRule rule) {
 		if (!(rule instanceof TestJobRule))
 			return false;

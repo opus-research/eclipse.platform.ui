@@ -45,7 +45,6 @@ public class ObjectContributionsPerformance extends BasicPerformanceTest {
 		this.selection = selection;
 	}
 
-	@Override
 	protected void runTest() {
 		ObjectContributionTest tests = new ObjectContributionTest(
                 "testObjectContributions");

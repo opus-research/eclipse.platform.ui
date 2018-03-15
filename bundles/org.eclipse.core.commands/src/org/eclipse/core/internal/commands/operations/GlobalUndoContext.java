@@ -22,11 +22,17 @@ import org.eclipse.core.commands.operations.IUndoContext;
  */
 public class GlobalUndoContext implements IUndoContext {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.IUndoContext#getLabel()
+	 */
 	@Override
 	public String getLabel() {
 		return "Global Undo Context"; //$NON-NLS-1$
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.operations.IUndoContext#matches(IUndoContext context)
+	 */
 	@Override
 	public boolean matches(IUndoContext context) {
 		return true;

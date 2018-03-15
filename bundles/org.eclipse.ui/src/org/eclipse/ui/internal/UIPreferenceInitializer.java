@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Kiryl Kazakevich, Intel - bug 88359
  *     Tonny Madsen, RCP Company - bug 201055
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485313
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -20,9 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
@@ -41,7 +40,6 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	@Override
 	public void initializeDefaultPreferences() {
 
 
@@ -77,7 +75,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 				IWorkbenchPreferenceConstants.TOP_LEFT);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR,
-				false);
+				true);
 		node.putBoolean(
 				IWorkbenchPreferenceConstants.SHOW_OTHER_IN_PERSPECTIVE_MENU,
 				true);
@@ -178,8 +176,15 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 		rootNode
 				.addNodeChangeListener(new IEclipsePreferences.INodeChangeListener() {
-
-					@Override
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #added(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
 					public void added(NodeChangeEvent event) {
 						if (!event.getChild().name().equals(uiName)) {
 							return;
@@ -190,7 +195,15 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 
 					}
 
-					@Override
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see
+					 * org.eclipse.core.runtime.preferences.IEclipsePreferences
+					 * .INodeChangeListener
+					 * #removed(org.eclipse.core.runtime.preferences
+					 * .IEclipsePreferences.NodeChangeEvent)
+					 */
 					public void removed(NodeChangeEvent event) {
 						// Nothing to do here
 
