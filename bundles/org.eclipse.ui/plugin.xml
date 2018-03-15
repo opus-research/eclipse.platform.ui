@@ -1902,8 +1902,11 @@
       </theme>
       <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
-            id="org.eclipse.ui.workbench.HOVER_BACKGROUND"
+            id="org.eclipse.ui.workbench.INFORMATION_BACKGROUND"
             label="%Color.infoBackground">
+            <description>
+            	%Color.informationBackground
+            </description>
             <colorFactory
                class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
                plugin="org.eclipse.ui">
@@ -1915,8 +1918,11 @@
       </colorDefinition>
       <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
-            id="org.eclipse.ui.workbench.HOVER_FOREGROUND"
+            id="org.eclipse.ui.workbench.INFORMATION_FOREGROUND"
             label="%Color.infoForeground">
+            <description>
+            	%Color.informationForeground
+            </description>
             <colorFactory
                class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
                plugin="org.eclipse.ui">
