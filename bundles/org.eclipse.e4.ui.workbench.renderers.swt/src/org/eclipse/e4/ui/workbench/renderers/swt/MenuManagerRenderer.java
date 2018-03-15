@@ -346,7 +346,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			rendererFilter = null;
 		}
 		context.remove(MenuManagerRenderer.class);
-		if (logger.isDebugEnabled()) {
+		if (isDebugEnabled()) {
 			logger.debug("\nMMR:dispose: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -879,7 +879,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToManager(MMenu model, MenuManager manager) {
 		modelToManager.put(model, manager);
 		managerToModel.put(manager, model);
-		if (logger.isDebugEnabled()) {
+		if (isDebugEnabled()) {
 			logger.debug("\nMMR:linkModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -895,7 +895,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
-		if (logger.isDebugEnabled()) {
+		if (isDebugEnabled()) {
 			logger.debug("\nMMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());
 		}
@@ -912,7 +912,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MMenuElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
-		if (logger.isDebugEnabled()) {
+		if (isDebugEnabled()) {
 			logger.debug(
 					"\nMMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());
@@ -928,7 +928,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
-		if (logger.isDebugEnabled()) {
+		if (isDebugEnabled()) {
 			logger.debug(
 					"\nMMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
 					modelToContribution.size(), contributionToModel.size());
