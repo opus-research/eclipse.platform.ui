@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 218553 [JFace] mis-spelling of their in applyDialogFont(...)
- *     Lucas Bullen (Red Hat Inc.) - Bug 500051 - Add option to import/export preferences from Dialog
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
@@ -130,22 +129,6 @@ public abstract class Dialog extends Window {
 	 * @since 3.2
 	 */
 	public static final String DLG_IMG_HELP = "dialog_help_image"; //$NON-NLS-1$
-
-	/**
-	 * Image registry key for import image (value
-	 * <code>"dialog_import_image"</code>).
-	 *
-	 * @since 4.8
-	 */
-	public static final String DLG_IMG_IMPORT = "dialog_import_image"; //$NON-NLS-1$
-
-	/**
-	 * Image registry key for export image (value
-	 * <code>"dialog_export_image"</code>).
-	 *
-	 * @since 4.8
-	 */
-	public static final String DLG_IMG_EXPORT = "dialog_export_image"; //$NON-NLS-1$
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431093, 440080, 440270, 475873
- *     Lucas Bullen <lbullen@redhat.com> - Bug 500051
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
@@ -426,10 +425,6 @@ public class JFaceResources {
 				+ "message_error.png", Dialog.class, "images/message_error.png");//$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(bundle, Dialog.DLG_IMG_HELP,
 				ICONS_PATH + "help.png", Dialog.class, "images/help.png");//$NON-NLS-1$ //$NON-NLS-2$
-		declareImage(bundle, Dialog.DLG_IMG_IMPORT, ICONS_PATH + "import_wiz.png", Dialog.class, //$NON-NLS-1$
-				"images/import_wiz.png");//$NON-NLS-1$
-		declareImage(bundle, Dialog.DLG_IMG_EXPORT, ICONS_PATH + "export_wiz.png", Dialog.class, //$NON-NLS-1$
-				"images/export_wiz.png");//$NON-NLS-1$
 		declareImage(
 				bundle,
 				TitleAreaDialog.DLG_IMG_TITLE_BANNER,
