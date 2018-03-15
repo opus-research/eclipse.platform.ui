@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,8 +15,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.expressions.EvaluationResult;
@@ -34,6 +32,8 @@ import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.services.IEvaluationService;
+
+import junit.framework.TestCase;
 
 /**
  * Tests various utility methods on WorkbenchActivityHelper as well as other misc. activities functionality.
@@ -341,7 +341,7 @@ public class UtilTest extends TestCase {
 		public static final String VARIABLE = "arbitraryVariable";
 		public static final String VALUE = "arbitraryValue";
 
-		private Map sourceState = new HashMap(1);
+		private Map<String, String> sourceState = new HashMap<>(1);
 
 		public TestSourceProvider() {
 			super();
@@ -383,7 +383,7 @@ public class UtilTest extends TestCase {
 		public void clearVariable() {
 			sourceState.put(VARIABLE, "");
 		}
-	};
+	}
 
 	public void testExpressionEnablement() throws Exception {
 		IPluginContribution filterExp = new IPluginContribution() {
@@ -530,7 +530,7 @@ public class UtilTest extends TestCase {
 	 * Enable all test activities.
 	 */
 	private void enableAll() {
-		HashSet set = new HashSet();
+		HashSet<String> set = new HashSet<>();
 		set.add(ID1);
 		set.add(ID2);
 		set.add(ID4);
@@ -596,7 +596,7 @@ public class UtilTest extends TestCase {
     		IWorkbenchActivitySupport support = PlatformUI.getWorkbench()
     			.getActivitySupport();
     		support.setEnabledActivityIds(new HashSet());
-    		Set set = new HashSet(support.getActivityManager().getEnabledActivityIds());
+			Set<String> set = new HashSet<>(support.getActivityManager().getEnabledActivityIds());
     		Set previousSet = new HashSet(support.getActivityManager().getEnabledActivityIds());
     		set.add(EXPRESSION_ACTIVITY_ID_2);
     		support.setEnabledActivityIds(set);

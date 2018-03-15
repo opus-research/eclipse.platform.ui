@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-;
 
 /**
  * @since 3.2
@@ -42,7 +41,7 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof List){
-				List children = new ArrayList();
+				List<Team> children = new ArrayList<>();
 				Iterator iter = ((List)parentElement).iterator();
 				while(iter.hasNext()){
 					Object next = iter.next();
@@ -179,7 +178,7 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 
 	@Override
 	protected void setInput() {
-		List input = new ArrayList(3);
+		List<Team> input = new ArrayList<>(3);
 		input.add(team1);
 		input.add(team2);
 		input.add(team3);
