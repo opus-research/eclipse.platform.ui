@@ -1927,8 +1927,7 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 							WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
 							new Object[] {
 									message,
-									Integer.valueOf(
-											(int) ((worked * 100) / totalWork)) });
+									Integer.valueOf((int) ((worked * 100) / totalWork)) });
 
 		}
 
