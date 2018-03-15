@@ -14,6 +14,7 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -38,7 +39,6 @@ import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Widget;
 
 /**
  * <code>MenuManagerShowProcessor</code> provides hooks for renderer processing
@@ -48,9 +48,18 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class MenuManagerShowProcessor implements IMenuListener2 {
 
-	private static void trace(String msg, Widget menu, MMenu menuModel) {
-		WorkbenchSWTActivator.trace(Policy.MENUS, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
-				+ menuModel, null);
+	private static final boolean DEBUG = WorkbenchSWTActivator.getDefault().getDebugOptions()
+			.getBooleanOption(WorkbenchSWTActivator.PI_RENDERERS + Policy.MENUS, false);
+
+	static boolean isDebugEnabled() {
+		return DEBUG;
+	}
+
+	private static void trace(String msg, MenuManager menuManager, MMenu menuModel) {
+		if (isDebugEnabled()) {
+			WorkbenchSWTActivator.trace(Policy.MENUS, msg + ": " + menuManager + ": " + menuManager.getMenu() + ": " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					+ menuModel, null);
+		}
 	}
 
 	@Inject
@@ -87,7 +96,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		AbstractPartRenderer obj = rendererFactory.getRenderer(menuModel,
 				menu.getParent());
 		if (!(obj instanceof MenuManagerRenderer)) {
-			trace("Not the correct renderer: " + obj, menu, menuModel); //$NON-NLS-1$
+			trace("Not the correct renderer: " + obj, menuManager, menuModel); //$NON-NLS-1$
 			return;
 		}
 		MenuManagerRenderer renderer = (MenuManagerRenderer) obj;
@@ -199,21 +208,20 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * @param menuManager
 	 */
 	private void cleanUp(MMenu menuModel, MenuManager menuManager) {
-		trace("Cleaning up the dynamic menu contributions" + menuManager, menuManager.getMenu(), menuModel); //$NON-NLS-1$
+		trace("\nCleaning up the dynamic menu contributions", menuManager, menuModel); //$NON-NLS-1$
 		renderer.removeDynamicMenuContributions(menuManager, menuModel);
 
 		if (menuManager.getRemoveAllWhenShown()) {
 			// remove the items from the model related to contributions defined
 			// with location URIs
-			trace("Cleaning up all of the menu model items" + menuManager, menuManager.getMenu(), menuModel); //$NON-NLS-1$
+			trace("\nCleaning up all of the menu model items", menuManager, menuModel); //$NON-NLS-1$
 			renderer.cleanUp(menuModel);
 
 			// cleanup any leftovers - opaque items etc
-			MMenuElement[] menuContributionsToRemove = menuModel.getChildren()
-					.toArray(new MMenuElement[menuModel.getChildren().size()]);
-			for (MMenuElement mMenuElement : menuContributionsToRemove) {
+			for (Iterator<MMenuElement> it = menuModel.getChildren().iterator(); it.hasNext();) {
+				MMenuElement mMenuElement = it.next();
 				// remove item from the menu model
-				menuModel.getChildren().remove(mMenuElement);
+				it.remove();
 				// cleanup the renderer
 				IContributionItem ici = renderer.getContribution(mMenuElement);
 				if (ici == null && mMenuElement instanceof MMenu) {
