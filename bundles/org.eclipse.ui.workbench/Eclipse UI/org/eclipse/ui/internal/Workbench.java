@@ -460,7 +460,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/**
 	 * Listener list for registered IWorkbenchListeners .
 	 */
-	private ListenerList workbenchListeners = new ListenerList(ListenerList.IDENTITY);
+	private ListenerList<IWorkbenchListener> workbenchListeners = new ListenerList<>(ListenerList.IDENTITY);
 
 	private ServiceRegistration workbenchService;
 
@@ -978,9 +978,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	boolean firePreShutdown(final boolean forced) {
-		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (final IWorkbenchListener l : workbenchListeners) {
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -1001,9 +999,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	void firePostShutdown() {
-		Object list[] = workbenchListeners.getListeners();
-		for (Object element : list) {
-			final IWorkbenchListener l = (IWorkbenchListener) element;
+		for (final IWorkbenchListener l : workbenchListeners) {
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -3525,9 +3521,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 		return WorkbenchPlugin.getDefault().getExportWizardRegistry();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public final Object getAdapter(final Class key) {
-		return serviceLocator.getService(key);
+	public final <T> T getAdapter(final Class<T> key) {
+		return (T) serviceLocator.getService(key);
 	}
 
 
