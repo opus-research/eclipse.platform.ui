@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,7 +66,6 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.services.EvaluationService;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.services.ISourceProviderService;
-import org.osgi.service.log.LogService;
 
 /**
  * @since 3.5
@@ -157,7 +156,7 @@ public class LegacyHandlerService implements IHandlerService {
 	private static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
 			String id, final String cmdId, IHandler handler, Expression activeWhen, String helpContextId,
 			Collection<HandlerActivation> handlerActivations) {
-		ECommandService cs = context.get(ECommandService.class);
+		ECommandService cs = (ECommandService) context.get(ECommandService.class.getName());
 		Command command = cs.getCommand(cmdId);
 		boolean handled = command.isHandled();
 		boolean enabled = command.isEnabled();
@@ -229,7 +228,8 @@ public class LegacyHandlerService implements IHandlerService {
 	public LegacyHandlerService(IEclipseContext context) {
 		eclipseContext = context;
 		evalContext = new ExpressionContext(eclipseContext);
-		IWorkbenchWindow window = eclipseContext.get(IWorkbenchWindow.class);
+		IWorkbenchWindow window = (IWorkbenchWindow) eclipseContext.get(IWorkbenchWindow.class
+				.getName());
 		if (window != null) {
 			defaultExpression = new WorkbenchWindowExpression(window);
 		}
@@ -382,17 +382,6 @@ public class LegacyHandlerService implements IHandlerService {
 			throws ExecutionException, NotDefinedException, NotEnabledException,
 			NotHandledException {
 		EHandlerService hs = eclipseContext.get(EHandlerService.class);
-
-		if (hs == null) {
-			// If the log shows an IEclipseContext named "Anonymous" this is an
-			// indication that the context is disposed before we try to execute
-			// the command
-			Activator.log(LogService.LOG_ERROR, "IEclipseContext is " + eclipseContext); //$NON-NLS-1$
-			Activator.log(LogService.LOG_ERROR, "EHandlerService is null", //$NON-NLS-1$
-					new IllegalStateException("EHandlerService must not be null")); //$NON-NLS-1$
-			throw new ExecutionException("No handler service available"); //$NON-NLS-1$
-		}
-
 		IEclipseContext staticContext = EclipseContextFactory.create();
 		if (event != null) {
 			staticContext.set(Event.class, event);
@@ -598,7 +587,8 @@ public class LegacyHandlerService implements IHandlerService {
 	}
 
 	private void readHandlers() {
-		IExtensionRegistry registry = eclipseContext.get(IExtensionRegistry.class);
+		IExtensionRegistry registry = (IExtensionRegistry) eclipseContext
+				.get(IExtensionRegistry.class.getName());
 		IExtensionPoint extPoint = registry
 				.getExtensionPoint(IWorkbenchRegistryConstants.EXTENSION_HANDLERS);
 		IConfigurationElement[] elements = extPoint.getConfigurationElements();
@@ -672,7 +662,8 @@ public class LegacyHandlerService implements IHandlerService {
 	}
 
 	private void readDefaultHandlers() {
-		IExtensionRegistry registry = eclipseContext.get(IExtensionRegistry.class);
+		IExtensionRegistry registry = (IExtensionRegistry) eclipseContext
+				.get(IExtensionRegistry.class.getName());
 		IExtensionPoint extPoint = registry
 				.getExtensionPoint(IWorkbenchRegistryConstants.EXTENSION_COMMANDS);
 		IConfigurationElement[] elements = extPoint.getConfigurationElements();
@@ -702,7 +693,8 @@ public class LegacyHandlerService implements IHandlerService {
 
 	private static void setHelpContextId(IHandler handler, String helpContextId,
 			IEclipseContext eclipseContext) {
-		ICommandHelpService commandHelpService = eclipseContext.get(ICommandHelpService.class);
+		ICommandHelpService commandHelpService = (ICommandHelpService) eclipseContext
+				.get(ICommandHelpService.class.getName());
 		commandHelpService.setHelpContextId(handler, helpContextId);
 	}
 }
