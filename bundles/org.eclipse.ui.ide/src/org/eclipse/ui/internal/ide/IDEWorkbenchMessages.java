@@ -965,11 +965,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceDialog_recentWorkspaces;
 	public static String ChooseWorkspaceDialog_useDefaultMessage;
 
-	public static String ImportPreferencesDialog_dialogTitle;
-	public static String ImportPreferencesDialog_message;
-	public static String ImportPreferencesDialog_importButtonLabel;
-	public static String ImportPreferencesDialog_alwaysUseSelectedButtonLabel;
-
 	public static String ChooseWorkspaceWithSettingsDialog_SettingsGroupName;
 	public static String ChooseWorkspaceWithSettingsDialog_ProblemsTransferTitle;
 	public static String ChooseWorkspaceWithSettingsDialog_TransferFailedMessage;
