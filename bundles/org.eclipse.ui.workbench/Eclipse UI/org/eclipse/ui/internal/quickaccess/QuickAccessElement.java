@@ -203,15 +203,8 @@ public abstract class QuickAccessElement {
 		Matcher m = p.matcher(sortLabel);
 		// if matches, return an entry
 		if (m.matches()) {
-			// and highlight match on the label only
-			String label = getLabel();
-			if (!sortLabel.equals(label)) {
-				m = p.matcher(getLabel());
-				if (!m.matches()) {
-					return new QuickAccessEntry(this, providerForMatching, EMPTY_INDICES, EMPTY_INDICES,
-							QuickAccessEntry.MATCH_GOOD);
-				}
-			}
+			// and highlight match on the label
+			m = p.matcher(getLabel());
 			int groupCount = m.groupCount();
 			int[][] indices = new int[groupCount][];
 			for (int i = 0; i < groupCount; i++) {
