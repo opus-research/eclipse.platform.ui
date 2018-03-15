@@ -12,6 +12,7 @@
  *     Didier Villevalois - Fix for Bug 178534
  *     Robin Stocker - Fix for Bug 193034 (tool tip also on text)
  *     Alena Laskavaia - Bug 481604, Bug 482024
+ *     Ralf Petter <ralf.petter@gmail.com> - Bug 183675
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -35,6 +36,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
@@ -316,8 +318,10 @@ public class ExpandableComposite extends Canvas {
 
 			boolean leftAlignment = textClient != null && (expansionStyle & LEFT_TEXT_CLIENT_ALIGNMENT) != 0;
 			if (toggle != null) {
-				// if label control is absent we vertically center the toggle,
-				// because the text client is usually a lot thicker
+				// if label control is absent we vcenter the toggle, because
+				// text client is usually a lot thicker
+				// before it was using leftAlignment flag for that which I think
+				// is not related to this at all
 				int ty = size.x == 0 ? (height - toggleSize.y) / 2 : 0;
 				ty = Math.max(ty, 0);
 				ty += marginHeight + tvmargin;
@@ -880,7 +884,7 @@ public class ExpandableComposite extends Canvas {
 				getDescriptionControl().setVisible(expanded);
 			if (client != null)
 				client.setVisible(expanded);
-			layout();
+			reflow();
 		}
 	}
 
@@ -1114,5 +1118,33 @@ public class ExpandableComposite extends Canvas {
 		gc.setForeground(textLabel.getForeground());
 		if (toggle.isFocusControl())
 			gc.drawFocus(0, 0, size.x, size.y);
+	}
+
+	void reflow() {
+		Composite c = this;
+		while (c != null) {
+			c.setRedraw(false);
+			c = c.getParent();
+			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
+				break;
+			}
+		}
+		c = this;
+		while (c != null) {
+			c.requestLayout();
+			c = c.getParent();
+			if (c instanceof SharedScrolledComposite) {
+				((SharedScrolledComposite) c).reflow(true);
+				break;
+			}
+		}
+		c = this;
+		while (c != null) {
+			c.setRedraw(true);
+			c = c.getParent();
+			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
+				break;
+			}
+		}
 	}
 }

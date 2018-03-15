@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 QNX Software Systems and others.
+ * Copyright (c) 2015, 2017 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,12 @@
  *
  * Contributors:
  *     Alena Laskavaia - initial API and implementation
+ *     Ralf M Petter<ralf.petter@gmail.com> - Bug 510241
  *******************************************************************************/
 package org.eclipse.ui.tests.forms.widgets;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -27,14 +31,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for expandable composite
  */
-public class ExpandableCompositeTest extends TestCase {
+public class ExpandableCompositeTest {
 	private int defaultFlags = ExpandableComposite.TWISTIE;
 	private static Display display;
 	private Shell shell;
@@ -94,7 +98,7 @@ public class ExpandableCompositeTest extends TestCase {
 		}
 	}
 
-	@Override
+	@Before
 	public void setUp() throws Exception {
 		font = new Font(display, "Arial", 12, SWT.NORMAL);
 		shell = new Shell(display);
@@ -104,7 +108,7 @@ public class ExpandableCompositeTest extends TestCase {
 		shell.open();
 	}
 
-	@Override
+	@After
 	public void tearDown() throws Exception {
 		if (humanWatching)
 			dispatch(1000);
@@ -172,7 +176,7 @@ public class ExpandableCompositeTest extends TestCase {
 		return sep;
 	}
 
-	public void createExtendableComposite(String text, int flags) {
+	private void createExtendableComposite(String text, int flags) {
 		ec = new ExpandableCompositeForTest(shell, SWT.NONE, flags);
 		ec.setFont(font);
 		ec.setText(text);
@@ -376,7 +380,7 @@ public class ExpandableCompositeTest extends TestCase {
 
 	}
 
-	public void checkSeparator() {
+	private void checkSeparator() {
 		update();
 		Rectangle bounds = ec.getBounds();
 		Rectangle sepBounds = ec.getSeparatorControl().getBounds();
