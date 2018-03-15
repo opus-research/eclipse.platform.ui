@@ -9,8 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *     Christian Georgi (SAP)            - Bug 432480
- *     Patrik Suzzi <psuzzi@gmail.com>   - Bug 490700
- *     Vasili Gulevich                   - Bug 501404
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -25,7 +24,6 @@ import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -41,7 +39,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
@@ -308,37 +305,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			workspaceUndoMonitor.shutdown();
 			workspaceUndoMonitor = null;
 		}
-
-		Display display = getWorkbenchConfigurer().getWorkbench().getDisplay();
-		IWorkspace workspace = IDEWorkbenchPlugin.getPluginWorkspace();
-
-		final Runnable disconnectFromWorkspace = new Runnable() {
-			@Override
-			public void run() {
-				if (isWorkspaceLocked(workspace)) {
-					display.asyncExec(this);
-					return;
-				}
-				disconnectFromWorkspace();
-			}
-		};
-
-		// postShutdown may be called while workspace is locked, for example -
-		// during file save operation
-		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=501404
-		// disconnect is postponed until workspace is unlocked to prevent
-		// deadlock between background thread launched by
-		// disconnectFromWorkspace() and current thread
-		// WARNING: this condition makes code that
-		// relies on synchronous disconnect very hard to discover and test
-		if (!display.isDisposed() && workspace != null && isWorkspaceLocked(workspace)) {
-			display.asyncExec(disconnectFromWorkspace);
+		if (IDEWorkbenchPlugin.getPluginWorkspace() != null) {
+			disconnectFromWorkspace();
 		}
-	}
-
-	private boolean isWorkspaceLocked(IWorkspace workspace) {
-		ISchedulingRule currentRule = Job.getJobManager().currentRule();
-		return currentRule != null && currentRule.isConflicting(workspace.getRoot());
 	}
 
 	@Override
@@ -462,9 +431,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Disconnect from the core workspace.
-	 *
-	 * Locks workspace in a background thread, should not be called while
-	 * holding any workspace locks.
 	 */
 	private void disconnectFromWorkspace() {
 		// save the workspace
