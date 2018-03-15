@@ -37,6 +37,7 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MCategory;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MCommandParameter;
+import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.osgi.service.event.Event;
@@ -228,7 +229,8 @@ public class CommandProcessingAddon {
 		if (cmdModel.getCategory() != null) {
 			cat = commandService.getCategory(cmdModel.getCategory().getElementId());
 		}
-		commandService.defineCommand(id, name, desc, cat, parms);
+		commandService.defineCommand(id, name, desc, cat, parms,
+				cmdModel.getPersistedState().get(EHelpService.HELP_CONTEXT_ID));
 	}
 
 	private void createCategories() {
