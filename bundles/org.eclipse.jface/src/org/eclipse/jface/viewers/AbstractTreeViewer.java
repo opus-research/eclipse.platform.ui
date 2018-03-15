@@ -2711,8 +2711,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 				updatePlus(item, newElement);
 				if (updateLabels) {
 					updateItem(item, newElement);
-				} else {
-					associate(newElement, item);
 				}
 			}
 		}
