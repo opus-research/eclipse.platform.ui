@@ -604,8 +604,8 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 *
 	 * @return WorkbenchSiteProgressService
 	 */
-	IWorkbenchSiteProgressService getSiteProgressService() {
-		return e4Context.get(IWorkbenchSiteProgressService.class);
+	WorkbenchSiteProgressService getSiteProgressService() {
+		return (WorkbenchSiteProgressService) e4Context.get(IWorkbenchSiteProgressService.class);
 	}
 
 	@Override
