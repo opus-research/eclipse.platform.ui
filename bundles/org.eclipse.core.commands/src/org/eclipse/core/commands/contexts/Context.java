@@ -233,7 +233,8 @@ public final class Context extends NamedHandleObject implements Comparable {
     @Override
 	public final String toString() {
         if (string == null) {
-			final StringBuilder stringBuffer = new StringBuilder("Context("); //$NON-NLS-1$
+            final StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append("Context("); //$NON-NLS-1$
             stringBuffer.append(id);
             stringBuffer.append(',');
             stringBuffer.append(name);

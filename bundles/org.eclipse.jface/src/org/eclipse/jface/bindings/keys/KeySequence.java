@@ -273,6 +273,7 @@ public final class KeySequence extends TriggerSequence implements Comparable {
 	 *
 	 * @return The formal string representation for this key sequence.
 	 *         Guaranteed not to be <code>null</code>.
+	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public final String toString() {
