@@ -12,6 +12,7 @@
  *     Didier Villevalois - Fix for Bug 178534
  *     Robin Stocker - Fix for Bug 193034 (tool tip also on text)
  *     Alena Laskavaia - Bug 481604
+ *     Ralf Petter <ralf.petter@gmail.com> - Bug 183675
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -37,6 +38,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
@@ -48,7 +50,7 @@ import org.eclipse.ui.internal.forms.widgets.FormsResources;
  * This composite is capable of expanding or collapsing a single client that is
  * its direct child. The composite renders an expansion toggle affordance
  * (according to the chosen style), and a title that also acts as a hyperlink
- * (can be selected and is traversable). The client is layed out below the title
+ * (can be selected and is traversable). The client is laid out below the title
  * when expanded, or hidden when collapsed.
  * <p>
  * The widget can be instantiated as-is, or subclassed to modify some aspects of
@@ -61,9 +63,9 @@ import org.eclipse.ui.internal.forms.widgets.FormsResources;
  *
  * <p>
  * While expandable composite recognize that different styles can be used to
- * render the title bar, and even defines the constants for these styles (<code>TITLE_BAR</code>
- * and <code>SHORT_TITLE_BAR</code> the actual painting is done in the
- * subclasses.
+ * render the title bar, and even defines the constants for these styles
+ * (<code>TITLE_BAR</code> and <code>SHORT_TITLE_BAR</code> the actual painting
+ * is done in the subclasses.
  *
  * @see Section
  * @since 3.0
@@ -97,7 +99,7 @@ public class ExpandableComposite extends Canvas {
 	/**
 	 * If this style is used, computed size of the composite will take the
 	 * client width into consideration only in the expanded state. Otherwise,
-	 * client width will always be taken into acount.
+	 * client width will always be taken into account.
 	 */
 	public static final int COMPACT = 1 << 5;
 
@@ -116,7 +118,7 @@ public class ExpandableComposite extends Canvas {
 
 	/**
 	 * If this style is used, a short version of the title bar decoration will
-	 * be painted behind the text. This style is useful when a more descrete
+	 * be painted behind the text. This style is useful when a more discrete
 	 * option is needed for the title bar.
 	 *
 	 * @since 3.1
@@ -874,7 +876,7 @@ public class ExpandableComposite extends Canvas {
 				getDescriptionControl().setVisible(expanded);
 			if (client != null)
 				client.setVisible(expanded);
-			layout();
+			reflow();
 		}
 	}
 
@@ -892,7 +894,7 @@ public class ExpandableComposite extends Canvas {
 	 * Removes the expansion listener.
 	 *
 	 * @param listener
-	 *            the listner to remove
+	 *            the listener to remove
 	 */
 	public void removeExpansionListener(IExpansionListener listener) {
 		listeners.remove(listener);
@@ -1108,5 +1110,33 @@ public class ExpandableComposite extends Canvas {
 		gc.setForeground(textLabel.getForeground());
 		if (toggle.isFocusControl())
 			gc.drawFocus(0, 0, size.x, size.y);
+	}
+
+	void reflow() {
+		Composite c = this;
+		while (c != null) {
+			c.setRedraw(false);
+			c = c.getParent();
+			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
+				break;
+			}
+		}
+		c = this;
+		while (c != null) {
+			c.requestLayout();
+			c = c.getParent();
+			if (c instanceof SharedScrolledComposite) {
+				((SharedScrolledComposite) c).reflow(true);
+				break;
+			}
+		}
+		c = this;
+		while (c != null) {
+			c.setRedraw(true);
+			c = c.getParent();
+			if (c instanceof SharedScrolledComposite || c instanceof Shell) {
+				break;
+			}
+		}
 	}
 }

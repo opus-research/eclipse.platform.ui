@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Point;
@@ -295,7 +294,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected void setSelection(List items) {
+	protected void setSelection(List<Item> items) {
 
 		Item[] current = getSelection(getTree());
 
@@ -798,8 +797,8 @@ public class TreeViewer extends AbstractTreeViewer {
 	public void remove(final Object parentOrTreePath, final int index) {
 		if (checkBusy())
 			return;
-		final List oldSelection = new LinkedList(Arrays
-				.asList(((TreeSelection) getSelection()).getPaths()));
+		final List<TreePath> oldSelection = new LinkedList<>(
+				Arrays.asList(((TreeSelection) getSelection()).getPaths()));
 		preservingSelection(() -> {
 			TreePath removedPath = null;
 			if (internalIsInputOrEmptyPath(parentOrTreePath)) {
@@ -840,9 +839,8 @@ public class TreeViewer extends AbstractTreeViewer {
 			}
 			if (removedPath != null) {
 				boolean removed = false;
-				for (Iterator it = oldSelection.iterator(); it
-						.hasNext();) {
-					TreePath path = (TreePath) it.next();
+				for (Iterator<TreePath> it = oldSelection.iterator(); it.hasNext();) {
+					TreePath path = it.next();
 					if (path.startsWith(removedPath, getComparer())) {
 						it.remove();
 						removed = true;
@@ -850,7 +848,7 @@ public class TreeViewer extends AbstractTreeViewer {
 				}
 				if (removed) {
 					setSelection(new TreeSelection(
-							(TreePath[]) oldSelection
+							oldSelection
 									.toArray(new TreePath[oldSelection
 											.size()]), getComparer()),
 							false);
@@ -867,21 +865,20 @@ public class TreeViewer extends AbstractTreeViewer {
 			applyEditorValue();
 		}
 
-		BusyIndicator.showWhile(event.display, () -> {
-			if (contentProviderIsLazy) {
-				if (event.item.getData() != null) {
-					Item[] children = getChildren(event.item);
-					if (children.length == 1 && children[0].getData() == null) {
-						// we have a dummy child node, ask for an updated child
-						// count
-						virtualLazyUpdateChildCount(event.item, children.length);
-					}
-					fireTreeExpanded(new TreeExpansionEvent(this, event.item.getData()));
+		if (contentProviderIsLazy) {
+			if (event.item.getData() != null) {
+				Item[] children = getChildren(event.item);
+				if (children.length == 1 && children[0].getData()==null) {
+					// we have a dummy child node, ask for an updated child
+					// count
+					virtualLazyUpdateChildCount(event.item, children.length);
 				}
-				return;
+				fireTreeExpanded(new TreeExpansionEvent(this, event.item
+						.getData()));
 			}
-			super.handleTreeExpand(event);
-		});
+			return;
+		}
+		super.handleTreeExpand(event);
 	}
 
 	@Override
