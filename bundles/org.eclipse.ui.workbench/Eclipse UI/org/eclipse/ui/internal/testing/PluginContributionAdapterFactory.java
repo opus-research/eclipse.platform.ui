@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,9 +36,8 @@ import org.osgi.framework.FrameworkUtil;
  */
 public class PluginContributionAdapterFactory implements IAdapterFactory {
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType != ContributionInfo.class) {
 			return null;
 		}
@@ -75,7 +74,7 @@ public class PluginContributionAdapterFactory implements IAdapterFactory {
 				elementType = ContributionInfoMessages.ContributionInfo_Unknown;
 			}
 
-			return (T) new ContributionInfo(contribution.getPluginId(), elementType, null);
+			return new ContributionInfo(contribution.getPluginId(), elementType, null);
 		}
 		if (adaptableObject instanceof JobInfo) {
 			JobInfo jobInfo = (JobInfo) adaptableObject;
@@ -83,7 +82,7 @@ public class PluginContributionAdapterFactory implements IAdapterFactory {
 			if (job != null) {
 				Bundle bundle = FrameworkUtil.getBundle(job.getClass());
 				if (bundle != null) {
-					return (T) new ContributionInfo(bundle.getSymbolicName(),
+					return new ContributionInfo(bundle.getSymbolicName(),
 							ContributionInfoMessages.ContributionInfo_Job, null);
 				}
 			}
@@ -92,7 +91,7 @@ public class PluginContributionAdapterFactory implements IAdapterFactory {
 	}
 
 	@Override
-	public Class<?>[] getAdapterList() {
+	public Class[] getAdapterList() {
 		return new Class[] { ContributionInfo.class };
 	}
 
