@@ -182,6 +182,17 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	}
 
 	@Override
+	public int hashCode() {
+		int code = getClass().hashCode();
+		if (paths != null) {
+			for (TreePath path : paths) {
+				code = code * 17 + path.hashCode(getElementComparer());
+			}
+		}
+		return code;
+	}
+
+	@Override
 	public TreePath[] getPaths() {
 		return paths==null ? EMPTY_TREE_PATHS : (TreePath[]) paths.clone();
 	}
