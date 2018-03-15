@@ -3605,7 +3605,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 			IWorkbenchPart part = reference.getPart(false);
 			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable != null) {
+			if (saveable != null && !result.contains(saveable)) {
 				if (saveable.isDirty()) {
 					result.add(saveable);
 				}
@@ -3626,7 +3626,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 			IWorkbenchPart part = reference.getPart(false);
 			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable != null) {
+			if (saveable != null && !result.contains(saveable)) {
 				if (saveable.isDirty()) {
 					result.add(part);
 				}
