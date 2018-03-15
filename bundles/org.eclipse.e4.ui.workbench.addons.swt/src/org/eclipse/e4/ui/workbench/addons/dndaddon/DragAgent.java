@@ -105,20 +105,19 @@ abstract class DragAgent {
 	}
 
 	public void track(DnDInfo info) {
-		DropAgent newDropAgent = dndManager.getDropAgent(dragElement, info);
-		if (newDropAgent == dropAgent) {
-			System.out.println("DragAgent: tracking " + newDropAgent);
-			if (dropAgent != null) {
-				dropAgent.track(dragElement, info);
-				// dropAgent = dropAgent.track(dragElement, info) ? dropAgent :
-				// null;
-			}
-		} else {
-			if (dropAgent != null) {
-				dropAgent.dragLeave(dragElement, info);
-			}
-			System.out.println("DragAgent: New Dropagent = " + newDropAgent);
-			dropAgent = newDropAgent;
+		DropAgent curAgent = dropAgent;
+
+		// Re-use the same dropAgent until it returns 'false' from track
+		if (dropAgent != null)
+			dropAgent = dropAgent.track(dragElement, info) ? dropAgent : null;
+
+		// If we don't have a drop agent currently try to get one
+		if (dropAgent == null) {
+			if (curAgent != null)
+				curAgent.dragLeave(dragElement, info);
+
+			dropAgent = dndManager.getDropAgent(dragElement, info);
+
 			if (dropAgent != null)
 				dropAgent.dragEnter(dragElement, info);
 			else {
@@ -154,14 +153,11 @@ abstract class DragAgent {
 	 *            determines if a drop operation should be performed if possible
 	 */
 	public void dragFinished(boolean performDrop, DnDInfo info) {
-		System.out.println("dragFinished");
 		boolean isNoDrop = dndManager.getDragShell().getCursor() == Display.getCurrent()
 				.getSystemCursor(SWT.CURSOR_NO);
 		if (performDrop && dropAgent != null && !isNoDrop) {
-			System.out.println("calling dropAgent.drop(...)");
 			dropAgent.drop(dragElement, info);
 		} else {
-			System.out.println("cancelDrag()");
 			cancelDrag();
 		}
 
