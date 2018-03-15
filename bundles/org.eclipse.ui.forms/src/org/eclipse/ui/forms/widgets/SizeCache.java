@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.internal.forms.widgets.FormUtil;
 
 /**
  * Caches the preferred size of an SWT control
@@ -182,7 +183,7 @@ public class SizeCache {
 			// This may not be what control returns but this means control won't
 			// fit in these dimensions and exactly how much it does not fit it
 			// probably not a concern of layout
-			return new Point(widthHint, heightHint);
+			return new Point(widthHint + widthAdjustment, heightHint + heightAdjustment);
         }
 
         // No hints given -- find the preferred size
@@ -196,11 +197,11 @@ public class SizeCache {
             Point result = Geometry.copy(getPreferredSize());
 
             if (widthHint != SWT.DEFAULT) {
-				result.x = widthHint;
+				result.x = widthHint + widthAdjustment;
             }
 
             if (heightHint != SWT.DEFAULT) {
-				result.y = heightHint;
+				result.y = heightHint + heightAdjustment;
             }
 
             return result;
@@ -211,7 +212,7 @@ public class SizeCache {
             // If we know the control's preferred size
             if (preferredSize != null) {
                 // If the given width is the preferred width, then return the preferred size
-				if (widthHint == preferredSize.x) {
+				if (widthHint + widthAdjustment == preferredSize.x) {
                     return Geometry.copy(preferredSize);
                 }
             }
@@ -229,12 +230,12 @@ public class SizeCache {
             // we can compute the result based on the preferred height
             if (preferredWidthOrLargerIsMinimumHeight) {
                 // Computed the preferred size (if we don't already know it)
-				Point preferred = getPreferredSize();
+                getPreferredSize();
 
                 // If the width hint is larger than the preferred width, then
                 // we can compute the result from the preferred width
-				if (widthHint >= preferred.x) {
-					return new Point(widthHint, preferred.y);
+				if (widthHint + widthAdjustment >= preferredSize.x) {
+					return new Point(widthHint + widthAdjustment, preferredSize.y);
                 }
             }
 
@@ -250,7 +251,7 @@ public class SizeCache {
             // If we know the control's preferred size
             if (preferredSize != null) {
                 // If the given height is the preferred height, then return the preferred size
-				if (heightHint == preferredSize.y) {
+				if (heightHint + heightAdjustment == preferredSize.y) {
                     return Geometry.copy(preferredSize);
                 }
             }
@@ -284,28 +285,15 @@ public class SizeCache {
 	 * @return the control's size
 	 */
 	public Point computeAdjustedSize(int widthHint, int heightHint) {
-		return computeSize(widthHint, heightHint);
-	}
-
-	private Point controlComputeSize(int widthHint, int heightHint) {
         int adjustedWidthHint = widthHint == SWT.DEFAULT ? SWT.DEFAULT : Math
                 .max(0, widthHint - widthAdjustment);
         int adjustedHeightHint = heightHint == SWT.DEFAULT ? SWT.DEFAULT : Math
                 .max(0, heightHint - heightAdjustment);
 
-		Point result = control.computeSize(adjustedWidthHint, adjustedHeightHint);
-		flushChildren = false;
+		Point result = computeSize(adjustedWidthHint, adjustedHeightHint);
 
         // If the amounts we subtracted off the widthHint and heightHint didn't do the trick, then
         // manually adjust the result to ensure that a non-default hint will return that result verbatim.
-
-		if (widthHint != SWT.DEFAULT) {
-			result.x = widthHint;
-		}
-
-		if (heightHint != SWT.DEFAULT) {
-			result.y = heightHint;
-		}
 
         return result;
     }
@@ -373,6 +361,13 @@ public class SizeCache {
         }
     }
 
+	private Point controlComputeSize(int widthHint, int heightHint) {
+		Point result = control.computeSize(widthHint, heightHint, flushChildren);
+		flushChildren = false;
+
+		return result;
+	}
+
     /**
 	 * Returns true only if the control will return a constant height for any
 	 * width hint larger than the preferred width. Returns false if there is any
@@ -405,14 +400,8 @@ public class SizeCache {
 			}
 		}
 
-		// TODO: Check for forms-specific control types that know how to compute
-		// their minimum width. Possibly allow
-		// the controls to implement ILayoutExtension directly.
-
-		// TODO: Fix the following branch.
-
 		if (minimumWidth == -1) {
-			Point minWidth = computeSize(5, SWT.DEFAULT);
+			Point minWidth = controlComputeSize(FormUtil.getWidthHint(5, control), SWT.DEFAULT);
 			minimumWidth = minWidth.x;
 		}
 
@@ -430,12 +419,6 @@ public class SizeCache {
 			}
 		}
 
-		// TODO: Check for forms-specific control types that know how to compute
-		// their minimum width. Possibly allow
-		// the controls to implement ILayoutExtension directly.
-
-		// TODO: Fix the following branch.
-
 		if (maximumWidth == -1) {
 			maximumWidth = getPreferredSize().x;
 		}
@@ -444,7 +427,6 @@ public class SizeCache {
 	}
 
 	private int computeMinimumHeight() {
-		// TODO: Fix the following branch
 		if (minimumHeight == -1) {
 			Point sizeAtMinHeight = controlComputeSize(SWT.DEFAULT, 0);
 
