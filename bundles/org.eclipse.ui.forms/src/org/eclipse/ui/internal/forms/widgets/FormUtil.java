@@ -33,6 +33,7 @@ import org.eclipse.ui.forms.widgets.ColumnLayout;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ILayoutExtension;
 
 import com.ibm.icu.text.BreakIterator;
 
@@ -405,6 +406,20 @@ public class FormUtil {
 		}
 	}
 
+	public static boolean isWrapControl(Control c) {
+		if ((c.getStyle() & SWT.WRAP) != 0)
+			return true;
+		if (c instanceof Composite) {
+			return ((Composite) c).getLayout() instanceof ILayoutExtension;
+		}
+		return false;
+	}
+
+	public static int getWidthHint(int wHint, Control c) {
+		boolean wrap = isWrapControl(c);
+		return wrap ? wHint : SWT.DEFAULT;
+	}
+
 	public static int getHeightHint(int hHint, Control c) {
 		if (c instanceof Composite) {
 			Layout layout = ((Composite) c).getLayout();
@@ -412,6 +427,26 @@ public class FormUtil {
 				return hHint;
 		}
 		return SWT.DEFAULT;
+	}
+
+	public static int computeMinimumWidth(Control c, boolean changed) {
+		if (c instanceof Composite) {
+			Layout layout = ((Composite) c).getLayout();
+			if (layout instanceof ILayoutExtension)
+				return ((ILayoutExtension) layout).computeMinimumWidth(
+						(Composite) c, changed);
+		}
+		return c.computeSize(FormUtil.getWidthHint(5, c), SWT.DEFAULT, changed).x;
+	}
+
+	public static int computeMaximumWidth(Control c, boolean changed) {
+		if (c instanceof Composite) {
+			Layout layout = ((Composite) c).getLayout();
+			if (layout instanceof ILayoutExtension)
+				return ((ILayoutExtension) layout).computeMaximumWidth(
+						(Composite) c, changed);
+		}
+		return c.computeSize(SWT.DEFAULT, SWT.DEFAULT, changed).x;
 	}
 
 	public static Form getForm(Control c) {
