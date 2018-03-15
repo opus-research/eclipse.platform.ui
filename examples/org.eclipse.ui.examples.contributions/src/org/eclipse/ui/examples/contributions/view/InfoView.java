@@ -167,7 +167,7 @@ public class InfoView extends ViewPart {
 				MessageDialog.openInformation(getSite().getShell(),
 						ContributionMessages.SampleHandler_plugin_name,
 						NLS.bind(ContributionMessages.InfoView_countElements,
-								Integer.valueOf(elements.size())));
+								new Integer(elements.size())));
 				return null;
 			}
 		};
