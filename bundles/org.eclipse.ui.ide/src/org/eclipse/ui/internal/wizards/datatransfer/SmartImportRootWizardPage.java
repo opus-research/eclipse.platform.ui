@@ -102,7 +102,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private Combo rootDirectoryText;
 	// Proposal part
 	private CheckboxTreeViewer tree;
-	private ControlDecoration proposalSelectionDecorator;
 	private Set<File> alreadyExistingProjects;
 	private Set<File> notAlreadyExistingProjects;
 	private Label selectionSummary;
@@ -500,15 +499,6 @@ public class SmartImportRootWizardPage extends WizardPage {
 		tree.getTree().getColumn(1).setText(DataTransferMessages.SmartImportProposals_importAs);
 		tree.getTree().getColumn(1).setWidth(250);
 
-		this.proposalSelectionDecorator = new ControlDecoration(tree.getTree(), SWT.TOP | SWT.LEFT);
-		Image errorImage = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
-				.getImage();
-		treeGridData.horizontalIndent += errorImage.getBounds().width;
-		this.proposalSelectionDecorator.setImage(errorImage);
-		this.proposalSelectionDecorator
-				.setDescriptionText(DataTransferMessages.SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject);
-		this.proposalSelectionDecorator.hide();
-
 		Composite selectionButtonsGroup = new Composite(res, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(selectionButtonsGroup);
 		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
@@ -571,18 +561,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	}
 
 	protected void validatePage() {
-		// reset error message
-		setErrorMessage(null);
-		// order of invocation of setErrorMessage == reverse order of priority
-		// ie: most important one must call setErrorMessage last
-		if (tree.getCheckedElements().length == 0) {
-			this.proposalSelectionDecorator.show();
-			setErrorMessage(this.proposalSelectionDecorator.getDescriptionText());
-		} else {
-			this.proposalSelectionDecorator.hide();
-		}
-
-		if (!sourceIsValid()) {
+		if (!isPageComplete()) {
 			this.rootDirectoryTextDecorator.show();
 			setErrorMessage(this.rootDirectoryTextDecorator.getDescriptionText());
 		} else {
