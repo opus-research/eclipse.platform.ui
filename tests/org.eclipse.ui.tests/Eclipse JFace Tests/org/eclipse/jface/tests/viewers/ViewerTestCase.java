@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.internal.gtk.OS;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -46,7 +45,13 @@ public abstract class ViewerTestCase extends TestCase {
 	public ViewerTestCase(String name) {
 		super(name);
 		disableTestsBug347491 = Util.isCocoa();
-		disableTestsBug493357 = OS.GTK3;
+		final String GTK_VERSION_PROPERTY = "org.eclipse.swt.internal.gtk.version";
+		String value = System.getProperty(GTK_VERSION_PROPERTY);
+		if (value != null) {
+			if (value.startsWith("3")) {
+				disableTestsBug493357 = true;
+			}
+		}
 	}
 
 	protected void assertSelectionEquals(String message, TestElement expected) {
