@@ -318,10 +318,8 @@ public class ExpandableComposite extends Canvas {
 
 			boolean leftAlignment = textClient != null && (expansionStyle & LEFT_TEXT_CLIENT_ALIGNMENT) != 0;
 			if (toggle != null) {
-				// if label control is absent we vcenter the toggle, because
-				// text client is usually a lot thicker
-				// before it was using leftAlignment flag for that which I think
-				// is not related to this at all
+				// if label control is absent we vertically center the toggle,
+				// because the text client is usually a lot thicker
 				int ty = size.x == 0 ? (height - toggleSize.y) / 2 : 0;
 				ty = Math.max(ty, 0);
 				ty += marginHeight + tvmargin;
