@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -74,7 +73,7 @@ import org.eclipse.ui.model.WorkbenchPartLabelProvider;
  */
 public class SaveablesList implements ISaveablesLifecycleListener {
 
-	private ListenerList<ISaveablesLifecycleListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	// event source (mostly ISaveablesSource) -> Set of Saveable
 	private Map<Object, Set<Saveable>> modelMap = new HashMap<>();
@@ -305,8 +304,10 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param event
 	 */
 	private void fireModelLifecycleEvent(SaveablesLifecycleEvent event) {
-		for (ISaveablesLifecycleListener listener : listeners) {
-			listener.handleLifecycleEvent(event);
+		Object[] listenerArray = listeners.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			((ISaveablesLifecycleListener) listenerArray[i])
+					.handleLifecycleEvent(event);
 		}
 	}
 
@@ -530,7 +531,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 									model.getName());
 					dialog = new MessageDialog(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, 0, buttons) {
+							MessageDialog.QUESTION, buttons, 0) {
 						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
