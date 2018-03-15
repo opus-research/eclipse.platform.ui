@@ -345,6 +345,10 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 	 * up-to-date.
 	 */
 	private void createProblemsViews() {
+		if (!getDefault().getPreferenceStore()
+				.getBoolean(IDEInternalPreferences.SHOW_PROBLEMS_VIEW_DECORATIONS_ON_STARTUP)) {
+			return;
+		}
 		final Runnable r= new Runnable() {
 			@Override
 			public void run() {
@@ -356,15 +360,7 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 					Display.getCurrent().timerExec(PROBLEMS_VIEW_CREATION_DELAY, this);
 					return;
 				}
-				// We can't access preferences store before scheduling the job
-				// because this would cause instance area to be initialized
-				// before user selected the workspace location.
-				// See bug 514297 and
-				// org.eclipse.core.internal.runtime.DataArea.assertLocationInitialized()
-				if (!getDefault().getPreferenceStore()
-						.getBoolean(IDEInternalPreferences.SHOW_PROBLEMS_VIEW_DECORATIONS_ON_STARTUP)) {
-					return;
-				}
+
 				for (IWorkbenchWindow window : workbench.getWorkbenchWindows()) {
 					IWorkbenchPage activePage= window.getActivePage();
 					if (activePage == null)
