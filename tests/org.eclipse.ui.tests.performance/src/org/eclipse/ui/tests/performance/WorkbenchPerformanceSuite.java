@@ -13,17 +13,18 @@ package org.eclipse.ui.tests.performance;
 
 import java.util.ArrayList;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.tests.harness.util.EmptyPerspective;
 import org.eclipse.ui.tests.performance.layout.ComputeSizeTest;
 import org.eclipse.ui.tests.performance.layout.LayoutTest;
 import org.eclipse.ui.tests.performance.layout.PerspectiveWidgetFactory;
+import org.eclipse.ui.tests.performance.layout.RecursiveTrimLayoutWidgetFactory;
 import org.eclipse.ui.tests.performance.layout.ResizeTest;
 import org.eclipse.ui.tests.performance.layout.TestWidgetFactory;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * @since 3.1
@@ -151,6 +152,7 @@ class WorkbenchPerformanceSuite extends TestSuite {
     }
 
     private void addLayoutScenarios() {
+        addLayoutScenarios(new RecursiveTrimLayoutWidgetFactory());
     }
 
     public static String[] getAllPerspectiveIds() {
