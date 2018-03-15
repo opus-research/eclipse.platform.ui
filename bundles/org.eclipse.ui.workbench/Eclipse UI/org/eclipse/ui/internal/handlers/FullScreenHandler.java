@@ -4,9 +4,8 @@
  * Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- * 	Simon Scholz <simon.scholz@vogella.com> - initial API and implementation;
- * 	Patrik Suzzi <psuzzi@gmail.com> - Bug 491572
+ * Contributors: Simon Scholz <simon.scholz@vogella.com> - initial API and
+ * implementation
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -49,7 +48,7 @@ import org.eclipse.ui.keys.IBindingService;
  */
 public class FullScreenHandler extends AbstractHandler {
 
-	private static final String FULL_SCREEN_COMMAND_ID = "org.eclipse.ui.window.fullscreenmode"; //$NON-NLS-1$
+	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
 
 	@Override
 	public Object execute(ExecutionEvent event) {
@@ -61,7 +60,7 @@ public class FullScreenHandler extends AbstractHandler {
 		IContextService bindingContextService = window.getService(IContextService.class);
 
 		Optional<TriggerSequence> sequence = getKeybindingSequence(bindingService, commandService, bindingTableManager,
-				bindingContextService, FULL_SCREEN_COMMAND_ID);
+				bindingContextService);
 
 		String keybinding = sequence.map(t -> t.format()).orElse(""); //$NON-NLS-1$
 
@@ -125,13 +124,12 @@ public class FullScreenHandler extends AbstractHandler {
 	}
 
 	protected Optional<TriggerSequence> getKeybindingSequence(IBindingService bindingService,
-			ECommandService eCommandService, BindingTableManager bindingTableManager, IContextService contextService,
-			String commandId) {
-		TriggerSequence triggerSequence = bindingService.getBestActiveBindingFor(commandId);
+			ECommandService eCommandService, BindingTableManager bindingTableManager, IContextService contextService) {
+		TriggerSequence triggerSequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
 		// FIXME Bug 491701 - [KeyBinding] get best active binding is not
 		// working
 		if (triggerSequence == null) {
-			ParameterizedCommand cmd = eCommandService.createCommand(commandId, null);
+			ParameterizedCommand cmd = eCommandService.createCommand(QUICK_ACCESS_COMMAND_ID, null);
 			ContextSet contextSet = bindingTableManager
 					.createContextSet(Arrays.asList(contextService.getDefinedContexts()));
 			Binding binding = bindingTableManager.getBestSequenceFor(contextSet, cmd);
