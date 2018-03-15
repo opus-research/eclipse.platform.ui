@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 Tom Schindl and others.
+ * Copyright (c) 2010, 2017 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Brian de Alwis - added support for multiple CSS engines
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
  *     IBM Corporation - initial API and implementation
+ *     Lucas Bullen (Red Hat Inc.) - Bug 527806
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.internal.theme;
 
@@ -61,6 +62,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 
 public class ThemeEngine implements IThemeEngine {
 	private List<Theme> themes = new ArrayList<>();
+	private Map<String, List<String>> oSsWithThemeVarient = new HashMap<>();
 	private List<CSSEngine> cssEngines = new ArrayList<>();
 
 	// kept for theme notifications only
@@ -126,10 +128,10 @@ public class ThemeEngine implements IThemeEngine {
 
 
 		File[] modifiedFiles = modDir.listFiles();
-
+		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
+		String osname = bundle.getBundleContext().getProperty("osgi.os");
 		for (IExtension e : extPoint.getExtensions()) {
-			for (IConfigurationElement ce : getPlatformMatches(e
-					.getConfigurationElements())) {
+			for (IConfigurationElement ce : e.getConfigurationElements()) {
 				if (ce.getName().equals("theme")) {
 					try {
 						String version = ce.getAttribute("os_version");
@@ -145,9 +147,21 @@ public class ThemeEngine implements IThemeEngine {
 									+ basestylesheeturi;
 						}
 						String themeId = ce.getAttribute("id") + version;
+						String label = ce.getAttribute("label");
+						String os = ce.getAttribute("os");
+						if (os != null && !os.contains(osname)) {
+							if (oSsWithThemeVarient.get(themeId) == null) {
+								ArrayList<String> osArrayList = new ArrayList<>();
+								osArrayList.add(ce.getAttribute("os"));
+								oSsWithThemeVarient.put(themeId, osArrayList);
+							} else {
+								oSsWithThemeVarient.get(themeId).add(os);
+							}
+							themeId = getOsSpecificThemeId(themeId, os);
+							label = getOsSpecificThemeLabel(label, os);
+						}
 						registerTheme(
-								themeId,
-								ce.getAttribute("label"), basestylesheeturi,
+								themeId, label, basestylesheeturi,
 								version);
 
 						//check for modified files
@@ -174,7 +188,7 @@ public class ThemeEngine implements IThemeEngine {
 		}
 
 		for (IExtension e : extPoint.getExtensions()) {
-			for (IConfigurationElement ce : getPlatformMatches(e.getConfigurationElements())) {
+			for (IConfigurationElement ce : e.getConfigurationElements()) {
 				if (ce.getName().equals("stylesheet")) {
 					IConfigurationElement[] cces = ce.getChildren("themeid");
 					if (cces.length == 0) {
@@ -191,15 +205,22 @@ public class ThemeEngine implements IThemeEngine {
 							}
 						}
 					} else {
-						String[] themes = new String[cces.length];
-						for (int i = 0; i < cces.length; i++) {
-							themes[i] = cces[i].getAttribute("refid");
+						List<String> themes = new ArrayList<>();
+						for (IConfigurationElement cce : cces) {
+							String refid = cce.getAttribute("refid");
+							List<String> osList = oSsWithThemeVarient.get(refid);
+							if(osList != null) {
+								for(String oString : osList) {
+									themes.add(refid + "_" + oString);
+								}
+							}
+							themes.add(refid);
 						}
 						registerStylesheet(
 								"platform:/plugin/"
 										+ ce.getContributor().getName() + "/"
-										+ ce.getAttribute("uri"), themes);
-
+										+ ce.getAttribute("uri"),
+										themes.toArray(new String[0]));
 						for (IConfigurationElement resourceEl : ce
 								.getChildren("osgiresourcelocator")) {
 							String uri = resourceEl.getAttribute("uri");
@@ -220,6 +241,20 @@ public class ThemeEngine implements IThemeEngine {
 		registerResourceLocator(new FileResourcesLocatorImpl());
 		// FIXME: perhaps ResourcesLocatorManager shouldn't have a default?
 		// registerResourceLocator(new HttpResourcesLocatorImpl());
+	}
+
+	private String getOsSpecificThemeId(String id, String os) {
+		if (os == null) {
+			return id;
+		}
+		return id + '_' + os;
+	}
+
+	private String getOsSpecificThemeLabel(String label, String os) {
+		if (os == null) {
+			return label;
+		}
+		return label + " - " + os;
 	}
 
 	@Override
@@ -317,35 +352,6 @@ public class ThemeEngine implements IThemeEngine {
 		}
 
 		return list;
-	}
-
-	/**
-	 * Get all elements that have os/ws attributes that best match the current
-	 * platform.
-	 *
-	 * @param elements
-	 *            the elements to check
-	 * @return the best matches, if any
-	 */
-	private IConfigurationElement[] getPlatformMatches(
-			IConfigurationElement[] elements) {
-		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
-		String osname = bundle.getBundleContext().getProperty("osgi.os");
-		// TODO: Need to differentiate win32 versions
-		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
-		ArrayList<IConfigurationElement> matchingElements = new ArrayList<>();
-		for (IConfigurationElement element : elements) {
-			String elementOs = element.getAttribute("os");
-			String elementWs = element.getAttribute("ws");
-			if (osname != null
-					&& (elementOs == null || elementOs.contains(osname))) {
-				matchingElements.add(element);
-			} else if (wsname != null && wsname.equalsIgnoreCase(elementWs)) {
-				matchingElements.add(element);
-			}
-		}
-		return matchingElements
-				.toArray(new IConfigurationElement[matchingElements.size()]);
 	}
 
 	@Override
