@@ -14,7 +14,7 @@
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -285,6 +285,9 @@ public class WorkbenchMessages extends NLS {
 	public static String ActivateEditorAction_toolTip;
 	public static String MaximizePartAction_toolTip;
 	public static String MinimizePartAction_toolTip;
+
+	// --- Filtered Table Base ---
+	public static String FilteredTableBase_Filter;
 
 
 
@@ -713,9 +716,6 @@ public class WorkbenchMessages extends NLS {
 	public static String EditorManager_reuseEditorDialogTitle;
 	public static String PinEditorAction_toolTip;
 	public static String WorkbenchPreference_reuseEditors;
-	public static String WorkbenchPreference_reuseDirtyEditorGroupTitle;
-	public static String WorkbenchPreference_promptToReuseEditor;
-	public static String WorkbenchPreference_openNewEditor;
 	public static String WorkbenchPreference_reuseEditorsThreshold;
 	public static String WorkbenchPreference_reuseEditorsThresholdError;
 	public static String WorkbenchPreference_recentFiles;
@@ -957,6 +957,8 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
+	public static String WorkbenchLayoutSettings_Name;
+	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
