@@ -40,8 +40,8 @@ public class MultipleWindowsTest {
 	}
 
 	/**
-	 * @see <a href="http://eclip.se/493335"> Bug 493335 - [WorkingSets] Setting
-	 *      window working set affects all windows</a>
+	 * {@link http://eclip.se/493335 Bug 493335 - [WorkingSets] Setting window
+	 * working set affects all windows}
 	 */
 	@Test
 	public void testIndependentWorkingSets() {
