@@ -137,4 +137,25 @@ public interface IDEInternalPreferences {
      */
     public static final String WARN_ABOUT_WORKSPACE_INCOMPATIBILITY = "WARN_ABOUT_WORKSPACE_INCOMPATIBILITY"; //$NON-NLS-1$
 
+	/**
+	 * Preference id for whether the editors may save automatically.
+	 * <p>
+	 * The boolean default value for this preference is: <code>false</code>.
+	 * </p>
+	 *
+	 * @since 3.8
+	 */
+	public static final String SAVE_AUTOMATICALLY = "SAVE_AUTOMATICALLY"; //$NON-NLS-1$
+
+	/**
+	 * Preference value that specifies the time interval in seconds between
+	 * editors auto-saves.
+	 * <p>
+	 * The integer default value for this preference is: <code>60</code>.
+	 * </p>
+	 *
+	 * @since 3.8
+	 */
+	public static final String SAVE_AUTOMATICALLY_INTERVAL = "SAVE_AUTOMATICALLY_INTERVAL"; //$NON-NLS-1$
+
 }

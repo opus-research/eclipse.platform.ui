@@ -574,6 +574,14 @@
          <keywordReference id="org.eclipse.ui.ide.state"/>
       </page>
       <page
+            name="%PreferencePages.AutoSave"
+            category="org.eclipse.ui.preferencePages.Editors"
+            class="org.eclipse.ui.internal.ide.dialogs.AutoSavePreferencePage"
+            id="org.eclipse.ui.preferencePages.AutoSave">
+         <keywordReference id="org.eclipse.ui.ide.editors"/>
+         <keywordReference id="org.eclipse.ui.ide.dirty"/>
+      </page>
+      <page
             name="%PreferencePages.Perspectives"
             category="org.eclipse.ui.preferencePages.Workbench"
             class="org.eclipse.ui.internal.ide.dialogs.IDEPerspectivesPreferencePage"
@@ -2069,6 +2077,17 @@
           </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="toolbar:org.eclipse.ui.trim.status">
+         <toolbar
+               id="org.eclipse.ui.ide.autosave.status">
+            <control
+                  class="org.eclipse.ui.internal.ide.menus.AutoSaveStatusBarItem"
+                  id="org.eclipse.ui.ide.autosave.status.control">
+            </control>
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -2421,5 +2440,12 @@
             label="%askUserViaPopup">
       </strategy>
    </extension>
-
+   <extension
+         id="org.eclipse.ui.ide.autoSave"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            apply="notexists"
+            uri="model/fragment.e4xmi">
+      </fragment>
+   </extension>
 </plugin>
