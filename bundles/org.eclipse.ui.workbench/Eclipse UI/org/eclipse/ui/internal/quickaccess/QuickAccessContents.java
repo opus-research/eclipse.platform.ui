@@ -10,14 +10,15 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452, 459989
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452, 459989, 507322
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -120,7 +121,7 @@ public abstract class QuickAccessContents {
 		Rectangle rect = table.getClientArea ();
 		int itemHeight = table.getItemHeight ();
 		int headerHeight = table.getHeaderHeight ();
-		return (rect.height - headerHeight - 1) / (itemHeight);
+		return (rect.height - headerHeight + itemHeight - 1) / (itemHeight + table.getGridLineWidth());
 	}
 
 	/**
@@ -358,19 +359,7 @@ public abstract class QuickAccessContents {
 		if (selectionIndex == -1) {
 			selectionIndex = 0;
 		}
-		final int preferredLastColumnWidth = getPreferredLastColumnWidth();
-		tableColumnLayout.setColumnData(
-				table.getColumn(1),
-				new ColumnWeightData(50, preferredLastColumnWidth));
 		return selectionIndex;
-	}
-
-	private int getPreferredLastColumnWidth() {
-		return Arrays.stream(table.getItems()).mapToInt(item -> {
-			final String text = item.getText(1);
-			textLayout.setText(text);
-			return textLayout.getBounds().width;
-		}).max().orElse(0) + 24;
 	}
 
 	int numberOfFilteredResults;
@@ -423,6 +412,7 @@ public abstract class QuickAccessContents {
 		}
 		boolean done;
 		String category = null;
+		Set<String> prevPickIds = new HashSet<>();
 		do {
 			// will be set to false if we find a provider with remaining
 			// elements
@@ -450,15 +440,24 @@ public abstract class QuickAccessContents {
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
 
-					// count number or previous picks
-					if ((provider instanceof PreviousPicksProvider)) {
+					// count previous picks and store ids
+					if (isPreviousPickProvider) {
 						prevPick = sortedElements.length;
+						Stream.of(sortedElements).forEach(e -> prevPickIds.add(e.getId()));
 					}
 
 					int j = indexPerProvider[i];
+					// loops on all the elements of a provider
 					while (j < sortedElements.length
 							&& (showAllMatches || (count < countPerProvider && countTotal < maxCount))) {
 						QuickAccessElement element = sortedElements[j];
+
+						// Skip element if already in contained amid previous picks
+						if (!isPreviousPickProvider && prevPickIds.contains(element.getId())) {
+							j++;
+							continue;
+						}
+
 						QuickAccessEntry entry = null;
 						if (filter.length() == 0) {
 							if (i == 0 || showAllMatches) {
@@ -671,7 +670,6 @@ public abstract class QuickAccessContents {
 
 	private Text hintText;
 	private boolean displayHintText;
-	private TableColumnLayout tableColumnLayout;
 
 	/** Create HintText as child of the given parent composite */
 	Text createHintText(Composite composite, int defaultOrientation) {
@@ -732,7 +730,7 @@ public abstract class QuickAccessContents {
 		});
 		Composite tableComposite = new Composite(composite, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(tableComposite);
-		tableColumnLayout = new TableColumnLayout();
+		TableColumnLayout tableColumnLayout = new TableColumnLayout();
 		tableComposite.setLayout(tableColumnLayout);
 		table = new Table(tableComposite, SWT.SINGLE | SWT.FULL_SELECTION);
 		textLayout = new TextLayout(table.getDisplay());
@@ -751,14 +749,23 @@ public abstract class QuickAccessContents {
 				maxProviderWidth = width;
 			}
 		}
-		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(50, maxProviderWidth));
-		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(50, 100));
-		table.addControlListener(new ControlAdapter() {
+		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(0, maxProviderWidth));
+		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(100, 100));
+		table.getShell().addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(ControlEvent e) {
 				if (!showAllMatches) {
-					if (table != null && !table.isDisposed() && filterText != null && !filterText.isDisposed()) {
-						refresh(filterText.getText().toLowerCase());
+					if (!resized) {
+						resized = true;
+						e.display.timerExec(100, new Runnable() {
+							@Override
+							public void run() {
+								if (table != null && !table.isDisposed() && filterText !=null && !filterText.isDisposed()) {
+									refresh(filterText.getText().toLowerCase());
+								}
+								resized = false;
+							}
+						});
 					}
 				}
 			}
@@ -882,7 +889,7 @@ public abstract class QuickAccessContents {
 		infoLabel.setBackground(table.getBackground());
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalAlignment = SWT.RIGHT;
-		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessHorizontalSpace = false;
 		infoLabel.setLayoutData(gd);
 		updateInfoLabel();
 		return infoLabel;
