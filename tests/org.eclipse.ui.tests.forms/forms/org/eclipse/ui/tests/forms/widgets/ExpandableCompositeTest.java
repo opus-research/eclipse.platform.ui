@@ -41,8 +41,6 @@ import org.junit.Test;
  * Tests for expandable composite
  */
 public class ExpandableCompositeTest {
-	private static final int SHORT_CONTROL_WIDTH = 58;
-
 	private int defaultFlags = ExpandableComposite.TWISTIE;
 	private static Display display;
 	private Shell shell;
@@ -459,8 +457,8 @@ public class ExpandableCompositeTest {
 	private Composite createFixedComp(Composite parent) {
 		Composite comp = createComposite(parent);
 		GridLayoutFactory.fillDefaults().applyTo(comp);
-		Control control = ControlFactory.create(comp, SHORT_CONTROL_WIDTH, 15);
-		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(control);
+		Label l = createLabel(comp, shortText);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(l);
 		return comp;
 	}
 
@@ -510,7 +508,9 @@ public class ExpandableCompositeTest {
 
 		Rectangle bounds = update();
 
-		assertEquals(SHORT_CONTROL_WIDTH, client.getBounds().width);
+		int w = getTextExtend(shortText).x;
+
+		assertEquals(w, client.getBounds().width);
 		assertTextLines(4, bounds);
 		assertAround("Width", 500, bounds.width, 8);
 	}
@@ -525,8 +525,9 @@ public class ExpandableCompositeTest {
 
 		Rectangle bounds = update();
 
+		int w = getTextExtend(shortText).x;
 		// not sure +8
-		assertAround("Text Client width", SHORT_CONTROL_WIDTH, client.getBounds().width, 8);
+		assertAround("Text Client width", w, client.getBounds().width, 8);
 		assertTextLines(4, bounds);
 		assertAround("Width", 500, bounds.width, 2);
 	}
@@ -543,6 +544,6 @@ public class ExpandableCompositeTest {
 		int textCenter = Geometry.centerPoint(children[1].getBounds()).y;
 		int twistieCenter = Geometry.centerPoint(children[0].getBounds()).y;
 
-		assertAround("Twisty position", textCenter, twistieCenter, 1);
+		assertEquals(textCenter, twistieCenter);
 	}
 }
