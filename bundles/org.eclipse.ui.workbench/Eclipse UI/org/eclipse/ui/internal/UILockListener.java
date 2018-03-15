@@ -201,7 +201,8 @@ public class UILockListener extends LockListener {
 		String msg = "To avoid deadlock while executing Display.syncExec() with argument: " //$NON-NLS-1$
 				+ runnable + ", thread " + nonUiThread.getName() //$NON-NLS-1$
 				+ " will interrupt UI thread."; //$NON-NLS-1$
-		MultiStatus main = new MultiStatus(WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, msg, null);
+		MultiStatus main = new MultiStatus(WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, msg,
+				new IllegalStateException());
 
 		ThreadInfo[] threads = ManagementFactory.getThreadMXBean().getThreadInfo(new long[] { nonUiThread.getId(), display.getThread().getId() }, true, true);
 
@@ -213,9 +214,8 @@ public class UILockListener extends LockListener {
 			} else {
 				childMsg = "UI thread waiting on a job or lock."; //$NON-NLS-1$
 			}
-			Exception childEx = new IllegalStateException("Call stack for thread " + info.getThreadName()); //$NON-NLS-1$
-			childEx.setStackTrace(info.getStackTrace());
-			Status child = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, childMsg, childEx);
+			childMsg += " Stack: \n" + info.toString(); //$NON-NLS-1$
+			Status child = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, childMsg, null);
 			main.add(child);
 		}
 
