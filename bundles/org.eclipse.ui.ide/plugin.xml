@@ -354,18 +354,6 @@
                id="org.eclipse.ui.openLocalFile">
          </action>
       </actionSet>
-      <actionSet
-            id="org.eclipse.ui.ide.search"
-            label="%openQuickAccessActionSet.label"
-            visible="true">
-         <action
-               class="testing.actions.TriggerQuickAccessAction"
-               id="org.eclipse.ui.ide.search.openQuickAccess"
-               label="%openQuickAccess.label"
-               menubarPath="org.eclipse.search.menu/extraSearchGroup"
-               tooltip="%openQuickAccess.description">
-         </action>
-      </actionSet>
    </extension>
 
    <extension
