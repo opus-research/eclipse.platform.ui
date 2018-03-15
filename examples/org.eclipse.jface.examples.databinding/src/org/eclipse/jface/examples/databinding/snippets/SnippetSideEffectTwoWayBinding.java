@@ -125,9 +125,8 @@ public class SnippetSideEffectTwoWayBinding {
 			// create the observables, which should be bound by the SideEffect
 			ISWTObservableValue textModifyObservable = WidgetProperties.text(SWT.Modify).observe(summaryText);
 
-			ISideEffect modelToTarget = ISideEffect.create(task::getSummary, summaryText::setText);
-			ISideEffect targetToModel = ISideEffect.create(() -> (String) textModifyObservable.getValue(),
-					task::setSummary);
+			ISideEffect modelToTarget = ISideEffect.getFactory().create(task::getSummary, summaryText::setText);
+			ISideEffect targetToModel = ISideEffect.getFactory().create(() -> (String) textModifyObservable.getValue(), task::setSummary);
 
 			// dispose the ISideEffect objects, when the widget of the
 			// ISWTObservableValue is disposed

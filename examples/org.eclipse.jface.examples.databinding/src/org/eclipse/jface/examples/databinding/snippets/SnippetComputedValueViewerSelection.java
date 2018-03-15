@@ -105,8 +105,7 @@ public class SnippetComputedValueViewerSelection {
 
 			// once the selection state(Boolean) changes the ISideEffect will
 			// update the button
-			ISideEffect deleteButtonEnablementSideEffect = ISideEffect.create(hasSelectionObservable::getValue,
-					deleteSelectionButton::setEnabled);
+			ISideEffect deleteButtonEnablementSideEffect = ISideEffect.getFactory().create(hasSelectionObservable::getValue, deleteSelectionButton::setEnabled);
 
 			deleteSelectionButton.addDisposeListener(e -> deleteButtonEnablementSideEffect.dispose());
 		}

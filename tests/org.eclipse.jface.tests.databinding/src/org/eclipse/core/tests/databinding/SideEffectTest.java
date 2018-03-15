@@ -12,10 +12,12 @@ package org.eclipse.core.tests.databinding;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.internal.databinding.observable.SideEffect;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
@@ -45,7 +47,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		alternateDependency = new WritableValue<>("", null);
 		useDefaultDependency = new WritableValue<>(true, null);
 
-		sideEffect = ISideEffect.createPaused(() -> {
+		sideEffect = ISideEffect.getFactory().createPaused(() -> {
 			if (useDefaultDependency.getValue()) {
 				defaultDependency.getValue();
 			} else {
@@ -202,11 +204,11 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 	public void testNestedDependencyChangeAndRunIfDirtyCompletes() throws Exception {
 		AtomicBoolean hasRun = new AtomicBoolean();
 		WritableValue<Object> invalidator = new WritableValue<Object>(new Object(), null);
-		ISideEffect innerSideEffect = ISideEffect.create(() -> {
+		ISideEffect innerSideEffect = ISideEffect.getFactory().create(() -> {
 			invalidator.getValue();
 		});
 
-		ISideEffect.createPaused(() -> {
+		ISideEffect.getFactory().createPaused(() -> {
 			// Make sure that there are no infinite loops.
 			assertFalse(hasRun.get());
 			hasRun.set(true);
@@ -221,13 +223,13 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 	public void testNestedInvalidateAndRunIfDirtyCompletes() throws Exception {
 		AtomicBoolean hasRun = new AtomicBoolean();
 		final WritableValue<Object> makesThingsDirty = new WritableValue<>(null, null);
-		ISideEffect innerSideEffect = ISideEffect.createPaused(() -> {
+		ISideEffect innerSideEffect = ISideEffect.getFactory().createPaused(() -> {
 			makesThingsDirty.getValue();
 		});
 
 		innerSideEffect.resume();
 
-		ISideEffect.createPaused(() -> {
+		ISideEffect.getFactory().createPaused(() -> {
 			// Make sure that there are no infinite loops.
 			assertFalse(hasRun.get());
 			hasRun.set(true);
@@ -250,7 +252,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 			}
 		};
 
-		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(value::getValue, (Object) -> {
+		ISideEffect consumeOnce = ISideEffect.getFactory().consumeOnceAsync(value::getValue, (Object) -> {
 			consumerHasRun.set(true);
 		});
 
@@ -274,7 +276,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 			}
 		};
 
-		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(value::getValue, (Object) -> {
+		ISideEffect consumeOnce = ISideEffect.getFactory().consumeOnceAsync(value::getValue, (Object) -> {
 			numberOfRuns.set(numberOfRuns.get() + 1);
 		});
 
@@ -296,7 +298,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		AtomicInteger numberOfRuns = new AtomicInteger();
 		WritableValue<Object> returnValue = new WritableValue<>("foo", null);
 
-		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(returnValue::getValue, (Object) -> {
+		ISideEffect consumeOnce = ISideEffect.getFactory().consumeOnceAsync(returnValue::getValue, (Object) -> {
 			numberOfRuns.set(numberOfRuns.get() + 1);
 		});
 
@@ -310,7 +312,7 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 		AtomicInteger numberOfRuns = new AtomicInteger();
 		WritableValue<Object> returnValue = new WritableValue<>("foo", null);
 
-		ISideEffect consumeOnce = ISideEffect.consumeOnceAsync(returnValue::getValue, (Object) -> {
+		ISideEffect consumeOnce = ISideEffect.getFactory().consumeOnceAsync(returnValue::getValue, (Object) -> {
 			numberOfRuns.set(numberOfRuns.get() + 1);
 		});
 
@@ -325,14 +327,47 @@ public class SideEffectTest extends AbstractDefaultRealmTestCase {
 
 		// Make sure that creating a SideEffect within another side effect works
 		// propely.
-		ISideEffect.createPaused(() -> {
-			ISideEffect.createPaused(() -> {
+		ISideEffect.getFactory().createPaused(() -> {
+			ISideEffect.getFactory().createPaused(() -> {
 				assertFalse(hasRun.get());
 				hasRun.set(true);
 			}).resume();
 		}).resume();
 		runAsync();
 		assertTrue(hasRun.get());
+	}
+
+	public void testSideEffectFiresDisposeEvent() throws Exception {
+		AtomicBoolean hasRun = new AtomicBoolean();
+
+		// Make sure that a dispose event is sent correctly.
+		ISideEffect disposeTest = ISideEffect.getFactory().createPaused(() -> {
+		});
+		disposeTest.resume();
+		disposeTest.addDisposeListener(sideEffect -> {
+			assertTrue(disposeTest == sideEffect);
+			hasRun.set(true);
+		});
+		disposeTest.dispose();
+		runAsync();
+		assertTrue(hasRun.get());
+	}
+
+	public void testCanRemoveDisposeListener() throws Exception {
+		AtomicBoolean hasRun = new AtomicBoolean();
+
+		// Make sure that a dispose event is sent correctly.
+		ISideEffect disposeTest = ISideEffect.getFactory().createPaused(() -> {
+		});
+		disposeTest.resume();
+		Consumer<ISideEffect> disposeListener = sideEffect -> {
+			hasRun.set(true);
+		};
+		disposeTest.addDisposeListener(disposeListener);
+		disposeTest.removeDisposeListener(disposeListener);
+		disposeTest.dispose();
+		runAsync();
+		assertFalse(hasRun.get());
 	}
 
 	// Doesn't currently work, but this would be a desirable property for
