@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088, 458033
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088, 458033, 393171
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Christian Georgi (SAP)            - Bug 432480
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 478896
@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -365,11 +366,6 @@ public class E4Application implements IApplication {
 		Boolean clearPersistedState = getArgValue(IWorkbench.CLEAR_PERSISTED_STATE, appContext, true)
 				.map(value -> Boolean.parseBoolean(value)).orElse(Boolean.FALSE);
 		eclipseContext.set(IWorkbench.CLEAR_PERSISTED_STATE, clearPersistedState);
-
-		// Delta save and restore
-		Boolean deltaRestore = getArgValue(E4Workbench.DELTA_RESTORE, appContext, false)
-				.map(value -> Boolean.parseBoolean(value)).orElse(Boolean.TRUE);
-		eclipseContext.set(E4Workbench.DELTA_RESTORE, deltaRestore);
 
 		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER, appContext, false)
 				.orElse("bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class.getName());
@@ -716,7 +712,7 @@ public class E4Application implements IApplication {
 			String versionLine = WORKSPACE_VERSION_KEY + '=' + WORKSPACE_VERSION_VALUE;
 
 			output = new FileOutputStream(versionFile);
-			output.write(versionLine.getBytes("UTF-8")); //$NON-NLS-1$
+			output.write(versionLine.getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			Logger logger = new WorkbenchLogger(PLUGIN_ID);
 			logger.error(e);

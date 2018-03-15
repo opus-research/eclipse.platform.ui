@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -277,23 +277,37 @@ public class NavigatorContentDescriptorManager {
 
 		Image image = null;
 		if (contentDescriptor != null) {
-			String icon = contentDescriptor.getIcon();
-			if (icon != null) {
-				image = getImageRegistry().get(icon);
+			String iconPath = contentDescriptor.getIcon();
+			if (iconPath != null) {
+				String prefix = contentDescriptor.getId() == null ? "" : contentDescriptor.getId(); //$NON-NLS-1$
+				String iconKey = prefix + "::" + iconPath; //$NON-NLS-1$
+				image = getImageRegistry().get(iconKey);
 				if (image == null || image.isDisposed()) {
 					ImageDescriptor imageDescriptor = AbstractUIPlugin
 							.imageDescriptorFromPlugin(contentDescriptor
-							.getContribution().getPluginId(), icon);
+							.getContribution().getPluginId(), iconPath);
 					if (imageDescriptor != null) {
 						image = imageDescriptor.createImage();
 						if (image != null) {
-							getImageRegistry().put(icon, image);
+							getImageRegistry().put(iconKey, image);
 						}
 					}
 				}
 			}
 		}
 		return image;
+	}
+
+	/**
+	 * Clears all cached information.
+	 */
+	public void clearCache() {
+		for (EvaluationCache cache : cachedPossibleChildrenEvaluations.values()) {
+			cache.clear();
+		}
+		for (EvaluationCache cache : cachedTriggerPointEvaluations.values()) {
+			cache.clear();
+		}
 	}
 
 	/**
@@ -469,5 +483,4 @@ public class NavigatorContentDescriptorManager {
 			return super.readElement(anElement);
 		}
 	}
-
 }
