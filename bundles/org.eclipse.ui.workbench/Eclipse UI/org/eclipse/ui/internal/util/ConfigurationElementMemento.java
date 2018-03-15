@@ -109,7 +109,7 @@ public final class ConfigurationElementMemento implements IMemento {
 
         if (string != null) {
 			try {
-				return Integer.valueOf(string);
+                return new Integer(string);
             } catch (NumberFormatException eNumberFormat) {
             }
 		}
