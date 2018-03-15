@@ -534,7 +534,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 									model.getName());
 					dialog = new MessageDialog(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, 0, buttons) {
+							MessageDialog.NONE, 0, buttons) {
 						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
