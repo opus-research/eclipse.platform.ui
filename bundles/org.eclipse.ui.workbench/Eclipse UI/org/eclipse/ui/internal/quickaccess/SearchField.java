@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -39,7 +39,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.util.Geometry;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -57,9 +56,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -115,7 +111,6 @@ public class SearchField {
 
 	private String selectedString = ""; //$NON-NLS-1$
 	private AccessibleAdapter accessibleListener;
-	private Font font;
 
 	@PostConstruct
 	void createControls(final Composite parent, MApplication application, MWindow window) {
@@ -304,33 +299,15 @@ public class SearchField {
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
 		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
-		// FIXME need to access the real shortcut
-		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, "Ctrl+3")); //$NON-NLS-1$
-
-		FontData[] fD = text.getFont().getFontData();
-		int round = (int) Math.round(fD[0].getHeight() * 0.8);
-		fD[0].setHeight(round);
-		font = new Font(text.getDisplay(), fD[0]);
-		text.setFont(font);
+		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		GC gc = new GC(text);
+		Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
+		Rectangle r = text.computeTrim(0, 0, p.x, p.y);
+		gc.dispose();
 
-		// workaround for Bug 491317
-		if (Util.isWin32() || Util.isGtk()) {
-			FontMetrics fm = gc.getFontMetrics();
-			int wHint = QuickAccessMessages.QuickAccess_EnterSearch.length() * fm.getAverageCharWidth();
-			int hHint = fm.getHeight();
-			gc.dispose();
-			text.setSize(text.computeSize(wHint, hHint));
-		} else {
-			Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
-			Rectangle r = text.computeTrim(0, 0, p.x, p.y);
-			gc.dispose();
-
-			// computeTrim() may result in r.x < 0
-			GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
-		}
-
+		// computeTrim() may result in r.x < 0
+		GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
 		return text;
 	}
 
