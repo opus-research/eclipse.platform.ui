@@ -74,28 +74,28 @@ class ExtensionEventHandler implements IRegistryChangeListener {
             // push action sets and perspectives to the top because incoming
             // actionSetPartAssociations and perspectiveExtensions may depend upon
             // them for their bindings.
-            for (IExtensionDelta element : delta) {
-                id = element.getExtensionPoint().getSimpleIdentifier();
-                if (element.getKind() == IExtensionDelta.ADDED) {
+            for (int i = 0; i < delta.length; i++) {
+                id = delta[i].getExtensionPoint().getSimpleIdentifier();
+                if (delta[i].getKind() == IExtensionDelta.ADDED) {
                     if (id.equals(IWorkbenchRegistryConstants.PL_ACTION_SETS)) {
-						appearList.add(0, element);
+						appearList.add(0, delta[i]);
 					} else if (!id.equals(IWorkbenchRegistryConstants.PL_PERSPECTIVES)
                             && !id.equals(IWorkbenchRegistryConstants.PL_VIEWS)
                             && !id.equals(IWorkbenchRegistryConstants.PL_ACTION_SETS)) {
 						appearList.add(appearList.size() - numPerspectives,
-                                element);
+                                delta[i]);
 					}
                 } else {
-                    if (element.getKind() == IExtensionDelta.REMOVED) {
+                    if (delta[i].getKind() == IExtensionDelta.REMOVED) {
                         if (id
                                 .equals(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS)) {
-                            revokeList.add(0, element);
+                            revokeList.add(0, delta[i]);
                             numActionSetPartAssoc++;
                         } else if (id
                                 .equals(IWorkbenchRegistryConstants.PL_PERSPECTIVES)) {
-							revokeList.add(numActionSetPartAssoc, element);
+							revokeList.add(numActionSetPartAssoc, delta[i]);
 						} else {
-							revokeList.add(element);
+							revokeList.add(delta[i]);
 						}
                     }
                 }
@@ -151,8 +151,8 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         reader.setRegistry((ThemeRegistry) WorkbenchPlugin.getDefault()
                 .getThemeRegistry());
         IConfigurationElement[] elements = ext.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
-			reader.readElement(element);
+        for (int i = 0; i < elements.length; i++) {
+			reader.readElement(elements[i]);
 		}
 
         Collection fonts = reader.getFontDefinitions();
@@ -170,8 +170,8 @@ class ExtensionEventHandler implements IRegistryChangeListener {
                 .getThemeRegistry();
         reader.setRegistry(registry);
         IConfigurationElement[] elements = ext.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
-			reader.readElement(element);
+        for (int i = 0; i < elements.length; i++) {
+			reader.readElement(elements[i]);
 		}
 
         Collection colors = reader.getColorDefinitions();
