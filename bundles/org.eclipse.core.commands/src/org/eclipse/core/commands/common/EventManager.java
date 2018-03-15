@@ -41,16 +41,21 @@ public abstract class EventManager {
 	 * A collection of objects listening to changes to this manager. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private transient ListenerList<Object> listenerList = null;
+	private volatile ListenerList<Object> listenerList = null;
 
 	/**
 	 * Adds a listener to this manager that will be notified when this manager's
-	 * state changes.
+	 * state changes. This method has no effect if the same listener is already
+	 * registered.
 	 *
 	 * @param listener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
 	protected synchronized final void addListenerObject(final Object listener) {
+		if (listener == null) {
+			throw new IllegalArgumentException();
+		}
+
 		if (listenerList == null) {
 			listenerList = new ListenerList<>(ListenerList.IDENTITY);
 		}
@@ -61,10 +66,8 @@ public abstract class EventManager {
 	/**
 	 * Clears all of the listeners from the listener list.
 	 */
-	protected synchronized final void clearListeners() {
-		if (listenerList != null) {
-			listenerList.clear();
-		}
+	protected final void clearListeners() {
+		listenerList = null;
 	}
 
 	/**
@@ -101,12 +104,17 @@ public abstract class EventManager {
 	}
 
 	/**
-	 * Removes a listener from this manager.
+	 * Removes a listener from this manager. Has no effect if the same listener
+	 * was not already registered.
 	 *
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */
 	protected synchronized final void removeListenerObject(final Object listener) {
+		if (listener == null) {
+			throw new IllegalArgumentException();
+		}
+
 		if (listenerList != null) {
 			listenerList.remove(listener);
 
