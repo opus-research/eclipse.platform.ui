@@ -13,6 +13,7 @@
 package org.eclipse.ui.preferences;
 
 import java.io.IOException;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
@@ -20,10 +21,10 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
@@ -604,7 +605,8 @@ public class ScopedPreferenceStore extends EventManager implements
 				getStorePreferences().putInt(name, value);
 			}
 			dirty = true;
-			firePropertyChangeEvent(name, Integer.valueOf(oldValue), Integer.valueOf(value));
+			firePropertyChangeEvent(name, Integer.valueOf(oldValue), Integer.valueOf(
+					value));
 		} finally {
 			silentRunning = false;// Restart listening to preferences
 		}
