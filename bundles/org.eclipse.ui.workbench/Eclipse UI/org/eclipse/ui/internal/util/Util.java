@@ -670,11 +670,11 @@ public final class Util {
 	 */
 	public static String createList(Object[] items) {
 		String list = null;
-		for (Object item : items) {
+		for (int i = 0; i < items.length; i++) {
 			if(list == null) {
-				list = item.toString();
+				list = items[i].toString();
 			} else {
-				list = createList(list, item.toString());
+				list = createList(list, items[i].toString());
 			}
 		}
 		return safeString(list);

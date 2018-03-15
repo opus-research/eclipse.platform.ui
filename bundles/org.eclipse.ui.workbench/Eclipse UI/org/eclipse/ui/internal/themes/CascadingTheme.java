@@ -52,8 +52,8 @@ public class CascadingTheme extends EventManager implements ITheme {
      */
     protected void fire(PropertyChangeEvent event) {
         Object[] listeners = getListeners();
-        for (Object listener2 : listeners) {
-            ((IPropertyChangeListener) listener2).propertyChange(event);
+        for (int i = 0; i < listeners.length; i++) {
+            ((IPropertyChangeListener) listeners[i]).propertyChange(event);
         }
     }
 

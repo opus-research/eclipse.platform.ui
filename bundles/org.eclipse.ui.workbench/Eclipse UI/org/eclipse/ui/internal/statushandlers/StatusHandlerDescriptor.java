@@ -69,12 +69,12 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 
 			Map params = new HashMap();
 
-			for (IConfigurationElement parameter : parameters) {
+			for (int i = 0; i < parameters.length; i++) {
 				params
 						.put(
-								parameter
+								parameters[i]
 										.getAttribute(IWorkbenchRegistryConstants.ATT_NAME),
-								parameter
+								parameters[i]
 										.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE));
 			}
 
@@ -93,11 +93,11 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 		IConfigurationElement parameters[] = configElement
 				.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
 
-		for (IConfigurationElement parameter : parameters) {
-			if (parameter
+		for (int i = 0; i < parameters.length; i++) {
+			if (parameters[i]
 					.getAttribute(IWorkbenchRegistryConstants.ATT_NAME).equals(
 							PREFIX)) {
-				prefix = parameter
+				prefix = parameters[i]
 						.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
 			}
 		}
