@@ -19,7 +19,7 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.service.component.annotations.Component;
 
-@Component
+@Component(name = "org.eclipse.e4.ui.css.swt.theme")
 public class ThemeEngineManager implements IThemeManager {
 	private static final String KEY = "org.eclipse.e4.ui.css.swt.theme";
 
