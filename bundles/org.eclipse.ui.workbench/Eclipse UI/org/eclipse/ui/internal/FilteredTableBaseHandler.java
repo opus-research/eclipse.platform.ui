@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -69,6 +69,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.keys.IBindingService;
+import org.eclipse.ui.model.PerspectiveLabelProvider;
 
 /**
  * Base class to open a dialog to filter and select elements of a {@link Table}.
@@ -151,7 +152,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			shell = window.getShell();
 		dialog = new Shell(shell, SWT.MODELESS);
 		dialog.setBackground(getBackground());
-		dialog.setMinimumSize(new Point(150, 120));
+		dialog.setMinimumSize(new Point(120, 50));
 		Display display = dialog.getDisplay();
 		dialog.setLayout(new FillLayout());
 
@@ -203,7 +204,8 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			text.setText(EMPTY_STRING);
 		}
 
-		tableViewer.setInput(page.getSortedEditorReferences());
+		// gets the input from the concrete subclass
+		tableViewer.setInput(getInput(page));
 
 		int tableItemCount = table.getItemCount();
 
@@ -730,24 +732,68 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		});
 	}
 
-	/** True to show search text and enable filtering */
+	/** True to show search text and enable filtering. False by default */
 	protected boolean isFiltered() {
-		return true;
+		return false;
 	}
 
-	/** True to have dialog persistent after releasing the key combo */
-	protected boolean isPersistent() {
-		return true;
+	/** Return the filter to use. Null by default */
+	protected ViewerFilter getFilter() {
+		return null;
 	}
 
-	/** returns the columnlabel provider for the only column */
-	protected abstract ColumnLabelProvider getColumnLabelProvider();
+	/** Set the filter text entered by the User, does nothing by default */
+	protected void setMatcherString(String pattern) {
+	}
 
-	/** Return the filter to use */
-	protected abstract ViewerFilter getFilter();
+	private PerspectiveLabelProvider perspectiveLabelProvider = null;
 
-	/** Set the filter text entered by the User */
-	protected abstract void setMatcherString(String pattern);
+	private PerspectiveLabelProvider getPerspectiveLabelProvider() {
+		if (perspectiveLabelProvider == null) {
+			perspectiveLabelProvider = new PerspectiveLabelProvider(false);
+		}
+		return perspectiveLabelProvider;
+	}
+
+	/** Default ColumnLabelProvider. The table has only one column */
+	protected ColumnLabelProvider getColumnLabelProvider() {
+		return new ColumnLabelProvider() {
+			@Override
+			public String getText(Object element) {
+				if (element instanceof WorkbenchPartReference) {
+					WorkbenchPartReference ref = ((WorkbenchPartReference) element);
+					if (ref.isDirty()) {
+						return "*" + ref.getTitle(); //$NON-NLS-1$
+					}
+					return ref.getTitle();
+				} else if (element instanceof IPerspectiveDescriptor) {
+					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
+					String text = getPerspectiveLabelProvider().getText(desc);
+					return (text == null) ? "" : text; //$NON-NLS-1$
+				}
+				return super.getText(element);
+			}
+
+			@Override
+			public Image getImage(Object element) {
+				if (element instanceof WorkbenchPartReference) {
+					return ((WorkbenchPartReference) element).getTitleImage();
+				} else if (element instanceof IPerspectiveDescriptor) {
+					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
+					return getPerspectiveLabelProvider().getImage(desc);
+				}
+				return super.getImage(element);
+			}
+
+			@Override
+			public String getToolTipText(Object element) {
+				if (element instanceof WorkbenchPartReference) {
+					return ((WorkbenchPartReference) element).getTitleToolTip();
+				}
+				return super.getToolTipText(element);
+			};
+		};
+	}
 
 	/** Add all items to the dialog in the activation order */
 	protected abstract Object getInput(WorkbenchPage page);
