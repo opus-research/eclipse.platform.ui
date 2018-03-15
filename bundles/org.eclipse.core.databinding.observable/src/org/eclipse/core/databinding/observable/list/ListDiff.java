@@ -66,7 +66,7 @@ public abstract class ListDiff<E> implements IDiff {
 	 * @see ListDiffVisitor
 	 * @since 1.1
 	 */
-	public void accept(ListDiffVisitor<E> visitor) {
+	public void accept(ListDiffVisitor<? super E> visitor) {
 		ListDiffEntry<E>[] differences = getDifferences();
 		for (int i = 0; i < differences.length; i++) {
 			ListDiffEntry<E> entry = differences[i];
