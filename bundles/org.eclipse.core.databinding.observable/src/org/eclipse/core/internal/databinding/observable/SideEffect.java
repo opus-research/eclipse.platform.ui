@@ -50,6 +50,7 @@ public final class SideEffect implements ISideEffect {
 		@Override
 		public void runIfDirty() {
 		}
+
 	};
 
 	/**
@@ -76,6 +77,8 @@ public final class SideEffect implements ISideEffect {
 	private Realm realm;
 
 	private PrivateInterface privateInterface = new PrivateInterface();
+
+	private Consumer<ISideEffect> disposalConsumer;
 
 	/**
 	 * Creates a SideEffect in the paused state that wraps the given runnable on
@@ -186,6 +189,17 @@ public final class SideEffect implements ISideEffect {
 		}
 	}
 
+	/**
+	 * Apply an disposal consumer for this {@link ISideEffect} instance.
+	 *
+	 * @param disposalConsumer
+	 *            a consumer which will be notified once this
+	 *            {@link ISideEffect} is disposed.
+	 */
+	public void setDisposalConsumer(Consumer<ISideEffect> disposalConsumer) {
+		this.disposalConsumer = disposalConsumer;
+	}
+
 	@Override
 	public void dispose() {
 		checkRealm();
@@ -193,6 +207,9 @@ public final class SideEffect implements ISideEffect {
 		stopListening();
 		dependencies = null;
 		runnable = null;
+		if (disposalConsumer != null) {
+			disposalConsumer.accept(this);
+		}
 	}
 
 	private boolean isDisposed() {
