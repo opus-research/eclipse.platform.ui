@@ -587,11 +587,7 @@ public class ExpandableComposite extends Canvas {
 			});
 			toggle.addPaintListener(e -> {
 				if (textLabel instanceof Label && !isFixedStyle())
-					if (toggle.hover) {
-						textLabel.setForeground(toggle.getHoverDecorationColor());
-					} else {
-						textLabel.setForeground(getTitleBarForeground());
-					}
+					textLabel.setForeground(toggle.hover ? toggle.getHoverDecorationColor() : getTitleBarForeground());
 			});
 			toggle.addKeyListener(new KeyAdapter() {
 				@Override
