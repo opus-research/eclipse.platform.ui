@@ -13,8 +13,6 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetDefaultSelectedAdapter;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -42,6 +40,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -743,10 +743,13 @@ public class FilteredTree extends Composite {
 		// default selection changes (which tell us the cancel button has been
 		// pressed)
 		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0) {
-			filterText.addSelectionListener(widgetDefaultSelectedAdapter(e -> {
-				if (e.detail == SWT.ICON_CANCEL)
-					clearText();
-			}));
+			filterText.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					if (e.detail == SWT.ICON_CANCEL)
+						clearText();
+				}
+			});
 		}
 
 		GridData gridData= new GridData(SWT.FILL, SWT.CENTER, true, false);
