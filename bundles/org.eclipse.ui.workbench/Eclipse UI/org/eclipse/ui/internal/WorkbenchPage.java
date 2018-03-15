@@ -13,7 +13,6 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799, 466230
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
- *     Stefan Prieschl <stefan.prieschl@gmail.com> - Bug 374132
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -161,9 +160,9 @@ import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityView;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.SelectionService;
-import org.eclipse.ui.internal.EditorReference;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.misc.ExternalEditor;
 import org.eclipse.ui.internal.misc.StatusUtil;
@@ -4159,7 +4158,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		if (nullRefList != null && nullRefList.size() > 0) {
 			for (MPlaceholder ph : nullRefList) {
-				replacePlaceholder(ph);
+				if (ph.isToBeRendered()) {
+					replacePlaceholder(ph);
+				}
 			}
 		}
 	}
@@ -4744,21 +4745,16 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public void showEditor(IEditorReference ref) {
-		IWorkbenchPart wPart = ref.getPart(false);
-		MPart part = ((EditorReference)ref).getModel();
-		part.setVisible(true);
+		// FIXME compat showEditor
+		E4Util.unsupported("showEditor"); //$NON-NLS-1$
 
-		//Workaround to get content visible. Otherwise the content sometimes is not rendered.
-		MElementContainer<MUIElement> partStack = part.getParent();
-		partStack.setSelectedElement(null);
-		partStack.setSelectedElement(part);
-		wPart.setFocus();
 	}
 
 	@Override
 	public void hideEditor(IEditorReference ref) {
-		MPart part = ((EditorReference)ref).getModel();
-		part.setVisible(false);
+		// FIXME compat hideEditor
+		E4Util.unsupported("hideEditor"); //$NON-NLS-1$
+
 	}
 
 	private String getEditorImageURI(EditorReference reference) {
