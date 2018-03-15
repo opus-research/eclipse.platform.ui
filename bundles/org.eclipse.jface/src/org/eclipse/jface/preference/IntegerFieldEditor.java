@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     <sgandon@nds.com> - Fix for bug 109389 - IntegerFieldEditor
  *     does not fire property change all the time
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -70,9 +71,8 @@ public class IntegerFieldEditor extends StringFieldEditor {
     public void setValidRange(int min, int max) {
         minValidValue = min;
         maxValidValue = max;
-        setErrorMessage(JFaceResources.format(
-        		"IntegerFieldEditor.errorMessageRange", //$NON-NLS-1$
-        		new Object[] { new Integer(min), new Integer(max) }));
+		setErrorMessage(JFaceResources.format("IntegerFieldEditor.errorMessageRange", //$NON-NLS-1$
+				new Integer(min), new Integer(max)));
     }
 
     @Override
