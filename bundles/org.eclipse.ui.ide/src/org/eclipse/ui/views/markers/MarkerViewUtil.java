@@ -120,16 +120,6 @@ public class MarkerViewUtil {
 					.findView(viewId);
 			if (view != null)
 				returnValue = MarkerSupportInternalUtilities.showMarkers(view, markersSameView);
-
-			// If we have already shown the new one do not open another one
-			viewId = getLegacyViewId(marker);
-			if (viewId != null) {
-				if (returnValue)
-					view = page.findView(viewId);
-				else
-					view = showView ? page.showView(viewId) : page
-							.findView(viewId);
-			}
 		} catch (CoreException e) {
 			Policy.handle(e);
 		}
@@ -160,23 +150,4 @@ public class MarkerViewUtil {
 		}
 		return markersOfView.toArray(new IMarker[markersOfView.size()]);
 	}
-
-	/**
-	 * Returns the id of the view used to show markers of the same type as the
-	 * given marker using.legacy support
-	 *
-	 * @param marker
-	 *            the marker
-	 * @return the view id or <code>null</code> if no appropriate view could
-	 *         be determined
-	 * @throws CoreException
-	 *             if an exception occurs testing the type of the marker
-	 */
-	private static String getLegacyViewId(IMarker marker) throws CoreException {
-		String viewId = getViewId(marker);
-		if (viewId == null)
-			return null;
-		return viewId + MarkerSupportInternalUtilities.LEGACY_SUFFIX;
-	}
-
 }
