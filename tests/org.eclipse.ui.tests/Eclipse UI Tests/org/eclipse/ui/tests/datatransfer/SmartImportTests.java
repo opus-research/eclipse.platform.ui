@@ -53,25 +53,16 @@ public class SmartImportTests extends UITestCase {
 
 	@Override
 	public void doTearDown() throws Exception {
-		try {
-			clearAll();
-		} finally {
-			super.doTearDown();
-		}
+		super.doTearDown();
+		clearAll();
 	}
 
 	private void clearAll() throws CoreException {
-		processEvents();
-		boolean closed = true;
 		if (dialog != null && !dialog.getShell().isDisposed()) {
-			closed = dialog.close();
+			dialog.close();
 		}
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 			project.delete(false, false, new NullProgressMonitor());
-		}
-		waitForJobs(100, 300);
-		if (!closed) {
-			assertTrue("Wizard dialog was not properly closed!", closed);
 		}
 	}
 
@@ -81,9 +72,7 @@ public class SmartImportTests extends UITestCase {
 		this.dialog = new WizardDialog(getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.setBlockOnOpen(false);
 		dialog.open();
-		processEvents();
 		final Button okButton = getFinishButton(dialog.buttonBar);
-		assertNotNull(okButton);
 		processEventsUntil(new Condition() {
 			@Override
 			public boolean compute() {
