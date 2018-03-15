@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mikael Barbero (Eclipse Foundation) - Bug 470175
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
+import org.eclipse.core.internal.runtime.Activator;
+import org.eclipse.core.internal.runtime.CancelabilityMonitor;
+import org.eclipse.core.internal.runtime.CancelabilityMonitor.BasicOptionsImpl;
+import org.eclipse.core.internal.runtime.CancelabilityMonitor.Options;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -74,6 +79,22 @@ final class JFaceUtil {
 			}
 		});
 
+		InternalPolicy.setCancelabilityMonitorOptions(new CancelabilityMonitor.ForwardingOptions() {
+			private Options defaultOptions;
+			@Override
+			protected Options delegate() {
+				Options optionService = Activator.getDefault().getCancelabilityMonitorOptions();
+				if (optionService == null) {
+					if (defaultOptions == null) {
+						defaultOptions = new CancelabilityMonitor.BasicOptionsImpl();
+						((BasicOptionsImpl) defaultOptions).setEnabled(false);
+					}
+					return defaultOptions;
+				}
+				return optionService;
+			}
+		});
+
 		// Get all debug options from Platform
 		if ("true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
 			Policy.DEBUG_DIALOG_NO_PARENT = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/dialog/noparent")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -85,7 +106,8 @@ final class JFaceUtil {
 			InternalPolicy.DEBUG_TRACE_URL_IMAGE_DESCRIPTOR = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/trace/URLImageDescriptor")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/logURLImageDescriptorMissing2x")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_DIRECTLY = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptorDirectly")); //$NON-NLS-1$ //$NON-NLS-2$
-			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2x")); //$NON-NLS-1$ //$NON-NLS-2$
+			// loadURLImageDescriptor2x is "true" by default and should stay "true" when absent in the debug options file:
+			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x = !"false".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2x")); //$NON-NLS-1$ //$NON-NLS-2$
 			InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x_PNG_FOR_GIF = "true".equalsIgnoreCase(Platform.getDebugOption(Policy.JFACE + "/debug/loadURLImageDescriptor2xPngForGif")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}

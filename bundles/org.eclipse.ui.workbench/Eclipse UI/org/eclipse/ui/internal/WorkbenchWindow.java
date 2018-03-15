@@ -15,6 +15,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
+ *     Mikael Barbero (Eclipse Foundation) - Bug 470175
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -41,6 +42,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -107,6 +109,7 @@ import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.internal.CancelabilityMonitorUtils;
 import org.eclipse.jface.internal.provisional.action.CoolBarManager2;
 import org.eclipse.jface.internal.provisional.action.ICoolBarManager2;
 import org.eclipse.jface.internal.provisional.action.IToolBarManager2;
@@ -2177,19 +2180,18 @@ STATUS_LINE_ID, model);
 				final InvocationTargetException[] ite = new InvocationTargetException[1];
 				final InterruptedException[] ie = new InterruptedException[1];
 
-				BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-					@Override
-					public void run() {
-						try {
-							ModalContext.run(runnable, fork, manager.getProgressMonitor(),
-									getShell().getDisplay());
-						} catch (InvocationTargetException e) {
-							ite[0] = e;
-						} catch (InterruptedException e) {
-							ie[0] = e;
-						} finally {
-							manager.getProgressMonitor().done();
-						}
+				IProgressMonitor pm = CancelabilityMonitorUtils.aboutToStart(cancelable, manager.getProgressMonitor(),
+						runnable.getClass().getName());
+				BusyIndicator.showWhile(getShell().getDisplay(), () -> {
+					try {
+						ModalContext.run(runnable, fork, pm, getShell().getDisplay());
+					} catch (InvocationTargetException e) {
+						ite[0] = e;
+					} catch (InterruptedException e) {
+						ie[0] = e;
+					} finally {
+						manager.getProgressMonitor().done();
+						CancelabilityMonitorUtils.hasStopped(pm);
 					}
 				});
 

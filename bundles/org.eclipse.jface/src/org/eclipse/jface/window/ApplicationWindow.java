@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,14 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Roman Dawydkin - bug 55116
+ *     Mikael Barbero (Eclipse Foundation) - Bug 470175
  *******************************************************************************/
 
 package org.eclipse.jface.window;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.ICoolBarManager;
@@ -21,6 +23,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.internal.CancelabilityMonitorUtils;
 import org.eclipse.jface.internal.provisional.action.ICoolBarManager2;
 import org.eclipse.jface.internal.provisional.action.IToolBarManager2;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -753,14 +756,17 @@ public class ApplicationWindow extends Window implements IRunnableContext {
 				}
                 mgr.setCancelEnabled(cancelable);
                 final Exception[] holder = new Exception[1];
+				IProgressMonitor pm = CancelabilityMonitorUtils.aboutToStart(cancelable, mgr.getProgressMonitor(),
+						runnable.getClass().getName());
                 BusyIndicator.showWhile(display, () -> {
 				    try {
-				        ModalContext.run(runnable, fork, mgr
-				                .getProgressMonitor(), display);
+				        ModalContext.run(runnable, fork, pm, display);
 				    } catch (InvocationTargetException ite) {
 				        holder[0] = ite;
 				    } catch (InterruptedException ie) {
 				        holder[0] = ie;
+				    } finally {
+				    	CancelabilityMonitorUtils.hasStopped(pm);
 				    }
 				});
 
