@@ -61,7 +61,7 @@ public abstract class EventManager {
 	/**
 	 * Clears all of the listeners from the listener list.
 	 */
-	protected synchronized final void clearListeners() {
+	protected final void clearListeners() {
 		listenerList = null;
 	}
 
@@ -99,17 +99,12 @@ public abstract class EventManager {
 	}
 
 	/**
-	 * Removes a listener from this manager. Has no effect if the same listener
-	 * was not already registered.
+	 * Removes a listener from this manager.
 	 *
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */
 	protected synchronized final void removeListenerObject(final Object listener) {
-		if (listener == null) {
-			throw new IllegalArgumentException();
-		}
-
 		if (listenerList != null) {
 			listenerList.remove(listener);
 
