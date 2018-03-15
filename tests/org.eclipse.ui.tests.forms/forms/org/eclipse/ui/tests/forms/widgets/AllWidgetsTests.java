@@ -19,7 +19,6 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	ExpandableCompositeTest.class,
-	SectionTest.class,
 	FormTextModelTest.class
 })
 public class AllWidgetsTests {
