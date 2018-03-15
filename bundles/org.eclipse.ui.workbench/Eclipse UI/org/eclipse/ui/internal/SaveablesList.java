@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700, 511198
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -228,8 +229,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			Saveable[] models = event.getSaveables();
 			Map<Saveable, Integer> modelsDecrementing = new HashMap<>();
 			Set<Saveable> modelsClosing = new HashSet<>();
-			for (int i = 0; i < models.length; i++) {
-				incrementRefCount(modelsDecrementing, models[i]);
+			for (Saveable model : models) {
+				incrementRefCount(modelsDecrementing, model);
 			}
 
 			fillModelsClosing(modelsClosing, modelsDecrementing);
@@ -269,8 +270,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	private void removeModels(Object source, Saveable[] modelArray) {
 		List<Saveable> removed = new ArrayList<>();
-		for (int i = 0; i < modelArray.length; i++) {
-			Saveable model = modelArray[i];
+		for (Saveable model : modelArray) {
 			if (removeModel(source, model)) {
 				removed.add(model);
 			}
@@ -288,8 +288,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	private void addModels(Object source, Saveable[] modelArray) {
 		List<Saveable> added = new ArrayList<>();
-		for (int i = 0; i < modelArray.length; i++) {
-			Saveable model = modelArray[i];
+		for (Saveable model : modelArray) {
 			if (addModel(source, model)) {
 				added.add(model);
 			}
@@ -382,10 +381,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					continue;
 				}
 			}
-			Saveable[] modelsFromSource = getSaveables(part);
-			for (int i = 0; i < modelsFromSource.length; i++) {
-				incrementRefCount(postCloseInfo.modelsDecrementing,
-						modelsFromSource[i]);
+			for (Saveable saveableModel : getSaveables(part)) {
+				incrementRefCount(postCloseInfo.modelsDecrementing, saveableModel);
 			}
 		}
 		fillModelsClosing(postCloseInfo.modelsClosing,
@@ -492,28 +489,26 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			} else if (modelsToSave.size() == 1) {
 				Saveable model = modelsToSave.get(0);
 				// Show a dialog.
-				String[] buttons;
-				if(canCancel) {
-					buttons = new String[] { IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL,
-							IDialogConstants.CANCEL_LABEL };
-				} else {
-					buttons = new String[] { IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL};
-				}
 
 				// don't save if we don't prompt
 				int choice = ISaveablePart2.NO;
 
 				MessageDialog dialog;
 				if (stillOpenElsewhere) {
+					LinkedHashMap<String, Integer> buttonLabelToIdMap = new LinkedHashMap<>();
+					buttonLabelToIdMap.put(WorkbenchMessages.Save, IDialogConstants.OK_ID);
+					buttonLabelToIdMap.put(WorkbenchMessages.Dont_Save, IDialogConstants.NO_ID);
+					if (canCancel) {
+						buttonLabelToIdMap.put(IDialogConstants.CANCEL_LABEL, IDialogConstants.CANCEL_ID);
+					}
 					String message = NLS
 							.bind(
 									WorkbenchMessages.EditorManager_saveChangesOptionallyQuestion,
 									model.getName());
 					MessageDialogWithToggle dialogWithToggle = new MessageDialogWithToggle(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, buttons, 0, WorkbenchMessages.EditorManager_closeWithoutPromptingOption, false) {
+							MessageDialog.QUESTION, buttonLabelToIdMap, 0,
+							WorkbenchMessages.EditorManager_closeWithoutPromptingOption, false) {
 						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
@@ -524,6 +519,14 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					};
 					dialog = dialogWithToggle;
 				} else {
+					String[] buttons;
+					if (canCancel) {
+						buttons = new String[] { WorkbenchMessages.Save, WorkbenchMessages.Dont_Save,
+								IDialogConstants.CANCEL_LABEL };
+					} else {
+						buttons = new String[] { WorkbenchMessages.Save, WorkbenchMessages.Dont_Save };
+					}
+
 					String message = NLS
 							.bind(
 									WorkbenchMessages.EditorManager_saveChangesQuestion,
@@ -790,7 +793,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		@Override
 		protected void createButtonsForButtonBar(Composite parent) {
 			createButton(parent, IDialogConstants.OK_ID,
-					IDialogConstants.OK_LABEL, true);
+					WorkbenchMessages.Save, true);
 			if (canCancel) {
 				createButton(parent, IDialogConstants.CANCEL_ID,
 						IDialogConstants.CANCEL_LABEL, false);

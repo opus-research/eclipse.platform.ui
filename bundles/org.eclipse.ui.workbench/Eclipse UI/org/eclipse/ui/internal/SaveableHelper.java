@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 511198
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -120,8 +121,8 @@ public class SaveableHelper {
 							WorkbenchMessages.Save_Resource, null, message,
 							MessageDialog.QUESTION,
 							0,
-							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL,
+							WorkbenchMessages.Save, 
+							WorkbenchMessages.Dont_Save,
 							IDialogConstants.CANCEL_LABEL) {
 						@Override
 						protected int getShellStyle() {
@@ -169,10 +170,8 @@ public class SaveableHelper {
 	 *   was canceled or an error occurred while saving.
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
-		Saveable[] selectedModels = modelSource.getActiveSaveables();
 		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
-		for (int i = 0; i < selectedModels.length; i++) {
-			Saveable model = selectedModels[i];
+		for (Saveable model : modelSource.getActiveSaveables()) {
 			if (model.isDirty()) {
 				dirtyModels.add(model);
 			}
@@ -186,8 +185,7 @@ public class SaveableHelper {
 			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
 			SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Save, dirtyModels.size());
 			try {
-				for (Iterator<Saveable> i = dirtyModels.iterator(); i.hasNext();) {
-					Saveable model = i.next();
+				for (Saveable model : dirtyModels) {
 					// handle case where this model got saved as a result of
 					// saving another
 					if (!model.isDirty()) {
@@ -308,9 +306,7 @@ public class SaveableHelper {
 	 * @since 3.2
 	 */
 	public static boolean needsSave(ISaveablesSource modelSource) {
-		Saveable[] selectedModels = modelSource.getActiveSaveables();
-		for (int i = 0; i < selectedModels.length; i++) {
-			Saveable model = selectedModels[i];
+		for (Saveable model : modelSource.getActiveSaveables()) {
 			if (model.isDirty() && !((InternalSaveable)model).isSavingInBackground()) {
 				return true;
 			}
@@ -383,8 +379,7 @@ public class SaveableHelper {
 				final IWorkbenchPart[] parts = saveablesList.getPartsForSaveable(model);
 
 				// this will cause the parts tabs to show the ongoing background operation
-				for (int i = 0; i < parts.length; i++) {
-					IWorkbenchPart workbenchPart = parts[i];
+				for (IWorkbenchPart workbenchPart : parts) {
 					IWorkbenchSiteProgressService progressService = Adapters.adapt(workbenchPart.getSite(),
 							IWorkbenchSiteProgressService.class);
 					progressService.showBusyForFamily(model);
@@ -421,11 +416,11 @@ public class SaveableHelper {
 
 	private static void notifySaveAction(final IWorkbenchPart[] parts) {
 		Set<IWorkbenchWindow> wwindows = new HashSet<>();
-		for (int i = 0; i < parts.length; i++) {
-			wwindows.add(parts[i].getSite().getWorkbenchWindow());
+		for (IWorkbenchPart part : parts) {
+			wwindows.add(part.getSite().getWorkbenchWindow());
 		}
-		for (Iterator<IWorkbenchWindow> it = wwindows.iterator(); it.hasNext();) {
-			WorkbenchWindow wwin = (WorkbenchWindow) it.next();
+		for (IWorkbenchWindow iWorkbenchWindow : wwindows) {
+			WorkbenchWindow wwin = (WorkbenchWindow) iWorkbenchWindow;
 			wwin.fireBackgroundSaveStarted();
 		}
 	}
