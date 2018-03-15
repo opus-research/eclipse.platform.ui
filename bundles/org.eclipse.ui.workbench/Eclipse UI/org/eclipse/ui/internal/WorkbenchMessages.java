@@ -255,6 +255,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ResetPerspective_text;
 	public static String ResetPerspective_toolTip;
 	public static String ResetPerspective_message;
+	public static String ResetPerspective_buttonLabel;
 	public static String ResetPerspective_title;
 	public static String RevertPerspective_note;
 
@@ -1013,6 +1014,8 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetGroup_WorkingSets_group;
 	public static String WorkingSetGroup_WorkingSetSelection_message;
 	public static String WorkingSetGroup_EnableWorkingSet_button;
+
+	public static String FilteredTableBaseHandler_Close;
 
 	// Util
 	public static String Util_List;
