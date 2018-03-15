@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
@@ -33,7 +32,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.about.ISystemSummarySection;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.util.Util;
 import org.osgi.framework.Bundle;
 
 /**
@@ -95,10 +93,8 @@ public class ConfigurationLogDefaultSection implements ISystemSummarySection {
     }
 
     private static void printEclipseProperty(PrintWriter writer, String value) {
-        String[] lines = Util.getArrayFromList(value, "\n"); //$NON-NLS-1$
-        for (int i = 0; i < lines.length; ++i) {
-			writer.println(lines[i]);
-		}
+		String adjustedValue = value.replaceAll("\r\n?|\n", System.getProperty("line.separator")); //$NON-NLS-1$ //$NON-NLS-2$
+		writer.println(adjustedValue);
     }
 
     /**

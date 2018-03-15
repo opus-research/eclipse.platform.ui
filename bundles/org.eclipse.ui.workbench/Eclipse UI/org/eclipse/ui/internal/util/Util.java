@@ -602,8 +602,12 @@ public final class Util {
 
 	/**
 	 * Returns the result of converting a list of comma-separated tokens into an array.
-	 * Used as a replacement for <code>String.split(String)</code>, to allow compilation
-	 * against JCL Foundation (bug 80053).
+	 * Used in legacy code as a replacement for <code>String.split(String)</code>, to allow compilation
+	 * against JCL Foundation (bug 80053), but the implementation is incompatible
+	 * with the original in subtle ways.
+	 * <p>
+	 * Do not use this confused hack in new code.
+	 * </p>
 	 *
 	 * @param prop the initial comma-separated string
 	 * @param separator the separator characters
