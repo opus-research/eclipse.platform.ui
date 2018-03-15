@@ -169,7 +169,7 @@ public class ContainerGenerator {
 		        		throw new CoreException(new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 1, msg, null));
 		        	}
 		            container = (IContainer) resource;
-					subMonitor.worked(1);
+					subMonitor.step(1);
 		        } else {
 		            if (i == 0) {
 		                IProject projectHandle = createProjectHandle(root,
