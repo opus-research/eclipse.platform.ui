@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.nested;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.commands.Command;
@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -39,6 +38,7 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 
 	private Command projectPresetionCommand;
 	private CommonViewer viewer;
+	private Set<IContainer> parentsToRefresh = new HashSet<IContainer>();
 
 	public NestedProjectsContentProvider() {
 		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
@@ -48,7 +48,8 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 		} catch (ExecutionException ex) {
 			WorkbenchNavigatorPlugin.log(ex.getMessage(), new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.PLUGIN_ID, ex.getMessage(), ex));
 		}
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
+				IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
 	}
 
 	@Override
@@ -101,41 +102,44 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		IResourceDelta delta = event.getDelta();
-		if (delta == null || event.getType() != IResourceChangeEvent.POST_CHANGE) {
-			return;
-		}
-		final Set<IContainer> parentsToRefresh = new LinkedHashSet<>();
-		if (delta.getKind() == IResourceDelta.CHANGED && delta.getResource() instanceof IWorkspaceRoot) {
-			for (IResourceDelta childDelta : event.getDelta().getAffectedChildren()) {
-				IResource childResource = childDelta.getResource();
-				if (childResource instanceof IProject && (childDelta.getKind() == IResourceDelta.ADDED
-						|| childDelta.getKind() == IResourceDelta.REMOVED)) {
-					IProject affectedProject = (IProject) childResource;
-					IContainer parent = getParent(affectedProject);
-					if (parent != null) {
-						parentsToRefresh.add(parent);
-					} else {
-						// workspace root
-						parentsToRefresh.clear();
-						parentsToRefresh.add(affectedProject.getParent());
-						break;
+		IResource resource = event.getResource();
+		if (event.getType() == IResourceChangeEvent.PRE_DELETE && resource != null
+				&& resource.getType() == IResource.PROJECT) {
+			IProject aboutToBeDeleted = (IProject) resource;
+			IContainer parent = getParent(aboutToBeDeleted);
+			if (parent != null) {
+				parentsToRefresh.add(parent);
+			}
+		} else if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+			IResourceDelta delta = event.getDelta();
+			if (delta != null) {
+				resource = delta.getResource();
+				if (delta.getKind() == IResourceDelta.CHANGED && resource != null
+						&& resource.getType() == IResource.ROOT) {
+					for (IResourceDelta childDelta : event.getDelta().getAffectedChildren()) {
+						IResource childResource = childDelta.getResource();
+						if (childResource != null && childResource.getType() == IResource.PROJECT
+								&& childDelta.getKind() == IResourceDelta.ADDED) {
+							IProject newProject = (IProject) childResource;
+							IContainer parent = getParent(newProject);
+							if (parent != null) {
+								parentsToRefresh.add(parent);
+							}
+						}
 					}
 				}
 			}
-		}
-		if (!parentsToRefresh.isEmpty()) {
-			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (viewer.getTree() == null || viewer.getTree().isDisposed()) {
-						return;
+			if (!parentsToRefresh.isEmpty()) {
+				this.viewer.getTree().getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						for (IContainer parent : parentsToRefresh) {
+							NestedProjectsContentProvider.this.viewer.refresh(parent);
+						}
+						parentsToRefresh.clear();
 					}
-					for (IContainer parent : parentsToRefresh) {
-						NestedProjectsContentProvider.this.viewer.refresh(parent);
-					}
-				}
-			});
+				});
+			}
 		}
 	}
 
