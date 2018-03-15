@@ -167,6 +167,11 @@
       </predicate>
     </workingSet>
   </setupTask>
+  <setupTask
+      xsi:type="setup:EclipseIniTask"
+      option="-Xmx"
+      value="1024m"
+      vm="true"/>
   <stream name="master"
       label="Master">
     <setupTask
