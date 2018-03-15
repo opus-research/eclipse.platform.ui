@@ -12,10 +12,10 @@
 package org.eclipse.ui.internal.wizards.datatransfer;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -27,7 +27,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -77,6 +76,8 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 					1);
 			TarFile tarFile = null;
 			ZipFile zipFile = null;
+			InputStream content = null;
+			FileOutputStream fileStream = null;
 			ILeveledImportStructureProvider importStructureProvider = null;
 			try {
 				if (ArchiveFileManipulations.isTarFile(archive.getAbsolutePath())) {
@@ -103,12 +104,15 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 					if (importStructureProvider.isFolder(current)) {
 						toCreate.mkdirs();
 					} else {
-						try (InputStream content = importStructureProvider.getContents(current)) {
-							// known IImportStructureProviders already log an
-							// exception before returning null
-							if (content != null) {
-								Files.copy(content, toCreate.toPath());
-							}
+						toCreate.createNewFile();
+						fileStream = null;
+						content = null;
+						fileStream = new FileOutputStream(toCreate);
+						content = importStructureProvider.getContents(current);
+						byte[] buffer = new byte[1024];
+						int nbBytes = 0;
+						while ((nbBytes = content.read(buffer, 0, 1024))  > 0) {
+							fileStream.write(buffer, 0, nbBytes);
 						}
 					}
 					List<?> children = importStructureProvider.getChildren(current);
@@ -132,6 +136,16 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 				if (zipFile != null)
 					try {
 						zipFile.close();
+					} catch (IOException ex) {
+					}
+				if (fileStream != null)
+					try {
+						fileStream.close();
+					} catch (IOException ex) {
+					}
+				if (content != null)
+					try {
+						content.close();
 					} catch (IOException ex) {
 					}
 			}
@@ -210,30 +224,14 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 		if (o instanceof File) {
 			return (File)o;
 		} else if (o instanceof IResource) {
-			IPath location = ((IResource)o).getLocation();
-			return location == null ? null : location.toFile();
+			return ((IResource)o).getLocation().toFile();
 		} else if (o instanceof IAdaptable) {
 			IResource resource = ((IAdaptable)o).getAdapter(IResource.class);
 			if (resource != null) {
-				IPath location = resource.getLocation();
-				return location == null ? null : location.toFile();
+				return resource.getLocation().toFile();
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Tries to infer a file path string from given object, using various
-	 * strategies
-	 *
-	 * @param o
-	 *            an object
-	 * @return a {@link File#getAbsolutePath} associated to this object, or
-	 *         empty string.
-	 */
-	public static String toAbsolutePath(Object o) {
-		File file = toFile(o);
-		return file == null ? "" : file.getAbsolutePath(); //$NON-NLS-1$
 	}
 
 	@Override
@@ -320,13 +318,15 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 				archive.getName() + "_expanded"); //$NON-NLS-1$
 	}
 
-	private static boolean matchesPage(SmartImportJob job, SmartImportRootWizardPage page) {
-		File jobRoot = job.getRoot().getAbsoluteFile();
-		File pageRoot = page.getSelectedRoot().getAbsoluteFile();
-		boolean sameSource = jobRoot.equals(pageRoot)
-				|| (isValidArchive(pageRoot) && getExpandDirectory(pageRoot).getAbsoluteFile().equals(jobRoot));
-		return sameSource && job.isDetectNestedProjects() == page.isDetectNestedProject()
-				&& job.isConfigureProjects() == page.isConfigureProjects();
+	/**
+	 * @param easymportJob2
+	 * @param projectRootPage2
+	 * @return
+	 */
+	private static boolean matchesPage(SmartImportJob easymportJob2, SmartImportRootWizardPage projectRootPage2) {
+		return easymportJob2.getRoot().getAbsoluteFile().equals(projectRootPage2.getSelectedRoot().getAbsoluteFile())
+				&& easymportJob2.isDetectNestedProjects() == projectRootPage2.isDetectNestedProject()
+				&& easymportJob2.isConfigureProjects() == projectRootPage2.isConfigureProjects();
 	}
 
 	@Override

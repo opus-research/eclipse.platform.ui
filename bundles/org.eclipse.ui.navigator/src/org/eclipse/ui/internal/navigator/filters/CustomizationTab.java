@@ -42,7 +42,10 @@ public class CustomizationTab extends Composite {
 
 		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
-			CustomizationTab.this.checkStateChanged(event);
+			if(event.getChecked())
+				checkedItems.add(event.getElement());
+			else
+				checkedItems.remove(event.getElement());
 		}
 
 	};
@@ -114,10 +117,4 @@ public class CustomizationTab extends Composite {
 		return checkedItems;
 	}
 
-	protected void checkStateChanged(CheckStateChangedEvent event) {
-		if (event.getChecked())
-			checkedItems.add(event.getElement());
-		else
-			checkedItems.remove(event.getElement());
-	}
 }
