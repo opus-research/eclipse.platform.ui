@@ -16,10 +16,13 @@ import java.net.URL;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 public class OpenBrowserHandler extends AbstractHandler {
 
@@ -35,7 +38,7 @@ public class OpenBrowserHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		String urlText = event.getParameter(PARAM_ID_URL);
-		URL url;
+		final URL url;
 		if (urlText == null) {
 			url = null;
 		} else {
@@ -46,21 +49,27 @@ public class OpenBrowserHandler extends AbstractHandler {
 			}
 		}
 
-		String browserId = event.getParameter(PARAM_ID_BROWSER_ID);
-		String name = event.getParameter(PARAM_ID_NAME);
-		String tooltip = event.getParameter(PARAM_ID_TOOLTIP);
-
-		try {
-			IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
+		final String browserId = event.getParameter(PARAM_ID_BROWSER_ID);
+		final String name = event.getParameter(PARAM_ID_NAME);
+		final String tooltip = event.getParameter(PARAM_ID_TOOLTIP);
+		final IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
 					.getBrowserSupport();
-			IWebBrowser browser = browserSupport.createBrowser(
-					IWorkbenchBrowserSupport.LOCATION_BAR
-							| IWorkbenchBrowserSupport.NAVIGATION_BAR,
-					browserId, name, tooltip);
-			browser.openURL(url);
-		} catch (PartInitException ex) {
-			throw new ExecutionException("error opening browser", ex); //$NON-NLS-1$
-		}
+		Shell shell = HandlerUtil.getActiveShell(event);
+		Display display = shell == null ? Display.getCurrent() : shell.getDisplay();
+		display.asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					IWebBrowser browser = browserSupport.createBrowser(
+							IWorkbenchBrowserSupport.LOCATION_BAR | IWorkbenchBrowserSupport.NAVIGATION_BAR, browserId,
+							name, tooltip);
+					browser.openURL(url);
+				} catch (PartInitException ex) {
+					throw new RuntimeException("error opening browser", ex); //$NON-NLS-1$
+				}
+			}
+		});
 
 		return null;
 	}
