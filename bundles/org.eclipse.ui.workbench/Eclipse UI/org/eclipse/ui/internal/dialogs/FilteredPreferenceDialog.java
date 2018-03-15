@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014, 2015, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 219273
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Stefan Xenos <sxenos@google.com> - Bug 466793
+ *     Lucas Bullen (Red Hat Inc.) - Bug 500051
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -36,12 +37,15 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -49,11 +53,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.ActiveShellExpression;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
@@ -66,6 +73,8 @@ import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.wizards.preferences.PreferencesExportWizard;
+import org.eclipse.ui.internal.wizards.preferences.PreferencesImportWizard;
 import org.eclipse.ui.model.IContributionService;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.preferences.IWorkingCopyManager;
@@ -353,6 +362,46 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 			((PreferencePage) page).applyData(this.pageData);
 		}
 
+	}
+
+	@Override
+	protected Control createHelpControl(Composite parent) {
+		Control control = super.createHelpControl(parent);
+		if (control instanceof ToolBar) {
+			ToolBar toolBar = (ToolBar) control;
+
+			ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
+			separator.setWidth(0);
+
+			ToolItem importButton = new ToolItem(toolBar, SWT.PUSH);
+			Image importImage = JFaceResources.getImage(DLG_IMG_IMPORT);
+			importButton.setImage(importImage);
+			importButton.setToolTipText(JFaceResources.getString("PreferencesDialog.importButtonLabel")); //$NON-NLS-1$
+			importButton.addListener(SWT.Selection, e -> {
+				Wizard importWizard = new PreferencesImportWizard();
+				WizardDialog wizardDialog = new WizardDialog(parent.getShell(), importWizard);
+				wizardDialog.open();
+				if (wizardDialog.getReturnCode() == 0) {
+					parent.getShell().close();
+				}
+			});
+
+			separator = new ToolItem(toolBar, SWT.SEPARATOR);
+			separator.setWidth(0);
+
+			ToolItem exportButton = new ToolItem(toolBar, SWT.PUSH);
+			Image exportImage = JFaceResources.getImage(DLG_IMG_EXPORT);
+			exportButton.setImage(exportImage);
+			exportButton.setToolTipText(JFaceResources.getString("PreferencesDialog.exportButtonLabel")); //$NON-NLS-1$
+			exportButton.addListener(SWT.Selection, e -> {
+				Wizard exportWizard = new PreferencesExportWizard();
+				WizardDialog wizardDialog = new WizardDialog(parent.getShell(), exportWizard);
+				wizardDialog.open();
+			});
+		} else if (control instanceof Link) {
+			// TODO
+		}
+		return control;
 	}
 
 	@Override
