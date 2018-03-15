@@ -14,6 +14,14 @@ package org.eclipse.ui.internal.browser;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,6 +106,8 @@ public class BrowserViewer extends Composite {
 
     protected ToolItem forward;
 
+	protected ToolItem autoRefresh;
+
     protected BusyIndicator busy;
 
     protected boolean loading;
@@ -116,7 +126,9 @@ public class BrowserViewer extends Composite {
 
     protected int progressWorked = 0;
 
-	 protected List<PropertyChangeListener> propertyListeners;
+	protected WatchService watcher;
+
+	protected List<PropertyChangeListener> propertyListeners;
 
     /**
      * Under development - do not use
@@ -267,7 +279,7 @@ public class BrowserViewer extends Composite {
      * @see #getURL()
      */
     public void setURL(String url) {
-       setURL(url, true);
+		setURL(url, true);
     }
 
     protected void updateBackNextBusy() {
@@ -424,6 +436,18 @@ public class BrowserViewer extends Composite {
                         }// else
                         //    combo.setText(""); //$NON-NLS-1$
                     }
+
+					// disable auto-refresh button if URL is not a file
+					File temp = getFile(browser.getUrl());
+					if (temp != null && temp.exists()) {
+						autoRefresh.setEnabled(true);
+						if (autoRefresh.getSelection()) {
+							fileChangedWatchService(temp);
+						}
+					} else {
+						autoRefresh.setSelection(false);
+						autoRefresh.setEnabled(false);
+					}
                 }
             });
         }
@@ -620,6 +644,24 @@ public class BrowserViewer extends Composite {
 		  }
     }
 
+	private void autoRefresh() {
+		File temp = getFile(browser.getUrl());
+		if (temp != null && temp.exists()) {
+			if (autoRefresh.getSelection()) {
+				refresh();
+				fileChangedWatchService(temp);
+			} else {
+				if (watcher != null) {
+					try {
+						watcher.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+
     private void setURL(String url, boolean browse) {
         Trace.trace(Trace.FINEST, "setURL: " + url + " " + browse); //$NON-NLS-1$ //$NON-NLS-2$
         if (url == null) {
@@ -759,6 +801,15 @@ public class BrowserViewer extends Composite {
         refresh.setToolTipText(Messages.actionWebBrowserRefresh);
 		refresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> refresh()));
 
+		// create a auto-refresh toggle action
+		// TODO: get new images for auto-refresh
+		autoRefresh = new ToolItem(toolbar, SWT.CHECK);
+		autoRefresh.setImage(ImageResource.getImage(ImageResource.IMG_ELCL_NAV_REFRESH));
+		autoRefresh.setHotImage(ImageResource.getImage(ImageResource.IMG_CLCL_NAV_REFRESH));
+		autoRefresh.setDisabledImage(ImageResource.getImage(ImageResource.IMG_DLCL_NAV_REFRESH));
+		autoRefresh.setToolTipText(Messages.actionWebBrowserAutoRefresh);
+		autoRefresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> autoRefresh()));
+
 		return toolbar;
     }
 
@@ -894,5 +945,47 @@ public class BrowserViewer extends Composite {
    	 fileListenerThread = null;
    	 browser.removeLocationListener(locationListener2);
    	 locationListener2 = null;
+    }
+
+	/*
+	 * Start the WatchService so that it monitors the local file system for any
+	 * changes. This is used by the auto-refresh action as it will monitor the HTML
+	 * file being displayed and refresh the browser when there are changes.
+	 */
+	private void fileChangedWatchService(File file) {
+		while (file.isFile()) {
+			// get the directory as that is the requirement of WatchService
+			file = file.getParentFile();
+		}
+		try {
+			if (watcher != null) {
+				watcher.close();
+			}
+			watcher = FileSystems.getDefault().newWatchService();
+			final Path path = FileSystems.getDefault().getPath(file.getAbsolutePath());
+			path.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+			new Thread(() -> {
+				try {
+					WatchKey key = watcher.take();
+					while (key != null) {
+						for (WatchEvent<?> event : key.pollEvents()) {
+							final Path changedPath = (Path) event.context();
+							if (changedPath.toString().endsWith(".html")) { //$NON-NLS-1$
+								Display.getDefault().asyncExec(() -> browser.refresh());
+							}
+						}
+						key.reset();
+						key = watcher.take();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ClosedWatchServiceException e) {
+					// ignore
+				}
+			}).start();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 }
