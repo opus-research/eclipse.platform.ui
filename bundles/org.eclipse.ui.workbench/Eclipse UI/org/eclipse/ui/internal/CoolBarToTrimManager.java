@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237, 472654
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601, 445538
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 409633
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -30,6 +31,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.HandledContributionItem;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
@@ -524,7 +526,22 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	}
 
 	@Override
-	public void setLockLayout(boolean value) {
+	public void setLockLayout(boolean lock) {
+		final List<MToolBar> children = modelService.findElements(window, null, MToolBar.class, null);
+		for (MToolBar el : children) {
+			if (lock) {
+				// locks the toolbars
+				if (!el.getTags().contains(TOOLBAR_SEPARATOR) && !el.getTags().contains(IPresentationEngine.NO_MOVE)) {
+					el.getTags().add(IPresentationEngine.NO_MOVE);
+				}
+			} else {
+				// unlocks the toolbars
+				if (!el.getTags().contains(TOOLBAR_SEPARATOR) && el.getTags().contains(IPresentationEngine.NO_MOVE)) {
+					el.getTags().remove(IPresentationEngine.NO_MOVE);
+				}
+			}
+		}
+
 	}
 
 	@Override
