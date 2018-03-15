@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,6 +52,10 @@ public class ObservableCollectionTreeContentProviderTest extends AbstractDefault
 		super.tearDown();
 	}
 
+	/**
+	 * This also tests, that the knownElements are filled on setInput without
+	 * calling getElements.
+	 */
 	public void testGetKnownElements_ExcludesInput() {
 		final Object input = new Object();
 		Object[] rootElements = new Object[] { "one", "two", "three" };
@@ -66,7 +70,6 @@ public class ObservableCollectionTreeContentProviderTest extends AbstractDefault
 		}, null);
 		viewer.setContentProvider(contentProvider);
 		viewer.setInput(input);
-		contentProvider.getElements(input);
 
 		IObservableSet knownElements = contentProvider.getKnownElements();
 		assertFalse(knownElements.contains(input));
