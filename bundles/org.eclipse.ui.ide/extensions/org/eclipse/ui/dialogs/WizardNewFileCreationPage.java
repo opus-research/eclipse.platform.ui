@@ -822,10 +822,27 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 
 		String resourceName = resourceGroup.getResource();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IStatus result = workspace.validateName(resourceName, IResource.FILE);
-		if (!result.isOK()) {
-			setErrorMessage(result.getMessage());
-			return false;
+		if (resourceName != null && !resourceName.isEmpty()) {
+			if (resourceName.endsWith("/")) { //$NON-NLS-1$
+				validateName(""); //$NON-NLS-1$
+				return false;
+			}
+			IPath resourcePath = new Path(resourceName);
+			if (resourcePath.segmentCount() > 1) {
+				for (String segment : resourcePath.segments()) {
+					if (!validateName(segment)) {
+						return false;
+					}
+				}
+			} else {
+				if (!validateName(resourceName)) {
+					return false;
+				}
+			}
+		} else {
+			if (!validateName(resourceName)) {
+				return false;
+			}
 		}
 
 		IStatus linkedResourceStatus = null;
@@ -864,6 +881,16 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			valid = false;
 		}
 		return valid;
+	}
+
+	private boolean validateName(String resourceName) {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IStatus result = workspace.validateName(resourceName, IResource.FILE);
+		if (!result.isOK()) {
+			setErrorMessage(result.getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isFilteredByParent() {
