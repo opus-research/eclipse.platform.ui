@@ -25,11 +25,12 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -383,20 +384,20 @@ public class DialogSettings implements IDialogSettings {
         out.startTag(TAG_SECTION, attributes);
         attributes.clear();
 
-		for (Entry<String, String> entry : items.entrySet()) {
-			String key = entry.getKey();
+        for (Iterator<String> i = items.keySet().iterator(); i.hasNext();) {
+            String key = i.next();
             attributes.put(TAG_KEY, key == null ? "" : key); //$NON-NLS-1$
-			String string = entry.getValue();
+            String string = items.get(key);
             attributes.put(TAG_VALUE, string == null ? "" : string); //$NON-NLS-1$
             out.printTag(TAG_ITEM, attributes, true);
         }
 
         attributes.clear();
-		for (Entry<String, String[]> entry : arrayItems.entrySet()) {
-			String key = entry.getKey();
+        for (Iterator<String> i = arrayItems.keySet().iterator(); i.hasNext();) {
+            String key = i.next();
             attributes.put(TAG_KEY, key == null ? "" : key); //$NON-NLS-1$
             out.startTag(TAG_LIST, attributes);
-			String[] value = entry.getValue();
+            String[] value = arrayItems.get(key);
             attributes.clear();
             if (value != null) {
                 for (int index = 0; index < value.length; index++) {
@@ -483,12 +484,12 @@ public class DialogSettings implements IDialogSettings {
     		sb.append('<');
     		sb.append(name);
     		if (parameters != null) {
-				for (Entry<String, String> entry : parameters.entrySet()) {
+				for (Enumeration<String> e = Collections.enumeration(parameters.keySet()); e.hasMoreElements();) {
     				sb.append(" "); //$NON-NLS-1$
-					String key = entry.getKey();
+    				String key = e.nextElement();
     				sb.append(key);
     				sb.append("=\""); //$NON-NLS-1$
-					sb.append(getEscaped(String.valueOf(entry.getValue())));
+    				sb.append(getEscaped(String.valueOf(parameters.get(key))));
     				sb.append("\""); //$NON-NLS-1$
     			}
 			}
