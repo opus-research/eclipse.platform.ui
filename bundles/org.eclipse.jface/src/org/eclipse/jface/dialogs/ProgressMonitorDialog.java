@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mikael Barbero (Eclipse Foundation) - Bug 470175
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
@@ -16,7 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.internal.CancelabilityMonitorUtils;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
@@ -476,16 +474,14 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 			IRunnableWithProgress runnable) throws InvocationTargetException,
 			InterruptedException {
 		setCancelable(cancelable);
-		IProgressMonitor pm = CancelabilityMonitorUtils.aboutToStart(cancelable, getProgressMonitor(), task);
 		try {
 			aboutToRun();
 			// Let the progress monitor know if they need to update in UI Thread
 			progressMonitor.forked = fork;
-
-			ModalContext.run(runnable, fork, pm, getShell().getDisplay());
+			ModalContext.run(runnable, fork, getProgressMonitor(), getShell()
+					.getDisplay());
 		} finally {
 			finishedRun();
-			CancelabilityMonitorUtils.hasStopped(pm);
 		}
 	}
 

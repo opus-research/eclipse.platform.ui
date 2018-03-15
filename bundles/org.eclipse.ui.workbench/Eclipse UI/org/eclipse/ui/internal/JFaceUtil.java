@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mikael Barbero (Eclipse Foundation) - Bug 470175
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
-import org.eclipse.core.internal.runtime.CancelabilityMonitor;
-import org.eclipse.core.internal.runtime.CancelabilityMonitor.BasicOptionsImpl;
-import org.eclipse.core.internal.runtime.CancelabilityMonitor.Options;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -75,22 +71,6 @@ final class JFaceUtil {
 				StatusAdapter statusAdapter = new StatusAdapter(status);
 				statusAdapter.setProperty(StatusAdapter.TITLE_PROPERTY, title);
 				StatusManager.getManager().handle(statusAdapter, StatusManager.SHOW);
-			}
-		});
-
-		InternalPolicy.setCancelabilityMonitorOptions(new CancelabilityMonitor.ForwardingOptions() {
-			private Options defaultOptions;
-			@Override
-			protected Options delegate() {
-				Options optionService = WorkbenchPlugin.getDefault().getCancelabilityMonitorOptions();
-				if (optionService == null) {
-					if (defaultOptions == null) {
-						defaultOptions = new CancelabilityMonitor.BasicOptionsImpl();
-						((BasicOptionsImpl) defaultOptions).setEnabled(false);
-					}
-					return defaultOptions;
-				}
-				return optionService;
 			}
 		});
 
