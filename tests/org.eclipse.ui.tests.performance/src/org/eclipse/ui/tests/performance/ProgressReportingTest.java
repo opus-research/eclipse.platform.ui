@@ -21,15 +21,6 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public class ProgressReportingTest extends BasicPerformanceTest {
 
-	/**
-	 * Number of iterations to run for the inner loop in these tests. This
-	 * should be chosen such that all the well-behaved tests produce a result of
-	 * around 500ms to 1s on average. Making it too small reduces the accuracy
-	 * of the measurements since the test framework can't measure times smaller
-	 * than 1ms. Making it too big reduces the number of times we can rerun the
-	 * tests in the 4s limit, preventing us from computing the standard
-	 * deviation.
-	 */
 	public static final int ITERATIONS = 10000000;
 
 	/**
