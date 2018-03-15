@@ -690,7 +690,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
+						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
+								.get(IMenuService.class);
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
@@ -844,7 +845,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 				}
 
 				Dictionary properties = new Hashtable();
-				properties.put(Constants.SERVICE_RANKING, Integer.valueOf(Integer.MAX_VALUE));
+				properties.put(Constants.SERVICE_RANKING, new Integer(Integer.MAX_VALUE));
 				BundleContext context = WorkbenchPlugin.getDefault().getBundleContext();
 				final ServiceRegistration registration[] = new ServiceRegistration[1];
 				StartupMonitor startupMonitor = new StartupMonitor() {
