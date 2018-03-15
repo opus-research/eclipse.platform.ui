@@ -37,6 +37,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablesLifecycleListener;
+import org.eclipse.ui.ISecondarySaveableSource;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -97,7 +98,8 @@ import org.eclipse.ui.part.ShowInContext;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class PropertySheet extends PageBookView implements ISelectionListener, IShowInTarget, IShowInSource, IRegistryEventListener {
+public class PropertySheet extends PageBookView
+		implements ISelectionListener, IShowInTarget, IShowInSource, IRegistryEventListener, ISecondarySaveableSource {
     /**
      * No longer used but preserved to avoid api change
      */
@@ -142,6 +144,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		@Override
 		public void handleLifecycleEvent(SaveablesLifecycleEvent event) {
 			if (currentPart == null || event.getEventType() != SaveablesLifecycleEvent.DIRTY_CHANGED) {
+				return;
+			}
+			if (!isDirtyStateIndicationSupported()) {
 				return;
 			}
 			Saveable[] saveables = event.getSaveables();
@@ -458,29 +463,22 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
 	}
 
-    /**
-	 * The <code>PropertySheet</code> implementation of this
-	 * <code>PageBookView</code> method handles the <code>ISaveablePart</code>
-	 * adapter case by calling <code>getSaveablePart()</code>.
-	 * <p>
-	 * This is required to make sure that if the current part tracked by this
-	 * <code>PropertySheet</code> instance is <b>not</b> contributing pages to
-	 * this <code>PropertySheet</code>, we do <b>not</b> expose an
-	 * <code>ISaveablePart</code> adapter to it via <code>getAdapter()</code>
-	 * call to the default page. If we would do this, we would illegally add
-	 * <code>ISaveablePart</code> functionality to this
-	 * <code>PropertySheet</code> instance even if the target part has not
-	 * contributed anything.
+	/**
+	 * @since 3.9
 	 */
 	@Override
-	public <T> T getAdapter(Class<T> key) {
-		if (ISaveablePart.class.equals(key)) {
-			return key.cast(getSaveablePart());
+	public boolean isDirtyStateIndicationSupported() {
+		ISecondarySaveableSource source = getAdapter(ISecondarySaveableSource.class);
+		if (source != null && source != this) {
+			// delegate to the page if we should show dirty state, see bug
+			// 495567
+			return source.isDirtyStateIndicationSupported();
 		}
-		return super.getAdapter(key);
+		// delegate to default implementation
+		return ISecondarySaveableSource.super.isDirtyStateIndicationSupported();
 	}
 
-    /**
+	/**
 	 * The <code>PropertySheet</code> implementation of this
 	 * <code>PageBookView</code> method handles the <code>ISaveablePart</code>
 	 * adapter case by calling <code>getSaveablePart()</code>.
