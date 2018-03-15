@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -4950,33 +4950,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 				});
 			}
 		}
-		else if (client != null) {
-			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
-						.get(E4PartWrapper.E4_WRAPPER_KEY);
-				final IWorkbenchPartReference partReference = getReference(workbenchPart);
-
-				if (partReference != null) {
-					for (final Object listener : partListenerList.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener) listener).partActivated(workbenchPart);
-							}
-						});
-					}
-
-					for (final Object listener : partListener2List.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener2) listener).partActivated(partReference);
-							}
-						});
-					}
-				}
-			}
-		}
 	}
 
 	private void firePartDeactivated(MPart part) {
@@ -5001,32 +4974,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 						((IPartListener2) listener).partDeactivated(partReference);
 					}
 				});
-			}
-		} else if (client != null) {
-			if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-				IWorkbenchPart workbenchPart = (IWorkbenchPart) part.getTransientData()
-						.get(E4PartWrapper.E4_WRAPPER_KEY);
-				final IWorkbenchPartReference partReference = getReference(workbenchPart);
-
-				if (partReference != null) {
-					for (final Object listener : partListenerList.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener) listener).partDeactivated(workbenchPart);
-							}
-						});
-					}
-
-					for (final Object listener : partListener2List.getListeners()) {
-						SafeRunner.run(new SafeRunnable() {
-							@Override
-							public void run() throws Exception {
-								((IPartListener2) listener).partDeactivated(partReference);
-							}
-						});
-					}
-				}
 			}
 		}
 	}

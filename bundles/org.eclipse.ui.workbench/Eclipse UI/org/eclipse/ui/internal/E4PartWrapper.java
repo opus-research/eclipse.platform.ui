@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 David Berger <david.berger@logicals.com> and others.
+ * Copyright (c) 2014 David Berger <david.berger@logicals.com> and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,23 +35,6 @@ public class E4PartWrapper extends ViewPart {
 		if (wrappedPart.getObject() != null && wrappedPart.getContext() != null)
 			ContextInjectionFactory.invoke(wrappedPart.getObject(), Focus.class,
 					wrappedPart.getContext());
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-            return true;
-        }
-		if (obj instanceof E4PartWrapper) {
-			E4PartWrapper wrapper = (E4PartWrapper) obj;
-			if (wrapper.wrappedPart == wrappedPart) {
-				return true;
-			}
-			if (wrapper.wrappedPart != null) {
-				return wrapper.wrappedPart.equals(wrappedPart);
-			}
-		}
-		return false;
 	}
 }
 
