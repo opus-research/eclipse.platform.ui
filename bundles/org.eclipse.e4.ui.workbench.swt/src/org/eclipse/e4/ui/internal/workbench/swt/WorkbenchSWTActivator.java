@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Hashtable;
 import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -72,9 +71,6 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
-		Hashtable<String, String> props = new Hashtable<>(2);
-		props.put(DebugOptions.LISTENER_SYMBOLICNAME, PI_RENDERERS);
-		context.registerService(DebugOptionsListener.class, this, props);
 	}
 
 	@Override
@@ -142,7 +138,7 @@ public class WorkbenchSWTActivator implements BundleActivator, DebugOptionsListe
 		DEBUG_MENUS = options.getBooleanOption(PI_RENDERERS + DEBUG_MENUS_FLAG, false);
 		DEBUG_RENDERER = options.getBooleanOption(PI_RENDERERS + DEBUG_RENDERER_FLAG, false);
 	}
-
+	
 	public DebugTrace getTrace() {
 		return trace;
 	}
