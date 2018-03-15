@@ -11,7 +11,6 @@
 package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 
@@ -131,7 +130,7 @@ public class StyledTextScrollbarTest extends CSSSWTTestCase {
 
 		engine.applyStyles(styledText, true);
 		assertEquals(false, invoke(adapter, "getScrollBarThemed"));
-		assertTrue(styledText.getVerticalBar().getVisible());
+		assertEquals(true, styledText.getVerticalBar().getVisible());
 	}
 
 	private Object invoke(Object adapter, String string) {

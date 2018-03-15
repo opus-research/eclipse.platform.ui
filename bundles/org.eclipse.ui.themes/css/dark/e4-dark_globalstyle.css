@@ -465,17 +465,17 @@ ProgressIndicator#org-eclipse-ui-splash-progressIndicator {
 	background-color: #e1e1e1;
 }
 
-/*
-	 * Default values for using a styled scrollbar to allow a user to set -Dswt.enable.themedScrollBar=true/false to force
-	 * it to true/false regardless of the CSS value.
+/* 
+	 * Default values for using a styled scrollbar to allow a user to set -Dswt.enable.themedScrollBar=true/false to force 
+	 * it to true/false regardless of the CSS value. 
 	 *
 	 * swt-scrollbar-themed must be present for -Dswt.enable.themedScrollBar to be supported
 	 */
-
+	 
 StyledText {
-
+	
 	swt-scrollbar-themed: false;
-
+	
 	swt-scrollbar-background-color: #383838;
 	swt-scrollbar-foreground-color: #494949;
 	swt-scrollbar-width: 4px;
