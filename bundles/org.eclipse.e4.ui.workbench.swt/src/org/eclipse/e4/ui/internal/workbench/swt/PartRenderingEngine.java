@@ -66,7 +66,6 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -237,36 +236,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 			return;
 		}
 
-		handleElement(event, changedObj, ((MContext) changedObj).getContext());
-	}
-
-	@Inject
-	@Optional
-	private void subscribePartTrimHandler(@EventTopic(UIEvents.Part.TOPIC_TRIMBARS) Event event) {
-
-		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(changedObj instanceof MPart)) {
-			return;
-		}
-
-		handleElement(event, changedObj, ((MContext) changedObj).getContext());
-	}
-
-	@Inject
-	@Optional
-	private void subscribePerspectiveTrimHandler(@EventTopic(UIEvents.Perspective.TOPIC_TRIMBARS) Event event) {
-
-		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(changedObj instanceof MPerspective)) {
-			return;
-		}
-
-		handleElement(event, changedObj, ((MContext) changedObj).getContext());
-	}
-
-	private void handleElement(Event event, Object changedObj, IEclipseContext elementContext) {
-		MUIElement uiElement = (MUIElement) changedObj;
-		if (uiElement.getWidget() == null) {
+		MTrimmedWindow window = (MTrimmedWindow) changedObj;
+		if (window.getWidget() == null) {
 			return;
 		}
 
@@ -274,7 +245,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			for (Object o : UIEvents.asIterable(event, UIEvents.EventTags.NEW_VALUE)) {
 				MUIElement added = (MUIElement) o;
 				if (added.isToBeRendered()) {
-					createGui(added, uiElement.getWidget(), elementContext);
+					createGui(added, window.getWidget(), window.getContext());
 				}
 			}
 		} else if (UIEvents.isREMOVE(event)) {
