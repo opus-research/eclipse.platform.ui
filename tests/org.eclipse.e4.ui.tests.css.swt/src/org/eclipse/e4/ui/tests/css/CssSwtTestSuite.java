@@ -20,6 +20,8 @@ import org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelperTest;
 import org.eclipse.e4.ui.css.swt.helpers.EclipsePreferencesHelperTest;
 import org.eclipse.e4.ui.css.swt.helpers.PreferenceOverriddenByCssChangeListenerTest;
 import org.eclipse.e4.ui.css.swt.properties.preference.EclipsePreferencesHandlerTest;
+import org.eclipse.e4.ui.tests.css.properties.tabbed.TabbedPropertiesListTest;
+import org.eclipse.e4.ui.tests.css.properties.tabbed.TabbedPropertiesTitleTest;
 import org.eclipse.e4.ui.tests.css.swt.Bug419482Test;
 import org.eclipse.e4.ui.tests.css.swt.Bug459961Test;
 import org.eclipse.e4.ui.tests.css.swt.ButtonTest;
@@ -37,6 +39,7 @@ import org.eclipse.e4.ui.tests.css.swt.InheritTest;
 import org.eclipse.e4.ui.tests.css.swt.InnerClassElementTest;
 import org.eclipse.e4.ui.tests.css.swt.LabelTest;
 import org.eclipse.e4.ui.tests.css.swt.LabelTextTransformTest;
+import org.eclipse.e4.ui.tests.css.swt.LifeCycleTest;
 import org.eclipse.e4.ui.tests.css.swt.LinkTest;
 import org.eclipse.e4.ui.tests.css.swt.MarginTest;
 import org.eclipse.e4.ui.tests.css.swt.ShellActiveTest;
@@ -65,6 +68,7 @@ import org.junit.runners.Suite;
 	EclipsePreferencesHelperTest.class,
 	CSSSWTWidgetTest.class,
 	LabelTest.class,
+	LifeCycleTest.class,
 	LinkTest.class,
 	CTabFolderTest.class,
 	CTabItemTest.class,
@@ -87,7 +91,9 @@ import org.junit.runners.Suite;
 	InheritTest.class,
 	StyledTextScrollbarTest.class,
 	TableTest.class,
-	TreeTest.class})
+	TreeTest.class,
+	TabbedPropertiesListTest.class,
+	TabbedPropertiesTitleTest.class})
 public class CssSwtTestSuite {
 
 }
