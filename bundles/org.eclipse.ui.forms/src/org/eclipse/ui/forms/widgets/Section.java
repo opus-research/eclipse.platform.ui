@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Michael Williamson (eclipse-bugs@magnaworks.com) - patch (see Bugzilla #92545)
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205, 458055
- *     Ralf Petter <ralf.petter@gmail.com> - Bug 509654, 183675
+ *     Ralf Petter <ralf.petter@gmail.com> - Bug 509654, 183675, 510228
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -62,6 +62,8 @@ public class Section extends ExpandableComposite {
 
 	private Hashtable<String, Color> titleColors;
 
+	private boolean updateHeaderImage;
+
 	private static final String COLOR_BG = "bg"; //$NON-NLS-1$
 
 	private static final String COLOR_GBG = "gbg"; //$NON-NLS-1$
@@ -88,11 +90,14 @@ public class Section extends ExpandableComposite {
 		}
 		if ((style & TITLE_BAR) != 0) {
 			Listener listener = e -> {
-				Image image = Section.super.getBackgroundImage();
-				if (image != null) {
-					FormImages.getInstance().markFinished(image, getDisplay());
+				updateHeaderImage = true;
+				if(e.type==SWT.Dispose){
+					Image image = Section.super.getBackgroundImage();
+					if (image != null) {
+						FormImages.getInstance().markFinished(image, getDisplay());
+					}
 				}
-				Section.super.setBackgroundImage(null);
+
 			};
 			addListener(SWT.Dispose, listener);
 			addListener(SWT.Resize, listener);
@@ -108,7 +113,7 @@ public class Section extends ExpandableComposite {
 		super.internalSetExpanded(expanded);
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
 			if (!expanded)
-				super.setBackgroundImage(null);
+				updateHeaderImage = false;
 		}
 		reflow();
 	}
@@ -303,11 +308,16 @@ public class Section extends ExpandableComposite {
 	}
 
 	private void putTitleBarColor(String key, Color color) {
-		if (color == null)
-			return;
 		if (titleColors == null)
 			titleColors = new Hashtable<>();
-		titleColors.put(key, color);
+		if (color != null && color.equals(titleColors.get(key))) {
+			return;
+		}
+		if (color != null)
+			titleColors.put(key, color);
+		else
+			titleColors.remove(key);
+		updateHeaderImage = true;
 	}
 
 	@Override
@@ -365,7 +375,7 @@ public class Section extends ExpandableComposite {
 			theight = 5;
 		}
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
-			if (getBackgroundImage() == null)
+			if (updateHeaderImage)
 				updateHeaderImage(bg, bounds, gradientheight, theight);
 			gc.setBackground(getBackground());
 			gc.fillRectangle(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -433,9 +443,13 @@ public class Section extends ExpandableComposite {
 
 	private void updateHeaderImage(Color bg, Rectangle bounds, int theight, int realtheight) {
 		Color gradient = getTitleBarGradientBackground() != null ? getTitleBarGradientBackground() : getBackground();
+		Image oldImage = super.getBackgroundImage();
 		Image image = FormImages.getInstance().getSectionGradientImage(gradient, bg, realtheight,
 				theight, marginHeight, getDisplay());
 		super.setBackgroundImage(image);
+		if (oldImage != null)
+			FormImages.getInstance().markFinished(oldImage, getDisplay());
+		updateHeaderImage = false;
 	}
 
 	/**
