@@ -16,7 +16,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IProduct;
@@ -26,8 +25,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceColors;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
@@ -62,7 +59,6 @@ import org.eclipse.ui.internal.about.AboutTextManager;
 import org.eclipse.ui.internal.about.InstallationDialog;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
-import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
  * Displays information about the product.
@@ -77,11 +73,7 @@ public class AboutDialog extends TrayDialog {
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
-	private final static int IMPORT_ID = IDialogConstants.CLIENT_ID + 2;
-
-	private final static int EXPORT_ID = IDialogConstants.CLIENT_ID + 3;
-
-	private String productName;
+    private String productName;
 
     private IProduct product;
 
@@ -136,46 +128,6 @@ public class AboutDialog extends TrayDialog {
 				dialog.open();
 			});
             break;
-		case EXPORT_ID:
-			BusyIndicator.showWhile(getShell().getDisplay(), () -> {
-				String wizard_id = "org.eclipse.equinox.p2.replication.export"; //$NON-NLS-1$
-				IWizardDescriptor descriptor = PlatformUI.getWorkbench().getExportWizardRegistry()
-						.findWizard(wizard_id);
-				if (descriptor != null) {
-					IWizard wizard;
-					try {
-						wizard = descriptor.createWizard();
-						WizardDialog wd = new WizardDialog(getShell(), wizard);
-						wd.setTitle(wizard.getWindowTitle());
-						wd.open();
-					} catch (CoreException e) {
-						e.printStackTrace();
-					}
-
-				}
-
-			});
-			break;
-		case IMPORT_ID:
-			BusyIndicator.showWhile(getShell().getDisplay(), () -> {
-				String wizard_id = "org.eclipse.equinox.p2.replication.import"; //$NON-NLS-1$
-				IWizardDescriptor descriptor = PlatformUI.getWorkbench().getImportWizardRegistry()
-						.findWizard(wizard_id);
-				if (descriptor != null) {
-					IWizard wizard;
-					try {
-						wizard = descriptor.createWizard();
-						WizardDialog wd = new WizardDialog(getShell(), wizard);
-						wd.setTitle(wizard.getWindowTitle());
-						wd.open();
-					} catch (CoreException e) {
-						e.printStackTrace();
-					}
-
-				}
-
-			});
-			break;
         default:
             super.buttonPressed(buttonId);
             break;
@@ -213,11 +165,6 @@ public class AboutDialog extends TrayDialog {
         parent.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createButton(parent, DETAILS_ID, WorkbenchMessages.AboutDialog_DetailsButton, false);
-
-		createButton(parent, EXPORT_ID, WorkbenchMessages.AboutDialog_ExportButton, false);
-
-		createButton(parent, IMPORT_ID, WorkbenchMessages.AboutDialog_ImportButton, false);
-
 
         Label l = new Label(parent, SWT.NONE);
         l.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));

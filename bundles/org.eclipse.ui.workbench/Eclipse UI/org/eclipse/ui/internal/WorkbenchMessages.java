@@ -310,8 +310,6 @@ public class WorkbenchMessages extends NLS {
 
 
 	public static String AboutDialog_DetailsButton;
-	public static String AboutDialog_ImportButton;
-	public static String AboutDialog_ExportButton;
 	public static String ProductInfoDialog_errorTitle;
 	public static String ProductInfoDialog_unableToOpenWebBrowser;
 	public static String PreferencesExportDialog_ErrorDialogTitle;
