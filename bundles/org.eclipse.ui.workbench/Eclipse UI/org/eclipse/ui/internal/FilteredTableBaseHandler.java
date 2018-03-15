@@ -6,13 +6,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -762,9 +760,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		return new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				if (element instanceof FilteredTableItem) {
-					return ((FilteredTableItem) element).text;
-				} else if (element instanceof WorkbenchPartReference) {
+				if (element instanceof WorkbenchPartReference) {
 					WorkbenchPartReference ref = ((WorkbenchPartReference) element);
 					if (ref.isDirty()) {
 						return "*" + ref.getTitle(); //$NON-NLS-1$
@@ -780,9 +776,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 
 			@Override
 			public Image getImage(Object element) {
-				if (element instanceof FilteredTableItem) {
-					return ((FilteredTableItem) element).image;
-				} else if (element instanceof WorkbenchPartReference) {
+				if (element instanceof WorkbenchPartReference) {
 					return ((WorkbenchPartReference) element).getTitleImage();
 				} else if (element instanceof IPerspectiveDescriptor) {
 					IPerspectiveDescriptor desc = (IPerspectiveDescriptor) element;
@@ -793,9 +787,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 
 			@Override
 			public String getToolTipText(Object element) {
-				if (element instanceof FilteredTableItem) {
-					return ((FilteredTableItem) element).tooltipText;
-				} else if (element instanceof WorkbenchPartReference) {
+				if (element instanceof WorkbenchPartReference) {
 					return ((WorkbenchPartReference) element).getTitleToolTip();
 				}
 				return super.getToolTipText(element);
@@ -843,30 +835,5 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 			String propertyName, Object data) throws CoreException {
 		// true by default, but depends on data
 		gotoDirection = data == null || "true".equals(data); //$NON-NLS-1$
-	}
-
-	/** Class used to store items to be displayed */
-	public class FilteredTableItem {
-		String text;
-		Image image;
-		String tooltipText;
-		Map<String, Object> dataMap = new HashMap<>();
-
-		public void setText(String text) {
-			this.text = text;
-		}
-
-		public void setImage(Image image) {
-			this.image = image;
-		}
-
-		public void putData(String key, Object value) {
-			this.dataMap.put(key, value);
-		}
-
-		public Object getData(String key) {
-			return dataMap.get(key);
-		}
-
 	}
 }
