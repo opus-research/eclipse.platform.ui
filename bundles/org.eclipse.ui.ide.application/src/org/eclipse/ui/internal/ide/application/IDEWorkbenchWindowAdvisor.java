@@ -10,6 +10,7 @@
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     Christian Georgi (SAP)             -  bug 432480
  *     Denis Zygann <d.zygann@web.de>      - bug 457390
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 502050
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
@@ -352,7 +354,8 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			public void propertyChange(PropertyChangeEvent event) {
 				String property = event.getProperty();
 				if (IDEInternalPreferences.WORKSPACE_NAME.equals(property)
-						|| IDEInternalPreferences.SHOW_LOCATION.equals(property)) {
+						|| IDEInternalPreferences.SHOW_LOCATION.equals(property)
+						|| IDEInternalPreferences.SHOW_LOCATION_FULLPATH.equals(property)) {
 					// Make sure the title is actually updated by
 					// setting last active page.
 					lastActivePage = null;
@@ -365,6 +368,35 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	private String computeTitle() {
+		StringJoiner joiner = new StringJoiner(" - "); //$NON-NLS-1$
+		StringJoiner sj = new StringJoiner(" - "); //$NON-NLS-1$
+		//
+		{
+			// workspace location / name
+			String workspaceLocation = wbAdvisor.getWorkspaceLocation();
+			if (workspaceLocation != null) {
+				sj.add(workspaceLocation);
+			}
+
+			IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+			IWorkbenchPage currentPage = configurer.getWindow().getActivePage();
+			IEditorPart activeEditor = null;
+			if (currentPage != null) {
+				activeEditor = lastActiveEditor;
+			}
+			// active editor
+			if (currentPage != null) {
+				if (activeEditor != null) {
+					sj.add(activeEditor.getTitleToolTip());
+				}
+			}
+			// Application (product) name
+			IProduct product = Platform.getProduct();
+			if (product != null) {
+				sj.add(product.getName());
+			}
+		}
+		//
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		IWorkbenchPage currentPage = configurer.getWindow().getActivePage();
 		IEditorPart activeEditor = null;
@@ -375,6 +407,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		String title = null;
 		IProduct product = Platform.getProduct();
 		if (product != null) {
+			joiner.add(product.getName());
 			title = product.getName();
 		}
 		if (title == null) {
@@ -384,42 +417,42 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		if (currentPage != null) {
 			if (activeEditor != null) {
 				lastEditorTitleTooltip = activeEditor.getTitleToolTip();
-				title = NLS.bind(
-						IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
-						lastEditorTitleTooltip, title);
+				joiner.add(lastEditorTitleTooltip);
+				title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle, lastEditorTitleTooltip, title);
 			}
 			IPerspectiveDescriptor persp = currentPage.getPerspective();
 			String label = ""; //$NON-NLS-1$
 			if (persp != null) {
 				label = persp.getLabel();
+				System.out.println(persp.getLabel());
 			}
 			IAdaptable input = currentPage.getInput();
 			if (input != null && !input.equals(wbAdvisor.getDefaultPageInput())) {
 				label = currentPage.getLabel();
+				System.out.println(currentPage.getLabel());
 			}
 			if (label != null && !label.equals("")) { //$NON-NLS-1$
-				title = NLS.bind(
-						IDEWorkbenchMessages.WorkbenchWindow_shellTitle, label,
-						title);
+				joiner.add(label);
+				title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle, label, title);
 			}
 		}
 
 		String workspaceLocation = wbAdvisor.getWorkspaceLocation();
 		if (workspaceLocation != null) {
-			title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
-					title, workspaceLocation);
+			joiner.add(workspaceLocation);
+			title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle, title, workspaceLocation);
 		}
 
 		// Bug 284447: Prepend workspace name to the title
-		String workspaceName = IDEWorkbenchPlugin.getDefault()
-				.getPreferenceStore().getString(
-						IDEInternalPreferences.WORKSPACE_NAME);
+		String workspaceName = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
+				.getString(IDEInternalPreferences.WORKSPACE_NAME);
 		if (workspaceName != null && workspaceName.length() > 0) {
-			title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
-					workspaceName, title);
+			joiner.add(workspaceName);
+			title = NLS.bind(IDEWorkbenchMessages.WorkbenchWindow_shellTitle, workspaceName, title);
 		}
 
-		return title;
+		System.out.printf("%n title: %s%n joind: %s%n", title, joiner.toString()); //$NON-NLS-1$
+		return sj.toString();
 	}
 
 	private void recomputeTitle() {
@@ -598,7 +631,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			openWelcomeEditor(window, new WelcomeEditorInput(productInfo), null);
 		} else {
 			// Show the welcome page for any newly installed features
-			List<AboutInfo> welcomeFeatures = new ArrayList<AboutInfo>();
+			List<AboutInfo> welcomeFeatures = new ArrayList<>();
 			for (Iterator it = wbAdvisor.getNewlyAddedBundleGroups().entrySet()
 					.iterator(); it.hasNext();) {
 				Map.Entry entry = (Map.Entry) it.next();
