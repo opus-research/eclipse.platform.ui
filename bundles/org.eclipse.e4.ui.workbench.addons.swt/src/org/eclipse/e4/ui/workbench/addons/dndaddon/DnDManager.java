@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.widgets.ImageBasedFrame;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -141,6 +142,11 @@ class DnDManager {
 		EventHandler stackWidgetHandler = new EventHandler() {
 			public void handleEvent(org.osgi.service.event.Event event) {
 				MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+
+				// Only add listeners for stacks in *this* window
+				MWindow elementWin = getModelService().getTopLevelWindowFor(element);
+				if (elementWin != dragWindow)
+					return;
 
 				// Listen for drags starting in CTabFolders
 				if (element.getWidget() instanceof CTabFolder
@@ -385,6 +391,10 @@ class DnDManager {
 			overlayFrame = new Shell(getDragShell(), SWT.NO_TRIM);
 			overlayFrame.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
 			overlayFrame.setAlpha(150);
+
+			IStylingEngine stylingEngine = dragWindow.getContext().get(IStylingEngine.class);
+			stylingEngine.setClassname(overlayFrame, "DragFeedback");
+			stylingEngine.style(overlayFrame);
 
 			overlayFrame.addPaintListener(new PaintListener() {
 				public void paintControl(PaintEvent e) {

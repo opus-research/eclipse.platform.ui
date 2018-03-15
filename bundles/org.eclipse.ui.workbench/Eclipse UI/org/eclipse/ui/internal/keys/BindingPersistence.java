@@ -1227,6 +1227,9 @@ public class BindingPersistence extends PreferencePersistence {
 			final CommandManager commandManager) {
 		this.bindingManager = bindingManager;
 		this.commandManager = commandManager;
+		// HACK.  Calling super.read() installs a required preferences change listener.
+		// See bug 266604.
+		super.read();
 	}
 
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {

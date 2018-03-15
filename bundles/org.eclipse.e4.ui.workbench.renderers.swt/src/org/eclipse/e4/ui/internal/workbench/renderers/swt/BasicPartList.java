@@ -23,6 +23,7 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -34,9 +35,12 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -45,6 +49,29 @@ import org.eclipse.swt.widgets.Table;
 public class BasicPartList extends AbstractTableInformationControl {
 
 	private class BasicStackListLabelProvider extends ColumnLabelProvider {
+
+		private Font boldFont;
+
+		public BasicStackListLabelProvider() {
+			Font font = Display.getDefault().getSystemFont();
+			FontData[] fontDatas = font.getFontData();
+			for (FontData fontData : fontDatas) {
+				fontData.setStyle(fontData.getStyle() | SWT.BOLD);
+			}
+			boldFont = new Font(Display.getDefault(), fontDatas);
+		}
+
+		@Override
+		public Font getFont(Object element) {
+			if (element instanceof MPart) {
+				MPart part = (MPart) element;
+				CTabItem item = renderer.findItemForPart(part);
+				if (item != null && !item.isShowing()) {
+					return boldFont;
+				}
+			}
+			return super.getFont(element);
+		}
 
 		public String getText(Object element) {
 			if (element instanceof MDirtyable
@@ -77,6 +104,11 @@ public class BasicPartList extends AbstractTableInformationControl {
 		public boolean useNativeToolTip(Object object) {
 			return true;
 		}
+
+		@Override
+		public void dispose() {
+			boldFont.dispose();
+		}
 	}
 
 	private Map<String, Image> images = new HashMap<String, Image>();
@@ -87,17 +119,20 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	private EPartService partService;
 
+	private StackRenderer renderer;
+
 	private CTabFolder cTabFolder;
 
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
-			ISWTResourceUtilities utils, CTabFolder cTabFolder,
-			boolean alphabetical) {
+			StackRenderer renderer, CTabFolder cTabFolder,
+			ISWTResourceUtilities utils, boolean alphabetical) {
 		super(parent, shellStyle, treeStyler);
 		this.partService = partService;
 		this.input = input;
-		this.utils = utils;
+		this.renderer = renderer;
 		this.cTabFolder = cTabFolder;
+		this.utils = utils;
 		if (alphabetical && getTableViewer() != null) {
 			getTableViewer().setComparator(new ViewerComparator());
 		}
@@ -105,9 +140,10 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
-			ISWTResourceUtilities utils, boolean alphabetical) {
-		this(parent, shellStyle, treeStyler, partService, input, utils, null,
-				alphabetical);
+			StackRenderer renderer, ISWTResourceUtilities utils,
+			boolean alphabetical) {
+		this(parent, shellStyle, treeStyler, partService, input, renderer,
+				null, utils, alphabetical);
 	}
 
 	private Image getLabelImage(String iconURI) {
@@ -185,6 +221,13 @@ public class BasicPartList extends AbstractTableInformationControl {
 				getShell().dispose();
 				return true;
 			}
+
+			// Remove part from viewer model
+			@SuppressWarnings("unchecked")
+			List<Object> viewerInput = (List<Object>) getTableViewer()
+					.getInput();
+			viewerInput.remove(selectedElement);
+
 		}
 		return false;
 

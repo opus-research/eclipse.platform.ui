@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -234,8 +234,9 @@ public class UIEventsTest extends HeadlessApplicationElementTest {
 
 		// Create the test harness and hook up the event publisher
 		MTestHarness allData = MTestFactory.eINSTANCE.createTestHarness();
-		((Notifier) allData).eAdapters().add(
-				new UIEventPublisher(applicationContext));
+		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
+		((Notifier) allData).eAdapters().add(ep);
+		applicationContext.set(UIEventPublisher.class, ep);
 
 		// AppElement
 		reset(allTesters);

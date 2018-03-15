@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -164,6 +164,8 @@ public class CommandContributionItem extends ContributionItem {
 	// items contributed
 	private String contributedLabel;
 
+	private String contributedTooltip;
+
 	private ImageDescriptor contributedIcon;
 
 	private ImageDescriptor contributedDisabledIcon;
@@ -184,6 +186,7 @@ public class CommandContributionItem extends ContributionItem {
 		super(contributionParameters.id);
 
 		contributedLabel = contributionParameters.label;
+		contributedTooltip = contributionParameters.tooltip;
 		contributedIcon = contributionParameters.icon;
 		contributedDisabledIcon = contributionParameters.disabledIcon;
 		contributedHoverIcon = contributionParameters.hoverIcon;
@@ -332,6 +335,7 @@ public class CommandContributionItem extends ContributionItem {
 					IHandler handler = commandEvent.getCommand().getHandler();
 					if (shouldRestoreAppearance(handler)) {
 						label = contributedLabel;
+						tooltip = contributedTooltip;
 						icon = contributedIcon;
 						disabledIcon = contributedDisabledIcon;
 						hoverIcon = contributedHoverIcon;
@@ -1031,9 +1035,9 @@ public class CommandContributionItem extends ContributionItem {
 		data.disabledIcon = contributedDisabledIcon;
 		data.hoverIcon = contributedHoverIcon;
 		data.label = contributedLabel;
+		data.tooltip = contributedTooltip;
 		data.helpContextId = helpContextId;
 		data.mnemonic = mnemonic;
-		data.tooltip = tooltip;
 		return data;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,8 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.model.internal;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -25,9 +24,15 @@ import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.EStructuralFeature.Setting;
 import org.eclipse.emf.ecore.ETypeParameter;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.EcoreUtil.UsageCrossReferencer;
 
 public class ModelUtils {
+	//public static final String CONTAINING_CONTEXT = "ModelUtils.containingContext";
+	public static final String CONTAINING_PARENT = "ModelUtils.containingParent";
+	
 	public static EClassifier getTypeArgument(EClass eClass,
 			EGenericType eGenericType) {
 		ETypeParameter eTypeParameter = eGenericType.getETypeParameter();
@@ -159,7 +164,14 @@ public class ModelUtils {
 						found = true; // skip 
 						break;
 					} else { // replace
+						EObject root = EcoreUtil.getRootContainer((EObject) existingEObject);
+						// Replacing the object in the container
 						EcoreUtil.replace((EObject)existingEObject, (EObject)element);
+						// Replacing the object in other references than the container.
+						Collection<Setting> settings = UsageCrossReferencer.find((EObject) existingEObject, root);
+						for (Setting setting : settings) {
+							setting.set(element);
+						}
 						found = true; 
 					}
 				}
@@ -173,22 +185,25 @@ public class ModelUtils {
 		}
 	}
 
+	static MApplicationElement getParent(MApplicationElement element) {
+		if ( (element instanceof MUIElement) && ((MUIElement)element).getCurSharedRef() != null) {
+			return ((MUIElement)element).getCurSharedRef().getParent();
+		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
+			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
+		} else if (element instanceof EObject) {
+			return (MApplicationElement) ((EObject) element).eContainer();
+		}
+		return null;
+	}
+	
 	public static IEclipseContext getContainingContext(MApplicationElement element) {
-		MApplicationElement curParent = null;
-		if ( element instanceof MUIElement && ((MUIElement)element).getCurSharedRef() != null)
-			curParent = ((MUIElement)element).getCurSharedRef().getParent();
-		else
-			curParent = (MApplicationElement) ((EObject) element).eContainer();
+		MApplicationElement curParent = getParent(element);
 
 		while (curParent != null) {
 			if (curParent instanceof MContext) {
 				return ((MContext) curParent).getContext();
 			}
-
-			if ( (curParent instanceof MUIElement) && ((MUIElement)curParent).getCurSharedRef() != null)
-				curParent = ((MUIElement)curParent).getCurSharedRef().getParent();
-			else
-				curParent = (MApplicationElement) ((EObject) curParent).eContainer();
+			curParent = getParent(curParent);
 		}
 
 		return null;

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2012, 2014 Eclipse Foundation.
+  Copyright (c) 2012, 2013 Eclipse Foundation and others.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Distribution License v1.0
   which accompanies this distribution, and is available at
   http://www.eclipse.org/org/documents/edl-v10.php
-
+ 
   Contributors:
      Igor Fedorenko - initial implementation
 -->
@@ -14,12 +14,12 @@
   <parent>
     <artifactId>eclipse.platform.ui</artifactId>
     <groupId>eclipse.platform.ui</groupId>
-    <version>4.2.2-SNAPSHOT</version>
+    <version>4.3.0-SNAPSHOT</version>
     <relativePath>../../</relativePath>
   </parent>
   <groupId>org.eclipse.e4.feature</groupId>
   <artifactId>org.eclipse.e4.rcp</artifactId>
-  <version>1.1.2-SNAPSHOT</version>
+  <version>1.2.2-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
   <build>
     <plugins>
@@ -36,8 +36,6 @@
             <configuration>
               <excludes>
                 <plugin id="javax.xml"/>
-                <plugin id="javax.annotation"/>
-                <plugin id="javax.inject"/>
                 <plugin id="org.apache.batik.css"/>
                 <plugin id="org.apache.batik.util"/>
                 <plugin id="org.apache.batik.util.gui"/>
@@ -47,20 +45,29 @@
                 <plugin id="org.eclipse.equinox.launcher.cocoa.macosx"/>
                 <plugin id="org.eclipse.equinox.launcher.cocoa.macosx"/>
                 <plugin id="org.eclipse.equinox.launcher.cocoa.macosx.x86_64"/>
-                <plugin id="org.eclipse.equinox.launcher.gtk.linux.ia64"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc64"/>
-                <plugin id="org.eclipse.equinox.launcher.gtk.linux.ppc64le"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.s390x"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.s390"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.linux.x86_64"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.aix.ppc"/>
                 <plugin id="org.eclipse.equinox.launcher.gtk.aix.ppc64"/>
-                <plugin id="org.eclipse.equinox.launcher.gtk.hpux.ia64_32"/>
+                <plugin id="org.eclipse.equinox.launcher.gtk.hpux.ia64"/>
                 <plugin id="org.eclipse.equinox.launcher.win32.win32.x86"/>
                 <plugin id="org.eclipse.equinox.launcher.win32.win32.x86_64"/>
                 <plugin id="org.eclipse.swt"/>
+                <plugin id="org.eclipse.swt.gtk.linux.s390x"/>
+                <plugin id="org.eclipse.swt.gtk.linux.s390"/>
+                <plugin id="org.eclipse.swt.gtk.solaris.sparc"/>
+                <plugin id="org.eclipse.swt.gtk.solaris.x86"/>
+                <plugin id="org.eclipse.swt.gtk.linux.ppc"/>
+                <plugin id="org.eclipse.swt.gtk.linux.ppc64"/>
+                <plugin id="org.eclipse.swt.cocoa.macosx"/>
+                <plugin id="org.eclipse.swt.cocoa.macosx"/>
+                <plugin id="org.eclipse.swt.gtk.aix.ppc"/>
+                <plugin id="org.eclipse.swt.gtk.aix.ppc64"/>
+                <plugin id="org.eclipse.swt.gtk.hpux.ia64"/>
                 <plugin id="org.w3c.css.sac"/>
                 <plugin id="org.w3c.dom.smil"/>
                 <plugin id="org.w3c.dom.svg"/>

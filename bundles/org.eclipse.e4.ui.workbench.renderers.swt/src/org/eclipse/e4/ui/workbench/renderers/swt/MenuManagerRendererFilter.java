@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.EHandlerService;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -36,8 +37,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
-import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.e4.ui.workbench.swt.modeling.MenuService;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
@@ -63,9 +62,6 @@ public class MenuManagerRendererFilter implements Listener {
 
 	@Inject
 	private EModelService modelService;
-
-	@Inject
-	private IRendererFactory rendererFactory;
 
 	@Inject
 	private MenuManagerRenderer renderer;
@@ -260,8 +256,7 @@ public class MenuManagerRendererFilter implements Listener {
 		if (cmd == null) {
 			return;
 		}
-		final IEclipseContext lclContext = modelService
-				.getContainingContext(item);
+		final IEclipseContext lclContext = renderer.getContext(item);
 		EHandlerService service = lclContext.get(EHandlerService.class);
 		final IEclipseContext staticContext = EclipseContextFactory
 				.create(MMRF_STATIC_CONTEXT);
