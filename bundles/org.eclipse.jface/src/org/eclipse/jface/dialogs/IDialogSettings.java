@@ -72,19 +72,34 @@ public interface IDialogSettings {
     public boolean getBoolean(String key);
 
     /**
-     * Convenience API. Convert the value of the given key in this dialog
-     * settings to a double and return it.
-     *
-     * @param key
-     *            the key
-     * @return the value coverted to double, or throws
-     *         <code>NumberFormatException</code> if none
-     *
-     * @exception NumberFormatException
-     *                if the string value does not contain a parsable number.
-     * @see java.lang.Double#valueOf(java.lang.String)
-     */
+	 * Convenience API. Convert the value of the given key in this dialog settings
+	 * to a double and return it.
+	 *
+	 * @param key
+	 *            the key
+	 * @return the value converted to double, or throws
+	 *         <code>NumberFormatException</code> if none
+	 *
+	 * @exception NumberFormatException
+	 *                if the string value does not contain a parsable number.
+	 * @see java.lang.Double#valueOf(java.lang.String)
+	 */
     public double getDouble(String key) throws NumberFormatException;
+
+	/**
+	 * Returns the value for the given key in this dialog settings. If no value is
+	 * associated with the key or the value is not of type double, the provided
+	 * default value is returned.
+	 *
+	 * @param key
+	 *            the key
+	 * @param defaultValue
+	 *            the default value
+	 * @return the double value for the given key or the default value
+	 * @since 3.13
+	 *
+	 */
+	public double getDouble(String key, double defaultValue);
 
     /**
      * Convenience API. Convert the value of the given key in this dialog
@@ -100,6 +115,21 @@ public interface IDialogSettings {
      * @see java.lang.Float#valueOf(java.lang.String)
      */
     public float getFloat(String key) throws NumberFormatException;
+
+	/**
+	 * Returns the value for the given key in this dialog settings. If no value is
+	 * associated with the key or the value is not of type float, the provided
+	 * default value is returned.
+	 *
+	 * @param key
+	 *            the key
+	 * @param defaultValue
+	 *            the default value
+	 * @return the float value for the given key or the default value
+	 * @since 3.13
+	 *
+	 */
+	public float getFloat(String key, float defaultValue);
 
     /**
      * Convenience API. Convert the value of the given key in this dialog
@@ -117,25 +147,55 @@ public interface IDialogSettings {
     public int getInt(String key) throws NumberFormatException;
 
     /**
-     * Convenience API. Convert the value of the given key in this dialog
-     * settings to a long and return it.
-     *
-     * @param key
-     *            the key
-     * @return the value coverted to long, or throws
-     *         <code>NumberFormatException</code> if none
-     *
-     * @exception NumberFormatException
-     *                if the string value does not contain a parsable number.
-     * @see java.lang.Long#valueOf(java.lang.String)
-     */
+	 * Returns the value for the given key in this dialog settings. If no value is
+	 * associated with the key or the value is not of type int, the provided default
+	 * value is returned.
+	 *
+	 * @param key
+	 *            the key
+	 * @param defaultValue
+	 *            the default value
+	 * @return the int value for the given key or the default value
+	 * @since 3.13
+	 *
+	 */
+	public int getInt(String key, int defaultValue);
+
+	/**
+	 * Convenience API. Convert the value of the given key in this dialog settings
+	 * to a long and return it.
+	 *
+	 * @param key
+	 *            the key
+	 * @return the value converted to long, or throws
+	 *         <code>NumberFormatException</code> if none
+	 *
+	 * @exception NumberFormatException
+	 *                if the string value does not contain a parsable number.
+	 * @see java.lang.Long#valueOf(java.lang.String)
+	 */
     public long getLong(String key) throws NumberFormatException;
 
     /**
-     * Returns the IDialogSettings name.
-     *
-     * @return the name
-     */
+	 * Returns the value for the given key in this dialog settings. If no value is
+	 * associated with the key or the value is not of type long, the provided
+	 * default value is returned.
+	 *
+	 * @param key
+	 *            the key
+	 * @param defaultValue
+	 *            the default value
+	 * @return the long value for the given key or the default value
+	 * @since 3.13
+	 *
+	 */
+	public long getLong(String key, long defaultValue);
+
+	/**
+	 * Returns the IDialogSettings name.
+	 *
+	 * @return the name
+	 */
     public String getName();
 
     /**
