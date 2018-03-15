@@ -30,11 +30,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
@@ -134,7 +129,7 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public static final String BLOCKED_JOB_KEY = "LOCKED_JOB"; //$NON-NLS-1$
 
-	final Map runnableMonitors = Collections.synchronizedMap(new HashMap());
+	final ConcurrentMap<Job, JobMonitor> runnableMonitors = new ConcurrentHashMap<>();
 
 	// A table that maps families to keys in the Jface image
 	// table
@@ -146,9 +141,9 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	private final INotificationListener notificationListener;
 
-	private final ConcurrentMap<JobInfo, ScheduledFuture<?>> scheduledUpdates = new ConcurrentHashMap<>();
+	private final ConcurrentMap<JobInfo, Runnable> scheduledUpdates = new ConcurrentHashMap<>();
 
-	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+	private final Display display;
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
 
@@ -175,28 +170,6 @@ public class ProgressManager extends ProgressProvider implements
 				singleton.notificationListener);
 		singleton.shutdown();
 	}
-
-	private final Function<JobInfo, ScheduledFuture<?>> scheduleRefresh = new Function<JobInfo, ScheduledFuture<?>>() {
-
-		@Override
-		public ScheduledFuture<?> apply(JobInfo jobInfo) {
-			return executor.schedule(() -> {
-				scheduledUpdates.remove(jobInfo);
-				GroupInfo group = jobInfo.getGroupInfo();
-				if (group != null) {
-					refreshGroup(group);
-				}
-
-				Object[] listenersArray = listeners.getListeners();
-				for (int i = 0; i < listenersArray.length; i++) {
-					IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
-					if (!isCurrentDisplaying(jobInfo.getJob(), listener.showsDebug())) {
-						listener.refreshJobInfo(jobInfo);
-					}
-				}
-			}, 100, TimeUnit.MILLISECONDS);
-		}
-	};
 
 	/**
 	 * The JobMonitor is the inner class that handles the IProgressMonitor
@@ -364,6 +337,8 @@ public class ProgressManager extends ProgressProvider implements
 		Job.getJobManager().setProgressProvider(this);
 		Job.getJobManager().addJobChangeListener(this.changeListener);
 		StatusManager.getManager().addListener(notificationListener);
+
+		display = Display.getCurrent();
 	}
 
 	private void setUpImages() {
@@ -498,9 +473,6 @@ public class ProgressManager extends ProgressProvider implements
 			 * @param event
 			 */
 			private void updateFor(IJobChangeEvent event) {
-				if (isInfrastructureJob(event.getJob())) {
-					return;
-				}
 				if (jobs.containsKey(event.getJob())) {
 					refreshJobInfo(getJobInfo(event.getJob()));
 				} else {
@@ -529,9 +501,6 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param info
 	 */
 	protected void sleepJobInfo(JobInfo info) {
-		if (isInfrastructureJob(info.getJob()))
-			return;
-
 		GroupInfo group = info.getGroupInfo();
 		if (group != null) {
 			sleepGroup(group,info);
@@ -609,21 +578,7 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return IProgressMonitor
 	 */
 	public JobMonitor progressFor(Job job) {
-		// Not thread-safe before fix for bug 445802. Now that we have a
-		// ConcurrentMap, we should probably replace the body of this method by
-		// return jobs.computeIfAbsent(job, JobInfo::new);
-		// but it degrades performance for about ~12%). As I don't know if the
-		// lack of thread-safety causes issues, I kept the method as is.
-		synchronized (runnableMonitors) {
-			JobMonitor monitor = (JobMonitor) runnableMonitors.get(job);
-			if (monitor == null) {
-				monitor = new JobMonitor(job);
-				runnableMonitors.put(job, monitor);
-			}
-
-			return monitor;
-		}
-
+		return runnableMonitors.computeIfAbsent(job, JobMonitor::new);
 	}
 
 	/**
@@ -652,12 +607,7 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return JobInfo
 	 */
 	JobInfo getJobInfo(Job job) {
-		JobInfo info = internalGetJobInfo(job);
-		if (info == null) {
-			info = new JobInfo(job);
-			jobs.put(job, info);
-		}
-		return info;
+		return jobs.computeIfAbsent(job, JobInfo::new);
 	}
 
 	/**
@@ -677,10 +627,44 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param info
 	 */
 	public void refreshJobInfo(JobInfo info) {
-		// Do not use a lambda instead of scheduleRefresh object.
-		// it causes too many useless calls LambdaForm$MH.linkToTargetMethod
-		// which leads to a lot of wasted runtime
-		scheduledUpdates.computeIfAbsent(info, scheduleRefresh);
+		// the update of scheduledUpdates map is not atomic, but we don't care.
+		// At worst, we will schedule a few more refresh in the UI job that we
+		// should, but it's less expensive than doing a
+		// ConcurrentMap#computeIfAbsent().
+		if (!scheduledUpdates.containsKey(info)) {
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					scheduledUpdates.remove(info);
+					GroupInfo group = info.getGroupInfo();
+					if (group != null) {
+						refreshGroup(group);
+					}
+
+					Object[] listenersArray = listeners.getListeners();
+					for (int i = 0; i < listenersArray.length; i++) {
+						IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+						if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+							listener.refreshJobInfo(info);
+						}
+					}
+				}
+			};
+			scheduledUpdates.put(info, runnable);
+
+			safeAsyncExec(new Runnable() {
+				@Override
+				public void run() {
+					display.timerExec(100, runnable);
+				}
+			});
+		}
+	}
+
+	private void safeAsyncExec(Runnable runnable) {
+		if (!display.isDisposed()) {
+			display.asyncExec(runnable);
+		}
 	}
 
 	/**
@@ -689,10 +673,11 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param info
 	 */
 	public void refreshGroup(GroupInfo info) {
-
-		for (IJobProgressManagerListener listener : listeners) {
-			listener.refreshGroup(info);
-		}
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				listener.refreshGroup(info);
+			}
+		});
 	}
 
 	/**
@@ -702,9 +687,11 @@ public class ProgressManager extends ProgressProvider implements
 	public void refreshAll() {
 
 		pruneStaleJobs();
-		for (IJobProgressManagerListener listener : listeners) {
-			listener.refreshAll();
-		}
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				listener.refreshAll();
+			}
+		});
 
 	}
 
@@ -719,11 +706,13 @@ public class ProgressManager extends ProgressProvider implements
 		jobs.remove(job);
 		runnableMonitors.remove(job);
 
-		for (IJobProgressManagerListener listener : listeners) {
-			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
-				listener.removeJob(info);
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+					listener.removeJob(info);
+				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -733,9 +722,11 @@ public class ProgressManager extends ProgressProvider implements
 	 *            GroupInfo
 	 */
 	public void removeGroup(GroupInfo group) {
-		for (IJobProgressManagerListener listener : listeners) {
-			listener.removeGroup(group);
-		}
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				listener.removeGroup(group);
+			}
+		});
 	}
 
 	/**
@@ -750,11 +741,13 @@ public class ProgressManager extends ProgressProvider implements
 		}
 
 		jobs.put(info.getJob(), info);
-		for (IJobProgressManagerListener listener : listeners) {
-			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
-				listener.addJob(info);
+		safeAsyncExec(() -> {
+			for (IJobProgressManagerListener listener : listeners) {
+				if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+					listener.addJob(info);
+				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -778,25 +771,10 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return boolean
 	 */
 	boolean isNeverDisplaying(Job job, boolean debug) {
-		if (isInfrastructureJob(job)) {
-			return true;
-		}
 		if (debug)
 			return false;
 
 		return job.isSystem();
-	}
-
-	/**
-	 * Return whether or not this job is an infrastructure job.
-	 *
-	 * @param job
-	 * @return boolean <code>true</code> if it is never displayed.
-	 */
-	private boolean isInfrastructureJob(Job job) {
-		if (Policy.DEBUG_SHOW_ALL_JOBS)
-			return false;
-		return job.getProperty(ProgressManagerUtil.INFRASTRUCTURE_PROPERTY) != null;
 	}
 
 	/**
@@ -956,7 +934,6 @@ public class ProgressManager extends ProgressProvider implements
 		listeners.clear();
 		Job.getJobManager().setProgressProvider(null);
 		Job.getJobManager().removeJobChangeListener(this.changeListener);
-		executor.shutdown();
 	}
 
 	@Override
