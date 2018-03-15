@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 
-import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
@@ -33,8 +32,7 @@ import org.eclipse.ui.tests.leaks.LeakTests;
  * Tests to ensure the addition of new action sets with dynamic plug-ins.
  */
 
-public class ActionSetTests extends DynamicTestCase implements
-        IRegistryChangeListener {
+public class ActionSetTests extends DynamicTestCase {
 
     /**
      *
@@ -67,8 +65,8 @@ public class ActionSetTests extends DynamicTestCase implements
         assertTrue("Action set not found", found[0]);
         assertNotNull("Action not found", action[0]);
 
-        ReferenceQueue queue = new ReferenceQueue();
-        WeakReference ref = new WeakReference(action[0], queue);
+		ReferenceQueue<WWinPluginAction> queue = new ReferenceQueue<>();
+		WeakReference<WWinPluginAction> ref = new WeakReference<>(action[0], queue);
 
         action[0] = null;
         found[0] = false;

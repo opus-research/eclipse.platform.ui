@@ -188,6 +188,7 @@ public class WorkbenchMessages extends NLS {
 
 	public static String LockToolBarAction_toolTip;
 
+	public static String CustomizePerspectiveDialog_okButtonLabel;
 	public static String EditActionSetsAction_text;
 	public static String EditActionSetsAction_toolTip;
 	public static String ActionSetSelection_customize;
@@ -255,6 +256,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ResetPerspective_text;
 	public static String ResetPerspective_toolTip;
 	public static String ResetPerspective_message;
+	public static String ResetPerspective_buttonLabel;
 	public static String ResetPerspective_title;
 	public static String RevertPerspective_note;
 
@@ -920,6 +922,9 @@ public class WorkbenchMessages extends NLS {
 	public static String ContentTypes_newContentTypeDialog_invalidContentTypeName;
 	public static String ContentTypes_failedAtEditingContentTypes;
     public static String Edit;
+	public static String ContentTypes_editorAssociations;
+	public static String ContentTypes_editorAssociationAddLabel;
+	public static String ContentTypes_editorAssociationRemoveLabel;
 
     // =========================================================================
     // Deprecated actions support
@@ -1014,10 +1019,11 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetGroup_WorkingSetSelection_message;
 	public static String WorkingSetGroup_EnableWorkingSet_button;
 
+	public static String FilteredTableBaseHandler_Close;
+
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
-
 
 
 }
