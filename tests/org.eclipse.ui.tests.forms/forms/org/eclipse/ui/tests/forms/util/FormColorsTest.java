@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class FormColorsTests {
+public class FormColorsTest {
 
 	// these keys should always return a Color until disposed
 	private static String[] KEYS_NON_NULL = {
