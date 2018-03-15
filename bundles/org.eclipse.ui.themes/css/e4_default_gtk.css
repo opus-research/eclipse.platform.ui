@@ -108,4 +108,11 @@ CTabFolder.MArea .MPartStack, CTabFolder.MArea .MPartStack.active {
 CTabFolder Canvas {
 	background-color: #F8F8F8;
 }
-
+  	
+Section {
+	background-color: #fafafc;
+  	color: #505050;		  	
+  	background-color-titlebar: #eaeaea;		 
+  	background-color-gradient-titlebar: #eaeaea;		  	
+  	border-color-titlebar: #fafafc;		  
+}
