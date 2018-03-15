@@ -98,6 +98,12 @@
             id="org.eclipse.ui.contexts.workbenchMenu"
             name="%context.workbenchMenu.name">
       </context>
+      <context
+            description="%context.about.dialog.description"
+            id="org.eclipse.ui.contexts.aboutDialog"
+            name="%context.about.dialog.name"
+            parentId="org.eclipse.ui.contexts.dialog">
+      </context>
    </extension>
    
    <extension point="org.eclipse.ui.bindings">
@@ -794,6 +800,12 @@
                value="false">
          </parameter>
       </key>
+      <key
+            commandId="org.eclipse.ui.ide.copyBuildIdCommand"
+            contextId="org.eclipse.ui.contexts.aboutDialog"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+C">
+      </key>
 
    </extension>
    
@@ -1103,7 +1115,6 @@
             id="org.eclipse.ui.window.newEditor" />
       <command
             categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.SplitHandler"
             description="%command.splitEditor.description"
             id="org.eclipse.ui.window.splitEditor"
             name="%command.splitEditor.name">
@@ -1168,6 +1179,12 @@
             description="%command.windowsHideTrimbars.description"
             id="org.eclipse.ui.window.hidetrimbars"
             name="%command.windowsHideTrimbars.name"/>
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="org.eclipse.ui.internal.handlers.FullScreenHandler"
+            description="%command.fullscreenmode.description"
+            id="org.eclipse.ui.window.fullscreenmode"
+            name="%command.fullscreenmode.name"/>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="org.eclipse.ui.internal.handlers.MinimizePartHandler"
@@ -2241,6 +2258,18 @@
       <handler
             class="org.eclipse.ui.internal.WorkbookEditorsHandler"
             commandId="org.eclipse.ui.window.openEditorDropDown">
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="org.eclipse.ui.IEditorPart">
+               </instanceof>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.eclipse.ui.internal.SplitHandler"
+            commandId="org.eclipse.ui.window.splitEditor">
          <enabledWhen>
             <with
                   variable="activeEditor">

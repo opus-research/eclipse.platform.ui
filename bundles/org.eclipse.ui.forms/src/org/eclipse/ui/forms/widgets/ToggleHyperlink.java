@@ -144,15 +144,18 @@ public abstract class ToggleHyperlink extends AbstractHyperlink {
 	 */
 	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
-		int width = innerWidth + 2 * marginWidth;
-		int height = innerHeight + 2 * marginHeight;
+		int width, height;
+		/*
 		if (wHint != SWT.DEFAULT)
 			width = wHint;
+		else */
+			width = innerWidth + 2 * marginWidth;
+		/*
 		if (hHint != SWT.DEFAULT)
 			height = hHint;
-
-		Rectangle trim = computeTrim(0, 0, width, height);
-		return new Point(trim.width, trim.height);
+		else */
+			height = innerHeight + 2 * marginHeight;
+		return new Point(width, height);
 	}
 	/**
 	 * Returns the expansion state of the toggle control. When toggle is in the
