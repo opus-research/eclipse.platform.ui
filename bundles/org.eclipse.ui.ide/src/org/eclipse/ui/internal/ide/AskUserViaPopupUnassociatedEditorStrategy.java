@@ -9,7 +9,7 @@
  *     Mickael Istria (Red Hat Inc.) - initial API and implementation
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
  *******************************************************************************/
-package org.eclipse.ui.internal.ide.registry;
+package org.eclipse.ui.internal.ide;
 
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -18,7 +18,6 @@ import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
 import org.eclipse.ui.ide.IUnassociatedEditorStrategy;
-import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 /**
  * @since 3.12

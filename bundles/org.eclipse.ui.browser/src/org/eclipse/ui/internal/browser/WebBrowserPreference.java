@@ -98,7 +98,7 @@ public class WebBrowserPreference {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			WebBrowserUIPlugin.logError(e.getMessage(), e);
+			e.printStackTrace();
 		}
 	}
 
@@ -147,7 +147,7 @@ public class WebBrowserPreference {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			WebBrowserUIPlugin.logError(e.getMessage(), e);
+			e.printStackTrace();
 		}
 		updateDefaultEditor(choice);
 	}

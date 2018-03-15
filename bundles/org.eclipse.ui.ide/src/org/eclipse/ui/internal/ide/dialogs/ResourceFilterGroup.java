@@ -1255,8 +1255,10 @@ public class ResourceFilterGroup {
 						img.dispose();
 						field.set(this, null);
 					}
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					IDEWorkbenchPlugin.log(e.getMessage(), e);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
 				}
 			}
 		}

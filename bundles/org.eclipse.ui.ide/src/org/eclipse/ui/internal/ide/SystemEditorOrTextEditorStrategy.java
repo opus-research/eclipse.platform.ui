@@ -8,13 +8,11 @@
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - extracted from IDE.getEditorDescription
  *******************************************************************************/
-package org.eclipse.ui.internal.ide.registry;
+package org.eclipse.ui.internal.ide;
 
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
-import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.IUnassociatedEditorStrategy;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * Strategy for unassociated file types:
@@ -32,11 +30,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * @since 3.12
  */
 public final class SystemEditorOrTextEditorStrategy implements IUnassociatedEditorStrategy {
-	/**
-	 * Id of the extension. Defined in plugin.xml and may be used as value for
-	 * preference {@link IDE#UNASSOCIATED_EDITOR_STRATEGY_PREFERENCE_KEY}
-	 */
-	public static final String EXTENSION_ID = "org.eclipse.ui.ide.systemEditorThenTextEditor"; //$NON-NLS-1$
+	static final String EXTENSION_ID = "org.eclipse.ui.ide.systemEditorThenTextEditor"; //$NON-NLS-1$
 
 	@Override
 	public IEditorDescriptor getEditorDescriptor(String name, IEditorRegistry editorReg) {

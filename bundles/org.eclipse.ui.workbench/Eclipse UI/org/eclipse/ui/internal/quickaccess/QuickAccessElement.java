@@ -15,7 +15,6 @@ package org.eclipse.ui.internal.quickaccess;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
@@ -105,7 +104,7 @@ public abstract class QuickAccessElement {
 			String sFilter = filter.replaceFirst(WS_START, EMPTY_STR).replaceFirst(WS_END, EMPTY_STR)
 					.replaceAll(PAR_START, ONE_CHAR).replaceAll(PAR_END, ONE_CHAR);
 			sFilter = String.format(".*(%s).*", sFilter.replaceAll(ANY_WS, ").*(")); //$NON-NLS-1$//$NON-NLS-2$
-			wsPattern = safeCompile(sFilter);
+			wsPattern = Pattern.compile(sFilter, Pattern.CASE_INSENSITIVE);
 		}
 		return wsPattern;
 	}
@@ -138,28 +137,9 @@ public abstract class QuickAccessElement {
 			}
 			sFilter = String.format(".*(%s).*", sb.toString()); //$NON-NLS-1$
 			//
-			wcPattern = safeCompile(sFilter);
+			wcPattern = Pattern.compile(sFilter, Pattern.CASE_INSENSITIVE);
 		}
 		return wcPattern;
-	}
-
-	/**
-	 * A safe way to compile some unknown pattern, avoids possible
-	 * {@link PatternSyntaxException}. If the pattern can't be compiled, some
-	 * not matching pattern will be returned.
-	 *
-	 * @param pattern
-	 *            some pattern to compile, not null
-	 * @return a {@link Pattern} object compiled from given input or a dummy
-	 *         pattern which do not match anything
-	 */
-	private Pattern safeCompile(String pattern) {
-		try {
-			return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
-		} catch (Exception e) {
-			// A "bell" special character: should not match anything we can get
-			return Pattern.compile("\\a"); //$NON-NLS-1$
-		}
 	}
 
 	int i = 0;
