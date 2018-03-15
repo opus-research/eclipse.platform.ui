@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 476045
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -25,7 +24,6 @@ import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
@@ -48,15 +46,8 @@ public class CommandProvider extends QuickAccessProvider {
 	private IHandlerService handlerService;
 	private ICommandService commandService;
 	private EHandlerService ehandlerService;
-	private ICommandImageService commandImageService;
-	private IEclipseContext context = null;
 
-	/**
-	 * Construct a CommandProvider passing an instance of
-	 * {@code IEclipseContext}.
-	 */
-	public CommandProvider(IEclipseContext context) {
-		this.context = context;
+	public CommandProvider() {
 	}
 
 	@Override
@@ -152,16 +143,6 @@ public class CommandProvider extends QuickAccessProvider {
 			}
 		}
 		return handlerService;
-	}
-
-	/**
-	 * @return Returns the commandImageService.
-	 */
-	public ICommandImageService getCommandImageService() {
-		if (commandImageService == null) {
-			commandImageService = context.get(ICommandImageService.class);
-		}
-		return commandImageService;
 	}
 
 	IEvaluationContext getContextSnapshot() {
