@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440149, 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 496319
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -51,8 +50,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.contexts.IContextActivation;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.ProductProperties;
 import org.eclipse.ui.internal.WorkbenchMessages;
@@ -72,9 +69,6 @@ public class AboutDialog extends TrayDialog {
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
-	/** Id for the context associated to this dialog */
-	private static final String ID_CONTEXT = "org.eclipse.ui.contexts.aboutDialog"; //$NON-NLS-1$
-
     private String productName;
 
     private IProduct product;
@@ -89,19 +83,12 @@ public class AboutDialog extends TrayDialog {
 
     private AboutTextManager aboutTextManager;
 
-	private IContextService contextService;
-
-	// represents the activated context
-	private IContextActivation contextActivation;
-
     /**
      * Create an instance of the AboutDialog for the given window.
      * @param parentShell The parent of the dialog.
      */
     public AboutDialog(Shell parentShell) {
         super(parentShell);
-
-        this.contextService = PlatformUI.getWorkbench().getService(IContextService.class);
 
         product = Platform.getProduct();
         if (product != null) {
@@ -146,20 +133,6 @@ public class AboutDialog extends TrayDialog {
         }
     }
 
-	/**
-	 * Activate the specialized context and open
-	 */
-	@Override
-    public int open() {
-		if (contextService != null) {
-			contextActivation = contextService.activateContext(ID_CONTEXT);
-		}
-		return super.open();
-    }
-
-	/**
-	 * Close and deactivate the specialized context
-	 */
     @Override
 	public boolean close() {
         // dispose all images
@@ -167,9 +140,6 @@ public class AboutDialog extends TrayDialog {
             Image image = images.get(i);
             image.dispose();
         }
-		if (contextService != null) {
-			contextService.deactivateContext(contextActivation);
-		}
 
         return super.close();
     }
