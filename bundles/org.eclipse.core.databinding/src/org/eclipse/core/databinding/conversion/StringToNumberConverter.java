@@ -167,15 +167,15 @@ public class StringToNumberConverter extends NumberFormatConverter {
 			}
 		} else if (Double.class.equals(boxedType)) {
 			if (StringToNumberParser.inDoubleRange(result.getNumber())) {
-				return Double.valueOf(result.getNumber().doubleValue());
+				return new Double(result.getNumber().doubleValue());
 			}
 		} else if (Long.class.equals(boxedType)) {
 			if (StringToNumberParser.inLongRange(result.getNumber())) {
-				return Long.valueOf(result.getNumber().longValue());
+				return new Long(result.getNumber().longValue());
 			}
 		} else if (Float.class.equals(boxedType)) {
 			if (StringToNumberParser.inFloatRange(result.getNumber())) {
-				return Float.valueOf(result.getNumber().floatValue());
+				return new Float(result.getNumber().floatValue());
 			}
 		} else if (BigInteger.class.equals(boxedType)) {
 			Number n = result.getNumber();
@@ -215,11 +215,11 @@ public class StringToNumberConverter extends NumberFormatConverter {
 			}
 		} else if (Short.class.equals(boxedType)) {
 			if (StringToNumberParser.inShortRange(result.getNumber())) {
-				return Short.valueOf(result.getNumber().shortValue());
+				return new Short(result.getNumber().shortValue());
 			}
 		} else if (Byte.class.equals(boxedType)) {
 			if (StringToNumberParser.inByteRange(result.getNumber())) {
-				return Byte.valueOf(result.getNumber().byteValue());
+				return new Byte(result.getNumber().byteValue());
 			}
 		}
 
