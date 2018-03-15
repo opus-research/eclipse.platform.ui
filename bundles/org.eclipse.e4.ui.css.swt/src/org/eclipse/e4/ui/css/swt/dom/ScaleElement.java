@@ -38,9 +38,7 @@ public class ScaleElement extends ControlElement {
 	public void initialize() {
 		super.initialize();
 
-		if (!dynamicEnabled) {
-			return;
-		}
+		if (!dynamicEnabled) return;
 
 		Scale scale = getScale();
 		scale.addSelectionListener(selectionListener);
@@ -50,9 +48,7 @@ public class ScaleElement extends ControlElement {
 	public void dispose() {
 		super.dispose();
 
-		if (!dynamicEnabled) {
-			return;
-		}
+		if (!dynamicEnabled) return;
 
 		Scale scale = getScale();
 		if (!scale.isDisposed()) {
