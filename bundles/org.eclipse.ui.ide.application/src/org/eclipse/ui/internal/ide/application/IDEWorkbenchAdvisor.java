@@ -235,10 +235,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void preStartup() {
-
-		// Suspend background jobs while we startup
-		Job.getJobManager().suspend();
-
 		// Register the build actions
 		IProgressService service = PlatformUI.getWorkbench()
 				.getProgressService();
@@ -252,19 +248,13 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void postStartup() {
-		try {
-			refreshFromLocal();
-			activateProxyService();
-			((Workbench) PlatformUI.getWorkbench()).registerService(
-					ISelectionConversionService.class,
-					new IDESelectionConversionService());
+		refreshFromLocal();
+		activateProxyService();
+		((Workbench) PlatformUI.getWorkbench()).registerService(ISelectionConversionService.class,
+				new IDESelectionConversionService());
 
-			initializeSettingsChangeListener();
-			Display.getCurrent().addListener(SWT.Settings,
-					settingsChangeListener);
-		} finally {// Resume background jobs after we startup
-			Job.getJobManager().resume();
-		}
+		initializeSettingsChangeListener();
+		Display.getCurrent().addListener(SWT.Settings, settingsChangeListener);
 	}
 
 	/**
