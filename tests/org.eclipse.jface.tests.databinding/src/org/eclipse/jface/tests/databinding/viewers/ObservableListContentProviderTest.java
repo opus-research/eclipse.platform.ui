@@ -11,9 +11,6 @@
  ******************************************************************************/
 package org.eclipse.jface.tests.databinding.viewers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,9 +27,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public class ObservableListContentProviderTest extends AbstractDefaultRealmTestCase {
 	private Shell shell;
@@ -40,8 +34,8 @@ public class ObservableListContentProviderTest extends AbstractDefaultRealmTestC
 	private ObservableListContentProvider contentProvider;
 	private IObservableList input;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		viewer = new TableViewer(shell, SWT.NONE);
@@ -53,27 +47,24 @@ public class ObservableListContentProviderTest extends AbstractDefaultRealmTestC
 		viewer.setInput(input);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		shell.dispose();
 		viewer = null;
 		input = null;
 		super.tearDown();
 	}
 
-	@Test
 	public void testKnownElements_Realm() throws Exception {
 		assertSame("realm for the known elements should be the SWT realm", DisplayRealm.getRealm(Display.getDefault()),
 				contentProvider.getKnownElements().getRealm());
 	}
 
-	@Test
 	public void testRealizedElements_Realm() {
 		assertSame("realm for the realized elements should be the SWT realm",
 				DisplayRealm.getRealm(Display.getDefault()), contentProvider.getRealizedElements().getRealm());
 	}
 
-	@Test
 	public void testKnownElementsAfterSetInput() {
 		assertEquals(0, contentProvider.getKnownElements().size());
 		Set<String> newElements = new HashSet<String>(Arrays.asList(new String[] { "one", "two", "three" }));
@@ -83,7 +74,6 @@ public class ObservableListContentProviderTest extends AbstractDefaultRealmTestC
 		assertEquals(newElements, contentProvider.getKnownElements());
 	}
 
-	@Test
 	public void testViewerUpdate_RemoveElementAfterMutation() {
 		Mutable element = new Mutable(1);
 		input.add(element);
@@ -96,7 +86,6 @@ public class ObservableListContentProviderTest extends AbstractDefaultRealmTestC
 		assertEquals(0, viewer.getTable().getItemCount());
 	}
 
-	@Test
 	public void testInputChanged_ClearsKnownElements() {
 		Object element = new Object();
 		input.add(element);
@@ -107,7 +96,6 @@ public class ObservableListContentProviderTest extends AbstractDefaultRealmTestC
 		assertEquals(Collections.EMPTY_SET, knownElements);
 	}
 
-	@Test
 	public void testInputChanged_ClearsRealizedElements() {
 		// Realized elements must be allocated before adding the element
 		// otherwise we'd have to spin the event loop to see the new element

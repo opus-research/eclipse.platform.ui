@@ -15,6 +15,10 @@ package org.eclipse.core.tests.databinding.observable.set;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IObservableCollection;
@@ -23,16 +27,11 @@ import org.eclipse.core.databinding.observable.set.AbstractObservableSet;
 import org.eclipse.core.databinding.observable.set.SetDiff;
 import org.eclipse.jface.databinding.conformance.ObservableCollectionContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
-
-import junit.framework.TestSuite;
 
 /**
  */
-@RunWith(AllTests.class)
-public class AbstractObservableSetTest {
-	public static junit.framework.Test suite() {
+public class AbstractObservableSetTest extends TestCase {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(AbstractObservableSetTest.class.getName());
 		suite.addTest(ObservableCollectionContractTest.suite(new Delegate()));
 		return suite;

@@ -11,25 +11,22 @@
 
 package org.eclipse.core.tests.databinding.observable;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.databinding.observable.set.SetDiff;
 import org.eclipse.core.databinding.observable.value.ValueDiff;
-import org.junit.Test;
 
 /**
  * @since 3.2
  *
  */
-public class DiffsTest {
+public class DiffsTest extends TestCase {
 	/**
 	 * Asserts that the {@link SetDiff#toString()} implementation doesn't throw
 	 * a NPE if any of its properties are <code>null</code>.
 	 */
-	@Test
 	public void test_SetDiff() {
 		SetDiff diff = new SetDiff() {
 			@Override
@@ -56,7 +53,6 @@ public class DiffsTest {
 	 * throw a NPE if any of its properties are <code>null</code>.
 	 *
 	 */
-	@Test
 	public void test_ValueDiff() {
 		ValueDiff diff = new ValueDiff() {
 			@Override

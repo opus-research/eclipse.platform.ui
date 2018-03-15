@@ -12,36 +12,32 @@
 
 package org.eclipse.core.tests.databinding.conversion;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.ibm.icu.text.NumberFormat;
 
 /**
  * @since 1.1
  */
-public class StringToNumberConverterTest {
+public class StringToNumberConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private NumberFormat numberIntegerFormat;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
 		numberFormat = NumberFormat.getNumberInstance();
 		numberFormat.setMaximumFractionDigits(305); // Used for BigDecimal test
 		numberFormat.setGroupingUsed(false); // Not really needed
 		numberIntegerFormat = NumberFormat.getIntegerInstance();
 	}
 
-	@Test
 	public void testToTypes() throws Exception {
 		assertEquals("Integer.class", Integer.class, StringToNumberConverter.toInteger(false).getToType());
 		assertEquals("Integer.TYPE", Integer.TYPE, StringToNumberConverter.toInteger(true).getToType());
@@ -59,13 +55,11 @@ public class StringToNumberConverterTest {
 		assertEquals("Byte.TYPE", Byte.TYPE, StringToNumberConverter.toByte(true).getToType());
 	}
 
-	@Test
 	public void testFromTypeIsString() throws Exception {
 		assertEquals(String.class, StringToNumberConverter.toInteger(false)
 				.getFromType());
 	}
 
-	@Test
 	public void testConvertsToBigInteger() throws Exception {
 		BigInteger input = BigInteger.valueOf(1000);
 
@@ -106,7 +100,6 @@ public class StringToNumberConverterTest {
 		throw new IllegalArgumentException("ICU not present. Cannot reliably format large BigDecimal values; needed for testing. Java platforms prior to 1.5 fail to format/parse these decimals correctly.");
 	}
 
-	@Test
 	public void testConvertsToBigDecimal() throws Exception {
 		StringToNumberConverter converter = StringToNumberConverter.toBigDecimal();
 		// Test 1: Decimal
@@ -130,7 +123,6 @@ public class StringToNumberConverterTest {
 		assertEquals("Non-integer BigDecimal", input, result);
 	}
 
-	@Test
 	public void testConvertsToInteger() throws Exception {
 		Integer input = Integer.valueOf(1000);
 
@@ -140,7 +132,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testConvertsToDouble() throws Exception {
 		Double input = new Double(1000);
 
@@ -151,7 +142,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testConvertsToLong() throws Exception {
 		Long input = new Long(1000);
 
@@ -162,7 +152,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testConvertsToFloat() throws Exception {
 		Float input = new Float(1000);
 
@@ -173,7 +162,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testConvertedToIntegerPrimitive() throws Exception {
 		Integer input = Integer.valueOf(1000);
 
@@ -183,7 +171,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testConvertsToDoublePrimitive() throws Exception {
 		Double input = new Double(1000);
 
@@ -194,7 +181,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testConvertsToLongPrimitive() throws Exception {
 		Long input = new Long(1000);
 
@@ -205,7 +191,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testConvertsToFloatPrimitive() throws Exception {
 		Float input = new Float(1000);
 
@@ -216,7 +201,6 @@ public class StringToNumberConverterTest {
 		assertEquals(input, result);
 	}
 
-	@Test
 	public void testReturnsNullBoxedTypeForEmptyString() throws Exception {
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(false);
 		try {
@@ -226,7 +210,6 @@ public class StringToNumberConverterTest {
 		}
 	}
 
-	@Test
 	public void testThrowsIllegalArgumentExceptionIfAskedToConvertNonString()
 			throws Exception {
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(false);
@@ -243,7 +226,6 @@ public class StringToNumberConverterTest {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testInvalidInteger() throws Exception {
 		StringToNumberConverter converter = StringToNumberConverter
 				.toInteger(false);
@@ -255,7 +237,6 @@ public class StringToNumberConverterTest {
 		}
 	}
 
-	@Test
 	public void testThrowsIllegalArgumentExceptionIfNumberIsOutOfRange() throws Exception {
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(false);
 		try {

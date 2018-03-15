@@ -13,9 +13,8 @@
 
 package org.eclipse.core.tests.databinding.observable.value;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -26,9 +25,6 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValu
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Display;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
@@ -39,7 +35,6 @@ public class WritableValueTest extends AbstractDefaultRealmTestCase {
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testConstructor() throws Exception {
 		WritableValue value = new WritableValue(DisplayRealm.getRealm(Display
 				.getDefault()));
@@ -47,7 +42,6 @@ public class WritableValueTest extends AbstractDefaultRealmTestCase {
 		assertNull(value.getValueType());
 	}
 
-	@Test
 	public void testWithValueType() throws Exception {
 		Object elementType = String.class;
 		WritableValue value = WritableValue.withValueType(elementType);
@@ -56,8 +50,9 @@ public class WritableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(elementType, value.getValueType());
 	}
 
-	public static junit.framework.Test suite() {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(WritableValueTest.class.getName());
+		suite.addTestSuite(WritableValueTest.class);
 		suite.addTest(MutableObservableValueContractTest.suite(new Delegate()));
 		return suite;
 	}

@@ -12,7 +12,8 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -24,11 +25,6 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * Tests for ShellObservableValue
@@ -43,8 +39,7 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 	ValueChangeEventTracker tracker;
 
 	@Override
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 		observable = SWTObservables.observeText(shell);
@@ -55,7 +50,6 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 	}
 
 	@Override
-	@After
 	public void tearDown() throws Exception {
 		observable.dispose();
 		observable = null;
@@ -64,12 +58,10 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 		super.tearDown();
 	}
 
-	@Test
 	public void testGetValueType() {
 		assertEquals(String.class, observable.getValueType());
 	}
 
-	@Test
 	public void testSetValue_FiresValueChangeEvent() {
 		observable.setValue(newValue);
 
@@ -78,7 +70,6 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(newValue, tracker.event.diff.getNewValue());
 	}
 
-	@Test
 	public void testSetValue_NullConvertedToEmptyString() {
 		observable.setValue(null);
 
@@ -86,7 +77,6 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals("", shell.getText());
 	}
 
-	@Test
 	public void testShellSetText_GetValueReturnsSame() {
 		assertEquals(oldValue, observable.getValue());
 
@@ -95,15 +85,17 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 		assertEquals(newValue, observable.getValue());
 	}
 
-	@Test
 	public void testShellSetText_NoValueChangeEvent() {
 		shell.setText(newValue);
 		assertEquals(0, tracker.count);
 	}
 
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(ShellObservableValueTest.class.toString());
-		suite.addTest(SWTMutableObservableValueContractTest.suite(new Delegate()));
+	public static Test suite() {
+		TestSuite suite = new TestSuite(ShellObservableValueTest.class
+				.toString());
+		suite.addTestSuite(ShellObservableValueTest.class);
+		suite.addTest(SWTMutableObservableValueContractTest
+				.suite(new Delegate()));
 		return suite;
 	}
 

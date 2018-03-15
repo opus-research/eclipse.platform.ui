@@ -13,7 +13,8 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -26,16 +27,12 @@ import org.eclipse.jface.tests.databinding.AbstractSWTTestCase;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  */
 public class CComboSingleSelectionObservableValueTest extends
 		AbstractSWTTestCase {
-	@Test
 	public void testSetValue() throws Exception {
 		CCombo combo = new CCombo(getShell(), SWT.NONE);
 		IObservableValue observableValue = SWTObservables
@@ -55,9 +52,12 @@ public class CComboSingleSelectionObservableValueTest extends
 		assertEquals("Item2", combo.getText());
 	}
 
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(CComboSingleSelectionObservableValueTest.class.getName());
-		suite.addTest(SWTMutableObservableValueContractTest.suite(new Delegate()));
+	public static Test suite() {
+		TestSuite suite = new TestSuite(
+				CComboSingleSelectionObservableValueTest.class.getName());
+		suite.addTestSuite(CComboSingleSelectionObservableValueTest.class);
+		suite.addTest(SWTMutableObservableValueContractTest
+				.suite(new Delegate()));
 		return suite;
 	}
 

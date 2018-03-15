@@ -12,7 +12,9 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -27,34 +29,32 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  *
  */
-public class ComboObservableValueSelectionTest {
+public class ComboObservableValueSelectionTest extends TestCase {
 	private Delegate delegate;
 
 	private Combo combo;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
+
 		delegate = new Delegate();
 		delegate.setUp();
 		combo = delegate.combo;
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+
 		delegate.tearDown();
 	}
 
-	@Test
 	public void testSelection_NotifiesObservable() throws Exception {
 		IObservableValue observable = (IObservableValue) delegate
 				.createObservable(DisplayRealm.getRealm(Display.getDefault()));
@@ -67,9 +67,12 @@ public class ComboObservableValueSelectionTest {
 		assertEquals("Observable was not notified.", 1, listener.count);
 	}
 
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(ComboObservableValueSelectionTest.class.toString());
-		suite.addTest(SWTMutableObservableValueContractTest.suite(new Delegate()));
+	public static Test suite() {
+		TestSuite suite = new TestSuite(ComboObservableValueSelectionTest.class
+				.toString());
+		suite.addTestSuite(ComboObservableValueSelectionTest.class);
+		suite.addTest(SWTMutableObservableValueContractTest
+				.suite(new Delegate()));
 		return suite;
 	}
 

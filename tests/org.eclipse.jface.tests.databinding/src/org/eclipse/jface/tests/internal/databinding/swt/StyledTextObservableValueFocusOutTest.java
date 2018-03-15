@@ -13,9 +13,8 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
@@ -29,21 +28,20 @@ import org.eclipse.jface.tests.databinding.AbstractSWTTestCase;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Test;
-
-import junit.framework.TestSuite;
 
 /**
  * Tests for the FocusOut version of StyledTextObservableValue.
  */
 public class StyledTextObservableValueFocusOutTest extends AbstractSWTTestCase {
-	public static junit.framework.Test suite() {
-		TestSuite suite = new TestSuite(StyledTextObservableValueFocusOutTest.class.toString());
-		suite.addTest(SWTMutableObservableValueContractTest.suite(new Delegate()));
+	public static Test suite() {
+		TestSuite suite = new TestSuite(
+				StyledTextObservableValueFocusOutTest.class.toString());
+		suite.addTestSuite(StyledTextObservableValueFocusOutTest.class);
+		suite.addTest(SWTMutableObservableValueContractTest
+				.suite(new Delegate()));
 		return suite;
 	}
 
-	@Test
 	public void testIsStale_AfterModifyBeforeFocusOut() {
 		StyledText text = new StyledText(getShell(), SWT.NONE);
 		text.setText("0");

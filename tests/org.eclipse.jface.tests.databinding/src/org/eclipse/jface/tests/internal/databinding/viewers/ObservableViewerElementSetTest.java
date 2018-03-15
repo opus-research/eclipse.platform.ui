@@ -20,14 +20,13 @@ import org.eclipse.jface.databinding.conformance.MutableObservableSetContractTes
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.internal.databinding.viewers.ObservableViewerElementSet;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-@RunWith(AllTests.class)
-public class ObservableViewerElementSetTest {
-	public static junit.framework.Test suite() {
+public class ObservableViewerElementSetTest extends TestCase {
+	public static Test suite() {
 		TestSuite suite = new TestSuite(ObservableViewerElementSetTest.class.getName());
 		suite.addTest(MutableObservableSetContractTest.suite(new Delegate()));
 		return suite;
