@@ -21,7 +21,6 @@ import java.util.List;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.ValueBinding;
 import org.eclipse.core.databinding.conversion.Converter;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.Diffs;
@@ -59,13 +58,6 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 		model = WritableValue.withValueType(String.class);
 		dbc = new DataBindingContext();
 		log = new ArrayList();
-	}
-
-	@Override
-	public void tearDown() throws Exception {
-		dbc.dispose();
-		model.dispose();
-		target.dispose();
 	}
 
 	/**
@@ -336,15 +328,6 @@ public class ValueBindingTest extends AbstractDefaultRealmTestCase {
 		model.setValue(new Object());
 		assertEquals(Arrays.asList(new String[] { "model-set", "model-get",
 				"model-convert", "model-after-convert" }), log);
-	}
-
-	/**
-	 * test for bug 491678
-	 */
-	public void testAddListenerAndInitialSyncAreUninterruptable() {
-		model.setValue("first");
-		new ValueBinding(target, model, new UpdateValueStrategy(), new UpdateValueStrategy());
-		model.setValue(null);
 	}
 
 	private void bindLoggingValue(UpdateValueStrategy targetToModel,
