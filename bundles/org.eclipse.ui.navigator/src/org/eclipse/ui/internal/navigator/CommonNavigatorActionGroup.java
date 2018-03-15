@@ -7,6 +7,7 @@
  *
  * Contributors:
  * IBM Corporation - initial API and implementation
+ * stefan@winklerweb.net - Bug 506931 - [CommonNavigator] A quick filter possibility
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator;
 
@@ -28,6 +29,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.navigator.actions.CollapseAllAction;
 import org.eclipse.ui.internal.navigator.actions.LinkEditorAction;
 import org.eclipse.ui.internal.navigator.filters.FilterActionGroup;
+import org.eclipse.ui.internal.navigator.filters.search.CommonNavigatorSearchFilterAction;
 import org.eclipse.ui.internal.navigator.framelist.BackAction;
 import org.eclipse.ui.internal.navigator.framelist.ForwardAction;
 import org.eclipse.ui.internal.navigator.framelist.FrameList;
@@ -52,6 +54,8 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 
     private UpAction upAction;
 
+	private CommonNavigatorSearchFilterAction filterAction;
+
 	private LinkEditorAction toggleLinkingAction;
 
 	private CollapseAllAction collapseAllAction;
@@ -67,7 +71,6 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 	private CollapseAllHandler collapseAllHandler;
 
     private boolean frameActionsShown;
-
 
 
 	/**
@@ -146,6 +149,20 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 			service.activateHandler(CollapseAllHandler.COMMAND_ID, collapseAllHandler);
 		}
 
+		// TODO We are already past API Freeze for Oxygen. So the property keys
+		// are hard-coded here, but should be moved to
+		// INavigatorViewerDescriptor in the future.
+		boolean hideSearchFilterAction = viewerDescriptor
+				.getBooleanConfigProperty("org.eclipse.ui.navigator.hideSearchFilterAction"); //$NON-NLS-1$
+		if (!hideSearchFilterAction) {
+			filterAction = new CommonNavigatorSearchFilterAction(commonViewer);
+			filterAction.setId(ActionFactory.FIND.getId());
+			ImageDescriptor findIcon = NavigatorPlugin
+					.getImageDescriptor("icons/full/elcl16/find.png"); //$NON-NLS-1$
+			filterAction.setImageDescriptor(findIcon);
+			filterAction.setHoverImageDescriptor(findIcon);
+		}
+
 		filterGroup = new FilterActionGroup(commonViewer);
 	}
 
@@ -174,6 +191,11 @@ public class CommonNavigatorActionGroup extends ActionGroup implements IMementoA
 			frameActionsShown= true;
 		}
 		toolBar.add(new GroupMarker(FRAME_ACTION_GROUP_ID));
+
+		if (filterAction != null) {
+			toolBar.add(filterAction);
+		}
+
 		if (collapseAllAction != null) {
 			toolBar.add(collapseAllAction);
 		}
