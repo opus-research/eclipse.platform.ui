@@ -1565,7 +1565,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 
 		Object clientObject = part.getObject();
-		if (clientObject == null || !(clientObject instanceof CompatibilityPart)) {
+		if (!(clientObject instanceof CompatibilityPart)) {
 			// either not a 3.x part or it's an e4 part, should still hide it
 			if (save) {
 				// save as necessary
