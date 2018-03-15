@@ -144,7 +144,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @param childElements
 	 *            the child elements to add
 	 */
-	public void add(Object parentElementOrTreePath, Object[] childElements) {
+	public void add(Object parentElementOrTreePath, Object... childElements) {
 		Assert.isNotNull(parentElementOrTreePath);
 		assertElementsNotNull(childElements);
 		if (checkBusy())
@@ -641,28 +641,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 			comparator.sort(this, result);
 		}
 		return result;
-	}
-
-	/**
-	 * Adds the given child element to this viewer as a child of the given
-	 * parent element. If this viewer does not have a sorter, the element is
-	 * added at the end of the parent's list of children; otherwise, the element
-	 * is inserted at the appropriate position.
-	 * <p>
-	 * This method should be called (by the content provider) when a single
-	 * element has been added to the model, in order to cause the viewer to
-	 * accurately reflect the model. This method only affects the viewer, not
-	 * the model. Note that there is another method for efficiently processing
-	 * the simultaneous addition of multiple elements.
-	 * </p>
-	 *
-	 * @param parentElementOrTreePath
-	 *            the parent element or path
-	 * @param childElement
-	 *            the child element
-	 */
-	public void add(Object parentElementOrTreePath, Object childElement) {
-		add(parentElementOrTreePath, new Object[] { childElement });
 	}
 
 	/**
@@ -2173,7 +2151,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @param elementsOrTreePaths
 	 *            the elements to remove
 	 */
-	public void remove(final Object[] elementsOrTreePaths) {
+	public void remove(final Object... elementsOrTreePaths) {
 		assertElementsNotNull(elementsOrTreePaths);
 		if (elementsOrTreePaths.length == 0) {
 			return;
@@ -2209,24 +2187,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		if (checkBusy())
 			return;
 		preservingSelection(() -> internalRemove(parent, elements));
-	}
-
-	/**
-	 * Removes the given element from the viewer. The selection is updated if
-	 * necessary.
-	 * <p>
-	 * This method should be called (by the content provider) when a single
-	 * element has been removed from the model, in order to cause the viewer to
-	 * accurately reflect the model. This method only affects the viewer, not
-	 * the model. Note that there is another method for efficiently processing
-	 * the simultaneous removal of multiple elements.
-	 * </p>
-	 *
-	 * @param elementsOrTreePaths
-	 *            the element
-	 */
-	public void remove(Object elementsOrTreePaths) {
-		remove(new Object[] { elementsOrTreePaths });
 	}
 
 	/**
@@ -2368,7 +2328,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 *            the array of expanded elements
 	 * @see #getExpandedElements
 	 */
-	public void setExpandedElements(Object[] elements) {
+	public void setExpandedElements(Object... elements) {
 		assertElementsNotNull(elements);
 		if (checkBusy()) {
 			return;
@@ -2404,7 +2364,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 *
 	 * @since 3.2
 	 */
-	public void setExpandedTreePaths(TreePath[] treePaths) {
+	public void setExpandedTreePaths(TreePath... treePaths) {
 		assertElementsNotNull(treePaths);
 		if (checkBusy())
 			return;
