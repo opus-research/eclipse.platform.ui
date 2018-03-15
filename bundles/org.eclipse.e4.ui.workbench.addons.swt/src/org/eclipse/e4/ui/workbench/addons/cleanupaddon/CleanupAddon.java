@@ -254,10 +254,6 @@ public class CleanupAddon {
 					}
 				}
 
-				if (isLastEditorStack(parent) && makeParentInvisible) {
-					return;
-				}
-
 				if (!shouldReactToChildVisibilityChanges(parent)) {
 					return;
 				}
