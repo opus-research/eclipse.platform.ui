@@ -212,7 +212,8 @@ public class PartRenderingEngineTests {
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
-		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
+		IPresentationEngine renderer = (IPresentationEngine) appContext
+				.get(IPresentationEngine.class.getName());
 		renderer.removeGui(part);
 		renderer.removeGui(window);
 
@@ -642,7 +643,8 @@ public class PartRenderingEngineTests {
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
-		IPresentationEngine engine = appContext.get(IPresentationEngine.class);
+		IPresentationEngine engine = (IPresentationEngine) appContext
+				.get(IPresentationEngine.class.getName());
 
 		CTabFolder folder = (CTabFolder) stack.getWidget();
 		CTabItem itemA = folder.getItem(0);
@@ -884,7 +886,8 @@ public class PartRenderingEngineTests {
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 
-		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
+		IPresentationEngine renderer = (IPresentationEngine) appContext
+				.get(IPresentationEngine.class.getName());
 		renderer.createGui(part);
 		renderer.removeGui(part);
 
@@ -932,7 +935,8 @@ public class PartRenderingEngineTests {
 		assertNull(partB.getWidget());
 
 		// try to remove the tab
-		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
+		IPresentationEngine renderer = (IPresentationEngine) appContext
+				.get(IPresentationEngine.class.getName());
 		renderer.removeGui(partB);
 
 		// item removed, one item
