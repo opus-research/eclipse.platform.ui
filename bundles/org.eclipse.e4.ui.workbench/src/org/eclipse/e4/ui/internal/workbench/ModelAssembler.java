@@ -10,7 +10,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430075, 430080, 431464, 433336, 472654
  *     René Brandstetter - Bug 419749
  *     Brian de Alwis (MTI) - Bug 433053
- *     Alexandra Buzila - Refactoring
+ *     Alexandra Buzila - Refactoring, Bug 475934
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -74,8 +74,9 @@ public class ModelAssembler {
 	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$
 
 	/**
-	 * Processes the model. This will run pre-processors, process the fragments,
-	 * run post-processors and resolve imports, in this order. <br>
+	 * Processes the application model. This will run pre-processors, process
+	 * the fragments, resolve imports and run post-processors, in this order.
+	 * <br>
 	 * The <strong>org.eclipse.e4.workbench.model</strong> extension point will
 	 * be used to retrieve the contributed fragments (with imports) and
 	 * processors.<br>
@@ -89,15 +90,12 @@ public class ModelAssembler {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
 
-		List<MApplicationElement> imports = new ArrayList<>();
-		List<MApplicationElement> addedElements = new ArrayList<>();
-
 		// run processors which are marked to run before fragments
 		runProcessors(extensions, initial, false);
-		processFragments(extensions, imports, addedElements, initial);
+		// process fragments (and resolve imports)
+		processFragments(extensions, initial);
 		// run processors which are marked to run after fragments
 		runProcessors(extensions, initial, true);
-		resolveImports(imports, addedElements);
 	}
 
 	/**
@@ -107,36 +105,50 @@ public class ModelAssembler {
 	 *
 	 * @param extensions
 	 *            the list of {@link IExtension} extension elements
-	 * @param imports
-	 *            list that will be populated in place with the
-	 *            {@link MApplicationElement MApplicationElements} imported by
-	 *            the fragments
-	 * @param addedElements
-	 *            list that will be populated in place with the
-	 *            {@link MApplicationElement MApplicationElements} contributed
-	 *            by the fragments to the application model
 	 * @param initial
 	 *            <code>true</code> if running from a non-persisted state
+	 *
+	 * @return list of the {@link MApplicationElement MApplicationElements}
+	 *         contributed by the fragments to the application model
 	 */
-	private void processFragments(IExtension[] extensions, List<MApplicationElement> imports,
-			List<MApplicationElement> addedElements, boolean initial) {
+	private List<MApplicationElement> processFragments(IExtension[] extensions, boolean initial) {
+		List<MApplicationElement> addedElements = new ArrayList<>();
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if ("fragment".equals(ce.getName()) && (initial || !INITIAL.equals(ce.getAttribute("apply")))) { //$NON-NLS-1$ //$NON-NLS-2$
 					boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$
-					processFragmentConfigurationElement(ce, checkExist, imports, addedElements);
+					addedElements.addAll(processFragmentConfigurationElement(ce, checkExist));
 				}
 			}
 		}
+		return addedElements;
 	}
 
-	private void processFragmentConfigurationElement(IConfigurationElement ce, boolean checkExist,
-			List<MApplicationElement> imports,
-			List<MApplicationElement> addedElements) {
+	/**
+	 * Adds the {@link MApplicationElement model elements} contributed by the
+	 * {@link IConfigurationElement} to the application model and resolves any
+	 * fragment imports along the way.
+	 *
+	 * @param ce
+	 *            an extension point configuration element containing a
+	 *            {@link MModelFragments fragment container}
+	 * @param checkExist
+	 *            specifies whether we should check that the application model
+	 *            doesn't already contain the elements contributed by the
+	 *            fragment before merging them
+	 */
+	private List<MApplicationElement> processFragmentConfigurationElement(IConfigurationElement ce,
+			boolean checkExist) {
+		/**
+		 * The application elements that were added by the given
+		 * IConfigurationElement to the application model
+		 */
+		List<MApplicationElement> result = new ArrayList<>();
+
 		MModelFragments fragmentsContainer = getFragmentsContainer(ce);
 		if (fragmentsContainer == null) {
-			return;
+			return result;
 		}
 		String contributorURI = URIHelper.constructPlatformURI(ce.getContributor());
 		boolean evalImports = false;
@@ -154,15 +166,16 @@ public class ModelAssembler {
 			List<MApplicationElement> merged = processModelFragment(fragment, contributorURI, checkExist);
 			if (merged.size() > 0) {
 				evalImports = true;
-				addedElements.addAll(merged);
+				result.addAll(merged);
 			} else {
 				logger.debug("Nothing to merge for fragment \"{0}\" of \"{1}\"", ce.getAttribute("uri"), //$NON-NLS-1$ //$NON-NLS-2$
 						ce.getContributor().getName());
 			}
 		}
-		if (evalImports) {
-			imports.addAll(fragmentsContainer.getImports());
+		if (evalImports && fragmentsContainer.getImports().size() > 0) {
+			resolveImports(fragmentsContainer.getImports(), result);
 		}
+		return result;
 	}
 
 	private MModelFragments getFragmentsContainer(IConfigurationElement ce) {
