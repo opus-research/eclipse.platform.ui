@@ -651,13 +651,10 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
             for (int i = 0; i < edMementos.length; i++) {
 				EditorDescriptor editor = new EditorDescriptor();
                 boolean valid = editor.loadValues(edMementos[i]);
-				if (!valid || isSystem(editor.getId())) {
-					// bug 502514: don't restore invalid or internal editor
-					// descriptors, they are always recreated via
-					// addSystemEditors(Map<String, IEditorDescriptor>)
+                if (!valid) {
                     continue;
                 }
-				if (editor.getPluginID() != null) {
+                if (editor.getPluginID() != null) {
                     //If the editor is from a plugin we use its ID to look it
                     // up in the mapping of editors we
                     //have obtained from plugins. This allows us to verify that
@@ -674,14 +671,8 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                     // editor
                     ImageDescriptor descriptor;
                     if (editor.getProgram() == null) {
-						String fileName = editor.getFileName();
-						if (fileName == null) {
-							String error = "Both editor program and path are null for descriptor id: "; //$NON-NLS-1$
-							error += editor.getId() + " with name: " + editor.getLabel(); //$NON-NLS-1$
-							WorkbenchPlugin.log(error, new IllegalStateException());
-							continue;
-						}
-						descriptor = new ProgramImageDescriptor(fileName, 0);
+						descriptor = new ProgramImageDescriptor(editor
+                                .getFileName(), 0);
 					} else {
 						descriptor = new ExternalProgramImageDescriptor(editor
                                 .getProgram());
@@ -713,27 +704,15 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
     }
 
     /**
-	 * @param id
-	 *            descriptor id
-	 * @return true if the id is one of the system internal id's:
-	 *         {@link IEditorRegistry#SYSTEM_EXTERNAL_EDITOR_ID} or
-	 *         {@link IEditorRegistry#SYSTEM_INPLACE_EDITOR_ID}
-	 */
-	private static boolean isSystem(String id) {
-		return IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID.equals(id)
-				|| IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID.equals(id);
-	}
-
-	/**
-	 * Read the file types and associate them to their defined editor(s).
-	 *
-	 * @param editorTable
-	 *            The editor table containing the defined editors.
-	 * @param reader
-	 *            Reader containing the preferences content for the resources.
-	 *
-	 * @throws WorkbenchException
-	 */
+     * Read the file types and associate them to their defined editor(s).
+     *
+     * @param editorTable
+     *            The editor table containing the defined editors.
+     * @param reader
+     *            Reader containing the preferences content for the resources.
+     *
+     * @throws WorkbenchException
+     */
 	public void readResources(Map<String, IEditorDescriptor> editorTable, Reader reader)
             throws WorkbenchException {
         XMLMemento memento = XMLMemento.createReadRoot(reader);
@@ -1033,12 +1012,6 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
         memento = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_EDITORS);
 		for (IEditorDescriptor editor : editors) {
-			if (isSystem(editor.getId())) {
-				// bug 502514: don't persist internal editor descriptors,
-				// they are always recreated via addSystemEditors(Map<String,
-				// IEditorDescriptor>)
-				continue;
-			}
             IMemento editorMemento = memento
                     .createChild(IWorkbenchConstants.TAG_DESCRIPTOR);
 			((EditorDescriptor) editor).saveValues(editorMemento);
