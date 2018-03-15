@@ -24,7 +24,7 @@ See [https://wiki.eclipse.org/Platform_UI/How_to_Contribute#Unit_Testing][2] for
 Contributions
 -------------
 
-For information how to contribute to the Platform UI project see [Platform UI - How to contribute wiki page][3].
+For information how to contribute to the Platform UI project see [Platform UI - How to contribute wiki page] [3].
 
 License
 -------
