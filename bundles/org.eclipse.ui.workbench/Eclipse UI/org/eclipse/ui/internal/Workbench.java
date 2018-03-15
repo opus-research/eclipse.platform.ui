@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Mickael Istria (Red Hat Inc.) - Bug 469918
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487297
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 520926
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -1085,6 +1084,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @return true if the close succeeded, and false otherwise
 	 */
 	private boolean busyClose(final boolean force) {
+		// Fire an E4 lifecycle notification
+		UIEvents.publishEvent(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, application);
+
 		// notify the advisor of preShutdown and allow it to veto if not forced
 		isClosing = advisor.preShutdown();
 		if (!force && !isClosing) {
@@ -1168,10 +1170,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		if (!force && !isClosing) {
 			return false;
 		}
-
-		// Fire an E4 lifecycle notification.
-		// Bug 520926: This event must be fired after all veto chances have passed:
-		UIEvents.publishEvent(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, application);
 
 		shutdown();
 
@@ -1457,7 +1455,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		// We can't return a window with no widget...it's in the process
 		// of closing...see Bug 379717
-		if (activeWindow == null || (activeWindow != null && activeWindow.getWidget() == null)) {
+		if (activeWindow == null || activeWindow.getWidget() == null) {
 			return null;
 		}
 
@@ -1563,8 +1561,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		for (MWindow window : application.getChildren()) {
 			IEclipseContext context = window.getContext();
 			if (context != null) {
-				IWorkbenchWindow wwindow = (IWorkbenchWindow) context.get(IWorkbenchWindow.class
-						.getName());
+				IWorkbenchWindow wwindow = context.get(IWorkbenchWindow.class);
 				if (wwindow != null) {
 					windows.add(wwindow);
 				}
