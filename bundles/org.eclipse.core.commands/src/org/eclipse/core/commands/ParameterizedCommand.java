@@ -107,8 +107,8 @@ public final class ParameterizedCommand implements Comparable {
 	 */
 	private static final String escape(final String rawText) {
 
-		// defer initialization of a StringBuilder until we know we need one
-		StringBuilder buffer = null;
+		// defer initialization of a StringBuffer until we know we need one
+		StringBuffer buffer = null;
 
 		for (int i = 0; i < rawText.length(); i++) {
 
@@ -120,7 +120,7 @@ public final class ParameterizedCommand implements Comparable {
 			case CommandManager.PARAMETER_SEPARATOR_CHAR:
 			case CommandManager.ESCAPE_CHAR:
 				if (buffer == null) {
-					buffer = new StringBuilder(rawText.substring(0, i));
+					buffer = new StringBuffer(rawText.substring(0, i));
 				}
 				buffer.append(CommandManager.ESCAPE_CHAR);
 				buffer.append(c);
@@ -535,7 +535,7 @@ public final class ParameterizedCommand implements Comparable {
 	 */
 	public final String getName(String baseName) throws NotDefinedException {
 		if (name == null) {
-			final StringBuilder nameBuffer = new StringBuilder();
+			final StringBuffer nameBuffer = new StringBuffer();
 			nameBuffer.append(baseName);
 			if (parameterizations != null) {
 				nameBuffer.append(" ("); //$NON-NLS-1$
@@ -560,7 +560,7 @@ public final class ParameterizedCommand implements Comparable {
 		return name;
 	}
 
-	private void appendParameter(final StringBuilder nameBuffer,
+	private void appendParameter(final StringBuffer nameBuffer,
 			final Parameterization parameterization, boolean shouldAppendName) {
 
 		if(shouldAppendName) {
@@ -678,7 +678,7 @@ public final class ParameterizedCommand implements Comparable {
 			return escapedId;
 		}
 
-		final StringBuilder buffer = new StringBuilder(escapedId);
+		final StringBuffer buffer = new StringBuffer(escapedId);
 		buffer.append(CommandManager.PARAMETER_START_CHAR);
 
 		for (int i = 0; i < parameterizations.length; i++) {
@@ -709,7 +709,8 @@ public final class ParameterizedCommand implements Comparable {
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder("ParameterizedCommand("); //$NON-NLS-1$
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append("ParameterizedCommand("); //$NON-NLS-1$
 		buffer.append(command);
 		buffer.append(',');
 		buffer.append(Arrays.toString(parameterizations));
