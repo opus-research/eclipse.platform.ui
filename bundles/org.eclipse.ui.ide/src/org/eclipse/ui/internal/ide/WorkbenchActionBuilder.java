@@ -10,7 +10,7 @@
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487570
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487570, 494289
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -491,7 +491,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         menu.add(getPrintItem());
         menu.add(new GroupMarker(IWorkbenchActionConstants.PRINT_EXT));
         menu.add(new Separator());
-        menu.add(openWorkspaceAction);
         menu.add(new GroupMarker(IWorkbenchActionConstants.OPEN_EXT));
         menu.add(new Separator());
         menu.add(importResourcesAction);
@@ -505,6 +504,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         menu.add(ContributionItemFactory.REOPEN_EDITORS.create(getWindow()));
         menu.add(new GroupMarker(IWorkbenchActionConstants.MRU));
         menu.add(new Separator());
+
+		menu.add(openWorkspaceAction);
 
         // If we're on OS X we shouldn't show this command in the File menu. It
 		// should be invisible to the user. However, we should not remove it -
