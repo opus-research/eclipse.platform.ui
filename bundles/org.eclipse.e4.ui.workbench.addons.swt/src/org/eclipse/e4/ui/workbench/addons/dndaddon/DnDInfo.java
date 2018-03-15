@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 class DnDInfo {
+
 	Point cursorPos;
 	Control curCtrl;
 	Item curItem;
@@ -194,9 +195,10 @@ class DnDInfo {
 			}
 		}
 
-		curCtrl = display.getCursorControl();
-		if (curCtrl == null)
+		curCtrl = DragAndDropUtil.findControl(display, display.getCursorLocation());
+		if (curCtrl == null) {
 			return;
+		}
 
 		curElement = getModelElement(curCtrl);
 		setItemInfo();
