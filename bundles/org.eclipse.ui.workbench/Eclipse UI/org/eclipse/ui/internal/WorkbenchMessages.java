@@ -188,7 +188,6 @@ public class WorkbenchMessages extends NLS {
 
 	public static String LockToolBarAction_toolTip;
 
-	public static String CustomizePerspectiveDialog_okButtonLabel;
 	public static String EditActionSetsAction_text;
 	public static String EditActionSetsAction_toolTip;
 	public static String ActionSetSelection_customize;
@@ -922,9 +921,6 @@ public class WorkbenchMessages extends NLS {
 	public static String ContentTypes_newContentTypeDialog_invalidContentTypeName;
 	public static String ContentTypes_failedAtEditingContentTypes;
     public static String Edit;
-	public static String ContentTypes_editorAssociations;
-	public static String ContentTypes_editorAssociationAddLabel;
-	public static String ContentTypes_editorAssociationRemoveLabel;
 
     // =========================================================================
     // Deprecated actions support
@@ -1024,6 +1020,7 @@ public class WorkbenchMessages extends NLS {
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
+
 
 
 }

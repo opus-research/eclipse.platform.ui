@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,11 +50,10 @@ public class BadElementFactory implements IElementFactory {
 		public static boolean failAttempted = false;
 
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public <T> T getAdapter(Class<T> adapter) {
+		public Object getAdapter(Class adapter) {
 			if (adapter.equals(IPersistableElement.class)) {
-				return (T) this;
+				return this;
 			}
 			return null;
 		}
@@ -74,6 +73,7 @@ public class BadElementFactory implements IElementFactory {
 		}
 
 	}
+;
 
 	@Override
 	public IAdaptable createElement(IMemento memento) {
