@@ -170,6 +170,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SelectPerspective_shellTitle;
 	public static String SelectPerspective_selectPerspectiveHelp;
 	public static String SelectPerspective_noDesc;
+	public static String SelectPerspective_open_button_label;
 	public static String Workbench_showPerspectiveError;
 	public static String ChangeToPerspectiveMenu_errorTitle;
     public static String OpenPerspectiveDialogAction_text;
@@ -179,6 +180,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ShowView_shellTitle;
 	public static String ShowView_selectViewHelp;
 	public static String ShowView_noDesc;
+	public static String ShowView_open_button_label;
 
 	public static String ToggleEditor_hideEditors;
 	public static String ToggleEditor_showEditors;
@@ -240,6 +242,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SavePerspective_text;
 	public static String SavePerspective_toolTip;
 	public static String SavePerspective_shellTitle;
+	public static String SavePerspective_saveButtonLabel;
 	public static String SavePerspectiveDialog_description;
 	public static String SavePerspective_name;
 	public static String SavePerspective_existing;
@@ -631,6 +634,10 @@ public class WorkbenchMessages extends NLS {
 	public static String Saving_Modifications;
 	public static String Save_All;
 	public static String Dont_Save;
+
+	public static String SaveableHelper_Save;
+	public static String SaveableHelper_Cancel;
+	public static String SaveableHelper_Dont_Save;
 
 
 	// ==============================================================================
