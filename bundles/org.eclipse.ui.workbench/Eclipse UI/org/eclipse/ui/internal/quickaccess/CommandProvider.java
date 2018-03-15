@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 476045
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -24,10 +25,12 @@ import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
+import org.eclipse.ui.internal.commands.CommandImageService;
 
 /**
  * @since 3.3
@@ -46,6 +49,7 @@ public class CommandProvider extends QuickAccessProvider {
 	private IHandlerService handlerService;
 	private ICommandService commandService;
 	private EHandlerService ehandlerService;
+	private ICommandImageService commandImageService;
 
 	public CommandProvider() {
 	}
@@ -143,6 +147,18 @@ public class CommandProvider extends QuickAccessProvider {
 			}
 		}
 		return handlerService;
+	}
+
+	ICommandImageService getCommandImageService() {
+		if (commandImageService == null) {
+			if (currentSnapshot instanceof ExpressionContext) {
+				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
+				commandImageService = ctx.get(CommandImageService.class);
+			} else {
+				commandImageService = PlatformUI.getWorkbench().getService(CommandImageService.class);
+			}
+		}
+		return commandImageService;
 	}
 
 	IEvaluationContext getContextSnapshot() {
