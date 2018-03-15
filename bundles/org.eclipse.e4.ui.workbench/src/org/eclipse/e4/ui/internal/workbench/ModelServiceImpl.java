@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 434611, 472654
  *     Manumitting Technologies Inc - Bug 380609
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 487817
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -1006,6 +1007,17 @@ public class ModelServiceImpl implements EModelService {
 		if (pStacks.size() == 1) {
 			MPerspective perspective = pStacks.get(0).getSelectedElement();
 			return perspective;
+		}
+
+		// find the MPerspectiveStack with the given window as parent
+		for (MPerspectiveStack perspectiveStack : pStacks) {
+			MPerspective selectedElement = perspectiveStack.getSelectedElement();
+			if (selectedElement != null) {
+				MWindow win = selectedElement.getContext().get(MWindow.class);
+				if (window.equals(win)) {
+					return selectedElement;
+				}
+			}
 		}
 
 		return null;
