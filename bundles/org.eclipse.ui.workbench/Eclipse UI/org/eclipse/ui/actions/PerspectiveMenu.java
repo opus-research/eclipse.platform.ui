@@ -41,6 +41,7 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 
@@ -88,10 +89,13 @@ public abstract class PerspectiveMenu extends ContributionItem {
 
     private boolean dirty = true;
 
-    private IMenuListener menuListener = manager -> {
-	    manager.markDirty();
-	    dirty = true;
-	};
+    private IMenuListener menuListener = new IMenuListener() {
+        @Override
+		public void menuAboutToShow(IMenuManager manager) {
+            manager.markDirty();
+            dirty = true;
+        }
+    };
 
     private Comparator comparator = new Comparator() {
         private Collator collator = Collator.getInstance();

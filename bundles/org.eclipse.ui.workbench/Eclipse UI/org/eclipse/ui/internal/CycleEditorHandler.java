@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Friederike Schertel <friederike@schertel.org> - Bug 478336
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 504088
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -17,6 +16,9 @@ package org.eclipse.ui.internal;
 import java.util.List;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.commands.ICommandService;
@@ -29,12 +31,22 @@ import org.eclipse.ui.commands.ICommandService;
  *
  * @since 3.3
  */
-public class CycleEditorHandler extends FilteredTableBaseHandler {
+public class CycleEditorHandler extends CycleBaseHandler {
 
 	@Override
-	protected Object getInput(WorkbenchPage page) {
+	protected void addItems(Table table, WorkbenchPage page) {
 		List<EditorReference> refs = page.getSortedEditorReferences();
-		return refs;
+		for (EditorReference ref : refs) {
+            TableItem item = null;
+            item = new TableItem(table, SWT.NONE);
+			if (ref.isDirty()) {
+				item.setText("*" + ref.getTitle()); //$NON-NLS-1$
+			} else {
+				item.setText(ref.getTitle());
+			}
+			item.setImage(ref.getTitleImage());
+			item.setData(ref);
+        }
 	}
 
 	@Override
