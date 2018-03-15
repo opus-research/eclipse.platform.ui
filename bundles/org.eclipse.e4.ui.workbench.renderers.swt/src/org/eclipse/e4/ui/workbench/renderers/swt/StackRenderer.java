@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,10 +9,12 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285, 472654
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476, 461573
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 487349
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -352,108 +354,25 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		preferences.addPreferenceChangeListener(this);
 		preferenceChange(null);
 
-		// TODO: Refactor using findItemForPart(MPart) method
-		itemUpdater = new EventHandler() {
+		itemUpdater = new AbstractItemUpdaterHandler() {
+
 			@Override
-			public void handleEvent(Event event) {
-				MUIElement element = (MUIElement) event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				if (!(element instanceof MPart))
-					return;
-
-				MPart part = (MPart) element;
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-				Object newValue = event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-				// is this a direct child of the stack?
-				if (element.getParent() != null
-						&& element.getParent().getRenderer() == StackRenderer.this) {
-					CTabItem cti = findItemForPart(element, element.getParent());
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-					return;
-				}
-
-				// Do we have any stacks with place holders for the element
-				// that's changed?
-				MWindow win = modelService.getTopLevelWindowFor(part);
-				List<MPlaceholder> refs = modelService.findElements(win, null,
-						MPlaceholder.class, null);
-				if (refs != null) {
-					for (MPlaceholder ref : refs) {
-						if (ref.getRef() != part)
-							continue;
-
-						MElementContainer<MUIElement> refParent = ref
-								.getParent();
-						// can be null, see bug 328296
-						if (refParent != null
-								&& refParent.getRenderer() instanceof StackRenderer) {
-							CTabItem cti = findItemForPart(ref, refParent);
-							if (cti != null) {
-								updateTab(cti, part, attName, newValue);
-							}
-						}
-					}
-				}
+			protected Collection<MPlaceholder> findPlaceHolder(MUIElement element) {
+				// change all labels even of on rendered placeholders
+				MWindow win = modelService.getTopLevelWindowFor(element);
+				return modelService.findElements(win, null, MPlaceholder.class, null);
 			}
 		};
-
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 
-		// TODO: Refactor using findItemForPart(MPart) method
-		dirtyUpdater = new EventHandler() {
+		dirtyUpdater = new AbstractItemUpdaterHandler() {
+
 			@Override
-			public void handleEvent(Event event) {
-				Object objElement = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-
-				// Ensure that this event is for a MMenuItem
-				if (!(objElement instanceof MPart)) {
-					return;
-				}
-
-				// Extract the data bits
-				MPart part = (MPart) objElement;
-
-				String attName = (String) event
-						.getProperty(UIEvents.EventTags.ATTNAME);
-				Object newValue = event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-				// Is the part directly under the stack?
-				MElementContainer<MUIElement> parent = part.getParent();
-				if (parent != null
-						&& parent.getRenderer() == StackRenderer.this) {
-					CTabItem cti = findItemForPart(part, parent);
-					if (cti != null) {
-						updateTab(cti, part, attName, newValue);
-					}
-					return;
-				}
-
-				// Do we have any stacks with place holders for the element
-				// that's changed?
-				Set<MPlaceholder> refs = renderedMap.get(part);
-				if (refs != null) {
-					for (MPlaceholder ref : refs) {
-						MElementContainer<MUIElement> refParent = ref
-								.getParent();
-						if (refParent.getRenderer() instanceof StackRenderer) {
-							CTabItem cti = findItemForPart(ref, refParent);
-							if (cti != null) {
-								updateTab(cti, part, attName, newValue);
-							}
-						}
-					}
-				}
+			protected Collection<MPlaceholder> findPlaceHolder(MUIElement element) {
+				// dirty state can only change on rendered elements
+				return renderedMap.get(element);
 			}
 		};
-
 		eventBroker.subscribe(UIEvents.buildTopic(UIEvents.Dirtyable.TOPIC,
 				UIEvents.Dirtyable.DIRTY), dirtyUpdater);
 
@@ -1754,6 +1673,51 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			}
 		}
 		return false;
+	}
+
+	private abstract class AbstractItemUpdaterHandler implements EventHandler {
+
+		@Override
+		public void handleEvent(Event event) {
+			MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+			if (!(element instanceof MPart))
+				return;
+
+			MPart part = (MPart) element;
+
+			String attName = (String) event.getProperty(UIEvents.EventTags.ATTNAME);
+			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
+
+			// is this a direct child of the stack?
+			if (element.getParent() != null && element.getParent().getRenderer() == StackRenderer.this) {
+				CTabItem cti = findItemForPart(element, element.getParent());
+				if (cti != null) {
+					updateTab(cti, part, attName, newValue);
+				}
+				return;
+			}
+
+			// Do we have any stacks with place holders for the element
+			// that's changed?
+			Collection<MPlaceholder> refs = findPlaceHolder(element);
+			if (refs != null) {
+				for (MPlaceholder ref : refs) {
+					if (ref.getRef() != part)
+						continue;
+
+					MElementContainer<MUIElement> refParent = ref.getParent();
+					// can be null, see bug 328296
+					if (refParent != null && refParent.getRenderer() instanceof StackRenderer) {
+						CTabItem cti = findItemForPart(ref, refParent);
+						if (cti != null) {
+							updateTab(cti, part, attName, newValue);
+						}
+					}
+				}
+			}
+		}
+
+		protected abstract Collection<MPlaceholder> findPlaceHolder(MUIElement element);
 	}
 
 	@SuppressWarnings("javadoc")
