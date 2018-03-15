@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 IBM Corporation and others.
+ * Copyright (c) 2013, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 497586
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.custom;
 
@@ -24,9 +23,6 @@ import org.w3c.dom.css.CSSValue;
 
 public class CSSPropertye4SelectedTabFillHandler extends
 AbstractCSSPropertySWTHandler {
-
-	private static final String SWT_SELECTED_TABS_HIGHLIGHT = "swt-selected-tabs-highlight";
-	private static final String SWT_SELECTED_TABS_BACKGROUND = "swt-selected-tabs-background";
 
 	@Override
 	protected void applyCSSProperty(Control control, String property,
@@ -45,11 +41,7 @@ AbstractCSSPropertySWTHandler {
 			if (newColor == null) {
 				return;
 			}
-			if (SWT_SELECTED_TABS_BACKGROUND.equals(property)) {
-				((ICTabRendering) renderer).setSelectedTabFill(newColor);
-			} else if (SWT_SELECTED_TABS_HIGHLIGHT.equals(property)) {
-				((ICTabRendering) renderer).setSelectedTabHighlight(newColor);
-			}
+			((ICTabRendering) renderer).setSelectedTabFill(newColor);
 		} else if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Gradient grad = (Gradient) engine.convert(value, Gradient.class,
 					control.getDisplay());
