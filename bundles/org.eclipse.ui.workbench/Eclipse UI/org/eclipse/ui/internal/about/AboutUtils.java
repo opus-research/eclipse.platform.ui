@@ -164,7 +164,7 @@ public class AboutUtils {
 	 * @since 3.0.2
 	 */
 	private static String urlEncodeForSpaces(char[] input) {
-		StringBuilder retu = new StringBuilder(input.length);
+		StringBuffer retu = new StringBuffer(input.length);
 		for (char element : input) {
 			if (element == ' ') {
 				retu.append("%20"); //$NON-NLS-1$
