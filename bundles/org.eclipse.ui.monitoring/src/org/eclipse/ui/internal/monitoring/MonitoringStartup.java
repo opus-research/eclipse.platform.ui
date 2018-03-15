@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, 2015 Google Inc and others.
+ * Copyright (C) 2014, 2016 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,13 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
+import java.util.concurrent.TimeUnit;
+
+import org.eclipse.core.internal.jobs.JobCancelabilityMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
+import org.eclipse.ui.internal.monitoring.preferences.JobCancelabilityMonitorPreferenceListener;
 import org.eclipse.ui.internal.monitoring.preferences.MonitoringPreferenceListener;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 
@@ -24,6 +28,7 @@ import org.eclipse.ui.monitoring.PreferenceConstants;
 public class MonitoringStartup implements IStartup {
 	private EventLoopMonitorThread monitoringThread;
 
+	@SuppressWarnings("restriction")
 	@Override
 	public void earlyStartup() {
 		if (monitoringThread != null) {
@@ -36,6 +41,26 @@ public class MonitoringStartup implements IStartup {
 		}
 
 		preferences.addPropertyChangeListener(new MonitoringPreferenceListener(monitoringThread));
+
+		JobCancelabilityMonitor.BasicOptionsImpl jobCancelabilityMonitorOptions = null;
+		if (preferences.getBoolean(PreferenceConstants.JOB_MONITORING_ENABLED)) {
+			jobCancelabilityMonitorOptions = createJobCancellabilityMonitorService(preferences);
+		}
+
+		preferences.addPropertyChangeListener(new JobCancelabilityMonitorPreferenceListener(jobCancelabilityMonitorOptions));
+	}
+
+	@SuppressWarnings("restriction")
+	private JobCancelabilityMonitor.BasicOptionsImpl createJobCancellabilityMonitorService(IPreferenceStore preferences) {
+		JobCancelabilityMonitor.BasicOptionsImpl jobCancelabilityMonitorOptions;
+		jobCancelabilityMonitorOptions = new JobCancelabilityMonitor.BasicOptionsImpl();
+		jobCancelabilityMonitorOptions.setEnabled(true);
+		jobCancelabilityMonitorOptions.setErrorThreshold(TimeUnit.MILLISECONDS.toNanos(preferences.getInt(PreferenceConstants.JOB_MONITORING_ERROR_THRESHOLD_MILLIS)));
+		jobCancelabilityMonitorOptions.setWarningThreshold(TimeUnit.MILLISECONDS.toNanos(preferences.getInt(PreferenceConstants.JOB_MONITORING_WARNING_THRESHOLD_MILLIS)));
+		jobCancelabilityMonitorOptions.setMaxStackSamples(preferences.getInt(PreferenceConstants.JOB_MONITORING_MAX_STACK_SAMPLES));
+		jobCancelabilityMonitorOptions.setAlwaysReportNonCancelableUserJobAsError(preferences.getBoolean(PreferenceConstants.JOB_MONITORING_LOG_NON_CANCELLABLE_USER_JOB));
+		MonitoringPlugin.getDefault().getBundle().getBundleContext().registerService(JobCancelabilityMonitor.Options.class, jobCancelabilityMonitorOptions, null);
+		return jobCancelabilityMonitorOptions;
 	}
 
 	/**
