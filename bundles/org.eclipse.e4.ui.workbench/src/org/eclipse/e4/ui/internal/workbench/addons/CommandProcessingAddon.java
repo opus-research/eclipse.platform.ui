@@ -104,9 +104,7 @@ public class CommandProcessingAddon {
 
 	@PostConstruct
 	public void init() {
-		if (Policy.DEBUG_CMDS) {
-			Activator.trace(Policy.DEBUG_CMDS_FLAG, "Initialize commands from model", null); //$NON-NLS-1$
-		}
+		Activator.trace(Policy.DEBUG_CMDS, "Initialize commands from model", null); //$NON-NLS-1$
 		undefinedCategory = commandService.defineCategory(MApplication.class.getName(),
 				"Application Category", null); //$NON-NLS-1$
 		createCategories();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Ralf M Petter<ralf.petter@gmail.com> and others.
+ * Copyright (c) 2016 Ralf M Petter<ralf.petter@gmail.com> and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,18 +10,22 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.forms.widgets;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-/**
- * Tests forms widgets (automated).
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-	ExpandableCompositeTest.class,
-	SectionTest.class,
-	FormTextModelTest.class
-})
-public class AllWidgetsTests {
+public class AllWidgetsTests extends TestSuite {
+	/*
+	 * Returns the entire test suite.
+	 */
+	public static Test suite() {
+		return new AllWidgetsTests();
+	}
 
+	/*
+	 * Constructs a new form widgets test suite.
+	 */
+	public AllWidgetsTests() {
+		addTestSuite(ExpandableCompositeTest.class);
+		addTestSuite(FormTextModelTest.class);
+	}
 }

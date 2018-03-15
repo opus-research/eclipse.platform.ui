@@ -165,11 +165,11 @@ public class AboutUtils {
 	 */
 	private static String urlEncodeForSpaces(char[] input) {
 		StringBuffer retu = new StringBuffer(input.length);
-		for (char element : input) {
-			if (element == ' ') {
+		for (int i = 0; i < input.length; i++) {
+			if (input[i] == ' ') {
 				retu.append("%20"); //$NON-NLS-1$
 			} else {
-				retu.append(element);
+				retu.append(input[i]);
 			}
 		}
 		return retu.toString();

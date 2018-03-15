@@ -100,16 +100,17 @@ public class IdentityMap<K, V> implements Map<K, V> {
 
 			@Override
 			public boolean contains(Object o) {
-				for (Entry<K, V> entry : this)
-					if (entry.equals(o))
+				for (Iterator<Map.Entry<K, V>> iterator = iterator(); iterator
+						.hasNext();)
+					if (iterator.next().equals(o))
 						return true;
 				return false;
 			}
 
 			@Override
 			public boolean containsAll(Collection<?> c) {
-				for (Object element : c)
-					if (!contains(element))
+				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+					if (!contains(iterator.next()))
 						return false;
 				return true;
 			}
@@ -220,8 +221,8 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			@Override
 			public boolean removeAll(Collection<?> c) {
 				boolean changed = false;
-				for (Object element : c)
-					changed |= remove(element);
+				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+					changed |= remove(iterator.next());
 				return changed;
 			}
 
@@ -259,8 +260,8 @@ public class IdentityMap<K, V> implements Map<K, V> {
 					a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
 				}
 				int i = 0;
-				for (Entry<K, V> entry : this) {
-					a[i++] = (T) entry;
+				for (Iterator<Map.Entry<K, V>> iterator = iterator(); iterator.hasNext();) {
+					a[i++] = (T) iterator.next();
 				}
 				return a;
 			}
@@ -318,8 +319,9 @@ public class IdentityMap<K, V> implements Map<K, V> {
 
 			@Override
 			public boolean containsAll(Collection<?> c) {
-				for (Object element : c)
-					if (!wrappedKeySet.contains(IdentityWrapper.wrap(element)))
+				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
+					if (!wrappedKeySet.contains(IdentityWrapper.wrap(iterator
+							.next())))
 						return false;
 				return true;
 			}
@@ -359,9 +361,9 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			@Override
 			public boolean removeAll(Collection<?> c) {
 				boolean changed = false;
-				for (Object element : c)
+				for (Iterator<?> iterator = c.iterator(); iterator.hasNext();)
 					changed |= wrappedKeySet.remove(IdentityWrapper
-							.wrap(element));
+							.wrap(iterator.next()));
 				return changed;
 			}
 
@@ -369,7 +371,9 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			public boolean retainAll(Collection<?> c) {
 				boolean changed = false;
 				Object[] toRetain = c.toArray();
-				outer: for (Object element : this) {
+				outer: for (Iterator<?> iterator = iterator(); iterator
+						.hasNext();) {
+					Object element = iterator.next();
 					for (int i = 0; i < toRetain.length; i++)
 						if (element == toRetain[i])
 							continue outer;

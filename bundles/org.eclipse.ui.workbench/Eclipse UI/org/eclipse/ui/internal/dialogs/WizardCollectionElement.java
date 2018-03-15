@@ -127,9 +127,10 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
      * @return WizardCollectionElement
      */
     public WizardCollectionElement findChildCollection(IPath searchPath) {
+        Object[] children = getChildren(null);
         String searchString = searchPath.segment(0);
-		for (Object element : getChildren(null)) {
-            WizardCollectionElement currentCategory = (WizardCollectionElement) element;
+        for (int i = 0; i < children.length; ++i) {
+            WizardCollectionElement currentCategory = (WizardCollectionElement) children[i];
             if (currentCategory.getId().equals(searchString)) {
                 if (searchPath.segmentCount() == 1) {
 					return currentCategory;
@@ -153,8 +154,9 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
      * @since 3.1
      */
     public WizardCollectionElement findCategory(String id) {
-		for (Object element : getChildren(null)) {
-            WizardCollectionElement currentCategory = (WizardCollectionElement) element;
+        Object[] children = getChildren(null);
+        for (int i = 0; i < children.length; ++i) {
+            WizardCollectionElement currentCategory = (WizardCollectionElement) children[i];
             if (id.equals(currentCategory.getId())) {
                     return currentCategory;
             }
@@ -175,8 +177,9 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
      * @return the element
      */
     public WorkbenchWizardElement findWizard(String searchId, boolean recursive) {
-		for (Object wizard : getWizards()) {
-            WorkbenchWizardElement currentWizard = (WorkbenchWizardElement) wizard;
+        Object[] wizards = getWizards();
+        for (int i = 0; i < wizards.length; ++i) {
+            WorkbenchWizardElement currentWizard = (WorkbenchWizardElement) wizards[i];
             if (currentWizard.getId().equals(searchId)) {
 				return currentWizard;
 			}
@@ -333,7 +336,7 @@ public class WizardCollectionElement extends AdaptableList implements IPluginCon
 
     @Override
 	public String getPluginId() {
-        return configElement != null ? configElement.getNamespace() : pluginId;
+		return configElement != null ? configElement.getNamespaceIdentifier() : pluginId;
     }
 
 
