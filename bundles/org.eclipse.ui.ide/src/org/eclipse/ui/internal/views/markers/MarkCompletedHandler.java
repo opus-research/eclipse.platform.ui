@@ -52,7 +52,7 @@ public class MarkCompletedHandler extends MarkerViewHandler {
 				IUndoableOperation op = new UpdateMarkersOperation(markers, attrs,
 						MarkerMessages.markCompletedAction_title, true);
 
-				subMonitor.step(20);
+				subMonitor.worked(20);
 				execute(op, MarkerMessages.markCompletedAction_title, subMonitor.split(80), null);
 			});
 		} catch (InvocationTargetException e) {

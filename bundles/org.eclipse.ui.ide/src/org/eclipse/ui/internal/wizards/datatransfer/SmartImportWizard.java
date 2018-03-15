@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -74,9 +73,7 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 
 		@Override
 		public void run(IProgressMonitor monitor) throws InvocationTargetException, OperationCanceledException {
-			SubMonitor subMonitor = SubMonitor.convert(monitor,
-					NLS.bind(DataTransferMessages.SmartImportWizardPage_expandingArchive,
-					archive.getName(), destination.getName()),
+			monitor.beginTask(NLS.bind(DataTransferMessages.SmartImportWizardPage_expandingArchive, archive.getName(), destination.getName()),
 					1);
 			TarFile tarFile = null;
 			ZipFile zipFile = null;
@@ -119,7 +116,8 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 						toProcess.addAll(children);
 					}
 				}
-				subMonitor.step(1);
+				monitor.worked(1);
+				monitor.done();
 			} catch (Exception ex) {
 				throw new InvocationTargetException(ex);
 			} finally {
