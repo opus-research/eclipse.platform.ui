@@ -96,15 +96,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PLACEHOLDER__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PLACEHOLDER__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -302,15 +293,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int PERSPECTIVE__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE__EXPLANATION = UiPackageImpl.ELEMENT_CONTAINER__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -620,15 +602,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	public static final int PERSPECTIVE_STACK__ELEMENT_ID = UiPackageImpl.UI_ELEMENT__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PERSPECTIVE_STACK__EXPLANATION = UiPackageImpl.UI_ELEMENT__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -826,15 +799,6 @@ public class AdvancedPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int AREA__ELEMENT_ID = BasicPackageImpl.PART_SASH_CONTAINER__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int AREA__EXPLANATION = BasicPackageImpl.PART_SASH_CONTAINER__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.

@@ -93,15 +93,6 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int PART_DESCRIPTOR__ELEMENT_ID = ApplicationPackageImpl.APPLICATION_ELEMENT__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int PART_DESCRIPTOR__EXPLANATION = ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

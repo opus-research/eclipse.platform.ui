@@ -315,20 +315,19 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	Map<String, String> getProperties();
 
 	/**
-	 * Returns the value of the '<em><b>Trim Bars</b></em>' containment
-	 * reference list. The list contents are of type
-	 * {@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar}. <!--
-	 * begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc -->
+	 * Returns the value of the '<em><b>Trim Bars</b></em>' containment reference list.
+	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The collection of TrimBars associated with the part represented by this
-	 * descriptor.
+	 * The collection of TrimBars associated with the part represented by this descriptor.
+	 * @since 2.0
 	 * </p>
 	 * <!-- end-model-doc -->
-	 * 
 	 * @return the value of the '<em>Trim Bars</em>' containment reference list.
 	 * @model containment="true"
 	 * @generated
-	 * @since 2.0
 	 */
 	List<MTrimBar> getTrimBars();
 

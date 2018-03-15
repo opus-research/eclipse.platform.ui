@@ -239,15 +239,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int UI_ELEMENT__ELEMENT_ID = ApplicationPackageImpl.APPLICATION_ELEMENT__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int UI_ELEMENT__EXPLANATION = ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -437,15 +428,6 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int ELEMENT_CONTAINER__ELEMENT_ID = UI_ELEMENT__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ELEMENT_CONTAINER__EXPLANATION = UI_ELEMENT__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -806,15 +788,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_STACK__ELEMENT_ID = ELEMENT_CONTAINER__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int GENERIC_STACK__EXPLANATION = ELEMENT_CONTAINER__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1002,15 +975,6 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int GENERIC_TILE__ELEMENT_ID = ELEMENT_CONTAINER__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int GENERIC_TILE__EXPLANATION = ELEMENT_CONTAINER__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -1211,15 +1175,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int GENERIC_TRIM_CONTAINER__ELEMENT_ID = ELEMENT_CONTAINER__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int GENERIC_TRIM_CONTAINER__EXPLANATION = ELEMENT_CONTAINER__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1418,15 +1373,6 @@ public class UiPackageImpl extends EPackageImpl {
 	public static final int EXPRESSION__ELEMENT_ID = ApplicationPackageImpl.APPLICATION_ELEMENT__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int EXPRESSION__EXPLANATION = ApplicationPackageImpl.APPLICATION_ELEMENT__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1488,15 +1434,6 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int CORE_EXPRESSION__ELEMENT_ID = EXPRESSION__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int CORE_EXPRESSION__EXPLANATION = EXPRESSION__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -1588,15 +1525,6 @@ public class UiPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int IMPERATIVE_EXPRESSION__ELEMENT_ID = EXPRESSION__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int IMPERATIVE_EXPRESSION__EXPLANATION = EXPRESSION__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.

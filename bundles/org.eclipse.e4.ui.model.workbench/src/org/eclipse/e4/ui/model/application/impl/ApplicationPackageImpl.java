@@ -145,22 +145,13 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	public static final int APPLICATION_ELEMENT__ELEMENT_ID = 0;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int APPLICATION_ELEMENT__EXPLANATION = 1;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION_ELEMENT__PERSISTED_STATE = 2;
+	public static final int APPLICATION_ELEMENT__PERSISTED_STATE = 1;
 
 	/**
 	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
@@ -169,7 +160,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION_ELEMENT__TAGS = 3;
+	public static final int APPLICATION_ELEMENT__TAGS = 2;
 
 	/**
 	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
@@ -178,7 +169,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION_ELEMENT__CONTRIBUTOR_URI = 4;
+	public static final int APPLICATION_ELEMENT__CONTRIBUTOR_URI = 3;
 
 	/**
 	 * The feature id for the '<em><b>Transient Data</b></em>' map.
@@ -187,7 +178,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION_ELEMENT__TRANSIENT_DATA = 5;
+	public static final int APPLICATION_ELEMENT__TRANSIENT_DATA = 4;
 
 	/**
 	 * The number of structural features of the '<em>Element</em>' class.
@@ -196,7 +187,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int APPLICATION_ELEMENT_FEATURE_COUNT = 6;
+	public static final int APPLICATION_ELEMENT_FEATURE_COUNT = 5;
 
 	/**
 	 * The number of operations of the '<em>Element</em>' class.
@@ -225,15 +216,6 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int APPLICATION__ELEMENT_ID = UiPackageImpl.ELEMENT_CONTAINER__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int APPLICATION__EXPLANATION = UiPackageImpl.ELEMENT_CONTAINER__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -579,15 +561,6 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	public static final int CONTRIBUTION__ELEMENT_ID = APPLICATION_ELEMENT__ELEMENT_ID;
 
 	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int CONTRIBUTION__EXPLANATION = APPLICATION_ELEMENT__EXPLANATION;
-
-	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -677,15 +650,6 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int ADDON__ELEMENT_ID = CONTRIBUTION__ELEMENT_ID;
-
-	/**
-	 * The feature id for the '<em><b>Explanation</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ADDON__EXPLANATION = CONTRIBUTION__EXPLANATION;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -1078,20 +1042,6 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	}
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.MApplicationElement#getExplanation <em>Explanation</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Explanation</em>'.
-	 * @see org.eclipse.e4.ui.model.application.MApplicationElement#getExplanation()
-	 * @see #getApplicationElement()
-	 * @generated
-	 */
-	public EAttribute getApplicationElement_Explanation() {
-		return (EAttribute)applicationElementEClass.getEStructuralFeatures().get(1);
-	}
-
-
-	/**
 	 * Returns the meta object for the map '{@link org.eclipse.e4.ui.model.application.MApplicationElement#getPersistedState <em>Persisted State</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1101,7 +1051,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 */
 	public EReference getApplicationElement_PersistedState() {
-		return (EReference)applicationElementEClass.getEStructuralFeatures().get(2);
+		return (EReference)applicationElementEClass.getEStructuralFeatures().get(1);
 	}
 
 
@@ -1115,7 +1065,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 */
 	public EAttribute getApplicationElement_Tags() {
-		return (EAttribute)applicationElementEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)applicationElementEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1128,7 +1078,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 */
 	public EAttribute getApplicationElement_ContributorURI() {
-		return (EAttribute)applicationElementEClass.getEStructuralFeatures().get(4);
+		return (EAttribute)applicationElementEClass.getEStructuralFeatures().get(3);
 	}
 
 
@@ -1142,7 +1092,7 @@ public class ApplicationPackageImpl extends EPackageImpl {
 	 * @generated
 	 */
 	public EReference getApplicationElement_TransientData() {
-		return (EReference)applicationElementEClass.getEStructuralFeatures().get(5);
+		return (EReference)applicationElementEClass.getEStructuralFeatures().get(4);
 	}
 
 
@@ -1294,7 +1244,6 @@ public class ApplicationPackageImpl extends EPackageImpl {
 
 		applicationElementEClass = createEClass(APPLICATION_ELEMENT);
 		createEAttribute(applicationElementEClass, APPLICATION_ELEMENT__ELEMENT_ID);
-		createEAttribute(applicationElementEClass, APPLICATION_ELEMENT__EXPLANATION);
 		createEReference(applicationElementEClass, APPLICATION_ELEMENT__PERSISTED_STATE);
 		createEAttribute(applicationElementEClass, APPLICATION_ELEMENT__TAGS);
 		createEAttribute(applicationElementEClass, APPLICATION_ELEMENT__CONTRIBUTOR_URI);
@@ -1392,7 +1341,6 @@ public class ApplicationPackageImpl extends EPackageImpl {
 
 		initEClass(applicationElementEClass, MApplicationElement.class, "ApplicationElement", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getApplicationElement_ElementId(), ecorePackage.getEString(), "elementId", null, 0, 1, MApplicationElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
-		initEAttribute(getApplicationElement_Explanation(), ecorePackage.getEString(), "explanation", null, 0, 1, MApplicationElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEReference(getApplicationElement_PersistedState(), this.getStringToStringMap(), null, "persistedState", null, 0, -1, MApplicationElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getApplicationElement_Tags(), ecorePackage.getEString(), "tags", null, 0, -1, MApplicationElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getApplicationElement_ContributorURI(), ecorePackage.getEString(), "contributorURI", null, 0, 1, MApplicationElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
@@ -1513,14 +1461,6 @@ public class ApplicationPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EAttribute APPLICATION_ELEMENT__ELEMENT_ID = eINSTANCE.getApplicationElement_ElementId();
-
-		/**
-		 * The meta object literal for the '<em><b>Explanation</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		public static final EAttribute APPLICATION_ELEMENT__EXPLANATION = eINSTANCE.getApplicationElement_Explanation();
 
 		/**
 		 * The meta object literal for the '<em><b>Persisted State</b></em>' map feature.

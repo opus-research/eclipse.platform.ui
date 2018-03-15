@@ -42,7 +42,6 @@ import java.util.Map;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplicationElement#getElementId <em>Element Id</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.MApplicationElement#getExplanation <em>Explanation</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplicationElement#getPersistedState <em>Persisted State</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplicationElement#getTags <em>Tags</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplicationElement#getContributorURI <em>Contributor URI</em>}</li>
@@ -81,40 +80,6 @@ public interface MApplicationElement {
 	 * @generated
 	 */
 	void setElementId(String value);
-
-	/**
-	 * Returns the value of the '<em><b>Explanation</b></em>' attribute. <!--
-	 * begin-user-doc -->
-	 * <p>
-	 * Provides a (technical) explanation/documentation of the element.
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * 
-	 * @return the value of the '<em>Explanation</em>' attribute.
-	 * @see #setExplanation(String)
-	 * @model
-	 * @generated
-	 * @since 2.0
-	 */
-	String getExplanation();
-
-	/**
-	 * Sets the value of the
-	 * '{@link org.eclipse.e4.ui.model.application.MApplicationElement#getExplanation
-	 * <em>Explanation</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * Sets a (technical) explanation/documentation of the element.
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Explanation</em>' attribute.
-	 * @see #getExplanation()
-	 * @generated
-	 * @since 2.0
-	 */
-	void setExplanation(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Persisted State</b></em>' map.
