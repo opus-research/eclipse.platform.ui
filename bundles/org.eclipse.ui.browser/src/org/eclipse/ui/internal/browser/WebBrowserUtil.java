@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -85,7 +85,12 @@ public class WebBrowserUtil {
 		Display d = Display.getCurrent();
 		if (d == null)
 			d = Display.getDefault();
-		d.asyncExec(() -> MessageDialog.openError(null, Messages.errorDialogTitle, message));
+		d.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				MessageDialog.openError(null, Messages.errorDialogTitle, message);
+			}
+		});
 	}
 
 	/**
@@ -99,7 +104,12 @@ public class WebBrowserUtil {
 		if (d == null)
 			d = Display.getDefault();
 
-		d.asyncExec(() -> MessageDialog.openInformation(null, Messages.searchingTaskName, message));
+		d.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				MessageDialog.openInformation(null, Messages.searchingTaskName, message);
+			}
+		});
 	}
 
 	/**
