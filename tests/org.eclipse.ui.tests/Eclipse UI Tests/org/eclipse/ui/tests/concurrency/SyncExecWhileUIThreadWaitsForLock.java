@@ -11,11 +11,9 @@
 
 package org.eclipse.ui.tests.concurrency;
 
-import org.eclipse.swt.widgets.Display;
-
 import org.eclipse.core.runtime.jobs.ILock;
-
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.swt.widgets.Display;
 
 import junit.framework.TestCase;
 
@@ -26,6 +24,10 @@ import junit.framework.TestCase;
  */
 public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 	public void testDeadlock() {
+		boolean interrupted = Thread.interrupted();
+		if (interrupted) {
+			fail("Thread was interrupted at start of test");
+		}
 		final ILock lock = Job.getJobManager().newLock();
 		final boolean[] blocked = new boolean[] {false};
 		final boolean[] lockAcquired= new boolean[] {false};
@@ -88,5 +90,10 @@ public class SyncExecWhileUIThreadWaitsForLock extends TestCase {
 			}
 		}
 		//if we get here, the test succeeded
+		interrupted = Thread.interrupted();
+		if (interrupted) {
+			// TODO: re-enable this check after bug 505920 is fixed
+			// fail("Thread was interrupted at end of test");
+		}
 	}
 }
