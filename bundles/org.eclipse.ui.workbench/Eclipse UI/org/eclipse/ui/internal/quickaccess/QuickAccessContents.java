@@ -10,7 +10,7 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452, 459989
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491529, 491293, 492434, 492452
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -19,14 +19,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.FontDescriptor;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.Util;
@@ -143,7 +141,6 @@ public abstract class QuickAccessContents {
 				showHintText(QuickAccessMessages.QuickAccess_StartTypingToFindMatches, grayColor);
 			} else {
 				showHintText(QuickAccessMessages.QuickAccessContents_NoMatchingResults, grayColor);
-				addHelpSearch(filter);
 			}
 
 			// update info as-you-type
@@ -151,67 +148,6 @@ public abstract class QuickAccessContents {
 
 			updateFeedback(filterTextEmpty, showAllMatches);
 		}
-	}
-
-	QuickAccessEntry searchHelpEntry = null;
-	QuickAccessProvider searchHelpProvider = null;
-	QuickAccessSearchElement searchHelpElement = null;
-
-	/**
-	 * Clear the table, and add a special {@link QuickAccessElement} that search
-	 * the given text in the Eclipse Help
-	 *
-	 * @param text
-	 *            String to search in the Eclipse Help
-	 */
-	private void addHelpSearch(String text) {
-		// help search
-		table.removeAll();
-		TableItem item = new TableItem(table, SWT.NONE);
-		//
-		if (searchHelpEntry == null) {
-			searchHelpProvider = Stream.of(providers).filter(p -> p instanceof ActionProvider).findFirst().get();
-			searchHelpElement = new QuickAccessSearchElement(searchHelpProvider);
-			searchHelpEntry = new QuickAccessEntry(searchHelpElement, searchHelpProvider, new int[][] {},
-					new int[][] {}, QuickAccessEntry.MATCH_PERFECT);
-		}
-		searchHelpElement.searchText = text;
-		//
-		item.setData(searchHelpEntry);
-		table.setSelection(0);
-	}
-
-	static class QuickAccessSearchElement extends QuickAccessElement {
-
-		String searchText;
-
-		/**
-		 * @param provider
-		 */
-		public QuickAccessSearchElement(QuickAccessProvider provider) {
-			super(provider);
-		}
-
-		@Override
-		public String getLabel() {
-			return QuickAccessMessages.QuickAccessContents_SearchInHelp;
-		}
-
-		@Override
-		public String getId() {
-			return "search.in.help"; //$NON-NLS-1$
-		}
-
-		@Override
-		public void execute() {
-			PlatformUI.getWorkbench().getHelpSystem().search(searchText);
-		}
-
-		@Override
-		public ImageDescriptor getImageDescriptor() {
-			return null;
-		}
-
 	}
 
 	/**
