@@ -121,6 +121,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private Label selectionSummary;
 	protected Map<File, List<ProjectConfigurator>> potentialProjects = Collections.emptyMap();
 	// Configuration part
+	private boolean openProjects = true;
 	private boolean detectNestedProjects = true;
 	private boolean configureProjects = true;
 	// Working sets
@@ -463,6 +464,13 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 * Creates the UI elements for the import options
 	 */
 	private void createConfigurationOptions(Composite parent) {
+		Button openProjectsCheckbox = new Button(parent, SWT.CHECK);
+		openProjectsCheckbox.setText(DataTransferMessages.SmartImportWizardPage_openProjects);
+		openProjectsCheckbox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
+		openProjectsCheckbox.setSelection(openProjects);
+		openProjectsCheckbox.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e -> openProjects = openProjectsCheckbox.getSelection()));
+
 		Link showDetectorsLink = new Link(parent, SWT.NONE);
 		showDetectorsLink.setText(DataTransferMessages.SmartImportWizardPage_showAvailableDetectors);
 		GridData layoutData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1);
@@ -801,6 +809,10 @@ public class SmartImportRootWizardPage extends WizardPage {
 	 */
 	public boolean isConfigureProjects() {
 		return this.configureProjects;
+	}
+
+	boolean isOpenProjects() {
+		return openProjects;
 	}
 
 	private void refreshProposals() {

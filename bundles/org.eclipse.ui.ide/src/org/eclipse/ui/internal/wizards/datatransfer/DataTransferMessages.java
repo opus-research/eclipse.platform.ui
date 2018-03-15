@@ -104,6 +104,7 @@ public class DataTransferMessages extends NLS {
 	public static String WizardProjectsImportPage_noProjectsToImport;
 	public static String WizardProjectsImportPage_projectLabel;
 	public static String WizardProjectsImportPage_hideExistingProjects;
+	public static String WizardProjectsImportPage_openProjects;
 	public static String WizardProjectsImportPage_invalidProjectName;
 
 	// --- Export Wizards ---
@@ -179,6 +180,7 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportWizardPage_scanProjectsFailed;
 	public static String SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject;
 	public static String SmartImportWizardPage_showOtherSpecializedImportWizard;
+	public static String SmartImportWizardPage_openProjects;
 
 	public static String SmartImportJob_discardRootProject_title;
 	public static String SmartImportJob_discardRootProject_description;
