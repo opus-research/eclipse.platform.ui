@@ -107,13 +107,13 @@ public class ResourceWorkingSetPage extends WizardPage implements
         IAdaptable[] elements = workingSet.getElements();
         IPath containerPath = container.getFullPath();
 
-        for (int i = 0; i < elements.length; i++) {
-			IResource resource = Adapters.adapt(elements[i], IResource.class);
+        for (IAdaptable element : elements) {
+			IResource resource = Adapters.adapt(element, IResource.class);
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
                 if (containerPath.isPrefixOf(resourcePath)) {
-					collectedResources.add(elements[i]);
+					collectedResources.add(element);
 				}
             }
         }
@@ -258,17 +258,17 @@ public class ResourceWorkingSetPage extends WizardPage implements
                     IDEWorkbenchMessages.ResourceWorkingSetPage_error,
                     IDEWorkbenchMessages.ResourceWorkingSetPage_error_updateCheckedState);
         }
-        for (int i = 0; i < resources.length; i++) {
-            if (tree.getGrayed(resources[i])) {
-                if (resources[i].isAccessible()) {
+        for (IResource resource : resources) {
+            if (tree.getGrayed(resource)) {
+                if (resource.isAccessible()) {
 					findCheckedResources(checkedResources,
-                            (IContainer) resources[i]);
+                            (IContainer) resource);
 				} else {
 					addWorkingSetElements(checkedResources,
-                            (IContainer) resources[i]);
+                            (IContainer) resource);
 				}
-            } else if (tree.getChecked(resources[i])) {
-                checkedResources.add(resources[i]);
+            } else if (tree.getChecked(resource)) {
+                checkedResources.add(resource);
             }
         }
     }
@@ -526,8 +526,8 @@ public class ResourceWorkingSetPage extends WizardPage implements
                 && (workingSet == null || newText.equals(workingSet.getName()) == false)) {
             IWorkingSet[] workingSets = PlatformUI.getWorkbench()
                     .getWorkingSetManager().getWorkingSets();
-            for (int i = 0; i < workingSets.length; i++) {
-                if (newText.equals(workingSets[i].getName())) {
+            for (IWorkingSet workingSet2 : workingSets) {
+                if (newText.equals(workingSet2.getName())) {
                     errorMessage = IDEWorkbenchMessages.ResourceWorkingSetPage_warning_workingSetExists;
                 }
             }

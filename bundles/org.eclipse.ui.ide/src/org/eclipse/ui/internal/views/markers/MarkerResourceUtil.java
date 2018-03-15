@@ -90,8 +90,8 @@ class MarkerResourceUtil {
 			return resourceSet;
 		}
 		Object[] clones = resourceSet.toArray();
-		for (int i = 0; i < clones.length; i++) {
-			IResource resource = (IResource) clones[i];
+		for (Object clone : clones) {
+			IResource resource = (IResource) clone;
 			Iterator<IResource> iterator = resourceSet.iterator();
 			while (iterator.hasNext()) {
 				IResource resToRemove = iterator.next();
@@ -246,23 +246,23 @@ class MarkerResourceUtil {
 		}
 		case MarkerFieldFilterGroup.ON_SELECTED_ONLY:
 		case MarkerFieldFilterGroup.ON_SELECTED_AND_CHILDREN: {
-			for (int i = 0; i < selectedResources.length; i++) {
-				resourceSet.add(selectedResources[i]);
+			for (IResource selectedResource : selectedResources) {
+				resourceSet.add(selectedResource);
 			}
 			break;
 		}
 		case MarkerFieldFilterGroup.ON_ANY_IN_SAME_CONTAINER: {
 			IResource[] resources = getProjects(selectedResources);
-			for (int i = 0; i < resources.length; i++) {
-				resourceSet.add(resources[i]);
+			for (IResource resource : resources) {
+				resourceSet.add(resource);
 			}
 			break;
 		}
 		case MarkerFieldFilterGroup.ON_WORKING_SET: {
 			group.refresh();
 			IResource[] resources = group.getResourcesInWorkingSet();
-			for (int i = 0; i < resources.length; i++) {
-				resourceSet.add(resources[i]);
+			for (IResource resource : resources) {
+				resourceSet.add(resource);
 			}
 			break;
 		}
@@ -295,13 +295,13 @@ class MarkerResourceUtil {
 	 */
 	static Collection<IProject> getProjectsAsCollection(Object[] elements) {
 		HashSet<IProject> projects = new HashSet<>();
-		for (int idx = 0; idx < elements.length; idx++) {
-			if (elements[idx] instanceof IResource) {
-				projects.add(((IResource) elements[idx]).getProject());
+		for (Object element : elements) {
+			if (element instanceof IResource) {
+				projects.add(((IResource) element).getProject());
 			} else {
-				IProject[] mappingProjects = (((ResourceMapping) elements[idx]).getProjects());
-				for (int i = 0; i < mappingProjects.length; i++) {
-					projects.add(mappingProjects[i]);
+				IProject[] mappingProjects = (((ResourceMapping) element).getProjects());
+				for (IProject mappingProject : mappingProjects) {
+					projects.add(mappingProject);
 				}
 			}
 		}
@@ -319,11 +319,10 @@ class MarkerResourceUtil {
 			ResourceTraversal[] traversals = resourceMapping.getTraversals(
 					ResourceMappingContext.LOCAL_CONTEXT,
 					new NullProgressMonitor());
-			for (int i = 0; i < traversals.length; i++) {
-				ResourceTraversal traversal = traversals[i];
+			for (ResourceTraversal traversal : traversals) {
 				IResource[] result = traversal.getResources();
-				for (int j = 0; j < result.length; j++) {
-					resourceCollection.add(result[j]);
+				for (IResource element : result) {
+					resourceCollection.add(element);
 				}
 			}
 		} catch (CoreException e) {
@@ -388,12 +387,12 @@ class MarkerResourceUtil {
 	static HashSet<MarkerType> getAllSubTypes(String[] typeIds) {
 		HashSet<MarkerType> set = new HashSet<>();
 		MarkerTypesModel typesModel = MarkerTypesModel.getInstance();
-		for (int i = 0; i < typeIds.length; i++) {
-			MarkerType type = typesModel.getType(typeIds[i]);
+		for (String typeId : typeIds) {
+			MarkerType type = typesModel.getType(typeId);
 			set.add(type);
 			MarkerType[] subs = type.getAllSubTypes();
-			for (int j = 0; j < subs.length; j++) {
-				set.add(subs[j]);
+			for (MarkerType sub : subs) {
+				set.add(sub);
 			}
 		}
 		return set;
@@ -419,12 +418,12 @@ class MarkerResourceUtil {
 	static HashSet<MarkerType> getMutuallyExclusiveSupers(String[] typeIds) {
 		HashSet<MarkerType> set = new HashSet<>();
 		MarkerTypesModel typesModel = MarkerTypesModel.getInstance();
-		for (int i = 0; i < typeIds.length; i++) {
-			MarkerType type = typesModel.getType(typeIds[i]);
+		for (String typeId : typeIds) {
+			MarkerType type = typesModel.getType(typeId);
 			set.add(type);
 		}
-		for (int i = 0; i < typeIds.length; i++) {
-			MarkerType type = typesModel.getType(typeIds[i]);
+		for (String typeId : typeIds) {
+			MarkerType type = typesModel.getType(typeId);
 			MarkerType[] subs = type.getAllSubTypes();
 			HashSet<MarkerType> subsOnly = new HashSet<>(Arrays.asList(subs));
 			subsOnly.remove(type);
