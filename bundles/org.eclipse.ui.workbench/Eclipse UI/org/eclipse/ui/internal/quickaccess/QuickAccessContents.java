@@ -10,7 +10,6 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -144,9 +143,6 @@ public abstract class QuickAccessContents {
 				item.setForeground(0, grayColor);
 			}
 
-			// update info as-you-type
-			updateInfoLabel();
-
 			updateFeedback(filterTextEmpty, showAllMatches);
 		}
 	}
@@ -191,16 +187,17 @@ public abstract class QuickAccessContents {
 	private void updateInfoLabel() {
 		if (infoLabel != null) {
 			TriggerSequence sequence = getTriggerSequence();
-			boolean forceHide = (getNumberOfFilteredResults() == 0)
-					|| (showAllMatches && (table.getItemCount() <= computeNumberOfItems()));
-			if (sequence == null || forceHide) {
+			if (sequence == null) {
 				infoLabel.setText(""); //$NON-NLS-1$
 			} else if (showAllMatches) {
-				infoLabel.setText(
-						NLS.bind(QuickAccessMessages.QuickAccessContents_PressKeyToLimitResults, sequence.format()));
-			} else {
 				infoLabel
-						.setText(NLS.bind(QuickAccessMessages.QuickAccess_PressKeyToShowAllMatches, sequence.format()));
+.setText(NLS.bind(
+						QuickAccessMessages.QuickAccessContents_PressKeyToLimitResults,
+						sequence.format()));
+			} else {
+				infoLabel.setText(NLS.bind(
+						QuickAccessMessages.QuickAccess_PressKeyToShowAllMatches,
+								sequence.format()));
 			}
 			infoLabel.getParent().layout(true);
 		}
@@ -281,19 +278,6 @@ public abstract class QuickAccessContents {
 		return selectionIndex;
 	}
 
-	int numberOfFilteredResults;
-
-	/**
-	 * Compute how many items are effectively filtered at a specific point in
-	 * time. So doing, the quick access content can perform operations that
-	 * depends on this number, i.e. hide the info label.
-	 *
-	 * @return number number of elements filtered
-	 */
-	protected int getNumberOfFilteredResults() {
-		return numberOfFilteredResults;
-	}
-
 	/**
 	 * Returns a list per provider containing matching {@link QuickAccessEntry}
 	 * that should be displayed in the table given a text filter and a perfect
@@ -319,7 +303,6 @@ public abstract class QuickAccessContents {
 		int[] indexPerProvider = new int[providers.length];
 		int countPerProvider = Math.min(maxCount / 4,
 				INITIAL_COUNT_PER_PROVIDER);
-		int prevPick = 0;
 		int countTotal = 0;
 		boolean perfectMatchAdded = true;
 		if (perfectMatch != null) {
@@ -343,11 +326,6 @@ public abstract class QuickAccessContents {
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
 					List<QuickAccessEntry> poorFilterMatches = new ArrayList<>();
-
-					// count number or previous picks 
-					if ((provider instanceof PreviousPicksProvider)) {
-						prevPick = sortedElements.length;
-					}
 
 					int j = indexPerProvider[i];
 					while (j < sortedElements.length
@@ -420,10 +398,6 @@ public abstract class QuickAccessContents {
 				entries[0].add(entry);
 			}
 		}
-		
-		// number of items matching the filtered search
-		numberOfFilteredResults = countTotal - prevPick;
-		
 		return entries;
 	}
 
