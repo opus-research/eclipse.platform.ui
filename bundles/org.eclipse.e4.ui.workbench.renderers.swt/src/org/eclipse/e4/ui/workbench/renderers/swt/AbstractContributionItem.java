@@ -542,6 +542,7 @@ public abstract class AbstractContributionItem extends ContributionItem {
 		return null;
 	}
 
+
 	protected void updateItemEnablement() {
 		if (!(modelItem.getWidget() instanceof ToolItem))
 			return;

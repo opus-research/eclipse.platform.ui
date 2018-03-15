@@ -57,9 +57,6 @@ public class ToolBarContributionRecord {
 		return renderer.getManager(toolbarModel);
 	}
 
-	/**
-	 * @param context
-	 */
 	public void updateVisibility(IEclipseContext context) {
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
