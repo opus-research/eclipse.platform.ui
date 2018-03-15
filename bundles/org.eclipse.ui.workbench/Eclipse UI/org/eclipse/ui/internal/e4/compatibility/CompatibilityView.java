@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextFunction;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -54,7 +53,6 @@ import org.eclipse.ui.testing.ContributionInfo;
 public class CompatibilityView extends CompatibilityPart {
 
 	private ViewReference reference;
-	private IWorkbenchPart legacyPart;
 
 	@Inject
 	CompatibilityView(MPart part, ViewReference ref) {
@@ -82,7 +80,6 @@ public class CompatibilityView extends CompatibilityPart {
 
 	@Override
 	protected boolean createPartControl(IWorkbenchPart legacyPart, Composite parent) {
-		this.legacyPart = legacyPart;
 		clearMenuItems();
 		part.getContext().set(IViewPart.class, (IViewPart) legacyPart);
 
@@ -143,9 +140,6 @@ public class CompatibilityView extends CompatibilityPart {
 			((ToolBarManagerRenderer) apr).linkModelToManager(toolbar, tbm);
 		}
 
-		// we perform dependency injection before the call to createPartControl
-		// so that injected values can be used
-		ContextInjectionFactory.inject(legacyPart, partContext);
 		super.createPartControl(legacyPart, parent);
 
 
@@ -291,7 +285,6 @@ public class CompatibilityView extends CompatibilityPart {
 				}
 			}
 		}
-		ContextInjectionFactory.uninject(legacyPart, context);
 		super.disposeSite(site);
 	}
 }
