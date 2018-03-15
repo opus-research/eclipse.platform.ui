@@ -281,6 +281,8 @@ public class SmartImportWizard extends Wizard implements IImportWizard {
 			if (!directoryToImport.isDirectory()) {
 				throw new IllegalArgumentException("Archive wasn't expanded first"); //$NON-NLS-1$
 			}
+		} else {
+			throw new IllegalArgumentException("Not supported archive type: " + root); //$NON-NLS-1$
  		}
 		if (this.easymportJob == null || !matchesPage(this.easymportJob, this.projectRootPage)) {
 			this.easymportJob = new SmartImportJob(this.directoryToImport, projectRootPage.getSelectedWorkingSets(),
