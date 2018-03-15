@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Leon J. Breedt - Added multiple folder creation support (in WizardNewFolderMainPage)
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430694, 472784
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 371776
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -752,18 +753,11 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 		boolean valid = true;
 
 		if (!resourceGroup.areAllValuesValid()) {
-			// if blank name then fail silently
-			if (resourceGroup.getProblemType() == ResourceAndContainerGroup.PROBLEM_RESOURCE_EMPTY
-					|| resourceGroup.getProblemType() == ResourceAndContainerGroup.PROBLEM_CONTAINER_EMPTY) {
-				setMessage(resourceGroup.getProblemMessage());
-				setErrorMessage(null);
-			} else {
-				setErrorMessage(resourceGroup.getProblemMessage());
-			}
+			setErrorMessage(resourceGroup.getProblemMessage());
 			valid = false;
 		}
 
-		if ((useDefaultLocation == null) || useDefaultLocation.getSelection()) {
+		if (valid && (useDefaultLocation == null || useDefaultLocation.getSelection())) {
 			IPath containerPath = resourceGroup.getContainerFullPath();
 			if (containerPath != null &&
 					createContainerHandle(containerPath).isVirtual()) {

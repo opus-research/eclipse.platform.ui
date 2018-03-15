@@ -117,7 +117,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	IRendererFactory curFactory = null;
 
-	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<String, AbstractPartRenderer>();
+	private Map<String, AbstractPartRenderer> customRendererMap = new HashMap<>();
 
 	org.eclipse.swt.widgets.Listener keyListener;
 
@@ -867,7 +867,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
 				// Bug 458460: Operate on a copy in case child nulls out parent
-				for (MUIElement child : new ArrayList<MUIElement>(children)) {
+				for (MUIElement child : new ArrayList<>(children)) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
@@ -1114,6 +1114,18 @@ public class PartRenderingEngine implements IPresentationEngine {
 						}
 					};
 				}
+				final IEventLoopAdvisor finalAdvisor = advisor;
+				display.setErrorHandler(e -> {
+					// If e is one of the exception types that are generally
+					// recoverable, hand it to the event loop advisor
+					if (e instanceof LinkageError || e instanceof AssertionError) {
+						handle(e, finalAdvisor);
+					} else {
+						// Otherwise, rethrow it
+						throw e;
+					}
+				});
+				display.setRuntimeExceptionHandler(e -> handle(e, finalAdvisor));
 				// Spin the event loop until someone disposes the display
 				while (((testShell != null && !testShell.isDisposed()) || (theApp != null && someAreVisible(theApp
 						.getChildren()))) && !display.isDisposed()) {
@@ -1447,7 +1459,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
-				prefs = new HashSet<IEclipsePreferences>();
+				prefs = new HashSet<>();
 				BundleContext context = WorkbenchSWTActivator.getDefault().getContext();
 				for (Bundle bundle : context.getBundles()) {
 					if (bundle.getSymbolicName() != null) {

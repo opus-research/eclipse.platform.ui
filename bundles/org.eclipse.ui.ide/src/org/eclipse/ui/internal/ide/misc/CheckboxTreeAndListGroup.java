@@ -67,14 +67,15 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
     private ILabelProvider listLabelProvider;
 
-	private ViewerComparator treeComparator;
+    private ViewerComparator treeComparator;
 
-	private ViewerComparator listComparator;
+    private ViewerComparator listComparator;
 
     // widgets
     private CheckboxTreeViewer treeViewer;
 
     private CheckboxTableViewer listViewer;
+
 
     /**
      *  Create an instance of this class.  Use this constructor if you wish to specify
@@ -96,40 +97,43 @@ public class CheckboxTreeAndListGroup extends EventManager implements
             IStructuredContentProvider listContentProvider,
             ILabelProvider listLabelProvider, int style, int width, int height) {
 
-		this(parent, rootObject, treeContentProvider, treeLabelProvider, null, listContentProvider, listLabelProvider,
-				null, style, width, height);
-	}
+    	this(parent, rootObject, treeContentProvider, treeLabelProvider, null,
+    			listContentProvider, listLabelProvider, null, style, width, height);
+    }
 
-	/**
-	 * Create an instance of this class. Use this constructor if you wish to
-	 * specify the width and/or height of the combined widget (to only hardcode
-	 * one of the sizing dimensions, specify the other dimension's value as -1)
-	 * 
-	 * @param parent
-	 * @param rootObject
-	 * @param treeContentProvider
-	 * @param treeLabelProvider
-	 * @param treeComparator
-	 * @param listContentProvider
-	 * @param listLabelProvider
-	 * @param listComparator
-	 * @param style
-	 * @param width
-	 * @param height
-	 */
-	public CheckboxTreeAndListGroup(Composite parent, Object rootObject, ITreeContentProvider treeContentProvider,
-			ILabelProvider treeLabelProvider, ViewerComparator treeComparator,
-			IStructuredContentProvider listContentProvider, ILabelProvider listLabelProvider,
-			ViewerComparator listComparator, int style, int width, int height) {
-
-		root = rootObject;
-		this.treeContentProvider = treeContentProvider;
-		this.listContentProvider = listContentProvider;
-		this.treeLabelProvider = treeLabelProvider;
-		this.listLabelProvider = listLabelProvider;
-		this.treeComparator = treeComparator;
-		this.listComparator = listComparator;
-		createContents(parent, width, height, style);
+    /**
+     *  Create an instance of this class.  Use this constructor if you wish to specify
+     *	the width and/or height of the combined widget (to only hardcode one of the
+     *	sizing dimensions, specify the other dimension's value as -1)
+     * @param parent
+     * @param rootObject
+     * @param treeContentProvider
+     * @param treeLabelProvider
+     * @param treeComparator
+     * @param listContentProvider
+     * @param listLabelProvider
+     * @param listComparator
+     * @param style
+     * @param width
+     * @param height
+     */
+    public CheckboxTreeAndListGroup(Composite parent, Object rootObject,
+    		ITreeContentProvider treeContentProvider,
+    		ILabelProvider treeLabelProvider,
+    		ViewerComparator treeComparator,
+    		IStructuredContentProvider listContentProvider,
+    		ILabelProvider listLabelProvider, 
+    		ViewerComparator listComparator,
+    		int style, int width, int height) {
+    	
+    	root = rootObject;
+    	this.treeContentProvider = treeContentProvider;
+    	this.listContentProvider = listContentProvider;
+    	this.treeLabelProvider = treeLabelProvider;
+    	this.listLabelProvider = listLabelProvider;
+    	this.treeComparator = treeComparator;
+    	this.listComparator = listComparator;
+    	createContents(parent, width, height, style);
     }
 
     /**
@@ -286,7 +290,7 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         listViewer.getTable().setFont(parent.getFont());
         listViewer.setContentProvider(listContentProvider);
         listViewer.setLabelProvider(listLabelProvider);
-		listViewer.setComparator(listComparator);
+        listViewer.setComparator(listComparator);
         listViewer.addCheckStateListener(this);
     }
 
@@ -304,7 +308,7 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         treeViewer = new CheckboxTreeViewer(tree);
         treeViewer.setContentProvider(treeContentProvider);
         treeViewer.setLabelProvider(treeLabelProvider);
-		treeViewer.setComparator(treeComparator);
+        treeViewer.setComparator(treeComparator);
         treeViewer.addTreeListener(this);
         treeViewer.addCheckStateListener(this);
         treeViewer.addSelectionChangedListener(this);
