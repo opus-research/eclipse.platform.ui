@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
@@ -218,6 +219,15 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 			return o.toString();
 		}
 
+		// FIXME: Commented out dead code. Filed https://bugs.eclipse.org/415442 to review this part of the code.
+		//		try {
+		//			//o = PropertyUtils.getProperty(widget, attr);
+		//			if (o != null)
+		//				return o.toString();
+		//		} catch (Exception e) {
+		//			// e.printStackTrace();
+		//		}
+
 		return "";
 	}
 
@@ -285,12 +295,6 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		}
 		return null;
 	}
-
-	/**
-	 * Called by the CSS engine upon a CSS theme switch. Implementations
-	 * should restore the default value so that the new theme can be applied to
-	 * the application without restart
-	 */
 
 	public void reset() {
 	}
