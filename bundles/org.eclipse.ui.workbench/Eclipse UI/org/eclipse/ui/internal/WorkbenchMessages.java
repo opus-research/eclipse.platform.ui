@@ -188,6 +188,7 @@ public class WorkbenchMessages extends NLS {
 
 	public static String LockToolBarAction_toolTip;
 
+	public static String CustomizePerspectiveDialog_okButtonLabel;
 	public static String EditActionSetsAction_text;
 	public static String EditActionSetsAction_toolTip;
 	public static String ActionSetSelection_customize;
@@ -255,6 +256,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ResetPerspective_text;
 	public static String ResetPerspective_toolTip;
 	public static String ResetPerspective_message;
+	public static String ResetPerspective_buttonLabel;
 	public static String ResetPerspective_title;
 	public static String RevertPerspective_note;
 
