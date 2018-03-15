@@ -31,6 +31,8 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -396,8 +398,11 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		if (action == null) {
 			action = new CommandLegacyActionWrapper(actionId, command, style,
 					window);
-			action.addPropertyChangeListener(event -> {
-				// TODO Update the state somehow.
+			action.addPropertyChangeListener(new IPropertyChangeListener() {
+				@Override
+				public final void propertyChange(final PropertyChangeEvent event) {
+					// TODO Update the state somehow.
+				}
 			});
 		}
 		return action;
@@ -504,7 +509,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				}
 			} catch (final CoreException e) {
 				// We will just fall through an let it return false.
-				final StringBuilder message = new StringBuilder(
+				final StringBuffer message = new StringBuffer(
 						"An exception occurred while evaluating the enabledWhen expression for "); //$NON-NLS-1$
 				if (delegate != null) {
 					message.append(delegate);
@@ -694,7 +699,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ActionDelegateHandlerProxy("); //$NON-NLS-1$
 		buffer.append(getDelegate());
 		if (element != null) {

@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.navigator.filters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +74,9 @@ public class CommonFilterDescriptorManager {
 	public CommonFilterDescriptor[] findVisibleFilters(INavigatorContentService contentService, boolean forUI) {
 
 		List<CommonFilterDescriptor> visibleFilters = new ArrayList<CommonFilterDescriptor>();
-		for (CommonFilterDescriptor descriptor : filters.values()) {
+		CommonFilterDescriptor descriptor;
+		for (Iterator filtersItr = filters.entrySet().iterator(); filtersItr.hasNext();) {
+			descriptor = (CommonFilterDescriptor) ((Map.Entry)filtersItr.next()).getValue();
 			if (forUI && !descriptor.isVisibleInUi())
 				continue;
 			if (contentService.isVisible(descriptor.getId())) {

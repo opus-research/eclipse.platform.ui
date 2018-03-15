@@ -107,9 +107,9 @@ public class MoveResourceAction extends CopyResourceAction {
         IResource[] copiedResources = operation.copyResources(resources,
                 destination);
 
-        for (IResource copiedResource : copiedResources) {
+        for (int i = 0; i < copiedResources.length; i++) {
             destinations.add(destination.getFullPath().append(
-                    copiedResource.getName()));
+                    copiedResources[i].getName()));
         }
     }
 

@@ -31,7 +31,8 @@ public final class ViewParameterValues implements IParameterValues {
 
 		final IViewDescriptor[] views = PlatformUI.getWorkbench()
 				.getViewRegistry().getViews();
-		for (final IViewDescriptor view : views) {
+		for (int i = 0; i < views.length; i++) {
+			final IViewDescriptor view = views[i];
 			values.put(view.getLabel(), view.getId());
 		}
 

@@ -71,8 +71,8 @@ public class MultiListProperty<S, E> extends ListProperty<S, E> {
 	@Override
 	protected List<E> doGetList(S source) {
 		List<E> list = new ArrayList<>();
-		for (IListProperty<S, E> property : properties)
-			list.addAll(property.getList(source));
+		for (int i = 0; i < properties.length; i++)
+			list.addAll(properties[i].getList(source));
 		return list;
 	}
 
@@ -92,15 +92,15 @@ public class MultiListProperty<S, E> extends ListProperty<S, E> {
 			@Override
 			public void handleReplace(int index, E oldElement, E newElement) {
 				int offset = 0;
-				for (IListProperty<S, E> property : properties) {
-					List<E> subList = property.getList(source);
+				for (int i = 0; i < properties.length; i++) {
+					List<E> subList = properties[i].getList(source);
 					if (index - offset < subList.size()) {
 						int subListIndex = index - offset;
 						List<ListDiffEntry<E>> entries = new ArrayList<>(2);
 						entries.add(Diffs.createListDiffEntry(subListIndex, false, oldElement));
 						entries.add(Diffs.createListDiffEntry(subListIndex, true, newElement));
 						ListDiff<E> diff = Diffs.createListDiff(entries);
-						property.updateList(source, diff);
+						properties[i].updateList(source, diff);
 						return;
 					}
 					offset += subList.size();
@@ -112,13 +112,13 @@ public class MultiListProperty<S, E> extends ListProperty<S, E> {
 			@Override
 			public void handleRemove(int index, E element) {
 				int offset = 0;
-				for (IListProperty<S, E> property : properties) {
-					List<E> subList = property.getList(source);
+				for (int i = 0; i < properties.length; i++) {
+					List<E> subList = properties[i].getList(source);
 					int subListIndex = index - offset;
 					if (subListIndex < subList.size()) {
 						ListDiff<E> diff = Diffs
 								.createListDiff(Diffs.createListDiffEntry(subListIndex, false, element));
-						property.updateList(source, diff);
+						properties[i].updateList(source, diff);
 						return;
 					}
 					offset += subList.size();
@@ -132,8 +132,8 @@ public class MultiListProperty<S, E> extends ListProperty<S, E> {
 	@Override
 	public IObservableList<E> observe(Realm realm, S source) {
 		List<IObservableList<E>> lists = new ArrayList<>(properties.length);
-		for (IListProperty<S, E> property : properties) {
-			lists.add(property.observe(realm, source));
+		for (int i = 0; i < properties.length; i++) {
+			lists.add(properties[i].observe(realm, source));
 		}
 		IObservableList<E> multiList = new MultiList<>(lists, elementType);
 

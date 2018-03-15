@@ -15,11 +15,12 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -82,10 +83,8 @@ public class ShellActivationListener implements Listener {
 		switch (event.type) {
 		case SWT.Activate:
 			final IEclipseContext local = window.getContext();
-			if (Policy.DEBUG_WORKBENCH) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_WORKBENCH_FLAG,
-						"setting mwindow context " + local, null);
-			}
+			WorkbenchSWTActivator.trace("/trace/workbench",
+					"setting mwindow context " + local, null);
 			// record this shell's context
 			shell.setData(ECLIPSE_CONTEXT_SHELL_CONTEXT, local);
 
@@ -105,10 +104,8 @@ public class ShellActivationListener implements Listener {
 			break;
 		case SWT.Deactivate:
 			Object context = window.getContext();
-			if(Policy.DEBUG_WORKBENCH) {
-				WorkbenchSWTActivator.trace(Policy.DEBUG_WORKBENCH_FLAG,
-						"setting mwindow context " + context, null);
-			}
+			WorkbenchSWTActivator.trace("/trace/workbench",
+					"setting mwindow context " + context, null);
 			// record this shell's context
 			shell.setData(ECLIPSE_CONTEXT_SHELL_CONTEXT, context);
 			break;
@@ -178,9 +175,12 @@ public class ShellActivationListener implements Listener {
 		EContextService contextService = context.get(EContextService.class);
 		contextService.activateContext(EBindingService.DIALOG_CONTEXT_ID);
 
-		shell.addDisposeListener(e -> {
-			deactivate(shell);
-			context.dispose();
+		shell.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				deactivate(shell);
+				context.dispose();
+			}
 		});
 
 		return context;

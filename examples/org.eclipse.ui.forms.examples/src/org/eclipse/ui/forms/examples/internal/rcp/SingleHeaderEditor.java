@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,14 +38,17 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 	public SingleHeaderEditor() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.forms.editor.FormEditor#createToolkit(org.eclipse.swt.widgets.Display)
+	 */
 	protected FormToolkit createToolkit(Display display) {
 		// Create a toolkit that shares colors between editors.
 		return new FormToolkit(ExamplesPlugin.getDefault().getFormColors(
 				display));
 	}
 
-	@Override
 	protected void createHeaderContents(IManagedForm headerForm) {
 		final ScrolledForm sform = headerForm.getForm();
 		//sform.setText("Shared header for all the pages");
@@ -53,11 +56,19 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 		addToolBar(sform.getForm());
 		sform.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(
 				ISharedImages.IMG_OBJ_FILE));
-		headerForm.getForm().getDisplay().timerExec(5000, () -> sform.setText("<Another text>"));
+		headerForm.getForm().getDisplay().timerExec(5000, new Runnable() {
+			public void run() {
+				sform.setText("<Another text>");
+			}
+		});
 		//sform.setMessage("Static text", 0);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
+	 */
 	protected void addPages() {
 		try {
 			addPage(new HeadlessPage(this, 1));
@@ -68,22 +79,33 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public void doSave(IProgressMonitor monitor) {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
 	public void doSaveAs() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
 	private void addToolBar(Form form) {
 		Action haction = new Action("hor", Action.AS_RADIO_BUTTON) {
-			@Override
 			public void run() {
 			}
 		};
@@ -93,7 +115,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 				.getImageRegistry()
 				.getDescriptor(ExamplesPlugin.IMG_HORIZONTAL));
 		Action vaction = new Action("ver", Action.AS_RADIO_BUTTON) {
-			@Override
 			public void run() {
 			}
 		};
@@ -102,7 +123,6 @@ public class SingleHeaderEditor extends SharedHeaderFormEditor {
 		vaction.setImageDescriptor(ExamplesPlugin.getDefault()
 				.getImageRegistry().getDescriptor(ExamplesPlugin.IMG_VERTICAL));
 		ControlContribution save = new ControlContribution("save") {
-			@Override
 			protected Control createControl(Composite parent) {
 				Button saveButton = new Button(parent, SWT.PUSH);
 				saveButton.setText("Save");

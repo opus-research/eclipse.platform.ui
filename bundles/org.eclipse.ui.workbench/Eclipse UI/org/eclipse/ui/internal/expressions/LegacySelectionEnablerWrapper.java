@@ -113,7 +113,7 @@ public final class LegacySelectionEnablerWrapper extends
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("LegacySelectionEnablerWrapper("); //$NON-NLS-1$
 		buffer.append(enabler);
 		buffer.append(',');

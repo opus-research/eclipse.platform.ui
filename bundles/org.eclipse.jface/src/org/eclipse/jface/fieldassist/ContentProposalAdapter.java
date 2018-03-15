@@ -1014,12 +1014,12 @@ public class ContentProposalAdapter {
 			// Check each string for a match. Use the string displayed to the
 			// user, not the proposal content.
 			ArrayList<IContentProposal> list = new ArrayList<>();
-			for (IContentProposal proposal : proposals) {
-				String string = getString(proposal);
+			for (int i = 0; i < proposals.length; i++) {
+				String string = getString(proposals[i]);
 				if (string.length() >= filterString.length()
 						&& string.substring(0, filterString.length())
 								.equalsIgnoreCase(filterString)) {
-					list.add(proposal);
+					list.add(proposals[i]);
 				}
 
 			}
@@ -1664,11 +1664,11 @@ public class ContentProposalAdapter {
 				case SWT.Traverse:
 				case SWT.KeyDown:
 					if (DEBUG) {
-						StringBuilder sb;
+						StringBuffer sb;
 						if (e.type == SWT.Traverse) {
-							sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+							sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 						} else {
-							sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+							sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 						}
 						sb.append(" received by adapter"); //$NON-NLS-1$
 						dump(sb.toString(), e);
@@ -1678,11 +1678,11 @@ public class ContentProposalAdapter {
 					if (popup != null) {
 						popup.getTargetControlListener().handleEvent(e);
 						if (DEBUG) {
-							StringBuilder sb;
+							StringBuffer sb;
 							if (e.type == SWT.Traverse) {
-								sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+								sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 							} else {
-								sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+								sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 							}
 							sb.append(" after being handled by popup"); //$NON-NLS-1$
 							dump(sb.toString(), e);
@@ -1810,7 +1810,7 @@ public class ContentProposalAdapter {
 			 *            the event
 			 */
 			private void dump(String who, Event e) {
-				StringBuilder sb = new StringBuilder(
+				StringBuffer sb = new StringBuffer(
 						"--- [ContentProposalAdapter]\n"); //$NON-NLS-1$
 				sb.append(who);
 				sb.append(" - e: keyCode=" + e.keyCode + hex(e.keyCode)); //$NON-NLS-1$
