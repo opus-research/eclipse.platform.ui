@@ -29,6 +29,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
+import org.eclipse.e4.ui.workbench.filter.IToolElementFilter;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.ToolBarManager;
@@ -107,6 +108,12 @@ public class ToolBarContributionRecord {
 					currentVisibility |= rec.isVisible;
 				}
 			}
+		}
+		// check if a user defined filter is present and apply if yes
+		IEclipseContext context = renderer.getContext(toolbarModel);
+		IToolElementFilter elementFilter = context.get(IToolElementFilter.class);
+		if (elementFilter != null) {
+			currentVisibility = !elementFilter.filterElement(item, context);
 		}
 		if (currentVisibility
 				&& item.getPersistedState().get(

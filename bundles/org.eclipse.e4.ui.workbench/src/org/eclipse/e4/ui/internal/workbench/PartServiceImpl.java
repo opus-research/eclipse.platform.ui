@@ -54,6 +54,7 @@ import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.filter.IPartFilter;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
@@ -183,6 +184,10 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	@Optional
 	private ContextManager contextManager;
+
+	@Inject
+	@Optional
+	private IPartFilter partFilter;
 
 	private PartActivationHistory partActivationHistory;
 
@@ -686,6 +691,11 @@ public class PartServiceImpl implements EPartService {
 				firePartDeactivated(activePart);
 			}
 			activePart = part;
+			return;
+		}
+		
+		// prevent the activation and creation of a part if a part filter is registered and the part is filtered
+		if( partFilter != null && partFilter.filterPart(part)) {
 			return;
 		}
 

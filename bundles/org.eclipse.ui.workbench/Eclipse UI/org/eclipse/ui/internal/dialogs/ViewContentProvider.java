@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
+import org.eclipse.e4.ui.workbench.filter.IPartFilter;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
@@ -39,9 +40,11 @@ public class ViewContentProvider implements ITreeContentProvider {
 
 	private MApplication application;
 	private IViewRegistry viewRegistry;
+	private IPartFilter partFilter;
 
 	public ViewContentProvider(MApplication application) {
 		this.application = application;
+		partFilter = application.getContext().get(IPartFilter.class);
 		viewRegistry = WorkbenchPlugin.getDefault().getViewRegistry();
 	}
 
@@ -109,7 +112,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 		List<MPartDescriptor> descriptors = application.getDescriptors();
 		Set<MPartDescriptor> categoryDescriptors = new HashSet<>();
 		for (MPartDescriptor descriptor : descriptors) {
-			if (isFilteredByActivity(descriptor.getElementId()) || isIntroView(descriptor.getElementId())) {
+			if (isFiltered(descriptor) || isIntroView(descriptor.getElementId())) {
 				continue;
 			}
 			String category = descriptor.getCategory();
@@ -130,7 +133,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 		for (MPartDescriptor descriptor : descriptors) {
 			// only process views and hide views which are filtered by
 			// activities
-			if (!isView(descriptor) || isFilteredByActivity(descriptor.getElementId())) {
+			if (!isView(descriptor) || isFiltered(descriptor)) {
 				continue;
 			}
 
@@ -173,15 +176,17 @@ public class ViewContentProvider implements ITreeContentProvider {
 	}
 
 	/**
-	 * Evaluates if the view is filtered by an activity
+	 * Evaluates if the view is filtered by an activity or the part filter.
 	 *
-	 * @param elementId
+	 * @param descriptor
 	 * @return result of the check
 	 */
-	private boolean isFilteredByActivity(String elementId) {
+	private boolean isFiltered(MPartDescriptor descriptor) {
 		IViewDescriptor[] views = viewRegistry.getViews();
-		for (IViewDescriptor descriptor : views) {
-			if (descriptor.getId().equals(elementId) && WorkbenchActivityHelper.filterItem(descriptor)) {
+		for (IViewDescriptor viewDescriptor : views) {
+			if (viewDescriptor.getId().equals(descriptor.getElementId())
+					&& WorkbenchActivityHelper.filterItem(viewDescriptor)
+					|| partFilter != null && partFilter.filterPart(descriptor)) {
 				return true;
 			}
 		}
