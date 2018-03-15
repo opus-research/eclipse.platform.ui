@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -419,12 +419,14 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
         while (iterator.hasNext()) {
             IWorkingSet editedWorkingSet = (IWorkingSet) iterator.next();
-			IWorkingSet originalWorkingSet = getEditedWorkingSets().get(editedWorkingSet);
+            IWorkingSet originalWorkingSet = (IWorkingSet) getEditedWorkingSets()
+                    .get(editedWorkingSet);
 
             if (editedWorkingSet.getName().equals(originalWorkingSet.getName()) == false) {
                 editedWorkingSet.setName(originalWorkingSet.getName());
             }
-			if (!Arrays.equals(editedWorkingSet.getElements(), originalWorkingSet.getElements())) {
+            if (editedWorkingSet.getElements().equals(
+                    originalWorkingSet.getElements()) == false) {
                 editedWorkingSet.setElements(originalWorkingSet.getElements());
             }
         }

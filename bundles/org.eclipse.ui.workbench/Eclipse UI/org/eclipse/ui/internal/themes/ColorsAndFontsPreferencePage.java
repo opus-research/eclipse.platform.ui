@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
  *     Mickael Istria (Red Hat Inc.) - Theme and fontregistry rather than pref
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -684,7 +683,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	/**
 	 * Map of definition id->FontData[] capturing the temporary changes caused
 	 * by a 'defaultsTo' font change.
-	 *
+	 * 
 	 * @deprecated in this page, we should only care about preferences,
 	 *             preference to fontValues synchronization in registry is
 	 *             handled in the ThemeAPI and listeners
@@ -1324,7 +1323,7 @@ getPreferenceStore(),
     @Override
 	public void init(IWorkbench aWorkbench) {
         this.workbench = (Workbench) aWorkbench;
-		themeEngine = workbench.getService(IThemeEngine.class);
+		themeEngine = (IThemeEngine) workbench.getService(IThemeEngine.class);
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
@@ -1343,7 +1342,7 @@ getPreferenceStore(),
 
         updateThemeInfo(themeManager);
 
-		eventBroker = workbench.getService(IEventBroker.class);
+        eventBroker = (IEventBroker) workbench.getService(IEventBroker.class);
 		eventBroker.subscribe(WorkbenchThemeManager.Events.THEME_REGISTRY_RESTYLED,
 				themeRegistryRestyledHandler);
     }
@@ -2122,8 +2121,8 @@ getPreferenceStore(),
 		String messageTop = RESOURCE_BUNDLE.getString("fontColorSample"); //$NON-NLS-1$
 		String fontColorString = RESOURCE_BUNDLE.getString("fontColorString"); //$NON-NLS-1$
 		RGB rgb = currentColor.getRGB();
-		String messageBottom = MessageFormat.format(fontColorString, Integer.valueOf(rgb.red),
-				Integer.valueOf(rgb.green), Integer.valueOf(rgb.blue));
+		String messageBottom = MessageFormat
+				.format(fontColorString, new Object[] { new Integer(rgb.red), new Integer(rgb.green), new Integer(rgb.blue) });
 
 		// calculate position of the vertical line
 		int separator = (clientArea.width - 2) / 3;
@@ -2217,12 +2216,9 @@ getPreferenceStore(),
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
 		if (definition instanceof ColorDefinition) {
-			ColorDefinition colorDef = (ColorDefinition) definition;
-			RGB value = colorDef.getValue();
-			if ((value == null || value == EMPTY_COLOR_VALUE) && colorDef.getDefaultsTo() == null) {
-				return false;
-			}
-			return colorRegistry.get(definition.getId()) != null;
+			RGB value = ((ColorDefinition) definition).getValue();
+			return value != null && value != EMPTY_COLOR_VALUE
+					&& colorRegistry.get(definition.getId()) != null;
 		}
 		return true;
 	}
@@ -2233,7 +2229,7 @@ getPreferenceStore(),
 			return description;
 		}
 		return MessageFormat.format(RESOURCE_BUNDLE.getString("definitionNotAvailInTheme"), //$NON-NLS-1$
-				description).trim();
+				new Object[] { description }).trim();
 	}
 
 	private void updateDefinitionState(ThemeElementDefinition definition, boolean reset) {

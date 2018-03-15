@@ -14,7 +14,6 @@ package org.eclipse.e4.ui.css.core.impl.dom;
 
 import org.eclipse.e4.ui.css.core.dom.CSSPropertyList;
 import org.eclipse.e4.ui.css.core.dom.ExtendedCSSRule;
-import org.w3c.css.sac.Selector;
 import org.w3c.css.sac.SelectorList;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.css.CSSRule;
@@ -25,7 +24,7 @@ import org.w3c.dom.css.CSSStyleSheet;
 public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, ExtendedCSSRule {
 
 	private SelectorList selectors;
-	private CSSStyleDeclaration styleDeclaration;
+	private CSSStyleDeclarationImpl styleDeclaration;
 
 	public CSSStyleRuleImpl(CSSStyleSheet parentStyleSheet, CSSRule parentRule,
 			SelectorList selectors) {
@@ -40,30 +39,15 @@ public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, Exten
 	public short getType() {
 		return CSSRule.STYLE_RULE;
 	}
-	// ----------------------------------------
-	// W3C CSSStyleRule API methods
 
-	@Override
-	public String getCssText() {
-		return getSelectorText() + " { " + getStyle().getCssText() + " }";
-	}
 
 	//----------------------------------------
 	// W3C CSSStyleRule API methods
 
 	@Override
 	public String getSelectorText() {
-		StringBuilder sb = new StringBuilder();
-		for (int selID = 0; selID < getSelectorList().getLength(); selID++) {
-			Selector item = getSelectorList().item(selID);
-			sb.append(item.toString());
-			sb.append(", ");
-		}
-		if (getSelectorList().getLength() > 0) {
-			sb.delete(sb.length() - 2, sb.length());
-		}
-
-		return sb.toString();
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
 	@Override
@@ -93,7 +77,7 @@ public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, Exten
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	public void setStyle(CSSStyleDeclaration styleDeclaration) {
+	public void setStyle(CSSStyleDeclarationImpl styleDeclaration) {
 		this.styleDeclaration = styleDeclaration;
 	}
 }
