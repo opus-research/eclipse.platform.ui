@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,8 +17,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.internal.forms.widgets.WrappedPageBook;
 /**
  * ScrolledPageBook is a class that is capable of stacking several composites
@@ -56,17 +54,14 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 		pages = new Hashtable<>();
 		setExpandHorizontal(true);
 		setExpandVertical(true);
-		this.addListener(SWT.Traverse, new Listener() {
-			@Override
-			public void handleEvent(Event e) {
-				switch (e.detail) {
-					case SWT.TRAVERSE_ESCAPE :
-					case SWT.TRAVERSE_RETURN :
-					case SWT.TRAVERSE_TAB_NEXT :
-					case SWT.TRAVERSE_TAB_PREVIOUS :
-						e.doit = true;
-						break;
-				}
+		this.addListener(SWT.Traverse, e -> {
+			switch (e.detail) {
+			case SWT.TRAVERSE_ESCAPE:
+			case SWT.TRAVERSE_RETURN:
+			case SWT.TRAVERSE_TAB_NEXT:
+			case SWT.TRAVERSE_TAB_PREVIOUS:
+				e.doit = true;
+				break;
 			}
 		});
 	}
@@ -83,7 +78,15 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 	 */
 	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
-		Rectangle trim = computeTrim(0, 0, 10, 10);
+		int width = 10;
+		int height = 10;
+		if (wHint != SWT.DEFAULT) {
+			width = wHint;
+		}
+		if (hHint != SWT.DEFAULT) {
+			height = hHint;
+		}
+		Rectangle trim = computeTrim(0, 0, width, height);
 		return new Point(trim.width, trim.height);
 	}
 	/**
@@ -214,7 +217,7 @@ public class ScrolledPageBook extends SharedScrolledComposite {
 		return currentPage;
 	}
 	private Composite createPage() {
-		Composite page = new LayoutComposite(pageBook, SWT.NULL);
+		Composite page = new Composite(pageBook, SWT.NULL);
 		page.setBackground(getBackground());
 		page.setForeground(getForeground());
 		page.setMenu(pageBook.getMenu());

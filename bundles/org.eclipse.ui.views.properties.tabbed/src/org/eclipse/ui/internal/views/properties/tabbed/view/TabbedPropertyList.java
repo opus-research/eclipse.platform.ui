@@ -164,12 +164,14 @@ public class TabbedPropertyList
 
 			addPaintListener(new PaintListener() {
 
+				@Override
 				public void paintControl(PaintEvent e) {
 					paint(e);
 				}
 			});
 			addMouseListener(new MouseAdapter() {
 
+				@Override
 				public void mouseUp(MouseEvent e) {
 					if (!selected) {
 						select(getIndex(ListElement.this));
@@ -189,6 +191,7 @@ public class TabbedPropertyList
 			});
 			addMouseMoveListener(new MouseMoveListener() {
 
+				@Override
 				public void mouseMove(MouseEvent e) {
 					if (!hover) {
 						hover = true;
@@ -198,6 +201,7 @@ public class TabbedPropertyList
 			});
 			addMouseTrackListener(new MouseTrackAdapter() {
 
+				@Override
 				public void mouseExit(MouseEvent e) {
 					hover = false;
 					redraw();
@@ -384,8 +388,7 @@ public class TabbedPropertyList
 
 			/* Draw dynamic images, if any */
 			boolean hasDynamicImage = false;
-			for (int i = 0; i < dynamicImages.length; i++) {
-				Image dynamicImage = dynamicImages[i];
+			for (Image dynamicImage : dynamicImages) {
 				if (dynamicImage != null && !dynamicImage.isDisposed()) {
 					hasDynamicImage = true;
 					break;
@@ -395,8 +398,7 @@ public class TabbedPropertyList
 				int drawPosition = textIndent
 						+ e.gc.textExtent(tab.getText()).x + 4;
 				boolean addSpace = false;
-				for (int i = 0; i < dynamicImages.length; i++) {
-					Image dynamicImage = dynamicImages[i];
+				for (Image dynamicImage : dynamicImages) {
 					if (dynamicImage != null && !dynamicImage.isDisposed()) {
 						if (addSpace) {
 							drawPosition = drawPosition + 3;
@@ -426,6 +428,7 @@ public class TabbedPropertyList
 			return tab;
 		}
 
+		@Override
 		public String toString() {
 			return tab.getText();
 		}
@@ -448,12 +451,14 @@ public class TabbedPropertyList
 			super(parent, SWT.NO_FOCUS);
 			addPaintListener(new PaintListener() {
 
+				@Override
 				public void paintControl(PaintEvent e) {
 					paint(e);
 				}
 			});
 			addMouseListener(new MouseAdapter() {
 
+				@Override
 				public void mouseUp(MouseEvent e) {
 					if (isUpScrollRequired()) {
 						bottomVisibleIndex--;
@@ -535,12 +540,14 @@ public class TabbedPropertyList
 			super(parent, SWT.NO_FOCUS);
 			addPaintListener(new PaintListener() {
 
+				@Override
 				public void paintControl(PaintEvent e) {
 					paint(e);
 				}
 			});
 			addMouseListener(new MouseAdapter() {
 
+				@Override
 				public void mouseUp(MouseEvent e) {
 					if (isDownScrollRequired()) {
 						topVisibleIndex++;
@@ -625,6 +632,7 @@ public class TabbedPropertyList
 
 		this.addFocusListener(new FocusListener() {
 
+			@Override
 			public void focusGained(FocusEvent e) {
 				focus = true;
 				int i = getSelectionIndex();
@@ -633,6 +641,7 @@ public class TabbedPropertyList
 				}
 			}
 
+			@Override
 			public void focusLost(FocusEvent e) {
 				focus = false;
 				int i = getSelectionIndex();
@@ -643,12 +652,14 @@ public class TabbedPropertyList
 		});
 		this.addControlListener(new ControlAdapter() {
 
+			@Override
 			public void controlResized(ControlEvent e) {
 				computeTopAndBottomTab();
 			}
 		});
 		this.addTraverseListener(new TraverseListener() {
 
+			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS
 					|| e.detail == SWT.TRAVERSE_ARROW_NEXT) {
@@ -729,8 +740,8 @@ public class TabbedPropertyList
 	 */
 	public void removeAll() {
 		if (elements != null) {
-			for (int i = 0; i < elements.length; i++) {
-				elements[i].dispose();
+			for (ListElement element : elements) {
+				element.dispose();
 			}
 		}
 		elements = ELEMENTS_EMPTY;
@@ -878,6 +889,7 @@ public class TabbedPropertyList
 		return element.index;
 	}
 
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		Point result = super.computeSize(hHint, wHint, changed);
 		if (widestLabelIndex == -1) {
@@ -913,10 +925,79 @@ public class TabbedPropertyList
 		return point;
 	}
 
+	public void setListBackgroundColor(Color color) {
+		listBackground = color;
+	}
+
+	public Color getListBackgroundColor() {
+		return listBackground;
+	}
+
+	public void setWidgetBackgroundColor(Color color) {
+		widgetBackground = color;
+
+		RGB black = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK).getRGB();
+		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE).getRGB();
+
+		defaultGradientStart = factory.getColors().createColor("TabbedPropertyList.defaultTabGradientStart", //$NON-NLS-1$
+				FormColors.blend(widgetBackground.getRGB(), FormColors.blend(white, widgetNormalShadow.getRGB(), 20),
+						60));
+		defaultGradientEnd = factory.getColors().createColor("TabbedPropertyList.defaultTabGradientEnd", //$NON-NLS-1$
+				FormColors.blend(widgetBackground.getRGB(), widgetNormalShadow.getRGB(), 40));
+
+		bottomNavigationElementShadowStroke1 = factory.getColors().createColor("TabbedPropertyList.tabShadowStroke1", //$NON-NLS-1$
+				FormColors.blend(black, widgetBackground.getRGB(), 10));
+		bottomNavigationElementShadowStroke2 = factory.getColors().createColor("TabbedPropertyList.tabShadowStroke2", //$NON-NLS-1$
+				FormColors.blend(black, widgetBackground.getRGB(), 5));
+
+		hoverGradientStart = factory.getColors().createColor("TabbedPropertyList.hoverBackgroundGradientStart", //$NON-NLS-1$
+				FormColors.blend(white, widgetBackground.getRGB(), 20));
+		hoverGradientEnd = factory.getColors().createColor("TabbedPropertyList.hoverBackgroundGradientEnd", //$NON-NLS-1$
+				FormColors.blend(widgetNormalShadow.getRGB(), widgetBackground.getRGB(), 10));
+
+		indentedDefaultBackground = factory.getColors().createColor("TabbedPropertyList.indentedDefaultBackground", //$NON-NLS-1$
+				FormColors.blend(white, widgetBackground.getRGB(), 10));
+		indentedHoverBackground = factory.getColors().createColor("TabbedPropertyList.indentedHoverBackground", //$NON-NLS-1$
+				FormColors.blend(white, widgetBackground.getRGB(), 75));
+	}
+
+	public Color getWidgetBackgroundColor() {
+		return widgetBackground;
+	}
+
+	public void setWidgetForegroundColor(Color color) {
+		widgetForeground = color;
+	}
+
+	public Color getWidgetForegroundColor() {
+		return widgetForeground;
+	}
+
+	public void setWidgetNormalShadowColor(Color color) {
+		widgetNormalShadow = color;
+
+		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE).getRGB();
+
+		navigationElementShadowStroke = factory.getColors().createColor("TabbedPropertyList.shadowStroke", //$NON-NLS-1$
+				FormColors.blend(white, widgetNormalShadow.getRGB(), 55));
+	}
+
+	public Color getWidgetNormalShadowColor() {
+		return widgetNormalShadow;
+	}
+
+	public void setWidgetDarkShadowColor(Color color) {
+		widgetDarkShadow = color;
+	}
+
+	public Color getWidgetDarkShadowColor() {
+		return widgetDarkShadow;
+	}
+
 	/**
 	 * Initialize the colours used in the list.
 	 */
-	private void initColours() {
+	public void initColours() {
 		/*
 		 * Colour 3 COLOR_LIST_BACKGROUND
 		 */
@@ -1165,6 +1246,7 @@ public class TabbedPropertyList
 		final Accessible accessible = getAccessible();
 		accessible.addAccessibleListener(new AccessibleAdapter() {
 
+			@Override
 			public void getName(AccessibleEvent e) {
 				if (getSelectionIndex() != NONE) {
 					e.result = elements[getSelectionIndex()].getTabItem()
@@ -1172,6 +1254,7 @@ public class TabbedPropertyList
 				}
 			}
 
+			@Override
 			public void getHelp(AccessibleEvent e) {
 				if (getSelectionIndex() != NONE) {
 					e.result = elements[getSelectionIndex()].getTabItem()
@@ -1182,12 +1265,14 @@ public class TabbedPropertyList
 
 		accessible.addAccessibleControlListener(new AccessibleControlAdapter() {
 
+			@Override
 			public void getChildAtPoint(AccessibleControlEvent e) {
 				Point pt = toControl(new Point(e.x, e.y));
 				e.childID = (getBounds().contains(pt)) ? ACC.CHILDID_SELF
 					: ACC.CHILDID_NONE;
 			}
 
+			@Override
 			public void getLocation(AccessibleControlEvent e) {
 				if (getSelectionIndex() != NONE) {
 					Rectangle location = elements[getSelectionIndex()]
@@ -1200,14 +1285,17 @@ public class TabbedPropertyList
 				}
 			}
 
+			@Override
 			public void getChildCount(AccessibleControlEvent e) {
 				e.detail = 0;
 			}
 
+			@Override
 			public void getRole(AccessibleControlEvent e) {
 				e.detail = ACC.ROLE_TABITEM;
 			}
 
+			@Override
 			public void getState(AccessibleControlEvent e) {
 				e.detail = ACC.STATE_NORMAL | ACC.STATE_SELECTABLE
 					| ACC.STATE_SELECTED | ACC.STATE_FOCUSED
@@ -1217,6 +1305,7 @@ public class TabbedPropertyList
 
 		addListener(SWT.Selection, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
 				if (isFocusControl()) {
 					accessible.setFocus(ACC.CHILDID_SELF);
@@ -1226,6 +1315,7 @@ public class TabbedPropertyList
 
 		addListener(SWT.FocusIn, new Listener() {
 
+			@Override
 			public void handleEvent(Event event) {
 				accessible.setFocus(ACC.CHILDID_SELF);
 			}

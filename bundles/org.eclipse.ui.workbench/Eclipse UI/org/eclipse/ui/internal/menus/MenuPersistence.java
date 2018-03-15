@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -51,12 +52,7 @@ final public class MenuPersistence extends RegistryPersistence {
 	private ArrayList<MToolBarContribution> toolBarContributions = new ArrayList<>();
 	private ArrayList<MTrimContribution> trimContributions = new ArrayList<>();
 
-	private final Comparator<IConfigurationElement> comparer = new Comparator<IConfigurationElement>() {
-		@Override
-		public int compare(IConfigurationElement c1, IConfigurationElement c2) {
-			return c1.getContributor().getName().compareToIgnoreCase(c2.getContributor().getName());
-		}
-	};
+	private final Comparator<IConfigurationElement> comparer = (c1, c2) -> c1.getContributor().getName().compareToIgnoreCase(c2.getContributor().getName());
 	private Pattern contributorFilter;
 
 	/**
@@ -85,7 +81,6 @@ final public class MenuPersistence extends RegistryPersistence {
 	}
 	@Override
 	protected boolean isChangeImportant(IRegistryChangeEvent event) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -119,17 +114,13 @@ final public class MenuPersistence extends RegistryPersistence {
 	private void readAdditions() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		ArrayList<IConfigurationElement> configElements = new ArrayList<>();
-
-		final IConfigurationElement[] menusExtensionPoint = registry
-				.getConfigurationElementsFor(EXTENSION_MENUS);
-
 		// Create a cache entry for every menu addition;
-		for (int i = 0; i < menusExtensionPoint.length; i++) {
-			if (PL_MENU_CONTRIBUTION.equals(menusExtensionPoint[i].getName())) {
+		for (IConfigurationElement configElement : registry.getConfigurationElementsFor(EXTENSION_MENUS)) {
+			if (PL_MENU_CONTRIBUTION.equals(configElement.getName())) {
 				if (contributorFilter == null
 						|| contributorFilter.matcher(
-								menusExtensionPoint[i].getContributor().getName()).matches()) {
-					configElements.add(menusExtensionPoint[i]);
+								configElement.getContributor().getName()).matches()) {
+					configElements.add(configElement);
 				}
 			}
 		}

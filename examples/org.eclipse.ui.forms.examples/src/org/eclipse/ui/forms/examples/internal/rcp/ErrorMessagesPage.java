@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,8 +15,6 @@ import java.io.StringWriter;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -143,6 +141,7 @@ public class ErrorMessagesPage extends FormPage {
 		super(editor, "messageManager", "Message Manager");
 	}
 
+	@Override
 	protected void createFormContent(final IManagedForm managedForm) {
 		final ScrolledForm form = managedForm.getForm();
 		final FormToolkit toolkit = managedForm.getToolkit();
@@ -151,6 +150,7 @@ public class ErrorMessagesPage extends FormPage {
 		form.setText("Example with message handling");
 		toolkit.decorateFormHeading(form.getForm());
 		form.getForm().addMessageHyperlinkListener(new HyperlinkAdapter() {
+			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				String title = e.getLabel();
 				// String details = title;
@@ -223,6 +223,7 @@ public class ErrorMessagesPage extends FormPage {
 		final Button button1 = toolkit.createButton(form.getBody(),
 				"Add general error", SWT.CHECK);
 		button1.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (button1.getSelection()) {
 					mmng.addMessage("saveError", "Save Error", null,
@@ -235,6 +236,7 @@ public class ErrorMessagesPage extends FormPage {
 		final Button button2 = toolkit.createButton(form.getBody(),
 				"Add static message", SWT.CHECK);
 		button2.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (button2.getSelection()) {
 					mmng.addMessage("info", "Secondary info", null,
@@ -247,6 +249,7 @@ public class ErrorMessagesPage extends FormPage {
 		final Button button3 = toolkit.createButton(form.getBody(),
 				"Auto update", SWT.CHECK);
 		button3.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				mmng.setAutoUpdate(button3.getSelection());
 			}
@@ -271,6 +274,7 @@ public class ErrorMessagesPage extends FormPage {
 
 	private void configureFormText(final Form form, FormText text) {
 		text.addHyperlinkListener(new HyperlinkAdapter() {
+			@Override
 			public void linkActivated(HyperlinkEvent e) {
 				String is = (String)e.getHref();
 				try {
@@ -330,40 +334,31 @@ public class ErrorMessagesPage extends FormPage {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.widthHint = 150;
 		text.setLayoutData(gd);
-		text.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				String s = text.getText();
-				// flag length
-				if (s.length() > 0 && s.length() <= 5) {
-					mmng.addMessage("textLength",
-							"Text is longer than 0 characters", null,
-							IMessageProvider.INFORMATION, text);
-				} else if (s.length() > 5 && s.length() <= 10) {
-					mmng.addMessage("textLength",
-							"Text is longer than 5 characters", null,
-							IMessageProvider.WARNING, text);
-				} else if (s.length() > 10) {
-					mmng.addMessage("textLength",
-							"Text is longer than 10 characters", null,
-							IMessageProvider.ERROR, text);
-				} else {
-					mmng.removeMessage("textLength", text);
+		text.addModifyListener(e -> {
+			String s = text.getText();
+			// flag length
+			if (s.length() > 0 && s.length() <= 5) {
+				mmng.addMessage("textLength", "Text is longer than 0 characters", null, IMessageProvider.INFORMATION,
+						text);
+			} else if (s.length() > 5 && s.length() <= 10) {
+				mmng.addMessage("textLength", "Text is longer than 5 characters", null, IMessageProvider.WARNING, text);
+			} else if (s.length() > 10) {
+				mmng.addMessage("textLength", "Text is longer than 10 characters", null, IMessageProvider.ERROR, text);
+			} else {
+				mmng.removeMessage("textLength", text);
+			}
+			// flag type
+			boolean badType = false;
+			for (int i = 0; i < s.length(); i++) {
+				if (!Character.isLetter(s.charAt(i))) {
+					badType = true;
+					break;
 				}
-				// flag type
-				boolean badType = false;
-				for (int i = 0; i < s.length(); i++) {
-					if (!Character.isLetter(s.charAt(i))) {
-						badType = true;
-						break;
-					}
-				}
-				if (badType) {
-					mmng.addMessage("textType",
-							"Text must only contain letters", null,
-							IMessageProvider.ERROR, text);
-				} else {
-					mmng.removeMessage("textType", text);
-				}
+			}
+			if (badType) {
+				mmng.addMessage("textType", "Text must only contain letters", null, IMessageProvider.ERROR, text);
+			} else {
+				mmng.removeMessage("textType", text);
 			}
 		});
 	}

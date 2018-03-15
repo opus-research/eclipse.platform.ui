@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -30,8 +31,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -234,8 +233,6 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public void addState(String id, State state) {
-		// TODO Auto-generated method stub
-
 	}
 
 
@@ -399,11 +396,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 		if (action == null) {
 			action = new CommandLegacyActionWrapper(actionId, command, style,
 					window);
-			action.addPropertyChangeListener(new IPropertyChangeListener() {
-				@Override
-				public final void propertyChange(final PropertyChangeEvent event) {
-					// TODO Update the state somehow.
-				}
+			action.addPropertyChangeListener(event -> {
+				// TODO Update the state somehow.
 			});
 		}
 		return action;
@@ -421,13 +415,11 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public State getState(String stateId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String[] getStateIds() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -665,8 +657,6 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public void removeState(String stateId) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private final void selectionChanged(final ISelection selection) {

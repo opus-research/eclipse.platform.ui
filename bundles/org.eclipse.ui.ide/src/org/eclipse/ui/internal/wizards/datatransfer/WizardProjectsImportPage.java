@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -89,8 +90,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.WizardDataTransferPage;
 import org.eclipse.ui.dialogs.WorkingSetGroup;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
+import org.eclipse.ui.internal.registry.WorkingSetDescriptor;
+import org.eclipse.ui.internal.registry.WorkingSetRegistry;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
@@ -285,10 +289,8 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		 * @since 3.4
 		 */
 		public String getProjectLabel() {
-			String path = projectSystemFile == null ? structureProvider
-					.getLabel(parent) : projectSystemFile
-					.getParent();
-
+			String path = projectSystemFile == null ? structureProvider.getFullPath(parent)
+					: projectSystemFile.getParent();
 			return NLS.bind(
 					DataTransferMessages.WizardProjectsImportPage_projectLabel,
 					projectName, path);
@@ -403,7 +405,20 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	public WizardProjectsImportPage(String pageName,String initialPath,
 			IStructuredSelection currentSelection) {
  		super(pageName);
-		this.initialPath = initialPath;
+		if (initialPath != null) {
+			this.initialPath = initialPath;
+		} else {
+			if (currentSelection != null) {
+				Object firstElement = currentSelection.getFirstElement();
+				if (firstElement instanceof File) {
+					this.initialPath = ((File) firstElement).getAbsolutePath();
+				} else if (firstElement instanceof IResource) {
+					this.initialPath = ((IResource) firstElement).getLocation().toFile().getAbsolutePath();
+				} else if (firstElement instanceof String && new File((String) firstElement).exists()) {
+					this.initialPath = new File((String) firstElement).getAbsolutePath();
+				}
+			}
+		}
 		this.currentSelection = currentSelection;
 		setPageComplete(false);
 		setTitle(DataTransferMessages.WizardProjectsImportPage_ImportProjectsTitle);
@@ -435,8 +450,9 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 * @param workArea
 	 */
 	private void createWorkingSetGroup(Composite workArea) {
-		String[] workingSetIds = new String[] {"org.eclipse.ui.resourceWorkingSetPage",  //$NON-NLS-1$
-				"org.eclipse.jdt.ui.JavaWorkingSetPage"};  //$NON-NLS-1$
+		WorkingSetRegistry registry = WorkbenchPlugin.getDefault().getWorkingSetRegistry();
+		String[] workingSetIds = Arrays.stream(registry.getNewPageWorkingSetDescriptors())
+				.map(WorkingSetDescriptor::getId).toArray(String[]::new);
 		workingSetGroup = new WorkingSetGroup(workArea, currentSelection, workingSetIds);
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,22 +56,19 @@ public abstract class ToggleHyperlink extends AbstractHyperlink {
 	 */
 	public ToggleHyperlink(Composite parent, int style) {
 		super(parent, style);
-		Listener listener = new Listener() {
-			@Override
-			public void handleEvent(Event e) {
-				switch (e.type) {
-					case SWT.MouseEnter:
-						hover=true;
-						redraw();
-						break;
-					case SWT.MouseExit:
-						hover = false;
-						redraw();
-						break;
-					case SWT.KeyDown:
-						onKeyDown(e);
-						break;
-				}
+		Listener listener = e -> {
+			switch (e.type) {
+			case SWT.MouseEnter:
+				hover = true;
+				redraw();
+				break;
+			case SWT.MouseExit:
+				hover = false;
+				redraw();
+				break;
+			case SWT.KeyDown:
+				onKeyDown(e);
+				break;
 			}
 		};
 		addListener(SWT.MouseEnter, listener);
@@ -144,18 +141,15 @@ public abstract class ToggleHyperlink extends AbstractHyperlink {
 	 */
 	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
-		int width, height;
-		/*
+		int width = innerWidth + 2 * marginWidth;
+		int height = innerHeight + 2 * marginHeight;
 		if (wHint != SWT.DEFAULT)
 			width = wHint;
-		else */
-			width = innerWidth + 2 * marginWidth;
-		/*
 		if (hHint != SWT.DEFAULT)
 			height = hHint;
-		else */
-			height = innerHeight + 2 * marginHeight;
-		return new Point(width, height);
+
+		Rectangle trim = computeTrim(0, 0, width, height);
+		return new Point(trim.width, trim.height);
 	}
 	/**
 	 * Returns the expansion state of the toggle control. When toggle is in the

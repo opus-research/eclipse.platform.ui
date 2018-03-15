@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -146,6 +146,7 @@ public class FilteredResourcesSelectionDialog extends
 		setSelectionHistory(new ResourceSelectionHistory());
 
 		setTitle(IDEWorkbenchMessages.OpenResourceDialog_title);
+		setMessage(IDEWorkbenchMessages.OpenResourceDialog_message);
 
 		/*
 		 * Allow location of paths relative to a searchContainer, which is
@@ -348,9 +349,9 @@ public class FilteredResourcesSelectionDialog extends
 
 		List resultToReturn = new ArrayList();
 
-		for (int i = 0; i < result.length; i++) {
-			if (result[i] instanceof IResource) {
-				resultToReturn.add((result[i]));
+		for (Object element : result) {
+			if (element instanceof IResource) {
+				resultToReturn.add((element));
 			}
 		}
 
@@ -516,8 +517,7 @@ public class FilteredResourcesSelectionDialog extends
 					progressMonitor);
 
 			if (visitor.visit(container.createProxy())) {
-				for (int i= 0; i < members.length; i++) {
-					IResource member = members[i];
+				for (IResource member : members) {
 					if (member.isAccessible())
 						member.accept(visitor, IResource.NONE);
 					progressMonitor.worked(1);
