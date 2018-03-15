@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
- *     Robert Roth <robert.roth.off@gmail.com>
- *          - Fix for Bug 364736 Setting limit to 0 has no effect
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -95,7 +93,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private Label limitsLabel;
 
 	private Object[] previouslyChecked = new Object[0];
-	private Group configComposite;
 
 	/**
 	 * Create a new instance of the receiver on builder.
@@ -146,7 +143,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		createAndOrButtons(composite);
 
-		configComposite = new Group(composite, SWT.NONE);
+		Group configComposite = new Group(composite, SWT.NONE);
 		configComposite.setText(MarkerMessages.MarkerConfigurationsLabel);
 
 		configComposite.setLayout(new GridLayout(3, false));
@@ -203,39 +200,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
-		updateConfigComposite(!showAll);
-	}
-
-	private void updateConfigComposite(boolean enabled) {
-		recursivelySetEnabled(configComposite, enabled);
-		if (enabled)
-			updateButtonEnablement(getSelectionFromTable());
-	}
-
-	/**
-	 * Recursively walk through the tree of components and set enabled state of
-	 * each control.
-	 *
-	 * @param control
-	 *            The root control
-	 * @param enabled
-	 *            Whether or not we're enabled.
-	 */
-	private void recursivelySetEnabled(Control control, boolean enabled) {
-		if (control instanceof Composite) {
-			for (Control child : ((Composite) control).getChildren()) {
-				recursivelySetEnabled(child, enabled);
-			}
-		}
-		control.setEnabled(enabled);
 	}
 
 	private void updateShowAll(boolean showAll) {
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
-		updateConfigComposite(!showAll);
-
 		if (showAll) {
 			previouslyChecked = configsTable.getCheckedElements();
 			configsTable.setAllChecked(false);
@@ -300,16 +270,9 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		});
 
 		limitText.addModifyListener(e -> {
-			boolean isInvalid = false;
 			try {
-				int value = Integer.parseInt(limitText.getText());
-				if (value <= 0) {
-					isInvalid = true;
-				}
+				Integer.parseInt(limitText.getText());
 			} catch (NumberFormatException ex) {
-				isInvalid = true;
-			}
-			if (isInvalid) {
 				limitText.setText(Integer.toString(generator.getMarkerLimits()));
 			}
 		});

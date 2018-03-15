@@ -17,7 +17,7 @@ package org.eclipse.ui.internal;
  */
 public class IntModel extends Model {
     public IntModel(int initialValue) {
-		super(Integer.valueOf(initialValue));
+        super(new Integer(initialValue));
     }
 
     /**
@@ -27,7 +27,7 @@ public class IntModel extends Model {
      * @param newValue the new value of the integer
      */
     public void set(int newValue, IChangeListener source) {
-		setState(Integer.valueOf(newValue), source);
+        setState(new Integer(newValue), source);
     }
 
     /**
@@ -37,7 +37,7 @@ public class IntModel extends Model {
      * @param newValue the new value of the integer
      */
     public void set(int newValue) {
-		setState(Integer.valueOf(newValue), null);
+        setState(new Integer(newValue), null);
     }
 
     /**
