@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473941
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -249,8 +248,9 @@ public class PageSite implements IPageSite, INestable {
 	@Override
 	public void activate() {
 		active = true;
-		e4Context.activate();
+
 		serviceLocator.activate();
+
 		if (contextService != null) {
 			contextService.activate();
 		}
@@ -262,7 +262,7 @@ public class PageSite implements IPageSite, INestable {
 		if (contextService != null) {
 			contextService.deactivate();
 		}
+
 		serviceLocator.deactivate();
-		e4Context.deactivate();
 	}
 }
