@@ -61,7 +61,7 @@ public class SashLayout extends Layout {
 	List<SashRect> sashesToDrag;
 
 	/**
-	 * @deprecated Always false. Don't use it.
+	 * This is always false. Don't use it.
 	 */
 	@Deprecated
 	public boolean layoutUpdateInProgress = false;

@@ -55,7 +55,7 @@ public class MenuManagerRendererFilter implements Listener {
 	static final String TMP_ORIGINAL_CONTEXT = "MenuServiceFilter.original.context"; //$NON-NLS-1$
 
 	private static void trace(String msg, Widget menu, MMenu menuModel) {
-		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
+		WorkbenchSWTActivator.trace(Policy.MENUS, msg + ": " + menu + ": " //$NON-NLS-1$ //$NON-NLS-2$
 				+ menuModel, null);
 	}
 
@@ -111,9 +111,7 @@ public class MenuManagerRendererFilter implements Listener {
 			return;
 		}
 		if (event.type == SWT.Dispose) {
-			if (Policy.DEBUG_MENUS) {
-				trace("handleMenu.Dispose", menu, null); //$NON-NLS-1$
-			}
+			trace("handleMenu.Dispose", menu, null); //$NON-NLS-1$
 			cleanUp(menu, null, null);
 			return;
 		}
@@ -277,17 +275,13 @@ public class MenuManagerRendererFilter implements Listener {
 
 	public void cleanUp(final Menu menu, MMenu menuModel,
 			MenuManager menuManager) {
-		if (Policy.DEBUG_MENUS) {
-			trace("cleanUp", menu, null); //$NON-NLS-1$
-		}
+		trace("cleanUp", menu, null); //$NON-NLS-1$
 		if (pendingCleanup.isEmpty()) {
 			return;
 		}
 		Runnable cleanUp = pendingCleanup.remove(menu);
 		if (cleanUp != null) {
-			if (Policy.DEBUG_MENUS) {
-				trace("cleanUp.run()", menu, null); //$NON-NLS-1$
-			}
+			trace("cleanUp.run()", menu, null); //$NON-NLS-1$
 			cleanUp.run();
 		}
 	}

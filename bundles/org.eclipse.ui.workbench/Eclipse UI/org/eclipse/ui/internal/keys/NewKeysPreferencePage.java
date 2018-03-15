@@ -16,8 +16,6 @@
 
 package org.eclipse.ui.internal.keys;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -528,24 +526,27 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		gridData.widthHint = Math.max(widthHint, filtersButton.computeSize(
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		filtersButton.setLayoutData(gridData);
-		filtersButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			KeysPreferenceFiltersDialog dialog = new KeysPreferenceFiltersDialog(getShell());
-			dialog.setFilterActionSet(fFilterActionSetContexts);
-			dialog.setFilterInternal(fFilterInternalContexts);
-			dialog.setFilterUncategorized(fFilteredTree.isFilteringCategories());
-			if (dialog.open() == Window.OK) {
-				fFilterActionSetContexts = dialog.getFilterActionSet();
-				fFilterInternalContexts = dialog.getFilterInternal();
-				fFilteredTree.filterCategories(dialog.getFilterUncategorized());
+		filtersButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				KeysPreferenceFiltersDialog dialog = new KeysPreferenceFiltersDialog(getShell());
+				dialog.setFilterActionSet(fFilterActionSetContexts);
+				dialog.setFilterInternal(fFilterInternalContexts);
+				dialog.setFilterUncategorized(fFilteredTree.isFilteringCategories());
+				if (dialog.open() == Window.OK) {
+					fFilterActionSetContexts = dialog.getFilterActionSet();
+					fFilterInternalContexts = dialog.getFilterInternal();
+					fFilteredTree.filterCategories(dialog.getFilterUncategorized());
 
-				// Apply context filters
-				keyController.filterContexts(fFilterActionSetContexts, fFilterInternalContexts);
+					// Apply context filters
+					keyController.filterContexts(fFilterActionSetContexts, fFilterInternalContexts);
 
-				ISelection currentContextSelection = fWhenCombo.getSelection();
-				fWhenCombo.setInput(keyController.getContextModel());
-				fWhenCombo.setSelection(currentContextSelection);
+					ISelection currentContextSelection = fWhenCombo.getSelection();
+					fWhenCombo.setInput(keyController.getContextModel());
+					fWhenCombo.setSelection(currentContextSelection);
+				}
 			}
-		}));
+		});
 
 		// Export bindings to CSV
 		final Button exportButton = new Button(buttonBar, SWT.PUSH);
@@ -555,7 +556,13 @@ public class NewKeysPreferencePage extends PreferencePage implements IWorkbenchP
 		gridData.widthHint = Math.max(widthHint, exportButton.computeSize(
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		exportButton.setLayoutData(gridData);
-		exportButton.addSelectionListener(widgetSelectedAdapter(e -> keyController.exportCSV(((Button) e.getSource()).getShell())));
+		exportButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				keyController.exportCSV(((Button) e.getSource()).getShell());
+			}
+
+		});
 
 		return buttonBar;
 	}
@@ -684,19 +691,29 @@ if (!event.getOldValue().equals(event.getNewValue())) {
 			final KeyStroke trappedKey = (KeyStroke) trappedKeyItr.next();
 			final MenuItem menuItem = new MenuItem(addKeyMenu, SWT.PUSH);
 			menuItem.setText(trappedKey.format());
-			menuItem.addSelectionListener(widgetSelectedAdapter(e -> {
-				fKeySequenceText.insert(trappedKey);
-				fBindingText.setFocus();
-				fBindingText.setSelection(fBindingText.getTextLimit());
-			}));
+			menuItem.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					fKeySequenceText.insert(trappedKey);
+					fBindingText.setFocus();
+					fBindingText.setSelection(fBindingText.getTextLimit());
+				}
+			});
 		}
-		addKeyButton.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-			Point buttonLocation = addKeyButton.getLocation();
-			buttonLocation = dataArea.toDisplay(buttonLocation.x, buttonLocation.y);
-			Point buttonSize = addKeyButton.getSize();
-			addKeyMenu.setLocation(buttonLocation.x, buttonLocation.y + buttonSize.y);
-			addKeyMenu.setVisible(true);
-		}));
+		addKeyButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				Point buttonLocation = addKeyButton.getLocation();
+				buttonLocation = dataArea.toDisplay(buttonLocation.x,
+						buttonLocation.y);
+				Point buttonSize = addKeyButton.getSize();
+				addKeyMenu.setLocation(buttonLocation.x, buttonLocation.y
+						+ buttonSize.y);
+				addKeyMenu.setVisible(true);
+			}
+		});
 
 		// The when label.
 		final Label whenLabel = new Label(leftDataArea, SWT.NONE);
@@ -1006,7 +1023,12 @@ if (!event.getOldValue().equals(event.getNewValue())) {
 		gridData.widthHint = Math.max(widthHint, addBindingButton.computeSize(
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		addBindingButton.setLayoutData(gridData);
-		addBindingButton.addSelectionListener(widgetSelectedAdapter(event -> keyController.getBindingModel().copy()));
+		addBindingButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetSelected(final SelectionEvent event) {
+				keyController.getBindingModel().copy();
+			}
+		});
 
 		final Button removeBindingButton = new Button(treeControls, SWT.PUSH);
 		gridData = new GridData();
@@ -1016,7 +1038,12 @@ if (!event.getOldValue().equals(event.getNewValue())) {
 		gridData.widthHint = Math.max(widthHint, removeBindingButton
 				.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		removeBindingButton.setLayoutData(gridData);
-		removeBindingButton.addSelectionListener(widgetSelectedAdapter(event -> keyController.getBindingModel().remove()));
+		removeBindingButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetSelected(final SelectionEvent event) {
+				keyController.getBindingModel().remove();
+			}
+		});
 
 		final Button restore = new Button(treeControls, SWT.PUSH);
 		gridData = new GridData();
@@ -1025,15 +1052,19 @@ if (!event.getOldValue().equals(event.getNewValue())) {
 		gridData.widthHint = Math.max(widthHint, restore.computeSize(
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		restore.setLayoutData(gridData);
-		restore.addSelectionListener(widgetSelectedAdapter(event -> {
-			try {
-				fFilteredTree.setRedraw(false);
-				BindingModel bindingModel = keyController.getBindingModel();
-				bindingModel.restoreBinding(keyController.getContextModel());
-			} finally {
-				fFilteredTree.setRedraw(true);
+		restore.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetSelected(final SelectionEvent event) {
+				try {
+					fFilteredTree.setRedraw(false);
+					BindingModel bindingModel = keyController.getBindingModel();
+					bindingModel
+							.restoreBinding(keyController.getContextModel());
+				} finally {
+					fFilteredTree.setRedraw(true);
+				}
 			}
-		}));
+		});
 
 		createButtonBar(treeControls);
 		return treeControls;
