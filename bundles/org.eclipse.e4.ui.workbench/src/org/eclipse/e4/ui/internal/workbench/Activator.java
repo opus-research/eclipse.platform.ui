@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,30 +11,14 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_CMDS;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_CMDS_FLAG;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_CONTEXTS;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_CONTEXTS_FLAG;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_CONTEXTS_VERBOSE;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_CONTEXTS_VERBOSE_FLAG;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_FLAG;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_MENUS;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_MENUS_FLAG;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_RENDERER;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_RENDERER_FLAG;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_WORKBENCH;
-import static org.eclipse.e4.ui.internal.workbench.Policy.DEBUG_WORKBENCH_FLAG;
-
-import java.util.Hashtable;
 import java.util.List;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.debug.DebugOptions;
-import org.eclipse.osgi.service.debug.DebugOptionsListener;
 import org.eclipse.osgi.service.debug.DebugTrace;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.ServiceTracker;
@@ -42,7 +26,7 @@ import org.osgi.util.tracker.ServiceTracker;
 /**
  * BundleActivator to access the required OSGi services.
  */
-public class Activator implements BundleActivator, DebugOptionsListener {
+public class Activator implements BundleActivator {
 	/**
 	 * The bundle symbolic name.
 	 */
@@ -100,9 +84,6 @@ public class Activator implements BundleActivator, DebugOptionsListener {
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
-		Hashtable<String, String> props = new Hashtable<>(2);
-		props.put(DebugOptions.LISTENER_SYMBOLICNAME, PI_WORKBENCH);
-		context.registerService(DebugOptionsListener.class, this, props);
 
 		// track required bundles
 		resolvedBundles = new BundleTracker<>(context, Bundle.RESOLVED
@@ -132,23 +113,33 @@ public class Activator implements BundleActivator, DebugOptionsListener {
 		}
 	}
 
-	@Override
-	public void optionsChanged(DebugOptions options) {
-		trace = options.newDebugTrace(PI_WORKBENCH);
-		DEBUG = options.getBooleanOption(PI_WORKBENCH + DEBUG_FLAG, false);
-		DEBUG_CMDS = options.getBooleanOption(PI_WORKBENCH + DEBUG_CMDS_FLAG, false);
-		DEBUG_CONTEXTS = options.getBooleanOption(PI_WORKBENCH + DEBUG_CONTEXTS_FLAG, false);
-		DEBUG_CONTEXTS_VERBOSE = options.getBooleanOption(PI_WORKBENCH + DEBUG_CONTEXTS_VERBOSE_FLAG, false);
-		DEBUG_MENUS = options.getBooleanOption(PI_WORKBENCH + DEBUG_MENUS_FLAG, false);
-		DEBUG_RENDERER = options.getBooleanOption(PI_WORKBENCH + DEBUG_RENDERER_FLAG, false);
-		DEBUG_WORKBENCH = options.getBooleanOption(PI_WORKBENCH + DEBUG_WORKBENCH_FLAG, false);
+	public DebugOptions getDebugOptions() {
+		if (debugTracker == null) {
+			if (context == null)
+				return null;
+			debugTracker = new ServiceTracker<>(context,
+					DebugOptions.class.getName(), null);
+			debugTracker.open();
+		}
+		return debugTracker.getService();
 	}
 
 	public DebugTrace getTrace() {
+		if (trace == null) {
+			trace = getDebugOptions().newDebugTrace(PI_WORKBENCH);
+		}
 		return trace;
 	}
 
 	public static void trace(String option, String msg, Throwable error) {
+		final DebugOptions debugOptions = activator.getDebugOptions();
+		if (debugOptions.isDebugEnabled()
+				&& debugOptions.getBooleanOption(PI_WORKBENCH + option, false)) {
+			System.out.println(msg);
+			if (error != null) {
+				error.printStackTrace(System.out);
+			}
+		}
 		activator.getTrace().trace(option, msg, error);
 	}
 
@@ -165,42 +156,55 @@ public class Activator implements BundleActivator, DebugOptionsListener {
 			}
 		}
 		if (logService == null) {
-			throw new IllegalStateException("No LogService is available."); //$NON-NLS-1$
+			logService = new LogService() {
+				@Override
+				public void log(int level, String message) {
+					log(null, level, message, null);
+				}
+
+				@Override
+				public void log(int level, String message, Throwable exception) {
+					log(null, level, message, exception);
+				}
+
+				@Override
+				public void log(ServiceReference sr, int level, String message) {
+					log(sr, level, message, null);
+				}
+
+				@Override
+				public void log(ServiceReference sr, int level, String message, Throwable exception) {
+					if (level == LogService.LOG_ERROR) {
+						System.err.print("ERROR: "); //$NON-NLS-1$
+					} else if (level == LogService.LOG_WARNING) {
+						System.err.print("WARNING: "); //$NON-NLS-1$
+					} else if (level == LogService.LOG_INFO) {
+						System.err.print("INFO: "); //$NON-NLS-1$
+					} else if (level == LogService.LOG_DEBUG) {
+						System.err.print("DEBUG: "); //$NON-NLS-1$
+					} else {
+						System.err.print("log level " + level + ": "); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					System.err.println(message);
+					if (exception != null) {
+						exception.printStackTrace(System.err);
+					}
+				}
+			};
 		}
 		return logService;
 	}
 
-	/**
-	 * @param level
-	 *            one from {@code LogService} constants
-	 * @param message
-	 * @see LogService#LOG_ERROR
-	 * @see LogService#LOG_WARNING
-	 * @see LogService#LOG_INFO
-	 * @see LogService#LOG_DEBUG
-	 */
 	public static void log(int level, String message) {
 		LogService logService = activator.getLogService();
-		if (logService != null) {
+		if (logService != null)
 			logService.log(level, message);
-		}
 	}
 
-	/**
-	 * @param level
-	 *            one from {@code LogService} constants
-	 * @param message
-	 * @param exception
-	 * @see LogService#LOG_ERROR
-	 * @see LogService#LOG_WARNING
-	 * @see LogService#LOG_INFO
-	 * @see LogService#LOG_DEBUG
-	 */
 	public static void log(int level, String message, Throwable exception) {
 		LogService logService = activator.getLogService();
-		if (logService != null) {
+		if (logService != null)
 			logService.log(level, message, exception);
-		}
 	}
 
 }

@@ -412,7 +412,7 @@ import java.util.NoSuchElementException;
 			return "{}"; //$NON-NLS-1$
 		}
 
-        StringBuilder buffer = new StringBuilder();
+        StringBuffer buffer = new StringBuffer();
         buffer.append('{');
         for (int i = elementData.length; --i >= 0;) {
             HashMapEntry entry = elementData[i];

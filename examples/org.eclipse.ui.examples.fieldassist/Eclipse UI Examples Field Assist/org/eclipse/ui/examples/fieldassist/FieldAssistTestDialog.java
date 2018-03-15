@@ -230,7 +230,7 @@ public class FieldAssistTestDialog extends StatusDialog {
 
 		void quickFix() {
 			String contents = getContents();
-			StringBuilder lettersOnly = new StringBuilder();
+			StringBuffer lettersOnly = new StringBuffer();
 			int length = contents.length();
 			for (int i = 0; i < length;) {
 				char ch = contents.charAt(i++);

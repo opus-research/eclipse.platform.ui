@@ -13,8 +13,6 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetDefaultSelectedAdapter;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -42,6 +40,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -439,12 +439,12 @@ public class FilteredTree extends Composite {
 	 * @return the first matching TreeItem
 	 */
 	private TreeItem getFirstMatchingItem(TreeItem[] items) {
-		for (TreeItem item : items) {
-			if (patternFilter.isLeafMatch(treeViewer, item.getData())
-					&& patternFilter.isElementSelectable(item.getData())) {
-				return item;
+		for (int i = 0; i < items.length; i++) {
+			if (patternFilter.isLeafMatch(treeViewer, items[i].getData())
+					&& patternFilter.isElementSelectable(items[i].getData())) {
+				return items[i];
 			}
-			TreeItem treeItem = getFirstMatchingItem(item.getItems());
+			TreeItem treeItem = getFirstMatchingItem(items[i].getItems());
 			if (treeItem != null) {
 				return treeItem;
 			}
@@ -501,7 +501,8 @@ public class FilteredTree extends Composite {
 					if (!narrowingDown) {
 						// collapse all
 						TreeItem[] is = treeViewer.getTree().getItems();
-						for (TreeItem item : is) {
+						for (int i = 0; i < is.length; i++) {
+							TreeItem item = is[i];
 							if (item.getExpanded()) {
 								treeViewer.setExpandedState(item.getData(),
 										false);
@@ -645,8 +646,8 @@ public class FilteredTree extends Composite {
 					private int getFilteredItemsCount() {
 						int total = 0;
 						TreeItem[] items = getViewer().getTree().getItems();
-						for (TreeItem item : items) {
-							total += itemCount(item);
+						for (int i = 0; i < items.length; i++) {
+							total += itemCount(items[i]);
 
 						}
 						return total;
@@ -660,8 +661,8 @@ public class FilteredTree extends Composite {
 					private int itemCount(TreeItem treeItem) {
 						int count = 1;
 						TreeItem[] children = treeItem.getItems();
-						for (TreeItem element : children) {
-							count += itemCount(element);
+						for (int i = 0; i < children.length; i++) {
+							count += itemCount(children[i]);
 
 						}
 						return count;
@@ -743,10 +744,13 @@ public class FilteredTree extends Composite {
 		// default selection changes (which tell us the cancel button has been
 		// pressed)
 		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0) {
-			filterText.addSelectionListener(widgetDefaultSelectedAdapter(e -> {
-				if (e.detail == SWT.ICON_CANCEL)
-					clearText();
-			}));
+			filterText.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					if (e.detail == SWT.ICON_CANCEL)
+						clearText();
+				}
+			});
 		}
 
 		GridData gridData= new GridData(SWT.FILL, SWT.CENTER, true, false);

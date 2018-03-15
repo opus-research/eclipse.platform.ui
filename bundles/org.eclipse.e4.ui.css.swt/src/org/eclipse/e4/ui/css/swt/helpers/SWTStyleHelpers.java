@@ -44,10 +44,7 @@ public class SWTStyleHelpers {
 	 * @return
 	 */
 	public static String getSWTWidgetStyleAsString(int style, String separator) {
-		if (style == 0) {
-			return "";
-		}
-		StringBuilder swtStyles = new StringBuilder();
+		StringBuffer swtStyles = new StringBuffer();
 		// Use catch error if SWT version doesn't provide
 		// the SWT constant
 		try {
@@ -766,11 +763,11 @@ public class SWTStyleHelpers {
 			}
 		} catch (Exception e) {
 		}
-		return swtStyles.length() == 0 ? "" : swtStyles.toString();
+		return swtStyles.toString();
 	}
 
 	/**
-	 * Add SWT String <code>style</code> to the {@link StringBuilder}
+	 * Add SWT String <code>style</code> to the {@link StringBuffer}
 	 * <cod>swtStyles</code> and separate it with <code>separator</code>
 	 * String.
 	 *
@@ -778,7 +775,7 @@ public class SWTStyleHelpers {
 	 * @param style
 	 * @param separator
 	 */
-	private static void addSWTStyle(StringBuilder swtStyles, String style,
+	private static void addSWTStyle(StringBuffer swtStyles, String style,
 			String separator) {
 		if (swtStyles.length() > 0) {
 			swtStyles.append(separator);

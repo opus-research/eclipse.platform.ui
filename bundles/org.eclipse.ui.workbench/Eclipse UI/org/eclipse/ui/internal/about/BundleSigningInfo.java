@@ -177,7 +177,7 @@ public class BundleSigningInfo {
 							if (certs.length == 0)
 								signerText = WorkbenchMessages.BundleSigningTray_Unknown;
 							else {
-								StringBuilder buffer = new StringBuilder();
+								StringBuffer buffer = new StringBuffer();
 								for (Iterator i = certs[0].entrySet().iterator(); i
 										.hasNext();) {
 									Map.Entry entry = (Entry) i.next();

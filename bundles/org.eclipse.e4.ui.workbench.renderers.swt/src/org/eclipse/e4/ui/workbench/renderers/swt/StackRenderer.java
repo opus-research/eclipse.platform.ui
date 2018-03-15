@@ -911,9 +911,9 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			return null;
 
 		CTabItem[] items = tabFolder.getItems();
-		for (CTabItem item : items) {
-			if (item.getData(OWNING_ME) == element)
-				return item;
+		for (int i = 0; i < items.length; i++) {
+			if (items[i].getData(OWNING_ME) == element)
+				return items[i];
 		}
 		return null;
 	}
@@ -1076,10 +1076,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 			@Override
 			public void mouseUp(MouseEvent e) {
-				if (tabFolder.isDisposed()) {
-					// 517654: MouseUp may be sent after stack has been disposed
-					return;
-				}
 				CTabItem item = tabFolder.getItem(new Point(e.x, e.y));
 
 				// If the user middle clicks on a tab, close it
@@ -1088,7 +1084,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				}
 
 				// If the user clicks on the tab or empty stack space, call
-				// setFocus() to transfer it from the tabfolder to the client widget
+				// setFocus()
 				if (e.button == 1) {
 					if (item == null) {
 						Rectangle clientArea = tabFolder.getClientArea();
@@ -1098,10 +1094,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 						}
 					}
 
-					// but only transfer focus if we have it.
-					// If we don't own it, the widget has already the focus
-					// so don't set it second time
-					if (item != null && tabFolder.isFocusControl()) {
+					if (item != null) {
 						MUIElement ele = (MUIElement) item.getData(OWNING_ME);
 						if (ele.getParent().getSelectedElement() == ele) {
 							Control ctrl = (Control) ele.getWidget();

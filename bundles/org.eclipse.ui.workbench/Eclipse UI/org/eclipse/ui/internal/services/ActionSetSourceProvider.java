@@ -55,7 +55,7 @@ public final class ActionSetSourceProvider extends AbstractSourceProvider
 		final IActionSetDescriptor[] newActionSets = event.getNewActionSets();
 		if (!Util.equals(newActionSets, activeActionSets)) {
 			if (DEBUG) {
-				final StringBuilder message = new StringBuilder();
+				final StringBuffer message = new StringBuffer();
 				message.append("Action sets changed to ["); //$NON-NLS-1$
 				if (newActionSets != null) {
 					for (int i = 0; i < newActionSets.length; i++) {
