@@ -252,7 +252,7 @@ public class UndoHistoryView extends ViewPart implements
 	private IUndoContext selectContext() {
 		// This would be better implemented as a view filter, but for now, we
 		// will use a dialog that collects the available undo contexts.
-		List<IUndoContext> input = new ArrayList<>();
+		List<IUndoContext> input = new ArrayList<IUndoContext>();
 		IUndoableOperation[] operations = history
 				.getUndoHistory(IOperationHistory.GLOBAL_UNDO_CONTEXT);
 		for (IUndoableOperation operation : operations) {
@@ -278,7 +278,7 @@ public class UndoHistoryView extends ViewPart implements
 		dialog.setTitle(UndoExampleMessages.UndoHistoryView_ContextFilterDialog);
 		dialog.setMessage(UndoExampleMessages.UndoHistoryView_ChooseContextMessage);
 		dialog.setElements(input.toArray());
-		dialog.setInitialSelections(fContext);
+		dialog.setInitialSelections(new Object[] { fContext });
 		if (dialog.open() == Window.OK) {
 			Object[] contexts = dialog.getResult();
 			if (contexts[0] instanceof IUndoContext) {
@@ -401,7 +401,7 @@ public class UndoHistoryView extends ViewPart implements
 			@Override
 			public void run() {
 				IUndoableOperation operation = (IUndoableOperation) viewer.getStructuredSelection().getFirstElement();
-				StringBuilder buf = new StringBuilder(operation.getLabel());
+				StringBuffer buf = new StringBuffer(operation.getLabel());
 				buf.append("\n");
 				buf.append("Enabled=");	//$NON-NLS-1$
 				buf.append(Boolean.valueOf(operation.canUndo()).toString());

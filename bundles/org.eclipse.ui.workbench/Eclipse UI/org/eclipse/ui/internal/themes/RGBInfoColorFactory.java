@@ -10,12 +10,8 @@ import org.eclipse.ui.themes.IColorFactory;
 
 /**
  * Used in org.eclipse.ui.themes extension point of the org.eclipse.ui plug-in
- * for the color definition of elements that provide text information.
- *
- * This provides colors that are easily readable across different platforms.
- * <br>
- * Win32 & Cocoa: Yellow background & black text. (COLOR_INFO_*) <br>
- * GTK: White background and black text. (COLOR_LIST_*)
+ * for the color definition org.eclipse.ui.workbench.HOVER_BACKGROUND and
+ * org.eclipse.ui.workbench.HOVER_FOREGROUND
  */
 public class RGBInfoColorFactory implements IColorFactory, IExecutableExtension {
 	String color;

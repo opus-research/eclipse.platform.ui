@@ -41,7 +41,6 @@ import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
@@ -324,8 +323,6 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 					IDEWorkbenchMessages.IDEApplication_workspaceInUse_Cancel);
 			// the return value influences the next loop's iteration
 			returnValue = dialog.open();
-			// Remember the locked workspace as recent workspace
-			launchData.writePersistedData();
         }
     }
 
@@ -480,11 +477,9 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 		boolean keepOnWarning = prefStore.getBoolean(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY);
 		if (keepOnWarning) {
 			MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell, title, null, message, severity,
-					new String[] { IDEWorkbenchMessages.IDEApplication_version_continue,
-							IDialogConstants.CANCEL_LABEL },
-					0, IDEWorkbenchMessages.IDEApplication_version_doNotWarnAgain, false);
-			int returnCode = dialog.open();
-			if (returnCode == Window.CANCEL || returnCode == SWT.DEFAULT) {
+					new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0,
+					IDEWorkbenchMessages.IDEApplication_version_doNotWarnAgain, false);
+			if (dialog.open() != Window.OK) {
 				return false;
 			}
 			keepOnWarning = !dialog.getToggleState();

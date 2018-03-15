@@ -59,22 +59,22 @@ public class StringToNumberConverter extends NumberFormatConverter {
 
 	// This code looks deceptive, but we can't use Double.MIN_VALUE because it
 	// is actually the smallest *positive* number.
-	private static final Double MIN_DOUBLE = Double.valueOf(-Double.MAX_VALUE);
-	private static final Double MAX_DOUBLE = Double.valueOf(Double.MAX_VALUE);
+	private static final Double MIN_DOUBLE = new Double(-Double.MAX_VALUE);
+	private static final Double MAX_DOUBLE = new Double(Double.MAX_VALUE);
 
-	private static final Long MIN_LONG = Long.valueOf(Long.MIN_VALUE);
-	private static final Long MAX_LONG = Long.valueOf(Long.MAX_VALUE);
+	private static final Long MIN_LONG = new Long(Long.MIN_VALUE);
+	private static final Long MAX_LONG = new Long(Long.MAX_VALUE);
 
 	// This code looks deceptive, but we can't use Float.MIN_VALUE because it is
 	// actually the smallest *positive* number.
-	private static final Float MIN_FLOAT = Float.valueOf(-Float.MAX_VALUE);
-	private static final Float MAX_FLOAT = Float.valueOf(Float.MAX_VALUE);
+	private static final Float MIN_FLOAT = new Float(-Float.MAX_VALUE);
+	private static final Float MAX_FLOAT = new Float(Float.MAX_VALUE);
 
-	private static final Short MIN_SHORT = Short.valueOf(Short.MIN_VALUE);
-	private static final Short MAX_SHORT = Short.valueOf(Short.MAX_VALUE);
+	private static final Short MIN_SHORT = new Short(Short.MIN_VALUE);
+	private static final Short MAX_SHORT = new Short(Short.MAX_VALUE);
 
-	private static final Byte MIN_BYTE = Byte.valueOf(Byte.MIN_VALUE);
-	private static final Byte MAX_BYTE = Byte.valueOf(Byte.MAX_VALUE);
+	private static final Byte MIN_BYTE = new Byte(Byte.MIN_VALUE);
+	private static final Byte MAX_BYTE = new Byte(Byte.MAX_VALUE);
 
 	static Class<?> icuBigDecimal = null;
 	static Method icuBigDecimalScale = null;
@@ -167,15 +167,15 @@ public class StringToNumberConverter extends NumberFormatConverter {
 			}
 		} else if (Double.class.equals(boxedType)) {
 			if (StringToNumberParser.inDoubleRange(result.getNumber())) {
-				return Double.valueOf(result.getNumber().doubleValue());
+				return new Double(result.getNumber().doubleValue());
 			}
 		} else if (Long.class.equals(boxedType)) {
 			if (StringToNumberParser.inLongRange(result.getNumber())) {
-				return Long.valueOf(result.getNumber().longValue());
+				return new Long(result.getNumber().longValue());
 			}
 		} else if (Float.class.equals(boxedType)) {
 			if (StringToNumberParser.inFloatRange(result.getNumber())) {
-				return Float.valueOf(result.getNumber().floatValue());
+				return new Float(result.getNumber().floatValue());
 			}
 		} else if (BigInteger.class.equals(boxedType)) {
 			Number n = result.getNumber();
@@ -215,11 +215,11 @@ public class StringToNumberConverter extends NumberFormatConverter {
 			}
 		} else if (Short.class.equals(boxedType)) {
 			if (StringToNumberParser.inShortRange(result.getNumber())) {
-				return Short.valueOf(result.getNumber().shortValue());
+				return new Short(result.getNumber().shortValue());
 			}
 		} else if (Byte.class.equals(boxedType)) {
 			if (StringToNumberParser.inByteRange(result.getNumber())) {
-				return Byte.valueOf(result.getNumber().byteValue());
+				return new Byte(result.getNumber().byteValue());
 			}
 		}
 

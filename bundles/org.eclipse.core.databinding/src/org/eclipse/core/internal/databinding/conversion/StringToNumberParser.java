@@ -118,7 +118,7 @@ public class StringToNumberParser {
 			return BindingMessages.formatString(
 					BindingMessages.VALIDATE_NUMBER_PARSE_ERROR, new Object[] {
 							value, Integer.valueOf(errorIndex + 1),
-							Character.valueOf(value.charAt(errorIndex)) });
+							new Character(value.charAt(errorIndex)) });
 		}
 		return BindingMessages.formatString(
 				BindingMessages.VALIDATE_NUMBER_PARSE_ERROR_NO_CHARACTER,

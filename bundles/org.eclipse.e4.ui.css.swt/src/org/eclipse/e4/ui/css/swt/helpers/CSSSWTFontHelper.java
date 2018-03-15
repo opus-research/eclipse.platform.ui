@@ -194,7 +194,7 @@ public class CSSSWTFontHelper {
 				newFontData.setHeight(fontDataByDefinition[0].getHeight());
 				fontHeightSet = true;
 			}
-		} else {
+		} else if (cssFontSize != null) {
 			newFontData.setHeight((int) (cssFontSize).getFloatValue(CSSPrimitiveValue.CSS_PT));
 			fontHeightSet = true;
 		}
@@ -417,7 +417,7 @@ public class CSSSWTFontHelper {
 
 	public static String getFontComposite(FontData fontData) {
 		if (fontData != null) {
-			StringBuilder composite = new StringBuilder();
+			StringBuffer composite = new StringBuffer();
 			// font-family
 			composite.append(getFontFamily(fontData));
 			composite.append(" ");

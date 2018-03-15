@@ -67,7 +67,14 @@ public class DialogCheck {
 	 */
 	@Deprecated
 	public static void assertDialog(Dialog dialog, Assert assertion) {
-		assertDialog(dialog);
+		assertNotNull(dialog);
+		if (_verifyDialog.getShell() == null) {
+			// force the creation of the verify dialog
+			getShell();
+		}
+		if (_verifyDialog.open(dialog) == IDialogConstants.NO_ID) {
+			assertTrue(_verifyDialog.getFailureText(), false);
+		}
 	}
 
 	/**
@@ -112,7 +119,14 @@ public class DialogCheck {
 	 */
 	@Deprecated
     public static void assertDialogTexts(Dialog dialog, Assert assertion) {
-		assertDialogTexts(dialog);
+		assertNotNull(dialog);
+        dialog.setBlockOnOpen(false);
+        dialog.open();
+        Shell shell = dialog.getShell();
+		verifyCompositeText(shell);
+		dialog.close();
+		// close "verify results" dialog, it makes other tests unhappy
+		_verifyDialog.buttonPressed(IDialogConstants.YES_ID);
     }
 
 	/**
@@ -202,7 +216,7 @@ public class DialogCheck {
             }
         }
 
-        String message = new StringBuilder("Warning: ").append(widget).append(
+        String message = new StringBuffer("Warning: ").append(widget).append(
                 "\n\tActual Width -> ").append(size.x).append(
                 "\n\tRecommended Width -> ").append(preferred.x).toString();
         if (preferred.x > size.x) {
@@ -234,7 +248,7 @@ public class DialogCheck {
                 preferred.x /= (size.y / preferred.y);
             }
         }
-        String message = new StringBuilder("Warning: ").append(widget).append(
+        String message = new StringBuffer("Warning: ").append(widget).append(
                 "\n\tActual Width -> ").append(size.x).append(
                 "\n\tRecommended Width -> ").append(preferred.x).toString();
         if (preferred.x > size.x) {

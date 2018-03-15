@@ -1664,11 +1664,11 @@ public class ContentProposalAdapter {
 				case SWT.Traverse:
 				case SWT.KeyDown:
 					if (DEBUG) {
-						StringBuilder sb;
+						StringBuffer sb;
 						if (e.type == SWT.Traverse) {
-							sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+							sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 						} else {
-							sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+							sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 						}
 						sb.append(" received by adapter"); //$NON-NLS-1$
 						dump(sb.toString(), e);
@@ -1678,11 +1678,11 @@ public class ContentProposalAdapter {
 					if (popup != null) {
 						popup.getTargetControlListener().handleEvent(e);
 						if (DEBUG) {
-							StringBuilder sb;
+							StringBuffer sb;
 							if (e.type == SWT.Traverse) {
-								sb = new StringBuilder("Traverse"); //$NON-NLS-1$
+								sb = new StringBuffer("Traverse"); //$NON-NLS-1$
 							} else {
-								sb = new StringBuilder("KeyDown"); //$NON-NLS-1$
+								sb = new StringBuffer("KeyDown"); //$NON-NLS-1$
 							}
 							sb.append(" after being handled by popup"); //$NON-NLS-1$
 							dump(sb.toString(), e);
@@ -1698,18 +1698,6 @@ public class ContentProposalAdapter {
 
 					// We were only listening to traverse events for the popup
 					if (e.type == SWT.Traverse) {
-						// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=520372
-						// The popup is null so record tab as a means to interrupt
-						// any autoactivation that is pending due to autoactivation
-						// delay.
-						if (popup == null) {
-							switch (e.detail) {
-							case SWT.TRAVERSE_TAB_NEXT:
-							case SWT.TRAVERSE_TAB_PREVIOUS:
-								receivedKeyDown = true;
-								break;
-							}
-						}
 						return;
 					}
 
@@ -1759,20 +1747,6 @@ public class ContentProposalAdapter {
 							// in the modify event.
 							if (triggerKeyStroke == null) {
 								watchModify = true;
-							}
-
-							// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=520372
-							// mimic close cases of popup in TargetControlListener
-							if (popup == null) {
-								switch (e.character) {
-								case SWT.CR:
-								case SWT.LF:
-								case SWT.ESC:
-									// Interrupt any autoactivation that is pending due to
-									// autoactivation delay.
-									receivedKeyDown = true;
-									break;
-								}
 							}
 						}
 					} else {
@@ -1836,7 +1810,7 @@ public class ContentProposalAdapter {
 			 *            the event
 			 */
 			private void dump(String who, Event e) {
-				StringBuilder sb = new StringBuilder(
+				StringBuffer sb = new StringBuffer(
 						"--- [ContentProposalAdapter]\n"); //$NON-NLS-1$
 				sb.append(who);
 				sb.append(" - e: keyCode=" + e.keyCode + hex(e.keyCode)); //$NON-NLS-1$
