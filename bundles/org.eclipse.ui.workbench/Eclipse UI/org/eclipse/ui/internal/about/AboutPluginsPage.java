@@ -274,7 +274,8 @@ public class AboutPluginsPage extends ProductInfoPage {
 	protected void handleSigningInfoPressed() {
 		if (signingArea == null) {
 			signingArea = new BundleSigningInfo();
-			AboutBundleData bundleInfo = (AboutBundleData) vendorInfo.getStructuredSelection().getFirstElement();
+			AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
+					.getSelection()).getFirstElement();
 			signingArea.setData(bundleInfo);
 
 			signingArea.createContents(sashForm);
@@ -491,7 +492,8 @@ public class AboutPluginsPage extends ProductInfoPage {
 	private void checkEnablement() {
 		// enable if there is an item selected and that
 		// item has additional info
-		IStructuredSelection selection = vendorInfo.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) vendorInfo
+				.getSelection();
 		if (selection.getFirstElement() instanceof AboutBundleData) {
 			AboutBundleData selected = (AboutBundleData) selection
 					.getFirstElement();
@@ -559,7 +561,8 @@ public class AboutPluginsPage extends ProductInfoPage {
 		if (vendorInfo.getSelection().isEmpty())
 			return;
 
-		AboutBundleData bundleInfo = (AboutBundleData) vendorInfo.getStructuredSelection().getFirstElement();
+		AboutBundleData bundleInfo = (AboutBundleData) ((IStructuredSelection) vendorInfo
+				.getSelection()).getFirstElement();
 
 		if (!AboutUtils.openBrowser(getShell(),
 				getMoreInfoURL(bundleInfo, true))) {

@@ -130,7 +130,8 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
 
     @Override
 	protected void okPressed() {
-		IStructuredSelection selection = listViewer.getStructuredSelection();
+        IStructuredSelection selection = (IStructuredSelection) listViewer
+                .getSelection();
         setResult(selection.toList());
         super.okPressed();
     }
