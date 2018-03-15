@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 487570
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -132,10 +133,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     private IWorkbenchAction prevPerspectiveAction;
 
     private IWorkbenchAction activateEditorAction;
-
-    private IWorkbenchAction maximizePartAction;
-
-    private IWorkbenchAction minimizePartAction;
 
     private IWorkbenchAction switchToEditorAction;
 
@@ -658,24 +655,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         openPreferencesItem.setVisible(!Util.isMac());
         menu.add(openPreferencesItem);
 
-		// Workaround for bug 461311. Radio buttons in the main menu can cause
-		// Eclipse to crash on window managers like unity that use menu proxies.
-		String menuProxy = System.getenv("UBUNTU_MENUPROXY"); //$NON-NLS-1$
-		String desktopSession = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
-		String os = Platform.getOS();
-		String ws = Platform.getWS();
-		// Setting this property to false disables the workaround. Omitting the
-		// property or setting it to any other value
-		// enables the workaround
-		boolean workaroundEnabled = !"false".equals(System.getProperty("eclipse.workaround.bug461311")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		boolean radioButtonsMightCauseCrash = ((menuProxy == null) || !menuProxy.equals("0")) //$NON-NLS-1$
-				&& Platform.WS_GTK.equals(ws) && Platform.OS_LINUX.equals(os)
-				&& (desktopSession == null || desktopSession.equals("ubuntu")) //$NON-NLS-1$
-				&& workaroundEnabled;
-		if (!radioButtonsMightCauseCrash) {
-			menu.add(ContributionItemFactory.OPEN_WINDOWS.create(getWindow()));
-		}
+        menu.add(ContributionItemFactory.OPEN_WINDOWS.create(getWindow()));
         return menu;
     }
 
@@ -745,9 +725,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         subMenu.add(showPartPaneMenuAction);
         subMenu.add(showViewMenuAction);
         subMenu.add(quickAccessAction);
-        subMenu.add(new Separator());
-        subMenu.add(maximizePartAction);
-        subMenu.add(minimizePartAction);
         subMenu.add(new Separator());
         subMenu.add(activateEditorAction);
         subMenu.add(nextEditorAction);
@@ -891,8 +868,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         nextPerspectiveAction = null;
         prevPerspectiveAction = null;
         activateEditorAction = null;
-        maximizePartAction = null;
-        minimizePartAction = null;
         switchToEditorAction = null;
         quickAccessAction.dispose();
         quickAccessAction = null;
@@ -1098,12 +1073,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         activateEditorAction = ActionFactory.ACTIVATE_EDITOR
                 .create(window);
         register(activateEditorAction);
-
-        maximizePartAction = ActionFactory.MAXIMIZE.create(window);
-        register(maximizePartAction);
-
-		minimizePartAction = ActionFactory.MINIMIZE.create(window);
-		register(minimizePartAction);
 
         switchToEditorAction = ActionFactory.SHOW_OPEN_EDITORS
                 .create(window);

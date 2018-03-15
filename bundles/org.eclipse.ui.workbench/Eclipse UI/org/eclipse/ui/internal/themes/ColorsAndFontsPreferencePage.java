@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -683,7 +683,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	/**
 	 * Map of definition id->FontData[] capturing the temporary changes caused
 	 * by a 'defaultsTo' font change.
-	 * 
+	 *
 	 * @deprecated in this page, we should only care about preferences,
 	 *             preference to fontValues synchronization in registry is
 	 *             handled in the ThemeAPI and listeners
@@ -2122,7 +2122,9 @@ getPreferenceStore(),
 		String fontColorString = RESOURCE_BUNDLE.getString("fontColorString"); //$NON-NLS-1$
 		RGB rgb = currentColor.getRGB();
 		String messageBottom = MessageFormat
-				.format(fontColorString, new Object[] { new Integer(rgb.red), new Integer(rgb.green), new Integer(rgb.blue) });
+				.format(fontColorString,
+						new Object[] { Integer.valueOf(rgb.red), Integer.valueOf(rgb.green),
+								Integer.valueOf(rgb.blue) });
 
 		// calculate position of the vertical line
 		int separator = (clientArea.width - 2) / 3;
@@ -2216,9 +2218,12 @@ getPreferenceStore(),
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
 		if (definition instanceof ColorDefinition) {
-			RGB value = ((ColorDefinition) definition).getValue();
-			return value != null && value != EMPTY_COLOR_VALUE
-					&& colorRegistry.get(definition.getId()) != null;
+			ColorDefinition colorDef = (ColorDefinition) definition;
+			RGB value = colorDef.getValue();
+			if ((value == null || value == EMPTY_COLOR_VALUE) && colorDef.getDefaultsTo() == null) {
+				return false;
+			}
+			return colorRegistry.get(definition.getId()) != null;
 		}
 		return true;
 	}
