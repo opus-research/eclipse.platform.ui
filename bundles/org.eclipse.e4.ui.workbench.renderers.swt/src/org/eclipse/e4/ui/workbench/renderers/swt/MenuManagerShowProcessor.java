@@ -228,8 +228,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 					MMenu menuElement = (MMenu) mMenuElement;
 					ici = renderer.getManager(menuElement);
 					renderer.clearModelToManager(menuElement, (MenuManager) ici);
-				} else {
-					renderer.clearModelToContribution(menuModel, ici);
 				}
 				renderer.clearModelToContribution(mMenuElement, ici);
 			}
