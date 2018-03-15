@@ -141,7 +141,7 @@ public final class Category extends NamedHandleObject {
 	@Override
 	public String toString() {
 		if (string == null) {
-			final StringBuilder stringBuffer = new StringBuilder();
+			final StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append("Category("); //$NON-NLS-1$
             stringBuffer.append(id);
             stringBuffer.append(',');
