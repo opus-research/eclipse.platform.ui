@@ -102,7 +102,7 @@ public class ExtensionStateModel extends EventManager implements
 	@Override
 	public void setIntProperty(String aPropertyName, int aPropertyValue) {
 		Integer oldValue = (Integer) values.get(aPropertyName);
-		Integer newValue = Integer.valueOf(aPropertyValue);
+		Integer newValue = new Integer(aPropertyValue);
 		if (hasPropertyChanged(oldValue, newValue)) {
 			values.put(aPropertyName, newValue);
 			firePropertyChangeEvent(new PropertyChangeEvent(this,

@@ -64,10 +64,11 @@ public class SavePerspectiveHandler extends AbstractHandler {
 	 * Save a singleton over itself.
 	 */
 	private void saveSingleton(IWorkbenchPage page) {
+		String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
 		MessageDialog d = new MessageDialog(page.getWorkbenchWindow().getShell(),
 				WorkbenchMessages.SavePerspective_overwriteTitle, null,
-				WorkbenchMessages.SavePerspective_singletonQuestion, MessageDialog.QUESTION, 0,
-				IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL);
+				WorkbenchMessages.SavePerspective_singletonQuestion, MessageDialog.QUESTION,
+				buttons, 0);
 		if (d.open() == 0) {
 			page.savePerspective();
 		}

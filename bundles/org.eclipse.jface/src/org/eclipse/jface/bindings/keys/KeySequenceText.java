@@ -633,7 +633,7 @@ public final class KeySequenceText {
 		 * Keep track of the text range under which the stroke appears (i.e.,
 		 * startTextIndex->string.length() is the first selected stroke).
 		 */
-		String string = ""; //$NON-NLS-1$
+		String string = new String();
 		List currentStrokes = new ArrayList();
 		int startTextIndex = 0; // keeps track of the start of the stroke
 		final int keyStrokesLength = keyStrokes.length;
