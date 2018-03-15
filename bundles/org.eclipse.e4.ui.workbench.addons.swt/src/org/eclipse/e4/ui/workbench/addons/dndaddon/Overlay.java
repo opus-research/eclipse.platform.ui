@@ -99,11 +99,10 @@ class Overlay {
 	public void removeAdornment(Adornment a) {
 		adornments.remove(a);
 
-		if (adornments.size() == 0) {
+		if (adornments.size() == 0)
 			overlayShell.setVisible(false);
-		} else {
+		else
 			overlayShell.redraw();
-		}
 	}
 
 	public void clear() {
@@ -144,15 +143,13 @@ class Overlay {
 			adornment.updateRegion(region);
 		}
 		overlayShell.setRegion(region);
-		if (!overlayShell.getVisible()) {
+		if (!overlayShell.getVisible())
 			overlayShell.setVisible(true);
-		}
 	}
 
 	public void dispose() {
 		adornments.clear();
-		if (!overlayShell.isDisposed()) {
+		if (!overlayShell.isDisposed())
 			overlayShell.dispose();
-		}
 	}
 }

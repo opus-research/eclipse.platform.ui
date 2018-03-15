@@ -50,6 +50,8 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.commands.contexts.ContextManager;
+import org.eclipse.core.commands.contexts.ContextManagerEvent;
+import org.eclipse.core.commands.contexts.IContextManagerListener;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -62,6 +64,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPlatformRunnable;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -112,9 +115,12 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.ExternalActionManager;
 import org.eclipse.jface.action.ExternalActionManager.CommandCallback;
+import org.eclipse.jface.action.ExternalActionManager.IActiveChecker;
+import org.eclipse.jface.action.ExternalActionManager.IExecuteApplicable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.bindings.BindingManager;
+import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -128,6 +134,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.IShellProvider;
@@ -142,6 +149,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IDecoratorManager;
@@ -234,6 +242,7 @@ import org.eclipse.ui.internal.themes.WorkbenchThemeManager;
 import org.eclipse.ui.internal.tweaklets.GrabFocus;
 import org.eclipse.ui.internal.tweaklets.Tweaklets;
 import org.eclipse.ui.internal.util.PrefUtil;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.menus.IMenuService;
@@ -259,6 +268,7 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
+import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
 /**
@@ -268,6 +278,11 @@ import org.osgi.util.tracker.ServiceTracker;
  * <p>
  * Note that any code that is run during the creation of a workbench instance
  * should not required access to the display.
+ * </p>
+ * <p>
+ * Note that this internal class changed significantly between 2.1 and 3.0.
+ * Applications that used to define subclasses of this internal class need to be
+ * rewritten to use the new workbench advisor API.
  * </p>
  */
 public final class Workbench extends EventManager implements IWorkbench,
@@ -308,18 +323,14 @@ public final class Workbench extends EventManager implements IWorkbench,
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
 			String bundleName;
-			boolean worked = false;
-			// Note: no calls to any non-trivial Eclipse code outside this class
-			// should be made inside the synchronized block below. Such calls
-			// can cause deadlocks on startup, see bug 502095.
-			// Progress monitor calls *are* non-trivial.
+
 			synchronized (this) {
 				if (eventType == BundleEvent.STARTING) {
 					starting.add(bundleName = event.getBundle().getSymbolicName());
 				} else if (eventType == BundleEvent.STARTED) {
 					progressCount++;
 					if (progressCount <= maximumProgressCount) {
-						worked = true;
+						progressMonitor.worked(1);
 					}
 					int index = starting.lastIndexOf(event.getBundle().getSymbolicName());
 					if (index >= 0) {
@@ -333,9 +344,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 					return; // uninteresting event
 				}
 			}
-			if (worked) {
-				progressMonitor.worked(1);
-			}
+
 			if (bundleName != null) {
 				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
 				progressMonitor.subTask(taskName);
@@ -451,7 +460,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	/**
 	 * Listener list for registered IWorkbenchListeners .
 	 */
-	private ListenerList<IWorkbenchListener> workbenchListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList workbenchListeners = new ListenerList(ListenerList.IDENTITY);
 
 	private ServiceRegistration workbenchService;
 
@@ -474,8 +483,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private String id;
 	private ServiceRegistration<?> e4WorkbenchService;
 
-	// flag used to identify if the application model needs to be saved
-	private boolean applicationModelChanged = false;
 
 	/**
 	 * Creates a new workbench.
@@ -536,13 +543,16 @@ public final class Workbench extends EventManager implements IWorkbench,
 		extensionEventHandler = new ExtensionEventHandler(this);
 		registry.addRegistryChangeListener(extensionEventHandler);
 		IServiceLocatorCreator slc = new ServiceLocatorCreator();
-		serviceLocator = (ServiceLocator) slc.createServiceLocator(null, null, () -> {
-			final Display display1 = getDisplay();
-			if (display1 != null && !display1.isDisposed()) {
-				MessageDialog.openInformation(null,
-						WorkbenchMessages.Workbench_NeedsClose_Title,
-						WorkbenchMessages.Workbench_NeedsClose_Message);
-				close(PlatformUI.RETURN_RESTART, true);
+		serviceLocator = (ServiceLocator) slc.createServiceLocator(null, null, new IDisposable() {
+			@Override
+			public void dispose() {
+				final Display display = getDisplay();
+				if (display != null && !display.isDisposed()) {
+					MessageDialog.openInformation(null,
+							WorkbenchMessages.Workbench_NeedsClose_Title,
+							WorkbenchMessages.Workbench_NeedsClose_Message);
+					close(PlatformUI.RETURN_RESTART, true);
+				}
 			}
 		}, appContext);
 		serviceLocator.registerService(IServiceLocatorCreator.class, slc);
@@ -591,108 +601,106 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	public static final int createAndRunWorkbench(final Display display, final WorkbenchAdvisor advisor) {
 		final int[] returnCode = new int[1];
-		Realm.runWithDefault(DisplayRealm.getRealm(display), () -> {
-			final String nlExtensions = Platform.getNLExtensions();
-			if (nlExtensions.length() > 0) {
-				ULocale.setDefault(Category.FORMAT,
-						new ULocale(ULocale.getDefault(Category.FORMAT).getBaseName()
-								+ nlExtensions));
-			}
-
-			System.setProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG,
-					"org.eclipse.ui.workbench/LegacyIDE.e4xmi"); //$NON-NLS-1$
-			Object obj = getApplication(Platform.getCommandLineArgs());
-
-			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-			if (!store.isDefault(IPreferenceConstants.LAYOUT_DIRECTION)) {
-				int orientation = store.getInt(IPreferenceConstants.LAYOUT_DIRECTION);
-				Window.setDefaultOrientation(orientation);
-			}
-
-			if (obj instanceof E4Application) {
-				E4Application e4app = (E4Application) obj;
-				E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(), display);
-
-				MApplication appModel = e4Workbench.getApplication();
-				IEclipseContext context = e4Workbench.getContext();
-
-				WorkbenchMigrationProcessor migrationProcessor = null;
-				try {
-					migrationProcessor = ContextInjectionFactory.make(WorkbenchMigrationProcessor.class, context);
-				} catch (@SuppressWarnings("restriction") InjectionException e1) {
-					WorkbenchPlugin.log(e1);
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+			@Override
+			public void run() {
+				final String nlExtensions = Platform.getNLExtensions();
+				if (nlExtensions.length() > 0) {
+					ULocale.setDefault(Category.FORMAT,
+							new ULocale(ULocale.getDefault(Category.FORMAT).getBaseName()
+									+ nlExtensions));
 				}
 
-				if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)
-						&& migrationProcessor.isLegacyWorkbenchDetected()) {
+				System.setProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG,
+						"org.eclipse.ui.workbench/LegacyIDE.e4xmi"); //$NON-NLS-1$
+				Object obj = getApplication(Platform.getCommandLineArgs());
+
+				IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+				if (!store.isDefault(IPreferenceConstants.LAYOUT_DIRECTION)) {
+					int orientation = store.getInt(IPreferenceConstants.LAYOUT_DIRECTION);
+					Window.setDefaultOrientation(orientation);
+				}
+
+				if (obj instanceof E4Application) {
+					E4Application e4app = (E4Application) obj;
+					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(), display);
+
+					MApplication appModel = e4Workbench.getApplication();
+					IEclipseContext context = e4Workbench.getContext();
+
+					WorkbenchMigrationProcessor migrationProcessor = null;
 					try {
-						WorkbenchPlugin
-								.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration started", null)); //$NON-NLS-1$
-						migrationProcessor.migrate();
-					} catch (Exception e2) {
-						WorkbenchPlugin.log("Workbench migration failed", e2); //$NON-NLS-1$
-						migrationProcessor.restoreDefaultModel();
+						migrationProcessor = ContextInjectionFactory.make(WorkbenchMigrationProcessor.class, context);
+					} catch (@SuppressWarnings("restriction") InjectionException e) {
+						WorkbenchPlugin.log(e);
 					}
-				}
 
-				// create the workbench instance
-				Workbench workbench = new Workbench(display, advisor, e4Workbench
-						.getApplication(), e4Workbench.getContext());
-
-				// prime the splash nice and early
-				if (createSplash)
-					workbench.createSplashWrapper();
-
-				AbstractSplashHandler handler = getSplash();
-
-				boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
-								IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
-
-				IProgressMonitor progressMonitor = null;
-				SynchronousBundleListener bundleListener = null;
-				if (handler != null && showProgress) {
-					progressMonitor = handler.getBundleProgressMonitor();
-					if (progressMonitor != null) {
-						double cutoff = 0.95;
-						int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
-								.getBundleCount() / 10);
-						progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
-						bundleListener = workbench.new StartupProgressBundleListener(
-								progressMonitor, (int) (expectedProgressCount * cutoff));
-						WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
+					if (migrationProcessor != null && isFirstE4WorkbenchRun(appModel)
+							&& migrationProcessor.isLegacyWorkbenchDetected()) {
+						try {
+							WorkbenchPlugin
+									.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration started", null)); //$NON-NLS-1$
+							migrationProcessor.migrate();
+						} catch (Exception e) {
+							WorkbenchPlugin.log("Workbench migration failed", e); //$NON-NLS-1$
+							migrationProcessor.restoreDefaultModel();
+						}
 					}
-				}
-				setSearchContribution(appModel, true);
-				// run the legacy workbench once
-				returnCode[0] = workbench.runUI();
-				if (migrationProcessor != null && migrationProcessor.isWorkbenchMigrated()) {
-					migrationProcessor.updatePartsAfterMigration(
-							WorkbenchPlugin.getDefault().getPerspectiveRegistry(),
-							WorkbenchPlugin.getDefault().getViewRegistry());
-					WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration finished", null)); //$NON-NLS-1$
-				}
 
-				if (returnCode[0] == PlatformUI.RETURN_OK) {
-					// run the e4 event loop and instantiate ... well, stuff
-					if (bundleListener != null) {
-						WorkbenchPlugin.getDefault().removeBundleListener(bundleListener);
+					// create the workbench instance
+					Workbench workbench = new Workbench(display, advisor, e4Workbench
+							.getApplication(), e4Workbench.getContext());
+
+					// prime the splash nice and early
+					if (createSplash)
+						workbench.createSplashWrapper();
+
+					AbstractSplashHandler handler = getSplash();
+
+					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
+									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
+
+					IProgressMonitor progressMonitor = null;
+					if (handler != null && showProgress) {
+						progressMonitor = handler.getBundleProgressMonitor();
+						if (progressMonitor != null) {
+							double cutoff = 0.95;
+							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
+									.getBundleCount() / 10);
+							progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
+							SynchronousBundleListener bundleListener = workbench.new StartupProgressBundleListener(
+									progressMonitor, (int) (expectedProgressCount * cutoff));
+							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
+						}
 					}
-					e4Workbench.createAndRunUI(e4Workbench.getApplication());
-					IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
-					wms.dispose();
-				}
-				if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
-					setSearchContribution(appModel, false);
-					e4app.saveModel();
-				}
+					setSearchContribution(appModel, true);
+					// run the legacy workbench once
+					returnCode[0] = workbench.runUI();
+					if (migrationProcessor != null && migrationProcessor.isWorkbenchMigrated()) {
+						migrationProcessor.updatePartsAfterMigration(
+								WorkbenchPlugin.getDefault().getPerspectiveRegistry(),
+								WorkbenchPlugin.getDefault().getViewRegistry());
+						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.INFO, "Workbench migration finished", null)); //$NON-NLS-1$
+					}
+					if (returnCode[0] == PlatformUI.RETURN_OK) {
+						// run the e4 event loop and instantiate ... well, stuff
+						e4Workbench.createAndRunUI(e4Workbench.getApplication());
+						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
+						wms.dispose();
+					}
+					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
+						setSearchContribution(appModel, false);
+						e4app.saveModel();
+					}
 
-				// if a restart was triggered via E4Workbench the return
-				// code needs to be set appropriately
-				if (e4Workbench.isRestart()) {
-					returnCode[0] = PlatformUI.RETURN_RESTART;
-				} else {
-					e4Workbench.close();
-					returnCode[0] = workbench.returnCode;
+					// if a restart was triggered via E4Workbench the return
+					// code needs to be set appropriately
+					if (e4Workbench.isRestart()) {
+						returnCode[0] = PlatformUI.RETURN_RESTART;
+					} else {
+						e4Workbench.close();
+						returnCode[0] = workbench.returnCode;
+					}
 				}
 			}
 		});
@@ -891,10 +899,24 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private Image loadImage(String splashLoc) {
 		Image background = null;
 		if (splashLoc != null) {
-			try (InputStream input = new BufferedInputStream(new FileInputStream(splashLoc)) ){
+			InputStream input = null;
+			try {
+				input = new BufferedInputStream(new FileInputStream(splashLoc));
 				background = new Image(display, input);
-			} catch (SWTException | IOException e) {
-				StatusManager.getManager().handle(StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
+			} catch (SWTException e) {
+				StatusManager.getManager().handle(
+						StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
+			} catch (IOException e) {
+				StatusManager.getManager().handle(
+						StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
+			} finally {
+				if (input != null) {
+					try {
+						input.close();
+					} catch (IOException e) {
+						// he's done for
+					}
+				}
 			}
 		}
 		return background;
@@ -956,7 +978,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	boolean firePreShutdown(final boolean forced) {
-		for (final IWorkbenchListener l : workbenchListeners) {
+		Object list[] = workbenchListeners.getListeners();
+		for (Object element : list) {
+			final IWorkbenchListener l = (IWorkbenchListener) element;
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -977,7 +1001,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * @since 3.2
 	 */
 	void firePostShutdown() {
-		for (final IWorkbenchListener l : workbenchListeners) {
+		Object list[] = workbenchListeners.getListeners();
+		for (Object element : list) {
+			final IWorkbenchListener l = (IWorkbenchListener) element;
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1421,7 +1447,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 	boolean close(int returnCode, final boolean force) {
 		this.returnCode = returnCode;
 		final boolean[] ret = new boolean[1];
-		BusyIndicator.showWhile(null, () -> ret[0] = busyClose(force));
+		BusyIndicator.showWhile(null, new Runnable() {
+			@Override
+			public void run() {
+				ret[0] = busyClose(force);
+			}
+		});
 		return ret[0];
 	}
 
@@ -1726,8 +1757,18 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	private void initializeCommandResolver() {
 		ExternalActionManager.getInstance().setCallback(
-				new CommandCallback(bindingManager, commandManager, commandId -> workbenchActivitySupport.getActivityManager().getIdentifier(
-						commandId).isEnabled(), action -> !(action instanceof CommandAction)));
+				new CommandCallback(bindingManager, commandManager, new IActiveChecker() {
+					@Override
+					public final boolean isActive(final String commandId) {
+						return workbenchActivitySupport.getActivityManager().getIdentifier(
+								commandId).isEnabled();
+					}
+				}, new IExecuteApplicable() {
+					@Override
+					public boolean isApplicable(IAction action) {
+						return !(action instanceof CommandAction);
+					}
+				}));
 	}
 
 	/**
@@ -1800,23 +1841,29 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 				ThemeElementHelper.populateRegistry(getThemeManager().getCurrentTheme(),
 						fontDefinitions, PrefUtil.getInternalPreferenceStore());
-				final IPropertyChangeListener themeToPreferencesFontSynchronizer = event -> {
-					if (event.getNewValue() instanceof FontData[]) {
-						FontData[] fontData = (FontData[]) event.getNewValue();
-						PrefUtil.getInternalPreferenceStore().setValue(event.getProperty(),
-								PreferenceConverter.getStoredRepresentation(fontData));
+				final IPropertyChangeListener themeToPreferencesFontSynchronizer = new IPropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent event) {
+						if (event.getNewValue() instanceof FontData[]) {
+							FontData[] fontData = (FontData[]) event.getNewValue();
+							PrefUtil.getInternalPreferenceStore().setValue(event.getProperty(),
+									PreferenceConverter.getStoredRepresentation(fontData));
+						}
 					}
 				};
 				getThemeManager().getCurrentTheme().getFontRegistry().addListener(themeToPreferencesFontSynchronizer);
-				getThemeManager().addPropertyChangeListener(event -> {
-					if (IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) {
-						Object oldValue = event.getOldValue();
-						if (oldValue != null && oldValue instanceof ITheme) {
-							((ITheme) oldValue).removePropertyChangeListener(themeToPreferencesFontSynchronizer);
-						}
-						Object newValue = event.getNewValue();
-						if (newValue != null && newValue instanceof ITheme) {
-							((ITheme) newValue).addPropertyChangeListener(themeToPreferencesFontSynchronizer);
+				getThemeManager().addPropertyChangeListener(new IPropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent event) {
+						if (IThemeManager.CHANGE_CURRENT_THEME.equals(event.getProperty())) {
+							Object oldValue = event.getOldValue();
+							if (oldValue != null && oldValue instanceof ITheme) {
+								((ITheme) oldValue).removePropertyChangeListener(themeToPreferencesFontSynchronizer);
+							}
+							Object newValue = event.getNewValue();
+							if (newValue != null && newValue instanceof ITheme) {
+								((ITheme) newValue).addPropertyChangeListener(themeToPreferencesFontSynchronizer);
+							}
 						}
 					}
 				});
@@ -1884,46 +1931,58 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// track the workbench preference and update the eclipse context with
 		// the new value
 		IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
-		preferenceStore.addPropertyChangeListener(event -> {
-			if (IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS.equals(event.getProperty())) {
-				Object o = event.getNewValue();
-				if (o instanceof Boolean) {
-					// Boolean if notified after the preference page has
-					// been closed
-					e4Context.set(IPresentationEngine.ANIMATIONS_ENABLED, o);
-				} else if (o instanceof String) {
-					// String if notified via an import of the preference
-					e4Context.set(IPresentationEngine.ANIMATIONS_ENABLED,
-							Boolean.parseBoolean((String) event.getNewValue()));
+		preferenceStore.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS.equals(event.getProperty())) {
+					Object o = event.getNewValue();
+					if (o instanceof Boolean) {
+						// Boolean if notified after the preference page has
+						// been closed
+						e4Context.set(IPresentationEngine.ANIMATIONS_ENABLED, o);
+					} else if (o instanceof String) {
+						// String if notified via an import of the preference
+						e4Context.set(IPresentationEngine.ANIMATIONS_ENABLED,
+								Boolean.parseBoolean((String) event.getNewValue()));
+					}
 				}
 			}
 		});
 
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, event -> {
-			if (application == event.getProperty(UIEvents.EventTags.ELEMENT)) {
-				if (UIEvents.isREMOVE(event)) {
-					for (Object removed : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
-						MWindow window = (MWindow) removed;
-						IEclipseContext windowContext = window.getContext();
-						if (windowContext != null) {
-							IWorkbenchWindow wwindow = windowContext.get(IWorkbenchWindow.class);
-							if (wwindow != null) {
-								fireWindowClosed(wwindow);
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, new EventHandler() {
+			@Override
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (application == event.getProperty(UIEvents.EventTags.ELEMENT)) {
+					if (UIEvents.isREMOVE(event)) {
+						for (Object removed : UIEvents.asIterable(event,
+								UIEvents.EventTags.OLD_VALUE)) {
+							MWindow window = (MWindow) removed;
+							IEclipseContext windowContext = window.getContext();
+							if (windowContext != null) {
+								IWorkbenchWindow wwindow = windowContext.get(IWorkbenchWindow.class);
+								if (wwindow != null) {
+									fireWindowClosed(wwindow);
+								}
 							}
 						}
 					}
 				}
 			}
 		});
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT, event -> {
-			if (application == event.getProperty(UIEvents.EventTags.ELEMENT)) {
-				if (UIEvents.EventTypes.SET.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
-					MWindow window = (MWindow) event.getProperty(UIEvents.EventTags.NEW_VALUE);
-					if (window != null) {
-						IWorkbenchWindow wwindow = window.getContext().get(IWorkbenchWindow.class);
-						if (wwindow != null) {
-							e4Context.set(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, wwindow);
-							e4Context.set(ISources.ACTIVE_WORKBENCH_WINDOW_SHELL_NAME, wwindow.getShell());
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT, new EventHandler() {
+			@Override
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (application == event.getProperty(UIEvents.EventTags.ELEMENT)) {
+					if (UIEvents.EventTypes.SET.equals(event
+							.getProperty(UIEvents.EventTags.TYPE))) {
+						MWindow window = (MWindow) event.getProperty(UIEvents.EventTags.NEW_VALUE);
+						if (window != null) {
+							IWorkbenchWindow wwindow = window.getContext().get(IWorkbenchWindow.class);
+							if (wwindow != null) {
+								e4Context.set(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, wwindow);
+								e4Context.set(ISources.ACTIVE_WORKBENCH_WINDOW_SHELL_NAME,
+										wwindow.getShell());
+							}
 						}
 					}
 				}
@@ -1933,46 +1992,54 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// watch for parts' "toBeRendered" attribute being flipped to true, if
 		// they need to be rendered, then they need a corresponding 3.x
 		// reference
-		eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED, event -> {
-			if (Boolean.TRUE.equals(event.getProperty(UIEvents.EventTags.NEW_VALUE))) {
-				Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-				if (element instanceof MPart) {
-					MPart part = (MPart) element;
-					createReference(part);
+		eventBroker.subscribe(
+UIEvents.UIElement.TOPIC_TOBERENDERED, new EventHandler() {
+			@Override
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (Boolean.TRUE.equals(event.getProperty(UIEvents.EventTags.NEW_VALUE))) {
+					Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+					if (element instanceof MPart) {
+						MPart part = (MPart) element;
+						createReference(part);
+					}
 				}
 			}
-});
+		});
 
 		// watch for parts' contexts being set, once they've been set, we need
 		// to inject the ViewReference/EditorReference into the context
-		eventBroker.subscribe(UIEvents.Context.TOPIC_CONTEXT, event -> {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (element instanceof MPart) {
-				MPart part = (MPart) element;
-				IEclipseContext context = part.getContext();
-				if (context != null) {
-					setReference(part, context);
+		eventBroker.subscribe(
+UIEvents.Context.TOPIC_CONTEXT,
+				new EventHandler() {
+					@Override
+					public void handleEvent(org.osgi.service.event.Event event) {
+						Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+						if (element instanceof MPart) {
+							MPart part = (MPart) element;
+							IEclipseContext context = part.getContext();
+							if (context != null) {
+								setReference(part, context);
+							}
+						}
+					}
+				});
+
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, new EventHandler() {
+			@Override
+			public void handleEvent(org.osgi.service.event.Event event) {
+				Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+				if (!(element instanceof MApplication)) {
+					return;
+				}
+				MApplication app = (MApplication) element;
+				if (UIEvents.isREMOVE(event)) {
+					if (app.getChildren().isEmpty()) {
+						Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
+						WorkbenchPlugin.log("The final top level window " + oldValue //$NON-NLS-1$
+								+ " was just removed", new Exception()); //$NON-NLS-1$
+					}
 				}
 			}
-		});
-
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, event -> {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (!(element instanceof MApplication)) {
-				return;
-			}
-			MApplication app = (MApplication) element;
-			if (UIEvents.isREMOVE(event)) {
-				if (app.getChildren().isEmpty()) {
-					Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
-					WorkbenchPlugin.log("The final top level window " + oldValue //$NON-NLS-1$
-							+ " was just removed", new Exception()); //$NON-NLS-1$
-				}
-			}
-		});
-
-		eventBroker.subscribe(UIEvents.UIModelTopicBase + "/*", event -> { // //$NON-NLS-1$
-			applicationModelChanged = true;
 		});
 
 		boolean found = false;
@@ -2250,13 +2317,15 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// TODO Correctly order service initialization
 		// there needs to be some serious consideration given to
 		// the services, and hooking them up in the correct order
-		final IEvaluationService evaluationService = serviceLocator.getService(IEvaluationService.class);
+		final IEvaluationService evaluationService = (IEvaluationService) serviceLocator
+				.getService(IEvaluationService.class);
 
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
 			@Override
 			public void runWithException() {
-				serviceLocator.registerService(ISaveablesLifecycleListener.class, new SaveablesList());
+				serviceLocator.registerService(ISaveablesLifecycleListener.class,
+						new SaveablesList());
 			}
 		});
 
@@ -2301,11 +2370,14 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 			@Override
 			public void runWithException() {
-				contextManager.addContextManagerListener(contextManagerEvent -> {
-					if (contextManagerEvent.isContextChanged()) {
-						String id = contextManagerEvent.getContextId();
-						if (id != null) {
-							defineBindingTable(id);
+				contextManager.addContextManagerListener(new IContextManagerListener() {
+					@Override
+					public void contextManagerChanged(ContextManagerEvent contextManagerEvent) {
+						if (contextManagerEvent.isContextChanged()) {
+							String id = contextManagerEvent.getContextId();
+							if (id != null) {
+								defineBindingTable(id);
+							}
 						}
 					}
 				});
@@ -2333,7 +2405,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 		serviceLocator.registerService(IBindingService.class, bindingService[0]);
 
 		final CommandImageManager commandImageManager = new CommandImageManager();
-		final CommandImageService commandImageService = new CommandImageService(commandImageManager, commandService[0]);
+		final CommandImageService commandImageService = new CommandImageService(
+				commandImageManager, commandService[0]);
 		commandImageService.readRegistry();
 		serviceLocator.registerService(ICommandImageService.class, commandImageService);
 
@@ -2357,7 +2430,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 		 * services. These source providers notify the services when particular
 		 * pieces of workbench state change.
 		 */
-		final SourceProviderService sourceProviderService = new SourceProviderService(serviceLocator);
+		final SourceProviderService sourceProviderService = new SourceProviderService(
+				serviceLocator);
 		serviceLocator.registerService(ISourceProviderService.class, sourceProviderService);
 		StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
@@ -2407,8 +2481,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 			}
 		});
 		workbenchContextSupport = new WorkbenchContextSupport(this, contextManager);
-		workbenchCommandSupport = new WorkbenchCommandSupport(bindingManager, commandManager, contextManager,
-				handlerService[0]);
+		workbenchCommandSupport = new WorkbenchCommandSupport(bindingManager, commandManager,
+				contextManager, handlerService[0]);
 		initializeCommandResolver();
 
 		// addWindowListener(windowListener);
@@ -2427,34 +2501,37 @@ public final class Workbench extends EventManager implements IWorkbench,
 	}
 
 	private Listener createBackForwardListener() {
-		return event -> {
-			String commandId;
-			switch (event.button) {
-			case 4:
-			case 8:
-				commandId = IWorkbenchCommandConstants.NAVIGATE_BACKWARD_HISTORY;
-				break;
-			case 5:
-			case 9:
-				commandId = IWorkbenchCommandConstants.NAVIGATE_FORWARD_HISTORY;
-				break;
-			default:
-				return;
-			}
+		return new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				String commandId;
+				switch (event.button) {
+				case 4:
+				case 8:
+					commandId = IWorkbenchCommandConstants.NAVIGATE_BACKWARD_HISTORY;
+					break;
+				case 5:
+				case 9:
+					commandId = IWorkbenchCommandConstants.NAVIGATE_FORWARD_HISTORY;
+					break;
+				default:
+					return;
+				}
 
-			final IHandlerService handlerService = getService(IHandlerService.class);
+				final IHandlerService handlerService = (IHandlerService) getService(IHandlerService.class);
 
-			try {
-				handlerService.executeCommand(commandId, event);
-				event.doit = false;
-			} catch (NotDefinedException e1) {
-				// regular condition; do nothing
-			} catch (NotEnabledException e2) {
-				// regular condition; do nothing
-			} catch (NotHandledException e3) {
-				// regular condition; do nothing
-			} catch (ExecutionException ex) {
-				StatusUtil.handleStatus(ex, StatusManager.SHOW | StatusManager.LOG);
+				try {
+					handlerService.executeCommand(commandId, event);
+					event.doit = false;
+				} catch (NotDefinedException e) {
+					// regular condition; do nothing
+				} catch (NotEnabledException e) {
+					// regular condition; do nothing
+				} catch (NotHandledException e) {
+					// regular condition; do nothing
+				} catch (ExecutionException ex) {
+					StatusUtil.handleStatus(ex, StatusManager.SHOW | StatusManager.LOG);
+				}
 			}
 		};
 	}
@@ -2487,7 +2564,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 			final int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
 					.getBundleCount() / 10);
 
-			runStartupWithProgress(expectedProgressCount, () -> doOpenFirstTimeWindow());
+			runStartupWithProgress(expectedProgressCount, new Runnable() {
+				@Override
+				public void run() {
+					doOpenFirstTimeWindow();
+				}
+			});
 		}
 	}
 
@@ -2622,7 +2704,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 			return null;
 		}
 
-		StringBuilder result = new StringBuilder(512);
+		StringBuffer result = new StringBuffer(512);
 		result.append(property);
 		result.append('\n');
 
@@ -2710,7 +2792,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 	public String[] getDisabledEarlyActivatedPlugins() {
 		String pref = PrefUtil.getInternalPreferenceStore().getString(
 				IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP);
-		return pref.split(";"); //$NON-NLS-1$
+		return Util.getArrayFromList(pref, ";"); //$NON-NLS-1$
 	}
 
 	/*
@@ -2821,16 +2903,24 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// being
 		// run while starting the Workbench, log a warning.
 		if (WorkbenchPlugin.getDefault().isDebugging()) {
-			display.asyncExec(() -> {
-				if (isStarting()) {
-					WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
-							"Event loop should not be run while the Workbench is starting.", //$NON-NLS-1$
-							new RuntimeException()));
+			display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (isStarting()) {
+						WorkbenchPlugin.log(StatusUtil.newStatus(IStatus.WARNING,
+								"Event loop should not be run while the Workbench is starting.", //$NON-NLS-1$
+								new RuntimeException()));
+					}
 				}
 			});
 		}
 
-		Listener closeListener = event -> event.doit = close();
+		Listener closeListener = new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				event.doit = close();
+			}
+		};
 
 		// Initialize an exception handler.
 		Window.IExceptionHandler handler = ExceptionHandler.getInstance();
@@ -2859,12 +2949,15 @@ public final class Workbench extends EventManager implements IWorkbench,
 						.registerService(org.eclipse.e4.ui.workbench.IWorkbench.class.getName(),
 								this, properties);
 
-				Runnable earlyStartup = () -> {
-					// Let the advisor run its start-up code.
-					advisor.postStartup(); // May trigger a close/restart.
-					// start eager plug-ins
-					startPlugins();
-					addStartupRegistryListener();
+				Runnable earlyStartup = new Runnable() {
+					@Override
+					public void run() {
+						// Let the advisor run its start-up code.
+						advisor.postStartup(); // May trigger a close/restart.
+						// start eager plug-ins
+						startPlugins();
+						addStartupRegistryListener();
+					}
 				};
 				e4Context.set(PartRenderingEngine.EARLY_STARTUP_HOOK, earlyStartup);
 				// start workspace auto-save
@@ -2878,11 +2971,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 							}
 							final int nextDelay = getAutoSaveJobTime();
 							try {
-								if (applicationModelChanged) {
-									persist(false);
-									applicationModelChanged = false;
-
-								}
+								persist(false);
 								monitor.done();
 							} finally {
 								// repeat
@@ -2897,6 +2986,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 					autoSaveJob.setSystem(true);
 					autoSaveJob.schedule(millisecondInterval);
 				}
+
+				// WWinPluginAction.refreshActionList();
 
 				display.asyncExec(new Runnable() {
 					@Override
@@ -2936,7 +3027,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	}
 
 	private int getAutoSaveJobTime() {
-		final int minuteSaveInterval = getPreferenceStore().getInt(IPreferenceConstants.WORKBENCH_SAVE_INTERVAL);
+		final int minuteSaveInterval = getPreferenceStore().getInt(
+				IPreferenceConstants.WORKBENCH_SAVE_INTERVAL);
 		final int millisecondInterval = minuteSaveInterval * 60 * 1000;
 		return millisecondInterval;
 	}
@@ -3213,9 +3305,13 @@ public final class Workbench extends EventManager implements IWorkbench,
 		return workbenchContextSupport;
 	}
 
-	private final IBindingManagerListener bindingManagerListener = bindingManagerEvent -> {
-		if (bindingManagerEvent.isActiveBindingsChanged()) {
-			updateActiveWorkbenchWindowMenuManager(true);
+	private final IBindingManagerListener bindingManagerListener = new IBindingManagerListener() {
+
+		@Override
+		public void bindingManagerChanged(BindingManagerEvent bindingManagerEvent) {
+			if (bindingManagerEvent.isActiveBindingsChanged()) {
+				updateActiveWorkbenchWindowMenuManager(true);
+			}
 		}
 	};
 
@@ -3292,29 +3388,33 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private IExtensionTracker tracker;
 
-	private IRegistryChangeListener startupRegistryListener = event -> {
-		final IExtensionDelta[] deltas = event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
-				IWorkbenchRegistryConstants.PL_STARTUP);
-		if (deltas.length == 0) {
-			return;
-		}
-		final String disabledPlugins = PrefUtil.getInternalPreferenceStore().getString(
-				IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP);
+	private IRegistryChangeListener startupRegistryListener = new IRegistryChangeListener() {
 
-		for (IExtensionDelta delta : deltas) {
-			IExtension extension = delta.getExtension();
-			if (delta.getKind() == IExtensionDelta.REMOVED) {
-				continue;
+		@Override
+		public void registryChanged(IRegistryChangeEvent event) {
+			final IExtensionDelta[] deltas = event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
+					IWorkbenchRegistryConstants.PL_STARTUP);
+			if (deltas.length == 0) {
+				return;
+			}
+			final String disabledPlugins = PrefUtil.getInternalPreferenceStore().getString(
+					IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP);
+
+			for (IExtensionDelta delta : deltas) {
+				IExtension extension = delta.getExtension();
+				if (delta.getKind() == IExtensionDelta.REMOVED) {
+					continue;
+				}
+
+				// if the plugin is not in the set of disabled plugins,
+				// then
+				// execute the code to start it
+				if (disabledPlugins.indexOf(extension.getNamespaceIdentifier()) == -1) {
+					SafeRunner.run(new EarlyStartupRunnable(extension));
+				}
 			}
 
-			// if the plugin is not in the set of disabled plugins,
-			// then
-			// execute the code to start it
-			if (disabledPlugins.indexOf(extension.getNamespaceIdentifier()) == -1) {
-				SafeRunner.run(new EarlyStartupRunnable(extension));
-			}
 		}
-
 	};
 
 	@Override
@@ -3426,18 +3526,18 @@ public final class Workbench extends EventManager implements IWorkbench,
 	}
 
 	@Override
-	public final <T> T getAdapter(final Class<T> key) {
-		return key.cast(serviceLocator.getService(key));
+	public final Object getAdapter(final Class key) {
+		return serviceLocator.getService(key);
 	}
 
 
 	@Override
-	public final <T> T getService(final Class<T> key) {
+	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
 
 	@Override
-	public final boolean hasService(final Class<?> key) {
+	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
 
@@ -3555,7 +3655,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	@Override
 	public IShellProvider getModalDialogShellProvider() {
-		return () -> ProgressManagerUtil.getDefaultParent();
+		return new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return ProgressManagerUtil.getDefaultParent();
+			}
+		};
 	}
 
 	public IEclipseContext getContext() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -145,8 +145,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return new String[0];
 		}
 
-		final List<String> strings = new ArrayList<>();
-		final StringBuilder stringBuffer = new StringBuilder();
+		final List strings = new ArrayList();
+		final StringBuffer stringBuffer = new StringBuffer();
 		string = string.trim(); // remove whitespace
 		if (string.length() > 0) {
 			final StringTokenizer stringTokenizer = new StringTokenizer(string,
@@ -163,7 +163,7 @@ public final class BindingManager extends HandleObjectManager implements
 		Collections.reverse(strings);
 		strings.add(Util.ZERO_LENGTH_STRING);
 		strings.add(null);
-		return strings.toArray(new String[strings.size()]);
+		return (String[]) strings.toArray(new String[strings.size()]);
 	}
 
 	/**
@@ -462,7 +462,8 @@ public final class BindingManager extends HandleObjectManager implements
 	private final int compareSchemes(final String schemeId1,
 			final String schemeId2) {
 		if (!schemeId2.equals(schemeId1)) {
-			for (final String schemePointer : activeSchemeIds) {
+			for (int i = 0; i < activeSchemeIds.length; i++) {
+				final String schemePointer = activeSchemeIds[i];
 				if (schemeId2.equals(schemePointer)) {
 					return 1;
 
@@ -549,8 +550,8 @@ public final class BindingManager extends HandleObjectManager implements
 			final String schemeId = binding.getSchemeId();
 			found = false;
 			if (activeSchemeIds != null) {
-				for (String activeSchemeId : activeSchemeIds) {
-					if (Util.equals(schemeId, activeSchemeId)) {
+				for (int j = 0; j < activeSchemeIds.length; j++) {
+					if (Util.equals(schemeId, activeSchemeIds[j])) {
 						found = true;
 						break;
 					}
@@ -704,7 +705,8 @@ public final class BindingManager extends HandleObjectManager implements
 	 */
 	private final int countStrokes(final Trigger[] triggers) {
 		int strokeCount = triggers.length;
-		for (final Trigger trigger : triggers) {
+		for (int i = 0; i < triggers.length; i++) {
+			final Trigger trigger = triggers[i];
 			if (trigger instanceof KeyStroke) {
 				final KeyStroke keyStroke = (KeyStroke) trigger;
 				final int modifierKeys = keyStroke.getModifierKeys();
@@ -894,8 +896,8 @@ public final class BindingManager extends HandleObjectManager implements
 		}
 
 		final Object[] listeners = getListeners();
-		for (Object l : listeners) {
-			final IBindingManagerListener listener = (IBindingManagerListener) l;
+		for (int i = 0; i < listeners.length; i++) {
+			final IBindingManagerListener listener = (IBindingManagerListener) listeners[i];
 			listener.bindingManagerChanged(event);
 		}
 	}
@@ -1647,8 +1649,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String localString : locales) {
-			if (Util.equals(localString, locale)) {
+		for (int i = 0; i < locales.length; i++) {
+			if (Util.equals(locales[i], locale)) {
 				matches = true;
 				break;
 			}
@@ -1680,8 +1682,8 @@ public final class BindingManager extends HandleObjectManager implements
 			return true; // shortcut a common case
 		}
 
-		for (String platformString : platforms) {
-			if (Util.equals(platformString, platform)) {
+		for (int i = 0; i < platforms.length; i++) {
+			if (Util.equals(platforms[i], platform)) {
 				matches = true;
 				break;
 			}
@@ -2270,7 +2272,8 @@ public final class BindingManager extends HandleObjectManager implements
 		if (bindings != null) {
 			// discard bindings not applicable for this platform
 			List newList = new ArrayList();
-			for (Binding binding : bindings) {
+			for (int i = 0; i < bindings.length; i++) {
+				Binding binding = bindings[i];
 				String p = binding.getPlatform();
 				if (p == null) {
 					newList.add(binding);

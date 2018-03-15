@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -274,7 +274,12 @@ public abstract class TrayDialog extends Dialog {
         fHelpButton = new ToolItem(toolBar, SWT.CHECK);
 		fHelpButton.setImage(image);
 		fHelpButton.setToolTipText(JFaceResources.getString("helpToolTip")); //$NON-NLS-1$
-		fHelpButton.addSelectionListener(widgetSelectedAdapter(e -> helpPressed()));
+		fHelpButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+				helpPressed();
+            }
+        });
 		return toolBar;
 	}
 
@@ -288,7 +293,12 @@ public abstract class TrayDialog extends Dialog {
 		link.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		link.setText("<a>"+IDialogConstants.HELP_LABEL+"</a>"); //$NON-NLS-1$ //$NON-NLS-2$
 		link.setToolTipText(IDialogConstants.HELP_LABEL);
-		link.addSelectionListener(widgetSelectedAdapter(e -> helpPressed()));
+		link.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+				helpPressed();
+            }
+        });
 		return link;
 	}
 

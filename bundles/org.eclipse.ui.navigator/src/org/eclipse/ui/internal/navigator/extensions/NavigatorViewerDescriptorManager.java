@@ -162,10 +162,10 @@ public class NavigatorViewerDescriptorManager {
 							.getChildren(TAG_PROPERTY);
 					String name;
 					String value;
-					for (IConfigurationElement property : properties) {
-						name = property.getAttribute(ATT_NAME);
+					for (int i = 0; i < properties.length; i++) {
+						name = properties[i].getAttribute(ATT_NAME);
 						if (name != null) {
-							value = property.getAttribute(ATT_VALUE);
+							value = properties[i].getAttribute(ATT_VALUE);
 							descriptor.setProperty(name, value);
 						}
 					}

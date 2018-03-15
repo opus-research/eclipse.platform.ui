@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,10 +23,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -281,7 +281,7 @@ public class DialogSettings implements IDialogSettings {
 	public void load(String fileName) throws IOException {
         FileInputStream stream = new FileInputStream(fileName);
         BufferedReader reader = new BufferedReader(new InputStreamReader(
-				stream, StandardCharsets.UTF_8));
+                stream, "utf-8"));//$NON-NLS-1$
         load(reader);
         reader.close();
     }
@@ -364,16 +364,17 @@ public class DialogSettings implements IDialogSettings {
 
 	@Override
 	public void save(Writer writer) throws IOException {
-		final XMLWriter xmlWriter = new XMLWriter(writer);
+    	final XMLWriter xmlWriter = new XMLWriter(writer);
     	save(xmlWriter);
     	xmlWriter.flush();
     }
 
     @Override
 	public void save(String fileName) throws IOException {
-		try (XMLWriter writer = new XMLWriter(new FileOutputStream(fileName))) {
-			save(writer);
-		}
+        FileOutputStream stream = new FileOutputStream(fileName);
+        XMLWriter writer = new XMLWriter(stream);
+        save(writer);
+        writer.close();
     }
 
     private void save(XMLWriter out) throws IOException {
@@ -398,7 +399,8 @@ public class DialogSettings implements IDialogSettings {
 			String[] value = entry.getValue();
             attributes.clear();
             if (value != null) {
-                for (String string : value) {
+                for (int index = 0; index < value.length; index++) {
+                    String string = value[index];
                     attributes.put(TAG_VALUE, string == null ? "" : string); //$NON-NLS-1$
                     out.printTag(TAG_ITEM, attributes, true);
                 }
@@ -406,8 +408,8 @@ public class DialogSettings implements IDialogSettings {
             out.endTag(TAG_LIST);
             attributes.clear();
         }
-        for (IDialogSettings iDialogSettings : sections.values()) {
-            ((DialogSettings) iDialogSettings).save(out);
+        for (Iterator<IDialogSettings> i = sections.values().iterator(); i.hasNext();) {
+            ((DialogSettings) i.next()).save(out);
         }
         out.endTag(TAG_SECTION);
     }
@@ -430,7 +432,7 @@ public class DialogSettings implements IDialogSettings {
     	 * @throws IOException
     	 */
     	public XMLWriter(OutputStream output) throws IOException {
-			this(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+    		this(new OutputStreamWriter(output, "UTF8")); //$NON-NLS-1$
     	}
 
     	/**
@@ -477,7 +479,7 @@ public class DialogSettings implements IDialogSettings {
     	}
 
     	private void printTag(String name, HashMap<String, String> parameters, boolean shouldTab, boolean newLine, boolean close) throws IOException {
-    		StringBuilder sb = new StringBuilder();
+    		StringBuffer sb = new StringBuffer();
     		sb.append('<');
     		sb.append(name);
     		if (parameters != null) {
@@ -519,7 +521,7 @@ public class DialogSettings implements IDialogSettings {
     		printTag(name, parameters, true, newLine, false);
     	}
 
-    	private static void appendEscapedChar(StringBuilder buffer, char c) {
+    	private static void appendEscapedChar(StringBuffer buffer, char c) {
     		String replacement = getReplacement(c);
     		if (replacement != null) {
     			buffer.append('&');
@@ -531,7 +533,7 @@ public class DialogSettings implements IDialogSettings {
     	}
 
     	private static String getEscaped(String s) {
-    		StringBuilder result = new StringBuilder(s.length() + 10);
+    		StringBuffer result = new StringBuffer(s.length() + 10);
     		for (int i = 0; i < s.length(); ++i) {
 				appendEscapedChar(result, s.charAt(i));
 			}

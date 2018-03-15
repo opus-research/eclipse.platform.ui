@@ -224,7 +224,7 @@ public final class Parameter implements IParameter, ITypedParameter {
 	@Override
 	public final String toString() {
 		if (string == null) {
-			final StringBuilder buffer = new StringBuilder();
+			final StringBuffer buffer = new StringBuffer();
 
 			buffer.append("Parameter("); //$NON-NLS-1$
 			buffer.append(id);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700, 489250, 511198
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
@@ -51,8 +50,8 @@ public class UIMessageDialogsAuto extends TestCase {
      */
     private MessageDialog getInformationDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-				MessageDialog.INFORMATION, 0,
-				IDialogConstants.OK_LABEL);
+                MessageDialog.INFORMATION,
+                new String[] { IDialogConstants.OK_LABEL }, 0);
     }
 
     /*
@@ -64,9 +63,9 @@ public class UIMessageDialogsAuto extends TestCase {
      */
     private MessageDialog getQuestionDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-                MessageDialog.QUESTION,0,
-                IDialogConstants.YES_LABEL,
-                IDialogConstants.NO_LABEL );
+                MessageDialog.QUESTION,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL }, 0);
     }
 
     /*
@@ -78,8 +77,8 @@ public class UIMessageDialogsAuto extends TestCase {
      */
     private MessageDialog getWarningDialog(String title, String message) {
         return new MessageDialog(getShell(), title, null, message,
-                MessageDialog.WARNING, 0,
-                IDialogConstants.OK_LABEL);
+                MessageDialog.WARNING,
+                new String[] { IDialogConstants.OK_LABEL }, 0);
     }
 
     public void testAbortPageFlipping() {
@@ -129,7 +128,8 @@ public class UIMessageDialogsAuto extends TestCase {
         Dialog dialog = new MessageDialog(
                 getShell(),
                 ResourceNavigatorMessages.DropAdapter_question,
-				null, MessageFormat.format(ResourceNavigatorMessages.DropAdapter_overwriteQuery, DUMMY_RELATIVE_PATH),
+                null, MessageFormat.format(ResourceNavigatorMessages.DropAdapter_overwriteQuery,
+                        new Object[] { DUMMY_RELATIVE_PATH }),
 				MessageDialog.QUESTION, 0,
 				IDialogConstants.YES_LABEL,
 				IDialogConstants.YES_TO_ALL_LABEL,
@@ -175,11 +175,11 @@ public class UIMessageDialogsAuto extends TestCase {
 
     public void testMoveReadOnlyCheck() {
         Dialog dialog = new MessageDialog(getShell(), "Move_title", null, ".MoveResourceAction",
-                MessageDialog.QUESTION, 0,
-                IDialogConstants.YES_LABEL,
-                IDialogConstants.YES_TO_ALL_LABEL,
-                IDialogConstants.NO_LABEL,
-				IDialogConstants.CANCEL_LABEL);
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.YES_LABEL,
+                        IDialogConstants.YES_TO_ALL_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
@@ -207,19 +207,18 @@ public class UIMessageDialogsAuto extends TestCase {
     public void testOverwritePerspective() {
         Dialog dialog = new MessageDialog(getShell(), WorkbenchMessages.SavePerspective_overwriteTitle, null,
                 NLS.bind(WorkbenchMessages.SavePerspective_overwriteQuestion, (new Object[] { "Dummy Perspective" })),
-                MessageDialog.QUESTION, 0,
-				IDialogConstants.YES_LABEL,
-				IDialogConstants.NO_LABEL,
-				IDialogConstants.CANCEL_LABEL);
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testRefreshDeleteProject() {
         Dialog dialog = new MessageDialog(getShell(), "RefreshAction_dialogTitle", null,
                "c:\\dummypath\\" + DUMMY_PROJECT,
-                MessageDialog.QUESTION, 0,
-                IDialogConstants.YES_LABEL,
-                IDialogConstants.NO_LABEL);
+                MessageDialog.QUESTION,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
@@ -230,25 +229,25 @@ public class UIMessageDialogsAuto extends TestCase {
 
     public void testResetPerspective() {
         Dialog dialog = new MessageDialog(getShell(), WorkbenchMessages.ResetPerspective_title, null, NLS.bind(WorkbenchMessages.ResetPerspective_message, (new Object[] { "Dummy Perspective" })),
-                MessageDialog.QUESTION, 0,
-                IDialogConstants.OK_LABEL,
-                IDialogConstants.CANCEL_LABEL);
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.OK_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testSaveAsOverwrite() {
-		Dialog dialog = new MessageDialog(getShell(), "WorkbenchMessages.Question", null, DUMMY_RELATIVE_PATH,
-				MessageDialog.QUESTION, 0,
-				IDialogConstants.YES_LABEL,
-				IDialogConstants.NO_LABEL,
-				IDialogConstants.CANCEL_LABEL);
+        Dialog dialog = new MessageDialog(getShell(), "WorkbenchMessages.Question", null,DUMMY_RELATIVE_PATH, MessageDialog.QUESTION,
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testSaveChanges() {
         Dialog dialog = new MessageDialog(getShell(), WorkbenchMessages.Save_Resource, null, NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion, (new Object[] { DUMMY_RESOURCE })), MessageDialog.QUESTION,
                 0,
-				WorkbenchMessages.Save, WorkbenchMessages.Dont_Save,
+                IDialogConstants.YES_LABEL,
+                IDialogConstants.NO_LABEL,
 				IDialogConstants.CANCEL_LABEL);
         DialogCheck.assertDialogTexts(dialog, this);
     }
@@ -267,7 +266,7 @@ public class UIMessageDialogsAuto extends TestCase {
     public void testWizardOverwrite() {
         Dialog dialog = new MessageDialog(getShell(), "WorkbenchMessages.Question", null, "WizardDataTransfer_existsQuestion", MessageDialog.QUESTION, 0,
 				IDialogConstants.YES_LABEL,
-				IDialogConstants.YES_TO_ALL_LABEL,
+				IDialogConstants.YES_TO_ALL_LABEL, 
 				IDialogConstants.NO_LABEL,
 				IDialogConstants.CANCEL_LABEL);
         DialogCheck.assertDialogTexts(dialog, this);

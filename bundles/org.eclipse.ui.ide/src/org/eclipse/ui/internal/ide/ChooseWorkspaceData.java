@@ -450,8 +450,8 @@ public class ChooseWorkspaceData {
 		StringBuilder buff = new StringBuilder();
 
 		String path = null;
-		for (String recentPath : recent) {
-			if (recentPath == null) {
+		for (int i = 0; i < recent.length; ++i) {
+			if (recent[i] == null) {
 				break;
 			}
 
@@ -460,7 +460,7 @@ public class ChooseWorkspaceData {
 				buff.append("\n"); //$NON-NLS-1$
 			}
 
-			path = recentPath;
+			path = recent[i];
 			buff.append(path);
 		}
 

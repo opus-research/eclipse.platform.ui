@@ -193,8 +193,8 @@ public final class CommandStateProxy extends PersistentState {
 
 				// Transfer the local listeners to the real state.
 				final Object[] listenerArray = getListeners();
-				for (Object element : listenerArray) {
-					state.addListener((IStateListener) element);
+				for (int i = 0; i < listenerArray.length; i++) {
+					state.addListener((IStateListener) listenerArray[i]);
 				}
 				clearListeners();
 

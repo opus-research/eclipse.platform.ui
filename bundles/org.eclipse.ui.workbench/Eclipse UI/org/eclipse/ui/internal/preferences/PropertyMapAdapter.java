@@ -80,8 +80,8 @@ public abstract class PropertyMapAdapter implements IDynamicPropertyMap {
 
     protected final void firePropertyChange(String[] prefIds) {
         if (ignoreCount > 0) {
-            for (String prefId : prefIds) {
-                queuedEvents.add(prefId);
+            for (int i = 0; i < prefIds.length; i++) {
+                queuedEvents.add(prefIds[i]);
             }
             return;
         }

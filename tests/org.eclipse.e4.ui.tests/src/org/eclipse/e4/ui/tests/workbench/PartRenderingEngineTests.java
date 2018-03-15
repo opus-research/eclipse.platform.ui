@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,21 +14,17 @@ package org.eclipse.e4.ui.tests.workbench;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.function.Consumer;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.services.statusreporter.StatusReporter;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
-import org.eclipse.e4.ui.internal.workbench.swt.IEventLoopAdvisor;
 import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -50,20 +46,16 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.test.Screenshots;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -83,10 +75,6 @@ public class PartRenderingEngineTests {
 	};
 	private boolean logged = false;
 	private EModelService ems;
-	private Consumer<RuntimeException> runtimeExceptionHandler;
-
-	@Rule
-	public TestName testName = new TestName();
 
 	private boolean checkMacBug466636() {
 		if (Platform.OS_MACOSX.equals(Platform.getOS())) {
@@ -150,50 +138,6 @@ public class PartRenderingEngineTests {
 		while (Display.getCurrent().readAndDispatch()) {
 			// spin the event loop
 		}
-	}
-
-	/**
-	 * Sets a temporary RuntimeException handler, that doesn't show an error dialog
-	 * when an exception occurs. The handler is reset by calling
-	 * resetRuntimeExceptionHandler() in the finally block of handler code.
-	 */
-	private void addRuntimeExceptionHandler() {
-		Display display = Display.getDefault();
-		runtimeExceptionHandler = display.getRuntimeExceptionHandler();
-		display.setRuntimeExceptionHandler(e -> handle(e, new IEventLoopAdvisor() {
-			@Override
-			public void eventLoopIdle(Display display) {
-				display.sleep();
-			}
-
-			@Override
-			public void eventLoopException(Throwable exception) {
-				StatusReporter statusReporter = appContext.get(StatusReporter.class);
-				if (statusReporter != null) {
-					statusReporter.report(statusReporter.newStatus(StatusReporter.ERROR, "Internal Error", exception),
-							StatusReporter.LOG, exception);
-				}
-			}
-		}));
-	}
-
-	private void handle(Throwable ex, IEventLoopAdvisor advisor) {
-		try {
-			advisor.eventLoopException(ex);
-		} catch (Throwable t) {
-			if (t instanceof ThreadDeath) {
-				throw (ThreadDeath) t;
-			}
-			// couldn't handle the exception, print to console
-			t.printStackTrace();
-		} finally {
-			resetRuntimeExceptionHandler();
-		}
-	}
-
-	private void resetRuntimeExceptionHandler() {
-		if (runtimeExceptionHandler != null)
-			Display.getDefault().setRuntimeExceptionHandler(runtimeExceptionHandler);
 	}
 
 	@Test
@@ -793,33 +737,17 @@ public class PartRenderingEngineTests {
 		// the selected element doesn't change its value
 		container.setSelectedElement(partA);
 		partB.setToBeRendered(false);
-		assertEquals(
+		assertTrue(
 				"Changing the TBR of a non-selected element should not change the value of the container's seletedElement",
-				partA, container.getSelectedElement());
+				container.getSelectedElement() == partA);
 
-
-		// Ensure that changing the TBR state of the selected element to false
-		// results in selecting moving to a TBR=true element
+		// Ensure that changing the TBR state of the selected element results in
+		// it going null
 		container.setSelectedElement(partA);
 		partA.setToBeRendered(false);
-		assertNotEquals("Changing the TBR of the selected element should have moved selection to a TBR item", partA,
-				container.getSelectedElement());
-
-		if ("gtk".equals(SWT.getPlatform())) {
-			assertTrue(
-					"Changing the TBR of the selected element should have moved selection to a TBR item",
-					container.getSelectedElement().isToBeRendered());
-
-			// Ensure that when all elements are TBR=false, selection is null
-			partC.setToBeRendered(false);
-			// Then there should be TBR item
-			assertNull("Changing the TBR of all elements to false should have set the field to null",
-					container.getSelectedElement());
-		} else {
-			assertTrue(
-					"Changing the TBR of the selected element should have set the field to null",
-					container.getSelectedElement() == null);
-		}
+		assertTrue(
+				"Changing the TBR of the selected element should have set the field to null",
+				container.getSelectedElement() == null);
 	}
 
 	@Test
@@ -1671,7 +1599,6 @@ public class PartRenderingEngineTests {
 		assertNotNull(part.getObject());
 		assertNotNull(part.getContext());
 
-		addRuntimeExceptionHandler();
 		SampleView view = (SampleView) part.getObject();
 		view.errorOnWidgetDisposal = true;
 
@@ -1702,7 +1629,6 @@ public class PartRenderingEngineTests {
 		assertNotNull(part.getObject());
 		assertNotNull(part.getContext());
 
-		addRuntimeExceptionHandler();
 		SampleView view = (SampleView) part.getObject();
 		view.errorOnPreDestroy = true;
 
@@ -3282,8 +3208,6 @@ public class PartRenderingEngineTests {
 		Control control = (Control) part.getWidget();
 		assertEquals(subShell, control.getParent());
 
-		Screenshots.takeScreenshot(getClass(), testName.getMethodName());
-
 		appContext.get(EPartService.class).activate(part);
 		assertEquals(subShell, control.getParent());
 	}
@@ -3385,7 +3309,6 @@ public class PartRenderingEngineTests {
 		assertNotNull(part.getObject());
 		assertNotNull(part.getContext());
 
-		addRuntimeExceptionHandler();
 		SampleView view = (SampleView) part.getObject();
 		view.errorOnWidgetDisposal = true;
 
@@ -3417,7 +3340,6 @@ public class PartRenderingEngineTests {
 		assertNotNull(part.getObject());
 		assertNotNull(part.getContext());
 
-		addRuntimeExceptionHandler();
 		SampleView view = (SampleView) part.getObject();
 		view.errorOnWidgetDisposal = true;
 

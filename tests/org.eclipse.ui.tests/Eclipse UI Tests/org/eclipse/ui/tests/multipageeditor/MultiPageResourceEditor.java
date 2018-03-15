@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2017 IBM Corporation and others.
+ * Copyright (c) 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,14 +54,13 @@ public class MultiPageResourceEditor extends MultiPageEditorPart {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (adapter == IPropertySheetPage.class) {
 			if (page == null) {
 				page = new PropertySheetPage();
 			}
-			return (T) page;
+			return page;
 		}
 		return super.getAdapter(adapter);
 	}

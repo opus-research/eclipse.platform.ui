@@ -51,9 +51,9 @@ public class DeleteHandler extends MarkerViewHandler {
 				MarkerMessages.deleteActionConfirmMessage,
 				MessageDialog.WARNING,
 				0,
-				MarkerMessages.deleteActionConfirm_buttonDeleteLabel, IDialogConstants.CANCEL_LABEL);
+				IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL);
 
-		if (dialog.open() != IDialogConstants.OK_ID) {
+		if (dialog.open() != 0) {
 			return view;
 		}
 

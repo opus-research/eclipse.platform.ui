@@ -140,7 +140,8 @@ public class ResourceNavigatorTest extends UITestCase {
         IStructuredSelection sel1 = new StructuredSelection(f1);
         part.selectReveal(sel1);
         // Get the selection the tree has
-		IStructuredSelection treeSel1 = tree.getStructuredSelection();
+        IStructuredSelection treeSel1 = (IStructuredSelection) tree
+                .getSelection();
         assertTrue("First selection wrong size, should be only one.", treeSel1
                 .size() == 1);
         IResource resource1 = (IResource) treeSel1.getFirstElement();
@@ -151,7 +152,8 @@ public class ResourceNavigatorTest extends UITestCase {
         IStructuredSelection sel2 = new StructuredSelection(p2);
         part.selectReveal(sel2);
         // Get the selection the tree has
-		IStructuredSelection treeSel2 = tree.getStructuredSelection();
+        IStructuredSelection treeSel2 = (IStructuredSelection) tree
+                .getSelection();
         assertTrue("Second selection wrong size, should be only one.", treeSel2
                 .size() == 1);
         IResource resource2 = (IResource) treeSel2.getFirstElement();

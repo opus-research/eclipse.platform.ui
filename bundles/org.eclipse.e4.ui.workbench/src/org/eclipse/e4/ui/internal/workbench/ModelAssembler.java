@@ -10,21 +10,15 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430075, 430080, 431464, 433336, 472654
  *     René Brandstetter - Bug 419749
  *     Brian de Alwis (MTI) - Bug 433053
- *     Alexandra Buzila - Refactoring, Bug 475934
+ *     Alexandra Buzila - Refactoring
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
@@ -41,7 +35,6 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.fragment.MModelFragment;
 import org.eclipse.e4.ui.model.fragment.MModelFragments;
-import org.eclipse.e4.ui.model.fragment.MStringModelFragment;
 import org.eclipse.e4.ui.model.fragment.impl.FragmentPackageImpl;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.emf.common.util.Diagnostic;
@@ -62,14 +55,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * pre- and post-processors on the model.
  */
 public class ModelAssembler {
-
-	private class Bucket {
-		SortedSet<ModelFragmentWrapper> wrapper = new TreeSet<>(new ModelFragmentComparator(application));
-		Bucket dependentOn;
-		Set<Bucket> dependencies = new LinkedHashSet<>();
-		Set<String> containedElementIds = new LinkedHashSet<>();
-	}
-
 	@Inject
 	private Logger logger;
 
@@ -89,9 +74,8 @@ public class ModelAssembler {
 	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$
 
 	/**
-	 * Processes the application model. This will run pre-processors, process
-	 * the fragments, resolve imports and run post-processors, in this order.
-	 * <br>
+	 * Processes the model. This will run pre-processors, process the fragments,
+	 * run post-processors and resolve imports, in this order. <br>
 	 * The <strong>org.eclipse.e4.workbench.model</strong> extension point will
 	 * be used to retrieve the contributed fragments (with imports) and
 	 * processors.<br>
@@ -105,12 +89,15 @@ public class ModelAssembler {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
 
+		List<MApplicationElement> imports = new ArrayList<>();
+		List<MApplicationElement> addedElements = new ArrayList<>();
+
 		// run processors which are marked to run before fragments
 		runProcessors(extensions, initial, false);
-		// process fragments (and resolve imports)
-		processFragments(extensions, initial);
+		processFragments(extensions, imports, addedElements, initial);
 		// run processors which are marked to run after fragments
 		runProcessors(extensions, initial, true);
+		resolveImports(imports, addedElements);
 	}
 
 	/**
@@ -120,156 +107,61 @@ public class ModelAssembler {
 	 *
 	 * @param extensions
 	 *            the list of {@link IExtension} extension elements
+	 * @param imports
+	 *            list that will be populated in place with the
+	 *            {@link MApplicationElement MApplicationElements} imported by
+	 *            the fragments
+	 * @param addedElements
+	 *            list that will be populated in place with the
+	 *            {@link MApplicationElement MApplicationElements} contributed
+	 *            by the fragments to the application model
 	 * @param initial
 	 *            <code>true</code> if running from a non-persisted state
-	 *
 	 */
-	private void processFragments(IExtension[] extensions, boolean initial) {
-		List<ModelFragmentWrapper> wrappers = new ArrayList<>();
+	private void processFragments(IExtension[] extensions, List<MApplicationElement> imports,
+			List<MApplicationElement> addedElements, boolean initial) {
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if ("fragment".equals(ce.getName()) && (initial || !INITIAL.equals(ce.getAttribute("apply")))) { //$NON-NLS-1$ //$NON-NLS-2$
-					MModelFragments fragmentsContainer = getFragmentsContainer(ce);
-					if (fragmentsContainer == null)
-						continue;
-					for (MModelFragment fragment : fragmentsContainer.getFragments()) {
-						boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$
-						wrappers.add(new ModelFragmentWrapper(fragmentsContainer, fragment,
-								ce.getContributor().getName(), URIHelper.constructPlatformURI(ce.getContributor()),
-								checkExist)); // $NON-NLS-1$
-					}
+					boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$
+					processFragmentConfigurationElement(ce, checkExist, imports, addedElements);
 				}
 			}
 		}
-
-		processFragmentWrappers(wrappers);
 	}
 
-	/**
-	 * Processes the given list of fragments wrapped in
-	 * {@link ModelFragmentWrapper} elements.
-	 *
-	 * @param wrappers
-	 *            the list of fragments
-	 */
-	public void processFragmentWrappers(Collection<ModelFragmentWrapper> wrappers) {
-		Map<String, Bucket> elementIdToBucket = new LinkedHashMap<>();
-		Map<String, Bucket> parentIdToBuckets = new LinkedHashMap<>();
-		for (ModelFragmentWrapper fragmentWrapper : wrappers) {
-			MModelFragment fragment = fragmentWrapper.getModelFragment();
-			String parentId = MStringModelFragment.class.cast(fragment).getParentElementId();
-			if (!parentIdToBuckets.containsKey(parentId)) {
-				parentIdToBuckets.put(parentId, new Bucket());
-			}
-			Bucket b = parentIdToBuckets.get(parentId);
-			if (elementIdToBucket.containsKey(parentId)) {
-				Bucket parentBucket = elementIdToBucket.get(parentId);
-				parentBucket.dependencies.add(b);
-				b.dependentOn = parentBucket;
-			}
-			b.wrapper.add(fragmentWrapper); // $NON-NLS-1$
-
-			for (MApplicationElement e : fragment.getElements()) {
-				// Error case -> clean up and ignore
-				if (parentId == e.getElementId()) {
-					// parentIdToBuckets.get(parentId).remove(b);
-					continue;
-				}
-				elementIdToBucket.put(e.getElementId(), b);
-				b.containedElementIds.add(e.getElementId());
-				if (parentIdToBuckets.containsKey(e.getElementId())) {
-					Bucket childBucket = parentIdToBuckets.get(e.getElementId());
-					b.dependencies.add(childBucket);
-					childBucket.dependentOn = b;
-				}
-			}
-		}
-		processFragments(createUnifiedFragmentList(elementIdToBucket));
-	}
-
-	private List<ModelFragmentWrapper> createUnifiedFragmentList(Map<String, Bucket> elementIdToBucket) {
-		List<ModelFragmentWrapper> fragmentList = new ArrayList<>();
-		Set<String> checkedElementIds = new LinkedHashSet<>();
-		for (String elementId : elementIdToBucket.keySet()) {
-			if (checkedElementIds.contains(elementId))
-				continue;
-			Bucket bucket = elementIdToBucket.get(elementId);
-			while (bucket.dependentOn != null) {
-				bucket = bucket.dependentOn;
-			}
-			addAllBucketFragmentWrapper(bucket, fragmentList, checkedElementIds);
-		}
-		return fragmentList;
-	}
-
-	private void addAllBucketFragmentWrapper(Bucket bucket, List<ModelFragmentWrapper> fragmentList,
-			Set<String> checkedElementIds) {
-		for (ModelFragmentWrapper wrapper : bucket.wrapper)
-			fragmentList.add(wrapper);
-		checkedElementIds.addAll(bucket.containedElementIds);
-		for (Bucket child : bucket.dependencies) {
-			addAllBucketFragmentWrapper(child, fragmentList, checkedElementIds);
-		}
-	}
-
-	public void processFragments(Collection<ModelFragmentWrapper> fragmentList) {
-		for (ModelFragmentWrapper fragmentWrapper : fragmentList) {
-			processFragment(fragmentWrapper.getFragmentContainer(), fragmentWrapper.getModelFragment(),
-					fragmentWrapper.getContributorName(), fragmentWrapper.getContributorURI(),
-					fragmentWrapper.isCheckExists());
-		}
-	}
-
-	/**
-	 * Adds the {@link MApplicationElement model elements} contributed by the
-	 * {@link IConfigurationElement} to the application model and resolves any
-	 * fragment imports along the way.
-	 *
-	 * @param fragmentsContainer
-	 *            the {@link MModelFragments}
-	 * @param fragment
-	 *            the {@link MModelFragment}
-	 * @param contributorName
-	 *            the name of the element contributing the fragment
-	 * @param contributorURI
-	 *            the URI of the element contributin the fragment
-	 * @param checkExist
-	 *            specifies whether we should check that the application model
-	 *            doesn't already contain the elements contributed by the
-	 *            fragment before merging them
-	 */
-	public void processFragment(MModelFragments fragmentsContainer, MModelFragment fragment, String contributorName,
-			String contributorURI, boolean checkExist) {
-		/**
-		 * The application elements that were added by the given
-		 * IConfigurationElement to the application model
-		 */
-		List<MApplicationElement> addedElements = new ArrayList<>();
-
+	private void processFragmentConfigurationElement(IConfigurationElement ce, boolean checkExist,
+			List<MApplicationElement> imports,
+			List<MApplicationElement> addedElements) {
+		MModelFragments fragmentsContainer = getFragmentsContainer(ce);
 		if (fragmentsContainer == null) {
 			return;
 		}
+		String contributorURI = URIHelper.constructPlatformURI(ce.getContributor());
 		boolean evalImports = false;
-		Diagnostic validationResult = Diagnostician.INSTANCE.validate((EObject) fragment);
-		int severity = validationResult.getSeverity();
-		if (severity == Diagnostic.ERROR) {
-			logger.error(
-					"Fragment from \"" + "uri.toString()" + "\" of \"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							+ contributorName + "\" could not be validated and was not merged \"{0}\"", //$NON-NLS-1$
-					fragment.toString());
-		}
+		for (MModelFragment fragment : fragmentsContainer.getFragments()) {
+			Diagnostic validationResult = Diagnostician.INSTANCE.validate((EObject) fragment);
+			int severity = validationResult.getSeverity();
+			if (severity == Diagnostic.ERROR) {
+				logger.error("Fragment from \"" + "uri.toString()" + "\" of \"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						+ ce.getContributor().getName() + "\" could not be validated and was not merged \"{0}\"", //$NON-NLS-1$
+						fragment.toString());
 
-		List<MApplicationElement> merged = processModelFragment(fragment, contributorURI, checkExist);
-		if (merged.size() > 0) {
-			evalImports = true;
-			addedElements.addAll(merged);
-		} else {
-			logger.debug("Nothing to merge for fragment \"{0}\" of \"{1}\"", contributorURI, //$NON-NLS-1$
-					contributorName);
+				continue;
+			}
+
+			List<MApplicationElement> merged = processModelFragment(fragment, contributorURI, checkExist);
+			if (merged.size() > 0) {
+				evalImports = true;
+				addedElements.addAll(merged);
+			} else {
+				logger.debug("Nothing to merge for fragment \"{0}\" of \"{1}\"", ce.getAttribute("uri"), //$NON-NLS-1$ //$NON-NLS-2$
+						ce.getContributor().getName());
+			}
 		}
-		if (evalImports && fragmentsContainer.getImports().size() > 0) {
-			resolveImports(fragmentsContainer.getImports(), addedElements);
+		if (evalImports) {
+			imports.addAll(fragmentsContainer.getImports());
 		}
 	}
 
@@ -477,11 +369,7 @@ public class ModelAssembler {
 				if (importObject.eContainmentFeature() == FragmentPackageImpl.Literals.MODEL_FRAGMENTS__IMPORTS) {
 					EStructuralFeature feature = featureIterator.feature();
 
-					MApplicationElement el = null;
-					if (importObject instanceof MApplicationElement) {
-						el = importMaps.get((MApplicationElement) importObject);
-					}
-
+					MApplicationElement el = importMaps.get(importObject);
 					if (el == null) {
 						logger.warn("Could not resolve import for " + el); //$NON-NLS-1$
 					}

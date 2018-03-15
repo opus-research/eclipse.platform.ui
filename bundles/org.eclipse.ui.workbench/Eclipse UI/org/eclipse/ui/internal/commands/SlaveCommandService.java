@@ -124,15 +124,15 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 	public void dispose() {
 		if (!fExecutionListeners.isEmpty()) {
 			Object[] array = fExecutionListeners.toArray();
-			for (Object element : array) {
-				removeExecutionListener((IExecutionListener) element);
+			for (int i = 0; i < array.length; i++) {
+				removeExecutionListener((IExecutionListener) array[i]);
 			}
 			fExecutionListeners.clear();
 		}
 		if (!fCallbackCache.isEmpty()) {
 			Object[] array = fCallbackCache.toArray();
-			for (Object element : array) {
-				unregisterElement((IElementReference) element);
+			for (int i = 0; i < array.length; i++) {
+				unregisterElement((IElementReference) array[i]);
 			}
 		}
 	}
@@ -289,7 +289,12 @@ public class SlaveCommandService implements ICommandService, IUpdateService {
 		try {
 			final IElementReference reference = registerElementForCommand(parameterizedCommand,
 					element);
-			return () -> unregisterElement(reference);
+			return new Runnable() {
+				@Override
+				public void run() {
+					unregisterElement(reference);
+				}
+			};
 		} catch (NotDefinedException e) {
 			WorkbenchPlugin.log(e);
 		}

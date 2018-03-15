@@ -94,12 +94,13 @@ public abstract class MenuItemImpl extends ItemImpl implements MMenuItem {
 
 	/**
 	 * <!-- begin-user-doc -->
-	 * This class does not support this feature.
 	 * <!-- end-user-doc -->
-	 * @generated NOT
+	 * @generated
 	 */
 	public String getLocalizedMnemonics() {
-		return null;
+		// TODO: implement this method
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
 	}
 
 	/**

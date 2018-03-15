@@ -11,15 +11,15 @@
 
 package org.eclipse.jface.action;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -216,11 +216,15 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             // Handle for chevron clicking
             if (getUseChevron()) {
                 // Chevron Support
-                coolItem.addSelectionListener(widgetSelectedAdapter(event -> {
-				    if (event.detail == SWT.ARROW) {
-				        handleChevron(event);
-				    }
-				}));
+                coolItem.addSelectionListener(new SelectionAdapter() {
+
+                    @Override
+					public void widgetSelected(SelectionEvent event) {
+                        if (event.detail == SWT.ARROW) {
+                            handleChevron(event);
+                        }
+                    }
+                });
             }
 
             // Handle for disposal
@@ -339,11 +343,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         Rectangle toolBarBounds = toolBar.getBounds();
         ToolItem[] items = toolBar.getItems();
         ArrayList<ToolItem> hidden = new ArrayList<>();
-        for (ToolItem toolItem : items) {
-            Rectangle itemBounds = toolItem.getBounds();
+        for (int i = 0; i < items.length; ++i) {
+            Rectangle itemBounds = items[i].getBounds();
             if (!((itemBounds.x + itemBounds.width <= toolBarBounds.width) && (itemBounds.y
                     + itemBounds.height <= toolBarBounds.height))) {
-                hidden.add(toolItem);
+                hidden.add(items[i]);
             }
         }
 
@@ -352,7 +356,8 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             chevronMenuManager.dispose();
         }
         chevronMenuManager = new MenuManager();
-        for (ToolItem toolItem : hidden) {
+        for (Iterator<ToolItem> i = hidden.iterator(); i.hasNext();) {
+            ToolItem toolItem = i.next();
             IContributionItem data = (IContributionItem) toolItem.getData();
             if (data instanceof ActionContributionItem) {
                 ActionContributionItem contribution = new ActionContributionItem(
@@ -436,9 +441,10 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         boolean visibleItem = false;
         if (toolBarManager != null) {
             IContributionItem[] contributionItems = toolBarManager.getItems();
-            for (IContributionItem item : contributionItems) {
-                IContributionItem contributionItem = item;
-				if ((!contributionItem.isGroupMarker()) && (!contributionItem.isSeparator())) {
+            for (int i = 0; i < contributionItems.length; i++) {
+                IContributionItem contributionItem = contributionItems[i];
+                if ((!contributionItem.isGroupMarker())
+                        && (!contributionItem.isSeparator())) {
                     visibleItem = true;
                     break;
                 }

@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.commands.IParameterValues;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
+import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
@@ -43,10 +45,14 @@ public final class PreferencePageParameterValues implements IParameterValues {
 
 	public PreferencePageParameterValues() {
 		Platform.getExtensionRegistry().addRegistryChangeListener(
-				event -> {
-					if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
-							IWorkbenchRegistryConstants.PL_PREFERENCES).length > 0) {
-						preferenceMap = null;
+				new IRegistryChangeListener() {
+
+					@Override
+					public void registryChanged(IRegistryChangeEvent event) {
+						if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
+								IWorkbenchRegistryConstants.PL_PREFERENCES).length > 0) {
+							preferenceMap = null;
+						}
 					}
 				});
 	}
@@ -70,7 +76,9 @@ public final class PreferencePageParameterValues implements IParameterValues {
 	private final void collectParameterValues(final Map values,
 			final IPreferenceNode[] preferenceNodes, final String namePrefix) {
 
-		for (final IPreferenceNode preferenceNode : preferenceNodes) {
+		for (int i = 0; i < preferenceNodes.length; i++) {
+			final IPreferenceNode preferenceNode = preferenceNodes[i];
+
 			final String name;
 			if (namePrefix == null) {
 				name = preferenceNode.getLabelText();
