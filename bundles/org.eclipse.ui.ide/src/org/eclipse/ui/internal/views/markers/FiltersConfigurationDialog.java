@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
+ *     Robert Roth <robert.roth.off@gmail.com>
+ *          - Fix for Bug 364736 Setting limit to 0 has no effect
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 498056
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -57,6 +60,7 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersConfigurationDialog is the dialog for configuring the filters for the
+ * problems view
  *
  * @since 3.3
  *
@@ -74,14 +78,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private MarkerContentGenerator generator;
 
-	private boolean andFilters;
+	private boolean andFilters = false;
 
 	private Button removeButton;
 	private Button renameButton;
 
 	private Button allButton;
-	private Button andButton;
-	private Button orButton;
 
 	private Button limitButton;
 	private Text limitText;
@@ -105,7 +107,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		super(parentShell);
 		filterGroups = makeWorkingCopy(generator.getAllFilters());
 		this.generator = generator;
-		andFilters = generator.andFilters();
+		andFilters = false;
 	}
 
 	/**
@@ -142,14 +144,13 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		composite.setBackground(container.getBackground());
 
-		createAndOrButtons(composite);
+		createSelectAllButton(composite);
 
 		configComposite = new Group(composite, SWT.NONE);
 		configComposite.setText(MarkerMessages.MarkerConfigurationsLabel);
 
 		configComposite.setLayout(new GridLayout(3, false));
 		GridData configData = new GridData(GridData.FILL_BOTH);
-		configData.horizontalIndent = 20;
 		configComposite.setLayoutData(configData);
 		configComposite.setBackground(composite.getBackground());
 
@@ -184,8 +185,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			configsTable.setChecked(group, enabled);
 		}
 
-		andButton.setSelection(andFilters);
-		orButton.setSelection(!andFilters);
 		updateRadioButtonsFromTable();
 		int limits = generator.getMarkerLimits();
 		boolean limitsEnabled = generator.isMarkerLimitsEnabled();
@@ -199,8 +198,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private void updateRadioButtonsFromTable() {
 		boolean showAll = isShowAll();
 		allButton.setSelection(showAll);
-		andButton.setEnabled(!showAll);
-		orButton.setEnabled(!showAll);
 		updateConfigComposite(!showAll);
 	}
 
@@ -230,8 +227,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private void updateShowAll(boolean showAll) {
 		allButton.setSelection(showAll);
-		andButton.setEnabled(!showAll);
-		orButton.setEnabled(!showAll);
 		updateConfigComposite(!showAll);
 
 		if (showAll) {
@@ -258,32 +253,31 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	 * @param parent
 	 */
 	private void createMarkerLimits(Composite parent) {
-		limitButton = new Button(parent, SWT.CHECK);
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(3, false);
+		composite.setLayout(layout);
+
+		limitButton = new Button(composite, SWT.CHECK);
 		limitButton.setText(MarkerMessages.MarkerPreferences_MarkerLimits);
 		limitButton.addSelectionListener(new SelectionAdapter() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				limitsLabel.setEnabled(limitButton.getSelection());
 				limitText.setEnabled(limitButton.getSelection());
 			}
 		});
 
 		GridData limitData = new GridData();
-		limitData.verticalIndent = 5;
 		limitButton.setLayoutData(limitData);
-
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		composite.setLayout(layout);
-		GridData compositeData = new GridData(GridData.FILL_HORIZONTAL);
-		compositeData.horizontalIndent = 20;
-		composite.setLayoutData(compositeData);
 
 		limitsLabel = new Label(composite, SWT.NONE);
 		limitsLabel.setText(MarkerMessages.MarkerPreferences_VisibleItems);
+
+		GridData limitsLabelData = new GridData();
+		limitsLabelData.verticalAlignment = SWT.TOP;
+		limitsLabelData.horizontalIndent = 10;
+		limitsLabelData.verticalIndent = 5;
+		limitsLabel.setLayoutData(limitsLabelData);
 
 		limitText = new Text(composite, SWT.BORDER);
 		GridData textData = new GridData();
@@ -298,9 +292,16 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		});
 
 		limitText.addModifyListener(e -> {
+			boolean isInvalid = false;
 			try {
-				Integer.parseInt(limitText.getText());
+				int value = Integer.parseInt(limitText.getText());
+				if (value <= 0) {
+					isInvalid = true;
+				}
 			} catch (NumberFormatException ex) {
+				isInvalid = true;
+			}
+			if (isInvalid) {
 				limitText.setText(Integer.toString(generator.getMarkerLimits()));
 			}
 		});
@@ -517,7 +518,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		};
 	}
 
-	private void createAndOrButtons(Composite parent) {
+	private void createSelectAllButton(Composite parent) {
 		allButton = new Button(parent, SWT.CHECK);
 		allButton.setText(MarkerMessages.ALL_Title);
 		allButton.addSelectionListener(new SelectionAdapter() {
@@ -527,29 +528,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		});
 
-		andButton = new Button(parent, SWT.RADIO);
-		andButton.setText(MarkerMessages.AND_Title);
-		andButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				andFilters = true;
-			}
-		});
-		GridData andData = new GridData();
-		andData.horizontalIndent = 20;
-		andButton.setLayoutData(andData);
-
-		orButton = new Button(parent, SWT.RADIO);
-		orButton.setText(MarkerMessages.OR_Title);
-		orButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				andFilters = false;
-			}
-		});
-		GridData orData = new GridData();
-		orData.horizontalIndent = 20;
-		orButton.setLayoutData(orData);
 	}
 
 	/**
@@ -694,25 +672,26 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	@Override
 	protected void performDefaults() {
 		andFilters = false;
-		andButton.setSelection(andFilters);
-		orButton.setSelection(!andFilters);
 
 		filterGroups.clear();
-		filterGroups.addAll(generator.getDeclaredFilters());
+		List<MarkerFieldFilterGroup> declaredFilters = new ArrayList<>(generator.getDeclaredFilters());
+		filterGroups.addAll(declaredFilters);
 		configsTable.refresh();
-		configsTable.setSelection(new StructuredSelection(
-				filterGroups.size() > 1 ? filterGroups.iterator().next()
-						: new Object[0]));
+
+		for (MarkerFieldFilterGroup marker : declaredFilters) {
+			if (marker.isEnabled()) {
+				configsTable.setChecked(marker, true);
+			}
+		}
 
 		IPreferenceStore preferenceStore = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
 		boolean useMarkerLimits = preferenceStore.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
-		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 100;
+		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 1000;
 
 		limitButton.setSelection(useMarkerLimits);
 		limitsLabel.setEnabled(useMarkerLimits);
 		limitText.setEnabled(useMarkerLimits);
 		limitText.setText(Integer.toString(markerLimits));
-
 		updateRadioButtonsFromTable();
 	}
 
