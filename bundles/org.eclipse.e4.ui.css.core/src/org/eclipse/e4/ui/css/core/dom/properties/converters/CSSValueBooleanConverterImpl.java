@@ -38,9 +38,8 @@ public class CSSValueBooleanConverterImpl extends AbstractCSSValueConverter {
 			throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
 			CSSPrimitiveValue primitiveValue = (CSSPrimitiveValue) value;
-			if (Boolean.TRUE.toString().equals(primitiveValue.getStringValue())) {
+			if ("true".equals(primitiveValue.getStringValue()))
 				return Boolean.TRUE;
-			}
 		}
 		return Boolean.FALSE;
 	}
@@ -50,9 +49,8 @@ public class CSSValueBooleanConverterImpl extends AbstractCSSValueConverter {
 			ICSSValueConverterConfig config) throws Exception {
 		if (value instanceof Boolean) {
 			Boolean b = (Boolean) value;
-			if (b.booleanValue()) {
+			if (b.booleanValue())
 				return "true";
-			}
 		}
 		return "false";
 	}

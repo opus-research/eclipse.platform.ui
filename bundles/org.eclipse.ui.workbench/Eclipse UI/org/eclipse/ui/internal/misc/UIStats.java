@@ -145,7 +145,7 @@ public class UIStats {
    		// We use a runtime debug option here for backwards compatibility (bug 96672)
 		// Note that this value is only relevant if the workspace chooser is not used.
    		String option = Platform.getDebugOption(Platform.PI_RUNTIME + "/debug"); //$NON-NLS-1$
-		if (option == null || !Boolean.TRUE.toString().equalsIgnoreCase(option)) {
+		if (option == null || !"true".equalsIgnoreCase(option)) { //$NON-NLS-1$
 			return;
 		}
 		String startString = System.getProperty("eclipse.startTime"); //$NON-NLS-1$

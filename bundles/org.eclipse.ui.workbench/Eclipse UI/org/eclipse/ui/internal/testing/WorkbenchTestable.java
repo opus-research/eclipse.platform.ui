@@ -61,8 +61,7 @@ public class WorkbenchTestable extends TestableObject {
                 @Override
 				public void run() {
 					// disable workbench auto-save during tests
-					if (Boolean.TRUE.toString().equalsIgnoreCase(
-							System.getProperty(PlatformUI.PLUGIN_ID + ".testsDisableWorkbenchAutoSave"))) { //$NON-NLS-1$
+					if ("true".equalsIgnoreCase(System.getProperty(PlatformUI.PLUGIN_ID + ".testsDisableWorkbenchAutoSave"))) { //$NON-NLS-1$ //$NON-NLS-2$
 						if (WorkbenchTestable.this.workbench instanceof Workbench) {
 							((Workbench) WorkbenchTestable.this.workbench).setEnableAutoSave(false);
 						}
@@ -71,8 +70,7 @@ public class WorkbenchTestable extends TestableObject {
                 	// Some tests (notably the startup performance tests) do not want to wait for early startup.
                 	// Allow this to be disabled by specifying the system property: org.eclipse.ui.testsWaitForEarlyStartup=false
                 	// For details, see bug 94129 [Workbench] Performance test regression caused by workbench harness change
-					if (!Boolean.FALSE.toString()
-							.equalsIgnoreCase(System.getProperty(PlatformUI.PLUGIN_ID + ".testsWaitForEarlyStartup"))) { //$NON-NLS-1$
+                	if (!"false".equalsIgnoreCase(System.getProperty(PlatformUI.PLUGIN_ID + ".testsWaitForEarlyStartup"))) {  //$NON-NLS-1$ //$NON-NLS-2$
                 		waitForEarlyStartup();
                 	}
                     getTestHarness().runTests();

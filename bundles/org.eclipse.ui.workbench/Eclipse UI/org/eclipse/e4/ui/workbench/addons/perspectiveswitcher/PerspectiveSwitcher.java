@@ -816,7 +816,7 @@ public class PerspectiveSwitcher {
 					boolean showText = true; // default
 					if (newValue instanceof Boolean)
 						showText = ((Boolean) newValue).booleanValue();
-					else if (Boolean.FALSE.toString().equals(newValue))
+					else if ("false".equals(newValue)) //$NON-NLS-1$
 						showText = false;
 					changeShowText(showText);
 				}

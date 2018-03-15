@@ -59,7 +59,7 @@ public class Policy {
 	}
 
 	private static boolean getDebugOption(String option) {
-		return Boolean.TRUE.toString().equalsIgnoreCase(Platform.getDebugOption(NavigatorPlugin.PLUGIN_ID + option));
+		return "true".equalsIgnoreCase(Platform.getDebugOption(NavigatorPlugin.PLUGIN_ID + option)); //$NON-NLS-1$
 	}
 
 	/**

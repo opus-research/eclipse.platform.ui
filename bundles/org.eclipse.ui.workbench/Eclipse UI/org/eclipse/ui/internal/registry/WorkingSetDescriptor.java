@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -96,7 +97,7 @@ public class WorkingSetDescriptor implements IPluginContribution {
 						.getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
 				if (className != null)
 					byClassList.add(className);
-				if (Boolean.TRUE.toString().equals(child.getAttribute(IWorkbenchRegistryConstants.ATT_ADAPTABLE)))
+				if ("true".equals(child.getAttribute(IWorkbenchRegistryConstants.ATT_ADAPTABLE)))  //$NON-NLS-1$
 					byAdapterList.add(className);
 			}
 			if (!byClassList.isEmpty()) {

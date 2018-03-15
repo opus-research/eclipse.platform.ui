@@ -276,7 +276,7 @@ public final class URI
   //
   private static final boolean ENCODE_PLATFORM_RESOURCE_URIS =
     System.getProperty("org.eclipse.emf.common.util.URI.encodePlatformResourceURIs") != null &&
-    !Boolean.FALSE.toString().equalsIgnoreCase(System.getProperty("org.eclipse.emf.common.util.URI.encodePlatformResourceURIs"));
+    !"false".equalsIgnoreCase(System.getProperty("org.eclipse.emf.common.util.URI.encodePlatformResourceURIs"));
 
   // Static initializer for archiveSchemes.
   static

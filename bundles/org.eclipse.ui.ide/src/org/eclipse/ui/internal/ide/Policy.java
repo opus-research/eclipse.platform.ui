@@ -54,8 +54,7 @@ public class Policy {
     }
 
     private static boolean getDebugOption(String option) {
-		return Boolean.TRUE.toString()
-				.equalsIgnoreCase(Platform.getDebugOption(IDEWorkbenchPlugin.IDE_WORKBENCH + option));
+        return "true".equalsIgnoreCase(Platform.getDebugOption(IDEWorkbenchPlugin.IDE_WORKBENCH + option)); //$NON-NLS-1$
     }
 
 	/**

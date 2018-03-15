@@ -106,16 +106,16 @@ public class StyledTextElement extends CompositeElement {
 	public void setScrollBarThemed(String cssText) {
 		String value = System.getProperty("swt.enable.themedScrollBar"); //$NON-NLS-1$
 		if (value != null) {
-			if (Boolean.TRUE.toString().equalsIgnoreCase(value)) {
+			if ("true".equalsIgnoreCase(value)) {
 				setScrollBarThemed(true);
 			} else {
 				setScrollBarThemed(false);
 			}
 
-		} else if (Boolean.TRUE.toString().equalsIgnoreCase(cssText)) {
+		} else if ("true".equalsIgnoreCase(cssText)) { //$NON-NLS-1$
 			setScrollBarThemed(true);
 
-		} else if (Boolean.FALSE.toString().equalsIgnoreCase(cssText)) {
+		} else if ("false".equalsIgnoreCase(cssText)) { //$NON-NLS-1$
 			setScrollBarThemed(false);
 
 		} else {

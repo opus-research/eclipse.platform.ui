@@ -168,8 +168,7 @@ public class Policy {
             DEBUG_SOURCES = getDebugOption("/trace/sources"); //$NON-NLS-1$
             DEBUG_KEY_BINDINGS = getDebugOption("/trace/keyBindings"); //$NON-NLS-1$
             DEBUG_KEY_BINDINGS_VERBOSE = getDebugOption("/trace/keyBindings.verbose"); //$NON-NLS-1$
-			DEBUG_TOOLBAR_DISPOSAL = Boolean.TRUE.toString()
-					.equalsIgnoreCase(Platform.getDebugOption("org.eclipse.jface/trace/toolbarDisposal")); //$NON-NLS-1$
+            DEBUG_TOOLBAR_DISPOSAL = "true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.jface/trace/toolbarDisposal")); //$NON-NLS-1$ //$NON-NLS-2$
             DEBUG_COMMANDS = getDebugOption("/trace/commands"); //$NON-NLS-1$
             DEBUG_CONTEXTS = getDebugOption("/trace/contexts"); //$NON-NLS-1$
             DEBUG_CONTEXTS_PERFORMANCE = getDebugOption("/trace/contexts.performance"); //$NON-NLS-1$
@@ -199,6 +198,6 @@ public class Policy {
     }
 
     private static boolean getDebugOption(String option) {
-		return Boolean.TRUE.toString().equalsIgnoreCase(Platform.getDebugOption(PlatformUI.PLUGIN_ID + option));
+        return "true".equalsIgnoreCase(Platform.getDebugOption(PlatformUI.PLUGIN_ID + option)); //$NON-NLS-1$
     }
 }

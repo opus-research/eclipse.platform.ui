@@ -189,10 +189,10 @@ public class FormText extends Canvas {
 	public int marginHeight = 1;
 
 	// private fields
-	private static final boolean DEBUG_TEXT = false;// Boolean.TRUE.toString().equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXT));
-	private static final boolean DEBUG_TEXTSIZE = false;// Boolean.TRUE.toString().equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXTSIZE));
+	private static final boolean DEBUG_TEXT = false;//"true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXT));
+	private static final boolean DEBUG_TEXTSIZE = false;//"true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_TEXTSIZE));
 
-	private static final boolean DEBUG_FOCUS = false;// Boolean.TRUE.toString().equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_FOCUS));
+	private static final boolean DEBUG_FOCUS = false;//"true".equalsIgnoreCase(Platform.getDebugOption(FormUtil.DEBUG_FOCUS));
 
 	private boolean hasFocus;
 
