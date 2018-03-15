@@ -24,7 +24,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Point;
@@ -39,9 +38,19 @@ import org.eclipse.swt.widgets.Shell;
 public class SplitDropAgent2 extends DropAgent {
 	private static final int TOLERANCE = 35;
 
-	private static final Rectangle NO_RECTANGLE = new Rectangle(0, 0, 0, 0);
+	private MUIElement relToElement = null;
 
 	private SplitFeedbackOverlay feedback = null;
+
+	private int dragElementLocation;
+
+	private int where;
+
+	private float ratio = 0.5f;
+
+	private Rectangle trackRect;
+
+	private boolean wasModified = false;
 
 	/**
 	 * @param manager
@@ -56,13 +65,14 @@ public class SplitDropAgent2 extends DropAgent {
 		if (!(dragElement instanceof MStackElement) && !(dragElement instanceof MPartStack))
 			return false;
 
-		return getTargetElement(dragElement, info) != null;
+		relToElement = getTargetElement(dragElement, info);
+		return relToElement != null;
 	}
 
 	private MUIElement getTargetElement(MUIElement dragElement, DnDInfo info) {
 		MUIElement target = null;
 
-		int dragElementLocation = dndManager.getModelService().getElementLocation(dragElement);
+		dragElementLocation = dndManager.getModelService().getElementLocation(dragElement);
 
 		// If we're inside a perspective somewhere check the shared area's edges
 		if (dragElementLocation == EModelService.IN_SHARED_AREA
@@ -82,7 +92,7 @@ public class SplitDropAgent2 extends DropAgent {
 		return target;
 	}
 
-	private static boolean isInCursorShell(DnDInfo info, Control ctrl) {
+	private boolean isInCursorShell(DnDInfo info, Control ctrl) {
 		if (ctrl == null || info.curCtrl == null || info.curCtrl.isDisposed())
 			return false;
 		Shell infoShell = (Shell) (info.curCtrl instanceof Shell ? info.curCtrl : info.curCtrl
@@ -91,82 +101,45 @@ public class SplitDropAgent2 extends DropAgent {
 	}
 
 	private MPartStack checkStacks(final MUIElement dragElement, final DnDInfo info) {
-		final EModelService ms = dndManager.getModelService();
-
-		MPartStack candidateStack = getStackAt(dragElement, info, ms);
-
-		return candidateStack;
-	}
-
-	private static Rectangle getRectangleFor(MPartStack candidateStack) {
-		Rectangle result = NO_RECTANGLE;
-		if (candidateStack != null && candidateStack.getWidget() instanceof CTabFolder) {
-			CTabFolder ctf = (CTabFolder) (candidateStack.getWidget());
-			result = ctf.getClientArea();
-			result = ctf.getDisplay().map(ctf, null, result);
-		}
-		return result;
-	}
-
-	static MPartStack getStackAt(final MUIElement dragElement, final DnDInfo info, final EModelService ms) {
 		MPartStack candidateStack = null;
 
-		MWindow topLevelWindow = ms.getTopLevelWindowFor(dragElement);
-
 		// Collect up the elements we can be split 'relative to'
-		List<MPartStack> stacks = ms.findElements(topLevelWindow,
+		final EModelService ms = dndManager.getModelService();
+		List<MPartStack> stacks = ms.findElements(ms.getTopLevelWindowFor(dragElement),
 				MPartStack.class, EModelService.PRESENTATION, new Selector() {
 					@Override
 					public boolean select(MApplicationElement element) {
 						MPartStack stack = (MPartStack) element;
 
 						// Has to be visible...
-						if (!stack.isVisible() || !(stack.getWidget() instanceof CTabFolder)) {
-							// System.out.println("SplitDropAgent2:
-							// !stack.isVisible()");
+						if (!stack.isVisible() || !(stack.getWidget() instanceof CTabFolder))
 							return false;
-						}
 
 						// ...not disposed...
 						CTabFolder ctf = (CTabFolder) stack.getWidget();
-						if (ctf.isDisposed()) {
-							// System.out.println("SplitDropAgent2:
-							// ctf.isDisposed()");
+						if (ctf.isDisposed())
 							return false;
-						}
 
 						// ...and in the shell the cursor is over
-						if (!isInCursorShell(info, ctf)) {
-							// System.out.println("SplitDropAgent2:
-							// !isInCursorShell(...)");
+						if (!isInCursorShell(info, ctf))
 							return false;
-						}
 
 						// ...and the cursor must be in the CTF's client area
 						Rectangle bb = ctf.getClientArea();
 						bb = ctf.getDisplay().map(ctf, null, bb);
-						if (!bb.contains(info.cursorPos)) {
-							// System.out.println("SplitDropAgent2:
-							// !bb.contains(...)");
+						if (!bb.contains(info.cursorPos))
 							return false;
-						}
 
 						// Can't split with ourselves if we're dragging a stack
-						if (dragElement instanceof MPartStack && stack == dragElement) {
-							// System.out.println("SplitDropAgent2: stack ==
-							// dragElement");
+						if (dragElement instanceof MPartStack && stack == dragElement)
 							return false;
-						}
 
 						// Can't split with ourselves if we're dragging the only visible element in
 						// a stack
 						MUIElement deParent = dragElement.getParent();
 						if (dragElement instanceof MStackElement && stack == deParent
-								&& ms.countRenderableChildren(deParent) == 1) {
-							// System.out.println("SplitDropAgent2: count
-							// failed");
+								&& ms.countRenderableChildren(deParent) == 1)
 							return false;
-						}
 
 						return true;
 					}
@@ -174,11 +147,11 @@ public class SplitDropAgent2 extends DropAgent {
 
 		if (stacks.size() > 0) {
 			candidateStack = stacks.get(0);
-		}
-
-		System.out.println("SplitDropAgent2: topLevelWindow = " + topLevelWindow);
-		if (candidateStack == null) {
-			System.out.println("SplitDropAgent2: candidateStack = " + candidateStack);
+			if (candidateStack.getWidget() instanceof CTabFolder) {
+				CTabFolder ctf = (CTabFolder) (candidateStack.getWidget());
+				trackRect = ctf.getClientArea();
+				trackRect = ctf.getDisplay().map(ctf, null, trackRect);
+			}
 		}
 
 		return candidateStack;
@@ -223,24 +196,22 @@ public class SplitDropAgent2 extends DropAgent {
 		if (bb.contains(info.cursorPos)) {
 			Point p = info.cursorPos;
 			if (p.x - bb.x < TOLERANCE) {
-				// where = EModelService.LEFT_OF;
-				// trackRect = new Rectangle(bb.x, bb.y, TOLERANCE, bb.height);
+				where = EModelService.LEFT_OF;
+				trackRect = new Rectangle(bb.x, bb.y, TOLERANCE, bb.height);
 				onEdge = true;
 				// } else if (p.y - bb.y < TOLERANCE) {
 				// where = EModelService.ABOVE;
 				// trackRect = new Rectangle(bb.x, bb.y, bb.width, TOLERANCE);
 				// onEdge = true;
 			} else if ((bb.x + bb.width) - p.x < TOLERANCE) {
-				// where = EModelService.RIGHT_OF;
-				// trackRect = new Rectangle(bb.x + (bb.width - TOLERANCE),
-				// bb.y, TOLERANCE,
-				// bb.height);
+				where = EModelService.RIGHT_OF;
+				trackRect = new Rectangle(bb.x + (bb.width - TOLERANCE), bb.y, TOLERANCE,
+						bb.height);
 				onEdge = true;
 			} else if ((bb.y + bb.height) - p.y < TOLERANCE) {
-				// where = EModelService.BELOW;
-				// trackRect = new Rectangle(bb.x, bb.y + (bb.height -
-				// TOLERANCE), bb.width,
-				// TOLERANCE);
+				where = EModelService.BELOW;
+				trackRect = new Rectangle(bb.x, bb.y + (bb.height - TOLERANCE), bb.width,
+						TOLERANCE);
 				onEdge = true;
 			}
 		}
@@ -251,18 +222,54 @@ public class SplitDropAgent2 extends DropAgent {
 	public void dragEnter(final MUIElement dragElement, DnDInfo info) {
 		super.dragEnter(dragElement, info);
 
-		MUIElement dragOverElement = getTargetElement(dragElement, info);
+		where = setRelToInfo(info);
 
-		if (dragOverElement == null) {
-			return;
+		showFeedback();
+	}
+
+	private int setRelToInfo(DnDInfo info) {
+		if (relToElement instanceof MPerspective || relToElement instanceof MArea) {
+			ratio = 0.33f; // 'where' has already been set
+			return where;
+		} else if (relToElement instanceof MPartStack) {
+			ratio = 0.5f;
+			Point p = info.cursorPos;
+			int dTop = p.y - trackRect.y;
+			int dBottom = (trackRect.y + trackRect.height) - p.y;
+			int dLeft = p.x - trackRect.x;
+			int dRight = (trackRect.x + trackRect.width) - p.x;
+
+			if (trackRect.width >= trackRect.height) {
+				int thirdOfWidth = trackRect.width / 3;
+				// System.out.println("tow: " + thirdOfWidth + " dLeft: " + dLeft + " dRight: "
+				// + dRight);
+				if (dLeft < thirdOfWidth)
+					return EModelService.LEFT_OF;
+				else if (dRight < thirdOfWidth)
+					return EModelService.RIGHT_OF;
+				else {
+					return dTop < dBottom ? EModelService.ABOVE : EModelService.BELOW;
+				}
+			}
+
+			int thirdOfHeight = trackRect.height / 3;
+			if (dTop < thirdOfHeight)
+				return EModelService.ABOVE;
+			else if (dBottom < thirdOfHeight)
+				return EModelService.BELOW;
+			else if (relToElement != null) {
+				return dLeft < dRight ? EModelService.LEFT_OF : EModelService.RIGHT_OF;
+			}
 		}
 
-		showFeedback(dragOverElement, info.cursorPos);
+		return -1;
 	}
 
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
+		dndManager.clearOverlay();
 		clearFeedback();
+		relToElement = null;
 
 		reactivatePart(dragElement);
 
@@ -271,10 +278,6 @@ public class SplitDropAgent2 extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
-		MUIElement relToElement = getTargetElement(dragElement, info);
-		if (relToElement == null) {
-			return true;
-		}
 		MPartSashContainerElement toInsert = (MPartSashContainerElement) dragElement;
 		if (dragElement instanceof MPartStack) {
 			// Ensure we restore the stack to the presentation first
@@ -300,15 +303,13 @@ public class SplitDropAgent2 extends DropAgent {
 			relToElement = targetParent;
 		}
 
-		int dragElementLocation = dndManager.getModelService().getElementLocation(dragElement);
-
 		// Adjust the relToElement based on the location of the dragElement
 		if (relToElement instanceof MArea) {
 			// make it difficult to drag outside parts into the shared area
 			boolean fromSharedArea = dragElementLocation == EModelService.IN_SHARED_AREA;
 			// if from shared area and no modifier, is ok
 			// if not from shared area and modifier is on, then ok
-			boolean shouldBePlacedInSharedArea = fromSharedArea == !isModified(relToElement);
+			boolean shouldBePlacedInSharedArea = fromSharedArea == !isModified();
 			if (shouldBePlacedInSharedArea) {
 				MArea area = (MArea) relToElement;
 				relToElement = area.getChildren().get(0);
@@ -320,38 +321,14 @@ public class SplitDropAgent2 extends DropAgent {
 			}
 		}
 
-		if (relToElement instanceof MPartSashContainerElement) {
-			MPartSashContainerElement element = (MPartSashContainerElement) relToElement;
-
-			Control ctrl = (Control) relToElement.getWidget();
-			Rectangle bb = ctrl.getBounds();
-			bb = ctrl.getDisplay().map(ctrl.getParent(), null, bb);
-
-			int side = Geometry.getClosestSide(bb, info.cursorPos);
-			int emodelSideConstant = swtConstantToEmodelServiceConstant(side);
-
-			dndManager.getModelService().insert(toInsert, element, emodelSideConstant, 0.5f);
-		} else {
-			System.out.println("Unknown drag element type: " + relToElement);
-		}
+		dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
+				where, ratio);
 		// reactivatePart(dragElement);
 
 		return true;
 	}
 
-	private static int swtConstantToEmodelServiceConstant(int swtConstant) {
-		switch (swtConstant) {
-		case SWT.TOP:
-			return EModelService.ABOVE;
-		case SWT.BOTTOM:
-			return EModelService.BELOW;
-		case SWT.LEFT:
-			return EModelService.LEFT_OF;
-		}
-		return EModelService.RIGHT_OF;
-	}
-
-	private boolean isModified(MUIElement relToElement) {
+	private boolean isModified() {
 		return dndManager.isModified
 				&& (relToElement instanceof MArea || relToElement instanceof MPerspective || dndManager
 						.getModelService().isLastEditorStack(relToElement));
@@ -359,15 +336,10 @@ public class SplitDropAgent2 extends DropAgent {
 
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
-		MUIElement element = getTargetElement(dragElement, info);
-
-		if (element == null) {
+		if (getTargetElement(dragElement, info) != relToElement) {
+			dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_NO));
 			return false;
 		}
-
-		final EModelService ms = dndManager.getModelService();
-		MPartStack stack = getStackAt(dragElement, info, ms);
-		Rectangle trackRect = getRectangleFor(stack);
 
 		if (!trackRect.contains(info.cursorPos)) {
 			dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_NO));
@@ -376,41 +348,45 @@ public class SplitDropAgent2 extends DropAgent {
 
 		dndManager.setCursor(Display.getCurrent().getSystemCursor(SWT.CURSOR_HAND));
 
-		showFeedback(element, info.cursorPos);
+		int curWhere = where;
+		where = setRelToInfo(info);
+
+		if (where == curWhere && wasModified == isModified())
+			return true;
+		wasModified = isModified();
+
+		showFeedback();
 
 		return true;
 	}
 
-	private void showFeedback(MUIElement element, Point pointToTest) {
-		if (element == null || !(element.getWidget() instanceof Control))
+	private void showFeedback() {
+		if (relToElement == null || !(relToElement.getWidget() instanceof Control))
 			return;
 
-		if (feedback != null) {
-			feedback.dispose();
-			feedback = null;
+		int side = -1;
+		if (where == EModelService.ABOVE) {
+			side = SWT.TOP;
+		} else if (where == EModelService.BELOW) {
+			side = SWT.BOTTOM;
+		} else if (where == EModelService.LEFT_OF) {
+			side = SWT.LEFT;
+		} else if (where == EModelService.RIGHT_OF) {
+			side = SWT.RIGHT;
 		}
 
-		Control ctrl = (Control) element.getWidget();
+		if (feedback != null)
+			feedback.dispose();
+
+		Control ctrl = (Control) relToElement.getWidget();
 		Rectangle bb = ctrl.getBounds();
 		bb = ctrl.getDisplay().map(ctrl.getParent(), null, bb);
-
-		int side = Geometry.getClosestSide(bb, pointToTest);
-
-		// boolean modified = isModified(element);
-
-		boolean horizontal = Geometry.isHorizontal(side);
-		int size = Geometry.getCoordinate(Geometry.getSize(bb), !horizontal);
-		Rectangle overlayBounds = Geometry.getExtrudedEdge(bb, size / 2, side);
-		System.out.println("Setting overlay to " + overlayBounds);
-		dndManager.frameRect(Geometry.copy(overlayBounds));
-		// dndManager.addFrame(newRect);
-		// feedback = new SplitFeedbackOverlay(ctrl.getShell(), bb, side, 0.5f,
-		// modified, modified);
-		// feedback.setVisible(true);
+		feedback = new SplitFeedbackOverlay(ctrl.getShell(), bb, side, ratio, isModified(),
+				isModified());
+		feedback.setVisible(true);
 	}
 
 	private void clearFeedback() {
-		dndManager.clearOverlay();
 		if (feedback == null)
 			return;
 
