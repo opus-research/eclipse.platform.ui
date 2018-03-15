@@ -11,10 +11,13 @@
 package org.eclipse.jface.util;
 
 import java.time.Duration;
+
 import org.eclipse.swt.widgets.Display;
 
 /**
  * A utility class that throttles the execution of a runnable in the UI thread.
+ * 
+ * @since 3.14
  */
 public class Throttler {
 	private final Runnable timerExec;

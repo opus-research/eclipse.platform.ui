@@ -15,8 +15,6 @@ package org.eclipse.jface.wizard;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.time.Duration;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
@@ -24,7 +22,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.Throttler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
@@ -89,7 +86,6 @@ public class ProgressMonitorPart extends Composite implements
 	/** <code>true</code> if this monitor part should show stop button **/
 	private boolean fHasStopButton = false;
 
-	private Throttler throttledUpdate;
 
 	/**
 	 * Creates a <code>ProgressMonitorPart</code> that does not provide a stop button.
@@ -278,8 +274,6 @@ public class ProgressMonitorPart extends Composite implements
         	fStopButton.setEnabled(false);
 			fStopButton.setToolTipText(JFaceResources.getString("ProgressMonitorPart.cancelToolTip")); //$NON-NLS-1$
         }
-
-		throttledUpdate = new Throttler(fLabel.getDisplay(), Duration.ofMillis(100), this::internalUpdateLabel);
     }
 
     @Override
@@ -336,27 +330,23 @@ public class ProgressMonitorPart extends Composite implements
         updateLabel();
     }
 
-	/**
-	 * Updates the label with the current task and subtask names.
-	 */
-	protected void updateLabel() {
-		throttledUpdate.throttledExec();
-	}
-
-	private void internalUpdateLabel() {
+    /**
+     * Updates the label with the current task and subtask names.
+     */
+    protected void updateLabel() {
 		if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
 			return;
 		}
-		if (blockedStatus == null) {
-			String text = taskLabel();
-			fLabel.setText(text);
-		} else {
+        if (blockedStatus == null) {
+            String text = taskLabel();
+            fLabel.setText(text);
+        } else {
 			fLabel.setText(blockedStatus.getMessage());
 		}
 
-		// Force an update as we are in the UI Thread
-		fLabel.update();
-	}
+        //Force an update as we are in the UI Thread
+        fLabel.update();
+    }
 
     /**
      * Return the label for showing tasks
