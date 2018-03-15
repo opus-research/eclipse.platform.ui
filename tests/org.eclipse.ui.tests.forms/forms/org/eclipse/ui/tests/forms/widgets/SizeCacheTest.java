@@ -359,14 +359,16 @@ public class SizeCacheTest {
 		checkCacheSize(link);
 	}
 
-	public void suppressed_testWrapHyperlink() {
+	@Test
+	public void testWrapHyperlink() {
 		Hyperlink link = new Hyperlink(shell, SWT.WRAP);
 		link.setText(LONG_TEXT);
 		link.setFont(shell.getFont());
 		checkCacheSize(link);
 	}
 
-	public void suppressed_testButton() {
+	@Test
+	public void testButton() {
 		checkCacheSize(createButton(shell, LONG_TEXT, SWT.PUSH));
 	}
 
