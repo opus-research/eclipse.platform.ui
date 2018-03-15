@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2017 vogella GmbH and others.
+ * Copyright (c) 2017 Fabian Pfaff and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Fabian Pfaff - - initial API and implementation
+ *     Fabian Pfaff - Bug 517461
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -228,11 +228,11 @@ public class Snippet066TableViewerWithLabelDecorator {
 	private List<Person> createModel() {
 		List<Person> persons = new ArrayList<>();
 
-		persons.add(new Person(1, "Jennifer", "Nerlich"));
-		persons.add(new Person(3, "Fab%ian", "Pfaff"));
-		persons.add(new Person(2, "Simon", "Scholz"));
 		persons.add(new Person(0, "Lars", "Vogel"));
+		persons.add(new Person(1, "Jennifer", "Nerlich"));
+		persons.add(new Person(2, "Simon", "Scholz"));
 		persons.add(new Person(3, "David", "Weiser"));
+		persons.add(new Person(3, "Fab%ian", "Pfaff"));
 
 		return persons;
 	}
