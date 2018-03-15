@@ -48,10 +48,18 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class MenuManagerShowProcessor implements IMenuListener2 {
 
+	private static final boolean DEBUG = WorkbenchSWTActivator.getDefault().getDebugOptions()
+			.getBooleanOption(WorkbenchSWTActivator.PI_RENDERERS + Policy.MENUS, false);
+
+	static boolean isDebugEnabled() {
+		return DEBUG;
+	}
+
 	private static void trace(String msg, MenuManager menuManager, MMenu menuModel) {
-		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG,
-				msg + ": " + menuManager + ": " + menuManager.getMenu() + ": " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ menuModel, null);
+		if (isDebugEnabled()) {
+			WorkbenchSWTActivator.trace(Policy.MENUS, msg + ": " + menuManager + ": " + menuManager.getMenu() + ": " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					+ menuModel, null);
+		}
 	}
 
 	@Inject
@@ -88,9 +96,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		AbstractPartRenderer obj = rendererFactory.getRenderer(menuModel,
 				menu.getParent());
 		if (!(obj instanceof MenuManagerRenderer)) {
-			if (Policy.DEBUG_MENUS) {
-				trace("Not the correct renderer: " + obj, menuManager, menuModel); //$NON-NLS-1$
-			}
+			trace("Not the correct renderer: " + obj, menuManager, menuModel); //$NON-NLS-1$
 			return;
 		}
 		MenuManagerRenderer renderer = (MenuManagerRenderer) obj;
@@ -202,17 +208,13 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	 * @param menuManager
 	 */
 	private void cleanUp(MMenu menuModel, MenuManager menuManager) {
-		if (Policy.DEBUG_MENUS) {
-			trace("\nCleaning up the dynamic menu contributions", menuManager, menuModel); //$NON-NLS-1$
-		}
+		trace("\nCleaning up the dynamic menu contributions", menuManager, menuModel); //$NON-NLS-1$
 		renderer.removeDynamicMenuContributions(menuManager, menuModel);
 
 		if (menuManager.getRemoveAllWhenShown()) {
 			// remove the items from the model related to contributions defined
 			// with location URIs
-			if (Policy.DEBUG_MENUS) {
-				trace("\nCleaning up all of the menu model items", menuManager, menuModel); //$NON-NLS-1$
-			}
+			trace("\nCleaning up all of the menu model items", menuManager, menuModel); //$NON-NLS-1$
 			renderer.cleanUp(menuModel);
 
 			// cleanup any leftovers - opaque items etc
