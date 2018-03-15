@@ -38,6 +38,7 @@ import org.junit.runners.Suite;
 	EclipsePreferencesHelperTest.class,
 	CSSSWTWidgetTest.class,
 	LabelTest.class,
+	LinkTest.class,
 	CTabFolderTest.class,
 	CTabItemTest.class,
 	IdClassLabelColorTest.class,
