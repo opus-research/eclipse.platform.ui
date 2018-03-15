@@ -22,12 +22,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -562,14 +560,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		MarkerFieldFilterGroup config = new MarkerFieldFilterGroup(null, generator);
 		config.setName(newName);
 		return config;
-	}
-
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-		super.createButtonsForButtonBar(parent);
-		Button okButton = getButton(IDialogConstants.OK_ID);
-		okButton.setText(JFaceResources.getString("PreferencesDialog.okButtonLabel")); //$NON-NLS-1$
-		setButtonLayoutData(okButton);
 	}
 
 	/**
