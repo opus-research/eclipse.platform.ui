@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 485840
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 380233
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485829
  ******************************************************************************/
@@ -375,25 +375,21 @@ public class PerspectiveSwitcher {
 
 		hookupDnD(perspSwitcherToolbar);
 
-		boolean showOpenOnPerspectiveBar = PrefUtil.getAPIPreferenceStore()
-				.getBoolean(IWorkbenchPreferenceConstants.SHOW_OPEN_ON_PERSPECTIVE_BAR);
-		if (showOpenOnPerspectiveBar) {
-			final ToolItem openPerspectiveItem = new ToolItem(perspSwitcherToolbar, SWT.PUSH);
-			openPerspectiveItem.setImage(getOpenPerspectiveImage());
-			openPerspectiveItem.setToolTipText(WorkbenchMessages.OpenPerspectiveDialogAction_tooltip);
-			openPerspectiveItem.addSelectionListener(new SelectionListener() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					selectPerspective();
-				}
+		final ToolItem createItem = new ToolItem(perspSwitcherToolbar, SWT.PUSH);
+		createItem.setImage(getOpenPerspectiveImage());
+		createItem.setToolTipText(WorkbenchMessages.OpenPerspectiveDialogAction_tooltip);
+		createItem.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				selectPerspective();
+			}
 
-				@Override
-				public void widgetDefaultSelected(SelectionEvent e) {
-					selectPerspective();
-				}
-			});
-			new ToolItem(perspSwitcherToolbar, SWT.SEPARATOR);
-		}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				selectPerspective();
+			}
+		});
+		new ToolItem(perspSwitcherToolbar, SWT.SEPARATOR);
 
 		MPerspectiveStack stack = getPerspectiveStack();
 		if (stack != null) {
@@ -689,7 +685,8 @@ public class PerspectiveSwitcher {
 	}
 
 	private void closePerspective(MPerspective persp) {
-		WorkbenchPage page = (WorkbenchPage) window.getContext().get(IWorkbenchPage.class);
+		MWindow win = modelService.getTopLevelWindowFor(persp);
+		WorkbenchPage page = (WorkbenchPage) win.getContext().get(IWorkbenchPage.class);
 		String perspectiveId = persp.getElementId();
 		IPerspectiveDescriptor desc = getDescriptorFor(perspectiveId);
 		page.closePerspective(desc, perspectiveId, true, true);
