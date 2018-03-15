@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *     Christian Georgi (SAP)            - Bug 432480
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700, 502050
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -828,10 +828,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Returns the location to show in the window title, depending on a
-	 * {@link IDEInternalPreferences#SHOW_LOCATION} and
-	 * {@link IDEInternalPreferences#SHOW_LOCATION_FULLPATH} user preferences.
-	 * Note that this may be overridden by the '-showlocation' command line
-	 * argument.
+	 * {@link IDEInternalPreferences#SHOW_LOCATION user preference}. Note that
+	 * this may be overridden by the '-showlocation' command line argument.
 	 *
 	 * @return the location string, or <code>null</code> if the location is not
 	 *         being shown
@@ -843,20 +841,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		if (location != null) {
 			return location;
 		}
-		// read the preferences
-		IPreferenceStore ps = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-		boolean isShowLocation = ps.getBoolean(IDEInternalPreferences.SHOW_LOCATION);
-		boolean isShowFullPath = ps.getBoolean(IDEInternalPreferences.SHOW_LOCATION_FULLPATH);
-
-		if (isShowLocation) {
-			if (isShowFullPath) {
-				return Platform.getLocation().toOSString();
-			}
-			String workspaceName = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
-					.getString(IDEInternalPreferences.WORKSPACE_NAME);
-			if (workspaceName != null && workspaceName.length() > 0) {
-				return workspaceName;
-			}
+		// read the preference
+		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION)) {
+			return Platform.getLocation().toOSString();
 		}
 		return null;
 	}
