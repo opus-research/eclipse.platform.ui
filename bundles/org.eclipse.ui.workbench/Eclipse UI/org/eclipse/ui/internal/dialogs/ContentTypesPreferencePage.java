@@ -21,19 +21,22 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.content.IContentTypeManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -42,7 +45,13 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -59,7 +68,6 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
-import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -75,7 +83,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 public class ContentTypesPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 
-	private TableViewer fileAssociationViewer;
+	private ListViewer fileAssociationViewer;
 
 	private Button removeButton;
 
@@ -90,6 +98,10 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	private Button setButton;
 
 	private IWorkbench workbench;
+
+	private Button removeContentTypeButton;
+
+	private Button addChildContentTypeButton;
 
 	private class Spec {
 		String name;
@@ -108,11 +120,13 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			} else {
 				toString = "*." + ext; //$NON-NLS-1$
 			}
-			return toString;
-		}
 
-		public boolean getPredefined() {
-			return isPredefined;
+			if (isPredefined) {
+				toString = NLS.bind(
+						WorkbenchMessages.ContentTypes_lockedFormat, toString);
+			}
+
+			return toString;
 		}
 	}
 
@@ -129,17 +143,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		public String getText(Object element) {
 			String label = super.getText(element);
 			return TextProcessor.process(label, "*."); //$NON-NLS-1$
-		}
-
-		@Override
-		public Image getImage(Object element) {
-			// only Spec objects will be in here
-			Spec spec = (Spec) element;
-			if (spec.getPredefined()) {
-				// Temporary until we decide on a location to host the icon
-				return JFaceResources.getImage(ProgressManager.BLOCKED_JOB_KEY);
-			}
-			return null;
 		}
 	}
 
@@ -202,10 +205,51 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	}
 
 	private class ContentTypesLabelProvider extends LabelProvider {
+		private Image silhouette;
+
+		public ContentTypesLabelProvider() {
+			this.silhouette = createImage(getFont(), "\uD83D\uDC64"); //$NON-NLS-1$
+		}
+
+		private Image createImage(Font font, String s) {
+			TextLayout textLayout = new TextLayout(font.getDevice());
+			textLayout.setText(s);
+			textLayout.setFont(font);
+			Rectangle bounds = textLayout.getBounds();
+			PaletteData palette = new PaletteData(0xFF, 0xFF00, 0xFF0000);
+			ImageData imageData = new ImageData(bounds.width, bounds.height, 32, palette);
+			imageData.transparentPixel = palette
+					.getPixel(font.getDevice().getSystemColor(SWT.COLOR_TRANSPARENT).getRGB());
+			for (int column = 0; column < imageData.width; column++) {
+				for (int line = 0; line < imageData.height; line++) {
+					imageData.setPixel(column, line, imageData.transparentPixel);
+				}
+			}
+			Image image = new Image(font.getDevice(), imageData);
+			GC gc = new GC(image);
+			textLayout.draw(gc, 0, 0);
+			return image;
+		}
+
 		@Override
 		public String getText(Object element) {
 			IContentType contentType = (IContentType) element;
 			return contentType.getName();
+		}
+
+		@Override
+		public Image getImage(Object element) {
+			IContentType contentType = (IContentType) element;
+			if (contentType.isUserDefined()) {
+				return this.silhouette;
+			}
+			return super.getImage(element);
+		}
+
+		@Override
+		public void dispose() {
+			this.silhouette.dispose();
+			super.dispose();
 		}
 	}
 
@@ -360,7 +404,7 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			label.setLayoutData(data);
 		}
 		{
-			fileAssociationViewer = new TableViewer(composite);
+			fileAssociationViewer = new ListViewer(composite);
 			fileAssociationViewer.setComparator(new FileSpecComparator());
 			fileAssociationViewer.getControl().setFont(composite.getFont());
 			fileAssociationViewer
@@ -578,7 +622,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			contentTypesViewer.setComparator(new ViewerComparator());
 			contentTypesViewer.setInput(Platform.getContentTypeManager());
 			GridData data = new GridData(GridData.FILL_BOTH);
-			data.horizontalSpan = 2;
 			contentTypesViewer.getControl().setLayoutData(data);
 
 			contentTypesViewer
@@ -604,9 +647,80 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 							charsetField.setEnabled(contentType != null);
 							addButton.setEnabled(contentType != null);
 							setButton.setEnabled(false);
+
+							addChildContentTypeButton.setEnabled(contentType != null);
+							removeContentTypeButton.setEnabled(contentType != null && contentType.isUserDefined());
 						}
 					});
 		}
+		Composite buttonsComposite = new Composite(composite, SWT.NONE);
+		buttonsComposite.setLayoutData(new GridData(SWT.DEFAULT, SWT.TOP, false, false));
+		buttonsComposite.setLayout(new GridLayout(1, false));
+		Button addRootContentTypeButton = new Button(buttonsComposite, SWT.PUSH);
+		setButtonLayoutData(addRootContentTypeButton);
+		addRootContentTypeButton.setText(WorkbenchMessages.ContentTypes_addRootContentTypeButton);
+		addRootContentTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String id = "userCreated" + System.currentTimeMillis(); //$NON-NLS-1$
+				IContentTypeManager manager = (IContentTypeManager) contentTypesViewer.getInput();
+				NewContentTypeDialog dialog = new NewContentTypeDialog(ContentTypesPreferencePage.this.getShell(),
+						manager, null);
+				if (dialog.open() == IDialogConstants.OK_ID) {
+					try {
+						IContentType newContentType = manager.addContentType(id, dialog.getName(), null);
+						contentTypesViewer.refresh();
+						contentTypesViewer.setSelection(new StructuredSelection(newContentType));
+					} catch (CoreException e1) {
+						MessageDialog.openError(getShell(), WorkbenchMessages.ContentTypes_failedAtEditingContentTypes,
+								e1.getMessage());
+					}
+				}
+			}
+		});
+		addChildContentTypeButton = new Button(buttonsComposite, SWT.PUSH);
+		setButtonLayoutData(addChildContentTypeButton);
+		addChildContentTypeButton.setText(WorkbenchMessages.ContentTypes_addChildContentTypeButton);
+		addChildContentTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String id = "userCreated" + System.currentTimeMillis(); //$NON-NLS-1$
+				IContentTypeManager manager = (IContentTypeManager) contentTypesViewer.getInput();
+				NewContentTypeDialog dialog = new NewContentTypeDialog(ContentTypesPreferencePage.this.getShell(),
+						manager,
+						getSelectedContentType());
+				if (dialog.open() == IDialogConstants.OK_ID) {
+					try {
+						IContentType newContentType = manager.addContentType(id, dialog.getName(),
+								getSelectedContentType());
+						contentTypesViewer.refresh(getSelectedContentType());
+						contentTypesViewer.setSelection(new StructuredSelection(newContentType));
+					} catch (CoreException e1) {
+						MessageDialog.openError(getShell(), WorkbenchMessages.ContentTypes_failedAtEditingContentTypes,
+								e1.getMessage());
+					}
+				}
+			}
+		});
+		addChildContentTypeButton.setEnabled(getSelectedContentType() != null);
+		removeContentTypeButton = new Button(buttonsComposite, SWT.PUSH);
+		setButtonLayoutData(removeContentTypeButton);
+		removeContentTypeButton.setText(WorkbenchMessages.ContentTypes_removeContentTypeButton);
+		removeContentTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IContentType selectedContentType = getSelectedContentType();
+				try {
+					Platform.getContentTypeManager().removeContentType(selectedContentType.getId());
+					contentTypesViewer.refresh();
+				} catch (CoreException e1) {
+					MessageDialog.openError(getShell(), WorkbenchMessages.ContentTypes_failedAtEditingContentTypes,
+							e1.getMessage());
+				}
+			}
+		});
+		removeContentTypeButton
+				.setEnabled(getSelectedContentType() != null && getSelectedContentType().isUserDefined());
 	}
 
 	@Override
