@@ -2232,7 +2232,7 @@ public final class BindingManager extends HandleObjectManager implements
 			throw new NullPointerException("Cannot activate a null scheme"); //$NON-NLS-1$
 		}
 
-		if (!scheme.isDefined()) {
+		if ((scheme == null) || (!scheme.isDefined())) {
 			throw new NotDefinedException(
 					"Cannot activate an undefined scheme. " //$NON-NLS-1$
 							+ scheme.getId());

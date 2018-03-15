@@ -170,8 +170,10 @@ abstract class DragAgent {
 			return;
 		}
 
-		dragPH.getParent().getChildren().remove(dragPH);
-		dragPH = null;
+		if (dragPH != null) {
+			dragPH.getParent().getChildren().remove(dragPH);
+			dragPH = null;
+		}
 
 		dragElement = null;
 	}
