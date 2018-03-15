@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Serge Beauchamp (Freescale Semiconductor) - Bug 229633
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -651,8 +652,7 @@ public class CopyFilesAndFoldersOperation {
 		IDEWorkbenchPlugin.getDefault().getLog().log(
 				StatusUtil.newStatus(IStatus.ERROR, MessageFormat.format(
 						"Exception in {0}.performCopy(): {1}", //$NON-NLS-1$
-						new Object[] { getClass().getName(),
-								e.getTargetException() }), null));
+						getClass().getName(), e.getTargetException()), null));
 		displayError(NLS
 				.bind(
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_internalError,
