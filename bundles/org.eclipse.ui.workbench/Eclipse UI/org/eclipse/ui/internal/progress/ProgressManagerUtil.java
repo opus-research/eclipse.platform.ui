@@ -179,39 +179,105 @@ public class ProgressManagerUtil {
 	 * @param control
 	 * @return String
 	 */
-
 	static String shortenText(String textValue, Control control) {
 		if (textValue == null) {
 			return null;
 		}
 		GC gc = new GC(control);
 		int maxWidth = control.getBounds().width - 5;
+		gc.getFontMetrics().getAverageCharWidth();
 		int maxExtent = gc.textExtent(textValue).x;
 		if (maxExtent < maxWidth) {
 			gc.dispose();
 			return textValue;
 		}
 		int length = textValue.length();
-		int charsToClip = Math.round(0.95f * length
-				* (1 - ((float) maxWidth / maxExtent)));
+
+		int characterDelta = maxExtent / length;
 		int secondWord = findSecondWhitespace(textValue, gc, maxWidth);
 		int pivot = ((length - secondWord) / 2) + secondWord;
-		int start = pivot - (charsToClip / 2);
-		int end = pivot + (charsToClip / 2) + 1;
-		while (start >= 0 && end < length) {
-			String s1 = textValue.substring(0, start);
-			String s2 = textValue.substring(end, length);
-			String s = s1 + ellipsis + s2;
+		int widthAtLargest = maxExtent;
+		int largestTooFewClipped = 0;
+		int smallestTooManyClipped = length;
+		int widthAtSmallest = 0;
+		int charsToClip = Math.min(length - 1,
+				Math.round(length * (1 - ((float) maxWidth / maxExtent))) + ellipsis.length());
+		String s;
+		for (;;) {
+			int oldCharsToClip = charsToClip;
+			s = getClippedString(textValue, pivot, charsToClip);
+
 			int l = gc.textExtent(s).x;
-			if (l < maxWidth) {
-				gc.dispose();
-				return s;
+			if (l == maxWidth) {
+				// If this was exactly the right size, stop the binary search
+				break;
+			} else if (l > maxWidth) {
+				// The string is too big. Need to clip more.
+				largestTooFewClipped = charsToClip;
+				widthAtLargest = l;
+				if (charsToClip >= smallestTooManyClipped - 1) {
+					// We're one character away from a value that is known to
+					// clip too much, so opt for clipping slightly too much
+					charsToClip++;
+					break;
+				}
+				if (l - maxWidth <= characterDelta * 2) {
+					charsToClip++;
+				} else {
+					int deltaWidth = l - widthAtSmallest;
+					int desiredWidthChange = l - maxWidth;
+					charsToClip = charsToClip
+							+ (smallestTooManyClipped - charsToClip) * desiredWidthChange / deltaWidth;
+					if (charsToClip == oldCharsToClip) {
+						charsToClip++;
+					}
+				}
+			} else {
+				// The string is too small. Need to clip less.
+				smallestTooManyClipped = charsToClip;
+				widthAtSmallest = l;
+				if (charsToClip <= largestTooFewClipped + 1) {
+					// We're one character away from a value that is known to
+					// clip too little, so opt for clipping slightly too much
+					break;
+				}
+				if (maxWidth - l <= characterDelta * 2) {
+					charsToClip--;
+				} else {
+					int deltaWidth = widthAtLargest - l;
+					int desiredWidthChange = maxWidth - l;
+					charsToClip = charsToClip - (charsToClip - largestTooFewClipped) * desiredWidthChange / deltaWidth;
+					if (charsToClip == oldCharsToClip) {
+						charsToClip--;
+					}
+				}
 			}
-			start--;
-			end++;
 		}
+
+		s = getClippedString(textValue, pivot, charsToClip);
 		gc.dispose();
-		return textValue;
+		return s;
+	}
+
+	private static String getClippedString(String textValue, int pivot, int charsToClip) {
+		int length = textValue.length();
+		String s;
+		int start = pivot - charsToClip / 2;
+		int end = pivot + (charsToClip + 1) / 2;
+
+		if (start < 0) {
+			end -= start;
+			start = 0;
+		}
+		if (end < 0) {
+			start -= end;
+			end = 0;
+		}
+
+		String s1 = textValue.substring(0, start);
+		String s2 = textValue.substring(end, length);
+		s = s1 + ellipsis + s2;
+		return s;
 	}
 
 	/**
