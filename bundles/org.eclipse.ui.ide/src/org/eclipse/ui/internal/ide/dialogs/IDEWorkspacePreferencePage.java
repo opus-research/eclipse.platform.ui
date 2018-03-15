@@ -84,10 +84,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 	private Button showLocationNameInTitle;
 
-	private Button showPerspectiveNameInTitle;
-
-	private Button showProductNameInTitle;
-
 	private Button autoRefreshButton;
 
 	private Button lightweightRefreshButton;
@@ -209,16 +205,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	 *            the Composite the group is created in.
 	 */
 	private void createWorkspaceLocationGroup(Composite composite) {
-
 		boolean showLocationIsSetOnCommandLine = e4Context.containsKey(E4Workbench.FORCED_SHOW_LOCATION);
-
-		// show workspace location in window title
-		boolean isShowLocation = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION);
-		boolean isShowName = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
-		boolean isShowPerspective = getIDEPreferenceStore()
-				.getBoolean(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE);
-		boolean isShowProduct = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE);
-
 		Composite groupComposite = new Composite(composite, SWT.LEFT);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupComposite);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(groupComposite);
@@ -230,32 +217,15 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		grpWindowTitle.setLayout(new GridLayout(1, false));
 		grpWindowTitle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		// show workspace name
-		showLocationNameInTitle = new Button(grpWindowTitle, SWT.CHECK);
-		showLocationNameInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationNameInWindowTitle);
-		showLocationNameInTitle.setSelection(isShowName);
+		// show workspace location in window title
+		boolean isShowLocation = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION);
+		boolean isShowName = getIDEPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
+		// either one or the other
+		if (isShowLocation == isShowName) {
+			isShowName = !isShowLocation;
+		}
 
-		Composite compositeWsName = new Composite(grpWindowTitle, SWT.NONE);
-		compositeWsName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
-		workspaceName = new StringFieldEditor(IDEInternalPreferences.WORKSPACE_NAME,
-				IDEWorkbenchMessages.IDEWorkspacePreference_workspaceName, compositeWsName);
-		gl = ((GridLayout) compositeWsName.getLayout());
-		gl.marginLeft = 15;
-		gl.marginHeight = 0;
-
-		workspaceName.setPreferenceStore(getIDEPreferenceStore());
-		workspaceName.load();
-		workspaceName.setPage(this);
-
-		// show perspective name
-		showPerspectiveNameInTitle = new Button(grpWindowTitle, SWT.CHECK);
-		showPerspectiveNameInTitle
-				.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showPerspectiveNameInWindowTitle);
-		showPerspectiveNameInTitle.setSelection(isShowPerspective);
-
-		// show full workspace path
-		showLocationPathInTitle = new Button(grpWindowTitle, SWT.CHECK);
+		showLocationPathInTitle = new Button(grpWindowTitle, SWT.RADIO);
 		showLocationPathInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle);
 		showLocationPathInTitle.setSelection(isShowLocation);
 
@@ -276,13 +246,26 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		workspacePath.setSelection(workspacePath.getText().length());
 		workspacePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-		// show product name
-		showProductNameInTitle = new Button(grpWindowTitle, SWT.CHECK);
-		showProductNameInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showProductNameInWindowTitle);
-		showProductNameInTitle.setSelection(isShowProduct);
+		showLocationNameInTitle = new Button(grpWindowTitle, SWT.RADIO);
+		showLocationNameInTitle.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showLocationNameInWindowTitle);
+		showLocationNameInTitle.setSelection(isShowName);
 
-		// disable location component if -showlocation forced
-		Stream.of(showLocationPathInTitle, locationLabel, workspacePath)
+		Composite compositeWsName = new Composite(grpWindowTitle, SWT.NONE);
+		compositeWsName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		workspaceName = new StringFieldEditor(IDEInternalPreferences.WORKSPACE_NAME,
+				IDEWorkbenchMessages.IDEWorkspacePreference_workspaceName, compositeWsName);
+		gl = ((GridLayout) compositeWsName.getLayout());
+		gl.marginLeft = 15;
+		gl.marginHeight = 0;
+
+		workspaceName.setPreferenceStore(getIDEPreferenceStore());
+		workspaceName.load();
+		workspaceName.setPage(this);
+
+		// disable components if -showlocation forced
+		Stream.of(grpWindowTitle, showLocationPathInTitle, locationLabel, workspacePath, showLocationNameInTitle,
+				workspaceName.getLabelControl(compositeWsName), workspaceName.getTextControl(compositeWsName))
 				.forEach(c -> c.setEnabled(!showLocationIsSetOnCommandLine));
 	}
 
@@ -496,15 +479,11 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		autoSaveAllButton.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
 		saveInterval.loadDefault();
 
-		// use the defaults defined in IDEPreferenceInitializer
+		// showLocationPath = false by default
 		boolean showLocationPath = store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION);
-		boolean showLocationName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION_NAME);
-		boolean showPerspectiveName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE);
-		boolean showProductName = store.getDefaultBoolean(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE);
+		boolean showLocationName = !showLocationPath;
 		showLocationPathInTitle.setSelection(showLocationPath);
 		showLocationNameInTitle.setSelection(showLocationName);
-		showPerspectiveNameInTitle.setSelection(showPerspectiveName);
-		showProductNameInTitle.setSelection(showProductName);
 		workspaceName.loadDefault();
 
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
@@ -579,8 +558,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationPathInTitle.getSelection());
 		store.setValue(IDEInternalPreferences.SHOW_LOCATION_NAME, showLocationNameInTitle.getSelection());
-		store.setValue(IDEInternalPreferences.SHOW_PERSPECTIVE_IN_TITLE, showPerspectiveNameInTitle.getSelection());
-		store.setValue(IDEInternalPreferences.SHOW_PRODUCT_IN_TITLE, showProductNameInTitle.getSelection());
 
         workspaceName.store();
 
