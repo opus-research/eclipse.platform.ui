@@ -9,8 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Francis Upton - <francisu@ieee.org> - Bug 217777
  *     Tristan Hume - <trishume@gmail.com> - Bug 2369
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661, 456897, 472654, 481516,
- *     											 486543
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661, 456897, 472654, 481516, 486543
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *     Snjezana Peco <snjeza.peco@gmail.com> - Bug 405542
@@ -690,7 +689,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 					if (returnCode[0] == PlatformUI.RETURN_OK) {
 						// run the e4 event loop and instantiate ... well, stuff
 						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						IMenuService wms = e4Workbench.getContext().get(IMenuService.class);
+						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
+								.get(IMenuService.class);
 						wms.dispose();
 					}
 					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
@@ -984,8 +984,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	boolean firePreShutdown(final boolean forced) {
 		Object list[] = workbenchListeners.getListeners();
-		for (int i = 0; i < list.length; i++) {
-			final IWorkbenchListener l = (IWorkbenchListener) list[i];
+		for (Object element : list) {
+			final IWorkbenchListener l = (IWorkbenchListener) element;
 			final boolean[] result = new boolean[] { false };
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
@@ -1007,8 +1007,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	void firePostShutdown() {
 		Object list[] = workbenchListeners.getListeners();
-		for (int i = 0; i < list.length; i++) {
-			final IWorkbenchListener l = (IWorkbenchListener) list[i];
+		for (Object element : list) {
+			final IWorkbenchListener l = (IWorkbenchListener) element;
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1036,8 +1036,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowOpened(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (int i = 0; i < list.length; i++) {
-			final IWindowListener l = (IWindowListener) list[i];
+		for (Object element : list) {
+			final IWindowListener l = (IWindowListener) element;
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1055,8 +1055,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowClosed(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (int i = 0; i < list.length; i++) {
-			final IWindowListener l = (IWindowListener) list[i];
+		for (Object element : list) {
+			final IWindowListener l = (IWindowListener) element;
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1075,8 +1075,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowActivated(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (int i = 0; i < list.length; i++) {
-			final IWindowListener l = (IWindowListener) list[i];
+		for (Object element : list) {
+			final IWindowListener l = (IWindowListener) element;
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1095,8 +1095,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 */
 	protected void fireWindowDeactivated(final IWorkbenchWindow window) {
 		Object list[] = getListeners();
-		for (int i = 0; i < list.length; i++) {
-			final IWindowListener l = (IWindowListener) list[i];
+		for (Object element : list) {
+			final IWindowListener l = (IWindowListener) element;
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1151,10 +1151,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 				@Override
 				public void run() {
 					IWorkbenchWindow windows[] = getWorkbenchWindows();
-					for (int i = 0; i < windows.length; i++) {
-						IWorkbenchPage pages[] = windows[i].getPages();
-						for (int j = 0; j < pages.length; j++) {
-							isClosing = isClosing && pages[j].closeAllEditors(false);
+					for (IWorkbenchWindow window : windows) {
+						IWorkbenchPage pages[] = window.getPages();
+						for (IWorkbenchPage page : pages) {
+							isClosing = isClosing && page.closeAllEditors(false);
 						}
 					}
 				}
@@ -1231,7 +1231,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 				for (IWorkbenchWindow window : windows) {
 					IWorkbenchPage pages[] = window.getPages();
 					for (IWorkbenchPage page : pages) {
-						List<EditorReference> editorReferences = ((WorkbenchPage) page).getInternalEditorReferences();
+						List<EditorReference> editorReferences = ((WorkbenchPage) page)
+								.getInternalEditorReferences();
 						List<EditorReference> referencesToClose = new ArrayList<>();
 						for (EditorReference reference : editorReferences) {
 							IEditorPart editor = reference.getEditor(false);
@@ -1295,9 +1296,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// now that we have updated the model, save it to workbench.xmi
 		// skip this during shutdown to be efficient since it is done again
 		// later
-		// if (!shutdown) {
+		if (!shutdown) {
 			persistWorkbenchModel();
-		// }
+		}
 	}
 
 	private boolean detectWorkbenchCorruption(MApplication application) {
@@ -1907,8 +1908,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 		WorkbenchImages.dispose();
 		Image[] images = Window.getDefaultImages();
 		Window.setDefaultImage(null);
-		for (int i = 0; i < images.length; i++) {
-			images[i].dispose();
+		for (Image image : images) {
+			image.dispose();
 		}
 	}
 
@@ -2821,11 +2822,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 				HashSet disabledPlugins = new HashSet(Arrays
 						.asList(getDisabledEarlyActivatedPlugins()));
 				monitor.beginTask(WorkbenchMessages.Workbench_startingPlugins, extensions.length);
-				for (int i = 0; i < extensions.length; ++i) {
+				for (IExtension extension : extensions) {
 					if (monitor.isCanceled() || !isRunning()) {
 						return Status.CANCEL_STATUS;
 					}
-					IExtension extension = extensions[i];
 
 					// if the plugin is not in the set of disabled plugins, then
 					// execute the code to start it
@@ -2878,8 +2878,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 		boolean avoidDeadlock = true;
 
 		String[] commandLineArgs = Platform.getCommandLineArgs();
-		for (int i = 0; i < commandLineArgs.length; i++) {
-			if (commandLineArgs[i].equalsIgnoreCase("-allowDeadlock")) { //$NON-NLS-1$
+		for (String commandLineArg : commandLineArgs) {
+			if (commandLineArg.equalsIgnoreCase("-allowDeadlock")) { //$NON-NLS-1$
 				avoidDeadlock = false;
 			}
 		}
@@ -3405,9 +3405,9 @@ UIEvents.Context.TOPIC_CONTEXT,
 			final String disabledPlugins = PrefUtil.getInternalPreferenceStore().getString(
 					IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP);
 
-			for (int i = 0; i < deltas.length; i++) {
-				IExtension extension = deltas[i].getExtension();
-				if (deltas[i].getKind() == IExtensionDelta.REMOVED) {
+			for (IExtensionDelta delta : deltas) {
+				IExtension extension = delta.getExtension();
+				if (delta.getKind() == IExtensionDelta.REMOVED) {
 					continue;
 				}
 
@@ -3632,16 +3632,14 @@ UIEvents.Context.TOPIC_CONTEXT,
 	private List<Saveable> getFilteredSaveables(ISaveableFilter filter, Saveable[] saveables) {
 		List<Saveable> toSave = new ArrayList<>();
 		if (filter == null) {
-			for (int i = 0; i < saveables.length; i++) {
-				Saveable saveable = saveables[i];
+			for (Saveable saveable : saveables) {
 				if (saveable.isDirty()) {
 					toSave.add(saveable);
 				}
 			}
 		} else {
 			SaveablesList saveablesList = (SaveablesList) getService(ISaveablesLifecycleListener.class);
-			for (int i = 0; i < saveables.length; i++) {
-				Saveable saveable = saveables[i];
+			for (Saveable saveable : saveables) {
 				if (saveable.isDirty()) {
 					IWorkbenchPart[] parts = saveablesList.getPartsForSaveable(saveable);
 					if (matchesFilter(filter, saveable, parts)) {
