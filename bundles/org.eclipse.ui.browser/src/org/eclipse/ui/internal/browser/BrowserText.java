@@ -127,10 +127,10 @@ public class BrowserText {
 
     private void loadExceptionText() {
         StringWriter swriter = new StringWriter();
-		try (PrintWriter writer = new PrintWriter(swriter)) {
-			writer.println(ex.getMessage());
-			ex.printStackTrace(writer);
-		}
+        PrintWriter writer = new PrintWriter(swriter);
+        writer.println(ex.getMessage());
+        ex.printStackTrace(writer);
+        writer.close();
         exception.setText(swriter.toString());
     }
 
