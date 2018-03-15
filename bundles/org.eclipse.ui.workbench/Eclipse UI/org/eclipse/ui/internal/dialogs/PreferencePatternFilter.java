@@ -116,8 +116,8 @@ public class PreferencePatternFilter extends PatternFilter {
 
 		// Also need to check the keywords
 		String[] keywords = getKeywords(node);
-		for (int i = 0; i < keywords.length; i++){
-			if (wordMatches(keywords[i])) {
+		for (String keyword : keywords) {
+			if (wordMatches(keyword)) {
 				return true;
 			}
 		}

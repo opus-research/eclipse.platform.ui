@@ -86,9 +86,8 @@ public class NewWizard extends Wizard {
     private IWizardCategory getChildWithID(
             IWizardCategory parent, String id) {
         IWizardCategory [] children = parent.getCategories();
-        for (int i = 0; i < children.length; ++i) {
-        	IWizardCategory currentChild = children[i];
-            if (currentChild.getId().equals(id)) {
+        for (IWizardCategory currentChild : children) {
+        	if (currentChild.getId().equals(id)) {
 				return currentChild;
 			}
         }

@@ -54,8 +54,8 @@ public class WizardPatternFilter extends PatternFilter {
 			}
 
 			String[] keywordLabels = desc.getKeywordLabels();
-			for (int i = 0; i < keywordLabels.length; i++) {
-				if (wordMatches(keywordLabels[i]))
+			for (String keywordLabel : keywordLabels) {
+				if (wordMatches(keywordLabel))
 					return true;
 			}
 		}

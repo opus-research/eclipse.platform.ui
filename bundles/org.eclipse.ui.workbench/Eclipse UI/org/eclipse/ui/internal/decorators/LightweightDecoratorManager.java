@@ -143,11 +143,10 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * can occur.
 	 */
 	private void buildContributors() {
-		for (int i = 0; i < lightweightDefinitions.length; i++) {
-			LightweightDecoratorDefinition decorator = lightweightDefinitions[i];
+		for (LightweightDecoratorDefinition decorator : lightweightDefinitions) {
 			String[] types = getTargetTypes(decorator);
-			for (int j = 0; j < types.length; j++) {
-				registerContributor(decorator, types[j]);
+			for (String type : types) {
+				registerContributor(decorator, type);
 			}
 		}
 	}
@@ -169,8 +168,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 			lightweightDefinitions[oldDefs.length] = decorator;
 			// no reset - handled in the DecoratorManager
 			String[] types = getTargetTypes(decorator);
-			for (int i = 0; i < types.length; i++) {
-				registerContributor(decorator, types[i]);
+			for (String type : types) {
+				registerContributor(decorator, type);
 			}
 			return true;
 		}
@@ -206,8 +205,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 							idx);
 			// no reset - handled in the DecoratorManager
 			String[] types = getTargetTypes(decorator);
-			for (int i = 0; i < types.length; i++) {
-				unregisterContributor(decorator, types[i]);
+			for (String type : types) {
+				unregisterContributor(decorator, type);
 
 			}
 			return true;
@@ -257,9 +256,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 */
 	LightweightDecoratorDefinition[] enabledDefinitions() {
 		ArrayList result = new ArrayList();
-		for (int i = 0; i < lightweightDefinitions.length; i++) {
-			if (lightweightDefinitions[i].isEnabled()) {
-				result.add(lightweightDefinitions[i]);
+		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
+			if (lightweightDefinition.isEnabled()) {
+				result.add(lightweightDefinition);
 			}
 		}
 		LightweightDecoratorDefinition[] returnArray = new LightweightDecoratorDefinition[result
@@ -274,8 +273,8 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 * @return boolean
 	 */
 	boolean hasEnabledDefinitions() {
-		for (int i = 0; i < lightweightDefinitions.length; i++) {
-			if (lightweightDefinitions[i].isEnabled()) {
+		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
+			if (lightweightDefinition.isEnabled()) {
 				return true;
 			}
 		}
@@ -296,9 +295,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	void shutdown() {
 		// Disable all fo the enabled decorators
 		// so as to force a dispose of thier decorators
-		for (int i = 0; i < lightweightDefinitions.length; i++) {
-			if (lightweightDefinitions[i].isEnabled()) {
-				lightweightDefinitions[i].setEnabled(false);
+		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
+			if (lightweightDefinition.isEnabled()) {
+				lightweightDefinition.setEnabled(false);
 			}
 		}
 	}
@@ -312,9 +311,9 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 	 *            String
 	 */
 	LightweightDecoratorDefinition getDecoratorDefinition(String decoratorId) {
-		for (int i = 0; i < lightweightDefinitions.length; i++) {
-			if (lightweightDefinitions[i].getId().equals(decoratorId)) {
-				return lightweightDefinitions[i];
+		for (LightweightDecoratorDefinition lightweightDefinition : lightweightDefinitions) {
+			if (lightweightDefinition.getId().equals(decoratorId)) {
+				return lightweightDefinition;
 			}
 		}
 		return null;
@@ -361,10 +360,7 @@ public class LightweightDecoratorManager extends ObjectContributorManager {
 
 		LightweightDecoratorDefinition[] decorators = getDecoratorsFor(element);
 
-		for (int i = 0; i < decorators.length; i++) {
-			// If we are doing the adaptable one make sure we are
-			// only applying the adaptable decorations
-			LightweightDecoratorDefinition dd = decorators[i];
+		for (LightweightDecoratorDefinition dd : decorators) {
 			decoration.setCurrentDefinition(dd);
 			decorate(element, decoration, dd);
 		}
