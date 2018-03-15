@@ -1180,7 +1180,7 @@ getPreferenceStore(),
     }
 
     protected ColorDefinition getSelectedColorDefinition() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+        Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
 		if (o instanceof ColorDefinition) {
 			return themeRegistry.findColor(((ColorDefinition) o).getId());
 		}
@@ -1188,7 +1188,7 @@ getPreferenceStore(),
     }
 
     protected FontDefinition getSelectedFontDefinition() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+        Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
 		if (o instanceof FontDefinition) {
 			return themeRegistry.findFont(((FontDefinition) o).getId());
 		}
@@ -1196,12 +1196,12 @@ getPreferenceStore(),
     }
 
     protected boolean isFontSelected() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+    	Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
     	return (o instanceof FontDefinition);
     }
 
     protected boolean isColorSelected() {
-		Object o = tree.getViewer().getStructuredSelection().getFirstElement();
+    	Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
     	return (o instanceof ColorDefinition);
     }
 
@@ -1769,7 +1769,7 @@ getPreferenceStore(),
 	 * @since 3.1
 	 */
 	private void saveTreeSelection() {
-		IStructuredSelection selection = tree.getViewer().getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) tree.getViewer().getSelection();
 		Object element = selection.getFirstElement();
 		StringBuffer buffer = new StringBuffer();
 		appendMarkerToBuffer(buffer, element);
