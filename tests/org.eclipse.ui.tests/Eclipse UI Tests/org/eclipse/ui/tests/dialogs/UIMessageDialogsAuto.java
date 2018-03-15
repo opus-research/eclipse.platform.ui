@@ -12,6 +12,8 @@ package org.eclipse.ui.tests.dialogs;
 
 import java.text.MessageFormat;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -21,8 +23,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
 import org.eclipse.ui.tests.harness.util.DialogCheck;
-
-import junit.framework.TestCase;
 
 public class UIMessageDialogsAuto extends TestCase {
     private static final String DUMMY_RESOURCE = "Dummy.resource";
@@ -97,20 +97,20 @@ public class UIMessageDialogsAuto extends TestCase {
         String title = "Project";
         String msg ="";
         Dialog dialog = new MessageDialog(getShell(), title, null, // accept the default window icon
-				msg, MessageDialog.QUESTION, 0,
-				IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
-				IDialogConstants.CANCEL_LABEL);
+                msg, MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
     public void testDeleteReadOnlyCheck() {
         Dialog dialog = new MessageDialog(getShell(), "Delete", null,
               "Exists",
-				MessageDialog.QUESTION, 0,
-				IDialogConstants.YES_LABEL,
-				IDialogConstants.YES_TO_ALL_LABEL,
-				IDialogConstants.NO_LABEL,
-				IDialogConstants.CANCEL_LABEL);
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.YES_LABEL,
+                        IDialogConstants.YES_TO_ALL_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
@@ -130,11 +130,11 @@ public class UIMessageDialogsAuto extends TestCase {
                 ResourceNavigatorMessages.DropAdapter_question,
                 null, MessageFormat.format(ResourceNavigatorMessages.DropAdapter_overwriteQuery,
                         new Object[] { DUMMY_RELATIVE_PATH }),
-				MessageDialog.QUESTION, 0,
-				IDialogConstants.YES_LABEL,
-				IDialogConstants.YES_TO_ALL_LABEL,
-				IDialogConstants.NO_LABEL,
-				IDialogConstants.CANCEL_LABEL);
+                MessageDialog.QUESTION, new String[] {
+                        IDialogConstants.YES_LABEL,
+                        IDialogConstants.YES_TO_ALL_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
@@ -245,10 +245,9 @@ public class UIMessageDialogsAuto extends TestCase {
 
     public void testSaveChanges() {
         Dialog dialog = new MessageDialog(getShell(), WorkbenchMessages.Save_Resource, null, NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion, (new Object[] { DUMMY_RESOURCE })), MessageDialog.QUESTION,
-                0,
-                IDialogConstants.YES_LABEL,
-                IDialogConstants.NO_LABEL,
-				IDialogConstants.CANCEL_LABEL);
+                new String[] { IDialogConstants.YES_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.CANCEL_LABEL }, 0);
         DialogCheck.assertDialogTexts(dialog, this);
     }
 
