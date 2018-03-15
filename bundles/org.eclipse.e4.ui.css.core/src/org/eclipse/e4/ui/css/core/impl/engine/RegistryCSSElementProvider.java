@@ -89,9 +89,9 @@ public class RegistryCSSElementProvider implements IElementProvider {
 	}
 
 	private List<Class<?>> computeElementTypeLookup(Class<?> clazz) {
-		ArrayList<Class<?>> results = new ArrayList<>();
-		LinkedList<Class<?>> todo = new LinkedList<>();
-		Set<Class<?>> seen = new HashSet<>();
+		ArrayList<Class<?>> results = new ArrayList<Class<?>>();
+		LinkedList<Class<?>> todo = new LinkedList<Class<?>>();
+		Set<Class<?>> seen = new HashSet<Class<?>>();
 		todo.add(clazz);
 		while (!todo.isEmpty()) {
 			Class<?> candidate = todo.removeFirst();
