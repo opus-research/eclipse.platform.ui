@@ -279,8 +279,8 @@ public final class TriggeredOperations extends AbstractOperation implements
 		ArrayList<IUndoContext> allContexts = new ArrayList<>();
 		if (triggeringOperation != null) {
 			IUndoContext[] contexts = triggeringOperation.getContexts();
-			for (IUndoContext context : contexts) {
-				allContexts.add(context);
+			for (int i = 0; i < contexts.length; i++) {
+				allContexts.add(contexts[i]);
 			}
 		}
 		for (int i = 0; i < children.size(); i++) {
@@ -300,9 +300,9 @@ public final class TriggeredOperations extends AbstractOperation implements
 	 */
 	private void removeAllChildren() {
 		IUndoableOperation[] nonTriggers = children.toArray(new IUndoableOperation[children.size()]);
-		for (IUndoableOperation nonTrigger : nonTriggers) {
-			children.remove(nonTrigger);
-			nonTrigger.dispose();
+		for (int i = 0; i < nonTriggers.length; i++) {
+			children.remove(nonTriggers[i]);
+			nonTriggers[i].dispose();
 		}
 	}
 

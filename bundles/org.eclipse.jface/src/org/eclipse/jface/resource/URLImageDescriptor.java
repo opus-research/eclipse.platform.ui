@@ -104,15 +104,9 @@ class URLImageDescriptor extends ImageDescriptor {
 		return ((URLImageDescriptor) o).url.equals(this.url);
 	}
 
-	@Deprecated
 	@Override
 	public ImageData getImageData() {
 		return getImageData(getURL(url));
-	}
-
-	@Override
-	public ImageData getImageData(int zoom) {
-		return new URLImageDataProvider(url).getImageData(zoom);
 	}
 
 	private static ImageData getImageData(URL url) {

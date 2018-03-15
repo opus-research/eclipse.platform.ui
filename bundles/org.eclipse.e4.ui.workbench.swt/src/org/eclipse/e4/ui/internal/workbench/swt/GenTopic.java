@@ -52,8 +52,8 @@ public class GenTopic implements IApplication {
 			throws IllegalArgumentException, IllegalAccessException {
 		Field[] fields = literals.getFields();
 		Map<String, EClass> classes = new TreeMap<>();
-		for (Field field : fields) {
-			Object value = field.get(null);
+		for (int i = 0; i < fields.length; i++) {
+			Object value = fields[i].get(null);
 			if (value instanceof EClass) {
 				classes.put(((EClass) value).getName(), (EClass) value);
 			}

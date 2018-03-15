@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.LegacyActionTools;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -120,8 +121,9 @@ public class SaveableHelper {
 							WorkbenchMessages.Save_Resource, null, message,
 							MessageDialog.QUESTION,
 							0,
-							WorkbenchMessages.SaveableHelper_Save, WorkbenchMessages.SaveableHelper_Dont_Save,
-							WorkbenchMessages.SaveableHelper_Cancel) {
+							WorkbenchMessages.Save, 
+							WorkbenchMessages.Dont_Save,
+							IDialogConstants.CANCEL_LABEL) {
 						@Override
 						protected int getShellStyle() {
 							return super.getShellStyle() | SWT.SHEET;
@@ -168,8 +170,10 @@ public class SaveableHelper {
 	 *   was canceled or an error occurred while saving.
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
+		Saveable[] selectedModels = modelSource.getActiveSaveables();
 		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
-		for (Saveable model : modelSource.getActiveSaveables()) {
+		for (int i = 0; i < selectedModels.length; i++) {
+			Saveable model = selectedModels[i];
 			if (model.isDirty()) {
 				dirtyModels.add(model);
 			}
@@ -183,7 +187,8 @@ public class SaveableHelper {
 			IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
 			SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Save, dirtyModels.size());
 			try {
-				for (Saveable model : dirtyModels) {
+				for (Iterator<Saveable> i = dirtyModels.iterator(); i.hasNext();) {
+					Saveable model = i.next();
 					// handle case where this model got saved as a result of
 					// saving another
 					if (!model.isDirty()) {
@@ -304,7 +309,9 @@ public class SaveableHelper {
 	 * @since 3.2
 	 */
 	public static boolean needsSave(ISaveablesSource modelSource) {
-		for (Saveable model : modelSource.getActiveSaveables()) {
+		Saveable[] selectedModels = modelSource.getActiveSaveables();
+		for (int i = 0; i < selectedModels.length; i++) {
+			Saveable model = selectedModels[i];
 			if (model.isDirty() && !((InternalSaveable)model).isSavingInBackground()) {
 				return true;
 			}
@@ -377,7 +384,8 @@ public class SaveableHelper {
 				final IWorkbenchPart[] parts = saveablesList.getPartsForSaveable(model);
 
 				// this will cause the parts tabs to show the ongoing background operation
-				for (IWorkbenchPart workbenchPart : parts) {
+				for (int i = 0; i < parts.length; i++) {
+					IWorkbenchPart workbenchPart = parts[i];
 					IWorkbenchSiteProgressService progressService = Adapters.adapt(workbenchPart.getSite(),
 							IWorkbenchSiteProgressService.class);
 					progressService.showBusyForFamily(model);
@@ -414,11 +422,11 @@ public class SaveableHelper {
 
 	private static void notifySaveAction(final IWorkbenchPart[] parts) {
 		Set<IWorkbenchWindow> wwindows = new HashSet<>();
-		for (IWorkbenchPart part : parts) {
-			wwindows.add(part.getSite().getWorkbenchWindow());
+		for (int i = 0; i < parts.length; i++) {
+			wwindows.add(parts[i].getSite().getWorkbenchWindow());
 		}
-		for (IWorkbenchWindow iWorkbenchWindow : wwindows) {
-			WorkbenchWindow wwin = (WorkbenchWindow) iWorkbenchWindow;
+		for (Iterator<IWorkbenchWindow> it = wwindows.iterator(); it.hasNext();) {
+			WorkbenchWindow wwin = (WorkbenchWindow) it.next();
 			wwin.fireBackgroundSaveStarted();
 		}
 	}
