@@ -150,7 +150,7 @@ public class FileTool {
 	}
 
 	public static StringBuffer read(Reader reader) throws IOException {
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		try {
 			char[] buffer= new char[8196];
 			int chars= reader.read(buffer);
@@ -164,7 +164,8 @@ public class FileTool {
 			} catch (IOException e) {
 			}
 		}
-		return s;
+		StringBuffer toReturn = s.toString() == null ? new StringBuffer() : new StringBuffer(s.toString());
+		return toReturn;
 	}
 
 	public static void write(String fileName, StringBuffer content) throws IOException {
