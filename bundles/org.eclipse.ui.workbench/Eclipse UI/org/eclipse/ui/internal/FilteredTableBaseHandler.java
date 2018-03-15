@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 368977, 504088, 504089, 504090, 504091, 506696
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -123,6 +123,7 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		IWorkbenchPage page = window.getActivePage();
 		IWorkbenchPart activePart= page.getActivePart();
 		getTriggers();
+		initializeDialog();
 		openDialog((WorkbenchPage) page, activePart);
 		clearTriggers();
 		activate(page, selection);
@@ -140,11 +141,20 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 	private TableColumn tc;
 	private TableViewerColumn tableViewerColumn;
 
+	protected boolean limitMaxHeight = false;
+	protected int maxNItems = 0;
+
+	/** Initialize dialog specific data, can be overridden by subclasses */
+	protected void initializeDialog() {
+		limitMaxHeight = true;
+		maxNItems = 15;
+	}
+
 	/*
 	 * Open a dialog showing all views in the activation order
 	 */
 	public void openDialog(WorkbenchPage page, IWorkbenchPart activePart) {
-		final int MAX_ITEMS = 15;
+
 		Shell shell = null;
 		selection = null;
 
@@ -237,7 +247,9 @@ public abstract class FilteredTableBaseHandler extends AbstractHandler implement
 		dialog.pack();
 
 		Rectangle tableBounds = table.getBounds();
-		tableBounds.height = Math.min(tableBounds.height, table.getItemHeight() * MAX_ITEMS);
+		if (limitMaxHeight) {
+			tableBounds.height = Math.min(tableBounds.height, table.getItemHeight() * maxNItems);
+		}
 		table.setBounds(tableBounds);
 
 		Rectangle dialogBounds = dialog.getBounds();
