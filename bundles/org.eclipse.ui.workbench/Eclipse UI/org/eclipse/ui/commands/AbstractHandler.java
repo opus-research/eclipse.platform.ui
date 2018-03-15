@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ import org.eclipse.core.commands.IHandlerAttributes;
  * @see org.eclipse.core.commands.AbstractHandler
  */
 @Deprecated
-@SuppressWarnings({ "unchecked" })
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public abstract class AbstractHandler extends
         org.eclipse.core.commands.AbstractHandler implements IHandler {
 
@@ -45,7 +45,7 @@ public abstract class AbstractHandler extends
      * no listeners attached to this handler. (Most handlers don't
      * have any listeners, and this optimization saves some memory.)
      */
-	private List<IHandlerListener> handlerListeners;
+	private List handlerListeners;
 
     /**
      * @see IHandler#addHandlerListener(IHandlerListener)
@@ -57,7 +57,7 @@ public abstract class AbstractHandler extends
 			throw new NullPointerException();
 		}
         if (handlerListeners == null) {
-			handlerListeners = new ArrayList<>();
+			handlerListeners = new ArrayList();
 		}
         if (!handlerListeners.contains(handlerListener)) {
 			handlerListeners.add(handlerListener);
@@ -94,7 +94,6 @@ public abstract class AbstractHandler extends
      *            the event describing changes to this instance. Must not be
      *            <code>null</code>.
      */
-	@SuppressWarnings("rawtypes")
 	@Override
 	@Deprecated
     protected void fireHandlerChanged(HandlerEvent handlerEvent) {
@@ -124,13 +123,12 @@ public abstract class AbstractHandler extends
                     this, attributesChanged, previousAttributes);
 
             for (int i = 0; i < handlerListeners.size(); i++) {
-                handlerListeners
-                        .get(i).handlerChanged(legacyEvent);
+                ((org.eclipse.ui.commands.IHandlerListener) handlerListeners
+                        .get(i)).handlerChanged(legacyEvent);
             }
         }
     }
 
-	@SuppressWarnings("rawtypes")
 	@Deprecated
     protected void fireHandlerChanged(
             final org.eclipse.ui.commands.HandlerEvent handlerEvent) {
@@ -140,8 +138,8 @@ public abstract class AbstractHandler extends
 
         if (handlerListeners != null) {
             for (int i = 0; i < handlerListeners.size(); i++) {
-				handlerListeners
-                        .get(i).handlerChanged(handlerEvent);
+				((org.eclipse.ui.commands.IHandlerListener) handlerListeners
+                        .get(i)).handlerChanged(handlerEvent);
 			}
         }
 

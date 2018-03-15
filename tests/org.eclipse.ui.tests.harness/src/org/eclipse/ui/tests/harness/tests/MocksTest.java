@@ -76,7 +76,7 @@ public class MocksTest  {
 
 	@Test
 	public void testPrimitiveByteSetLastReturnValue() {
-		Byte value = Byte.valueOf((byte) 1);
+		Byte value = new Byte((byte) 1);
 		primitiveMock.getByte();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
@@ -96,7 +96,7 @@ public class MocksTest  {
 
 	@Test
 	public void testPrimitiveCharSetLastReturnValue() {
-		Character value = Character.valueOf('a');
+		Character value = new Character('a');
 		primitiveMock.getChar();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
@@ -116,7 +116,7 @@ public class MocksTest  {
 
 	@Test
 	public void testPrimitiveShortSetLastReturnValue() {
-		Short value = Short.valueOf((short) 1);
+		Short value = new Short((short) 1);
 		primitiveMock.getShort();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
@@ -156,7 +156,7 @@ public class MocksTest  {
 
 	@Test
 	public void testPrimitiveLongSetLastReturnValue() {
-		Long value = Long.valueOf(1);
+		Long value = new Long(1);
 		primitiveMock.getLong();
 		Mocks.setLastReturnValue(primitiveMock, value);
 		Mocks.startChecking(primitiveMock);
