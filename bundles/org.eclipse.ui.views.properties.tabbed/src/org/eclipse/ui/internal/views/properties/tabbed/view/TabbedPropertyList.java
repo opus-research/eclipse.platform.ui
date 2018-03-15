@@ -947,8 +947,8 @@ public class TabbedPropertyList
 		widgetNormalShadow = Display.getCurrent().getSystemColor(
 				SWT.COLOR_WIDGET_NORMAL_SHADOW);
 
-		RGB infoBackground = Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
-
+		RGB infoBackground = Display.getCurrent().getSystemColor(
+				SWT.COLOR_INFO_BACKGROUND).getRGB();
 		RGB white = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE)
 				.getRGB();
 		RGB black = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK)
