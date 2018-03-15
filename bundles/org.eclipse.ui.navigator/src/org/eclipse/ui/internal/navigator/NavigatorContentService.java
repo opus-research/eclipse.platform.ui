@@ -246,8 +246,9 @@ public class NavigatorContentService implements IExtensionActivationListener,
 			return NO_DESCRIPTORS;
 		}
 
-		assistant.bindExtensions(extensionIds, isRoot);
-
+		for (int i = 0; i < extensionIds.length; i++) {
+			assistant.bindExtensions(extensionIds, isRoot);
+		}
 		Set<INavigatorContentDescriptor> boundDescriptors = new HashSet<INavigatorContentDescriptor>();
 		INavigatorContentDescriptor descriptor;
 		for (int i = 0; i < extensionIds.length; i++) {
