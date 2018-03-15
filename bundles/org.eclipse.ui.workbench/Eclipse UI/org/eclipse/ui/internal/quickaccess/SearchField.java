@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -101,7 +101,6 @@ public class SearchField {
 	private int dialogHeight = -1;
 	private int dialogWidth = -1;
 	private Control previousFocusControl;
-	boolean activated = false;
 
 	@Inject
 	private EPartService partService;
@@ -211,7 +210,6 @@ public class SearchField {
 						checkFocusLost(table, txtQuickAcesss);
 					}
 				});
-				activated = false;
 			}
 
 			@Override
@@ -220,10 +218,10 @@ public class SearchField {
 				if (commandProvider.getContextSnapshot() == null) {
 					commandProvider.setSnapshot(hs.createContextSnapshot(true));
 				}
+
 				previousFocusControl = (Control) e.getSource();
-				activated = true;
-				showList();
 			}
+
 		});
 		table.addFocusListener(new FocusAdapter() {
 			@Override
@@ -241,18 +239,28 @@ public class SearchField {
 		txtQuickAcesss.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-				showList();
+				boolean wasVisible = shell.getVisible();
+				boolean nowVisible = txtQuickAcesss.getText().length() > 0;
+				if (!wasVisible && nowVisible) {
+					layoutShell();
+					addAccessibleListener();
+					quickAccessContents.preOpen();
+				}
+				if (wasVisible && !nowVisible) {
+					removeAccessibleListener();
+				}
+				if (nowVisible) {
+					notifyAccessibleTextChanged();
+				}
+				shell.setVisible(nowVisible);
 			}
 		});
 		txtQuickAcesss.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.ESC) {
-					activated = false;
 					txtQuickAcesss.setText(""); //$NON-NLS-1$
-					if (txtQuickAcesss == previousFocusControl) {
-						txtQuickAcesss.getShell().forceFocus();
-					} else if (previousFocusControl != null && !previousFocusControl.isDisposed())
+					if (previousFocusControl != null && !previousFocusControl.isDisposed())
 						previousFocusControl.setFocus();
 				} else if (e.keyCode == SWT.ARROW_UP) {
 					// Windows moves caret left/right when pressing up/down,
@@ -268,24 +276,6 @@ public class SearchField {
 			}
 		});
 		quickAccessContents.createInfoLabel(shell);
-	}
-
-
-	private void showList() {
-		boolean wasVisible = shell.getVisible();
-		boolean nowVisible = txtQuickAcesss.getText().length() > 0 || activated;
-		if (!wasVisible && nowVisible) {
-			layoutShell();
-			addAccessibleListener();
-			quickAccessContents.preOpen();
-		}
-		if (wasVisible && !nowVisible) {
-			removeAccessibleListener();
-		}
-		if (nowVisible) {
-			notifyAccessibleTextChanged();
-		}
-		shell.setVisible(nowVisible);
 	}
 
 	private Text createText(Composite parent) {
