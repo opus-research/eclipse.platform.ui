@@ -147,20 +147,15 @@ public class MenuHelper {
 		return getIconURI(imageDescriptor, null);
 	}
 
-	private static String getUrl(Class<? extends ImageDescriptor> idc, ImageDescriptor imageDescriptor) {
+	private static URL getUrl(Class<?> idc, ImageDescriptor imageDescriptor) {
 		try {
 			if (urlField == null) {
 				urlField = idc.getDeclaredField("url"); //$NON-NLS-1$
 				urlField.setAccessible(true);
 			}
-			// type check for backwards compatibility
-			Object value = urlField.get(imageDescriptor);
-			if (value instanceof URL) {
-				return ((URL) value).toExternalForm();
-			}
-			return value.toString();
+			return (URL) urlField.get(imageDescriptor);
 		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
-			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -259,7 +254,7 @@ public class MenuHelper {
 			}
 		} catch (InvalidRegistryObjectException | CoreException e) {
 			// visWhenMap.put(configElement, null);
-			WorkbenchPlugin.log(e);
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -1103,8 +1098,8 @@ public class MenuHelper {
 		// Attempt to retrieve URIs from the descriptor and convert into a more
 		// durable form in case it's to be persisted
 		if (descriptor.getClass().toString().endsWith("URLImageDescriptor")) { //$NON-NLS-1$
-			String url = getUrl(descriptor.getClass(), descriptor);
-			return rewriteDurableURL(url);
+			URL url = getUrl(descriptor.getClass(), descriptor);
+			return rewriteDurableURL(url.toExternalForm());
 		} else if (descriptor.getClass().toString().endsWith("FileImageDescriptor")) { //$NON-NLS-1$
 			Class<?> sourceClass = getLocation(descriptor);
 			if (sourceClass == null) {
