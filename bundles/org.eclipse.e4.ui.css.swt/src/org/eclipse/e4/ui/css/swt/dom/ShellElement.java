@@ -115,7 +115,7 @@ public class ShellElement extends CompositeElement {
 	}
 
 	@Override
-	public String getAttribute(String attr) {
+	protected String internalGetAttribute(String attr) {
 		if("title".equals(attr)) {
 			String title = getShell().getText();
 			return title != null ? title : "";
@@ -136,7 +136,7 @@ public class ShellElement extends CompositeElement {
 			} while (parent != null);
 			return sb.toString().trim();
 		}
-		return super.getAttribute(attr);
+		return super.internalGetAttribute(attr);
 	}
 
 	@Override

@@ -42,10 +42,11 @@ public class SWTHTMLElement extends WidgetElement {
 	}
 
 	@Override
-	public String getAttribute(String attr) {
-		if ("type".equals(attr))
+	protected String internalGetAttribute(String attr) {
+		if ("type".equals(attr)) {
 			return attributeType;
-		return super.getAttribute(attr);
+		}
+		return super.internalGetAttribute(attr);
 	}
 
 	@Override

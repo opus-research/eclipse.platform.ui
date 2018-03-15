@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
+import java.util.Objects;
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.dom.ElementAdapter;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
@@ -193,21 +194,29 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 	}
 
 	@Override
-	public String getAttribute(String attr) {
+	public final String getAttribute(String attr) {
+		return Objects.toString(internalGetAttribute(attr), "");
+	}
+
+	@Override
+	public final boolean hasAttribute(String attr) {
+		return internalGetAttribute(attr) != null;
+	}
+
+	protected String internalGetAttribute(String attr) {
 		Widget widget = getWidget();
 		if (attr.equals("style")) {
 			return swtStyles;
 		} else if (attr.equals("class")) {
 			String result = getCSSClass(widget);
-			return result != null ? result : "";
+			return result;
 		} else if ("swt-data-class".equals(attr)) {
 			Object data = widget.getData();
 			if (data == null) {
-				return "";
+				return null;
 			}
 			StringBuilder sb = new StringBuilder();
-			for (Class<?> clazz = data.getClass(); clazz != Object.class; sb
-					.append(' ')) {
+			for (Class<?> clazz = data.getClass(); clazz != Object.class; sb.append(' ')) {
 				sb.append(clazz.getName());
 				clazz = clazz.getSuperclass();
 			}
@@ -218,7 +227,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 			return o.toString();
 		}
 
-		return "";
+		return null;
 	}
 
 	@Override
