@@ -289,7 +289,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		if(!isDisposed()){
 			ITreeContentProvider contentProvider = (ITreeContentProvider) viewer
 				.getContentProvider();
-			IStructuredSelection selection = viewer.getStructuredSelection();
+			IStructuredSelection selection = (IStructuredSelection) viewer
+					.getSelection();
 			if (selection instanceof ITreeSelection) {
 				return getActiveSaveablesFromTreeSelection((ITreeSelection) selection);
 			} else if (contentProvider instanceof ITreePathContentProvider) {

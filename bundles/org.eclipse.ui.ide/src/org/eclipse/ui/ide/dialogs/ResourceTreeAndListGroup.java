@@ -1130,7 +1130,7 @@ public class ResourceTreeAndListGroup extends EventManager {
      */
     public void setFocus() {
         treeViewer.getTree().setFocus();
-		if (treeViewer.getStructuredSelection().isEmpty()) {
+        if(treeViewer.getSelection().isEmpty()) {
         	Object[] elements = treeContentProvider.getElements(root);
         	if(elements.length > 0) {
         		StructuredSelection selection = new StructuredSelection(elements[0]);

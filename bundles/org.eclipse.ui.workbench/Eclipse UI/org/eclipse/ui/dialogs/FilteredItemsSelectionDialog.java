@@ -987,7 +987,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 	@Override
 	protected void computeResult() {
 
-		List selectedElements = list.getStructuredSelection().toList();
+		List selectedElements = ((StructuredSelection) list.getSelection())
+				.toList();
 
 		List objectsToReturn = new ArrayList();
 
