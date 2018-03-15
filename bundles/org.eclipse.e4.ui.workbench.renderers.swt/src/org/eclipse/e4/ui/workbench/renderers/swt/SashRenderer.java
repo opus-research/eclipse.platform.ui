@@ -114,7 +114,7 @@ public class SashRenderer extends SWTPartRenderer {
 		}
 		// This is a 'root' sash container, create a composite
 		if (sashComposite == null) {
-			sashComposite = new Composite((Composite) parent, SWT.NO_BACKGROUND);
+			sashComposite = new Composite((Composite) parent, SWT.NONE);
 		}
 		sashComposite.setLayout(new SashLayout(sashComposite, element));
 
