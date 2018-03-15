@@ -115,6 +115,7 @@ public abstract class ObservableCollectionContentProvider implements
 		if (observableCollection == null)
 			return new Object[0];
 
+		knownElements.addAll(observableCollection);
 		if (realizedElements != null) {
 			if (!realizedElements.equals(knownElements)) {
 				asyncUpdateRealizedElements();
@@ -201,7 +202,6 @@ public abstract class ObservableCollectionContentProvider implements
 					"Input must be an IObservableCollection"); //$NON-NLS-1$
 			observableCollection = (IObservableCollection) input;
 			addCollectionChangeListener(observableCollection);
-			knownElements.addAll(observableCollection);
 		}
 	}
 
