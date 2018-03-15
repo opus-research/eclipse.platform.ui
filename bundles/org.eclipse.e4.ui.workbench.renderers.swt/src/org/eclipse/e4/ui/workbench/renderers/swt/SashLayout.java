@@ -35,7 +35,7 @@ public class SashLayout extends Layout {
 	int marginRight = 0;
 	int marginTop = 0;
 	int marginBottom = 0;
-	int sashWidth = 2;
+	int sashWidth = 4;
 
 	MUIElement root;
 	private Composite host;
