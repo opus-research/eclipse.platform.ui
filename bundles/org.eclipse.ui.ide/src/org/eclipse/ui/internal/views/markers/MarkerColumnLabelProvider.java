@@ -34,7 +34,6 @@ public class MarkerColumnLabelProvider extends ColumnLabelProvider {
 	 * Create a MarkerViewLabelProvider on a field.
 	 *
 	 * @param field
-	 * @param column
 	 */
 	MarkerColumnLabelProvider(MarkerField field) {
 		FieldDecorationRegistry.getDefault();
@@ -53,19 +52,5 @@ public class MarkerColumnLabelProvider extends ColumnLabelProvider {
 	@Override
 	public void update(ViewerCell cell) {
 		field.update(cell);
-	}
-
-	@Override
-	public boolean useNativeToolTip(Object object) {
-		return false;
-	}
-
-	@Override
-	public String getToolTipText(Object element) {
-		if (!(element instanceof MarkerEntry)) {
-			return super.getToolTipText(element);
-		}
-		MarkerEntry markerEntry = (MarkerEntry) element;
-		return field.getValue(markerEntry);
 	}
 }
