@@ -829,13 +829,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param manager
 	 */
 	public void clearModelToManager(MToolBar model, ToolBarManager manager) {
-		for (MToolBarElement element : model.getChildren()) {
-			if (element instanceof MToolBar) {
-				clearModelToManager((MToolBar) element, getManager((MToolBar) element));
-			}
-			IContributionItem ici = getContribution(element);
-			clearModelToContribution(element, ici);
-		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
 		if (logger.isDebugEnabled()) {
@@ -867,6 +860,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void linkModelToContribution(MToolBarElement model, IContributionItem item) {
 		modelToContribution.put(model, item);
 		contributionToModel.put(item, model);
+		if (logger.isDebugEnabled()) {
+			logger.debug(
+					"\nTBMR:linkModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	/**
@@ -874,14 +872,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param item
 	 */
 	public void clearModelToContribution(MToolBarElement model, IContributionItem item) {
-		if (model instanceof MToolBar) {
-			for (MToolBarElement element : ((MToolBar) model).getChildren()) {
-				IContributionItem ici = getContribution(element);
-				clearModelToContribution(element, ici);
-			}
-		}
 		modelToContribution.remove(model);
 		contributionToModel.remove(item);
+		if (logger.isDebugEnabled()) {
+			logger.debug(
+					"\nTBMR:clearModelToContribution: modelToContribution size = {0}, contributionToModel size = {1}", //$NON-NLS-1$
+					modelToContribution.size(), contributionToModel.size());
+		}
 	}
 
 	/**
