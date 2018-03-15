@@ -534,9 +534,10 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
     }
 
     private void setInitialTextValues(Combo text) {
-		for (String recentWorkspace : launchData.getRecentWorkspaces()) {
-			if (recentWorkspace != null) {
-				text.add(recentWorkspace);
+        String[] recentWorkspaces = launchData.getRecentWorkspaces();
+        for (int i = 0; i < recentWorkspaces.length; ++i) {
+			if (recentWorkspaces[i] != null) {
+				text.add(recentWorkspaces[i]);
 			}
 		}
 

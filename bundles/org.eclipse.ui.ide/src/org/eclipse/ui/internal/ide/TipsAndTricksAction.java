@@ -70,9 +70,9 @@ public class TipsAndTricksAction extends PartEventAction implements
         AboutInfo[] featureInfos = IDEWorkbenchPlugin.getDefault()
                 .getFeatureInfos();
         ArrayList tipsAndTricksFeatures = new ArrayList(featureInfos.length);
-        for (AboutInfo featureInfo : featureInfos) {
-            if (featureInfo.getTipsAndTricksHref() != null) {
-				tipsAndTricksFeatures.add(featureInfo);
+        for (int i = 0; i < featureInfos.length; i++) {
+            if (featureInfos[i].getTipsAndTricksHref() != null) {
+				tipsAndTricksFeatures.add(featureInfos[i]);
 			}
         }
 
