@@ -879,7 +879,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		actionSetMenuViewer.setUseHashlookup(true);
 		actionSetMenuViewer.setContentProvider(TreeManager
 				.getTreeContentProvider());
-		actionSetMenuViewer.setLabelProvider(new GrayOutUnavailableLabelProvider(null));
+		actionSetMenuViewer.setLabelProvider(TreeManager.getLabelProvider());
 		actionSetMenuViewer.addFilter(setFilter);
 		actionSetMenuViewer.setInput(menuItems);
 
@@ -905,7 +905,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				new GridData(SWT.FILL, SWT.FILL, true, true));
 		actionSetToolbarViewer.setContentProvider(TreeManager
 				.getTreeContentProvider());
-		actionSetToolbarViewer.setLabelProvider(new GrayOutUnavailableLabelProvider(null));
+		actionSetToolbarViewer.setLabelProvider(TreeManager.getLabelProvider());
 		actionSetToolbarViewer.addFilter(setFilter);
 		actionSetToolbarViewer.setInput(toolBarItems);
 
