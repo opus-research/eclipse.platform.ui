@@ -29,8 +29,8 @@
         <artifactId>tycho-surefire-plugin</artifactId>
         <version>${tycho.version}</version>
         <configuration>
-          <useUIHarness>false</useUIHarness>
-          <useUIThread>false</useUIThread>
+          <useUIHarness>true</useUIHarness>
+          <useUIThread>true</useUIThread>
           <argLine>-Xms128m -Xmx512m</argLine>
             <dependencies>
               <dependency>
