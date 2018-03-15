@@ -78,12 +78,14 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private MarkerContentGenerator generator;
 
-	private boolean andFilters = false;
+	private boolean andFilters;
 
 	private Button removeButton;
 	private Button renameButton;
 
 	private Button allButton;
+	private Button andButton;
+	private Button orButton;
 
 	private Button limitButton;
 	private Text limitText;
@@ -107,7 +109,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		super(parentShell);
 		filterGroups = makeWorkingCopy(generator.getAllFilters());
 		this.generator = generator;
-		andFilters = false;
+		andFilters = generator.andFilters();
 	}
 
 	/**
@@ -186,6 +188,8 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			configsTable.setChecked(group, enabled);
 		}
 
+		andButton.setSelection(andFilters);
+		orButton.setSelection(!andFilters);
 		updateRadioButtonsFromTable();
 		int limits = generator.getMarkerLimits();
 		boolean limitsEnabled = generator.isMarkerLimitsEnabled();
@@ -199,6 +203,8 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private void updateRadioButtonsFromTable() {
 		boolean showAll = isShowAll();
 		allButton.setSelection(showAll);
+		andButton.setEnabled(!showAll);
+		orButton.setEnabled(!showAll);
 		updateConfigComposite(!showAll);
 	}
 
@@ -228,6 +234,8 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private void updateShowAll(boolean showAll) {
 		allButton.setSelection(showAll);
+		andButton.setEnabled(!showAll);
+		orButton.setEnabled(!showAll);
 		updateConfigComposite(!showAll);
 
 		if (showAll) {
@@ -530,6 +538,29 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		});
 
+		andButton = new Button(parent, SWT.RADIO);
+		andButton.setText(MarkerMessages.AND_Title);
+		andButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				andFilters = true;
+			}
+		});
+		GridData andData = new GridData();
+		andData.horizontalIndent = 20;
+		andButton.setLayoutData(andData);
+
+		orButton = new Button(parent, SWT.RADIO);
+		orButton.setText(MarkerMessages.OR_Title);
+		orButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				andFilters = false;
+			}
+		});
+		GridData orData = new GridData();
+		orData.horizontalIndent = 20;
+		orButton.setLayoutData(orData);
 	}
 
 	/**
@@ -674,6 +705,8 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	@Override
 	protected void performDefaults() {
 		andFilters = false;
+		andButton.setSelection(andFilters);
+		orButton.setSelection(!andFilters);
 
 		filterGroups.clear();
 		List<MarkerFieldFilterGroup> declaredFilters = new ArrayList<>(generator.getDeclaredFilters());
