@@ -12,13 +12,11 @@
 
 package org.eclipse.jface.dialogs;
 
-import java.util.Map;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -342,11 +340,6 @@ public class MessageDialogWithToggle extends MessageDialog {
      */
     private boolean toggleState;
 
-	/**
-	 * The mapping for custom buttons and ids
-	 */
-	private Map<String, Integer> dialogButtonIdMapping;
-
     /**
      * Creates a message dialog with a toggle. See the superclass constructor
      * for info on the other parameters.
@@ -393,55 +386,6 @@ public class MessageDialogWithToggle extends MessageDialog {
         this.toggleState = toggleState;
         setButtonLabels(dialogButtonLabels);
     }
-
-	/**
-	 * Creates a message dialog with a toggle. See the superclass constructor
-	 * for info on the other parameters. This constructor accepts a Map<String,
-	 * Integer> to set custom button labels (String) and custom button ids
-	 * (Integer) as return codes for that buttons.
-	 *
-	 * @param parentShell
-	 *            the parent shell
-	 * @param dialogTitle
-	 *            the dialog title, or <code>null</code> if none
-	 * @param image
-	 *            the dialog title image, or <code>null</code> if none
-	 * @param message
-	 *            the dialog message
-	 * @param dialogImageType
-	 *            one of the following values:
-	 *            <ul>
-	 *            <li><code>MessageDialog.NONE</code> for a dialog with no
-	 *            image</li>
-	 *            <li><code>MessageDialog.ERROR</code> for a dialog with an
-	 *            error image</li>
-	 *            <li><code>MessageDialog.INFORMATION</code> for a dialog with
-	 *            an information image</li>
-	 *            <li><code>MessageDialog.QUESTION </code> for a dialog with a
-	 *            question image</li>
-	 *            <li><code>MessageDialog.WARNING</code> for a dialog with a
-	 *            warning image</li>
-	 *            </ul>
-	 * @param buttonLabelToIdMap
-	 *            map with button labels and ids
-	 * @param defaultIndex
-	 *            the index in the button label array of the default button
-	 * @param toggleMessage
-	 *            the message for the toggle control, or <code>null</code> for
-	 *            the default message
-	 * @param toggleState
-	 *            the initial state for the toggle
-	 * @since 3.13
-	 */
-	public MessageDialogWithToggle(Shell parentShell, String dialogTitle, Image image, String message,
-			int dialogImageType, Map<String, Integer> buttonLabelToIdMap, int defaultIndex, String toggleMessage,
-			boolean toggleState) {
-		super(parentShell, dialogTitle, image, message, dialogImageType, defaultIndex,
-				buttonLabelToIdMap.keySet().toArray(new String[buttonLabelToIdMap.size()]));
-		this.toggleMessage = toggleMessage;
-		this.toggleState = toggleState;
-		this.dialogButtonIdMapping = buttonLabelToIdMap;
-	}
 
     /**
      * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
@@ -524,14 +468,7 @@ public class MessageDialogWithToggle extends MessageDialog {
         button.setLayoutData(data);
         button.setFont(parent.getFont());
 
-        button.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-			public void widgetSelected(SelectionEvent e) {
-                toggleState = button.getSelection();
-            }
-
-        });
+        button.addSelectionListener(widgetSelectedAdapter(e -> toggleState = button.getSelection()));
 
         return button;
     }
@@ -668,25 +605,14 @@ public class MessageDialogWithToggle extends MessageDialog {
     }
 
     /**
-	 * Attempt to find a standard JFace button id that matches the specified
-	 * button label. If a Map<String, Integer> with custom button labels and
-	 * custom button ids was set, this method first searches the Map to find the
-	 * button id that matches the specific button label. If no match can be
-	 * found at all, use the default id provided.
-	 *
-	 * @param buttonLabel
-	 *            the button label whose id is sought
-	 * @param defaultId
-	 *            the id to use for the button if there is no custom or standard
-	 *            id
-	 * @return the id for the specified button label
-	 */
+     * Attempt to find a standard JFace button id that matches the specified button
+     * label.  If no match can be found, use the default id provided.
+     *
+     * @param buttonLabel the button label whose id is sought
+     * @param defaultId the id to use for the button if there is no standard id
+     * @return the id for the specified button label
+     */
     private int mapButtonLabelToButtonID(String buttonLabel, int defaultId) {
-
-		if (dialogButtonIdMapping != null && dialogButtonIdMapping.containsKey(buttonLabel)) {
-			return dialogButtonIdMapping.get(buttonLabel);
-		}
-
     	// Not pretty but does the job...
     	if (IDialogConstants.OK_LABEL.equals(buttonLabel)) {
 			return IDialogConstants.OK_ID;
