@@ -789,32 +789,35 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 				}
 			}
 
-			// fix for PR 1FW89L7:
-			// don't complain and remove all "dummies" ...
-			if (items != null) {
-				for (Item item : items) {
-					if (item.getData() != null) {
-						disassociate(item);
-						Assert.isTrue(item.getData() == null, "Second or later child is non -null");//$NON-NLS-1$
+			BusyIndicator.showWhile(widget.getDisplay(), () -> {
+				// fix for PR 1FW89L7:
+				// don't complain and remove all "dummies" ...
+				if (items != null) {
+					for (Item item : items) {
+						if (item.getData() != null) {
+							disassociate(item);
+							Assert.isTrue(item.getData() == null,
+									"Second or later child is non -null");//$NON-NLS-1$
 
+						}
+						item.dispose();
 					}
-					item.dispose();
 				}
-			}
-			Object d = widget.getData();
-			if (d != null) {
-				Object parentElement = d;
-				Object[] children;
-				if (isTreePathContentProvider() && widget instanceof Item) {
-					TreePath path = getTreePathFromItem((Item) widget);
-					children = getSortedChildren(path);
-				} else {
-					children = getSortedChildren(parentElement);
+				Object d = widget.getData();
+				if (d != null) {
+					Object parentElement = d;
+					Object[] children;
+					if (isTreePathContentProvider() && widget instanceof Item) {
+						TreePath path = getTreePathFromItem((Item) widget);
+						children = getSortedChildren(path);
+					} else {
+						children = getSortedChildren(parentElement);
+					}
+					for (Object element : children) {
+						createTreeItem(widget, element, -1);
+					}
 				}
-				for (Object element : children) {
-					createTreeItem(widget, element, -1);
-				}
-			}
+			});
 		} finally {
 			setBusy(oldBusy);
 		}
@@ -1042,9 +1045,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 *            levels of the tree
 	 */
 	public void expandToLevel(int level) {
-		BusyIndicator.showWhile(getControl().getDisplay(), () -> {
-			expandToLevel(getRoot(), level);
-		});
+		expandToLevel(getRoot(), level);
 	}
 
 	/**
