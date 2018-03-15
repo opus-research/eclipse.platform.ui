@@ -216,17 +216,17 @@ public class CommonViewer extends TreeViewer {
 		Object[] changed = event.getElements();
 		if (changed != null) {
 			List<Object> others = new ArrayList<Object>();
-			for (int i = 0; i < changed.length; i++) {
-				if (changed[i] == null)
+			for (Object element : changed) {
+				if (element == null)
 					continue;
 
 				if (_mapper != null) {
-					if (_mapper.handlesObject(changed[i])) {
-						_mapper.objectChanged(changed[i]);
+					if (_mapper.handlesObject(element)) {
+						_mapper.objectChanged(element);
 						continue;
 					}
 				}
-				others.add(changed[i]);
+				others.add(element);
 			}
 			if (others.isEmpty()) {
 				return;

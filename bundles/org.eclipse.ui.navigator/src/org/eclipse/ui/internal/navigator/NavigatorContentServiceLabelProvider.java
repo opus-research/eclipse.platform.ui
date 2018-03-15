@@ -131,11 +131,11 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		if (labelProviders.length == 0)
 			return NLS.bind(CommonNavigatorMessages.NavigatorContentServiceLabelProvider_Error_no_label_provider_for_0_, makeSmallString(anElement));
 		String text = null;
-		for (int i = 0; i < labelProviders.length; i++) {
-			if (labelProviders[i] instanceof ITableLabelProvider && aColumn != -1)
-				text = ((ITableLabelProvider)labelProviders[i]).getColumnText(anElement, aColumn);
+		for (ILabelProvider labelProvider : labelProviders) {
+			if (labelProvider instanceof ITableLabelProvider && aColumn != -1)
+				text = ((ITableLabelProvider)labelProvider).getColumnText(anElement, aColumn);
 			else
-				text = labelProviders[i].getText(anElement);
+				text = labelProvider.getText(anElement);
 			if (text != null && text.length() > 0)
 				return text;
 		}
@@ -204,8 +204,7 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	@Override
 	public Font getFont(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
-		for (int i = 0; i < labelProviders.length; i++) {
-			ILabelProvider provider = labelProviders[i];
+		for (ILabelProvider provider : labelProviders) {
 			if (provider instanceof IFontProvider) {
 				IFontProvider fontProvider = (IFontProvider) provider;
 				Font font = fontProvider.getFont(anElement);
@@ -220,8 +219,7 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	@Override
 	public Color getForeground(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
-		for (int i = 0; i < labelProviders.length; i++) {
-			ILabelProvider provider = labelProviders[i];
+		for (ILabelProvider provider : labelProviders) {
 			if (provider instanceof IColorProvider) {
 				IColorProvider colorProvider = (IColorProvider) provider;
 				Color color = colorProvider.getForeground(anElement);
@@ -236,8 +234,7 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	@Override
 	public Color getBackground(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
-		for (int i = 0; i < labelProviders.length; i++) {
-			ILabelProvider provider = labelProviders[i];
+		for (ILabelProvider provider : labelProviders) {
 			if (provider instanceof IColorProvider) {
 				IColorProvider colorProvider = (IColorProvider) provider;
 				Color color = colorProvider.getBackground(anElement);
@@ -332,8 +329,8 @@ public class NavigatorContentServiceLabelProvider extends EventManager
     protected void fireLabelProviderChanged(
             final LabelProviderChangedEvent event) {
         Object[] theListeners = getListeners();
-        for (int i = 0; i < theListeners.length; ++i) {
-            final ILabelProviderListener l = (ILabelProviderListener) theListeners[i];
+        for (Object theListener : theListeners) {
+            final ILabelProviderListener l = (ILabelProviderListener) theListener;
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
