@@ -49,7 +49,7 @@ public class Policy {
 	 * https://bugs.eclipse.org/434325 .
 	 * </p>
 	 */
-	private static Comparator<String> viewerComparator;
+	private static Comparator<Object> viewerComparator;
 
 	private static AnimatorFactory animatorFactory;
 
@@ -170,8 +170,8 @@ public class Policy {
 	 *
 	 * @return a default comparator used by JFace to sort strings
 	 */
-	private static Comparator<String> getDefaultComparator() {
-		return (s1, s2) -> s1.compareTo(s2);
+	private static Comparator<Object> getDefaultComparator() {
+		return (s1, s2) -> ((String) s1).compareTo((String) s2);
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class Policy {
 	 * @return the comparator used by JFace to sort strings
 	 * @since 3.2
 	 */
-	public static Comparator<String> getComparator() {
+	public static Comparator<Object> getComparator() {
 		if (viewerComparator == null) {
 			viewerComparator = getDefaultComparator();
 		}
@@ -194,7 +194,7 @@ public class Policy {
 	 *            comparator used by JFace to sort strings
 	 * @since 3.2
 	 */
-	public static void setComparator(Comparator<String> comparator) {
+	public static void setComparator(Comparator<Object> comparator) {
 		org.eclipse.core.runtime.Assert.isTrue(viewerComparator == null);
 		viewerComparator = comparator;
 	}

@@ -59,8 +59,8 @@ public class ViewerSorter extends ViewerComparator {
      *
      * @param collator the collator to use to sort strings
      */
-	public ViewerSorter(Collator collator) {
-		super((s1, s2) -> collator.compare(s1, s2));
+    public ViewerSorter(Collator collator) {
+    	super(collator);
         this.collator = collator;
     }
 
