@@ -820,9 +820,15 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			valid = false;
 		}
 
-		String resourceName = resourceGroup.getResource();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IStatus result = workspace.validateName(resourceName, IResource.FILE);
+		IPath path = new Path(getFileName());
+		if (path.segmentCount() == 0 || path.hasTrailingSeparator()) {
+			IStatus result = workspace.validateName("", IResource.FILE); //$NON-NLS-1$
+			setErrorMessage(result.getMessage());
+			return false;
+		}
+		IPath resourcePath = getContainerFullPath().append(getFileName());
+		IStatus result = workspace.validatePath(resourcePath.toString(), IResource.FILE);
 		if (!result.isOK()) {
 			setErrorMessage(result.getMessage());
 			return false;
@@ -846,8 +852,6 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			if (resourceGroup.getAllowExistingResources()) {
 				String problemMessage = NLS.bind(
 						IDEWorkbenchMessages.ResourceGroup_nameExists,
-						getFileName());
-				IPath resourcePath = getContainerFullPath().append(
 						getFileName());
 				if (workspace.getRoot().getFolder(resourcePath).exists()) {
 					setErrorMessage(problemMessage);
@@ -877,7 +881,12 @@ public class WizardNewFileCreationPage extends WizardPage implements Listener {
 			return false;
 		if (resourceName.length() > 0) {
 			IPath newFolderPath = containerPath.append(resourceName);
-			IFile newFileHandle = createFileHandle(newFolderPath);
+			IFile newFileHandle;
+			try {
+				newFileHandle = createFileHandle(newFolderPath);
+			} catch (Exception e) {
+				return false;
+			}
 			IWorkspace workspace = newFileHandle.getWorkspace();
 			return !workspace.validateFiltered(newFileHandle).isOK();
 		}
