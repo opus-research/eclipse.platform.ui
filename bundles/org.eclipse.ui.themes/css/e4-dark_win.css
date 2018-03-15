@@ -9,7 +9,7 @@
  *     Andrea Guarinoni <andrea.guarinoni.dev@outlook.com> - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - initial API and implementation
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 431845
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309
+ *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434201, 434309, 430278
  *******************************************************************************/
 
 /*******************************************************************************
@@ -333,4 +333,10 @@ StatusLine, ImageBasedFrame{
 .MPartStack.active .MPart Form FormHeading ImageHyperlink {
     background-color: #415062;
     color: #9ac9d8;
+}
+
+/* On the windows dark theme, the default is having the scrollbar themed */
+IEclipsePreferences#org-eclipse-ui-themes {
+	preferences:
+		'SCROLLBAR-THEMED=true'
 }
