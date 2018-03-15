@@ -692,11 +692,9 @@ if (!event.getOldValue().equals(event.getNewValue())) {
 		}
 		addKeyButton.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 			Point buttonLocation = addKeyButton.getLocation();
-			buttonLocation = dataArea.toDisplay(buttonLocation.x,
-					buttonLocation.y);
+			buttonLocation = dataArea.toDisplay(buttonLocation.x, buttonLocation.y);
 			Point buttonSize = addKeyButton.getSize();
-			addKeyMenu.setLocation(buttonLocation.x, buttonLocation.y
-					+ buttonSize.y);
+			addKeyMenu.setLocation(buttonLocation.x, buttonLocation.y + buttonSize.y);
 			addKeyMenu.setVisible(true);
 		}));
 
@@ -1031,8 +1029,7 @@ if (!event.getOldValue().equals(event.getNewValue())) {
 			try {
 				fFilteredTree.setRedraw(false);
 				BindingModel bindingModel = keyController.getBindingModel();
-				bindingModel
-						.restoreBinding(keyController.getContextModel());
+				bindingModel.restoreBinding(keyController.getContextModel());
 			} finally {
 				fFilteredTree.setRedraw(true);
 			}
