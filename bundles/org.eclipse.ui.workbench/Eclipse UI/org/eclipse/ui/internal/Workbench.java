@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *     Francis Upton - <francisu@ieee.org> - Bug 217777
  *     Tristan Hume - <trishume@gmail.com> - Bug 2369
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661, 456897, 472654, 481516
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661, 456897, 472654, 481516,
+ *     											 486543
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *     Snjezana Peco <snjeza.peco@gmail.com> - Bug 405542
@@ -1228,11 +1229,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 			@Override
 			public void run() {
 				IWorkbenchWindow windows[] = getWorkbenchWindows();
-				for (int i = 0; i < windows.length; i++) {
-					IWorkbenchPage pages[] = windows[i].getPages();
-					for (int j = 0; j < pages.length; j++) {
-						List<EditorReference> editorReferences = ((WorkbenchPage) pages[j])
-								.getInternalEditorReferences();
+				for (IWorkbenchWindow window : windows) {
+					IWorkbenchPage pages[] = window.getPages();
+					for (IWorkbenchPage page : pages) {
+						List<EditorReference> editorReferences = ((WorkbenchPage) page).getInternalEditorReferences();
 						List<EditorReference> referencesToClose = new ArrayList<>();
 						for (EditorReference reference : editorReferences) {
 							IEditorPart editor = reference.getEditor(false);
@@ -1242,7 +1242,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 						}
 						if (shutdown) {
 							for (EditorReference reference : referencesToClose) {
-								((WorkbenchPage) pages[j]).closeEditor(reference);
+								((WorkbenchPage) page).closeEditor(reference);
 							}
 						}
 					}
@@ -1279,13 +1279,13 @@ public final class Workbench extends EventManager implements IWorkbench,
 			@Override
 			public void run() {
 				IWorkbenchWindow windows[] = getWorkbenchWindows();
-				for (int i = 0; i < windows.length; i++) {
-					IWorkbenchPage pages[] = windows[i].getPages();
-					for (int j = 0; j < pages.length; j++) {
-						IViewReference[] references = pages[j].getViewReferences();
-						for (int k = 0; k < references.length; k++) {
-							if (references[k].getView(false) != null) {
-								((ViewReference) references[k]).persist();
+				for (IWorkbenchWindow window : windows) {
+					IWorkbenchPage pages[] = window.getPages();
+					for (IWorkbenchPage page : pages) {
+						IViewReference[] references = page.getViewReferences();
+						for (IViewReference reference : references) {
+							if (reference.getView(false) != null) {
+								((ViewReference) reference).persist();
 							}
 						}
 					}
@@ -1296,9 +1296,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 		// now that we have updated the model, save it to workbench.xmi
 		// skip this during shutdown to be efficient since it is done again
 		// later
-		if (!shutdown) {
+		// if (!shutdown) {
 			persistWorkbenchModel();
-		}
+		// }
 	}
 
 	private boolean detectWorkbenchCorruption(MApplication application) {
