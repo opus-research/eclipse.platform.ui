@@ -72,7 +72,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextFunction;
@@ -266,9 +265,9 @@ import org.eclipse.ui.views.IViewRegistry;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -304,19 +303,51 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private static final String CMD_DATA = "-data"; //$NON-NLS-1$
 	private static final String CMD_VMARGS = "-vmargs"; //$NON-NLS-1$
 
-	private final class StartupProgressBundleListener implements BundleListener {
+	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
 		private final IProgressMonitor progressMonitor;
 
-		StartupProgressBundleListener(IProgressMonitor progressMonitor) {
+		private final int maximumProgressCount;
+
+		// stack of names of bundles currently starting
+		private final List<String> starting;
+
+		StartupProgressBundleListener(IProgressMonitor progressMonitor, int maximumProgressCount) {
+			super();
 			this.progressMonitor = progressMonitor;
+			this.maximumProgressCount = maximumProgressCount;
+			this.starting = new ArrayList<>();
 		}
 
 		@Override
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
-			if (eventType == BundleEvent.STARTED) {
-				progressMonitor.worked(1);
+			String bundleName;
+
+			synchronized (this) {
+				if (eventType == BundleEvent.STARTING) {
+					starting.add(bundleName = event.getBundle().getSymbolicName());
+				} else if (eventType == BundleEvent.STARTED) {
+					progressCount++;
+					if (progressCount <= maximumProgressCount) {
+						progressMonitor.worked(1);
+					}
+					int index = starting.lastIndexOf(event.getBundle().getSymbolicName());
+					if (index >= 0) {
+						starting.remove(index);
+					}
+					if (index != starting.size()) {
+						return; // not currently displayed
+					}
+					bundleName = index == 0 ? null : (String) starting.get(index - 1);
+				} else {
+					return; // uninteresting event
+				}
+			}
+
+			if (bundleName != null) {
+				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
+				progressMonitor.subTask(taskName);
 			}
 		}
 	}
@@ -626,16 +657,19 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 					AbstractSplashHandler handler = getSplash();
 
-					boolean showProgress = PrefUtil.getAPIPreferenceStore()
-							.getBoolean(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
+					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
+									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
 
 					IProgressMonitor progressMonitor = null;
 					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
-							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault().getBundleCount() / 10);
-							SubMonitor subMonitor = SubMonitor.convert(progressMonitor, expectedProgressCount);
-							BundleListener bundleListener = workbench.new StartupProgressBundleListener(subMonitor);
+							double cutoff = 0.95;
+							int expectedProgressCount = Math.max(1, WorkbenchPlugin.getDefault()
+									.getBundleCount() / 10);
+							progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
+							SynchronousBundleListener bundleListener = workbench.new StartupProgressBundleListener(
+									progressMonitor, (int) (expectedProgressCount * cutoff));
 							WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 						}
 					}
@@ -2580,7 +2614,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 			runnable.run();
 		} else {
 			progressMonitor.beginTask("", expectedProgressCount); //$NON-NLS-1$
-			BundleListener bundleListener = new StartupProgressBundleListener(progressMonitor);
+			SynchronousBundleListener bundleListener = new StartupProgressBundleListener(
+					progressMonitor, (int) (expectedProgressCount * cutoff));
 			WorkbenchPlugin.getDefault().addBundleListener(bundleListener);
 			try {
 				runnable.run();
