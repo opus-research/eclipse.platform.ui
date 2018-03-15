@@ -8,11 +8,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
@@ -41,11 +37,13 @@ public class PluginActivationTests {
 			"org.apache.lucene",
 			"org.eclipse.ant.core",
 			"org.eclipse.ant.ui",
+			"org.eclipse.compare", // caveat, see workaround for EGit in setUpTest below!
 			"org.eclipse.core.commands",
 			"org.eclipse.core.filesystem.win32.x86",
 			"org.eclipse.core.resources.compatibility",
 			"org.eclipse.core.resources.win32",
 			"org.eclipse.core.runtime.compatibility.registry",
+			"org.eclipse.debug.ui",
 			"org.eclipse.equinox.http.jetty",
 			"org.eclipse.equinox.http.registry",
 			"org.eclipse.equinox.http.servlet",
@@ -54,9 +52,25 @@ public class PluginActivationTests {
 			"org.eclipse.help.base",
 			"org.eclipse.help.ui",
 			"org.eclipse.help.webapp",
+			"org.eclipse.jdt",
+			"org.eclipse.jdt.apt.core",
+			"org.eclipse.jdt.apt.ui",
+			"org.eclipse.jdt.compiler.apt",
+			"org.eclipse.jdt.compiler.tool",
+			"org.eclipse.jdt.debug",
+			"org.eclipse.jdt.debug.ui",
+			"org.eclipse.jdt.doc.isv",
+			"org.eclipse.jdt.doc.user",
+			"org.eclipse.jdt.junit",
+			"org.eclipse.jdt.junit.runtime",
+			"org.eclipse.jdt.junit4.runtime",
 			"org.eclipse.jface.databinding",
 			"org.eclipse.jface.text",
 			"org.eclipse.osgi.services",
+			"org.eclipse.pde",
+			"org.eclipse.pde.build",
+			"org.eclipse.pde.doc.user",
+			"org.eclipse.pde.runtime",
 			"org.eclipse.platform.doc.isv",
 			"org.eclipse.platform.doc.user",
 			"org.eclipse.sdk",
@@ -64,6 +78,10 @@ public class PluginActivationTests {
 			"org.eclipse.search",
 			"org.eclipse.swt",
 			"org.eclipse.swt.win32.win32.x86",
+			"org.eclipse.team.cvs.core",
+			"org.eclipse.team.cvs.ssh",
+			"org.eclipse.team.cvs.ssh2",
+			"org.eclipse.team.cvs.ui",
 			"org.eclipse.test.performance",
 			"org.eclipse.test.performance.ui",
 			"org.eclipse.test.performance.win32",
@@ -72,6 +90,9 @@ public class PluginActivationTests {
 			"org.eclipse.ui.cheatsheets",
 			"org.eclipse.ui.console",
 			"org.eclipse.ui.editors.tests",
+			"org.eclipse.ui.externaltools",
+			"org.eclipse.ui.navigator",
+			"org.eclipse.ui.navigator.resources",
 			"org.eclipse.ui.views.properties.tabbed",
 			"org.eclipse.ui.win32",
 			"org.eclipse.ui.workbench.compatibility",
@@ -80,12 +101,14 @@ public class PluginActivationTests {
 			"org.eclipse.update.ui",
 			"org.junit",
 			"org.eclipse.core.databinding.beans",
+			"org.eclipse.cvs",
 			"org.eclipse.equinox.launcher",
 			"org.eclipse.equinox.launcher.win32.win32.x86",
 			"org.eclipse.help.appserver",
 			"org.eclipse.jdt.apt.pluggable.core",
 			"org.eclipse.jsch.ui",
 			"org.eclipse.osgi.util",
+			"org.eclipse.pde.ui.templates",
 			"org.eclipse.platform",
 			"org.eclipse.rcp",
 			"org.eclipse.ui.browser"
@@ -130,16 +153,35 @@ public class PluginActivationTests {
 			"org.eclipse.emf.ecore.xmi",
 			"org.eclipse.equinox.app",
 			"org.eclipse.equinox.common",
-			"org.eclipse.ui.cheatsheets",
 			"org.eclipse.equinox.console",
 			"org.eclipse.equinox.ds",
 			"org.eclipse.equinox.event",
+			"org.eclipse.equinox.p2.core",
+			"org.eclipse.equinox.p2.engine",
+			"org.eclipse.equinox.p2.metadata",
+			"org.eclipse.equinox.p2.metadata.repository",
+			"org.eclipse.equinox.p2.operations",
+			"org.eclipse.equinox.p2.repository",
+			"org.eclipse.equinox.p2.ui.sdk.scheduler",
+			"org.eclipse.equinox.p2.updatechecker",
 			"org.eclipse.equinox.preferences",
 			"org.eclipse.equinox.registry",
 			"org.eclipse.equinox.security",
 			"org.eclipse.help",
+			"org.eclipse.jdt.core",
+			"org.eclipse.jdt.core.manipulation",
+			"org.eclipse.jdt.launching",
+			"org.eclipse.jdt.ui",
 			"org.eclipse.jgit",
 			"org.eclipse.jsch.core",
+			"org.eclipse.ltk.core.refactoring",
+			"org.eclipse.ltk.ui.refactoring",
+			"org.eclipse.pde.core",
+			"org.eclipse.pde.junit.runtime",
+			"org.eclipse.pde.launching",
+			"org.eclipse.pde.ui",
+			"org.eclipse.team.core",
+			"org.eclipse.team.ui",
 			"org.eclipse.ui",
 			"org.eclipse.ui.editors",
 			"org.eclipse.ui.examples.contributions",
@@ -148,12 +190,11 @@ public class PluginActivationTests {
 			"org.eclipse.ui.intro",
 			"org.eclipse.ui.intro.universal",
 			"org.eclipse.ui.monitoring",
-			"org.eclipse.ui.navigator",
-			"org.eclipse.ui.navigator.resources",
 			"org.eclipse.ui.net",
 			"org.eclipse.ui.tests",
 			"org.eclipse.ui.tests.harness",
 			"org.eclipse.ui.themes",
+			"org.eclipse.ui.trace",
 			"org.eclipse.ui.views.log",
 			"org.eclipse.ui.workbench",
 			"org.eclipse.ui.workbench.texteditor",
@@ -179,16 +220,6 @@ public class PluginActivationTests {
 		 */
 		if (Platform.getBundle("org.eclipse.egit.ui") != null) {
 			addLoadedPlugIns("org.eclipse.compare");
-		}
-
-		// enforce to show certain views to trigger plug-in activation
-		// are used
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		try {
-			window.getActivePage().showView("org.eclipse.ui.navigator.ProjectExplorer");
-			window.getActivePage().showView("org.eclipse.ui.views.PropertySheet");
-		} catch (PartInitException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -242,7 +273,6 @@ public class PluginActivationTests {
 	 */
 
 	@Test
-	@Ignore("See Bug 516743")
 	public void pluginsWithoutOSGiServiceOrActivatorShouldNotActive() {
 		StringBuffer buf = new StringBuffer();
 		for (String element : NOT_ACTIVE_BUNDLES) {
@@ -262,7 +292,7 @@ public class PluginActivationTests {
 		if (buf.length() > 0) {
 			printPluginStatus(true);
 		}
-		assertTrue("Unexpected bundles in status active:\n" + buf, buf.length() == 0);
+		assertTrue("Wrong bundles in active status:\n" + buf, buf.length() == 0);
 	}
 
 	/**
@@ -273,19 +303,15 @@ public class PluginActivationTests {
 	 * situation. If the test is failing due to such a situation, add the
 	 * corresponding bundle to this list.
 	 *
-	 * Equinox also (seems to activates plug-ins which set the singleton:=true. Not
-	 * sure if that is a bug or desired
-	 *
 	 * Also plug-ins with an activator must be activated but additional activators
 	 * should be avoided as the slow down the startup of Eclipse
 	 *
 	 */
 
 	@Test
-	@Ignore("See Bug 516743")
 	public void activePluginsShouldNotIncrease() {
 		printPluginStatus(true);
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (String element : ACTIVE_BUNDLES) {
 			Bundle bundle = Platform.getBundle(element);
 			if (bundle == null) {
@@ -303,6 +329,6 @@ public class PluginActivationTests {
 		if (buf.length() > 0) {
 			printPluginStatus(true);
 		}
-		assertTrue("Bundles not active which used to be active:\n" + buf, buf.length() == 0);
+		assertTrue("Wrong bundles loaded:\n" + buf, buf.length() == 0);
 	}
 }
