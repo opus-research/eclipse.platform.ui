@@ -124,10 +124,10 @@ public class AdaptedResourceNavigator extends ViewPart {
      * where the elements are resources.
      */
     StructuredSelection convertSelection(ISelection selection) {
-		ArrayList<IResource> list = new ArrayList<>();
+        ArrayList list = new ArrayList();
         if (selection instanceof IStructuredSelection) {
             IStructuredSelection ssel = (IStructuredSelection) selection;
-			for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
+            for (Iterator i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
 				IResource resource = Adapters.adapt(o, IResource.class);
                 if (resource != null) {
@@ -164,7 +164,8 @@ public class AdaptedResourceNavigator extends ViewPart {
 
         // Update the global action enable state to match
         // the current selection.
-		IStructuredSelection selection = viewer.getStructuredSelection();
+        IStructuredSelection selection = (IStructuredSelection) viewer
+                .getSelection();
         actionGroup.updateGlobalActions(selection);
 
 		viewer.addSelectionChangedListener(event -> handleSelectionChanged(event));
@@ -327,7 +328,7 @@ public class AdaptedResourceNavigator extends ViewPart {
      */
     protected void handleDoubleClick(DoubleClickEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event
-				.getSelection();
+                .getSelection();
         Object element = selection.getFirstElement();
 
         // 1GBZIA0: ITPUI:WIN2000 - Double-clicking in navigator should expand/collapse containers

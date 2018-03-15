@@ -99,12 +99,12 @@ public class Bug36420Test extends UITestCase {
         // Check to see that the key binding for the given command matches.
         ICommandManager manager = fWorkbench.getCommandSupport()
                 .getCommandManager();
-		List<KeySequence> keyBindings = manager.getCommand(commandId)
+        List keyBindings = manager.getCommand(commandId)
                 .getKeySequenceBindings();
-		Iterator<KeySequence> keyBindingItr = keyBindings.iterator();
+        Iterator keyBindingItr = keyBindings.iterator();
         boolean found = false;
         while (keyBindingItr.hasNext()) {
-            KeySequence keyBinding = keyBindingItr.next();
+            KeySequence keyBinding = (KeySequence) keyBindingItr.next();
             String currentText = keyBinding.toString();
             if (keySequenceText.equals(currentText)) {
                 found = true;

@@ -304,7 +304,8 @@ public class VirtualTableViewerTest extends TableViewerTest {
 		TestElement[] children = fRootElement.getChildren();
 		StructuredSelection selection = new StructuredSelection(children);
 		fViewer.setSelection(selection);
-		IStructuredSelection result = fViewer.getStructuredSelection();
+		IStructuredSelection result = (IStructuredSelection) fViewer
+				.getSelection();
 		assertTrue("Size was " + String.valueOf(result.size()) + " expected "
 				+ String.valueOf(children.length),
 				(result.size() == children.length));
