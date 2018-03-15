@@ -11,6 +11,9 @@
 
 package org.eclipse.ui.internal.views.markers;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.views.markers.MarkerItem;
@@ -18,19 +21,25 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 class MarkerCategory extends MarkerSupportItem {
 
+
 	boolean refreshing;
 
 	int start;
 
 	int end;
 
+	Markers markers;
 	MarkerEntry[] children;
+	MarkerEntry[] markerEntries;
+	MarkerSupportItem[] markerProjects;
+
+	HashMap<MarkerProject, String> projects = new HashMap<>();
+	HashMap<String, LinkedList<Integer>> projectIndexes = new HashMap<>();
 
 	private String name;
 
 	private int severity = -1;
 
-	private Markers markers;
 
 	/**
 	 * Create a new instance of the receiver that has the markers between
@@ -52,16 +61,37 @@ class MarkerCategory extends MarkerSupportItem {
 
 	@Override
 	MarkerSupportItem[] getChildren() {
-		if (children == null) {
+		if (markerProjects == null) {
 			MarkerItem[] allMarkers = markers.getMarkerEntryArray();
 			int totalSize = getChildrenCount();
-			children = new MarkerEntry[totalSize];
-			System.arraycopy(allMarkers, start, children, 0, totalSize);
-			for (int i = 0; i < children.length; i++) {
-				children[i].setCategory(this);
+			markerEntries = new MarkerEntry[totalSize];
+			System.arraycopy(allMarkers, start, markerEntries, 0, totalSize);
+			for (int i = 0; i < markerEntries.length; i++) {
+				String project = allMarkers[i].getMarker().getResource().getProject().getName();
+				System.out.println("project name = " + project); //$NON-NLS-1$
+				if (!projectIndexes.containsKey(project)) {
+					LinkedList<Integer> list = new LinkedList();
+					list.add(i);
+					projectIndexes.put(project, list);
+				} else {
+					LinkedList<Integer> list = projectIndexes.get(project);
+					list.add(i);
+					projectIndexes.put(project, list);
+				}
+				// children[i].setCategory(this);
+			}
+			for (String key : projectIndexes.keySet()) {
+				LinkedList<Integer> indexes = projectIndexes.get(key);
+				projects.put(new MarkerProject(key, markerEntries, name, indexes), key);
+			}
+			markerProjects = new MarkerSupportItem[projects.size()];
+			int i = 0;
+			for (MarkerProject project : projects.keySet()) {
+				markerProjects[i] = project;
+				i++;
 			}
 		}
-		return children;
+		return markerProjects;
 	}
 
 	@Override
