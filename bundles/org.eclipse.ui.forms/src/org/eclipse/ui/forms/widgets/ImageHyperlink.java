@@ -253,17 +253,16 @@ public class ImageHyperlink extends Hyperlink {
 	 */
 	public void setImage(Image image) {
 		this.image = image;
-		if (disabledImage != null) {
+		if (disabledImage != null)
 			disabledImage.dispose();
+		if (image == null) {
 			disabledImage = null;
 		}
-		redraw();
 	}
 
 	private void createDisabledImage() {
-		if ((disabledImage == null || disabledImage.isDisposed()) && image != null && !image.isDisposed()) {
-			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);
-		}
+		if (this.image != null && !this.image.isDisposed())
+			disabledImage = new Image(this.image.getDevice(), this.image, SWT.IMAGE_DISABLE);
 	}
 
 	private Point computeMaxImageSize() {
@@ -321,8 +320,9 @@ public class ImageHyperlink extends Hyperlink {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		if (!enabled)
-			createDisabledImage();
+		if (!enabled && (disabledImage == null || disabledImage.isDisposed()) && image != null && !image.isDisposed()) {
+			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);
+		}
 		super.setEnabled(enabled);
 		if (enabled && disabledImage != null) {
 			disabledImage.dispose();
