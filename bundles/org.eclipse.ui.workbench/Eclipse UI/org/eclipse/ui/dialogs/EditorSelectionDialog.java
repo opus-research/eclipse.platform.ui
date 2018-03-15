@@ -43,6 +43,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -380,7 +381,23 @@ public class EditorSelectionDialog extends Dialog {
 
 		if (newSelection != null) {
 			editorTableViewer.setSelection(new StructuredSelection(newSelection), true);
-		} else {
+		} else if (!showInternal) {
+			int index = fileName.lastIndexOf('.');
+			if (index != -1) {
+				String extension = fileName.substring(index);
+				Program program = Program.findProgram(extension);
+				if (program != null) {
+					for (IEditorDescriptor descriptor : externalEditors) {
+						if (descriptor instanceof EditorDescriptor
+								&& program.equals(((EditorDescriptor) descriptor).getProgram())) {
+							editorTableViewer.setSelection(new StructuredSelection(descriptor), true);
+						}
+					}
+				}
+			}
+		}
+
+		if (editorTableViewer.getSelection().isEmpty()) {
 			// set focus to first element, but don't select it:
 			Tree tree = editorTableViewer.getTree();
 			if (tree.getItemCount() > 0) {
