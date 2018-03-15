@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@
  *                    283204, 281723, 283428
  *     Ovidio Mallo - bugs 237163, 235195, 299619, 306611, 305367
  *     Eugen Neufeld - bug 461560
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 492268
  *******************************************************************************/
 package org.eclipse.jface.tests.databinding;
 
@@ -27,6 +28,7 @@ import org.eclipse.core.tests.databinding.BindingTest;
 import org.eclipse.core.tests.databinding.DatabindingContextTest;
 import org.eclipse.core.tests.databinding.ListBindingTest;
 import org.eclipse.core.tests.databinding.ObservablesManagerTest;
+import org.eclipse.core.tests.databinding.SideEffectTest;
 import org.eclipse.core.tests.databinding.UpdateListStrategyTest;
 import org.eclipse.core.tests.databinding.UpdateSetStrategyTest;
 import org.eclipse.core.tests.databinding.UpdateStrategyTest;
@@ -227,16 +229,16 @@ import org.eclipse.jface.tests.internal.databinding.viewers.ViewerElementMapTest
 import org.eclipse.jface.tests.internal.databinding.viewers.ViewerElementSetTest;
 import org.eclipse.jface.tests.internal.databinding.viewers.ViewerElementWrapperTest;
 import org.eclipse.jface.tests.internal.databinding.viewers.ViewerInputObservableValueTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ BindingTestSuite.class, SideEffectTest.class })
 public class BindingTestSuite extends TestSuite {
-
-	public static void main(String[] args) {
-		junit.textui.TestRunner.run(suite());
-	}
 
 	public static Test suite() {
 		return new BindingTestSetup(new BindingTestSuite());
