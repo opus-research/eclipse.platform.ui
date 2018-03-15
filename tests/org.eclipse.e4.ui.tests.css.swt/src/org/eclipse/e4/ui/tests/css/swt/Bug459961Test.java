@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Stefan Winkler and others.
+ * Copyright (c) 2015 Stefan Winkler and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,20 +38,6 @@ public class Bug459961Test extends CSSSWTTestCase {
 		Label label = createTestLabel(cssString);
 
 		RGBA expected = Display.getDefault().getSystemColor(SWT.COLOR_TRANSPARENT).getRGBA();
-
-		if (System.getProperty("org.eclipse.swt.internal.gtk.version", "").startsWith("3.")) { // $NON-NLS-1//NON-NLS-3
-			// In GTK3 the background color set using the color specified by the
-			// theme. Theme does not have the alpha/transparency specified so it
-			// the default value set is 255. COLOR-TRANSPARENT sets the alpha
-			// value to 0. So in GTK3 we need to get the expected color
-			// correctly. COLOR_WIDGET_BACKGROUND fetches the background color
-			// from the theme but since the alpha value is not defined in the
-			// theme we need to set it.
-			// more details see Bug 493640
-			expected = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGBA();
-			expected.alpha = 0;
-		}
-
 		RGBA actual = label.getBackground().getRGBA();
 		assertRGBAEquals(expected, actual);
 	}
