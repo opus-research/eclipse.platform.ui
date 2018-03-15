@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     James Blackburn (Broadcom Corp.) Bug 86973 Allow path pattern matching
  *     Anton Leherbauer (Wind River Systems, Inc.) - Bug 415099 Terminating with "<" or " " (space) does not work for extensions
  *     Mickael Istria (Red Hat Inc.) - Bug 460749: filter resources with same location
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491025
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -548,7 +547,6 @@ public class FilteredResourcesSelectionDialog extends
 		@Override
 		public void run() {
 			FilteredResourcesSelectionDialog.this.isDerived = isChecked();
-			scheduleRefresh();
 			applyFilter();
 		}
 	}
