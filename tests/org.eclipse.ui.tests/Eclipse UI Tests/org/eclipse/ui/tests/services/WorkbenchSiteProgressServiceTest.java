@@ -11,12 +11,17 @@
 
 package org.eclipse.ui.tests.services;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.graphics.Cursor;
@@ -48,6 +53,8 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 	private IWorkbenchPartSite site;
 
 	private SimpleDateFormat dateFormat;
+	private volatile long startTime;
+	private volatile boolean teardownCalled;
 
 	@Override
 	protected void doSetUp() throws Exception {
@@ -61,6 +68,14 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 		updateJob = progressService.getUpdateJob();
 
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
+		startTime = System.currentTimeMillis();
+		new TimeoutReportJob(getName(), 60 * 1000).schedule();
+	}
+
+	@Override
+	protected void doTearDown() throws Exception {
+		teardownCalled = true;
+		super.doTearDown();
 	}
 
 	public void forceUpdate() {
@@ -215,17 +230,57 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-
+			logTime("job starts");
 			monitor.beginTask("job starts", 1000);
 			for (int i = 0; i < 1000; i++) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
+					if (monitor.isCanceled()) {
+						break;
+					}
 				}
 				if(monitor.isCanceled()) {
 					break;
 				}
 				monitor.worked(1);
+			}
+			return Status.OK_STATUS;
+		}
+	}
+
+	class TimeoutReportJob extends Job {
+		private long maxTimeoutInMilis;
+
+		public TimeoutReportJob(String name, long maxTimeoutInMilis) {
+			super(name);
+			this.maxTimeoutInMilis = maxTimeoutInMilis;
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			while (!teardownCalled && System.currentTimeMillis() - startTime < maxTimeoutInMilis) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					break;
+				}
+			}
+			if (!teardownCalled) {
+				System.out.println("Test seem to hang: " + getName());
+				System.out.println("\nFULL THREAD DUMP START");
+				System.out.println(dumpThreads());
+				System.out.println("FULL THREAD DUMP END\n");
+				File file = Platform.getLogFileLocation().toFile();
+				try {
+					System.out.println("System log: " + file);
+					List<String> lines = Files.readAllLines(file.toPath());
+					for (String line : lines) {
+						System.out.println(line);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			return Status.OK_STATUS;
 		}
