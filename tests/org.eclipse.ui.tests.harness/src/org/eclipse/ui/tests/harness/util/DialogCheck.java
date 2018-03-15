@@ -23,8 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.tests.internal.util.VerifyDialog;
-
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * A <code>DialogCheck</code> is used test a dialog in
@@ -58,7 +57,7 @@ public class DialogCheck {
 	 *            this is the test case object, assertions will be executed on
 	 *            this object.
 	 */
-    public static void assertDialog(Dialog dialog, Assert assertion) {
+	public static void assertDialog(Dialog dialog) {
         Assert.assertNotNull(dialog);
         if (_verifyDialog.getShell() == null) {
             //force the creation of the verify dialog
@@ -80,12 +79,12 @@ public class DialogCheck {
 	 *            this is the test case object, assertions will be executed on
 	 *            this object.
 	 */
-    public static void assertDialogTexts(Dialog dialog, Assert assertion) {
+	public static void assertDialogTexts(Dialog dialog) {
         Assert.assertNotNull(dialog);
         dialog.setBlockOnOpen(false);
         dialog.open();
         Shell shell = dialog.getShell();
-        verifyCompositeText(shell, assertion);
+		verifyCompositeText(shell);
 		dialog.close();
 		// close "verify results" dialog, it makes other tests unhappy
 		_verifyDialog.buttonPressed(IDialogConstants.YES_ID);
@@ -113,8 +112,7 @@ public class DialogCheck {
      * @param composite The composite to look through
      * @param assert The object to invoke assertions on.
      */
-    private static void verifyCompositeText(Composite composite,
-            Assert assertion) {
+	private static void verifyCompositeText(Composite composite) {
         Control children[] = composite.getChildren();
 		for (Control child : children) {
             if (child instanceof TabFolder) {
@@ -134,7 +132,7 @@ public class DialogCheck {
             }
             else if (child instanceof Composite) {
                 //child is not a label, make a recursive call if it is a composite
-                verifyCompositeText((Composite) child, assertion);
+				verifyCompositeText((Composite) child);
             }
         }
     }

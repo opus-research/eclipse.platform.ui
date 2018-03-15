@@ -80,7 +80,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
             /*
              * Check page texts
              */
-            DialogCheck.assertDialogTexts(fWizardDialog, this);
+			DialogCheck.assertDialogTexts(fWizardDialog);
         }
     }
 
@@ -171,7 +171,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         /*
          * Check page texts
          */
-        DialogCheck.assertDialogTexts(fWizardDialog, this);
+		DialogCheck.assertDialogTexts(fWizardDialog);
     }
 }
 
