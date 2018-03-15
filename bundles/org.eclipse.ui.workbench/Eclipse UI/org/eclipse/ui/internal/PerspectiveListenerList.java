@@ -67,8 +67,8 @@ public class PerspectiveListenerList extends EventManager {
     public void firePerspectiveActivated(final IWorkbenchPage page,
             final IPerspectiveDescriptor perspective) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            final IPerspectiveListener l = (IPerspectiveListener) array[nX];
+        for (Object element : array) {
+            final IPerspectiveListener l = (IPerspectiveListener) element;
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -86,9 +86,9 @@ public class PerspectiveListenerList extends EventManager {
     public void firePerspectivePreDeactivate(final IWorkbenchPage page,
             final IPerspectiveDescriptor perspective) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            if (array[nX] instanceof IPerspectiveListener4) {
-                final IPerspectiveListener4 l4 = (IPerspectiveListener4) array[nX];
+        for (Object element : array) {
+            if (element instanceof IPerspectiveListener4) {
+                final IPerspectiveListener4 l4 = (IPerspectiveListener4) element;
                 fireEvent(new SafeRunnable() {
                     @Override
 					public void run() {
@@ -107,9 +107,9 @@ public class PerspectiveListenerList extends EventManager {
     public void firePerspectiveDeactivated(final IWorkbenchPage page,
             final IPerspectiveDescriptor perspective) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            if (array[nX] instanceof IPerspectiveListener3) {
-                final IPerspectiveListener3 l3 = (IPerspectiveListener3) array[nX];
+        for (Object element : array) {
+            if (element instanceof IPerspectiveListener3) {
+                final IPerspectiveListener3 l3 = (IPerspectiveListener3) element;
                 fireEvent(new SafeRunnable() {
                     @Override
 					public void run() {
@@ -126,8 +126,8 @@ public class PerspectiveListenerList extends EventManager {
     public void firePerspectiveChanged(final IWorkbenchPage page,
             final IPerspectiveDescriptor perspective, final String changeId) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            final IPerspectiveListener l = (IPerspectiveListener) array[nX];
+        for (Object element : array) {
+            final IPerspectiveListener l = (IPerspectiveListener) element;
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -147,9 +147,9 @@ public class PerspectiveListenerList extends EventManager {
             final IPerspectiveDescriptor perspective,
             final IWorkbenchPartReference partRef, final String changeId) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            if (array[nX] instanceof IPerspectiveListener2) {
-                final IPerspectiveListener2 l2 = (IPerspectiveListener2) array[nX];
+        for (Object element : array) {
+            if (element instanceof IPerspectiveListener2) {
+                final IPerspectiveListener2 l2 = (IPerspectiveListener2) element;
                 fireEvent(new SafeRunnable() {
                     @Override
 					public void run() {
@@ -169,9 +169,9 @@ public class PerspectiveListenerList extends EventManager {
     public void firePerspectiveClosed(final IWorkbenchPage page,
             final IPerspectiveDescriptor perspective) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            if (array[nX] instanceof IPerspectiveListener3) {
-                final IPerspectiveListener3 l3 = (IPerspectiveListener3) array[nX];
+        for (Object element : array) {
+            if (element instanceof IPerspectiveListener3) {
+                final IPerspectiveListener3 l3 = (IPerspectiveListener3) element;
                 fireEvent(new SafeRunnable() {
                     @Override
 					public void run() {
@@ -190,9 +190,9 @@ public class PerspectiveListenerList extends EventManager {
     public void firePerspectiveOpened(final IWorkbenchPage page,
             final IPerspectiveDescriptor perspective) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            if (array[nX] instanceof IPerspectiveListener3) {
-                final IPerspectiveListener3 l3 = (IPerspectiveListener3) array[nX];
+        for (Object element : array) {
+            if (element instanceof IPerspectiveListener3) {
+                final IPerspectiveListener3 l3 = (IPerspectiveListener3) element;
                 fireEvent(new SafeRunnable() {
                     @Override
 					public void run() {
@@ -212,9 +212,9 @@ public class PerspectiveListenerList extends EventManager {
             final IPerspectiveDescriptor oldPerspective,
             final IPerspectiveDescriptor newPerspective) {
         Object[] array = getListeners();
-        for (int nX = 0; nX < array.length; nX++) {
-            if (array[nX] instanceof IPerspectiveListener3) {
-                final IPerspectiveListener3 l3 = (IPerspectiveListener3) array[nX];
+        for (Object element : array) {
+            if (element instanceof IPerspectiveListener3) {
+                final IPerspectiveListener3 l3 = (IPerspectiveListener3) element;
                 fireEvent(new SafeRunnable() {
                     @Override
 					public void run() {
