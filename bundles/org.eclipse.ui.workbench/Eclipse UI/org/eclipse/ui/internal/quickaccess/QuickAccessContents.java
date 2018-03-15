@@ -137,8 +137,7 @@ public abstract class QuickAccessContents {
 			// (extensible)
 			List<QuickAccessEntry> extraEntries = new ArrayList<>();
 			if (filter.length() > MIN_SEARCH_LENGTH) {
-				extraEntries.add(makeSearchHelpEntry(filter));
-				extraEntries.add(makeSearchWorkspaceEntry(filter));
+				extraEntries.add(makeHelpSearchEntry(filter));
 			}
 
 			// perfect match, to be selected in the table if not null
@@ -163,21 +162,9 @@ public abstract class QuickAccessContents {
 		}
 	}
 
-	QuickAccessProvider searchProvider = null;
 	QuickAccessEntry searchHelpEntry = null;
-	QuickAccessEntry searchWorkspaceEntry = null;
-	QuickAccessSearchHelpElement searchHelpElement = null;
-	QuickAccessSearchWorkspeceElement searchWorkspaceElement = null;
-
-	/**
-	 * @return Returns the searchProvider.
-	 */
-	public QuickAccessProvider getSearchProvider() {
-		if (searchProvider == null) {
-			searchProvider = Stream.of(providers).filter(p -> p instanceof ActionProvider).findFirst().get();
-		}
-		return searchProvider;
-	}
+	QuickAccessProvider searchHelpProvider = null;
+	QuickAccessSearchElement searchHelpElement = null;
 
 	/**
 	 * Instantiate a new {@link QuickAccessEntry} to search the given text in
@@ -188,42 +175,18 @@ public abstract class QuickAccessContents {
 	 *
 	 * @return the {@link QuickAccessEntry} to perform the action
 	 */
-	private QuickAccessEntry makeSearchHelpEntry(String text) {
+	private QuickAccessEntry makeHelpSearchEntry(String text) {
 		if (searchHelpEntry == null) {
-			searchHelpElement = new QuickAccessSearchHelpElement(getSearchProvider());
-			searchHelpEntry = new QuickAccessEntry(searchHelpElement, getSearchProvider(), new int[][] {},
+			searchHelpProvider = Stream.of(providers).filter(p -> p instanceof ActionProvider).findFirst().get();
+			searchHelpElement = new QuickAccessSearchElement(searchHelpProvider);
+			searchHelpEntry = new QuickAccessEntry(searchHelpElement, searchHelpProvider, new int[][] {},
 					new int[][] {}, QuickAccessEntry.MATCH_PERFECT);
 		}
 		searchHelpElement.searchText = text;
 		return searchHelpEntry;
 	}
 
-	/**
-	 * Instantiate a new {@link QuickAccessEntry} to search the given text in
-	 * the eclipse workspace
-	 *
-	 * @param text
-	 *            String to search in the Eclipse Help
-	 *
-	 * @return the {@link QuickAccessEntry} to perform the action
-	 */
-	private QuickAccessEntry makeSearchWorkspaceEntry(String text) {
-		if (searchWorkspaceEntry == null) {
-			searchWorkspaceElement = new QuickAccessSearchWorkspeceElement(getSearchProvider());
-			searchWorkspaceEntry = new QuickAccessEntry(searchWorkspaceElement, getSearchProvider(), new int[][] {},
-					new int[][] {}, QuickAccessEntry.MATCH_PERFECT);
-		}
-		searchWorkspaceElement.searchText = text;
-		return searchWorkspaceEntry;
-	}
-
-	/**
-	 * Quick Access Element responsible to trigger a search in Help
-	 *
-	 * @since 3.5
-	 *
-	 */
-	static class QuickAccessSearchHelpElement extends QuickAccessElement {
+	static class QuickAccessSearchElement extends QuickAccessElement {
 
 		/** identifier */
 		private static final String SEARCH_IN_HELP_ID = "search.in.help"; //$NON-NLS-1$
@@ -233,7 +196,7 @@ public abstract class QuickAccessContents {
 		/**
 		 * @param provider
 		 */
-		public QuickAccessSearchHelpElement(QuickAccessProvider provider) {
+		public QuickAccessSearchElement(QuickAccessProvider provider) {
 			super(provider);
 		}
 
@@ -249,49 +212,6 @@ public abstract class QuickAccessContents {
 
 		@Override
 		public void execute() {
-			PlatformUI.getWorkbench().getHelpSystem().search(searchText);
-		}
-
-		@Override
-		public ImageDescriptor getImageDescriptor() {
-			return null;
-		}
-
-	}
-
-	/**
-	 * Quick Access Element responsible to search in workspace
-	 *
-	 * @since 3.5
-	 *
-	 */
-	static class QuickAccessSearchWorkspeceElement extends QuickAccessElement {
-
-		/** identifier */
-		private static final String SEARCH_IN_WORKSPACE_ID = "search.in.workspace"; //$NON-NLS-1$
-
-		String searchText;
-
-		/**
-		 * @param provider
-		 */
-		public QuickAccessSearchWorkspeceElement(QuickAccessProvider provider) {
-			super(provider);
-		}
-
-		@Override
-		public String getLabel() {
-			return NLS.bind(QuickAccessMessages.QuickAccessContents_SearchInWorkspaceLabel, searchText);
-		}
-
-		@Override
-		public String getId() {
-			return SEARCH_IN_WORKSPACE_ID;
-		}
-
-		@Override
-		public void execute() {
-			// FIXME: trigger org.eclipse.search.ui.performTextSearchWorkspace 
 			PlatformUI.getWorkbench().getHelpSystem().search(searchText);
 		}
 
