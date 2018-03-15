@@ -383,7 +383,7 @@ public class EditorSelectionDialog extends Dialog {
 
 		editorTableViewer.setInput(showInternal ? getInternalEditors() : getExternalEditors());
 
-		if (newSelection == null) {
+		if (fileName != null && newSelection == null) {
 			if (!showInternal) {
 				newSelection = findBestExternalEditor();
 			} else {
@@ -405,6 +405,9 @@ public class EditorSelectionDialog extends Dialog {
 	}
 
 	private static String getFileExtension(String fileName) {
+		if (fileName == null) {
+			return null;
+		}
 		int index = fileName.lastIndexOf('.');
 		if (index != -1) {
 			return fileName.substring(index);
@@ -550,6 +553,9 @@ public class EditorSelectionDialog extends Dialog {
 	}
 
 	private void initializeSuggestion() {
+		if (fileName == null) {
+			return;
+		}
 		IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
 		IEditorDescriptor suggestion = editorRegistry.getDefaultEditor(fileName);
 		if (suggestion != null && suggestion.isInternal()) {
@@ -563,6 +569,9 @@ public class EditorSelectionDialog extends Dialog {
 	}
 
 	private IEditorDescriptor findBestExternalEditor() {
+		if (fileName == null) {
+			return null;
+		}
 		String extension = getFileExtension(fileName);
 		Program program = Program.findProgram(extension);
 		if (program != null) {
@@ -583,27 +592,26 @@ public class EditorSelectionDialog extends Dialog {
 	 */
 	protected void restoreWidgetValues() {
 		IDialogSettings settings = getDialogSettings();
-		if (!(selectedEditor == null || getFileExtension(fileName).equals(settings.get(STORE_ID_FILE_EXTENSION)))) {
-			return;
-		}
-		boolean wasExternal = settings.getBoolean(STORE_ID_INTERNAL_EXTERNAL);
-		internalButton.setSelection(!wasExternal);
-		externalButton.setSelection(wasExternal);
-		String id = settings.get(STORE_ID_DESCR);
-		if (id != null) {
-			IEditorDescriptor[] editors;
-			if (wasExternal) {
-				editors = getExternalEditors();
-			} else {
-				editors = getInternalEditors();
-			}
-			for (IEditorDescriptor desc : editors) {
-				if (id.equals(desc.getId())) {
-					selectedEditor = desc;
+		if (fileName == null || selectedEditor == null
+				|| getFileExtension(fileName).equals(settings.get(STORE_ID_FILE_EXTENSION))) {
+			boolean wasExternal = settings.getBoolean(STORE_ID_INTERNAL_EXTERNAL);
+			internalButton.setSelection(!wasExternal);
+			externalButton.setSelection(wasExternal);
+			String id = settings.get(STORE_ID_DESCR);
+			if (id != null) {
+				IEditorDescriptor[] editors;
+				if (wasExternal) {
+					editors = getExternalEditors();
+				} else {
+					editors = getInternalEditors();
+				}
+				for (IEditorDescriptor desc : editors) {
+					if (id.equals(desc.getId())) {
+						selectedEditor = desc;
+					}
 				}
 			}
 		}
-
 	}
 
 	/**
