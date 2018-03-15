@@ -443,9 +443,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 
 			@Override
 			public void done(IJobChangeEvent event) {
-				if (!PlatformUI.isWorkbenchRunning()) {
-					return;
-				}
 				Iterator<IJobBusyListener> startListeners = busyListenersForJob(event.getJob()).iterator();
 				while (startListeners.hasNext()) {
 					IJobBusyListener next = startListeners.next();
