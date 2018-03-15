@@ -79,7 +79,7 @@ public class AggregateHyperlinkSegment extends ParagraphSegment implements
 
 	@Override
 	public String getText() {
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < segments.size(); i++) {
 			IHyperlinkSegment segment = (IHyperlinkSegment) segments.get(i);
 			buf.append(segment.getText());

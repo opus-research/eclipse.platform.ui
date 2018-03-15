@@ -411,7 +411,7 @@ public class WorkingSetConfigurationBlock {
 	private void updateWorkingSetSelection() {
 		if (selectedWorkingSets.length > 0) {
 			workingSetCombo.setEnabled(true);
-			StringBuilder buf = new StringBuilder();
+			StringBuffer buf = new StringBuffer();
 
 			buf.append(selectedWorkingSets[0].getLabel());
 			for (int i = 1; i < selectedWorkingSets.length; i++) {
