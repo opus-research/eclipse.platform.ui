@@ -46,9 +46,7 @@ public abstract class ViewerTestCase extends TestCase {
 	public ViewerTestCase(String name) {
 		super(name);
 		disableTestsBug347491 = Util.isCocoa();
-		if (Util.isGtk()) {
-			disableTestsBug493357 = OS.GTK3;
-		}
+		disableTestsBug493357 = OS.GTK3;
 	}
 
 	protected void assertSelectionEquals(String message, TestElement expected) {
