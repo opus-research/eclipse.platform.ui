@@ -26,6 +26,8 @@ import org.eclipse.jface.viewers.ViewerSorter;
  */
 public class WorkingSetSorter extends ViewerSorter {
 
+	private static final boolean DISABLE_FIX_FOR_364735 = Boolean.getBoolean("eclipse.disable.fix.for.bug364735"); //$NON-NLS-1$
+
 	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		// Make the other working set the last one in the explorer
@@ -37,7 +39,7 @@ public class WorkingSetSorter extends ViewerSorter {
 		if(viewer instanceof StructuredViewer) {
 			ILabelProvider labelProvider = (ILabelProvider) ((StructuredViewer) viewer).getLabelProvider();
 
-			if (labelProvider instanceof DecoratingStyledCellLabelProvider) {
+			if (labelProvider instanceof DecoratingStyledCellLabelProvider && !DISABLE_FIX_FOR_364735) {
 				// Bug 512637: use the real label provider to avoid unstable
 				// sort behavior if the decoration is running while sorting.
 				// decorations are usually visual aids to the user and
@@ -52,7 +54,7 @@ public class WorkingSetSorter extends ViewerSorter {
 				return -1;
 			}
 
-			if (labelProvider instanceof DecoratingLabelProvider) {
+			if (labelProvider instanceof DecoratingLabelProvider && !DISABLE_FIX_FOR_364735) {
 				// Bug 364735: use the real label provider to avoid unstable
 				// sort behavior if the decoration is running while sorting.
 				// decorations are usually visual aids to the user and
