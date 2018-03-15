@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,12 +147,12 @@ public class MarkerSupportInternalUtilities {
 	 * Create the image at the supplied path.
 	 *
 	 * @param completeImagePath
-	 * @param manager the resource manager to allocate the image in
+	 * @param manager
+	 *            the resource manager to allocate the image in
 	 * @return Image or <code>null</code>.
 	 */
 	static final Image createImage(String completeImagePath, ResourceManager manager) {
-		URL url = BundleUtility.find(IDEWorkbenchPlugin.getDefault()
-				.getBundle().getSymbolicName(), completeImagePath);
+		URL url = BundleUtility.find(IDEWorkbenchPlugin.getDefault().getBundle().getSymbolicName(), completeImagePath);
 		if (url == null)
 			return null;
 		return manager.createImageWithDefault(ImageDescriptor.createFromURL(url));
@@ -165,9 +165,8 @@ public class MarkerSupportInternalUtilities {
 	 * @return StatusAdapter
 	 */
 	static final StatusAdapter errorFor(Throwable exception) {
-		IStatus status = new Status(IStatus.ERROR,
-				IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.ERROR, exception
-						.getLocalizedMessage(), exception);
+		IStatus status = new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.ERROR,
+				exception.getLocalizedMessage(), exception);
 		return new StatusAdapter(status);
 	}
 
@@ -179,13 +178,11 @@ public class MarkerSupportInternalUtilities {
 	 * @return MarkerFieldFilter or <code>null</code>.
 	 */
 	static final MarkerFieldFilter generateFilter(MarkerField field) {
-		IConfigurationElement configurationElement = field
-				.getConfigurationElement();
+		IConfigurationElement configurationElement = field.getConfigurationElement();
 		try {
 			if (configurationElement.getAttribute(ATTRIBUTE_FILTER_CLASS) == null)
 				return null;
-			Object filter = IDEWorkbenchPlugin.createExtension(
-					configurationElement, ATTRIBUTE_FILTER_CLASS);
+			Object filter = IDEWorkbenchPlugin.createExtension(configurationElement, ATTRIBUTE_FILTER_CLASS);
 			if (filter == null)
 				return null;
 			MarkerFieldFilter fieldFilter = (MarkerFieldFilter) filter;
@@ -205,15 +202,12 @@ public class MarkerSupportInternalUtilities {
 	 * @return FilterConfigurationArea or <code>null</code>
 	 */
 	static final FilterConfigurationArea generateFilterArea(MarkerField field) {
-		IConfigurationElement configurationElement = field
-				.getConfigurationElement();
+		IConfigurationElement configurationElement = field.getConfigurationElement();
 		try {
-			if (configurationElement
-					.getAttribute(ATTRIBUTE_FILTER_CONFIGURATION_CLASS) == null)
+			if (configurationElement.getAttribute(ATTRIBUTE_FILTER_CONFIGURATION_CLASS) == null)
 				return null;
 			FilterConfigurationArea area = (FilterConfigurationArea) IDEWorkbenchPlugin
-					.createExtension(configurationElement,
-							ATTRIBUTE_FILTER_CONFIGURATION_CLASS);
+					.createExtension(configurationElement, ATTRIBUTE_FILTER_CONFIGURATION_CLASS);
 			if (area != null)
 				area.setField(field);
 			return area;
@@ -257,12 +251,11 @@ public class MarkerSupportInternalUtilities {
 	 * @param item
 	 * @return String
 	 */
-	public static final String  getGroupValue(MarkerGroup group, MarkerItem item) {
+	public static final String getGroupValue(MarkerGroup group, MarkerItem item) {
 		if (item.getMarker() == null)
 			return ((MarkerSupportItem) item).getDescription();
 		try {
-			MarkerGroupingEntry groupingEntry = group.findGroupValue(item
-					.getMarker().getType(), item.getMarker());
+			MarkerGroupingEntry groupingEntry = group.findGroupValue(item.getMarker().getType(), item.getMarker());
 			return groupingEntry.getLabel();
 		} catch (CoreException exception) {
 			Policy.handle(exception);
@@ -294,8 +287,7 @@ public class MarkerSupportInternalUtilities {
 	 * @return String
 	 */
 	public static final String getId(MarkerField field) {
-		return field.getConfigurationElement().getAttribute(
-				MarkerSupportInternalUtilities.ATTRIBUTE_ID);
+		return field.getConfigurationElement().getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
 	}
 
 	/**
@@ -306,15 +298,15 @@ public class MarkerSupportInternalUtilities {
 	 */
 	private static Image getIDEImage(String constantName) {
 
-		return JFaceResources.getResources().createImageWithDefault(
-				IDEInternalWorkbenchImages.getImageDescriptor(constantName));
+		return JFaceResources.getResources()
+				.createImageWithDefault(IDEInternalWorkbenchImages.getImageDescriptor(constantName));
 
 	}
 
 
 	/**
-	 * Return the severity value for item. A value of -1 indicates
-	 * that there is no severity value.
+	 * Return the severity value for item. A value of -1 indicates that there is
+	 * no severity value.
 	 *
 	 * @param item
 	 * @return int
@@ -359,18 +351,36 @@ public class MarkerSupportInternalUtilities {
 	 * Show the marker in view if possible.
 	 *
 	 * @param view
+	 *            view where to show the markers
 	 * @param marker
-	 * @return <code>true</code> if the marker is shown
+	 *            marker to be shown
+	 *
+	 * @return <code>true</code> if the marker is shown, <code>false</code>
+	 *         otherwise
 	 */
 	public static boolean showMarker(IViewPart view, IMarker marker) {
+		return showMarkers(view, new IMarker[] { marker });
+	}
+
+	/**
+	 * Show the markers in view if possible.
+	 *
+	 * @param view
+	 *            view where to show the markers
+	 * @param markers
+	 *            markers to be shown
+	 *
+	 * @return <code>true</code> if the markers are shown, <code>false</code>
+	 *         otherwise
+	 */
+	public static boolean showMarkers(IViewPart view, IMarker[] markers) {
 		if (view instanceof ExtendedMarkersView) {
-			StructuredSelection selection = new StructuredSelection(marker);
+			StructuredSelection selection = new StructuredSelection(markers);
 			ExtendedMarkersView markerView = (ExtendedMarkersView) view;
 			markerView.setSelection(selection, true);
 			return true;
 		}
 		return false;
-
 	}
 
 	/**
@@ -400,23 +410,20 @@ public class MarkerSupportInternalUtilities {
 		if (exception instanceof CoreException) {
 			// Check for a nested CoreException
 			IStatus status = ((CoreException) exception).getStatus();
-			if (status != null
-					&& status.getException() instanceof CoreException) {
+			if (status != null && status.getException() instanceof CoreException) {
 				exception = (CoreException) status.getException();
 				status = ((CoreException) exception).getStatus();
 			}
 
 			if (status == null)
 				StatusManager.getManager().handle(
-						StatusUtil.newStatus(IStatus.ERROR,
-								exception.getLocalizedMessage(), exception),
+						StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception),
 						handlingMethod);
 			else
 				StatusManager.getManager().handle(status, handlingMethod);
 			return;
 		}
-		StatusManager.getManager().handle(StatusUtil.newStatus(IStatus.ERROR,
-				exception.getLocalizedMessage(), exception),
-				handlingMethod);
+		StatusManager.getManager().handle(
+				StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception), handlingMethod);
 	}
 }
