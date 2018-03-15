@@ -30,8 +30,6 @@ public interface IWorkbenchGraphicConstants {
 
     public final static String IMG_ETOOL_HELP_SEARCH = "IMG_ETOOL_HELP_SEARCH"; //$NON-NLS-1$
 
-	public static final String IMG_ETOOL_TIPS_AND_TRICKS = "IMG_ETOOL_TIPS_AND_TRICKS"; //$NON-NLS-1$
-
 
     //Fast view enabled and disabled icons
     public final static String IMG_ETOOL_NEW_FASTVIEW = "IMG_ETOOL_NEW_FASTVIEW"; //$NON-NLS-1$

@@ -72,10 +72,11 @@ public class MenuManagerServiceFilter implements Listener {
 				if (e instanceof Error) {
 					// errors are deadly, we shouldn't ignore these
 					throw (Error) e;
-				}
-				// log exceptions otherwise
-				if (logger != null) {
-					logger.error(e);
+				} else {
+					// log exceptions otherwise
+					if (logger != null) {
+						logger.error(e);
+					}
 				}
 			}
 
