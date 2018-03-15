@@ -27,7 +27,7 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	private boolean readOnly;
 	private CSSRule parentRule;
-	private List<CSSProperty> properties = new ArrayList<>();
+	private List<CSSProperty> properties = new ArrayList<CSSProperty>();
 	private CSSPropertyList cssPropertyListView;
 
 	public CSSStyleDeclarationImpl(CSSRule parentRule) {
@@ -64,19 +64,25 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	@Override
 	public CSSValue getPropertyCSSValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
-		return (property == null) ? null : property.getValue();
+		return (property == null)
+			? null
+			: property.getValue();
 	}
 
 	@Override
 	public String getPropertyPriority(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
-		return (property != null && property.isImportant()) ? CSSPropertyImpl.IMPORTANT_IDENTIFIER : "";
+		return (property != null && property.isImportant())
+			? CSSPropertyImpl.IMPORTANT_IDENTIFIER
+			: "";
 	}
 
 	@Override
 	public String getPropertyValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
-		return (property == null) ? "" : property.getValue().toString();
+		return (property == null)
+			? ""
+			: property.getValue().toString();
 	}
 
 	@Override
@@ -86,13 +92,11 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	@Override
 	public String removeProperty(String propertyName) throws DOMException {
-		if (readOnly) {
-			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-					DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
-		}
+		if(readOnly)
+			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
 		for (int i = 0; i < properties.size(); i++) {
 			CSSProperty property = properties.get(i);
-			if (CSSPropertyImpl.sameName(property, propertyName)) {
+			if(CSSPropertyImpl.sameName(property, propertyName)) {
 				properties.remove(i);
 				return property.getValue().toString();
 			}
@@ -102,10 +106,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	@Override
 	public void setCssText(String cssText) throws DOMException {
-		if (readOnly) {
-			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-					DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
-		}
+		if(readOnly)
+			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if cssText is unparsable
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -113,10 +115,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	@Override
 	public void setProperty(String propertyName, String value, String priority) throws DOMException {
-		if (readOnly) {
-			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR,
-					DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
-		}
+		if(readOnly)
+			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if value is unparsable
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -125,7 +125,7 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	// Additional
 
-	public void addProperty(CSSProperty property) {
+	public void addProperty(CSSProperty  property) {
 		properties.add(property);
 	}
 
@@ -155,15 +155,9 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	private CSSProperty findCSSProperty(String propertyName) {
 		for (CSSProperty property : properties) {
-			if (CSSPropertyImpl.sameName(property, propertyName)) {
+			if(CSSPropertyImpl.sameName(property, propertyName))
 				return property;
-			}
 		}
 		return null;
-	}
-
-	@Override
-	public String toString() {
-		return getCssText();
 	}
 }
