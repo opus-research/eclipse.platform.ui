@@ -317,8 +317,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         FileEditorMapping resourceType = getSelectedResourceType();
         if (resourceType != null) {
             IEditorDescriptor[] array = resourceType.getEditors();
-            for (int i = 0; i < array.length; i++) {
-                IEditorDescriptor editor = array[i];
+            for (IEditorDescriptor editor : array) {
                 TableItem item = new TableItem(editorTable, SWT.NULL);
                 item.setData(DATA_EDITOR, editor);
                 // Check if it is the default editor
@@ -342,27 +341,26 @@ public class FileEditorsPreferencePage extends PreferencePage implements
 					.getDefault().getEditorRegistry();
 			IContentType[] contentTypes = Platform.getContentTypeManager()
 					.findContentTypesFor(resourceType.getLabel());
-			for (int i = 0; i < contentTypes.length; i++) {
-				array = registry.getEditorsForContentType(contentTypes[i]);
-				for (int j = 0; j < array.length; j++) {
-					IEditorDescriptor editor = array[j];
+			for (IContentType contentType : contentTypes) {
+				array = registry.getEditorsForContentType(contentType);
+				for (IEditorDescriptor editor : array) {
 					// don't add duplicates
 					TableItem[] items = editorTable.getItems();
 					TableItem foundItem = null;
-					for (int k = 0; k < items.length; k++) {
-						if (items[k].getData(DATA_EDITOR).equals(editor)) {
-							foundItem = items[k];
+					for (TableItem item : items) {
+						if (item.getData(DATA_EDITOR).equals(editor)) {
+							foundItem = item;
 							break;
 						}
 					}
 					if (foundItem == null) {
 						TableItem item = new TableItem(editorTable, SWT.NULL);
 						item.setData(DATA_EDITOR, editor);
-						item.setData(DATA_FROM_CONTENT_TYPE, contentTypes[i]);
+						item.setData(DATA_FROM_CONTENT_TYPE, contentType);
 						setLockedItemText(item, editor.getLabel());
 						item.setImage(getImage(editor));
 					} else { // update the item to reflect its origin
-						foundItem.setData(DATA_FROM_CONTENT_TYPE, contentTypes[i]);
+						foundItem.setData(DATA_FROM_CONTENT_TYPE, contentType);
 						setLockedItemText(foundItem, foundItem.getText());
 					}
 				}
@@ -570,10 +568,10 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         TableItem[] items = editorTable.getSelection();
         boolean defaultEditor = editorTable.getSelectionIndex() == 0;
         if (items.length > 0) {
-        	for (int i = 0; i < items.length; i++) {
+        	for (TableItem item : items) {
                 getSelectedResourceType().removeEditor(
-                        (EditorDescriptor) items[i].getData(DATA_EDITOR));
-                items[i].dispose();
+                        (EditorDescriptor) item.getData(DATA_EDITOR));
+                item.dispose();
         	}
         }
         if (defaultEditor && editorTable.getItemCount() > 0) {
@@ -595,8 +593,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      */
     public void removeSelectedResourceType() {
         TableItem[] items = resourceTypeTable.getSelection();
-        for (int i = 0; i < items.length; i++) {
-        	items[i].dispose();
+        for (TableItem item : items) {
+        	item.dispose();
         }
         //Clear out the editors too
         editorTable.removeAll();

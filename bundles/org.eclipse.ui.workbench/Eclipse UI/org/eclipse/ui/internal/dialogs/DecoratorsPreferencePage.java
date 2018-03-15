@@ -198,8 +198,8 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     private void populateDecorators() {
         DecoratorDefinition[] definitions = getAllDefinitions();
         checkboxViewer.setInput(definitions);
-        for (int i = 0; i < definitions.length; i++) {
-            checkboxViewer.setChecked(definitions[i], definitions[i]
+        for (DecoratorDefinition definition : definitions) {
+            checkboxViewer.setChecked(definition, definition
                     .isEnabled());
         }
     }
@@ -239,8 +239,8 @@ public class DecoratorsPreferencePage extends PreferencePage implements
 				.getDecoratorManager();
         DecoratorDefinition[] definitions = manager
                 .getAllDecoratorDefinitions();
-        for (int i = 0; i < definitions.length; i++) {
-            checkboxViewer.setChecked(definitions[i], definitions[i]
+        for (DecoratorDefinition definition : definitions) {
+            checkboxViewer.setChecked(definition, definition
                     .getDefaultValue());
         }
     }
@@ -256,9 +256,9 @@ public class DecoratorsPreferencePage extends PreferencePage implements
             manager.clearCaches();
             DecoratorDefinition[] definitions = manager
                     .getAllDecoratorDefinitions();
-            for (int i = 0; i < definitions.length; i++) {
-                boolean checked = checkboxViewer.getChecked(definitions[i]);
-                definitions[i].setEnabled(checked);
+            for (DecoratorDefinition definition : definitions) {
+                boolean checked = checkboxViewer.getChecked(definition);
+                definition.setEnabled(checked);
 
             }
             //Have the manager clear again as there may have been

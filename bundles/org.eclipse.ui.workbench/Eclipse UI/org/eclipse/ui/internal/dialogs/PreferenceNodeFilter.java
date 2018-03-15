@@ -33,8 +33,8 @@ public class PreferenceNodeFilter extends ViewerFilter {
 	 */
 	public PreferenceNodeFilter(String[] filteredIds) {
 		super();
-		for (int i = 0; i < filteredIds.length; i++) {
-			ids.add(filteredIds[i]);
+		for (String filteredId : filteredIds) {
+			ids.add(filteredId);
 		}
 	}
 
@@ -56,8 +56,8 @@ public class PreferenceNodeFilter extends ViewerFilter {
 		}
 
 		IPreferenceNode[] subNodes = node.getSubNodes();
-		for (int i = 0; i < subNodes.length; i++) {
-			if(checkNodeAndChildren(subNodes[i])) {
+		for (IPreferenceNode subNode : subNodes) {
+			if(checkNodeAndChildren(subNode)) {
 				return true;
 			}
 
