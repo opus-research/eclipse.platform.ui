@@ -323,14 +323,18 @@ public final class Workbench extends EventManager implements IWorkbench,
 		public void bundleChanged(BundleEvent event) {
 			int eventType = event.getType();
 			String bundleName;
-
+			boolean worked = false;
+			// Note: no calls to any non-trivial Eclipse code outside this class
+			// should be made inside the synchronized block below. Such calls
+			// can cause deadlocks on startup, see bug 502095.
+			// Progress monitor calls *are* non-trivial.
 			synchronized (this) {
 				if (eventType == BundleEvent.STARTING) {
 					starting.add(bundleName = event.getBundle().getSymbolicName());
 				} else if (eventType == BundleEvent.STARTED) {
 					progressCount++;
 					if (progressCount <= maximumProgressCount) {
-						progressMonitor.worked(1);
+						worked = true;
 					}
 					int index = starting.lastIndexOf(event.getBundle().getSymbolicName());
 					if (index >= 0) {
@@ -344,7 +348,9 @@ public final class Workbench extends EventManager implements IWorkbench,
 					return; // uninteresting event
 				}
 			}
-
+			if (worked) {
+				progressMonitor.worked(1);
+			}
 			if (bundleName != null) {
 				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
 				progressMonitor.subTask(taskName);
@@ -904,24 +910,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private Image loadImage(String splashLoc) {
 		Image background = null;
 		if (splashLoc != null) {
-			InputStream input = null;
-			try {
-				input = new BufferedInputStream(new FileInputStream(splashLoc));
+			try (InputStream input = new BufferedInputStream(new FileInputStream(splashLoc)) ){
 				background = new Image(display, input);
-			} catch (SWTException e) {
-				StatusManager.getManager().handle(
-						StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
-			} catch (IOException e) {
-				StatusManager.getManager().handle(
-						StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
-			} finally {
-				if (input != null) {
-					try {
-						input.close();
-					} catch (IOException e) {
-						// he's done for
-					}
-				}
+			} catch (SWTException | IOException e) {
+				StatusManager.getManager().handle(StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
 			}
 		}
 		return background;
