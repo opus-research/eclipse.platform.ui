@@ -17,8 +17,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.event.EventAdmin;
 
 
 
@@ -27,17 +25,6 @@ import org.osgi.service.event.EventAdmin;
  */
 @Component(service = IContextFunction.class, property = "service.context.key=org.eclipse.e4.core.services.events.IEventBroker")
 public class EventBrokerFactory extends ContextFunction {
-
-	// mandatory static reference to EventAdmin to ensure it is available before
-	// the factory is activated
-
-	EventAdmin eventAdmin;
-
-	@Reference
-	void setEventAdmin(EventAdmin admin) {
-		this.eventAdmin = admin;
-	}
-
 	@Override
 	public Object compute(IEclipseContext context, String contextKey) {
         EventBroker broker = context.getLocal(EventBroker.class);
