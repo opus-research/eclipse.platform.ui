@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2017 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088, 458033, 393171
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Christian Georgi (SAP)            - Bug 432480
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 478896, 512026
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 478896
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 import org.eclipse.core.databinding.observable.Realm;
@@ -43,6 +44,8 @@ import org.eclipse.e4.core.services.adapter.Adapter;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.ILoggerProvider;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.core.services.translation.TranslationProviderFactory;
+import org.eclipse.e4.core.services.translation.TranslationService;
 import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.internal.workbench.ActiveChildLookupFunction;
 import org.eclipse.e4.ui.internal.workbench.ActivePartLookupFunction;
@@ -537,7 +540,23 @@ public class E4Application implements IApplication {
 			}
 		});
 
+		// translation
+		initializeLocalization(appContext);
+
 		return appContext;
+	}
+
+	/**
+	 * Initializes the given context with the locale and the TranslationService
+	 * to use.
+	 *
+	 * @param appContext
+	 *            The application context to which the locale and the
+	 *            TranslationService should be set.
+	 */
+	private static void initializeLocalization(IEclipseContext appContext) {
+		appContext.set(TranslationService.LOCALE, Locale.getDefault());
+		appContext.set(TranslationService.class, TranslationProviderFactory.bundleTranslationService(appContext));
 	}
 
 	/**
