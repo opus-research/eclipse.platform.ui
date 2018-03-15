@@ -488,7 +488,7 @@ public class TaskList extends ViewPart {
      * given markers.
      */
     static String createMarkerReport(IMarker[] markers) {
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         // Create the header
         buf.append(TaskListMessages.TaskList_reportKind);
         buf.append("\t"); //$NON-NLS-1$
@@ -515,7 +515,7 @@ public class TaskList extends ViewPart {
     /**
      * Writes a string representation of the given marker to the buffer.
      */
-    static void writeMarker(StringBuilder buf, IMarker marker) {
+    static void writeMarker(StringBuffer buf, IMarker marker) {
         buf.append(MarkerUtil.getKindText(marker));
         buf.append("\t"); //$NON-NLS-1$
         buf.append(MarkerUtil.getCompleteText(marker));

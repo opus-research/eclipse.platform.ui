@@ -48,7 +48,7 @@ public abstract class RegistryReader {
      */
     protected static void logError(IConfigurationElement element, String text) {
         IExtension extension = element.getDeclaringExtension();
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         buf
 				.append("Plugin " + extension.getNamespace() + ", extension " //$NON-NLS-1$//$NON-NLS-2$
 						+ extension.getExtensionPointUniqueIdentifier());

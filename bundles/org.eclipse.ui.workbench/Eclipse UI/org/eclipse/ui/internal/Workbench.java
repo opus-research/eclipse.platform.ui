@@ -2622,7 +2622,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 			return null;
 		}
 
-		StringBuilder result = new StringBuilder(512);
+		StringBuffer result = new StringBuffer(512);
 		result.append(property);
 		result.append('\n');
 
