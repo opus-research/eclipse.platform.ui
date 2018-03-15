@@ -7,14 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440149, 472654, 506588
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440149, 472654
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 496319, 498301
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IProduct;
@@ -24,7 +23,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceColors;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
@@ -52,7 +50,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.ProductProperties;
@@ -64,7 +61,6 @@ import org.eclipse.ui.internal.about.AboutTextManager;
 import org.eclipse.ui.internal.about.InstallationDialog;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
-import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
  * Displays information about the product.
@@ -78,8 +74,6 @@ public class AboutDialog extends TrayDialog {
 	private final static int MAX_IMAGE_WIDTH_FOR_TEXT = 250;
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
-
-	private final static int EXPORT_ID = DETAILS_ID + 1;
 
     private String productName;
 
@@ -139,14 +133,6 @@ public class AboutDialog extends TrayDialog {
 				}
 			});
             break;
-		case EXPORT_ID:
-			BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-				@Override
-				public void run() {
-					openInstallationExportWizard();
-				}
-			});
-			break;
         default:
             super.buttonPressed(buttonId);
             break;
@@ -184,7 +170,6 @@ public class AboutDialog extends TrayDialog {
         parent.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createButton(parent, DETAILS_ID, WorkbenchMessages.AboutDialog_DetailsButton, false);
-		createButton(parent, EXPORT_ID, WorkbenchMessages.AboutDialog_ExportButton, false);
 
         Label l = new Label(parent, SWT.NONE);
         l.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -485,26 +470,6 @@ public class AboutDialog extends TrayDialog {
         return button;
     }
 
-	private void openInstallationExportWizard() {
-		final String installationExportWizard = "org.eclipse.equinox.p2.replication.export"; //$NON-NLS-1$
-		IWizardDescriptor wizardDescriptor = PlatformUI.getWorkbench().getExportWizardRegistry()
-				.findWizard(installationExportWizard);
-
-		// should not happen, but who knows what p2 is doing in the future...
-		if (wizardDescriptor == null) {
-			return;
-		}
-		try {
-			IWorkbenchWizard wizard = wizardDescriptor.createWizard();
-			WizardDialog dlg = new WizardDialog(getShell(), wizard);
-			dlg.setTitle(wizard.getWindowTitle());
-			dlg.setHelpAvailable(false);
-			dlg.open();
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-
-	}
 	@Override
 	protected boolean isResizable() {
 		return true;
