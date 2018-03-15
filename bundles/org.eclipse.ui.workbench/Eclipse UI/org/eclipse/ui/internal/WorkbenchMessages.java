@@ -15,6 +15,7 @@
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977, 501811, 511198
+ * Kaloyan Raev <kaloyan.r@zend.com> - Bug 322002
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -188,6 +189,7 @@ public class WorkbenchMessages extends NLS {
 
 	public static String LockToolBarAction_toolTip;
 
+	public static String CustomizePerspectiveDialog_okButtonLabel;
 	public static String EditActionSetsAction_text;
 	public static String EditActionSetsAction_toolTip;
 	public static String ActionSetSelection_customize;
@@ -255,6 +257,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ResetPerspective_text;
 	public static String ResetPerspective_toolTip;
 	public static String ResetPerspective_message;
+	public static String ResetPerspective_buttonLabel;
 	public static String ResetPerspective_title;
 	public static String RevertPerspective_note;
 
@@ -366,6 +369,7 @@ public class WorkbenchMessages extends NLS {
 
 	//--- Coolbar ---
 	public static String WorkbenchWindow_FileToolbar;
+	public static String WorkbenchWindow_EditToolbar;
 	public static String WorkbenchWindow_NavigateToolbar;
 	public static String WorkbenchWindow_HelpToolbar;
 	public static String WorkbenchWindow_searchCombo_toolTip;
@@ -920,6 +924,9 @@ public class WorkbenchMessages extends NLS {
 	public static String ContentTypes_newContentTypeDialog_invalidContentTypeName;
 	public static String ContentTypes_failedAtEditingContentTypes;
     public static String Edit;
+	public static String ContentTypes_editorAssociations;
+	public static String ContentTypes_editorAssociationAddLabel;
+	public static String ContentTypes_editorAssociationRemoveLabel;
 
     // =========================================================================
     // Deprecated actions support
@@ -1019,7 +1026,6 @@ public class WorkbenchMessages extends NLS {
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
-
 
 
 }
