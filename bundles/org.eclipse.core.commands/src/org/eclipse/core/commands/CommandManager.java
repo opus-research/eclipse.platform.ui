@@ -458,9 +458,10 @@ public final class CommandManager extends HandleObjectManager implements
 			throw new NullPointerException();
 		}
 
-		for (Object listener : getListeners()) {
-			final ICommandManagerListener commandManagerListener = (ICommandManagerListener) listener;
-			commandManagerListener.commandManagerChanged(event);
+		final Object[] listeners = getListeners();
+		for (Object listener2 : listeners) {
+			final ICommandManagerListener listener = (ICommandManagerListener) listener2;
+			listener.commandManagerChanged(event);
 		}
 	}
 
