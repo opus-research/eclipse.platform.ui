@@ -98,7 +98,7 @@ public class WebBrowserPreference {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			WebBrowserUIPlugin.logError(e.getMessage(), e);
+			e.printStackTrace();
 		}
 	}
 
@@ -147,7 +147,7 @@ public class WebBrowserPreference {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			WebBrowserUIPlugin.logError(e.getMessage(), e);
+			e.printStackTrace();
 		}
 		updateDefaultEditor(choice);
 	}
@@ -168,7 +168,8 @@ public class WebBrowserPreference {
 
 		// For each default editor that matches the oldId, change
 		// the default editor to the newId
-		for (String[] ext : extensions) {
+		for (int i = 0; i < extensions.length; i++) {
+			String[] ext = extensions[i];
 			IEditorDescriptor ddesc = registry.getDefaultEditor(ext[0]);
 			if (ddesc != null && ddesc.getId().equals(oldId)) {
 				registry.setDefaultEditor(ext[1], newId);

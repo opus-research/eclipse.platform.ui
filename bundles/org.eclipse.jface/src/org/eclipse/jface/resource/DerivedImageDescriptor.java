@@ -87,11 +87,12 @@ final class DerivedImageDescriptor extends ImageDescriptor {
         return result;
     }
 
-	@Override
-	public ImageData getImageData(int zoom) {
-		Image image = internalCreateImage(Display.getCurrent());
-		ImageData result = image.getImageData(zoom);
-		image.dispose();
-		return result;
-	}
+    @Override
+	public ImageData getImageData() {
+        Image image = internalCreateImage(Display.getCurrent());
+        ImageData result = image.getImageData();
+        image.dispose();
+        return result;
+    }
+
 }

@@ -135,8 +135,8 @@ public abstract class ObservableCollectionTreeContentProvider implements
 			// Ensure we flush any observable collection listeners
 			TreeNode[] oldNodes = new TreeNode[elementNodes.size()];
 			elementNodes.values().toArray(oldNodes);
-			for (TreeNode oldNode : oldNodes)
-				oldNode.dispose();
+			for (int i = 0; i < oldNodes.length; i++)
+				oldNodes[i].dispose();
 			elementNodes.clear();
 			elementNodes = null;
 		}
@@ -197,8 +197,8 @@ public abstract class ObservableCollectionTreeContentProvider implements
 	private Object[] getChildren(Object element, boolean input) {
 		TreeNode node = getOrCreateNode(element, input);
 		Object[] children = node.getChildren().toArray();
-		for (Object childElement : children)
-			getOrCreateNode(childElement, false).addParent(element);
+		for (int i = 0; i < children.length; i++)
+			getOrCreateNode(children[i], false).addParent(element);
 		knownElements.addAll(node.getChildren());
 		asyncUpdateRealizedElements();
 		return children;
@@ -277,8 +277,8 @@ public abstract class ObservableCollectionTreeContentProvider implements
 			if (!elementNodes.isEmpty()) {
 				TreeNode[] nodes = new TreeNode[elementNodes.size()];
 				elementNodes.values().toArray(nodes);
-				for (TreeNode node : nodes) {
-					node.dispose();
+				for (int i = 0; i < nodes.length; i++) {
+					nodes[i].dispose();
 				}
 				elementNodes.clear();
 			}

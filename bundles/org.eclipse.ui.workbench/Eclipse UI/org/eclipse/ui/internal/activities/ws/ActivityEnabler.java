@@ -103,11 +103,12 @@ public class ActivityEnabler {
 				// the state of the category is always absolute after clicking
 				// on it. Never gray.
 				dualViewer.setGrayed(element, false);
+				Object categoryActivities[] = provider.getChildren(element);
 				// Update the category's activities for multiplicity in other
 				// categories
-				for (Object categoryActivity : provider.getChildren(element)) {
+				for (int index = 0; index < categoryActivities.length; index++) {
 					handleDuplicateActivities(event.getChecked(),
-							categoryActivity);
+							categoryActivities[index]);
 				}
 
 			} else {
@@ -128,8 +129,11 @@ public class ActivityEnabler {
 		private void handleDuplicateActivities(boolean checkedState,
 				Object element) {
 			// Retrieve duplicate activities from the other categories
-			Object[] duplicateActivities = provider.getDuplicateCategoryActivities((CategorizedActivity) element);
-			for (Object activity : duplicateActivities) {
+			Object[] duplicateActivities = provider
+					.getDuplicateCategoryActivities((CategorizedActivity) element);
+			CategorizedActivity activity = null;
+			for (int index = 0; index < duplicateActivities.length; index++) {
+				activity = (CategorizedActivity) duplicateActivities[index];
 				// Update the duplicate activity with the same state as the
 				// original
 				dualViewer.setChecked(activity, checkedState);
@@ -156,8 +160,8 @@ public class ActivityEnabler {
 			Object[] children = provider.getChildren(proxy.getCategory());
 			int state = NONE;
 			int count = 0;
-			for (Object child : children) {
-				if (checked.contains(child)) {
+			for (int i = 0; i < children.length; i++) {
+				if (checked.contains(children[i])) {
 					count++;
 				}
 			}
@@ -211,14 +215,16 @@ public class ActivityEnabler {
 			// An element has been unchecked - we want to uncheck its parent
 			// required activities
 			else {
-				requiredActivities = provider.getParentRequiredActivities(((CategorizedActivity) element).getId());
-				for (Object requiredActivity : requiredActivities) {
+				requiredActivities = provider
+						.getParentRequiredActivities(((CategorizedActivity) element)
+								.getId());
+				for (int index = 0; index < requiredActivities.length; index++) {
 					// We want to uncheck the element if it is checked
-					if (checked.contains(requiredActivity)) {
-						dualViewer.setChecked(requiredActivity, false);
+					if (checked.contains(requiredActivities[index])) {
+						dualViewer.setChecked(requiredActivities[index], false);
 						handleActivityCheck(new HashSet(Arrays
 								.asList(dualViewer.getCheckedElements())),
-								requiredActivity);
+								requiredActivities[index]);
 					}
 				}
 			}
@@ -413,12 +419,15 @@ public class ActivityEnabler {
 	 * tree.
 	 */
 	public void updateActivityStates() {
-		Set enabledActivities = new HashSet(activitySupport.getEnabledActivityIds());
+		Set enabledActivities = new HashSet(activitySupport
+                .getEnabledActivityIds());
 
 		// remove all but the unmanaged activities (if any).
 		enabledActivities.removeAll(managedActivities);
 
-		for (Object element : dualViewer.getCheckedElements()) {
+		Object[] checked = dualViewer.getCheckedElements();
+		for (int i = 0; i < checked.length; i++) {
+			Object element = checked[i];
 			if (element instanceof ICategory || dualViewer.getGrayed(element)) {
 				continue;
 			}
@@ -462,10 +471,10 @@ public class ActivityEnabler {
 		dualViewer.setGrayedElements(new Object[0]);
 
 		//enable all categories
-		for (Object element : elements) {
+		for (int i = 0; i < elements.length; i++) {
 			dualViewer
-					.expandToLevel(element, AbstractTreeViewer.ALL_LEVELS);
-			dualViewer.setSubtreeChecked(element, enabled);
+					.expandToLevel(elements[i], AbstractTreeViewer.ALL_LEVELS);
+			dualViewer.setSubtreeChecked(elements[i], enabled);
 		}
 	}
 }

@@ -17,6 +17,7 @@ package org.eclipse.e4.ui.internal.workbench.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +57,6 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -99,7 +99,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
-import org.osgi.service.log.LogService;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
@@ -1362,13 +1361,26 @@ public class PartRenderingEngine implements IPresentationEngine {
 			});
 
 			URL url;
+			InputStream stream = null;
 			try {
 				url = FileLocator.resolve(new URL(cssURI));
-				try (InputStream stream = url.openStream()) {
-					cssEngine.parseStyleSheet(stream);
-				}
+				stream = url.openStream();
+				cssEngine.parseStyleSheet(stream);
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (IOException e) {
-				Activator.log(LogService.LOG_ERROR, e.getMessage(), e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				if (stream != null) {
+					try {
+						stream.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 
 			Shell[] shells = display.getShells();
@@ -1378,7 +1390,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 					s.reskin(SWT.ALL);
 					cssEngine.applyStyles(s, true);
 				} catch (Exception e) {
-					Activator.log(LogService.LOG_ERROR, e.getMessage(), e);
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} finally {
 					s.setRedraw(true);
 				}
