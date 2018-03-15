@@ -429,8 +429,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
                 Font font = (Font) fonts.get(baseFont);
                 if (font == null) {
                     FontData[] data = baseFont.getFontData();
-                    for (FontData element2 : data) {
-                        element2.setHeight(parentHeight);
+                    for (FontData fontData : data) {
+                        fontData.setHeight(parentHeight);
                     }
                     font = new Font(display, data);
 

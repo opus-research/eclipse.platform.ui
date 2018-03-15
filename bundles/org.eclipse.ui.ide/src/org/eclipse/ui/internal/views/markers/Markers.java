@@ -299,14 +299,14 @@ class Markers {
 	 */
 	static Integer[] getMarkerCounts(MarkerEntry[] entries) {
 		int[] ints = new int[] { 0, 0, 0, 0 };
-		for (MarkerEntry entrie : entries) {
-			IMarker marker = entrie.getMarker();
+		for (MarkerEntry entry : entries) {
+			IMarker marker = entry.getMarker();
 			int severity = -1;
 			Object value = null;
 			try {
 				value = marker.getAttribute(IMarker.SEVERITY);
 			} catch (CoreException e) {
-				entrie.checkIfMarkerStale();
+				entry.checkIfMarkerStale();
 			}
 			if (value instanceof Integer) {
 				severity = ((Integer) value).intValue();

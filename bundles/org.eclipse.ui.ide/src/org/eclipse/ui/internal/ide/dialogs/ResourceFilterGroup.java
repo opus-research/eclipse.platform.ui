@@ -1129,9 +1129,9 @@ public class ResourceFilterGroup {
 					int mask = element.equals(includeOnlyGroup) ? IResourceFilterDescription.INCLUDE_ONLY:
 						IResourceFilterDescription.EXCLUDE_ALL;
 					FilterCopy[] children = filters.getChildren();
-					for (FilterCopy element2 : children) {
-						if ((element2.getType() & mask) != 0)
-							filters.removeChild(element2);
+					for (FilterCopy filterCopy : children) {
+						if ((filterCopy.getType() & mask) != 0)
+							filters.removeChild(filterCopy);
 					}
 				}
 			}

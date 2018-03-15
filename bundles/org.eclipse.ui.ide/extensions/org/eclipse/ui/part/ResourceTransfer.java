@@ -132,8 +132,8 @@ public class ResourceTransfer extends ByteArrayTransfer {
             dataOut.writeInt(resourceCount);
 
             //write each resource
-            for (IResource resource : resources) {
-                writeResource(dataOut, resource);
+            for (int i = 0; i < resources.length; i++) {
+                writeResource(dataOut, resources[i]);
             }
 
             //cleanup

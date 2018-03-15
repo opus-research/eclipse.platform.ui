@@ -38,7 +38,8 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 			if (adaptable instanceof IWorkingSet) {
 				IWorkingSet workingSet = (IWorkingSet) adaptable;
 				IAdaptable[] elements = workingSet.getElements();
-				for (IAdaptable element : elements) {
+				for (int i = 0; i < elements.length; i++) {
+					IAdaptable element = elements[i];
 					ResourceMapping mapping = getContributedResourceMapping(element);
 					if (mapping == null) {
 						mapping = getResourceMapping(element);
@@ -111,7 +112,8 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 			if (adapterType == ResourceMapping.class) {
 				IWorkingSet workingSet = (IWorkingSet) adaptableObject;
 				IAdaptable[] elements = workingSet.getElements();
-				for (IAdaptable element : elements) {
+				for (int i = 0; i < elements.length; i++) {
+					IAdaptable element = elements[i];
 					ResourceMapping mapping = getResourceMapping(element);
 					if (mapping != null) {
 						return adapterType.cast(new WorkingSetResourceMapping(workingSet));

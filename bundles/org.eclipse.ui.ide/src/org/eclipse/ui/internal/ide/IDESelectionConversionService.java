@@ -66,12 +66,12 @@ public class IDESelectionConversionService implements
 				if (traversals != null) {
 					ResourceTraversal traversal = null;
 					IResource[] resources = null;
-					for (ResourceTraversal traversal2 : traversals) {
-						traversal = traversal2;
+					for (int i = 0; i < traversals.length; i++) {
+						traversal = traversals[i];
 						resources = traversal.getResources();
 						if (resources != null) {
-							for (IResource resource2 : resources) {
-								result.add(resource2);
+							for (int j = 0; j < resources.length; j++) {
+								result.add(resources[j]);
 							}
 						}
 					}

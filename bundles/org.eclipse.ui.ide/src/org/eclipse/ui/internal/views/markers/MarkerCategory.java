@@ -145,8 +145,8 @@ class MarkerCategory extends MarkerSupportItem {
 	@Override
 	void clearCache() {
 		MarkerSupportItem[] entries = getChildren();
-		for (MarkerSupportItem entrie : entries) {
-			entrie.clearCache();
+		for (MarkerSupportItem entry : entries) {
+			entry.clearCache();
 		}
 	}
 

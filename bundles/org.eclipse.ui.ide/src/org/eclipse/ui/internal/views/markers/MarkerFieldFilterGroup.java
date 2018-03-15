@@ -263,8 +263,8 @@ class MarkerFieldFilterGroup {
 		IAdaptable[] elements = workingSet.getElements();
 		List<IResource> result = new ArrayList<>(elements.length);
 
-		for (IAdaptable element2 : elements) {
-			IResource next = Adapters.adapt(element2, IResource.class);
+		for (IAdaptable adaptable : elements) {
+			IResource next = Adapters.adapt(adaptable, IResource.class);
 			if (next != null) {
 				result.add(next);
 			}

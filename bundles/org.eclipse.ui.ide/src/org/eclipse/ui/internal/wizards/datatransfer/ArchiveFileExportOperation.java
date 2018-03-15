@@ -130,8 +130,8 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
         int count = 0;
         if (checkResource.isAccessible()) {
             IResource[] children = ((IContainer) checkResource).members();
-            for (IResource element : children) {
-				count += countChildrenOf(element);
+            for (int i = 0; i < children.length; i++) {
+				count += countChildrenOf(children[i]);
 			}
         }
 
@@ -224,8 +224,8 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
                 }
             }
 
-            for (IResource element : children) {
-				exportResource(element, leadupDepth + 1);
+            for (int i = 0; i < children.length; i++) {
+				exportResource(children[i], leadupDepth + 1);
 			}
 
         }

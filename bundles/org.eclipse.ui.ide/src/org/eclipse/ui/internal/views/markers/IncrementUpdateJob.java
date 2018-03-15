@@ -104,8 +104,8 @@ class IncrementUpdateJob extends MarkerUpdateJob {
 			clone = clone.getClone();
 		}
 		MarkerEntry[] entries = clone.getMarkerEntryArray();
-		for (MarkerEntry entrie : entries) {
-			markerEntries.add(entrie);
+		for (MarkerEntry entry : entries) {
+			markerEntries.add(entry);
 		}
 		return true;
 	}

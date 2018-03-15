@@ -157,9 +157,9 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 			workingSets = (IWorkingSet[]) fWorkingSets
 					.toArray(new IWorkingSet[fWorkingSets.size()]);
 		}
-		for (IWorkingSet workingSet : workingSets) {
+		for (int w = 0; w < workingSets.length; w++) {
 			WorkingSetDelta workingSetDelta = new WorkingSetDelta(
-					workingSet);
+					workingSets[w]);
 			processResourceDelta(workingSetDelta, delta);
 			workingSetDelta.process();
 		}
@@ -193,8 +193,8 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 		}
 
 		IResourceDelta[] children = delta.getAffectedChildren();
-		for (IResourceDelta element : children) {
-			processResourceDelta(result, element);
+		for (int i = 0; i < children.length; i++) {
+			processResourceDelta(result, children[i]);
 		}
 	}
 

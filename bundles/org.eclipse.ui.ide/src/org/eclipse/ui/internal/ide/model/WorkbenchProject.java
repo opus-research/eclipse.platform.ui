@@ -44,7 +44,10 @@ public class WorkbenchProject extends WorkbenchResource implements
         if (isOpen) {
             try {
                 String[] natureIds = project.getDescription().getNatureIds();
-                for (String imageKey : natureIds) {
+                for (int i = 0; i < natureIds.length; ++i) {
+                    // Have to use a cache because OverlayIcon does not define its own equality criteria,
+                    // so WorkbenchLabelProvider would always create a new image otherwise.
+                    String imageKey = natureIds[i];
                     ImageDescriptor overlayImage = (ImageDescriptor) imageCache
                             .get(imageKey);
                     if (overlayImage != null) {
@@ -52,7 +55,7 @@ public class WorkbenchProject extends WorkbenchResource implements
                     }
                     ImageDescriptor natureImage = IDEWorkbenchPlugin
                             .getDefault().getProjectImageRegistry()
-                            .getNatureImage(imageKey);
+                            .getNatureImage(natureIds[i]);
                     if (natureImage != null) {
                         ImageDescriptor baseImage = IDEInternalWorkbenchImages
                                 .getImageDescriptor(baseKey);

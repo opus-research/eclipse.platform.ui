@@ -285,8 +285,8 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 			private void setChildrenChecked(Object element, boolean checked) {
 				Object[] children = typesContentProvider.getChildren(element);
 				if (children.length > 0) {
-					for (Object element2 : children) {
-						typesViewer.setChecked(element2, checked);
+					for (Object child : children) {
+						typesViewer.setChecked(child, checked);
 					}
 				}
 			}
@@ -304,9 +304,9 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 				}
 
 				Object[] children = typesContentProvider.getChildren(parentType);
-				for (Object element2 : children) {// At least one
+				for (Object child : children) {// At least one
 					// different
-					if (typesViewer.getChecked(element2) != checked) {
+					if (typesViewer.getChecked(child) != checked) {
 						typesViewer.setGrayChecked(parentType, true);
 						return;
 					}
