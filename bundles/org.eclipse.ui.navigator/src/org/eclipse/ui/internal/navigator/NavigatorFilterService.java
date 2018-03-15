@@ -97,10 +97,10 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			.getInstance();
 
 			/*
-			 * by creating a StringBuilder with DELIM, we ensure the string is not empty
-			 * when persisted.
+			 * by creating a StringBuffer with DELIM, we ensure the string is
+			 * not empty when persisted.
 			 */
-			StringBuilder activatedFiltersPreferenceValue = new StringBuilder(DELIM);
+			StringBuffer activatedFiltersPreferenceValue = new StringBuffer(DELIM);
 
 			for (String id : activeFilters) {
 				if (!dm.getFilterById(id).isVisibleInUi())
