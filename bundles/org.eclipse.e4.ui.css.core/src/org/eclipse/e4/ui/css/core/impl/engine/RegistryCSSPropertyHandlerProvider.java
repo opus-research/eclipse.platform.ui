@@ -54,6 +54,47 @@ public class RegistryCSSPropertyHandlerProvider extends
 
 	private Map<String, Map<String, ICSSPropertyHandler>> propertyHandlerMap = new HashMap<>();;
 
+	private class LazyPropertyHander implements ICSSPropertyHandler {
+		IConfigurationElement ce;
+		ICSSPropertyHandler handler = null;
+
+		boolean loaded = false;
+		private String name;
+
+		public LazyPropertyHander(String name, IConfigurationElement ce) {
+			this.name = name;
+			this.ce = ce;
+		}
+
+		@Override
+		public boolean applyCSSProperty(Object element, String property, CSSValue value, String pseudo,
+				CSSEngine engine) throws Exception {
+			if (!loaded) {
+				load();
+			}
+			if (handler == null) {
+				// an error occurred during loading (e.g. class is not an
+				// instance of ICSSPropertyHandler)
+				return false;
+			}
+			return handler.applyCSSProperty(element, property, value, pseudo, engine);
+		}
+
+		private void load() {
+			try {
+				Object t = ce.createExecutableExtension(ATTR_HANDLER);
+
+				if (t instanceof ICSSPropertyHandler) {
+					handler = (ICSSPropertyHandler) t;
+				} else {
+					logError("invalid property handler for " + name);
+				}
+			} catch (CoreException e1) {
+				logError("invalid property handler for " + name + ": " + e1);
+			}
+		}
+	}
+
 	public RegistryCSSPropertyHandlerProvider(IExtensionRegistry registry) {
 		this.registry = registry;
 		if (configure(DEPRECATED_PROPERTY_HANDLERS_EXTPOINT)) {
@@ -103,33 +144,21 @@ public class RegistryCSSPropertyHandlerProvider extends
 						}
 
 					}
-					try {
-						Map<String, ICSSPropertyHandler> adaptersMap = handlersMap
-								.get(adapter);
-						if (adaptersMap == null) {
-							handlersMap
-									.put(adapter,
-											adaptersMap = new HashMap<>());
-						}
-						if (!adaptersMap.containsKey(name)) {
-							Object t = ce
-									.createExecutableExtension(ATTR_HANDLER);
-							if (t instanceof ICSSPropertyHandler) {
-								for (int i = 0; i < names.length; i++) {
-									adaptersMap
-											.put(names[i],
-													deprecated[i] == null ? (ICSSPropertyHandler) t
-															: new DeprecatedPropertyHandlerWrapper(
-																	(ICSSPropertyHandler) t,
-																	deprecated[i]));
-								}
+					Map<String, ICSSPropertyHandler> adaptersMap = handlersMap.get(adapter);
+					if (adaptersMap == null) {
+						handlersMap.put(adapter, adaptersMap = new HashMap<>());
+					}
+					if (!adaptersMap.containsKey(name)) {
+						for (int i = 0; i < names.length; i++) {
+							LazyPropertyHander lazyHandler = new LazyPropertyHander(name, ce);
+							if (deprecated[i] == null) {
+								DeprecatedPropertyHandlerWrapper deprecatedPropertyHandlerWrapper = new DeprecatedPropertyHandlerWrapper(
+										lazyHandler, deprecated[i]);
+								adaptersMap.put(names[i], deprecatedPropertyHandlerWrapper);
 							} else {
-								logError("invalid property handler for " + name);
+								adaptersMap.put(names[i], lazyHandler);
 							}
 						}
-					} catch (CoreException e1) {
-						logError("invalid property handler for " + name + ": "
-								+ e1);
 					}
 				}
 			}
