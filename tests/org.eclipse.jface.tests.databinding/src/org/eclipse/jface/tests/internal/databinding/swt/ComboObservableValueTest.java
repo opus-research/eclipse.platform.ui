@@ -13,8 +13,6 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
-
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.property.value.IValueProperty;
@@ -26,14 +24,12 @@ import org.eclipse.jface.internal.databinding.swt.ComboTextProperty;
 import org.eclipse.jface.tests.databinding.AbstractSWTTestCase;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
-import org.junit.Test;
 
 /**
  * @since 3.2
  * @no
  */
 public class ComboObservableValueTest extends AbstractSWTTestCase {
-	@Test
 	public void testDispose() throws Exception {
 		Combo combo = new Combo(getShell(), SWT.NONE);
 		IObservableValue observableValue = SWTObservables.observeText(combo);
@@ -59,7 +55,6 @@ public class ComboObservableValueTest extends AbstractSWTTestCase {
 		assertEquals(expected2, combo.getText());
 	}
 
-	@Test
 	public void testSetValueWithNull() {
 		testSetValueWithNull(WidgetProperties.text());
 		testSetValueWithNull(WidgetProperties.selection());

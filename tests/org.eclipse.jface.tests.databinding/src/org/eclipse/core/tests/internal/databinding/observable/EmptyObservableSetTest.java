@@ -19,24 +19,27 @@ import org.eclipse.jface.databinding.conformance.ObservableCollectionContractTes
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.delegate.IObservableCollectionContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.SuiteBuilder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * @since 3.2
  *
  */
-@RunWith(AllTests.class)
 public class EmptyObservableSetTest {
-
-	public static junit.framework.Test suite() {
-		return new SuiteBuilder().addObservableContractTest(ImmutableObservableSetContractTest.class, new Delegate())
-				.build();
+	public static Test suite() {
+		TestSuite suite = new TestSuite(EmptyObservableSetTest.class.getName());
+		suite.addTest(ImmutableObservableSetContractTest.suite(new Delegate()));
+		return suite;
 	}
 
 	public static class ImmutableObservableSetContractTest extends
 			ObservableCollectionContractTest {
+		public static Test suite(IObservableCollectionContractDelegate delegate) {
+			return new SuiteBuilder().addObservableContractTest(
+					ImmutableObservableSetContractTest.class, delegate).build();
+		}
 
 		public ImmutableObservableSetContractTest(
 				IObservableCollectionContractDelegate delegate) {
@@ -49,104 +52,87 @@ public class EmptyObservableSetTest {
 		}
 
 		@Override
-		@Test
-	public void testChange_ChangeEvent() {
+		public void testChange_ChangeEvent() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_EventObservable() {
+		public void testChange_EventObservable() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_ObservableRealmIsTheCurrentRealm() {
+		public void testChange_ObservableRealmIsTheCurrentRealm() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testChange_RealmCheck() {
+		public void testChange_RealmCheck() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testRemoveChangeListener_RemovesListener() {
+		public void testRemoveChangeListener_RemovesListener() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testContains_GetterCalled() {
+		public void testContains_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testContainsAll_GetterCalled() {
+		public void testContainsAll_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testEquals_GetterCalled() {
+		public void testEquals_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testHashCode_GetterCalled() {
+		public void testHashCode_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsEmpty_GetterCalled() {
+		public void testIsEmpty_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIterator_GetterCalled() {
+		public void testIterator_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testSize_GetterCalled() {
+		public void testSize_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testToArray_GetterCalled() {
+		public void testToArray_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testToArrayWithObjectArray_GetterCalled() {
+		public void testToArrayWithObjectArray_GetterCalled() {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsStale_GetterCalled() throws Exception {
+		public void testIsStale_GetterCalled() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testIsDisposed() throws Exception {
+		public void testIsDisposed() throws Exception {
 			// disabled
 		}
 
 		@Override
-		@Test
-	public void testAddDisposeListener_HandleDisposeInvoked() {
+		public void testAddDisposeListener_HandleDisposeInvoked() {
 			// disabled
 		}
 	}

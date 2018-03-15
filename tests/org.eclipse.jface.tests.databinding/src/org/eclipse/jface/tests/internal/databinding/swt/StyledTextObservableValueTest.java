@@ -13,10 +13,6 @@
 
 package org.eclipse.jface.tests.internal.databinding.swt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -25,8 +21,6 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Tests to assert the inputs of the StyledTextObservableValue constructor.
@@ -35,8 +29,8 @@ public class StyledTextObservableValueTest extends AbstractDefaultRealmTestCase 
 	private StyledText text;
 	private ValueChangeEventTracker listener;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		super.setUp();
 
 		Shell shell = new Shell();
@@ -49,7 +43,6 @@ public class StyledTextObservableValueTest extends AbstractDefaultRealmTestCase 
 	 * Asserts that only valid SWT event types are accepted on construction of
 	 * StyledTextObservableValue.
 	 */
-	@Test
 	public void testConstructorUpdateEventTypes() {
 		try {
 			new StyledTextTextProperty(new int[] { SWT.None });
@@ -74,7 +67,6 @@ public class StyledTextObservableValueTest extends AbstractDefaultRealmTestCase 
 	 *
 	 * @throws Exception
 	 */
-	@Test
 	public void testGetValueBeforeFocusOutChangeEventsFire() throws Exception {
 		IObservableValue observableValue = SWTObservables.observeText(text,
 				SWT.FocusOut);
@@ -98,7 +90,6 @@ public class StyledTextObservableValueTest extends AbstractDefaultRealmTestCase 
 		assertEquals(b, listener.event.diff.getNewValue());
 	}
 
-	@Test
 	public void testDispose() throws Exception {
 		IObservableValue observableValue = SWTObservables.observeText(text,
 				SWT.Modify);

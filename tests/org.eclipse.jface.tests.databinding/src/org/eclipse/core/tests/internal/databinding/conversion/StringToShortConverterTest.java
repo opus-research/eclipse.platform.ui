@@ -11,30 +11,26 @@
 
 package org.eclipse.core.tests.internal.databinding.conversion;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import junit.framework.TestCase;
 
 import org.eclipse.core.internal.databinding.conversion.StringToShortConverter;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.ibm.icu.text.NumberFormat;
 
 /**
  * @since 1.1
  */
-public class StringToShortConverterTest {
+public class StringToShortConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private StringToShortConverter converter;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
 		numberFormat = NumberFormat.getIntegerInstance();
 		converter = StringToShortConverter.toShort(numberFormat, false);
 	}
 
-	@Test
 	public void testConvertsToShort() throws Exception {
 		Short value = new Short((short) 1);
 		Short result = (Short) converter.convert(numberFormat.format(value));
@@ -42,7 +38,6 @@ public class StringToShortConverterTest {
 		assertEquals(value, result);
 	}
 
-	@Test
 	public void testConvertsToShortPrimitive() throws Exception {
 		converter = StringToShortConverter.toShort(numberFormat, true);
 		Short value = new Short((short) 1);
@@ -50,28 +45,23 @@ public class StringToShortConverterTest {
 		assertEquals(value, result);
 	}
 
-	@Test
 	public void testFromTypeIsString() throws Exception {
 		assertEquals(String.class, converter.getFromType());
 	}
 
-	@Test
 	public void testToTypeIsShort() throws Exception {
 		assertEquals(Short.class, converter.getToType());
 	}
 
-	@Test
 	public void testToTypeIsShortPrimitive() throws Exception {
 		converter = StringToShortConverter.toShort(true);
 		assertEquals(Short.TYPE, converter.getToType());
 	}
 
-	@Test
 	public void testReturnsNullBoxedTypeForEmptyString() throws Exception {
 		assertNull(converter.convert(""));
 	}
 
-	@Test
 	public void testThrowsIllegalArgumentExceptionIfAskedToConvertNonString()
 			throws Exception {
 		try {

@@ -11,33 +11,28 @@
 
 package org.eclipse.jface.tests.internal.databinding.viewers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.eclipse.jface.internal.databinding.viewers.ViewerElementWrapper;
 import org.eclipse.jface.viewers.IElementComparer;
-import org.junit.Before;
-import org.junit.Test;
+
+import junit.framework.TestCase;
 
 /**
  * @since 3.2
  *
  */
-public class ViewerElementWrapperTest {
+public class ViewerElementWrapperTest extends TestCase {
 	private ViewerElementWrapper wrapper;
 	private Object element;
 	private IElementComparer comparer;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
+		super.setUp();
 		element = new ElementStub(0);
 		comparer = new IdentityElementComparer();
 		wrapper = new ViewerElementWrapper(element, comparer);
 	}
 
-	@Test
 	public void testConstructor_NullComparer() {
 		try {
 			new ViewerElementWrapper(element, null);
@@ -46,14 +41,12 @@ public class ViewerElementWrapperTest {
 		}
 	}
 
-	@Test
 	public void testEquals() {
 		assertFalse(wrapper.equals(null));
 		assertTrue(wrapper.equals(wrapper));
 		assertTrue(wrapper.equals(new ViewerElementWrapper(element, comparer)));
 	}
 
-	@Test
 	public void testHashCode() {
 		int hash = 0;
 		element = new ElementStub(hash);
