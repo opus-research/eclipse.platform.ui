@@ -14,7 +14,6 @@ package org.eclipse.e4.ui.tests.workbench;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -738,25 +737,17 @@ public class PartRenderingEngineTests {
 		// the selected element doesn't change its value
 		container.setSelectedElement(partA);
 		partB.setToBeRendered(false);
-		assertEquals(
+		assertTrue(
 				"Changing the TBR of a non-selected element should not change the value of the container's seletedElement",
-				partA, container.getSelectedElement());
+				container.getSelectedElement() == partA);
 
-		// Ensure that changing the TBR state of the selected element to false
-		// results in selecting moving to a TBR=true element
+		// Ensure that changing the TBR state of the selected element results in
+		// it going null
 		container.setSelectedElement(partA);
 		partA.setToBeRendered(false);
-		assertNotEquals("Changing the TBR of the selected element should have moved selection to a TBR item", partA,
-				container.getSelectedElement());
 		assertTrue(
-				"Changing the TBR of the selected element should have moved selection to a TBR item",
-				container.getSelectedElement().isToBeRendered());
-
-		// Ensure that when all elements are TBR=false, selection is null
-		partC.setToBeRendered(false);
-		// Then there should be TBR item
-		assertNull("Changing the TBR of all elements to false should have set the field to null",
-				container.getSelectedElement());
+				"Changing the TBR of the selected element should have set the field to null",
+				container.getSelectedElement() == null);
 	}
 
 	@Test
