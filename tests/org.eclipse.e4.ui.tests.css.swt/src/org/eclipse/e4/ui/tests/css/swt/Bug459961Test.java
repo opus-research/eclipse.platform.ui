@@ -12,7 +12,6 @@ package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.jface.util.Util;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Display;
@@ -39,20 +38,6 @@ public class Bug459961Test extends CSSSWTTestCase {
 		Label label = createTestLabel(cssString);
 
 		RGBA expected = Display.getDefault().getSystemColor(SWT.COLOR_TRANSPARENT).getRGBA();
-
-		if (Util.isGtk()) {
-			// In GTK the background color set using the color specified by the
-			// theme. Theme does not have the alpha/transparency specified so it
-			// the default value set is 255. COLOR-TRANSPARENT sets the alpha
-			// value to 0. So in GTK we need to get the expected color
-			// correctly. COLOR_WIDGET_BACKGROUND fetches the background color
-			// from the theme but since the alpha value is not defined in the
-			// theme we need to set it.
-			// more details see Bug 493640
-			expected = Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGBA();
-			expected.alpha = 0;
-		}
-
 		RGBA actual = label.getBackground().getRGBA();
 		assertRGBAEquals(expected, actual);
 	}
