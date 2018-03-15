@@ -548,6 +548,10 @@
       <keyword
             id="org.eclipse.ui.ide.save"
             label="%PreferenceKeywords.Save"/>
+      <keyword
+            id="org.eclipse.ui.ide.open"
+            label="%PreferenceKeywords.Open">
+      </keyword>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -605,6 +609,9 @@
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.editors"/>
          <keywordReference id="org.eclipse.ui.ide.unassociated"/>
+         <keywordReference
+               id="org.eclipse.ui.ide.open">
+         </keywordReference>
       </page>
       <page
             name="%PreferencePages.Views"
@@ -1736,6 +1743,12 @@
                   commandId="org.eclipse.ui.window.fullscreenmode"
                   style="push">
             </command>
+            <command
+                  commandId="org.eclipse.ui.window.togglestatusbar"
+                  label="%menu.toggleStatusBar.label"
+                  style="push"
+                  tooltip="%menu.toggleStatusBar.tooltip">
+            </command>
             <separator
                   name="org.eclipse.ui.window.appearance.separator1"
                   visible="true">
@@ -1773,12 +1786,14 @@
             <command
                   commandId="org.eclipse.ui.ide.markers.copyDescription"
                   label="%command.copyDescription.label"
+                  mnemonic="%command.copyDescription.mnemonic"
                   style="push">
             </command>
             <command
                   commandId="org.eclipse.ui.ide.markers.copyMarkerResourceQualifiedName"
                   icon="icons/full/elcl16/cpyqual_menu.png"
                   label="%command.copyMarkerResourceQualifiedName.label"
+                  mnemonic="%command.copyMarkerResourceQualifiedName.mnemonic"
                   style="push">
             </command>
          </menu>

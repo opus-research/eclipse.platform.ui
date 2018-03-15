@@ -23,15 +23,16 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.StreamSupport;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
@@ -98,7 +99,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	final private ConcurrentMap<Job, JobInfo> jobs = new ConcurrentHashMap<>();
 
 	final private Map<Object, Collection<IJobBusyListener>> familyListeners = Collections
-			.synchronizedMap(new HashMap<>());
+			.synchronizedMap(new LinkedHashMap<>());
 
 	//	list of IJobProgressManagerListener
 	private ListenerList<IJobProgressManagerListener> listeners = new ListenerList<>();
@@ -142,22 +143,36 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	private final INotificationListener notificationListener;
 
 	/**
-	 * Lock object for synchronizing updates of {@code pendingJobUpdates} and
-	 * {@code pendingGroupUpdates}
+	 * Lock object for synchronizing updates of {@code pendingJobUpdates},
+	 * {@code pendingGroupUpdates}, {@code pendingJobRemoval},
+	 * {@code pendingGroupRemoval} and {@code pendingJobAddition}.
 	 */
 	private final Object pendingUpdatesMutex = new Object();
 
 	/**
 	 * Modification guarded by {@link #pendingUpdatesMutex}.
 	 */
-	private Set<JobInfo> pendingJobUpdates = new HashSet<>();
+	private Map<JobInfo, Set<IJobProgressManagerListener>> pendingJobUpdates = new LinkedHashMap<>();
 
 	/**
 	 * Modification guarded by {@link #pendingUpdatesMutex}.
 	 */
-	private Set<GroupInfo> pendingGroupUpdates = new HashSet<>();
+	private Set<GroupInfo> pendingGroupUpdates = new LinkedHashSet<>();
 
-	private final Display display;
+	/**
+	 * Modification guarded by {@link #pendingUpdatesMutex}.
+	 */
+	private Map<JobInfo, Set<IJobProgressManagerListener>> pendingJobRemoval = new LinkedHashMap<>();
+
+	/**
+	 * Modification guarded by {@link #pendingUpdatesMutex}.
+	 */
+	private Set<GroupInfo> pendingGroupRemoval = new LinkedHashSet<>();
+
+	/**
+	 * Modification guarded by {@link #pendingUpdatesMutex}.
+	 */
+	private Map<JobInfo, Set<IJobProgressManagerListener>> pendingJobAddition = new LinkedHashMap<>();
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
 
@@ -342,42 +357,44 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		Job.getJobManager().addJobChangeListener(this.changeListener);
 		StatusManager.getManager().addListener(notificationListener);
 
-		display = PlatformUI.getWorkbench().getDisplay();
-
-		uiRefreshThrottler = new Throttler(display, Duration.ofMillis(100), () -> {
-			Set<JobInfo> localPendingJobUpdates;
-			Set<GroupInfo> localPendingGroupUpdates;
+		uiRefreshThrottler = new Throttler(Display.getDefault(), Duration.ofMillis(100), () -> {
+			Set<GroupInfo> localPendingGroupUpdates, localPendingGroupRemoval;
+			Map<JobInfo, Set<IJobProgressManagerListener>> localPendingJobUpdates, localPendingJobAddition,
+					localPendingJobRemoval;
 			synchronized (pendingUpdatesMutex) {
 				localPendingJobUpdates = pendingJobUpdates;
-				pendingJobUpdates = new HashSet<>();
+				pendingJobUpdates = new LinkedHashMap<>();
 				localPendingGroupUpdates = pendingGroupUpdates;
-				pendingGroupUpdates = new HashSet<>();
+				pendingGroupUpdates = new LinkedHashSet<>();
+				localPendingJobRemoval = pendingJobRemoval;
+				pendingJobRemoval = new LinkedHashMap<>();
+				localPendingGroupRemoval = pendingGroupRemoval;
+				pendingGroupRemoval = new LinkedHashSet<>();
+				localPendingJobAddition = pendingJobAddition;
+				pendingJobAddition = new LinkedHashMap<>();
 			}
-			Iterator<JobInfo> jobUpdatesIterator = localPendingJobUpdates.iterator();
-			while (jobUpdatesIterator.hasNext()) {
-				JobInfo info = jobUpdatesIterator.next();
 
-				GroupInfo group = info.getGroupInfo();
-				if (group != null) {
-					localPendingGroupUpdates.remove(group);
-					doRefreshGroup(group);
-				}
+			localPendingJobAddition.entrySet()
+					.forEach(e -> e.getValue().forEach(listener -> listener.addJob(e.getKey())));
 
-				Object[] listenersArray = listeners.getListeners();
-				for (int i = 0; i < listenersArray.length; i++) {
-					IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
-					if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
-						listener.refreshJobInfo(info);
-					}
-				}
-			}
+			// Adds all non null JobInfo#getGroupInfo to the list of groups to
+			// be refreshed
+			localPendingJobUpdates.entrySet().stream().map(e -> e.getKey().getGroupInfo()).filter(Objects::nonNull)
+					.forEach(localPendingGroupUpdates::add);
+
+			localPendingJobUpdates.entrySet()
+					.forEach(e -> e.getValue().forEach(listener -> listener.refreshJobInfo(e.getKey())));
 
 			// refresh groups
-			Iterator<GroupInfo> groupUpdatesIterator = localPendingGroupUpdates.iterator();
-			while (groupUpdatesIterator.hasNext()) {
-				GroupInfo groupInfo = groupUpdatesIterator.next();
-				doRefreshGroup(groupInfo);
-			}
+			localPendingGroupUpdates
+					.forEach(groupInfo -> listeners.forEach(listener -> listener.refreshGroup(groupInfo)));
+
+			localPendingJobRemoval.entrySet()
+					.forEach(e -> e.getValue().forEach(listener -> listener.removeJob(e.getKey())));
+
+			localPendingGroupRemoval.forEach(group -> {
+				listeners.forEach(listener -> listener.removeGroup(group));
+			});
 		});
 	}
 
@@ -398,13 +415,10 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	}
 
 	private INotificationListener createNotificationListener() {
-		return new StatusManager.INotificationListener(){
-			@Override
-			public void statusManagerNotified(int type, StatusAdapter[] adapters) {
-				if(type == INotificationTypes.HANDLED){
-					FinishedJobs.getInstance().removeErrorJobs();
-					StatusAdapterHelper.getInstance().clear();
-				}
+		return (type, adapters) -> {
+			if(type == INotificationTypes.HANDLED){
+				FinishedJobs.getInstance().removeErrorJobs();
+				StatusAdapterHelper.getInstance().clear();
 			}
 		};
 	}
@@ -651,15 +665,9 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	public void refreshJobInfo(JobInfo info) {
 		synchronized (pendingUpdatesMutex) {
-			pendingJobUpdates.add(info);
+			rememberListenersForJob(info, pendingJobUpdates);
 		}
 		uiRefreshThrottler.throttledExec();
-	}
-
-	private void safeAsyncExec(Runnable runnable) {
-		if (!display.isDisposed()) {
-			display.asyncExec(runnable);
-		}
 	}
 
 	/**
@@ -675,12 +683,6 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		uiRefreshThrottler.throttledExec();
 	}
 
-	private void doRefreshGroup(GroupInfo info) {
-		for (IJobProgressManagerListener listener : listeners) {
-			listener.refreshGroup(info);
-		}
-	}
-
 	/**
 	 * Refreshes the content providers as a result of a deletion of info.
 	 *
@@ -691,17 +693,10 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		Job job = info.getJob();
 		jobs.remove(job);
 		synchronized (pendingUpdatesMutex) {
-			pendingJobUpdates.remove(info);
+			rememberListenersForJob(info, pendingJobRemoval);
 		}
 		runnableMonitors.remove(job);
-
-		safeAsyncExec(() -> {
-			for (IJobProgressManagerListener listener : listeners) {
-				if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
-					listener.removeJob(info);
-				}
-			}
-		});
+		uiRefreshThrottler.throttledExec();
 	}
 
 	/**
@@ -712,14 +707,9 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 	 */
 	public void removeGroup(GroupInfo group) {
 		synchronized (pendingUpdatesMutex) {
-			pendingGroupUpdates.remove(group);
+			pendingGroupRemoval.add(group);
 		}
-
-		safeAsyncExec(() -> {
-			for (IJobProgressManagerListener listener : listeners) {
-				listener.removeGroup(group);
-			}
-		});
+		uiRefreshThrottler.throttledExec();
 	}
 
 	/**
@@ -734,13 +724,18 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		}
 
 		jobs.put(info.getJob(), info);
-		safeAsyncExec(() -> {
-			for (IJobProgressManagerListener listener : listeners) {
-				if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
-					listener.addJob(info);
-				}
-			}
-		});
+		synchronized (pendingUpdatesMutex) {
+			rememberListenersForJob(info, pendingJobAddition);
+		}
+		uiRefreshThrottler.throttledExec();
+	}
+
+	private void rememberListenersForJob(JobInfo info, Map<JobInfo, Set<IJobProgressManagerListener>> listenersMap) {
+		Set<IJobProgressManagerListener> localListeners = listenersMap.computeIfAbsent(info,
+				k -> new LinkedHashSet<>());
+		StreamSupport.stream(listeners.spliterator(), false)
+				.filter(listener -> !isCurrentDisplaying(info.getJob(), listener.showsDebug()))
+				.forEach(localListeners::add);
 	}
 
 	/**
@@ -847,20 +842,17 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		final InvocationTargetException[] invokes = new InvocationTargetException[1];
 		final InterruptedException[] interrupt = new InterruptedException[1];
 		// Show a busy cursor until the dialog opens.
-		Runnable dialogWaitRunnable = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					dialog.setOpenOnRun(false);
-					setUserInterfaceActive(false);
-					dialog.run(true, true, runnable);
-				} catch (InvocationTargetException e) {
-					invokes[0] = e;
-				} catch (InterruptedException e) {
-					interrupt[0] = e;
-				} finally {
-					setUserInterfaceActive(true);
-				}
+		Runnable dialogWaitRunnable = () -> {
+			try {
+				dialog.setOpenOnRun(false);
+				setUserInterfaceActive(false);
+				dialog.run(true, true, runnable);
+			} catch (InvocationTargetException e1) {
+				invokes[0] = e1;
+			} catch (InterruptedException e2) {
+				interrupt[0] = e2;
+			} finally {
+				setUserInterfaceActive(true);
 			}
 		};
 		busyCursorWhile(dialogWaitRunnable, dialog);
@@ -950,7 +942,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 		synchronized (familyListeners) {
 			Collection<IJobBusyListener> currentListeners = familyListeners.get(family);
 			if (currentListeners == null) {
-				currentListeners = new HashSet<>();
+				currentListeners = new LinkedHashSet<>();
 				familyListeners.put(family, currentListeners);
 			}
 			currentListeners.add(listener);
@@ -994,7 +986,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 			}
 
 			Iterator<Object> families = familyListeners.keySet().iterator();
-			Collection<IJobBusyListener> returnValue = new HashSet<>();
+			Collection<IJobBusyListener> returnValue = new LinkedHashSet<>();
 			while (families.hasNext()) {
 				Object next = families.next();
 				if (job.belongsTo(next)) {
@@ -1034,12 +1026,7 @@ public class ProgressManager extends ProgressProvider implements IProgressServic
 			final ISchedulingRule rule) throws InvocationTargetException, InterruptedException {
 		final RunnableWithStatus runnableWithStatus = new RunnableWithStatus(context, runnable, rule);
 		final Display display = Display.getDefault();
-		display.syncExec(new Runnable() {
-			@Override
-			public void run() {
-				BusyIndicator.showWhile(display, runnableWithStatus);
-			}
-		});
+		display.syncExec(() -> BusyIndicator.showWhile(display, runnableWithStatus));
 
 		IStatus status = runnableWithStatus.getStatus();
 		if (!status.isOK()) {
