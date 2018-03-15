@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2017 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     Matthew Hall - initial API and implementation (bug 207858)
  *     Matthew Hall - bugs 226765, 239015, 222991, 263693, 263956, 226292,
  *                    266038
+ *     Conrad Groth - Bug 371756
  ******************************************************************************/
 
 package org.eclipse.jface.internal.databinding.viewers;
@@ -146,6 +147,11 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		knownElements.clear();
 		if (realizedElements != null)
 			realizedElements.clear();
+
+		if (newInput != null) {
+			getElements(newInput);
+		}
+
 	}
 
 	private void setViewer(Viewer viewer) {
@@ -199,7 +205,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		Object[] children = node.getChildren().toArray();
 		for (int i = 0; i < children.length; i++)
 			getOrCreateNode(children[i], false).addParent(element);
-		knownElements.addAll(node.getChildren());
 		asyncUpdateRealizedElements();
 		return children;
 	}
@@ -484,6 +489,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 									"Children observable collection must be on the Display realm"); //$NON-NLS-1$
 					listener = createCollectionChangeListener(element);
 					addCollectionChangeListener(children, listener);
+					knownElements.addAll(children);
 				}
 			}
 		}
