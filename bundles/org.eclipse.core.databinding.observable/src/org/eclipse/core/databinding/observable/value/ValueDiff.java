@@ -62,12 +62,9 @@ public abstract class ValueDiff<T> implements IDiff {
 		return result;
 	}
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		buffer
 			.append(getClass().getName())
 			.append("{oldValue [") //$NON-NLS-1$
