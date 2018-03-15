@@ -108,8 +108,8 @@ public class IdentityMap<K, V> implements Map<K, V> {
 
 			@Override
 			public boolean containsAll(Collection<?> c) {
-				for (Object name : c)
-					if (!contains(name))
+				for (Object element : c)
+					if (!contains(element))
 						return false;
 				return true;
 			}
@@ -220,8 +220,8 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			@Override
 			public boolean removeAll(Collection<?> c) {
 				boolean changed = false;
-				for (Object name : c)
-					changed |= remove(name);
+				for (Object element : c)
+					changed |= remove(element);
 				return changed;
 			}
 
@@ -318,8 +318,8 @@ public class IdentityMap<K, V> implements Map<K, V> {
 
 			@Override
 			public boolean containsAll(Collection<?> c) {
-				for (Object name : c)
-					if (!wrappedKeySet.contains(IdentityWrapper.wrap(name)))
+				for (Object element : c)
+					if (!wrappedKeySet.contains(IdentityWrapper.wrap(element)))
 						return false;
 				return true;
 			}
@@ -359,9 +359,9 @@ public class IdentityMap<K, V> implements Map<K, V> {
 			@Override
 			public boolean removeAll(Collection<?> c) {
 				boolean changed = false;
-				for (Object name : c)
+				for (Object element : c)
 					changed |= wrappedKeySet.remove(IdentityWrapper
-							.wrap(name));
+							.wrap(element));
 				return changed;
 			}
 
@@ -370,13 +370,13 @@ public class IdentityMap<K, V> implements Map<K, V> {
 				boolean changed = false;
 				Object[] toRetain = c.toArray();
 				outer: for (Object element : this) {
-for (int i = 0; i < toRetain.length; i++)
-				if (element == toRetain[i])
-					continue outer;
-// element not contained in collection, remove.
-remove(element);
-changed = true;
-}
+					for (int i = 0; i < toRetain.length; i++)
+						if (element == toRetain[i])
+							continue outer;
+					// element not contained in collection, remove.
+					remove(element);
+					changed = true;
+				}
 				return changed;
 			}
 

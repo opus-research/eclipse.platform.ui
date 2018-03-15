@@ -102,8 +102,8 @@ public class ObservablesManager {
 	 */
 	public void runAndCollect(Runnable runnable) {
 		IObservable[] collected = ObservableTracker.runAndCollect(runnable);
-		for (IObservable element : collected)
-			addObservable(element);
+		for (IObservable observable : collected)
+			addObservable(observable);
 	}
 
 	/**

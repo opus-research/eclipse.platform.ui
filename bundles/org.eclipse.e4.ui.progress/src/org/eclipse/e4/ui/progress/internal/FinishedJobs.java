@@ -328,17 +328,17 @@ public class FinishedJobs extends EventManager {
 
 				// delete all elements that have jte as their direct or indirect
 				// parent
-				JobTreeElement jtes[] = keptjobinfos
+				JobTreeElement jobTreeElements[] = keptjobinfos
 								.toArray(new JobTreeElement[keptjobinfos.size()]);
-				for (JobTreeElement jte2 : jtes) {
-					JobTreeElement parent = (JobTreeElement) jte2
+				for (JobTreeElement jobTreeElement : jobTreeElements) {
+					JobTreeElement parent = (JobTreeElement) jobTreeElement
 							.getParent();
 					if (parent != null) {
 						if (parent == jte || parent.getParent() == jte) {
-							if (keptjobinfos.remove(jte2)) {
-								disposeAction(jte2);
+							if (keptjobinfos.remove(jobTreeElement)) {
+								disposeAction(jobTreeElement);
 							}
-							finishedTime.remove(jte2);
+							finishedTime.remove(jobTreeElement);
 						}
 					}
 				}
