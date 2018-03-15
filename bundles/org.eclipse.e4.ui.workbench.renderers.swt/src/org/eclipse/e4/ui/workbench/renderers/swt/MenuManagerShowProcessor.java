@@ -33,6 +33,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -79,12 +80,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 		if (menuModel != null && menuManager != null) {
 			cleanUp(menuModel, menuManager);
-			if (menuManager.getRemoveAllWhenShown()) {
-				// This needs to be done or else menu items get added multiple
-				// times to MenuModel which results in incorrect behavior and
-				// memory leak - bug 486474
-				menuModel.getChildren().removeAll(menuModel.getChildren());
-			}
 		}
 		if (menuModel instanceof MPopupMenu) {
 			showPopup(menu, (MPopupMenu) menuModel, menuManager);
@@ -194,13 +189,43 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 	/**
 	 * Remove all of the items created by any dynamic contributions on the
-	 * menuModel.
+	 * menuModel. In addition removes all of the items of menuModel in the case
+	 * all items of menuManager need removal when the menu is about to show.
+	 * This needs to be done or else menu items get added multiple times to
+	 * MenuModel which results in incorrect behavior and memory leak - bug
+	 * 486474
 	 *
 	 * @param menuModel
 	 * @param menuManager
 	 */
 	private void cleanUp(MMenu menuModel, MenuManager menuManager) {
+		trace("Cleaning up the dynamic menu contributions" + menuManager, menuManager.getMenu(), menuModel); //$NON-NLS-1$
 		renderer.removeDynamicMenuContributions(menuManager, menuModel);
+
+		if (menuManager.getRemoveAllWhenShown()) {
+			// remove the items from the model related to contributions defined
+			// with location URIs
+			trace("Cleaning up all of the menu model items" + menuManager, menuManager.getMenu(), menuModel); //$NON-NLS-1$
+			renderer.cleanUp(menuModel);
+
+			// cleanup any leftovers - opaque items etc
+			MMenuElement[] menuContributionsToRemove = menuModel.getChildren()
+					.toArray(new MMenuElement[menuModel.getChildren().size()]);
+			for (MMenuElement mMenuElement : menuContributionsToRemove) {
+				// remove item from the menu model
+				menuModel.getChildren().remove(mMenuElement);
+				// cleanup the renderer
+				IContributionItem ici = renderer.getContribution(mMenuElement);
+				if (ici == null && mMenuElement instanceof MMenu) {
+					MMenu menuElement = (MMenu) mMenuElement;
+					ici = renderer.getManager(menuElement);
+					renderer.clearModelToManager(menuElement, (MenuManager) ici);
+				} else {
+					renderer.clearModelToContribution(menuModel, ici);
+				}
+				renderer.clearModelToContribution(mMenuElement, ici);
+			}
+		}
 	}
 
 	private void showPopup(final Menu menu, final MPopupMenu menuModel,
