@@ -186,13 +186,11 @@ public class PartServiceImpl implements EPartService {
 
 	private PartActivationHistory partActivationHistory;
 
-	private MPerspective activePerspective;
 	private MPart activePart;
 
 	private ListenerList<IPartListener> listeners = new ListenerList<>();
 
 	private boolean constructed = false;
-
 
 	@Inject
 	public PartServiceImpl(MApplication application, @Optional MWindow window) {
@@ -612,7 +610,6 @@ public class PartServiceImpl implements EPartService {
 		Assert.isNotNull(perspective);
 		MWindow window = getWindow();
 		if (window != null && isInContainer(window, perspective)) {
-			activePerspective = perspective;
 			perspective.getParent().setSelectedElement(perspective);
 			List<MPart> newPerspectiveParts = modelService.findElements(perspective, null,
 					MPart.class, null);
@@ -818,10 +815,7 @@ public class PartServiceImpl implements EPartService {
 
 	@Override
 	public MPart getActivePart() {
-		if (modelService.getActivePerspective(workbenchWindow) == activePerspective) {
-			return activePart;
-		}
-		return null;
+		return activePart;
 	}
 
 	private MPart createPart(MPartDescriptor descriptor) {
