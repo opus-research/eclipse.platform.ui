@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2017 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -808,8 +808,7 @@ public final class IDE {
 	}
 
 	/**
-	 * Returns an editor descriptor appropriate for opening the given file
-	 * store.
+	 * Returns an editor id appropriate for opening the given file store.
 	 * <p>
 	 * The editor descriptor is determined using a multi-step process. This
 	 * method will attempt to resolve the editor based on content-type bindings
@@ -838,12 +837,11 @@ public final class IDE {
 	 *            the file store
 	 * @param allowInteractive
 	 *            Whether user interactions are allowed
-	 * @return editor descriptorr, appropriate for opening the file
+	 * @return the id of an editor, appropriate for opening the file
 	 * @throws PartInitException
 	 *             if no editor can be found
 	 */
-	public static IEditorDescriptor getEditorDescriptorForFileStore(IFileStore fileStore, boolean allowInteractive)
-			throws PartInitException {
+	private static String getEditorId(IFileStore fileStore, boolean allowInteractive) throws PartInitException {
 		String name = fileStore.fetchInfo().getName();
 		if (name == null) {
 			throw new IllegalArgumentException();
@@ -871,7 +869,7 @@ public final class IDE {
 		IEditorDescriptor defaultEditor = editorReg.getDefaultEditor(name, contentType);
 		defaultEditor = overrideDefaultEditorAssociation(new FileStoreEditorInput(fileStore), contentType,
 				defaultEditor);
-		return getEditorDescriptor(name, editorReg, defaultEditor, allowInteractive);
+		return getEditorDescriptor(name, editorReg, defaultEditor, allowInteractive).getId();
 	}
 
 	/**
@@ -1386,7 +1384,7 @@ public final class IDE {
         IEditorInput input = getEditorInput(fileStore);
 		String editorId;
 		try {
-			editorId = getEditorDescriptorForFileStore(fileStore, true).getId();
+			editorId = getEditorId(fileStore, true);
 		} catch (OperationCanceledException ex) {
 			return null;
 		}
