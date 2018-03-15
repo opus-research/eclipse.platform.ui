@@ -193,6 +193,12 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 					}
 					currentMenuElement.getTransientData().put(DYNAMIC_ELEMENT_STORAGE_KEY, mel);
 				}
+			} else if (currentMenuElement instanceof MMenu) {
+				MMenu childMenu = (MMenu) currentMenuElement;
+				MenuManager childManager = renderer.getManager(childMenu);
+				renderer.removeDynamicMenuContributions(childManager, childMenu);
+				processDynamicElements(childMenu, childManager);
+				childManager.update(true);
 			}
 		}
 	}
