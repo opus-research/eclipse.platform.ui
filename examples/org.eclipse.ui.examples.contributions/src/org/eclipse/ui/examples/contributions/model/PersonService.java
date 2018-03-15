@@ -50,8 +50,8 @@ public class PersonService implements IPersonService, IDisposable {
 	private void fillModel() {
 		int i = ME;
 		for (int j = 0; j < datafill.length; j += 2) {
-			int iid = i++;
-			Person p = new Person(iid, datafill[j], datafill[j + 1]);
+			Integer iid = Integer.valueOf(i++);
+			Person p = new Person(iid.intValue(), datafill[j], datafill[j + 1]);
 			if (p.getId() == ME) {
 				p.setAdminRights(true);
 			}
