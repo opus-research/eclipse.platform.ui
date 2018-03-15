@@ -15,7 +15,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 501965
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -960,20 +959,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			}
 		}
 
-	}
-
-	@Inject
-	private void listenToPerspectiveSaved(
-			@Optional @UIEventTopic(UIEvents.UILifeCycle.PERSPECTIVE_SAVED) Event event) {
-		if(event==null){
-			return;
-		}
-		Object changed = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (changed != null && changed instanceof MPerspective) {
-			String perspectiveId = ((MPerspective) changed).getElementId();
-			IPerspectiveDescriptor pDesc = workbench.getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
-			firePerspectiveSavedAs(page, null, pDesc);
-		}
 	}
 
 	private static final String QUICK_ACCESS_ID = "SearchField"; //$NON-NLS-1$
