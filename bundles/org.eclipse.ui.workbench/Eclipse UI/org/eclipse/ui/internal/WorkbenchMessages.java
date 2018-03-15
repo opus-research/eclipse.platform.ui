@@ -445,8 +445,6 @@ public class WorkbenchMessages extends NLS {
 	public static String PreferenceNode_errorMessage;
     public static String PreferenceNode_NotFound;
 	public static String Preference_note;
-	public static String PreferenceEditor_couldNotSave;
-	public static String PreferenceEditor_invalidContent;
 
 	// --- Workbench ---
 	public static String WorkbenchPreference_showMultipleEditorTabsButton;
@@ -456,9 +454,6 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_stickyCycleButton;
 	public static String WorkbenchPreference_RunInBackgroundButton;
 	public static String WorkbenchPreference_RunInBackgroundToolTip;
-	public static String WorkbenchPreference_preferencePresentation;
-	public static String WorkbenchPreference_preferencePresentation_dialog;
-	public static String WorkbenchPreference_preferencePresentation_editor;
 
 	// --- Appearance ---
 	public static String ViewsPreferencePage_Theme;
@@ -1001,6 +996,7 @@ public class WorkbenchMessages extends NLS {
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
+
 
 
 }

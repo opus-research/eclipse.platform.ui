@@ -281,23 +281,4 @@ public interface IPreferenceConstants {
 	 */
 	public static final String SAVE_AUTOMATICALLY_INTERVAL = "SAVE_AUTOMATICALLY_INTERVAL"; //$NON-NLS-1$
 
-	/**
-	 * Preference id of how to show preferences to users
-	 * <p>
-	 * The String default value for this preference is: <code>dialog</code>.
-	 * </p>
-	 *
-	 * @since 3.109
-	 */
-	public static final String PREFERENCE_FACADE = "PREFERENCE_FACADE"; //$NON-NLS-1$
-
-	/**
-	 * Possible values for preference KEYS_PREFERENCE_FACADE
-	 *
-	 * @since 3.109
-	 */
-	public enum PREFERENCE_FACADE_MODE {
-		DIALOG, EDITOR
-	}
-
 }
