@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 QNX Software Systems and others.
+ * Copyright (c) 2015 QNX Software Systems and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.tests.forms.widgets;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -206,16 +205,6 @@ public class SizeCacheTest {
 		sizeCache = new SizeCache(control);
 	}
 
-	private void checkMinimumWidth(Control inner) {
-		control = inner;
-		update();
-		resetCache();
-		int minimumWidth = sizeCache.computeMinimumWidth();
-		int maximumWidth = controlComputeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-		assertTrue("Minimum width was not less than maximum width for control: expected less than " + maximumWidth
-				+ ", but was " + minimumWidth, minimumWidth < maximumWidth);
-	}
-
 	private void checkCacheComputeSize(Point calcSize, int whint, int hhint) {
 		Point cachedSize = sizeCache.computeSize(whint, hhint);
 		assertEquals(calcSize, cachedSize);
@@ -317,18 +306,8 @@ public class SizeCacheTest {
 	}
 
 	@Test
-	public void testFillCompMinimumWidth() {
-		checkMinimumWidth(createFillComp(shell, SWT.NONE));
-	}
-
-	@Test
 	public void testFillCompWithWrapFlag() {
 		checkCacheSize(createFillComp(shell, SWT.WRAP));
-	}
-
-	@Test
-	public void testFillCompWithWrapFlagMinimumWidth() {
-		checkMinimumWidth(createFillComp(shell, SWT.WRAP));
 	}
 
 	@Test
@@ -362,11 +341,6 @@ public class SizeCacheTest {
 	@Test
 	public void testWrapLabelLong() {
 		checkCacheSize(createLabel(shell, LONG_TEXT, SWT.WRAP));
-	}
-
-	@Test
-	public void testWrapLabelLongMinimumWidth() {
-		checkMinimumWidth(createLabel(shell, LONG_TEXT, SWT.WRAP));
 	}
 
 	@Test
