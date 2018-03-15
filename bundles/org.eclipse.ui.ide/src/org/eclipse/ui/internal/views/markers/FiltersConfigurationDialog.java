@@ -284,26 +284,18 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		});
 
-		GridData limitData = new GridData();
-		limitData.verticalIndent = 5;
-		limitButton.setLayoutData(limitData);
-
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		composite.setLayout(layout);
-		GridData compositeData = new GridData(GridData.FILL_HORIZONTAL);
-		compositeData.horizontalIndent = 20;
-		composite.setLayoutData(compositeData);
-
-		limitsLabel = new Label(composite, SWT.NONE);
+		limitsLabel = new Label(compositeLimits, SWT.NONE);
 		limitsLabel.setText(MarkerMessages.MarkerPreferences_VisibleItems);
 
-		limitText = new Text(composite, SWT.BORDER);
+		GridData limitsLabelData = new GridData();
+		limitsLabelData.verticalAlignment = SWT.TOP;
+		limitsLabelData.horizontalIndent = 10;
+		limitsLabelData.verticalIndent = 2;
+		limitsLabel.setLayoutData(limitsLabelData);
+
+		limitText = new Text(compositeLimits, SWT.BORDER);
 		GridData textData = new GridData();
 		textData.widthHint = convertWidthInCharsToPixels(10);
-
 		limitText.setLayoutData(textData);
 		limitText.addVerifyListener(e -> {
 			if (e.character != 0 && e.keyCode != SWT.BS
