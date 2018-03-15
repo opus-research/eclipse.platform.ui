@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marc-Andre Laperle (Ericsson) - Bug 413278
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 497618, 368977
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -21,13 +22,13 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * Shows a list of open editors in the current or last active workbook.
+ * Shows a list of open editor and parts in the current or last active workbook.
  *
  * @since 3.4
  *
@@ -38,12 +39,12 @@ public class WorkbookEditorsHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		MUIElement uiElement = null;
 
-		IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
-		if (activeEditor != null) {
+		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
+		if (activePart != null) {
 			IWorkbenchWindow workbenchWindow = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 			WorkbenchPage page = (WorkbenchPage) workbenchWindow.getActivePage();
 			if (page != null) {
-				IWorkbenchPartReference reference = page.getReference(activeEditor);
+				IWorkbenchPartReference reference = page.getReference(activePart);
 				if (reference != null) {
 					uiElement = page.getActiveElement(reference);
 				}
@@ -59,7 +60,7 @@ public class WorkbookEditorsHandler extends AbstractHandler {
 			if (activeStack.getRenderer() instanceof StackRenderer
 					&& activeStack.getWidget() instanceof CTabFolder) {
 				StackRenderer stackRenderer = (StackRenderer) activeStack.getRenderer();
-				stackRenderer.showAvailableItems(activeStack, (CTabFolder) activeStack.getWidget());
+				stackRenderer.showAvailableItems(activeStack, (CTabFolder) activeStack.getWidget(), true);
 			}
 		}
 		return null;

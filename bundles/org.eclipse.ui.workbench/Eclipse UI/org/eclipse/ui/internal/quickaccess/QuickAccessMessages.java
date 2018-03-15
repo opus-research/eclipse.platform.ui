@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 459989
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -21,6 +21,7 @@ import org.eclipse.osgi.util.NLS;
 public class QuickAccessMessages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ui.internal.quickaccess.messages"; //$NON-NLS-1$
 	public static String QuickAccess_TooltipDescription;
+	public static String QuickAccess_TooltipDescription_Empty;
 	public static String QuickAccess_Perspectives;
 	public static String QuickAccess_Commands;
 	public static String QuickAccess_Properties;
@@ -39,6 +40,7 @@ public class QuickAccessMessages extends NLS {
 	public static String QuickAccessContents_NoMatchingResults;
 	public static String QuickAccessContents_PressKeyToLimitResults;
 	public static String QuickAccessContents_QuickAccess;
+	public static String QuickAccessContents_SearchInHelpLabel;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, QuickAccessMessages.class);
