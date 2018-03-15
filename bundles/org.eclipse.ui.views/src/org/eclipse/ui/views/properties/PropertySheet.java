@@ -240,12 +240,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
 		IEditorPart activeEditor = page.getActiveEditor();
 		if (activeEditor != null && isImportant(activeEditor)) {
-			if (activeEditor.getSite().getSelectionProvider() != null) {
-				ISelection selection = activeEditor.getSite().getSelectionProvider().getSelection();
-				if (originalSel.equals(selection)) {
-					bootstrapSelection = originalSel;
-					return activeEditor;
-				}
+			ISelection selection = activeEditor.getSite().getSelectionProvider().getSelection();
+			if (originalSel.equals(selection)) {
+				bootstrapSelection = originalSel;
+				return activeEditor;
 			}
 		}
 		IViewReference[] viewrefs = page.getViewReferences();
@@ -254,7 +252,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 			if (part == null || part == this || !page.isPartVisible(part)) {
 				continue;
 			}
-			if (!isImportant(part) || part.getSite().getSelectionProvider() == null) {
+			if (!isImportant(part)) {
 				continue;
 			}
 			ISelection selection = part.getSite().getSelectionProvider().getSelection();
