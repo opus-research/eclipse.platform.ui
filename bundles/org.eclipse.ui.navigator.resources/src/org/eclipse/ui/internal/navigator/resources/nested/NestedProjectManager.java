@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -57,17 +56,12 @@ public class NestedProjectManager {
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
 			@Override
 			public void resourceChanged(IResourceChangeEvent event) {
-				IResourceDelta delta = event.getDelta();
-				IResource resource = null;
-				if (delta != null) {
-					resource = delta.getResource();
-				}
-				if (resource != null
-						&& (resource.getType() == IResource.PROJECT || resource.getType() == IResource.ROOT)) {
+				if (event.getType() == IResourceChangeEvent.POST_CHANGE
+						&& event.getDelta().getResource().getType() == IResource.PROJECT) {
 					refreshProjectsList();
 				}
 			}
-		}, IResourceChangeEvent.POST_CHANGE);
+		});
 	}
 
 	private void refreshProjectsListIfNeeded() {
@@ -131,7 +125,6 @@ public class NestedProjectManager {
 		if (!project.exists()) {
 			return false;
 		}
-		refreshProjectsListIfNeeded();
 		IPath location = project.getLocation();
 		if (location == null) {
 			return false;
@@ -151,7 +144,6 @@ public class NestedProjectManager {
 		if (location == null) {
 			return null;
 		}
-		refreshProjectsListIfNeeded();
 		IProject mostDirectParentProject = null;
 		IPath queriedLocation = location.removeLastSegments(1);
 		while (mostDirectParentProject == null && queriedLocation.segmentCount() > 0) {
@@ -187,7 +179,6 @@ public class NestedProjectManager {
 			IWorkspaceRoot root = (IWorkspaceRoot) container;
 			return root.getProjects();
 		}
-		refreshProjectsListIfNeeded();
 		Set<IProject> res = new HashSet<>();
 		IPath containerLocation = container.getLocation();
 		IPath projectLocation = container.getProject().getLocation();
@@ -218,7 +209,6 @@ public class NestedProjectManager {
 			IWorkspaceRoot root = (IWorkspaceRoot) container;
 			return root.getProjects().length > 0;
 		}
-		refreshProjectsListIfNeeded();
 		IPath containerLocation = container.getLocation();
 		IPath projectLocation = container.getProject().getLocation();
 		if (containerLocation == null || projectLocation == null) {
