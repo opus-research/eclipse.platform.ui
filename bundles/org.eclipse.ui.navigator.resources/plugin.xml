@@ -309,13 +309,6 @@
          </filterExpression>
       </commonFilter>
       <commonFilter
-            activeByDefault="false"
-            class="org.eclipse.ui.navigator.resources.OpenProjectsWorkingSetFilter"
-            description="%filters.openProjectsWorkingSet.description"
-            id="org.eclipse.ui.navigator.resources.filters.openProjectsWorkingSet"
-            name="%filters.openProjectsWorkingSet.name">
-      </commonFilter>
-      <commonFilter
             id="org.eclipse.ui.navigator.resources.filters.workingSet"
             name="%filters.workingSet.name"
             description="%filters.workingSet.description"
