@@ -2100,20 +2100,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	}
 
 	/**
-	 * Convenient method for calling
-	 * <code>getViewer().update(element, null)</code>. See the Javadoc of
-	 * {@link #update(Object, String[])}.
-	 *
-	 * @param element
-	 *            the element
-	 * @since 3.12
-	 *
-	 */
-	public void update(Object element) {
-		update(element, null);
-	}
-
-	/**
      * Updates the given element's presentation when one or more of its
      * properties changes. Only the given element is updated.
      * <p>
