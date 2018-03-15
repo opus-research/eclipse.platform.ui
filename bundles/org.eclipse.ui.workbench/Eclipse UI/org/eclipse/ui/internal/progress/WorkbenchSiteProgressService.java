@@ -108,7 +108,7 @@ public class WorkbenchSiteProgressService implements
          */
         private Cursor getWaitCursor(Display display) {
             if (waitCursor == null) {
-                waitCursor = new Cursor(display, SWT.CURSOR_APPSTARTING);
+				waitCursor = new Cursor(display, SWT.CURSOR_WAIT);
             }
             return waitCursor;
         }
