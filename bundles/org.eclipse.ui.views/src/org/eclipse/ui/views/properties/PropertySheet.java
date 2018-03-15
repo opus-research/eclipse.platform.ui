@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
-import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -44,13 +43,8 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.Saveable;
-import org.eclipse.ui.SaveablesLifecycleEvent;
-import org.eclipse.ui.internal.DefaultSaveable;
-import org.eclipse.ui.internal.SaveablesList;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.part.IPage;
@@ -135,37 +129,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
 	private boolean wasHidden;
 
-	private final SaveablesTracker saveablesTracker;
-
-	class SaveablesTracker implements ISaveablesLifecycleListener {
-
-		@Override
-		public void handleLifecycleEvent(SaveablesLifecycleEvent event) {
-			if (currentPart == null || event.getEventType() != SaveablesLifecycleEvent.DIRTY_CHANGED) {
-				return;
-			}
-			Saveable[] saveables = event.getSaveables();
-			for (Saveable saveable : saveables) {
-				if (new DefaultSaveable(PropertySheet.this).equals(saveable)) {
-					return;
-				}
-			}
-			if (event.getSource() instanceof SaveablesList) {
-				SaveablesList saveablesList = (SaveablesList) event.getSource();
-				for (Saveable saveable : saveables) {
-					IWorkbenchPart[] parts = saveablesList.getPartsForSaveable(saveable);
-					for (IWorkbenchPart part : parts) {
-						if (PropertySheet.this.currentPart == part) {
-							firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
-							return;
-						}
-					}
-				}
-			}
-		}
-
-	}
-
     /**
      * Creates a property sheet view.
      */
@@ -173,7 +136,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         super();
         pinPropertySheetAction = new PinPropertySheetAction();
         RegistryFactory.getRegistry().addListener(this, EXT_POINT);
-		saveablesTracker = new SaveablesTracker();
     }
 
     @Override
@@ -212,8 +174,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 				.getToolBarManager();
 		menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		toolBarManager.add(pinPropertySheetAction);
-		SaveablesList saveables = (SaveablesList) getSite().getService(ISaveablesLifecycleListener.class);
-		saveables.addModelLifecycleListener(saveablesTracker);
+
         getSite().getPage().getWorkbenchWindow().getWorkbench().getHelpSystem()
 				.setHelp(getPageBook(),
 						IPropertiesHelpContextIds.PROPERTY_SHEET_VIEW);
@@ -227,8 +188,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         // remove ourselves as a selection and registry listener
         getSite().getPage().removePostSelectionListener(this);
         RegistryFactory.getRegistry().removeListener(this);
-		SaveablesList saveables = (SaveablesList) getSite().getService(ISaveablesLifecycleListener.class);
-		saveables.removeModelLifecycleListener(saveablesTracker);
+
         currentPart = null;
         currentSelection = null;
         pinPropertySheetAction = null;
@@ -454,30 +414,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		} else {
 			setContentDescription(""); //$NON-NLS-1$
 		}
-		// since our selection changes, our dirty state might change too
-		firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
-	}
-
-    /**
-	 * The <code>PropertySheet</code> implementation of this
-	 * <code>PageBookView</code> method handles the <code>ISaveablePart</code>
-	 * adapter case by calling <code>getSaveablePart()</code>.
-	 * <p>
-	 * This is required to make sure that if the current part tracked by this
-	 * <code>PropertySheet</code> instance is <b>not</b> contributing pages to
-	 * this <code>PropertySheet</code>, we do <b>not</b> expose an
-	 * <code>ISaveablePart</code> adapter to it via <code>getAdapter()</code>
-	 * call to the default page. If we would do this, we would illegally add
-	 * <code>ISaveablePart</code> functionality to this
-	 * <code>PropertySheet</code> instance even if the target part has not
-	 * contributed anything.
-	 */
-	@Override
-	public <T> T getAdapter(Class<T> key) {
-		if (ISaveablePart.class.equals(key)) {
-			return key.cast(getSaveablePart());
-		}
-		return super.getAdapter(key);
 	}
 
     /**
