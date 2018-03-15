@@ -18,7 +18,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class OpenSimpleFormEditorAction extends OpenFormEditorAction {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		return openEditor(new SimpleFormEditorInput("Simple Editor"), "org.eclipse.ui.forms.examples.base-editor", window);

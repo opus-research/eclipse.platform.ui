@@ -21,7 +21,9 @@ import java.util.List;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -294,15 +296,18 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
 
     @Override
 	public void create() {
-        BusyIndicator.showWhile(null, () -> {
-		    access$superCreate();
-		    fViewer.setCheckedElements(getInitialElementSelections()
-		            .toArray());
-		    if (fExpandedElements != null) {
-		        fViewer.setExpandedElements(fExpandedElements);
-		    }
-		    updateOKStatus();
-		});
+        BusyIndicator.showWhile(null, new Runnable() {
+            @Override
+			public void run() {
+                access$superCreate();
+                fViewer.setCheckedElements(getInitialElementSelections()
+                        .toArray());
+                if (fExpandedElements != null) {
+                    fViewer.setExpandedElements(fExpandedElements);
+                }
+                updateOKStatus();
+            }
+        });
     }
 
     @Override
@@ -340,7 +345,12 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
         }
         fViewer.setContentProvider(fContentProvider);
         fViewer.setLabelProvider(fLabelProvider);
-        fViewer.addCheckStateListener(event -> updateOKStatus());
+        fViewer.addCheckStateListener(new ICheckStateListener() {
+            @Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+                updateOKStatus();
+            }
+        });
         fViewer.setComparator(fComparator);
         if (fFilters != null) {
             for (int i = 0; i != fFilters.size(); i++) {
@@ -389,8 +399,8 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
                 if (fContainerMode) {
 					fViewer.setCheckedElements(viewerElements);
 				} else {
-                    for (Object viewerElement : viewerElements) {
-						fViewer.setSubtreeChecked(viewerElement, true);
+                    for (int i = 0; i < viewerElements.length; i++) {
+						fViewer.setSubtreeChecked(viewerElements[i], true);
 					}
                 }
                 updateOKStatus();

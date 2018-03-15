@@ -199,7 +199,13 @@ public class Theme extends EventManager implements ITheme {
      */
     private IPropertyChangeListener getCascadeListener() {
         if (themeListener == null) {
-            themeListener = event -> firePropertyChange(event);
+            themeListener = new IPropertyChangeListener() {
+
+                @Override
+				public void propertyChange(PropertyChangeEvent event) {
+                    firePropertyChange(event);
+                }
+            };
         }
         return themeListener;
     }

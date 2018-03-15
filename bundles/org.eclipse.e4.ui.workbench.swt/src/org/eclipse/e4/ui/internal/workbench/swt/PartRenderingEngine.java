@@ -1422,7 +1422,12 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 
 		protected Listener createOnDisplayDisposedListener() {
-			return event -> resetOverriddenPreferences();
+			return new Listener() {
+					@Override
+					public void handleEvent(org.eclipse.swt.widgets.Event event) {
+						resetOverriddenPreferences();
+					}
+			};
 		}
 
 		@Override
