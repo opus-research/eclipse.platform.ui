@@ -183,6 +183,34 @@ If no value is supplied, a default ratio will be used.
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="inject" type="boolean">
+            <annotation>
+               <documentation>
+                  flag indicating whether this view allows to use the e4 dependency injection (e4 di) framework. 
+If set to false, the view will not use the e4 dependency injection framework, if set to true, e4 di will be used.
+The default is false.
+
+The framework will process the fields and methods in the following order, if all elements are present:
+
+- default constructor
+-  the IExecutableExtension#setInitializationData method
+-  the IViewPart#init method
+-  optionally fields annotated with @Inject 
+-  optionally methods annoted with @Inject
+-  optionally one method annotated with @PostConstruct
+-  the IWorkbenchPart#createPartControl method
+
+You cannot use constructor injection with these views, as the framework still requires a parameterless constructor.
+
+ During disposal of the view the methods are called in the following order:
+ 
+- IWorkbenchPart#dispose
+- optionally a method annotated with @PreDestroy
+
+&lt;p&gt;&lt;em&gt;Since: 4.7&lt;/em&gt;&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
