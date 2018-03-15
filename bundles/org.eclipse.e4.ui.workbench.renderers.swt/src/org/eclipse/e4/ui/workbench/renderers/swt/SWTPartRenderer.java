@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Ragnar Nevries <r.eclipse@nevri.es> - Bug 443514
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 495721
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -93,8 +93,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 			return;
 		}
 
-		final IStylingEngine engine = (IStylingEngine) ctxt
-				.get(IStylingEngine.SERVICE_NAME);
+		final IStylingEngine engine = ctxt.get(IStylingEngine.class);
 		if (engine == null)
 			return;
 

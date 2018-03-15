@@ -1221,7 +1221,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
 		if ("none".equals(cssTheme) || (!enableThemePreference)) {
-			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
+			appContext.set(IStylingEngine.class, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
@@ -1258,7 +1258,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				themeEngine.registerResourceLocator(new OSGiResourceLocator(cssResourcesURI));
 			}
 
-			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
+			appContext.set(IStylingEngine.class, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
@@ -1301,7 +1301,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			}
 			// FIXME: is this needed?
 			display.setData("org.eclipse.e4.ui.css.context", appContext); //$NON-NLS-1$
-			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
+			appContext.set(IStylingEngine.class, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);

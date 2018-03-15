@@ -405,7 +405,7 @@ public class WorkbenchThemeManager extends EventManager implements
 		}
 
 		protected IStylingEngine getStylingEngine() {
-			return (IStylingEngine) getContext().get(IStylingEngine.SERVICE_NAME);
+			return getContext().get(IStylingEngine.class);
 		}
 
 		protected ThemeRegistry getThemeRegistry() {
