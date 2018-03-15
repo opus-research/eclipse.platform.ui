@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -563,14 +562,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		return config;
 	}
 
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-		super.createButtonsForButtonBar(parent);
-		Button okButton = getButton(IDialogConstants.OK_ID);
-		okButton.setText(MarkerMessages.filtersDialog_applyAndCloseButton);
-		setButtonLayoutData(okButton);
-	}
-
 	/**
 	 * Return the dialog settings for the receiver.
 	 *
@@ -621,7 +612,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 				Iterator<MarkerFieldFilterGroup> filterGroupIterator = filterGroups.iterator();
 				while (filterGroupIterator.hasNext()) {
 					MarkerFieldFilterGroup group = filterGroupIterator.next();
-					if (Objects.equals(group.getName(), selectedElementName)) {
+					if (Util.equals(group.getName(), selectedElementName)) {
 						selectedElements.add(group);
 						break;
 					}

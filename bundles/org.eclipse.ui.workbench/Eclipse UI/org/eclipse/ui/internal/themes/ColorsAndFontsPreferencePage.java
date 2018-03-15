@@ -1755,7 +1755,7 @@ getPreferenceStore(),
 	private void saveTreeSelection() {
 		IStructuredSelection selection = tree.getViewer().getStructuredSelection();
 		Object element = selection.getFirstElement();
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		appendMarkerToBuffer(buffer, element);
 		if (buffer.length() > 0)
 			buffer.append(((IThemeElementDefinition) element).getId());
@@ -1821,7 +1821,7 @@ getPreferenceStore(),
 		Object[] elements = tree.getViewer().getExpandedElements();
 		List elementIds = new ArrayList(elements.length);
 
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		for (Object object : elements) {
 			appendMarkerToBuffer(buffer, object);
 
@@ -1843,7 +1843,7 @@ getPreferenceStore(),
 		getPreferenceStore().setValue(EXPANDED_ELEMENTS_PREF, buffer.toString());
 	}
 
-	private void appendMarkerToBuffer(StringBuilder buffer, Object object) {
+	private void appendMarkerToBuffer(StringBuffer buffer, Object object) {
 		if (object instanceof FontDefinition) {
 			buffer.append(MARKER_FONT);
 		} else if (object instanceof ColorDefinition) {
@@ -1909,25 +1909,25 @@ getPreferenceStore(),
 	protected void updateControls() {
 		FontDefinition fontDefinition = getSelectedFontDefinition();
 		if (fontDefinition != null) {
-			boolean isSetToDefault = isDefault(fontDefinition);
-			boolean hasEditableDefault = defaultIsEditable(fontDefinition);
+			boolean isDefault = isDefault(fontDefinition);
+			boolean hasDefault = fontDefinition.getDefaultsTo() != null;
 			fontChangeButton.setEnabled(true);
 			fontSystemButton.setEnabled(true);
-			fontResetButton.setEnabled(!isSetToDefault);
-			editDefaultButton.setEnabled(hasEditableDefault && isSetToDefault);
-			goToDefaultButton.setEnabled(hasEditableDefault);
+			fontResetButton.setEnabled(!isDefault);
+			editDefaultButton.setEnabled(hasDefault && isDefault);
+			goToDefaultButton.setEnabled(hasDefault);
             setCurrentFont(fontDefinition);
             return;
         }
         ColorDefinition colorDefinition = getSelectedColorDefinition();
         if (colorDefinition != null) {
-			boolean isSetToDefault = isDefault(getSelectedColorDefinition());
-			boolean hasEditableDefault = defaultIsEditable(colorDefinition);
+			boolean isDefault = isDefault(getSelectedColorDefinition());
+			boolean hasDefault = colorDefinition.getDefaultsTo() != null;
 			fontChangeButton.setEnabled(true);
             fontSystemButton.setEnabled(false);
-			fontResetButton.setEnabled(!isSetToDefault);
-			editDefaultButton.setEnabled(hasEditableDefault && isSetToDefault);
-			goToDefaultButton.setEnabled(hasEditableDefault);
+			fontResetButton.setEnabled(!isDefault);
+			editDefaultButton.setEnabled(hasDefault && isDefault);
+			goToDefaultButton.setEnabled(hasDefault);
             setCurrentColor(colorDefinition);
             return;
         }
@@ -1938,29 +1938,6 @@ getPreferenceStore(),
 		editDefaultButton.setEnabled(false);
 		goToDefaultButton.setEnabled(false);
 		descriptionText.setText(""); //$NON-NLS-1$
-	}
-
-	/**
-	 * Find out if the default can be edited. Note, isEditable=false also means that
-	 * a property is not shown to user.
-	 *
-	 * @param definition
-	 * @return True if definition has a default and the default's isEditable=true.
-	 *         False otherwise.
-	 */
-	private boolean defaultIsEditable(IHierarchalThemeElementDefinition definition) {
-		assert definition instanceof ColorDefinition || definition instanceof FontDefinition;
-		String defaultId = definition.getDefaultsTo();
-		if (defaultId == null) {
-			return false;
-		}
-		IEditable defaultDefinition = null;
-		if (definition instanceof ColorDefinition) {
-			defaultDefinition = themeRegistry.findColor(defaultId);
-		} else if (definition instanceof FontDefinition) {
-			defaultDefinition = themeRegistry.findFont(defaultId);
-		}
-		return (defaultDefinition != null && defaultDefinition.isEditable());
 	}
 
     /**
@@ -1980,7 +1957,7 @@ getPreferenceStore(),
 		FontData[] fontData = currentFont != null ? currentFont.getFontData() : new FontData[0];
 
 		// recalculate sample text
-		StringBuilder tmp = new StringBuilder();
+		StringBuffer tmp = new StringBuffer();
 		for (FontData currentFontData : fontData) {
 			tmp.append(currentFontData.getName());
 			tmp.append(' ');
