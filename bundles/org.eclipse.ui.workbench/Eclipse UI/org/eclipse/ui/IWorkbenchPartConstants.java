@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Stefan Xenos, IBM; Chris Torrence, ITT Visual Information Solutions - bug 51580
+ *     Axel Richard <axel.richard@obeo.fr> - Bug 486644
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -53,5 +54,10 @@ public interface IWorkbenchPartConstants {
      * @since 3.4
      */
     int PROP_PREFERRED_SIZE = 0x303;
+
+	/**
+	 * The property id for <code>ISaveablePart3.getLastModified()</code>.
+	 */
+	int PROP_LAST_MODIFIED = 0x106;
 
 }

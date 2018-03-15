@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui;
+
+import java.util.Date;
 
 
 /**
@@ -31,6 +33,7 @@ package org.eclipse.e4.ui.model.application.ui;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.MDirtyable#isDirty <em>Dirty</em>}</li>
+ *   <li>{@link org.eclipse.e4.ui.model.application.ui.MDirtyable#getLastModified <em>Last Modified</em>}</li>
  * </ul>
  *
  * @model interface="true" abstract="true"
@@ -62,5 +65,31 @@ public interface MDirtyable {
 	 * @generated
 	 */
 	void setDirty(boolean value);
+
+	/**
+	 * Returns the value of the '<em><b>Last Modified</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * <p>
+	 * The date of the last modification of the UI element.
+	 * </p>
+	 * <!-- end-model-doc -->
+	 * @return the value of the '<em>Last Modified</em>' attribute.
+	 * @see #setLastModified(Date)
+	 * @model transient="true" derived="true"
+	 * @generated
+	 */
+	Date getLastModified();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.e4.ui.model.application.ui.MDirtyable#getLastModified <em>Last Modified</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Last Modified</em>' attribute.
+	 * @see #getLastModified()
+	 * @generated
+	 */
+	void setLastModified(Date value);
 
 } // MDirtyable

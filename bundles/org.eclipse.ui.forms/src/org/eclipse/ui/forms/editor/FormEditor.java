@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Mickael Istria (Red Hat Inc.) - Bug 478587
+ *     Axel Richard <axel.richard@obeo.fr> - Bug 486644
  *******************************************************************************/
 package org.eclipse.ui.forms.editor;
 
@@ -391,6 +392,7 @@ public abstract class FormEditor extends MultiPageEditorPart  {
 	 */
 	public void editorDirtyStateChanged() {
 		firePropertyChange(PROP_DIRTY);
+		firePropertyChange(PROP_LAST_MODIFIED);
 	}
 
 	/**

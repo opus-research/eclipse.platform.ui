@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,12 +48,17 @@ package org.eclipse.ui;
  * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
  * @see org.eclipse.ui.part.EditorPart
  */
-public interface IEditorPart extends IWorkbenchPart, ISaveablePart {
+public interface IEditorPart extends IWorkbenchPart, ISaveablePart3 {
 
     /**
      * The property id for <code>isDirty</code>.
      */
     public static final int PROP_DIRTY = IWorkbenchPartConstants.PROP_DIRTY;
+
+	/**
+	 * The property id for <code>getLastModified</code>.
+	 */
+	public static final int PROP_LAST_MODIFIED = IWorkbenchPartConstants.PROP_LAST_MODIFIED;
 
     /**
      * The property id for <code>getEditorInput</code>.
