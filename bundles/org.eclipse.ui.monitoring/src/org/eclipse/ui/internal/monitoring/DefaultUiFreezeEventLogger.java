@@ -35,10 +35,6 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 	private static class StackTrace extends Throwable {
 		private static final long serialVersionUID = -2829405667536819137L;
 
-		StackTrace(StackTraceElement[] stackTraceElements) {
-			setStackTrace(stackTraceElements);
-		}
-
 		@Override
 		public String toString() {
 			return Messages.DefaultUiFreezeEventLogger_stack_trace_header;
@@ -94,7 +90,8 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 			ThreadInfo[] threads = sample.getStackTraces();
 
 			// The first thread is guaranteed to be the display thread.
-			Throwable stackTrace = new StackTrace(threads[0].getStackTrace());
+			Throwable stackTrace = new StackTrace();
+			stackTrace.setStackTrace(threads[0].getStackTrace());
 			String traceText = NLS.bind(
 					Messages.DefaultUiFreezeEventLogger_sample_header_2,
 					dateFormat.format(sample.getTimestamp()),
@@ -116,7 +113,9 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 	}
 
 	private static IStatus createThreadStatus(ThreadInfo thread) {
-		Throwable stackTrace = new StackTrace(thread.getStackTrace());
+		Exception stackTrace = new Exception(
+				Messages.DefaultUiFreezeEventLogger_stack_trace_header);
+		stackTrace.setStackTrace(thread.getStackTrace());
 
 		StringBuilder threadText = createThreadMessage(thread);
 		String lockName = thread.getLockName();
