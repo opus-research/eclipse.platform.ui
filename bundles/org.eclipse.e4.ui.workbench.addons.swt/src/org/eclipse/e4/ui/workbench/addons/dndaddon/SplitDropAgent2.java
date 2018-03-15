@@ -92,7 +92,7 @@ public class SplitDropAgent2 extends DropAgent {
 		return target;
 	}
 
-	private static boolean isInCursorShell(DnDInfo info, Control ctrl) {
+	private boolean isInCursorShell(DnDInfo info, Control ctrl) {
 		if (ctrl == null || info.curCtrl == null || info.curCtrl.isDisposed())
 			return false;
 		Shell infoShell = (Shell) (info.curCtrl instanceof Shell ? info.curCtrl : info.curCtrl
@@ -101,23 +101,10 @@ public class SplitDropAgent2 extends DropAgent {
 	}
 
 	private MPartStack checkStacks(final MUIElement dragElement, final DnDInfo info) {
-		final EModelService ms = dndManager.getModelService();
-
-		MPartStack candidateStack = getStackAt(dragElement, info, ms);
-
-		if (candidateStack != null && candidateStack.getWidget() instanceof CTabFolder) {
-			CTabFolder ctf = (CTabFolder) (candidateStack.getWidget());
-			trackRect = ctf.getClientArea();
-			trackRect = ctf.getDisplay().map(ctf, null, trackRect);
-		}
-
-		return candidateStack;
-	}
-
-	static MPartStack getStackAt(final MUIElement dragElement, final DnDInfo info, final EModelService ms) {
 		MPartStack candidateStack = null;
 
 		// Collect up the elements we can be split 'relative to'
+		final EModelService ms = dndManager.getModelService();
 		List<MPartStack> stacks = ms.findElements(ms.getTopLevelWindowFor(dragElement),
 				MPartStack.class, EModelService.PRESENTATION, new Selector() {
 					@Override
@@ -160,7 +147,13 @@ public class SplitDropAgent2 extends DropAgent {
 
 		if (stacks.size() > 0) {
 			candidateStack = stacks.get(0);
+			if (candidateStack.getWidget() instanceof CTabFolder) {
+				CTabFolder ctf = (CTabFolder) (candidateStack.getWidget());
+				trackRect = ctf.getClientArea();
+				trackRect = ctf.getDisplay().map(ctf, null, trackRect);
+			}
 		}
+
 		return candidateStack;
 	}
 

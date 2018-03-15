@@ -105,17 +105,19 @@ abstract class DragAgent {
 	}
 
 	public void track(DnDInfo info) {
-		DropAgent newDropAgent = dndManager.getDropAgent(dragElement, info);
-		if (newDropAgent == dropAgent) {
-			if (dropAgent != null) {
-				dropAgent = dropAgent.track(dragElement, info) ? dropAgent : null;
-			}
-		} else {
-			if (dropAgent != null) {
-				dropAgent.dragLeave(dragElement, info);
-			}
-			System.out.println("New drop agent: " + newDropAgent);
-			dropAgent = newDropAgent;
+		DropAgent curAgent = dropAgent;
+
+		// Re-use the same dropAgent until it returns 'false' from track
+		if (dropAgent != null)
+			dropAgent = dropAgent.track(dragElement, info) ? dropAgent : null;
+
+		// If we don't have a drop agent currently try to get one
+		if (dropAgent == null) {
+			if (curAgent != null)
+				curAgent.dragLeave(dragElement, info);
+
+			dropAgent = dndManager.getDropAgent(dragElement, info);
+
 			if (dropAgent != null)
 				dropAgent.dragEnter(dragElement, info);
 			else {
