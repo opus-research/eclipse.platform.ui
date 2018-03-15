@@ -134,7 +134,7 @@ public class PropertySheet extends PageBookView
 	/**
 	 * Set of workbench parts, which should not be used as a source for PropertySheet
 	 */
-	private HashSet<String> ignoredViews;
+	private HashSet ignoredViews;
 
 	private boolean wasHidden;
 
@@ -537,11 +537,10 @@ public class PropertySheet extends PageBookView
 	 *
 	 * @since 3.2
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T getViewAdapter(Class<T> key) {
+	protected Object getViewAdapter(Class key) {
 		if (ISaveablePart.class.equals(key)) {
-			return (T) getSaveablePart();
+			return getSaveablePart();
 		}
 		return super.getViewAdapter(key);
 	}
@@ -570,11 +569,21 @@ public class PropertySheet extends PageBookView
 		return pinPropertySheetAction != null && pinPropertySheetAction.isChecked();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 3.4
+	 */
 	@Override
 	public ShowInContext getShowInContext() {
 		return new PropertyShowInContext(currentPart, currentSelection);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 3.4
+	 */
 	@Override
 	public boolean show(ShowInContext aContext) {
 		if (!isPinned()
@@ -596,9 +605,9 @@ public class PropertySheet extends PageBookView
 		updateContentDescription();
 	}
 
-	private HashSet<String> getIgnoredViews() {
+	private HashSet getIgnoredViews() {
 		if (ignoredViews == null) {
-			ignoredViews = new HashSet<>();
+			ignoredViews = new HashSet();
 	        IExtensionRegistry registry = RegistryFactory.getRegistry();
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {
@@ -622,21 +631,37 @@ public class PropertySheet extends PageBookView
 		return getIgnoredViews().contains(partID);
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtension[])
+	 * @since 3.5
+	 */
 	@Override
 	public void added(IExtension[] extensions) {
 		ignoredViews = null;
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtensionPoint[])
+	 * @since 3.5
+	 */
 	@Override
 	public void added(IExtensionPoint[] extensionPoints) {
 		ignoredViews = null;
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtension[])
+	 * @since 3.5
+	 */
 	@Override
 	public void removed(IExtension[] extensions) {
 		ignoredViews = null;
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtensionPoint[])
+	 * @since 3.5
+	 */
 	@Override
 	public void removed(IExtensionPoint[] extensionPoints) {
 		ignoredViews = null;

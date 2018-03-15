@@ -65,13 +65,14 @@ public class HandlerProcessingAddon {
 	 *            The event thrown in the event bus
 	 */
 	@Inject
-	public void handleHandlerEvent(@Optional @EventTopic(UIEvents.HandlerContainer.TOPIC_HANDLERS) Event event) {
-		if (event == null) {
+	public void handleHandlerEvent(
+			@Optional @EventTopic(UIEvents.HandlerContainer.TOPIC_HANDLERS) Event event) {
+		if (event == null)
 			return;
-		}
 		if ((event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MHandlerContainer)
 				&& (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MContext)) {
-			MHandlerContainer handlerContainer = (MHandlerContainer) event.getProperty(UIEvents.EventTags.ELEMENT);
+			MHandlerContainer handlerContainer = (MHandlerContainer) event
+					.getProperty(UIEvents.EventTags.ELEMENT);
 			if (UIEvents.EventTypes.ADD.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
 				if (event.getProperty(UIEvents.EventTags.NEW_VALUE) instanceof MHandler) {
 					MHandler handler = (MHandler) event.getProperty(UIEvents.EventTags.NEW_VALUE);
@@ -81,7 +82,8 @@ public class HandlerProcessingAddon {
 						processActiveHandler(handler, context);
 					}
 				}
-			} else if (UIEvents.EventTypes.REMOVE.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
+			} else if (UIEvents.EventTypes.REMOVE
+					.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
 				if (event.getProperty(UIEvents.EventTags.OLD_VALUE) instanceof MHandler) {
 					MHandler handler = (MHandler) event.getProperty(UIEvents.EventTags.OLD_VALUE);
 					MContext mContext = (MContext) handlerContainer;
@@ -90,7 +92,8 @@ public class HandlerProcessingAddon {
 						MCommand command = handler.getCommand();
 						if (command != null) {
 							String commandId = command.getElementId();
-							EHandlerService handlerService = context.get(EHandlerService.class);
+							EHandlerService handlerService = (EHandlerService) context
+									.get(EHandlerService.class.getName());
 							handlerService.deactivateHandler(commandId, handler.getObject());
 						}
 					}
@@ -112,9 +115,8 @@ public class HandlerProcessingAddon {
 
 	@Inject
 	public void handleContextEvent(@Optional @EventTopic(UIEvents.Context.TOPIC_CONTEXT) Event event) {
-		if (event == null) {
+		if (event == null)
 			return;
-		}
 		Object origin = event.getProperty(UIEvents.EventTags.ELEMENT);
 		Object context = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 		if ((origin instanceof MHandlerContainer)
@@ -134,16 +136,17 @@ public class HandlerProcessingAddon {
 	 */
 	private void processActiveHandler(MHandler handler, IEclipseContext context) {
 		MCommand command = handler.getCommand();
-		if (command == null) {
-			return;
+		if (command != null) {
+			String commandId = command.getElementId();
+			if (handler.getObject() == null) {
+				IContributionFactory contributionFactory = (IContributionFactory) context
+						.get(IContributionFactory.class.getName());
+				handler.setObject(contributionFactory.create(handler.getContributionURI(), context));
+			}
+			EHandlerService handlerService = (EHandlerService) context.get(EHandlerService.class
+					.getName());
+			handlerService.activateHandler(commandId, handler.getObject());
 		}
-		String commandId = command.getElementId();
-		if (handler.getObject() == null) {
-			IContributionFactory contributionFactory = context.get(IContributionFactory.class);
-			handler.setObject(contributionFactory.create(handler.getContributionURI(), context));
-		}
-		EHandlerService handlerService = context.get(EHandlerService.class);
-		handlerService.activateHandler(commandId, handler.getObject());
 	}
 
 }
