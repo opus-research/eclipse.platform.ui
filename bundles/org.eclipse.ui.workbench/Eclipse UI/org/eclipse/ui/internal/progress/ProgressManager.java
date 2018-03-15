@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.RejectedExecutionException;
@@ -211,12 +212,12 @@ public class ProgressManager extends ProgressProvider implements
 	 * The JobMonitor is the inner class that handles the IProgressMonitor
 	 * integration with the ProgressMonitor.
 	 */
-	class JobMonitor implements IProgressMonitorWithBlocking {
+	public class JobMonitor implements IProgressMonitorWithBlocking {
 		Job job;
 
 		String currentTaskName;
 
-		IProgressMonitorWithBlocking listener;
+		Set<IProgressMonitorWithBlocking> monitors = Collections.emptySet();
 
 		/**
 		 * Create a monitor on the supplied job.
@@ -232,14 +233,22 @@ public class ProgressManager extends ProgressProvider implements
 		 *
 		 * @param monitor
 		 */
-		void addProgressListener(IProgressMonitorWithBlocking monitor) {
-			listener = monitor;
+		public void addProgressListener(IProgressMonitorWithBlocking monitor) {
+			Set<IProgressMonitorWithBlocking> newSet = new HashSet<>(monitors);
+			newSet.add(monitor);
+			this.monitors = Collections.unmodifiableSet(newSet);
 			JobInfo info = getJobInfo(job);
 			TaskInfo currentTask = info.getTaskInfo();
 			if (currentTask != null) {
-				listener.beginTask(currentTaskName, currentTask.totalWork);
-				listener.internalWorked(currentTask.preWork);
+				monitor.beginTask(currentTaskName, currentTask.totalWork);
+				monitor.internalWorked(currentTask.preWork);
 			}
+		}
+
+		public void removeProgresListener(IProgressMonitorWithBlocking monitor) {
+			Set<IProgressMonitorWithBlocking> newSet = new HashSet<>(monitors);
+			newSet.remove(monitor);
+			this.monitors = Collections.unmodifiableSet(newSet);
 		}
 
 		@Override
@@ -248,9 +257,7 @@ public class ProgressManager extends ProgressProvider implements
 			info.beginTask(taskName, totalWork);
 			refreshJobInfo(info);
 			currentTaskName = taskName;
-			if (listener != null) {
-				listener.beginTask(taskName, totalWork);
-			}
+			monitors.stream().forEach(listener -> listener.beginTask(taskName, totalWork));
 		}
 
 		@Override
@@ -259,9 +266,7 @@ public class ProgressManager extends ProgressProvider implements
 			info.clearTaskInfo();
 			info.clearChildren();
 			runnableMonitors.remove(job);
-			if (listener != null) {
-				listener.done();
-			}
+			monitors.stream().forEach(IProgressMonitorWithBlocking::done);
 		}
 
 		@Override
@@ -271,9 +276,7 @@ public class ProgressManager extends ProgressProvider implements
 				info.addWork(work);
 				refreshJobInfo(info);
 			}
-			if (listener != null) {
-				listener.internalWorked(work);
-			}
+			monitors.stream().forEach(listener -> listener.internalWorked(work));
 		}
 
 		@Override
@@ -293,9 +296,7 @@ public class ProgressManager extends ProgressProvider implements
 			if (value && !info.isCanceled()) {
 				info.cancel();
 				// Only inform the first time
-				if (listener != null) {
-					listener.setCanceled(value);
-				}
+				monitors.stream().forEach(listener -> listener.setCanceled(value));
 			}
 		}
 
@@ -311,9 +312,7 @@ public class ProgressManager extends ProgressProvider implements
 			info.clearChildren();
 			refreshJobInfo(info);
 			currentTaskName = taskName;
-			if (listener != null) {
-				listener.setTaskName(taskName);
-			}
+			monitors.stream().forEach(listener -> listener.setTaskName(taskName));
 		}
 
 		@Override
@@ -325,9 +324,7 @@ public class ProgressManager extends ProgressProvider implements
 			info.clearChildren();
 			info.addSubTask(name);
 			refreshJobInfo(info);
-			if (listener != null) {
-				listener.subTask(name);
-			}
+			monitors.stream().forEach(listener -> listener.subTask(name));
 		}
 
 		@Override
@@ -340,9 +337,7 @@ public class ProgressManager extends ProgressProvider implements
 			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(null);
 			refreshJobInfo(info);
-			if (listener != null) {
-				listener.clearBlocked();
-			}
+			monitors.stream().forEach(IProgressMonitorWithBlocking::clearBlocked);
 		}
 
 		@Override
@@ -350,9 +345,7 @@ public class ProgressManager extends ProgressProvider implements
 			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(reason);
 			refreshJobInfo(info);
-			if (listener != null) {
-				listener.setBlocked(reason);
-			}
+			monitors.stream().forEach(listener -> listener.setBlocked(reason));
 		}
 
 	}
