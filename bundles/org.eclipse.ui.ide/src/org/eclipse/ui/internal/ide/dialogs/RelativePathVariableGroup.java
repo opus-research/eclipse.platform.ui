@@ -147,13 +147,12 @@ public class RelativePathVariableGroup {
 			pathVariableManager = content.getResource().getPathVariableManager();
 		else
 			pathVariableManager = ResourcesPlugin.getWorkspace().getPathVariableManager();
-		String[] variables = pathVariableManager.getPathVariableNames();
 
 		ArrayList items = new ArrayList();
-		for (int i = 0; i < variables.length; i++) {
-			if (variables[i].equals("PARENT")) //$NON-NLS-1$
+		for (String variable : pathVariableManager.getPathVariableNames()) {
+			if (variable.equals("PARENT")) //$NON-NLS-1$
 				continue;
-			items.add(variables[i]);
+			items.add(variable);
 		}
 		items.add(IDEWorkbenchMessages.ImportTypeDialog_editVariables);
 		variableCombo.setItems((String[]) items.toArray(new String[0]));
@@ -251,12 +250,12 @@ public class RelativePathVariableGroup {
 	public static String getPreferredVariable(IPath[] paths,
 			IContainer target) {
 		IPath commonRoot = null;
-		for (int i = 0; i < paths.length; i++) {
-			if (paths[i] != null) {
+		for (IPath path : paths) {
+			if (path != null) {
 				if (commonRoot == null)
-					commonRoot = paths[i];
+					commonRoot = path;
 				else  {
-					int count = commonRoot.matchingFirstSegments(paths[i]);
+					int count = commonRoot.matchingFirstSegments(path);
 					int remainingSegments = commonRoot.segmentCount() - count;
 					if (remainingSegments <= 0)
 						return null;
@@ -270,11 +269,10 @@ public class RelativePathVariableGroup {
 		int mostAppropriateCount = Integer.MAX_VALUE;
 		int mostAppropriateCountToParent = Integer.MAX_VALUE;
 		IPathVariableManager pathVariableManager = target.getPathVariableManager();
-		String [] variables = pathVariableManager.getPathVariableNames();
 
-		for (int i = 0; i < variables.length; i++) {
-			if (isPreferred(variables[i])) {
-				URI rawValue = pathVariableManager.getURIValue(variables[i]);
+		for (String variable : pathVariableManager.getPathVariableNames()) {
+			if (isPreferred(variable)) {
+				URI rawValue = pathVariableManager.getURIValue(variable);
 				URI value = pathVariableManager.resolveURI(rawValue);
 				if (value != null) {
 					IPath path = URIUtil.toPath(value);
@@ -283,7 +281,7 @@ public class RelativePathVariableGroup {
 						if (difference > 0) {
 							if (difference < mostAppropriateCount) {
 								mostAppropriateCount = difference;
-								mostAppropriate = variables[i];
+								mostAppropriate = variable;
 							}
 						}
 						else {
@@ -292,7 +290,7 @@ public class RelativePathVariableGroup {
 							if (difference > 0) {
 								if (difference < mostAppropriateCountToParent) {
 									mostAppropriateCountToParent = difference;
-									mostAppropriateToParent = variables[i];
+									mostAppropriateToParent = variable;
 								}
 							}
 						}
