@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,7 +72,7 @@ public abstract class WorkbenchPart extends EventManager implements
 
     private String contentDescription = ""; //$NON-NLS-1$
 
-	private ListenerList<IPropertyChangeListener> partChangeListeners = new ListenerList<>();
+    private ListenerList partChangeListeners = new ListenerList();
 
     /**
      * Creates a new workbench part.
@@ -230,7 +230,7 @@ public abstract class WorkbenchPart extends EventManager implements
 		}
 
         imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
-				configElement.getNamespaceIdentifier(), strIcon);
+                configElement.getNamespace(), strIcon);
 
         if (imageDescriptor == null) {
 			return;
@@ -468,9 +468,10 @@ public abstract class WorkbenchPart extends EventManager implements
 	 */
     protected void firePartPropertyChanged(String key, String oldValue, String newValue) {
     	final PropertyChangeEvent event = new PropertyChangeEvent(this, key, oldValue, newValue);
-		for (IPropertyChangeListener l : partChangeListeners) {
+    	Object[] l = partChangeListeners.getListeners();
+    	for (int i = 0; i < l.length; i++) {
 			try {
-				l.propertyChange(event);
+				((IPropertyChangeListener)l[i]).propertyChange(event);
 			} catch (RuntimeException e) {
 				WorkbenchPlugin.log(e);
 			}

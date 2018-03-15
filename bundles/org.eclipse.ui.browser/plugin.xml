@@ -106,27 +106,18 @@
          <location>usr/bin/google-chrome</location>
       </browser>
       <browser
-         id="org.eclipse.ui.browser.chromium"
-         name="%browserChromium"
-         os="linux"
-         executable="chromium-browser">
-         <location>usr/bin/chromium-browser</location>
-      </browser>
-      <browser
          id="org.eclipse.ui.browser.konqueror"
          name="%browserKonqueror"
          os="linux,aix,hpux,solaris"
          executable="konqueror">
-         <location>usr/bin/konqueror</location>
+         <location>opt/kde3/bin/konqueror</location>
       </browser>
       <browser
-         id="org.eclipse.ui.browser.epiphany"
-         name="%browserEpiphany"
-         os="linux"
-         executable="epiphany">
-         <location>
-         	usr/bin/epiphany
-         </location>
+         id="org.eclipse.ui.browser.galeon"
+         name="%browserGaleon"
+         os="linux,aix,hpux,solaris"
+         executable="galeon">
+         <location>opt/usr/gnome/bin/galeon</location>
       </browser>
 
       <!-- Windows -->
