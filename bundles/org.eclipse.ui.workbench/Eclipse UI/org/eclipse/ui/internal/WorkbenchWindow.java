@@ -2231,7 +2231,7 @@ STATUS_LINE_ID, model);
 				manager.setCancelEnabled(wasCancelEnabled);
 
 				// re-enable the main menu if necessary
-				if (enableMainMenu && model != null && model.getMainMenu() != null) {
+				if (enableMainMenu) {
 					Menu mainMenu = (Menu) model.getMainMenu().getWidget();
 					mainMenu.setEnabled(true);
 				}
