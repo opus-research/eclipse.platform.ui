@@ -12,8 +12,9 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
@@ -30,7 +31,7 @@ public class JobInfo extends JobTreeElement {
     private IStatus blockedStatus;
 
     private volatile boolean canceled = false;
-	private Queue<JobTreeElement> children = new ConcurrentLinkedQueue<>();
+    private List children = Collections.synchronizedList(new ArrayList());
 
     private Job job;
 
@@ -333,7 +334,7 @@ public class JobInfo extends JobTreeElement {
 
     @Override
 	boolean hasChildren() {
-		return !children.isEmpty();
+        return children.size() > 0;
     }
 
     /**
