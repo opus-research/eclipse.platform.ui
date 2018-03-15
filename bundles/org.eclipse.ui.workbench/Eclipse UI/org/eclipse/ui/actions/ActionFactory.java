@@ -618,6 +618,7 @@ public abstract class ActionFactory {
 	 * Workbench action (id: "maximize", commandId: "org.eclipse.ui.window.maximizePart"):
 	 * Maximize/restore the active part. This action maintains its enablement state.
 	 */
+	@Deprecated
     public static final ActionFactory MAXIMIZE = new ActionFactory("maximize", //$NON-NLS-1$
     		IWorkbenchCommandConstants.WINDOW_MAXIMIZE_ACTIVE_VIEW_OR_EDITOR) {
 
@@ -643,6 +644,7 @@ public abstract class ActionFactory {
 	 *
 	 * @since 3.1
 	 */
+	@Deprecated
     public static final ActionFactory MINIMIZE = new ActionFactory("minimize", //$NON-NLS-1$
     		IWorkbenchCommandConstants.WINDOW_MINIMIZE_ACTIVE_VIEW_OR_EDITOR) {
 
