@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
 public abstract class SWTPartRenderer extends AbstractPartRenderer {
-
 	private static final String ICON_URI_FOR_PART = "IconUriForPart"; //$NON-NLS-1$
 
 	private Map<String, Image> imageMap = new HashMap<>();
@@ -378,5 +377,4 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 				ctrl.forceFocus();
 		}
 	}
-
 }
