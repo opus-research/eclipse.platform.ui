@@ -1249,7 +1249,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		// a part may not have a context if it hasn't been rendered
 		IEclipseContext context = partContext == null ? parentContext : partContext;
 		// Allow closes to be 'canceled'
-		EPartService partService = context.get(EPartService.class);
+		EPartService partService = (EPartService) context.get(EPartService.class.getName());
 		if (partService.savePart(part, true)) {
 			partService.hidePart(part);
 			return true;
