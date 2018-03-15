@@ -78,8 +78,7 @@ import org.eclipse.swt.widgets.Shell;
  * required.
  * </p>
  */
-public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
-		IPageChangeProvider {
+public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, IPageChangeProvider {
 	/**
 	 * Image registry key for error message image (value
 	 * <code>"dialog_title_error_image"</code>).
@@ -148,8 +147,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	private Composite pageContainer;
 
-	private PageContainerFillLayout pageContainerLayout = new PageContainerFillLayout(
-			5, 5, 300, 225);
+	private PageContainerFillLayout pageContainerLayout = new PageContainerFillLayout(5, 5, 300, 225);
 
 	private int pageWidth = SWT.DEFAULT;
 
@@ -500,14 +498,12 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	protected void createButtonsForButtonBar(Composite parent) {
 		((GridLayout) parent.getLayout()).makeColumnsEqualWidth = false;
 		if (wizard.isHelpAvailable()) {
-			helpButton = createButton(parent, IDialogConstants.HELP_ID,
-					IDialogConstants.HELP_LABEL, false);
+			helpButton = createButton(parent, IDialogConstants.HELP_ID, IDialogConstants.HELP_LABEL, false);
 		}
 		if (wizard.needsPreviousAndNextButtons()) {
 			createPreviousAndNextButtons(parent);
 		}
-		finishButton = createButton(parent, IDialogConstants.FINISH_ID,
-				IDialogConstants.FINISH_LABEL, true);
+		finishButton = createButton(parent, IDialogConstants.FINISH_ID, IDialogConstants.FINISH_LABEL, true);
 		cancelButton = createCancelButton(parent);
 
 		if (parent.getDisplay().getDismissalAlignment() == SWT.RIGHT) {
