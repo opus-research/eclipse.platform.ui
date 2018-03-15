@@ -35,6 +35,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -76,6 +77,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.swt.IFocusService;
 
 
@@ -301,11 +303,34 @@ public class SearchField {
 		shell.setVisible(nowVisible);
 	}
 
+	private static final String QUICK_ACCESS_COMMAND_ID = "org.eclipse.ui.window.quickAccess"; //$NON-NLS-1$
+
+	private String triggerSequenceFormat = null;
+	/**
+	 * FIXME this returns the correct binding, but we should get it using
+	 * {@code bindingService.getBestActiveBindingFormattedFor(QUICK_ACCESS_COMMAND_ID)}
+	 *
+	 * @return the trigger
+	 */
+	protected String getQuickAccessTriggerSequenceFormat() {
+		if (triggerSequenceFormat == null) {
+			IBindingService bindingService = SearchField.this.window.getContext().get(IBindingService.class);
+			for (Binding b : bindingService.getBindings()) {
+				if (b.getParameterizedCommand() != null
+						&& QUICK_ACCESS_COMMAND_ID.equalsIgnoreCase(b.getParameterizedCommand().getId())) {
+					this.triggerSequenceFormat = b.getTriggerSequence().format();
+					break;
+				}
+			}
+		}
+		return triggerSequenceFormat;
+	}
+
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
 		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
-		// FIXME need to access the real shortcut
-		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, "Ctrl+3")); //$NON-NLS-1$
+
+		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, getQuickAccessTriggerSequenceFormat()));
 
 		FontData[] fD = text.getFont().getFontData();
 		int round = (int) Math.round(fD[0].getHeight() * 0.8);
