@@ -55,11 +55,11 @@ public final class SplashHandlerFactory {
 		IExtension[] extensions = point.getExtensions();
 		Map idToSplash = new HashMap(); // String->ConfigurationElement
 		String[] targetId = new String[1];
-		for (int i = 0; i < extensions.length; i++) {
-			IConfigurationElement[] children = extensions[i]
+		for (IExtension extension : extensions) {
+			IConfigurationElement[] children = extension
 					.getConfigurationElements();
-			for (int j = 0; j < children.length; j++) {
-				AbstractSplashHandler handler = processElement(children[j],
+			for (IConfigurationElement element : children) {
+				AbstractSplashHandler handler = processElement(element,
 						idToSplash, targetId, product);
 				if (handler != null)
 					return handler;
