@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import java.time.Duration;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -79,9 +78,6 @@ public class ProgressAnimationItem extends AnimationItem implements
 	private int flags;
 
 	private AccessibleListener currentAccessibleListener;
-
-	private Throttler throttledRefresh = new Throttler(PlatformUI.getWorkbench().getDisplay(), Duration.ofMillis(100),
-			this::refresh);
 
 	/**
 	 * Create an instance of the receiver in the supplied region.
@@ -400,12 +396,24 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	@Override
 	public void removed(JobTreeElement info) {
-		throttledRefresh.throttledExec();
+		final Display display = Display.getDefault();
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		});
 	}
 
 	@Override
 	public void finished(final JobTreeElement jte) {
-		throttledRefresh.throttledExec();
+		final Display display = Display.getDefault();
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				refresh();
+			}
+		});
 	}
 
 }
