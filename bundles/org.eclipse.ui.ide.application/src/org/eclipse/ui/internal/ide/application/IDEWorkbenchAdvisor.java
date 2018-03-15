@@ -235,10 +235,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void preStartup() {
-
-		// Suspend background jobs while we startup
-		Job.getJobManager().suspend();
-
 		// Register the build actions
 		IProgressService service = PlatformUI.getWorkbench()
 				.getProgressService();
