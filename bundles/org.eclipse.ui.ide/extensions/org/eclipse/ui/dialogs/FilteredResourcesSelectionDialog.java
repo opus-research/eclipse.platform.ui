@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000 - 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     James Blackburn (Broadcom Corp.) Bug 86973 Allow path pattern matching
  *     Anton Leherbauer (Wind River Systems, Inc.) - Bug 415099 Terminating with "<" or " " (space) does not work for extensions
  *     Mickael Istria (Red Hat Inc.) - Bug 460749: filter resources with same location
+ *     Lucas Bullen (Red Hat Inc.) - Bug 525974: Open Resource sorting doesn't show perfect match first
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -112,6 +113,8 @@ public class FilteredResourcesSelectionDialog extends
 	private GroupResourcesByLocationAction groupResourcesByLocationAction;
 
 	private String title;
+
+	private ItemsFilter latestFilter;
 
 	/**
 	 * The base outer-container which will be used to search for resources. This
@@ -405,7 +408,8 @@ public class FilteredResourcesSelectionDialog extends
 
 	@Override
 	protected ItemsFilter createFilter() {
-		return new ResourceFilter(container, searchContainer, isDerived, typeMask);
+		latestFilter = new ResourceFilter(container, searchContainer, isDerived, typeMask);
+		return latestFilter;
 	}
 
 	@Override
@@ -422,6 +426,18 @@ public class FilteredResourcesSelectionDialog extends
 			String s1 = resource1.getName();
 			String s2 = resource2.getName();
 
+			if (latestFilter != null) {
+				String filterPattern = latestFilter.getPattern();
+				// See if any are exact matches
+				boolean m1 = filterPattern.equals(s1);
+				boolean m2 = filterPattern.equals(s2);
+				if (m1 && m2)
+					return 0;
+				if (m1)
+					return -1;
+				if (m2)
+					return 1;
+			}
 			// Compare names without extension first
 			int s1Dot = s1.lastIndexOf('.');
 			int s2Dot = s2.lastIndexOf('.');
