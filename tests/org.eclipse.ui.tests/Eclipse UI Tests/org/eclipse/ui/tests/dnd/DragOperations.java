@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.tests.dnd;
+
+import junit.framework.Assert;
 
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.SWT;
@@ -23,7 +25,6 @@ import org.eclipse.ui.internal.PartPane;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.dnd.DragUtil;
 import org.eclipse.ui.internal.dnd.TestDropLocation;
-import org.junit.Assert;
 
 /**
  * @since 3.0
@@ -145,7 +146,7 @@ public class DragOperations {
      * @return
      */
     public static String getLayoutDescription(WorkbenchPage page) {
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
 
         //page.getActivePerspective().describeLayout(buf);
         buf.append("this layout still not quite described - TODO");

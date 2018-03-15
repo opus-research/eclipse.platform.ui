@@ -19,7 +19,7 @@ public class BinaryTranslatorProvider extends TranslationService {
 		if (key == null)
 			return null;
 		char[] charArray = key.toCharArray();
-		StringBuilder tmp = new StringBuilder();
+		StringBuffer tmp = new StringBuffer();
 		tmp.append("0x");
 		for(int i = 0; i < charArray.length; i++) {
 			int value = charArray[i];

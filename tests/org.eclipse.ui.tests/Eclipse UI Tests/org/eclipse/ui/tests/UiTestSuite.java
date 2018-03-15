@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Red Hat Inc. - Bug 474132
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 504029
  *******************************************************************************/
 package org.eclipse.ui.tests;
 
@@ -32,8 +31,6 @@ import org.eclipse.ui.tests.operations.OperationsTestSuite;
 import org.eclipse.ui.tests.preferences.PreferencesTestSuite;
 import org.eclipse.ui.tests.progress.ProgressTestSuite;
 import org.eclipse.ui.tests.propertysheet.PropertySheetTestSuite;
-import org.eclipse.ui.tests.quickaccess.QuickAccessTestSuite;
-import org.eclipse.ui.tests.releng.PluginActivationTests;
 import org.eclipse.ui.tests.services.ServicesTestSuite;
 import org.eclipse.ui.tests.statushandlers.StatusHandlingTestSuite;
 import org.eclipse.ui.tests.themes.ThemesTestSuite;
@@ -59,7 +56,6 @@ import org.junit.runners.Suite;
 	OperationsTestSuite.class,
 	FieldAssistTestSuite.class,
 	ServicesTestSuite.class,
-	PluginActivationTests.class,
 	ProgressTestSuite.class,
 	PropertySheetTestSuite.class,
 	AdaptableTestSuite.class,
@@ -68,12 +64,12 @@ import org.junit.runners.Suite;
 	ConcurrencyTestSuite.class,
 	FilteredTreeTests.class,
 	StatusHandlingTestSuite.class,
-	MenusTestSuite.class,
-	QuickAccessTestSuite.class
+	MenusTestSuite.class
 })
 public class UiTestSuite {
 
 	// Not enabled tests:
+	// QuickAccessTestSuite.class,
 	// InternalTestSuite.class,
 	// ZoomTestSuite.class,
 	// DynamicPluginsTestSuite.class,

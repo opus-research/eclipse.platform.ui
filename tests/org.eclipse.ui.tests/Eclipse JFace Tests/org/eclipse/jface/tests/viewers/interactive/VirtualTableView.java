@@ -13,6 +13,7 @@ package org.eclipse.jface.tests.viewers.interactive;
 
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -66,7 +67,8 @@ public class VirtualTableView extends ViewPart {
 		delete.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Object[] selection = viewer.getStructuredSelection().toArray();
+				Object[] selection = ((IStructuredSelection) viewer
+						.getSelection()).toArray();
 				doRemove(selection);
 			}
 		});
