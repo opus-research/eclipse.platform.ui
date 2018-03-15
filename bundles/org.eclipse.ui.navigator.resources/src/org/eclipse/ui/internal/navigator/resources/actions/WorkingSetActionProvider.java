@@ -286,8 +286,7 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 				new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.PLUGIN_ID, ""));  //$NON-NLS-1$
 			return;
 		}
-		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)
-		    && extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_OTHERS_WORKING_SET)) {
+		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
 			// do not need filter when working sets are used for grouping
 			// a filter would hide the "Others" working set content
 			workingSetFilter.setWorkingSet(null);
@@ -315,16 +314,17 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 
 		if (viewer != null) {
 			setWorkingSetFilter(workingSet);
-			if (workingSet == null || emptyWorkingSet
-					|| !extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
+			if (!extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
 				if (viewer.getInput() != originalViewerInput) {
 					viewer.setInput(originalViewerInput);
 				} else {
 					viewer.refresh();
 				}
 			} else {
-				if (!workingSet.isAggregateWorkingSet()) {
-					IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+				IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+				if (workingSet == null) {
+					viewer.setInput(workingSetManager.createAggregateWorkingSet("", "", new IWorkingSet[] {})); //$NON-NLS-1$ //$NON-NLS-2$
+				} else if (!workingSet.isAggregateWorkingSet()) {
 					viewer.setInput(workingSetManager.createAggregateWorkingSet(
 							"", "", new IWorkingSet[] { workingSet })); //$NON-NLS-1$ //$NON-NLS-2$
 				} else {

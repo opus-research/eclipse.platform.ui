@@ -60,12 +60,6 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	private static final Object[] NO_CHILDREN = new Object[0];
 
 	/**
-	 * A key used by the Extension State Model to keep track of whether the
-	 * "Others" working set
-	 */
-	public static final String SHOW_OTHERS_WORKING_SET = EXTENSION_ID + ".showOthersWorkingSet"; //$NON-NLS-1$
-
-	/**
 	 * An object representing the "Others" working set, showing unassigned
 	 * content
 	 */
@@ -116,19 +110,15 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 			IWorkingSet workingSet = (IWorkingSet) parentElement;
 			if (workingSet.isAggregateWorkingSet() && projectExplorer != null) {
 				switch (projectExplorer.getRootMode()) {
-					case ProjectExplorer.WORKING_SETS :
-						IWorkingSet[] activeWorkingSets = ((IAggregateWorkingSet) workingSet).getComponents();
+				case ProjectExplorer.WORKING_SETS:
+					IWorkingSet[] activeWorkingSets = ((IAggregateWorkingSet) workingSet).getComponents();
 					Object[] res;
-					if (extensionStateModel.getBooleanProperty(SHOW_OTHERS_WORKING_SET)) {
-							res = new Object[activeWorkingSets.length + 1];
-							System.arraycopy(activeWorkingSets, 0, res, 0, activeWorkingSets.length);
-							res[activeWorkingSets.length] = OTHERS_WORKING_SET;
-						} else {
-							res = activeWorkingSets;
-						}
+					res = new Object[activeWorkingSets.length + 1];
+					System.arraycopy(activeWorkingSets, 0, res, 0, activeWorkingSets.length);
+					res[activeWorkingSets.length] = OTHERS_WORKING_SET;
 					return res;
 				case ProjectExplorer.PROJECTS:
-						return getWorkingSetElements(workingSet);
+					return getWorkingSetElements(workingSet);
 				}
 			}
 			return getWorkingSetElements(workingSet);
