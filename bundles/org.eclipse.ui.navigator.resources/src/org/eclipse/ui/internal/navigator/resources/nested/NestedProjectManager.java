@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
@@ -175,17 +174,9 @@ public class NestedProjectManager {
 	 * @return the direct children projects for given container
 	 */
 	public IProject[] getDirectChildrenProjects(IContainer container) {
-		if (container instanceof IWorkspaceRoot) {
-			IWorkspaceRoot root = (IWorkspaceRoot) container;
-			return root.getProjects();
-		}
 		Set<IProject> res = new HashSet<>();
 		IPath containerLocation = container.getLocation();
-		IPath projectLocation = container.getProject().getLocation();
-		if (containerLocation == null || projectLocation == null) {
-			return res.toArray(new IProject[res.size()]);
-		}
-		for (Entry<IPath, IProject> entry : locationsToProjects.tailMap(projectLocation)
+		for (Entry<IPath, IProject> entry : locationsToProjects.tailMap(container.getProject().getLocation())
 				.entrySet()) {
 			if (entry.getValue().equals(container.getProject())) {
 				// ignore current project
@@ -205,16 +196,8 @@ public class NestedProjectManager {
 	 * @return whether the container has some projects as direct children
 	 */
 	public boolean hasDirectChildrenProjects(IContainer container) {
-		if (container instanceof IWorkspaceRoot) {
-			IWorkspaceRoot root = (IWorkspaceRoot) container;
-			return root.getProjects().length > 0;
-		}
 		IPath containerLocation = container.getLocation();
-		IPath projectLocation = container.getProject().getLocation();
-		if (containerLocation == null || projectLocation == null) {
-			return false;
-		}
-		for (Entry<IPath, IProject> entry : locationsToProjects.tailMap(projectLocation)
+		for (Entry<IPath, IProject> entry : locationsToProjects.tailMap(container.getProject().getLocation())
 				.entrySet()) {
 			if (entry.getValue().equals(container.getProject())) {
 				// ignore current project
