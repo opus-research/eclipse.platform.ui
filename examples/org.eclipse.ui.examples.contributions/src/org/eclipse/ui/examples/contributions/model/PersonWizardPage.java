@@ -95,10 +95,12 @@ public class PersonWizardPage extends WizardPage implements Listener {
 		if (getId() == 0) {
 			return false;
 		}
-		IPersonService service = (IPersonService) locator.getService(IPersonService.class);
+		IPersonService service = (IPersonService) locator
+				.getService(IPersonService.class);
 		if (service.getPerson(getId()) != null) {
 			setErrorMessage(NLS.bind(
-					ContributionMessages.PersonWizardPage_error_alreadyExists, getId()));
+					ContributionMessages.PersonWizardPage_error_alreadyExists,
+					Integer.valueOf(getId())));
 			return false;
 		}
 		if (getSurname() == null || getSurname().length() == 0) {
