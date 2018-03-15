@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -58,6 +57,7 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -74,6 +74,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.GridData;
@@ -83,6 +84,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.event.Event;
@@ -246,15 +248,7 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 			boolean isVisible = (Boolean) event.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-			Rectangle oldBounds = theShell.getBounds();
 			theShell.setVisible(isVisible);
-			// Workaround for bug 490944: Making a shell visible can change its
-			// size. This is a no-op if the bug isn't present.
-			Rectangle newBounds = theShell.getBounds();
-			if (!Objects.equals(oldBounds, newBounds)) {
-				theShell.setBounds(oldBounds);
-			}
 		}
 	}
 
@@ -367,11 +361,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 		}
 		// Force the shell onto the display if it would be invisible otherwise
-		Rectangle displayBounds = Display.getCurrent().getBounds();
+		Display display = Display.getCurrent();
+		Monitor closestMonitor = getClosestMonitor(display, Geometry.centerPoint(modelBounds));
+		Rectangle displayBounds = closestMonitor.getClientArea();
 		if (!modelBounds.intersects(displayBounds)) {
-			Rectangle clientArea = Display.getCurrent().getClientArea();
-			modelBounds.x = clientArea.x;
-			modelBounds.y = clientArea.y;
+			Geometry.moveInside(modelBounds, displayBounds);
 		}
 		wbwShell.setBounds(modelBounds);
 
@@ -449,6 +443,46 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 
 		return newWidget;
+	}
+
+	/**
+	 * TODO: Create an API for this method and delete this version. See bug
+	 * 491273
+	 *
+	 * Returns the monitor whose client area contains the given point. If no
+	 * monitor contains the point, returns the monitor that is closest to the
+	 * point. If this is ever made public, it should be moved into a separate
+	 * utility class.
+	 *
+	 * @param toSearch
+	 *            point to find (display coordinates)
+	 * @param toFind
+	 *            point to find (display coordinates)
+	 * @return the montor closest to the given point
+	 */
+	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
+		int closest = Integer.MAX_VALUE;
+
+		Monitor[] monitors = toSearch.getMonitors();
+		Monitor result = monitors[0];
+
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
+			Rectangle clientArea = current.getClientArea();
+
+			if (clientArea.contains(toFind)) {
+				return current;
+			}
+
+			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
+			if (distance < closest) {
+				closest = distance;
+				result = current;
+			}
+		}
+
+		return result;
 	}
 
 	private void setCloseHandler(MWindow window) {
@@ -699,16 +733,8 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		shell.layout(true);
 		forceLayout(shell);
-		Rectangle oldBounds = shell.getBounds();
 		if (shellME.isVisible()) {
 			shell.open();
-
-			// Workaround for bug 490944: Making a shell visible can change its
-			// size. This is a no-op if the bug isn't present.
-			Rectangle newBounds = shell.getBounds();
-			if (!Objects.equals(oldBounds, newBounds)) {
-				shell.setBounds(oldBounds);
-			}
 		} else {
 			shell.setVisible(false);
 		}
