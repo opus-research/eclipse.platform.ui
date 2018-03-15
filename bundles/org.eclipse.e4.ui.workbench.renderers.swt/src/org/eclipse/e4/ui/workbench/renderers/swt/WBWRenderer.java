@@ -57,6 +57,7 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -345,7 +346,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			EClass wbwclass = wbw.eClass();
 			// use eIsSet rather than embed sentinel values
 			if (wbw.eIsSet(wbwclass.getEStructuralFeature("x"))) { //$NON-NLS-1$
-				modelBounds.x = wbwModel.getX();
+				modelBounds.x = wbwModel.getX() - 2000;
 			}
 			if (wbw.eIsSet(wbwclass.getEStructuralFeature("y"))) { //$NON-NLS-1$
 				modelBounds.y = wbwModel.getY();
@@ -358,11 +359,9 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 		}
 		// Force the shell onto the display if it would be invisible otherwise
-		Rectangle displayBounds = Display.getCurrent().getBounds();
+		Rectangle displayBounds = Display.getCurrent().getClientArea();
 		if (!modelBounds.intersects(displayBounds)) {
-			Rectangle clientArea = Display.getCurrent().getClientArea();
-			modelBounds.x = clientArea.x;
-			modelBounds.y = clientArea.y;
+			Geometry.moveInside(modelBounds, displayBounds);
 		}
 		wbwShell.setBounds(modelBounds);
 
