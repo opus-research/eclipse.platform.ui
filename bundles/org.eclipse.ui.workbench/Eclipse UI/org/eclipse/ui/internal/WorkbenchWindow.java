@@ -15,6 +15,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184, 472654, 486632
  *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
+ *     Axel Richard <axel.richard@obeo.fr> - Bug 354538
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.expressions.Expression;
@@ -73,6 +75,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
@@ -248,6 +251,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private WorkbenchWindowAdvisor windowAdvisor;
 
 	private ActionBarAdvisor actionBarAdvisor;
+
+	private MenuManagerRenderer renderer;
+
+	private MMenu mainMenu;
 
 	private PageListenerList pageListeners = new PageListenerList();
 
@@ -681,10 +688,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 			Shell shell = (Shell) model.getWidget();
 			if (model.getMainMenu() == null) {
-				final MMenu mainMenu = modelService.createModelElement(MMenu.class);
+				mainMenu = modelService.createModelElement(MMenu.class);
 				mainMenu.setElementId(ActionSet.MAIN_MENU);
 
-				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory
+				renderer = (MenuManagerRenderer) rendererFactory
 						.getRenderer(mainMenu, null);
 				renderer.linkModelToManager(mainMenu, menuManager);
 				fill(renderer, mainMenu, menuManager);
@@ -783,6 +790,15 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		} finally {
 			HandlerServiceImpl.pop();
 		}
+	}
+
+	@PreDestroy
+	void preDestroy() {
+		if (mainMenu != null) {
+			renderer.clearModelToManager(mainMenu, menuManager);
+			mainMenu = null;
+		}
+		renderer = null;
 	}
 
 	private void configureShell(Shell shell, IEclipseContext context) {
@@ -1968,7 +1984,14 @@ STATUS_LINE_ID, model);
 			// Null out the progress region. Bug 64024.
 			progressRegion = null;
 
+			// Opposite of setup() and fill()
 			MWindow window = model;
+			if (window.getMainMenu() != null) {
+				MMenu mainMenu = window.getMainMenu();
+				final MenuManagerRenderer renderer = (MenuManagerRenderer) rendererFactory.getRenderer(mainMenu, null);
+				cleanupMenuManagerRec(renderer, mainMenu);
+			}
+
 			engine.removeGui(model);
 
 			MElementContainer<MUIElement> parent = window.getParent();
@@ -1996,6 +2019,16 @@ STATUS_LINE_ID, model);
 			menuRestrictions.clear();
 		}
 		return true;
+	}
+
+	private void cleanupMenuManagerRec(MenuManagerRenderer renderer, MMenu m) {
+		for (MMenuElement e : m.getChildren()) {
+			// renderer.clearModelToContribution(e, null);
+			if (e instanceof MMenu) {
+				cleanupMenuManagerRec(renderer, (MMenu) e);
+			}
+		}
+		renderer.clearModelToManager(m, null);
 	}
 
 	/**
