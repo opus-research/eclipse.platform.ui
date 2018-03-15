@@ -479,7 +479,8 @@ public class BookmarkNavigator extends ViewPart {
             IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
             for (int i = 0; i < markerMems.length; i++) {
                 try {
-                    long id = Long.parseLong(markerMems[i].getString(TAG_ID)));
+                    long id = new Long(markerMems[i].getString(TAG_ID))
+                            .longValue();
                     IResource resource = root.findMember(markerMems[i]
                             .getString(TAG_RESOURCE));
                     if (resource != null) {
@@ -501,7 +502,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_VERTICAL_POSITION);
                 int position;
-				position = Integer.parseInt(posStr);
+                position = new Integer(posStr).intValue();
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
@@ -511,7 +512,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_HORIZONTAL_POSITION);
                 int position;
-				position = Integer.parseInt(posStr);
+                position = new Integer(posStr).intValue();
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
