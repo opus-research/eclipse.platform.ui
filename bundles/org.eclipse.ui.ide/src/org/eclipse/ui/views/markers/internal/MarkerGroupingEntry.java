@@ -37,8 +37,7 @@ public class MarkerGroupingEntry {
 	public MarkerGroupingEntry(IConfigurationElement element) {
 		label = element.getAttribute(MarkerSupportRegistry.LABEL);
 		id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
-		sortPriority = Integer.valueOf(element.getAttribute(PRIORITY))
-				.intValue();
+		sortPriority = Integer.parseInt(element.getAttribute(PRIORITY));
 	}
 
 	/**
