@@ -13,6 +13,7 @@ package org.eclipse.core.internal.databinding;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.databinding.util.ILogger;
 import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -45,18 +46,23 @@ public class Activator implements BundleActivator {
 		_frameworkLogTracker = new ServiceTracker(context, FrameworkLog.class.getName(), null);
 		_frameworkLogTracker.open();
 
-		Policy.setLog(status -> {
-			ServiceTracker frameworkLogTracker = _frameworkLogTracker;
-			FrameworkLog log = frameworkLogTracker == null ? null : (FrameworkLog) frameworkLogTracker.getService();
-			if (log != null) {
-				log.log(createLogEntry(status));
-			} else {
-				// fall back to System.err
-				System.err.println(status.getPlugin() + " - " + status.getCode() + " - " + status.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
-				if( status.getException() != null ) {
-					status.getException().printStackTrace(System.err);
+		Policy.setLog(new ILogger() {
+
+			@Override
+			public void log(IStatus status) {
+				ServiceTracker frameworkLogTracker = _frameworkLogTracker;
+				FrameworkLog log = frameworkLogTracker == null ? null : (FrameworkLog) frameworkLogTracker.getService();
+				if (log != null) {
+					log.log(createLogEntry(status));
+				} else {
+					// fall back to System.err
+					System.err.println(status.getPlugin() + " - " + status.getCode() + " - " + status.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
+					if( status.getException() != null ) {
+						status.getException().printStackTrace(System.err);
+					}
 				}
 			}
+
 		});
 	}
 
@@ -76,9 +82,8 @@ public class Activator implements BundleActivator {
 		}
 
 		if (status.isMultiStatus()) {
-			IStatus[] children = status.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				childlist.add(createLogEntry(children[i]));
+			for (IStatus child : status.getChildren()) {
+				childlist.add(createLogEntry(child));
 			}
 		}
 
