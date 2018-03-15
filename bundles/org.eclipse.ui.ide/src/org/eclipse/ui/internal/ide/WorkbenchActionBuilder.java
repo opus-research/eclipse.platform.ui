@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -877,10 +877,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         showInQuickMenu = null;
         newQuickMenu = null;
         buildProjectAction = null;
-        if (newWizardMenu != null) {
-            newWizardMenu.dispose();
-            newWizardMenu = null;
-        }
+        newWizardMenu = null;
         statusLineItem = null;
         prefListener = null;
         propPrefListener = null;

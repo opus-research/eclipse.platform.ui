@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.action.IAction;
@@ -509,14 +508,23 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		if (defaultPageRec != null) {
 			// check for null since the default page may not have
 			// been created (ex. perspective never visible)
-			removePage(defaultPageRec, false);
+			defaultPageRec.page.dispose();
+			Object site = mapPageToSite.remove(defaultPageRec.page);
+			mapPageToNumRecs.remove(defaultPageRec.page);
+			if (defaultPageRec.subActionBars != null) {
+				defaultPageRec.subActionBars.dispose();
+			}
+
+			if (site instanceof PageSite) {
+				((PageSite) site).dispose();
+			}
 			defaultPageRec = null;
 		}
 		Map clone = (Map) ((HashMap) mapPartToRec).clone();
 		Iterator itr = clone.values().iterator();
 		while (itr.hasNext()) {
 			PageRec rec = (PageRec) itr.next();
-			removePage(rec, true);
+			removePage(rec);
 		}
 
 		// Run super.
@@ -744,32 +752,22 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 */
 	public void partActivated(IWorkbenchPart part) {
 		// Is this an important part? If not just return.
-		if (isImportant(part)) {
-			hiddenPart = null;
+		if (!isImportant(part)) {
+			return;
+		}
+		hiddenPart = null;
 
-			// Create a page for the part.
-			PageRec rec = getPageRec(part);
-			if (rec == null) {
-				rec = createPage(part);
-			}
-
-			// Show the page.
-			if (rec != null) {
-				showPageRec(rec);
-			} else {
-				showPageRec(defaultPageRec);
-			}
+		// Create a page for the part.
+		PageRec rec = getPageRec(part);
+		if (rec == null) {
+			rec = createPage(part);
 		}
 
-		// If *we* are activating then activate the context
-		if (part == this) {
-			PageSite pageSite = getPageSite(getCurrentPage());
-			if (pageSite != null) {
-				IEclipseContext pageContext = pageSite.getSiteContext();
-				if (pageContext != null) {
-					pageContext.activate();
-				}
-			}
+		// Show the page.
+		if (rec != null) {
+			showPageRec(rec);
+		} else {
+			showPageRec(defaultPageRec);
 		}
 	}
 
@@ -795,7 +793,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		// Find and remove the part page.
 		PageRec rec = getPageRec(part);
 		if (rec != null) {
-			removePage(rec, true);
+			removePage(rec);
 		}
 		if (part == hiddenPart) {
 			hiddenPart = null;
@@ -846,11 +844,8 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * it - otherwise just decrement the reference count.
 	 * 
 	 * @param rec
-	 * @param doDestroy
-	 *            if <code>true</code>, also call
-	 *            {@link #doDestroyPage(IWorkbenchPart, PageRec)}
 	 */
-	private void removePage(PageRec rec, boolean doDestroy) {
+	private void removePage(PageRec rec) {
 		mapPartToRec.remove(rec.part);
 
 		int newCount = ((Integer) mapPageToNumRecs.get(rec.page)).intValue() - 1;
@@ -870,10 +865,8 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 				control.dispose();
 			}
 
-			if (doDestroy) {
-				// free the page
-				doDestroyPage(rec.part, rec);
-			}
+			// free the page
+			doDestroyPage(rec.part, rec);
 
 			if (rec.subActionBars != null) {
 				rec.subActionBars.dispose();

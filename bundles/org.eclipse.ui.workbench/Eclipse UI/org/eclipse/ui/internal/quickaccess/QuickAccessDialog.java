@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -97,8 +97,7 @@ public class QuickAccessDialog extends PopupDialog {
 							providerMap.put(providers[i].getId(), providers[i]);
 						}
 						QuickAccessDialog.this.contents = new QuickAccessContents(providers) {
-							protected void updateFeedback(boolean filterTextEmpty,
-									boolean showAllMatches) {
+							void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
 								if (filterTextEmpty) {
 									setInfoText(QuickAccessMessages.QuickAccess_StartTypingToFindMatches);
 								} else {
@@ -115,7 +114,7 @@ public class QuickAccessDialog extends PopupDialog {
 							}
 
 							@Override
-							protected void doClose() {
+							void doClose() {
 								QuickAccessDialog.this.close();
 							}
 
@@ -188,14 +187,14 @@ public class QuickAccessDialog extends PopupDialog {
 							}
 
 							@Override
-							protected QuickAccessElement getPerfectMatch(String filter) {
+							QuickAccessElement getPerfectMatch(String filter) {
 								QuickAccessElement perfectMatch = (QuickAccessElement) elementMap
 										.get(filter);
 								return perfectMatch;
 							}
 
 							@Override
-							protected void handleElementSelected(String text, Object selectedElement) {
+							void handleElementSelected(String text, Object selectedElement) {
 								if (selectedElement instanceof QuickAccessElement) {
 									addPreviousPick(text, selectedElement);
 									storeDialog(getDialogSettings());
@@ -287,7 +286,7 @@ public class QuickAccessDialog extends PopupDialog {
 					for (int i = 0; i < sequences.length; i++) {
 						if (sequences[i].equals(keySequence)) {
 							e.doit = false;
-							contents.setShowAllMatches(!contents.getShowAllMatches());
+							contents.toggleShowAllMatches();
 							return;
 						}
 					}

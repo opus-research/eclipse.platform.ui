@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,9 +27,8 @@ public abstract class HeadlessApplicationElementTest extends
 		applicationElement = createApplicationElement(applicationContext);
 
 		// Hook the global notifications
-		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
-		((Notifier) applicationElement).eAdapters().add(ep);
-		applicationContext.set(UIEventPublisher.class, ep);
+		((Notifier) applicationElement).eAdapters().add(
+				new UIEventPublisher(applicationContext));
 	}
 
 	protected abstract MApplicationElement createApplicationElement(

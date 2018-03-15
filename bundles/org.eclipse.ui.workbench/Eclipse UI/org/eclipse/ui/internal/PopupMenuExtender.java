@@ -56,6 +56,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
+import org.eclipse.ui.menus.IMenuService;
 
 /**
  * This class extends a single popup menu
@@ -414,7 +415,7 @@ public class PopupMenuExtender implements IMenuListener2,
 		if (obj instanceof MenuManagerRenderer) {
 			MenuManagerRenderer renderer = (MenuManagerRenderer) obj;
 			renderer.reconcileManagerToModel(menu, menuModel);
-			renderer.processContributions(menuModel, menuModel.getElementId(), false, true);
+			renderer.processContributions(menuModel, false, true);
 			// double cast because we're bad people
 			renderer.processContents((MElementContainer<MUIElement>) ((Object) menuModel));
 		}
@@ -541,6 +542,11 @@ public class PopupMenuExtender implements IMenuListener2,
      */
     public void dispose() {
 		clearStaticActions();
+		final IMenuService menuService = (IMenuService) part.getSite()
+				.getService(IMenuService.class);
+		if (menuService != null) {
+			menuService.releaseContributions(menu);
+		}
 		Platform.getExtensionRegistry().removeRegistryChangeListener(this);
 		menu.removeMenuListener(this);
 

@@ -163,7 +163,7 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 			selectionService.addPostSelectionListener(postListener);
 			this.selectionService = selectionService;
 		}
-	}
+	 }
 
 	@PreDestroy
 	public void dispose() {
