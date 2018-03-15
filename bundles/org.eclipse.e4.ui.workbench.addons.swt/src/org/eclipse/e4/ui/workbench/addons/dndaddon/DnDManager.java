@@ -57,6 +57,11 @@ class DnDManager {
 	public static final int SIMPLE = 3;
 	private int feedbackStyle = SIMPLE;
 
+	/**
+	 * Size of the rectangle used for drag and drop feedback
+	 */
+	private static final int BORDER_SIZE = 3;
+
 	Collection<DragAgent> dragAgents = new ArrayList<DragAgent>();
 	Collection<DropAgent> dropAgents = new ArrayList<DropAgent>();
 
@@ -431,16 +436,22 @@ class DnDManager {
 
 		Region rgn = new Region();
 
+		List<Rectangle> adjustedFrames = new ArrayList<>();
+
+		for (Rectangle next : frames) {
+			adjustedFrames.add(Geometry.toControl(overlayFrame, next));
+		}
+
 		// Add frames
 		for (Rectangle frameRect : frames) {
-			int x = frameRect.x - bounds.x;
-			int y = frameRect.y - bounds.y;
+			int x = frameRect.x;
+			int y = frameRect.y;
 
-			if (frameRect.width > 6) {
-				Rectangle outerBounds = new Rectangle(x - 3, y - 3, frameRect.width + 6,
-						frameRect.height + 6);
+			if (frameRect.width > BORDER_SIZE * 2) {
+				Rectangle outerBounds = Geometry.copy(frameRect);
+				Rectangle innerBounds = Geometry.copy(frameRect);
+				Geometry.expand(innerBounds, -BORDER_SIZE, -BORDER_SIZE, -BORDER_SIZE, -BORDER_SIZE);
 				rgn.add(outerBounds);
-				Rectangle innerBounds = new Rectangle(x, y, frameRect.width, frameRect.height);
 				rgn.subtract(innerBounds);
 			} else {
 				Rectangle itemBounds = new Rectangle(x, y, frameRect.width, frameRect.height);
@@ -450,11 +461,11 @@ class DnDManager {
 
 		// Add images
 		for (int i = 0; i < images.size(); i++) {
-			Rectangle ir = imageRects.get(i);
+			Rectangle ir = Geometry.toControl(overlayFrame, imageRects.get(i));
 			Image im = images.get(i);
 
-			int x = ir.x - bounds.x;
-			int y = ir.y - bounds.y;
+			int x = ir.x;
+			int y = ir.y;
 
 			rgn.add(x, y, im.getBounds().width, im.getBounds().height);
 		}
@@ -480,17 +491,9 @@ class DnDManager {
 	private Rectangle getOverlayBounds() {
 		Rectangle bounds = null;
 		for (Rectangle fr : frames) {
-			if (fr.width > 6) {
-				Rectangle outerBounds = new Rectangle(fr.x - 3, fr.y - 3, fr.width + 6,
-						fr.height + 6);
-				if (bounds == null)
-					bounds = outerBounds;
-				bounds.add(outerBounds);
-			} else {
-				if (bounds == null)
-					bounds = fr;
-				bounds.add(fr);
-			}
+			if (bounds == null)
+				bounds = fr;
+			bounds.add(fr);
 		}
 
 		for (Rectangle ir : imageRects) {
