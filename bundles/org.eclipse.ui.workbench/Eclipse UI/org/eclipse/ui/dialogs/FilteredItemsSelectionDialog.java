@@ -1591,8 +1591,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 		private boolean isSelected(Object element) {
 			if (element != null && currentSelection != null) {
-				for (Object element2 : currentSelection) {
-					if (element.equals(element2))
+				for (int i = 0; i < currentSelection.length; i++) {
+					if (element.equals(currentSelection[i]))
 						return true;
 				}
 			}
@@ -2183,7 +2183,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 			IMemento[] mementoElements = historyMemento
 					.getChildren(infoNodeName);
-			for (IMemento mementoElement : mementoElements) {
+			for (int i = 0; i < mementoElements.length; ++i) {
+				IMemento mementoElement = mementoElements[i];
 				Object object = restoreItemFromMemento(mementoElement);
 				if (object != null) {
 					historyList.add(object);
@@ -2202,7 +2203,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			IMemento historyMemento = memento.createChild(rootNodeName);
 
 			Object[] items = getHistoryItems();
-			for (Object item : items) {
+			for (int i = 0; i < items.length; i++) {
+				Object item = items[i];
 				IMemento elementMemento = historyMemento
 						.createChild(infoNodeName);
 				storeItemToMemento(item, elementMemento);
@@ -2571,7 +2573,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 		public void addHistoryItems(ItemsFilter itemsFilter) {
 			if (this.selectionHistory != null) {
 				Object[] items = this.selectionHistory.getHistoryItems();
-				for (Object item : items) {
+				for (int i = 0; i < items.length; i++) {
+					Object item = items[i];
 					if (itemsFilter == filter) {
 						if (itemsFilter != null) {
 							if (itemsFilter.matchItem(item)) {
@@ -3044,8 +3047,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 				return;
 			}
 			Object input = getInput();
-			for (Object obj : objs) {
-				if (obj.equals(input)) {
+			for (int i = 0; i < objs.length; i++) {
+				if (objs[i].equals(input)) {
 					refresh();
 					break;
 				}
