@@ -58,6 +58,7 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
+	@Deprecated
 	public static final int INDEX_PARAMETER_ID = 0;
 
 	/**
@@ -66,6 +67,7 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
+	@Deprecated
 	public static final int INDEX_PARAMETER_NAME = 1;
 
 	/**
@@ -74,6 +76,7 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
+	@Deprecated
 	public static final int INDEX_PARAMETER_VALUE_NAME = 2;
 
 	/**
@@ -81,6 +84,7 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
+	@Deprecated
 	public static final int INDEX_PARAMETER_VALUE_VALUE = 3;
 
 	/**
@@ -453,6 +457,7 @@ public final class ParameterizedCommand implements Comparable {
 	 * @deprecated Please use {@link #executeWithChecks(Object, Object)}
 	 *             instead.
 	 */
+	@Deprecated
 	public final Object execute(final Object trigger, final Object applicationContext)
 			throws ExecutionException, NotHandledException {
 		return command.execute(new ExecutionEvent(command, getParameterMap(), trigger, applicationContext));
@@ -516,15 +521,32 @@ public final class ParameterizedCommand implements Comparable {
 	 *             If the underlying command is not defined.
 	 */
 	public final String getName() throws NotDefinedException {
+		return getName(command.getName());
+	}
+
+	/**
+	 * Returns a human-readable representation of this command with all of its
+	 * parameterizations.
+	 *
+	 * @param baseName
+	 *            The base name of the command that should be used to create the
+	 *            parameterized command representation.
+	 * @return The human-readable representation of this parameterized command;
+	 *         never <code>null</code>.
+	 * @throws NotDefinedException
+	 *             If the underlying command is not defined.
+	 * @since 3.8
+	 */
+	public final String getName(String baseName) throws NotDefinedException {
 		if (name == null) {
 			final StringBuffer nameBuffer = new StringBuffer();
-			nameBuffer.append(command.getName());
+			nameBuffer.append(baseName);
 			if (parameterizations != null) {
 				nameBuffer.append(" ("); //$NON-NLS-1$
 				final int parameterizationCount = parameterizations.length;
-				if(parameterizationCount == 1) {
+				if (parameterizationCount == 1) {
 					appendParameter(nameBuffer, parameterizations[0], false);
-				}else {
+				} else {
 					for (int i = 0; i < parameterizationCount; i++) {
 
 						appendParameter(nameBuffer, parameterizations[i], true);
