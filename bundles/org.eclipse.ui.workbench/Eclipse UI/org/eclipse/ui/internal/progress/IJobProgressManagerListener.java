@@ -10,18 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import java.util.Collection;
-
 /**
  * The IJobProgressManagerListener is a class that listeners to the JobProgressManager.
  */
 interface IJobProgressManagerListener {
 
     /**
-	 * Refresh the viewer as a result of an addition of info.
-	 *
-	 * @param info
-	 */
+     * Refresh the viewer as a result of an addition of info.
+     * @param info
+     */
     void addJob(final JobInfo info);
 
     /**
@@ -43,11 +40,10 @@ interface IJobProgressManagerListener {
     public void refreshGroup(GroupInfo info);
 
     /**
-	 * Refresh the viewer for all jobs.
-	 *
-	 * @param infos
-	 */
-	void refreshAll(Collection<JobInfo> infos);
+     * Refresh the viewer for all jobs.
+     * @param info
+     */
+    void refreshAll();
 
     /**
      * Refresh the viewer as a result of a removal of info.
@@ -56,9 +52,14 @@ interface IJobProgressManagerListener {
     void removeJob(final JobInfo info);
 
     /**
-	 * Refresh the viewer as a result of a removal of group.
-	 * 
-	 * @param group
-	 */
+     * Refresh the viewer as a result of a removal of group.
+     * @param info
+     */
     void removeGroup(final GroupInfo group);
+
+    /**
+     * Return whether or not this listener shows debug information.
+     * @return boolean
+     */
+    boolean showsDebug();
 }

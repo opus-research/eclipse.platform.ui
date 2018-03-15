@@ -70,7 +70,7 @@ public abstract class ProgressContentProvider implements
     	if(!canShowDebug) {
 			return false;
 		}
-		return ProgressManager.getInstance().showSystemJobs();
+    	return ProgressViewUpdater.getSingleton().debug;
 
     }
 

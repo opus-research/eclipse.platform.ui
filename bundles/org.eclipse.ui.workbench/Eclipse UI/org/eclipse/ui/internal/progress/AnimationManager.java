@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -127,7 +128,7 @@ public class AnimationManager {
 
     private IJobProgressManagerListener getProgressListener() {
         return new IJobProgressManagerListener() {
-			Set jobs = new HashSet();
+            Set jobs = Collections.synchronizedSet(new HashSet());
 
             @Override
 			public void addJob(JobInfo info) {
@@ -145,17 +146,24 @@ public class AnimationManager {
             }
 
             @Override
-			public void refreshAll(Collection<JobInfo> infos) {
+			public void refreshAll() {
+                ProgressManager manager = ProgressManager.getInstance();
                 jobs.clear();
                 setAnimated(false);
-				for (JobInfo info : infos) {
-					addJob(info);
+                JobInfo[] currentInfos = manager.getJobInfos(showsDebug());
+                for (int i = 0; i < currentInfos.length; i++) {
+                    addJob(currentInfos[i]);
                 }
             }
 
             @Override
 			public void removeJob(JobInfo info) {
                 decrementJobCount(info.getJob());
+            }
+
+            @Override
+			public boolean showsDebug() {
+                return false;
             }
 
             private void incrementJobCount(JobInfo info) {

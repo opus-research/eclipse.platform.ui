@@ -13,7 +13,6 @@
 package org.eclipse.ui.internal.progress;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -225,12 +224,14 @@ public class TaskBarProgressManager {
 			}
 
 			@Override
-			public void refreshAll(Collection<JobInfo> infos) {
+			public void refreshAll() {
+				ProgressManager manager = ProgressManager.getInstance();
 				jobs.clear();
 				jobInfoMap.clear();
 				setAnimated(false);
-				for (JobInfo info : infos) {
-					addJob(info);
+				JobInfo[] currentInfos = manager.getJobInfos(showsDebug());
+				for (int i = 0; i < currentInfos.length; i++) {
+					addJob(currentInfos[i]);
 				}
 			}
 
@@ -241,6 +242,11 @@ public class TaskBarProgressManager {
 				if (jobs.isEmpty()) {
 					setAnimated(false);
 				}
+			}
+
+			@Override
+			public boolean showsDebug() {
+				return false;
 			}
 
 			/**

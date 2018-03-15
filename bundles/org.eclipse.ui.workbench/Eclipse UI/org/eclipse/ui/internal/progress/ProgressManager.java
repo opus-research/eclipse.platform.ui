@@ -30,6 +30,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
@@ -58,14 +63,12 @@ import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.EventLoopProgressMonitor;
 import org.eclipse.ui.internal.dialogs.WorkbenchDialogBlockedHandler;
 import org.eclipse.ui.internal.misc.Policy;
-import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.progress.WorkbenchJob;
@@ -91,8 +94,6 @@ public class ProgressManager extends ProgressProvider implements
 	public static final QualifiedName PROPERTY_IN_DIALOG = IProgressConstants.PROPERTY_IN_DIALOG;
 
 	private static final String ERROR_JOB = "errorstate.png"; //$NON-NLS-1$
-
-	private static final QualifiedName JOB_INFO = new QualifiedName(ProgressManager.class.getName(), "JOB_INFO"); //$NON-NLS-1$
 
 	static final String ERROR_JOB_KEY = "ERROR_JOB"; //$NON-NLS-1$
 
@@ -133,7 +134,7 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public static final String BLOCKED_JOB_KEY = "LOCKED_JOB"; //$NON-NLS-1$
 
-	final ConcurrentMap<Job, JobMonitor> runnableMonitors = new ConcurrentHashMap<>();
+	final Map runnableMonitors = Collections.synchronizedMap(new HashMap());
 
 	// A table that maps families to keys in the Jface image
 	// table
@@ -145,11 +146,9 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	private final INotificationListener notificationListener;
 
-	private final ConcurrentMap<JobInfo, Runnable> scheduledUpdates = new ConcurrentHashMap<>();
+	private final ConcurrentMap<JobInfo, ScheduledFuture<?>> scheduledUpdates = new ConcurrentHashMap<>();
 
-	private final Display display;
-
-	private boolean showSystemJobs;
+	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
 	private static final String IMAGE_KEY = "org.eclipse.ui.progress.images"; //$NON-NLS-1$
 
@@ -176,6 +175,28 @@ public class ProgressManager extends ProgressProvider implements
 				singleton.notificationListener);
 		singleton.shutdown();
 	}
+
+	private final Function<JobInfo, ScheduledFuture<?>> scheduleRefresh = new Function<JobInfo, ScheduledFuture<?>>() {
+
+		@Override
+		public ScheduledFuture<?> apply(JobInfo jobInfo) {
+			return executor.schedule(() -> {
+				scheduledUpdates.remove(jobInfo);
+				GroupInfo group = jobInfo.getGroupInfo();
+				if (group != null) {
+					refreshGroup(group);
+				}
+
+				Object[] listenersArray = listeners.getListeners();
+				for (int i = 0; i < listenersArray.length; i++) {
+					IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
+					if (!isCurrentDisplaying(jobInfo.getJob(), listener.showsDebug())) {
+						listener.refreshJobInfo(jobInfo);
+					}
+				}
+			}, 100, TimeUnit.MILLISECONDS);
+		}
+	};
 
 	/**
 	 * The JobMonitor is the inner class that handles the IProgressMonitor
@@ -204,7 +225,7 @@ public class ProgressManager extends ProgressProvider implements
 		 */
 		void addProgressListener(IProgressMonitorWithBlocking monitor) {
 			listener = monitor;
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			TaskInfo currentTask = info.getTaskInfo();
 			if (currentTask != null) {
 				listener.beginTask(currentTaskName, currentTask.totalWork);
@@ -214,7 +235,7 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void beginTask(String taskName, int totalWork) {
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			info.beginTask(taskName, totalWork);
 			refreshJobInfo(info);
 			currentTaskName = taskName;
@@ -225,9 +246,10 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void done() {
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			info.clearTaskInfo();
 			info.clearChildren();
+			runnableMonitors.remove(job);
 			if (listener != null) {
 				listener.done();
 			}
@@ -235,7 +257,7 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void internalWorked(double work) {
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.addWork(work);
 				refreshJobInfo(info);
@@ -257,7 +279,7 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void setCanceled(boolean value) {
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			// Don't bother cancelling twice
 			if (value && !info.isCanceled()) {
 				info.cancel();
@@ -270,7 +292,7 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void setTaskName(String taskName) {
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			if (info.hasTaskInfo()) {
 				info.setTaskName(taskName);
 			} else {
@@ -290,7 +312,7 @@ public class ProgressManager extends ProgressProvider implements
 			if (name == null) {
 				return;
 			}
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			info.clearChildren();
 			info.addSubTask(name);
 			refreshJobInfo(info);
@@ -306,7 +328,7 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void clearBlocked() {
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(null);
 			refreshJobInfo(info);
 			if (listener != null) {
@@ -316,16 +338,12 @@ public class ProgressManager extends ProgressProvider implements
 
 		@Override
 		public void setBlocked(IStatus reason) {
-			JobInfo info = internalGetJobInfo(job);
+			JobInfo info = getJobInfo(job);
 			info.setBlockedStatus(reason);
 			refreshJobInfo(info);
 			if (listener != null) {
 				listener.setBlocked(reason);
 			}
-		}
-
-		private JobInfo internalGetJobInfo(Job job) {
-			return (JobInfo) job.getProperty(JOB_INFO);
 		}
 
 	}
@@ -346,9 +364,6 @@ public class ProgressManager extends ProgressProvider implements
 		Job.getJobManager().setProgressProvider(this);
 		Job.getJobManager().addJobChangeListener(this.changeListener);
 		StatusManager.getManager().addListener(notificationListener);
-
-		this.display = Display.getCurrent();
-		showSystemJobs = PrefUtil.getAPIPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.SHOW_SYSTEM_JOBS);
 	}
 
 	private void setUpImages() {
@@ -392,10 +407,8 @@ public class ProgressManager extends ProgressProvider implements
 
 			@Override
 			public void aboutToRun(IJobChangeEvent event) {
-				JobInfo info = jobs.get(event.getJob());
-				if (info != null) {
-					refreshJobInfo(info);
-				}
+				JobInfo info = getJobInfo(event.getJob());
+				refreshJobInfo(info);
 				Iterator startListeners = busyListenersForJob(event.getJob())
 						.iterator();
 				while (startListeners.hasNext()) {
@@ -410,15 +423,16 @@ public class ProgressManager extends ProgressProvider implements
 				if (!PlatformUI.isWorkbenchRunning()) {
 					return;
 				}
-				final Job job = event.getJob();
-				Iterator startListeners = busyListenersForJob(job)
+				Iterator startListeners = busyListenersForJob(event.getJob())
 						.iterator();
 				while (startListeners.hasNext()) {
-					IJobBusyListener next = (IJobBusyListener) startListeners.next();
-					next.decrementBusy(job);
+					IJobBusyListener next = (IJobBusyListener) startListeners
+							.next();
+					next.decrementBusy(event.getJob());
 				}
 
-				JobInfo info = removeJobInfo(job);
+				final JobInfo info = getJobInfo(event.getJob());
+				removeJobInfo(info);
 
 				/*
 				 * Only report severe errors to the StatusManager if the error
@@ -434,14 +448,21 @@ public class ProgressManager extends ProgressProvider implements
 					statusAdapter = new StatusAdapter(event.getJobGroupResult());
 				} else if (event.getResult() != null
 						&& event.getResult().getSeverity() == IStatus.ERROR
-						&& (job == null || job.getJobGroup() == null)) {
+						&& (event.getJob() == null || event.getJob().getJobGroup() == null)) {
 					statusAdapter = new StatusAdapter(event.getResult());
-					statusAdapter.addAdapter(Job.class, job);
+					statusAdapter.addAdapter(Job.class, event.getJob());
 				}
 				if (statusAdapter != null) {
-					if (job.getProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY) == Boolean.TRUE) {
-						statusAdapter.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-						StatusAdapterHelper.getInstance().putStatusAdapter(info, statusAdapter);
+					if (event
+							.getJob()
+							.getProperty(
+									IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY) == Boolean.TRUE) {
+						statusAdapter
+								.setProperty(
+										IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY,
+										Boolean.TRUE);
+						StatusAdapterHelper.getInstance().putStatusAdapter(
+								info, statusAdapter);
 					}
 
 					StatusManager.getManager().handle(statusAdapter, StatusManager.SHOW);
@@ -450,45 +471,53 @@ public class ProgressManager extends ProgressProvider implements
 
 			@Override
 			public void scheduled(IJobChangeEvent event) {
-				final Job job = event.getJob();
-				JobInfo info = getOrCreateJobInfo(job);
-				display.asyncExec(() -> {
-					if (shouldDisplay(info.getJob(), showSystemJobs)) {
-						for (IJobProgressManagerListener listener : listeners) {
-							listener.addJob(info);
-						}
-					}
-				});
-
-				if (job.isUser()) {
-					if (!shouldRunInBackground()) {
-						WorkbenchJob showJob = new WorkbenchJob(ProgressMessages.ProgressManager_showInDialogName) {
+				updateFor(event);
+				if (event.getJob().isUser()) {
+					boolean noDialog = shouldRunInBackground();
+					if (!noDialog) {
+						final IJobChangeEvent finalEvent = event;
+						WorkbenchJob showJob = new WorkbenchJob(
+								ProgressMessages.ProgressManager_showInDialogName) {
 							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) {
-								showInDialog(null, job);
+							public IStatus runInUIThread(
+									IProgressMonitor monitor) {
+								showInDialog(null, finalEvent.getJob());
 								return Status.OK_STATUS;
 							}
 						};
 						showJob.setSystem(true);
 						showJob.schedule();
+						return;
 					}
+				}
+			}
+
+			/**
+			 * Update the listeners for the receiver for the event.
+			 *
+			 * @param event
+			 */
+			private void updateFor(IJobChangeEvent event) {
+				if (isInfrastructureJob(event.getJob())) {
+					return;
+				}
+				if (jobs.containsKey(event.getJob())) {
+					refreshJobInfo(getJobInfo(event.getJob()));
+				} else {
+					addJobInfo(new JobInfo(event.getJob()));
 				}
 			}
 
 			@Override
 			public void awake(IJobChangeEvent event) {
-				JobInfo jobInfo = jobs.get(event.getJob());
-				if (jobInfo != null) {
-					refreshJobInfo(jobInfo);
-				}
+				updateFor(event);
 			}
 
 			@Override
 			public void sleeping(IJobChangeEvent event) {
-				JobInfo jobInfo = jobs.get(event.getJob());
-				if (jobInfo != null) {
-					sleepJobInfo(jobInfo);
-				}
+
+				if (jobs.containsKey(event.getJob()))// Are we showing this?
+					sleepJobInfo(getJobInfo(event.getJob()));
 			}
 		};
 	}
@@ -499,20 +528,24 @@ public class ProgressManager extends ProgressProvider implements
 	 *
 	 * @param info
 	 */
-	void sleepJobInfo(JobInfo info) {
+	protected void sleepJobInfo(JobInfo info) {
+		if (isInfrastructureJob(info.getJob()))
+			return;
+
 		GroupInfo group = info.getGroupInfo();
 		if (group != null) {
 			sleepGroup(group,info);
 		}
 
-		if (!isNeverDisplaying(info.getJob(), showSystemJobs)) {
-			for (IJobProgressManagerListener listener : listeners) {
-				if (showSystemJobs)
-					listener.refreshJobInfo(info);
-				else
-					listener.removeJob(info);
+		for (IJobProgressManagerListener listener : listeners) {
+			// Is this one the user never sees?
+			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
+				continue;
+			if (listener.showsDebug())
+				listener.refreshJobInfo(info);
+			else
+				listener.removeJob(info);
 
-			}
 		}
 	}
 
@@ -521,13 +554,15 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param group
 	 */
 	private void sleepGroup(GroupInfo group, JobInfo info) {
-		if (!isNeverDisplaying(info.getJob(), showSystemJobs)) {
-			for (IJobProgressManagerListener listener : listeners) {
-				if (group.isActive())
-					listener.refreshGroup(group);
-				else
-					listener.removeGroup(group);
-			}
+		for (IJobProgressManagerListener listener : listeners) {
+
+			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
+				continue;
+
+			if (listener.showsDebug() || group.isActive())
+				listener.refreshGroup(group);
+			else
+				listener.removeGroup(group);
 		}
 	}
 
@@ -574,7 +609,21 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return IProgressMonitor
 	 */
 	public JobMonitor progressFor(Job job) {
-		return runnableMonitors.computeIfAbsent(job, JobMonitor::new);
+		// Not thread-safe before fix for bug 445802. Now that we have a
+		// ConcurrentMap, we should probably replace the body of this method by
+		// return jobs.computeIfAbsent(job, JobInfo::new);
+		// but it degrades performance for about ~12%). As I don't know if the
+		// lack of thread-safety causes issues, I kept the method as is.
+		synchronized (runnableMonitors) {
+			JobMonitor monitor = (JobMonitor) runnableMonitors.get(job);
+			if (monitor == null) {
+				monitor = new JobMonitor(job);
+				runnableMonitors.put(job, monitor);
+			}
+
+			return monitor;
+		}
+
 	}
 
 	/**
@@ -602,12 +651,24 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param job
 	 * @return JobInfo
 	 */
-	JobInfo getOrCreateJobInfo(Job job) {
-		return jobs.computeIfAbsent(job, j -> {
-			JobInfo info = new JobInfo(job);
-			job.setProperty(JOB_INFO, info);
-			return info;
-		});
+	JobInfo getJobInfo(Job job) {
+		JobInfo info = internalGetJobInfo(job);
+		if (info == null) {
+			info = new JobInfo(job);
+			jobs.put(job, info);
+		}
+		return info;
+	}
+
+	/**
+	 * Return an existing job info for the given Job or <code>null</code> if
+	 * there isn't one.
+	 *
+	 * @param job
+	 * @return JobInfo
+	 */
+	JobInfo internalGetJobInfo(Job job) {
+		return jobs.get(job);
 	}
 
 	/**
@@ -616,31 +677,10 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param info
 	 */
 	public void refreshJobInfo(JobInfo info) {
-		// the update of scheduledUpdates map is not atomic, but we don't care.
-		// At worst, we will schedule a few more refresh in the UI job that we
-		// should, but it's less expensive than doing a
-		// ConcurrentMap#computeIfAbsent().
-		if (!scheduledUpdates.containsKey(info)) {
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					scheduledUpdates.remove(info);
-					GroupInfo group = info.getGroupInfo();
-					if (group != null) {
-						refreshGroup(group);
-					}
-
-					if (shouldDisplay(info.getJob(), showSystemJobs)) {
-						for (IJobProgressManagerListener listener : listeners) {
-							listener.refreshJobInfo(info);
-						}
-					}
-				}
-			};
-			scheduledUpdates.put(info, runnable);
-			display.asyncExec(runnable);
-		}
-		// scheduledUpdates.computeIfAbsent(info, scheduleRefresh);
+		// Do not use a lambda instead of scheduleRefresh object.
+		// it causes too many useless calls LambdaForm$MH.linkToTargetMethod
+		// which leads to a lot of wasted runtime
+		scheduledUpdates.computeIfAbsent(info, scheduleRefresh);
 	}
 
 	/**
@@ -649,11 +689,10 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param info
 	 */
 	public void refreshGroup(GroupInfo info) {
-		display.asyncExec(() -> {
-			for (IJobProgressManagerListener listener : listeners) {
-				listener.refreshGroup(info);
-			}
-		});
+
+		for (IJobProgressManagerListener listener : listeners) {
+			listener.refreshGroup(info);
+		}
 	}
 
 	/**
@@ -663,12 +702,10 @@ public class ProgressManager extends ProgressProvider implements
 	public void refreshAll() {
 
 		pruneStaleJobs();
-		Collection<JobInfo> infos = jobs.values();
-		display.asyncExec(() -> {
-			for (IJobProgressManagerListener listener : listeners) {
-				listener.refreshAll(infos);
-			}
-		});
+		for (IJobProgressManagerListener listener : listeners) {
+			listener.refreshAll();
+		}
+
 	}
 
 	/**
@@ -677,20 +714,16 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param info
 	 *            JobInfo
 	 */
-	private JobInfo removeJobInfo(Job job) {
-		JobInfo info = jobs.remove(job);
-		if (info != null) {
-			runnableMonitors.remove(job);
+	public void removeJobInfo(JobInfo info) {
+		Job job = info.getJob();
+		jobs.remove(job);
+		runnableMonitors.remove(job);
 
-			if (shouldDisplay(job, showSystemJobs)) {
-				display.asyncExec(() -> {
-					for (IJobProgressManagerListener listener : listeners) {
-						listener.removeJob(info);
-					}
-				});
+		for (IJobProgressManagerListener listener : listeners) {
+			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+				listener.removeJob(info);
 			}
 		}
-		return info;
 	}
 
 	/**
@@ -700,23 +733,40 @@ public class ProgressManager extends ProgressProvider implements
 	 *            GroupInfo
 	 */
 	public void removeGroup(GroupInfo group) {
-		display.asyncExec(() -> {
-			for (IJobProgressManagerListener listener : listeners) {
-				listener.removeGroup(group);
+		for (IJobProgressManagerListener listener : listeners) {
+			listener.removeGroup(group);
+		}
+	}
+
+	/**
+	 * Refresh the content providers as a result of an addition of info.
+	 *
+	 * @param info
+	 */
+	public void addJobInfo(JobInfo info) {
+		GroupInfo group = info.getGroupInfo();
+		if (group != null) {
+			refreshGroup(group);
+		}
+
+		jobs.put(info.getJob(), info);
+		for (IJobProgressManagerListener listener : listeners) {
+			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
+				listener.addJob(info);
 			}
-		});
+		}
 	}
 
 	/**
 	 * Return whether or not this job is currently displayable.
 	 *
 	 * @param job
-	 * @param showAll
+	 * @param debug
 	 *            If the listener is in debug mode.
 	 * @return boolean <code>true</code> if the job is not displayed.
 	 */
-	private boolean shouldDisplay(Job job, boolean showAll) {
-		return !isNeverDisplaying(job, showAll) && job.getState() != Job.SLEEPING;
+	boolean isCurrentDisplaying(Job job, boolean debug) {
+		return isNeverDisplaying(job, debug) || job.getState() == Job.SLEEPING;
 	}
 
 	/**
@@ -724,17 +774,40 @@ public class ProgressManager extends ProgressProvider implements
 	 * debug.
 	 *
 	 * @param job
-	 * @param showAll
+	 * @param debug
 	 * @return boolean
 	 */
-	boolean isNeverDisplaying(Job job, boolean showAll) {
-		if (Policy.DEBUG_SHOW_ALL_JOBS) {
-			return false;
-		} else if (showAll) {
-			return false;
-		} else {
-			return job.isSystem();
+	boolean isNeverDisplaying(Job job, boolean debug) {
+		if (isInfrastructureJob(job)) {
+			return true;
 		}
+		if (debug)
+			return false;
+
+		return job.isSystem();
+	}
+
+	/**
+	 * Return whether or not this job is an infrastructure job.
+	 *
+	 * @param job
+	 * @return boolean <code>true</code> if it is never displayed.
+	 */
+	private boolean isInfrastructureJob(Job job) {
+		if (Policy.DEBUG_SHOW_ALL_JOBS)
+			return false;
+		return job.getProperty(ProgressManagerUtil.INFRASTRUCTURE_PROPERTY) != null;
+	}
+
+	/**
+	 * Return the current job infos filtered on debug mode.
+	 *
+	 * @param debug
+	 * @return JobInfo[]
+	 */
+	public JobInfo[] getJobInfos(boolean debug) {
+		return jobs.entrySet().stream().filter(entry -> !isCurrentDisplaying(entry.getKey(), debug))
+				.toArray(JobInfo[]::new);
 	}
 
 	/**
@@ -743,15 +816,24 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param debug
 	 * @return JobTreeElement[]
 	 */
-	JobTreeElement[] getRootElements(boolean debug) {
-		return jobs.entrySet().stream().filter(e -> shouldDisplay(e.getKey(), debug)).map(e -> {
-			JobInfo jobInfo = e.getValue();
+	public JobTreeElement[] getRootElements(boolean debug) {
+		return jobs.entrySet().stream().filter(entry -> !isCurrentDisplaying(entry.getKey(), debug)).map(entry -> {
+			JobInfo jobInfo = entry.getValue();
 			GroupInfo group = jobInfo.getGroupInfo();
 			if (group == null) {
 				return jobInfo;
 			}
 			return group;
 		}).distinct().toArray(JobTreeElement[]::new);
+	}
+
+	/**
+	 * Return whether or not there are any jobs being displayed.
+	 *
+	 * @return boolean
+	 */
+	public boolean hasJobInfos() {
+		return !jobs.isEmpty();
 	}
 
 	/**
@@ -874,6 +956,7 @@ public class ProgressManager extends ProgressProvider implements
 		listeners.clear();
 		Job.getJobManager().setProgressProvider(null);
 		Job.getJobManager().removeJobChangeListener(this.changeListener);
+		executor.shutdown();
 	}
 
 	@Override
@@ -887,7 +970,7 @@ public class ProgressManager extends ProgressProvider implements
 		JobMonitor monitor = progressFor(job);
 		if (group instanceof GroupInfo) {
 			GroupInfo groupInfo = (GroupInfo) group;
-			JobInfo jobInfo = getOrCreateJobInfo(job);
+			JobInfo jobInfo = getJobInfo(job);
 			jobInfo.setGroupInfo(groupInfo);
 			jobInfo.setTicks(ticks);
 			groupInfo.addJobInfo(jobInfo);
@@ -1101,7 +1184,11 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return boolean
 	 */
 	boolean checkForStaleness(Job job) {
-		return job.getState() == Job.NONE && removeJobInfo(job) != null;
+		if (job.getState() == Job.NONE) {
+			removeJobInfo(getJobInfo(job));
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -1120,8 +1207,10 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param showSystem
 	 */
 	public void setShowSystemJobs(boolean showSystem) {
-		this.showSystemJobs = showSystem;
-		refreshAll();
+		ProgressViewUpdater updater = ProgressViewUpdater.getSingleton();
+		updater.debug = showSystem;
+		updater.refreshAll();
+
 	}
 
 	private class RunnableWithStatus implements Runnable {
@@ -1187,12 +1276,5 @@ public class ProgressManager extends ProgressProvider implements
 			return status;
 		}
 
-	}
-
-	/**
-	 * @return
-	 */
-	boolean showSystemJobs() {
-		return showSystemJobs;
 	}
 }
