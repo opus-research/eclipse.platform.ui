@@ -10,7 +10,7 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, 491389
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, Bug 491529
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -319,8 +319,7 @@ public abstract class QuickAccessContents {
 
 		int maxCount = computeNumberOfItems();
 		int[] indexPerProvider = new int[providers.length];
-		int countPerProvider = Math.min(maxCount / 4,
-				INITIAL_COUNT_PER_PROVIDER);
+		int countPerProvider = INITIAL_COUNT_PER_PROVIDER;
 		int prevPick = 0;
 		int countTotal = 0;
 		boolean perfectMatchAdded = true;
@@ -339,7 +338,7 @@ public abstract class QuickAccessContents {
 			Matcher categoryMatcher = getCategoryPattern().matcher(filter);
 			if (categoryMatcher.matches()) {
 				category = categoryMatcher.group(1);
-				filter = categoryMatcher.group(2);
+				filter = category + " " + categoryMatcher.group(2); //$NON-NLS-1$
 			}
 			for (int i = 0; i < providers.length
 					&& (showAllMatches || countTotal < maxCount); i++) {
@@ -360,7 +359,7 @@ public abstract class QuickAccessContents {
 					List<QuickAccessEntry> poorFilterMatches = new ArrayList<>();
 
 					// count number or previous picks
-					if (isPreviousPickProvider) {
+					if ((provider instanceof PreviousPicksProvider)) {
 						prevPick = sortedElements.length;
 					}
 
@@ -464,7 +463,6 @@ public abstract class QuickAccessContents {
 		}
 		return categoryPattern;
 	}
-
 
 	/**
 	 * @param provider
