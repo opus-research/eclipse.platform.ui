@@ -477,8 +477,7 @@ public class BookmarkNavigator extends ViewPart {
         IMemento selectionMem = memento.getChild(TAG_SELECTION);
         if (selectionMem != null) {
             ArrayList selectionList = new ArrayList();
-            IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
-            for (IMemento markerMem : markerMems) {
+			for (IMemento markerMem : selectionMem.getChildren(TAG_MARKER)) {
                 try {
                     long id = Long.parseLong(markerMem.getString(TAG_ID));
                     IResource resource = root.findMember(markerMem
@@ -536,11 +535,10 @@ public class BookmarkNavigator extends ViewPart {
                 .toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);
-            for (Object marker2 : markers) {
+            for (Object currentMarker : markers) {
                 IMemento elementMem = selectionMem.createChild(TAG_MARKER);
-                IMarker marker = (IMarker) marker2;
-                elementMem.putString(TAG_RESOURCE, marker.getResource()
-                        .getFullPath().toString());
+                IMarker marker = (IMarker) currentMarker;
+				elementMem.putString(TAG_RESOURCE, marker.getResource().getFullPath().toString());
                 elementMem.putString(TAG_ID, String.valueOf(marker.getId()));
             }
         }
@@ -702,9 +700,9 @@ public class BookmarkNavigator extends ViewPart {
         IMarker[] markerData = (IMarker[]) getClipboard().getContents(transfer);
         boolean canPaste = false;
         if (markerData != null) {
-            for (IMarker element : markerData) {
+            for (IMarker marker : markerData) {
                 try {
-                    if (element.getType().equals(IMarker.BOOKMARK)) {
+                    if (marker.getType().equals(IMarker.BOOKMARK)) {
                         canPaste = true;
                         break;
                     }

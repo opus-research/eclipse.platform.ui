@@ -590,10 +590,8 @@ public class PathVariablesGroup {
      * (Re-)Initialize collections used to mantain temporary variable state.
      */
     private void initTemporaryState() {
-        String[] varNames = pathVariableManager.getPathVariableNames();
-
         tempPathVariables.clear();
-        for (String varName : varNames) {
+		for (String varName : pathVariableManager.getPathVariableNames()) {
         	// hide the PARENT variable
         	if (varName.equals(PARENT_VARIABLE_NAME))
         		continue;
@@ -688,9 +686,8 @@ public class PathVariablesGroup {
      */
     private void removeSelectedVariables() {
         // remove each selected element
-        int[] selectedIndices = variableTable.getTable().getSelectionIndices();
-        for (int selectedIndice : selectedIndices) {
-            TableItem selectedItem = variableTable.getTable().getItem(selectedIndice);
+		for (int selectedIndex : variableTable.getTable().getSelectionIndices()) {
+			TableItem selectedItem = variableTable.getTable().getItem(selectedIndex);
             String varName = (String) selectedItem.getData();
             removedVariableNames.add(varName);
             tempPathVariables.remove(varName);
@@ -700,9 +697,8 @@ public class PathVariablesGroup {
     }
 
     private boolean canChangeSelection() {
-        int[] selectedIndices = variableTable.getTable().getSelectionIndices();
-        for (int selectedIndice : selectedIndices) {
-            TableItem selectedItem = variableTable.getTable().getItem(selectedIndice);
+		for (int selectedIndex : variableTable.getTable().getSelectionIndices()) {
+			TableItem selectedItem = variableTable.getTable().getItem(selectedIndex);
             String varName = (String) selectedItem.getData();
             if (isBuiltInVariable(varName))
                 return false;

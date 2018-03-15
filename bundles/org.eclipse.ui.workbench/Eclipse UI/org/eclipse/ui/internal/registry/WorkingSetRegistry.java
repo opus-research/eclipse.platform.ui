@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -209,8 +208,7 @@ public class WorkingSetRegistry implements IExtensionChangeHandler {
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		WorkingSetRegistryReader reader = new WorkingSetRegistryReader(this);
-		IConfigurationElement[] elements = extension.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
+		for (IConfigurationElement element : extension.getConfigurationElements()) {
 			reader.readElement(element);
 		}
 	}

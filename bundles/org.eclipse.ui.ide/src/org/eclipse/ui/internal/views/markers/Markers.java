@@ -148,12 +148,11 @@ class Markers {
 			inChange = true;
 			if (builder.isShowingHierarchy()) {
 				Comparator<MarkerItem> comparator = builder.getComparator().getFieldsComparator();
-				for (MarkerCategory categorie : categories) {
+				for (MarkerCategory category : categories) {
 					if (monitor.isCanceled()) {
 						return false;
 					}
 					// sort various categories
-					MarkerCategory category = categorie;
 					category.children = null; // reset cached children
 					int avaliable = category.end - category.start + 1;
 					int effLimit = getShowingLimit(avaliable);
@@ -329,10 +328,10 @@ class Markers {
 	public MarkerItem getMarkerItem(IMarker marker) {
 		if (markerToEntryMap == null) {
 			markerToEntryMap = new HashMap<>();
-			for (MarkerEntry element : markerEntryArray) {
-				IMarker nextMarker = element.getMarker();
+			for (MarkerEntry markerEntry : markerEntryArray) {
+				IMarker nextMarker = markerEntry.getMarker();
 				if (nextMarker != null) {
-					markerToEntryMap.put(nextMarker, element);
+					markerToEntryMap.put(nextMarker, markerEntry);
 				}
 			}
 		}

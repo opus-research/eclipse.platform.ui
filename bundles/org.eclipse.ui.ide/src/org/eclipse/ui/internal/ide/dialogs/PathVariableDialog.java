@@ -394,8 +394,7 @@ public class PathVariableDialog extends TitleAreaDialog {
         	String resolveValue = URIUtil.toPath(resolvedURI).toOSString();
         	// Delete intermediate variables that might have been created as
         	// as a side effect of converting arbitrary relative paths to an internal string.
-        	String[] newVariables = pathVariableManager2.getPathVariableNames();
-        	for (String newVariable : newVariables) {
+			for (String newVariable : pathVariableManager2.getPathVariableNames()) {
         		boolean found = false;
             	for (String variable : variables) {
             		if (variable.equals(newVariable)) {

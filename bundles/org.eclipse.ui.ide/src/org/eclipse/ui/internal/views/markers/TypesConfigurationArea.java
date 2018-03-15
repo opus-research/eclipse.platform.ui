@@ -213,10 +213,9 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 	@Override
 	public void apply(MarkerFieldFilter filter) {
 		Collection<MarkerType> selectedTypes = new ArrayList<>();
-		Object[] elements = typesViewer.getCheckedElements();
-		for (Object element : elements) {
-			if (element instanceof MarkerTypeEntry) {
-				selectedTypes.add(((MarkerTypeEntry) element).getMarkerType());
+		for (Object checkedElement : typesViewer.getCheckedElements()) {
+			if (checkedElement instanceof MarkerTypeEntry) {
+				selectedTypes.add(((MarkerTypeEntry) checkedElement).getMarkerType());
 			}
 		}
 		MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) typesViewer.getInput();
@@ -303,9 +302,8 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 					return;
 				}
 
-				Object[] children = typesContentProvider.getChildren(parentType);
-				for (Object child : children) {// At least one
-					// different
+				for (Object child : typesContentProvider.getChildren(parentType)) {
+					// At least one different
 					if (typesViewer.getChecked(child) != checked) {
 						typesViewer.setGrayChecked(parentType, true);
 						return;
@@ -362,8 +360,7 @@ public class TypesConfigurationArea extends GroupFilterConfigurationArea {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Object[] elements = typesContentProvider.getElements(typesViewer.getInput());
-				for (Object element : elements) {
+				for (Object element : typesContentProvider.getElements(typesViewer.getInput())) {
 					typesViewer.setSubtreeChecked(element, checked);
 				}
 			}

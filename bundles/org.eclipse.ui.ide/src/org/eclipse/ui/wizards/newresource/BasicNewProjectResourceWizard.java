@@ -517,12 +517,9 @@ try {
 	 *            the id to query.
 	 * @since 3.0
 	 */
-	private static void addPerspectiveAndDescendants(List perspectiveIds,
-			String id) {
-		IPerspectiveRegistry registry = PlatformUI.getWorkbench()
-				.getPerspectiveRegistry();
-		IPerspectiveDescriptor[] perspectives = registry.getPerspectives();
-		for (IPerspectiveDescriptor perspective : perspectives) {
+	private static void addPerspectiveAndDescendants(List perspectiveIds, String id) {
+		IPerspectiveRegistry registry = PlatformUI.getWorkbench().getPerspectiveRegistry();
+		for (IPerspectiveDescriptor perspective : registry.getPerspectives()) {
 			// @issue illegal ref to workbench internal class;
 			// consider adding getOriginalId() as API on IPerspectiveDescriptor
 			PerspectiveDescriptor descriptor = ((PerspectiveDescriptor) perspective);

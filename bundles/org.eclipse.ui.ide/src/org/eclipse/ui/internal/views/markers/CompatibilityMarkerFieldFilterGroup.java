@@ -71,8 +71,7 @@ public class CompatibilityMarkerFieldFilterGroup extends MarkerFieldFilterGroup 
 		// Now initialize with the ProblemFilter
 		for (MarkerFieldFilter fieldFilter : fieldFilters) {
 			if (fieldFilter instanceof CompatibilityFieldFilter)
-				((CompatibilityFieldFilter) fieldFilter)
-						.initialize(problemFilter);
+				((CompatibilityFieldFilter) fieldFilter).initialize(problemFilter);
 		}
 	}
 

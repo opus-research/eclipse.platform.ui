@@ -143,8 +143,8 @@ class ScopeArea extends GroupFilterConfigurationArea {
 		 */
 		void setSelection(boolean selected) {
 			if (selected || (button.getSelection() && !selected)) {
-				for (Button button2 : buttons) {
-					button2.setSelection(false);
+				for (Button currentButton : buttons) {
+					currentButton.setSelection(false);
 				}
 				if (selected) {
 					setScope(MarkerFieldFilterGroup.ON_WORKING_SET);

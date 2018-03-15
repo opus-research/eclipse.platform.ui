@@ -68,16 +68,16 @@ public class CommonDropDescriptorManager {
 
 		Set<CommonDropAdapterDescriptor> foundDescriptors = new LinkedHashSet<CommonDropAdapterDescriptor>();
 		for (INavigatorContentDescriptor contentDescriptor : dropDescriptors.keySet()) {
-if (aContentService.isVisible(contentDescriptor.getId())
-			&& aContentService.isActive(contentDescriptor.getId())) {
-		List<CommonDropAdapterDescriptor> dropDescriptors = getDropDescriptors(contentDescriptor);
-		for (CommonDropAdapterDescriptor dropDescriptor : dropDescriptors) {
-if (dropDescriptor.isDropElementSupported(aDropTarget)) {
-		foundDescriptors.add(dropDescriptor);
-}
-}
-}
-}
+			if (aContentService.isVisible(contentDescriptor.getId())
+					&& aContentService.isActive(contentDescriptor.getId())) {
+				List<CommonDropAdapterDescriptor> dropDescriptors = getDropDescriptors(contentDescriptor);
+				for (CommonDropAdapterDescriptor dropDescriptor : dropDescriptors) {
+					if (dropDescriptor.isDropElementSupported(aDropTarget)) {
+						foundDescriptors.add(dropDescriptor);
+					}
+				}
+			}
+		}
 
 		if (foundDescriptors.isEmpty()) {
 			return NO_DESCRIPTORS;

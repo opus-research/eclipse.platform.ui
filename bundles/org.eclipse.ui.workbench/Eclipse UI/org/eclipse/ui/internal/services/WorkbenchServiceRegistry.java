@@ -136,8 +136,8 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 							handle, IExtensionTracker.REF_WEAK);
 
 			    	List serviceNames = new ArrayList();
-					for (IConfigurationElement serviceNameElement : serviceNameElements) {
-						String serviceName = serviceNameElement.getAttribute(IWorkbenchRegistryConstants.ATTR_SERVICE_CLASS);
+					for (IConfigurationElement configElement : serviceNameElements) {
+						String serviceName = configElement.getAttribute(IWorkbenchRegistryConstants.ATTR_SERVICE_CLASS);
 						if (factories.containsKey(serviceName)) {
 							WorkbenchPlugin.log("Factory already exists for " //$NON-NLS-1$
 									+ serviceName);
@@ -166,27 +166,23 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 	public AbstractSourceProvider[] getSourceProviders() {
 		ArrayList providers = new ArrayList();
 		IExtensionPoint ep = getExtensionPoint();
-		IConfigurationElement[] elements = ep.getConfigurationElements();
-		for (IConfigurationElement element : elements) {
-			if (element.getName().equals(
+		for (IConfigurationElement configElement : ep.getConfigurationElements()) {
+			if (configElement.getName().equals(
 					IWorkbenchRegistryConstants.TAG_SOURCE_PROVIDER)) {
 				try {
-					Object sourceProvider = element
+					Object sourceProvider = configElement
 							.createExecutableExtension(IWorkbenchRegistryConstants.ATTR_PROVIDER);
 					if (!(sourceProvider instanceof AbstractSourceProvider)) {
-						String attributeName = element
-								.getAttribute(IWorkbenchRegistryConstants.ATTR_PROVIDER);
+						String attributeName = configElement.getAttribute(IWorkbenchRegistryConstants.ATTR_PROVIDER);
 						final String message = "Source Provider '" + //$NON-NLS-1$
 								attributeName
 								+ "' should extend AbstractSourceProvider"; //$NON-NLS-1$
-						final IStatus status = new Status(IStatus.ERROR,
-								WorkbenchPlugin.PI_WORKBENCH, message);
+						final IStatus status = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, message);
 						WorkbenchPlugin.log(status);
 						continue;
 					}
 					providers.add(sourceProvider);
-					processVariables(element
-							.getChildren(IWorkbenchRegistryConstants.TAG_VARIABLE));
+					processVariables(configElement.getChildren(IWorkbenchRegistryConstants.TAG_VARIABLE));
 				} catch (CoreException e) {
 					StatusManager.getManager().handle(e.getStatus());
 				}
@@ -205,14 +201,12 @@ public class WorkbenchServiceRegistry implements IExtensionChangeHandler {
 	};
 
 	private void processVariables(IConfigurationElement[] children) {
-		for (IConfigurationElement element : children) {
-			String name = element
-					.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
+		for (IConfigurationElement configElement : children) {
+			String name = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
 			if (name == null || name.length() == 0) {
 				continue;
 			}
-			String level = element
-					.getAttribute(IWorkbenchRegistryConstants.ATT_PRIORITY_LEVEL);
+			String level = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_PRIORITY_LEVEL);
 			if (level == null || level.length() == 0) {
 				level = WORKBENCH_LEVEL;
 			} else {

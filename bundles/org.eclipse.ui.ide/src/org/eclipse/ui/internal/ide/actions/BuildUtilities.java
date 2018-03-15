@@ -49,19 +49,19 @@ public class BuildUtilities {
 	 */
 	public static IProject[] extractProjects(Object[] selection) {
 		HashSet projects = new HashSet();
-		for (Object element : selection) {
-			IResource resource = ResourceUtil.getResource(element);
+		for (Object currentSelection : selection) {
+			IResource resource = ResourceUtil.getResource(currentSelection);
 			if (resource != null) {
 				projects.add(resource.getProject());
 			} else {
-				ResourceMapping mapping = ResourceUtil.getResourceMapping(element);
+				ResourceMapping mapping = ResourceUtil.getResourceMapping(currentSelection);
 				if (mapping != null) {
 					IProject[] theProjects = mapping.getProjects();
 					for (IProject theProject : theProjects) {
 						projects.add(theProject);
 					}
 				} else {
-					Object marker = ResourceUtil.getAdapter(element, IMarker.class, false);
+					Object marker = ResourceUtil.getAdapter(currentSelection, IMarker.class, false);
 					if (marker instanceof IMarker) {
 						IProject project = ((IMarker) marker).getResource().getProject();
 						if (project != null) {
@@ -151,9 +151,8 @@ public class BuildUtilities {
 			}
 			try {
 				IProjectDescription description = projects[i].getDescription();
-				ICommand[] buildSpec = description.getBuildSpec();
-				for (ICommand element : buildSpec) {
-					if (element.isBuilding(trigger) == value) {
+				for (ICommand buildSpec : description.getBuildSpec()) {
+					if (buildSpec.isBuilding(trigger) == value) {
 						return true;
 					}
 				}
@@ -176,13 +175,11 @@ public class BuildUtilities {
 		}
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
 		for (IWorkbenchWindow window : windows) {
-			IWorkbenchPage[] pages = window.getPages();
-			for (IWorkbenchPage page : pages) {
+			for (IWorkbenchPage page : window.getPages()) {
 				if (projects == null) {
 					page.saveAllEditors(false);
 				} else {
-					IEditorPart[] editors = page.getDirtyEditors();
-					for (IEditorPart editor : editors) {
+					for (IEditorPart editor : page.getDirtyEditors()) {
 						IFile inputFile = ResourceUtil.getFile(editor.getEditorInput());
 						if (inputFile != null) {
 							if (projects.contains(inputFile.getProject())) {

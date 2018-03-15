@@ -446,9 +446,9 @@ public class IDEResourceInfoUtils {
 			log(e);
 			return new IFileStore[0];
 		}
-		for (IFileStore element : children) {
-			if (fileFilter.accept(element)) {
-				result.add(element);
+		for (IFileStore fileStore : children) {
+			if (fileFilter.accept(fileStore)) {
+				result.add(fileStore);
 			}
 		}
 		IFileStore[] stores = new IFileStore[result.size()];

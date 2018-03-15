@@ -229,10 +229,9 @@ public class ResourceFilterGroup {
 	class Filters extends FilterCopy {
 		public Filters(IContainer resource) {
 			try {
-				IResourceFilterDescription[] tmp = resource.getFilters();
 				children = new LinkedList();
-				for (IResourceFilterDescription element : tmp) {
-					FilterCopy copy = new FilterCopy(UIResourceFilterDescription.wrap(element));
+				for (IResourceFilterDescription filter : resource.getFilters()) {
+					FilterCopy copy = new FilterCopy(UIResourceFilterDescription.wrap(filter));
 					copy = convertLegacyMatchers(copy);
 					addChild(copy);
 				}
@@ -364,10 +363,9 @@ public class ResourceFilterGroup {
 				ArrayList list = new ArrayList();
 				int mask = parentElement.equals(includeOnlyGroup) ? IResourceFilterDescription.INCLUDE_ONLY:
 								IResourceFilterDescription.EXCLUDE_ALL;
-				FilterCopy[] children = filters.getChildren();
-				for (FilterCopy element : children) {
-					if ((element.getType() & mask) != 0)
-						list.add(element);
+				for (FilterCopy filterCopy : filters.getChildren()) {
+					if ((filterCopy.getType() & mask) != 0)
+						list.add(filterCopy);
 				}
 				return list.toArray();
 			}
@@ -919,23 +917,23 @@ public class ResourceFilterGroup {
 			FilterCopy[] toDrop = (FilterCopy[]) data;
 
 			if (target instanceof FilterCopy) {
-				for (FilterCopy element : toDrop)
-					if (element.equals(target)
-							|| ((FilterCopy) target).hasParent(element))
+				for (FilterCopy filterToDrop : toDrop)
+					if (filterToDrop.equals(target)
+							|| ((FilterCopy) target).hasParent(filterToDrop))
 						return false;
 			}
 
-			for (FilterCopy element : toDrop) {
+			for (FilterCopy filterToDrop : toDrop) {
 				if (target instanceof Filters)
-					filters.add(element);
+					filters.add(filterToDrop);
 				if (target instanceof String) {
-					FilterTypeUtil.setValue(element, FilterTypeUtil.MODE, target.equals(includeOnlyGroup) ? 0 : 1);
-					addToTopLevelFilters(element);
+					FilterTypeUtil.setValue(filterToDrop, FilterTypeUtil.MODE, target.equals(includeOnlyGroup) ? 0 : 1);
+					addToTopLevelFilters(filterToDrop);
 				}
 				if (target instanceof FilterCopy)
-					((FilterCopy) target).addChild(element);
+					((FilterCopy) target).addChild(filterToDrop);
 				filterView.refresh();
-				filterView.reveal(element);
+				filterView.reveal(filterToDrop);
 			}
 			return true;
 		}
@@ -1128,8 +1126,7 @@ public class ResourceFilterGroup {
 				else {
 					int mask = element.equals(includeOnlyGroup) ? IResourceFilterDescription.INCLUDE_ONLY:
 						IResourceFilterDescription.EXCLUDE_ALL;
-					FilterCopy[] children = filters.getChildren();
-					for (FilterCopy filterCopy : children) {
+					for (FilterCopy filterCopy : filters.getChildren()) {
 						if ((filterCopy.getType() & mask) != 0)
 							filters.removeChild(filterCopy);
 					}
@@ -2433,9 +2430,9 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	@Override
 	public void dispose() {
 		Widget list[] = new Widget[] {multiKey, multiOperator, multiArgumentComposite, stringArgumentComposite, stringTextArgumentComposite, arguments, argumentsLabel, argumentsCaseSensitive, argumentsRegularExpresion, attributeStringArgumentComposite, description, conditionComposite, descriptionComposite, dummyLabel1, dummyLabel2};
-		for (Widget element : list) {
-			if (element != null) {
-				element.dispose();
+		for (Widget widget : list) {
+			if (widget != null) {
+				widget.dispose();
 			}
 		}
 		multiKey = null;
@@ -3119,9 +3116,9 @@ class DefaultCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 	@Override
 	public void dispose() {
 		Widget list[] = new Widget[] {arguments, argumentsLabel, description};
-		for (Widget element : list) {
-			if (element != null) {
-				element.dispose();
+		for (Widget widget : list) {
+			if (widget != null) {
+				widget.dispose();
 			}
 		}
 		arguments = null;
@@ -3262,17 +3259,17 @@ class MultiMatcherLocalization {
 	};
 
 	static public String getLocalMultiMatcherKey(String key) {
-		for (String[] element : multiMatcherKey) {
-			if (element[0].equals(key))
-				return element[1];
+		for (String[] matcherKey : multiMatcherKey) {
+			if (matcherKey[0].equals(key))
+				return matcherKey[1];
 		}
 		return null;
 	}
 
 	static public String getMultiMatcherKey(String local) {
-		for (String[] element : multiMatcherKey) {
-			if (element[1].equals(local))
-				return element[0];
+		for (String[] matcherKey : multiMatcherKey) {
+			if (matcherKey[1].equals(local))
+				return matcherKey[0];
 		}
 		return null;
 	}

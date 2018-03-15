@@ -503,8 +503,8 @@ return true;
 	}
 
 	boolean areFixed(IResource[] res) {
-		for (IResource re : res) {
-			String fullPath = re.getFullPath().toPortableString();
+		for (IResource resource : res) {
+			String fullPath = resource.getFullPath().toPortableString();
 			if (!fFixedResources.containsKey(fullPath))
 				return false;
 		}
@@ -947,8 +947,7 @@ return true;
 	void reparent(IResource[] resources) {
 		boolean changed = false;
 
-		for (IResource resource2 : resources) {
-			IResource resource = resource2;
+		for (IResource resource : resources) {
 			boolean isBroken;
 			try {
 				isBroken = !exists(resource);

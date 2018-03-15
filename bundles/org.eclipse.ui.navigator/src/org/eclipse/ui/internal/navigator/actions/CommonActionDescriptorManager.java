@@ -189,9 +189,8 @@ public class CommonActionDescriptorManager {
 					.toArray(new CommonActionProviderDescriptor[unresolvedDependentDescriptors
 							.size()]);
 			for (CommonActionProviderDescriptor unresolvedDescriptor : unresolvedDescriptors) {
-				errorMessage
-						.append(
-								"\nUnresolved dependency specified for actionProvider: ").append(unresolvedDescriptor.getDefinedId()); //$NON-NLS-1$
+				errorMessage.append("\nUnresolved dependency specified for actionProvider: ") //$NON-NLS-1$
+						.append(unresolvedDescriptor.getDefinedId());
 			}
 
 			NavigatorPlugin.log(IStatus.WARNING, 0, errorMessage.toString(),
@@ -333,7 +332,7 @@ public class CommonActionDescriptorManager {
 					for (IConfigurationElement actionProvider : actionProviders) {
 						if(defaultEnablement == null) {
 							NavigatorPlugin.logError(0,
-											"Disabling actionProvider: " + actionProvider.getAttribute(ATT_ID), null); //$NON-NLS-1$
+									"Disabling actionProvider: " + actionProvider.getAttribute(ATT_ID), null); //$NON-NLS-1$
 						} else {
 							SafeRunner.run(new AddProviderSafeRunner(actionProvider, defaultEnablement, defaultPriority, anElement));
 						}

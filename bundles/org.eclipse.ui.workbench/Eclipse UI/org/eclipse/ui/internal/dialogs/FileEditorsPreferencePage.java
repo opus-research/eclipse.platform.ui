@@ -316,8 +316,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         editorTable.removeAll();
         FileEditorMapping resourceType = getSelectedResourceType();
         if (resourceType != null) {
-            IEditorDescriptor[] array = resourceType.getEditors();
-            for (IEditorDescriptor editor : array) {
+			for (IEditorDescriptor editor : resourceType.getEditors()) {
                 TableItem item = new TableItem(editorTable, SWT.NULL);
                 item.setData(DATA_EDITOR, editor);
                 // Check if it is the default editor
@@ -342,8 +341,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
 			IContentType[] contentTypes = Platform.getContentTypeManager()
 					.findContentTypesFor(resourceType.getLabel());
 			for (IContentType contentType : contentTypes) {
-				array = registry.getEditorsForContentType(contentType);
-				for (IEditorDescriptor editor : array) {
+				for (IEditorDescriptor editor : registry.getEditorsForContentType(contentType)) {
 					// don't add duplicates
 					TableItem[] items = editorTable.getItems();
 					TableItem foundItem = null;
@@ -592,8 +590,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * Remove the type from the table
      */
     public void removeSelectedResourceType() {
-        TableItem[] items = resourceTypeTable.getSelection();
-        for (TableItem item : items) {
+		for (TableItem item : resourceTypeTable.getSelection()) {
         	item.dispose();
         }
         //Clear out the editors too

@@ -429,13 +429,10 @@ public class TaskList extends ViewPart {
                 }
                 updateSortingState();
                 viewer.refresh();
-                IDialogSettings workbenchSettings = getPlugin()
-                        .getDialogSettings();
-                IDialogSettings settings = workbenchSettings
-                        .getSection(TAG_SORT_SECTION);
+				IDialogSettings workbenchSettings = getPlugin().getDialogSettings();
+				IDialogSettings settings = workbenchSettings.getSection(TAG_SORT_SECTION);
                 if (settings == null) {
-					settings = workbenchSettings
-                            .addNewSection(TAG_SORT_SECTION);
+					settings = workbenchSettings.addNewSection(TAG_SORT_SECTION);
 				}
                 comparator.saveState(settings);
             }
@@ -445,14 +442,13 @@ public class TaskList extends ViewPart {
             //restore columns width
             IMemento children[] = memento.getChildren(TAG_COLUMN);
             if (children != null) {
-                for (IMemento element : children) {
-                    Integer val = element.getInteger(TAG_NUMBER);
+                for (IMemento child : children) {
+                    Integer val = child.getInteger(TAG_NUMBER);
                     if (val != null) {
                         int index = val.intValue();
-                        val = element.getInteger(TAG_WIDTH);
+                        val = child.getInteger(TAG_WIDTH);
                         if (val != null) {
-                            columnLayouts[index] = new ColumnPixelData(val
-                                    .intValue(), true);
+							columnLayouts[index] = new ColumnPixelData(val.intValue(), true);
                         }
                     }
                 }
@@ -990,18 +986,16 @@ public class TaskList extends ViewPart {
         }
 
         IResource[] resources = getResources();
-        IResource resource2;
 
         if (showOwnerProject()) {
             IProject project;
 
-            for (IResource resource3 : resources) {
-                resource2 = resource3;
+			for (IResource currentResource : resources) {
 
-                if (resource2 == null) {
+				if (currentResource == null) {
                     return true;
                 }
-                project = resource2.getProject();
+				project = currentResource.getProject();
 
                 if (project == null
                         || project.equals(resource.getProject())) {
@@ -1011,20 +1005,16 @@ public class TaskList extends ViewPart {
         }
 
         if (showChildrenHierarchy()) {
-            for (IResource resource3 : resources) {
-                resource2 = resource3;
+			for (IResource currentResource : resources) {
 
-                if (resource2 != null
-                        && resource2.getFullPath().isPrefixOf(
-                                resource.getFullPath())) {
+				if (currentResource != null && currentResource.getFullPath().isPrefixOf(resource.getFullPath())) {
 					return true;
 				}
             }
         } else {
-			for (IResource resource3 : resources) {
-                resource2 = resource3;
+			for (IResource currentResource : resources) {
 
-                if (resource.equals(resource2)) {
+				if (resource.equals(currentResource)) {
 					return true;
 				}
             }
@@ -1268,12 +1258,10 @@ public class TaskList extends ViewPart {
         IMemento selectionMem = memento.getChild(TAG_SELECTION);
         if (selectionMem != null) {
             ArrayList selectionList = new ArrayList();
-            IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
-            for (IMemento markerMem : markerMems) {
+			for (IMemento markerMemento : selectionMem.getChildren(TAG_MARKER)) {
                 try {
-                    long id = Long.parseLong(markerMem.getString(TAG_ID));
-                    IResource resource = root.findMember(markerMem
-                            .getString(TAG_RESOURCE));
+					long id = Long.parseLong(markerMemento.getString(TAG_ID));
+					IResource resource = root.findMember(markerMemento.getString(TAG_RESOURCE));
                     if (resource != null) {
                         IMarker marker = resource.findMarker(id);
                         if (marker != null) {
@@ -1336,9 +1324,9 @@ public class TaskList extends ViewPart {
                 .toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);
-            for (Object marker2 : markers) {
+            for (Object selection : markers) {
                 IMemento elementMem = selectionMem.createChild(TAG_MARKER);
-                IMarker marker = (IMarker) marker2;
+                IMarker marker = (IMarker) selection;
                 elementMem.putString(TAG_RESOURCE, marker.getResource()
                         .getFullPath().toString());
                 elementMem.putString(TAG_ID, String.valueOf(marker.getId()));
@@ -1635,8 +1623,8 @@ public class TaskList extends ViewPart {
         IMarker[] markerData = (IMarker[]) getClipboard().getContents(transfer);
         boolean canPaste = false;
         if (markerData != null) {
-            for (IMarker element : markerData) {
-                if (MarkerUtil.isMarkerType(element, IMarker.TASK)) {
+            for (IMarker marker : markerData) {
+                if (MarkerUtil.isMarkerType(marker, IMarker.TASK)) {
                     canPaste = true;
                     break;
                 }

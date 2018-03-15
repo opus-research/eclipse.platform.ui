@@ -14,7 +14,6 @@ package org.eclipse.ui.internal.statushandlers;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -95,21 +94,17 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
-		IConfigurationElement[] configElements = extension
-				.getConfigurationElements();
+		IConfigurationElement[] configElements = extension.getConfigurationElements();
 		for (IConfigurationElement configElement : configElements) {
 			if (configElement.getName().equals(TAG_STATUSHANDLER)) {
-				StatusHandlerDescriptor descriptor = new StatusHandlerDescriptor(
-						configElement);
-				tracker.registerObject(extension, descriptor,
-						IExtensionTracker.REF_STRONG);
+				StatusHandlerDescriptor descriptor = new StatusHandlerDescriptor(configElement);
+				tracker.registerObject(extension, descriptor, IExtensionTracker.REF_STRONG);
 				statusHandlerDescriptors.add(descriptor);
 			} else if (configElement.getName().equals(
 					TAG_STATUSHANDLER_PRODUCTBINDING)) {
 				StatusHandlerProductBindingDescriptor descriptor = new StatusHandlerProductBindingDescriptor(
 						configElement);
-				tracker.registerObject(extension, descriptor,
-						IExtensionTracker.REF_STRONG);
+				tracker.registerObject(extension, descriptor, IExtensionTracker.REF_STRONG);
 				productBindingDescriptors.add(descriptor);
 			}
 		}

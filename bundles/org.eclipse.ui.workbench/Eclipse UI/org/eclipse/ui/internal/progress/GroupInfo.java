@@ -182,8 +182,7 @@ class GroupInfo extends JobTreeElement implements IProgressMonitor {
 
 	@Override
 	public void cancel() {
-		Object[] jobInfos = getChildren();
-		for (Object jobInfo : jobInfos) {
+		for (Object jobInfo : getChildren()) {
 			((JobInfo) jobInfo).cancel();
 		}
 		// Call the refresh so that this is updated immediately

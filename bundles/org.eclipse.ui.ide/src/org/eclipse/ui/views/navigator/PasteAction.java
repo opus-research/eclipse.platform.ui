@@ -129,10 +129,10 @@ import org.eclipse.ui.part.ResourceTransfer;
         if (resourceData != null && resourceData.length > 0) {
             if (resourceData[0].getType() == IResource.PROJECT) {
                 // enablement checks for all projects
-                for (IResource element : resourceData) {
+                for (IResource resource : resourceData) {
                     CopyProjectOperation operation = new CopyProjectOperation(
                             this.shell);
-                    operation.copyProject((IProject) element);
+                    operation.copyProject((IProject) resource);
                 }
             } else {
                 // enablement should ensure that we always have access to a container
@@ -199,11 +199,11 @@ import org.eclipse.ui.part.ResourceTransfer;
                 && resourceData[0].getType() == IResource.PROJECT;
 
         if (isProjectRes) {
-            for (IResource element : resourceData) {
+            for (IResource resource : resourceData) {
                 // make sure all resource data are open projects
                 // can paste open projects regardless of selection
-                if (element.getType() != IResource.PROJECT
-                        || ((IProject) element).isOpen() == false) {
+                if (resource.getType() != IResource.PROJECT
+                        || ((IProject) resource).isOpen() == false) {
 					return false;
 				}
             }
@@ -245,8 +245,8 @@ import org.eclipse.ui.part.ResourceTransfer;
 
             if (targetResource.getType() == IResource.FOLDER) {
                 // don't try to copy folder to self
-                for (IResource element : resourceData) {
-                    if (targetResource.equals(element)) {
+                for (IResource resource : resourceData) {
+                    if (targetResource.equals(resource)) {
 						return false;
 					}
                 }

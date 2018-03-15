@@ -443,8 +443,8 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			INavigatorContentDescriptor[] descriptors = contentService
 					.getActiveDescriptorsWithSaveables();
 			List<SaveablesProvider> result = new ArrayList<SaveablesProvider>();
-			for (INavigatorContentDescriptor descriptor2 : descriptors) {
-				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) descriptor2;
+			for (INavigatorContentDescriptor iDescriptor : descriptors) {
+				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) iDescriptor;
 				String pluginId = descriptor
 						.getContribution().getPluginId();
 				if (Platform.getBundle(pluginId).getState() != Bundle.ACTIVE) {

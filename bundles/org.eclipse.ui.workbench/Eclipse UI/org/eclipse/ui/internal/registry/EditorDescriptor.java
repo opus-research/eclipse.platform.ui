@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.registry;
 
 import java.io.File;
 import java.io.Serializable;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -159,11 +158,9 @@ public final class EditorDescriptor implements IEditorDescriptor, Serializable,
      * @return org.eclipse.swt.program.Program
      */
     private static Program findProgram(String programName) {
-
-        Program[] programs = Program.getPrograms();
-        for (Program program2 : programs) {
-            if (program2.getName().equals(programName)) {
-				return program2;
+		for (Program program : Program.getPrograms()) {
+			if (program.getName().equals(programName)) {
+				return program;
 			}
         }
 

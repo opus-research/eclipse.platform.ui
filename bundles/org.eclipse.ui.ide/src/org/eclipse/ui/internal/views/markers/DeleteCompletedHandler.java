@@ -80,11 +80,9 @@ public class DeleteCompletedHandler extends MarkerViewHandler {
 	 * @return List of {@link IMarker}
 	 */
 	private List<IMarker> getCompletedTasks(ExtendedMarkersView view) {
-
 		List<IMarker> completed = new ArrayList<>();
-		MarkerItem[] items = view.getAllConcreteItems();
 
-		for (MarkerItem markerItem : items) {
+		for (MarkerItem markerItem : view.getAllConcreteItems()) {
 			if (markerItem.getAttributeValue(IMarker.DONE, false)
 					&& markerItem.getMarker() != null) {
 				completed.add(markerItem.getMarker());

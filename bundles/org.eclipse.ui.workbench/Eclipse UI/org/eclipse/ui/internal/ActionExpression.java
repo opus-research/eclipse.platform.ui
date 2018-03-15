@@ -185,8 +185,8 @@ public class ActionExpression {
 					if (classNames == null) {
 						classNames = new ArrayList();
 					}
-					for (String objectClasse : objectClasses) {
-						classNames.add(objectClasse);
+					for (String objectClass : objectClasses) {
+						classNames.add(objectClass);
 					}
 				}
 			}

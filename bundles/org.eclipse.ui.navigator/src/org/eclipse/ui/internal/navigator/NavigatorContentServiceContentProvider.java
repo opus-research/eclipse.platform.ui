@@ -199,19 +199,17 @@ public class NavigatorContentServiceContentProvider implements ITreeContentProvi
 			INavigatorContentDescriptor firstClassDescriptor, ContributorTrackingSet pipelinedChildren, boolean elements) {
 		IPipelinedTreeContentProvider pipelinedContentProvider;
 		NavigatorContentExtension[] overridingExtensions;
-		for (NavigatorContentExtension theOverridingExtension : theOverridingExtensions) {
+		for (NavigatorContentExtension overridingExtension : theOverridingExtensions) {
 
-			if (theOverridingExtension.internalGetContentProvider().isPipelined()) {
-				pipelinedContentProvider = (IPipelinedTreeContentProvider) theOverridingExtension
-						.internalGetContentProvider();
-				pipelinedChildren.setContributor(theOverridingExtension
-						.getDescriptor(), firstClassDescriptor);
+			if (overridingExtension.internalGetContentProvider().isPipelined()) {
+				pipelinedContentProvider = overridingExtension.internalGetContentProvider();
+				pipelinedChildren.setContributor(overridingExtension.getDescriptor(), firstClassDescriptor);
 				if (elements) {
 					pipelinedContentProvider.getPipelinedElements(aParent, pipelinedChildren);
 				} else {
 					pipelinedContentProvider.getPipelinedChildren(aParent, pipelinedChildren);
 				}
-				overridingExtensions = theOverridingExtension.getOverridingExtensionsForTriggerPoint(aParent);
+				overridingExtensions = overridingExtension.getOverridingExtensionsForTriggerPoint(aParent);
 				if (overridingExtensions.length > 0) {
 					pipelineChildren(aParent, overridingExtensions, firstClassDescriptor, pipelinedChildren, elements);
 				}
@@ -357,7 +355,7 @@ public class NavigatorContentServiceContentProvider implements ITreeContentProvi
 		for (NavigatorContentExtension theOverridingExtension : theOverridingExtensions) {
 
 			if (theOverridingExtension.internalGetContentProvider().isPipelined()) {
-				pipelinedContentProvider = (IPipelinedTreeContentProvider) theOverridingExtension
+				pipelinedContentProvider = theOverridingExtension
 						.internalGetContentProvider();
 
 				aSuggestedParent = pipelinedContentProvider.getPipelinedParent(anInputElement, aSuggestedParent);
@@ -438,7 +436,7 @@ public class NavigatorContentServiceContentProvider implements ITreeContentProvi
 
 	private boolean callNormalHasChildren(Object anElementOrPath, Object anElement, SafeDelegateTreeContentProvider cp) {
 		if (cp.isTreePath() && anElementOrPath instanceof TreePath) {
-			ITreePathContentProvider tpcp = (ITreePathContentProvider) cp;
+			ITreePathContentProvider tpcp = cp;
 			return tpcp.hasChildren((TreePath) anElementOrPath);
 		}
 		return ((ITreeContentProvider) cp).hasChildren(anElement);
@@ -596,7 +594,7 @@ public class NavigatorContentServiceContentProvider implements ITreeContentProvi
 		Set/* <TreePathCompiler> */foundPaths = Collections.EMPTY_SET;
 		if (parents.size() > 0) {
 			for (Iterator parentIter = parents.iterator(); parentIter.hasNext();) {
-				Object parent = (Object) parentIter.next();
+				Object parent = parentIter.next();
 				TreePathCompiler c = new TreePathCompiler(aPathCompiler);
 				try {
 					c.addParent(parent);
@@ -675,7 +673,7 @@ public class NavigatorContentServiceContentProvider implements ITreeContentProvi
 				.getOverridingExtensionsForPossibleChild(anElement);
 		for (NavigatorContentExtension overridingExtension : overridingExtensions) {
 			if (overridingExtension.internalGetContentProvider().isPipelined()) {
-				piplineContentProvider = (IPipelinedTreeContentProvider) overridingExtension.internalGetContentProvider();
+				piplineContentProvider = overridingExtension.internalGetContentProvider();
 				suggestedOverriddenParent = piplineContentProvider.getPipelinedParent(anElement, lastValidParent);
 
 				if (suggestedOverriddenParent != null && !suggestedOverriddenParent.equals(aSuggestedParent))

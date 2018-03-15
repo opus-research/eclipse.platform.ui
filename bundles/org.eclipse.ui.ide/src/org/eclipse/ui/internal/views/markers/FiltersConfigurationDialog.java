@@ -734,9 +734,8 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private void setEnabled(boolean enabled, Control control) {
 		control.setEnabled(enabled);
 		if (control instanceof Composite) {
-			Control[] children = ((Composite) control).getChildren();
-			for (Control element : children) {
-				setEnabled(enabled, element);
+			for (Control child : ((Composite) control).getChildren()) {
+				setEnabled(enabled, child);
 			}
 		}
 	}

@@ -102,17 +102,14 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 				.getExtensionPoint(IDEWorkbenchPlugin.IDE_WORKBENCH + '.'
 						+ ResourcePatternFilter.FILTERS_TAG);
 		if (extension != null) {
-			IExtension[] extensions = extension.getExtensions();
-			for (IExtension extension2 : extensions) {
-				IConfigurationElement[] configElements = extension2
-						.getConfigurationElements();
+			for (IExtension currentExtension : extension.getExtensions()) {
+				IConfigurationElement[] configElements = currentExtension.getConfigurationElements();
 				for (IConfigurationElement configElement : configElements) {
 					String pattern = configElement.getAttribute("pattern");//$NON-NLS-1$
 					if (pattern != null) {
 						definedFilters.add(pattern);
 					}
-					String selected = configElement
-							.getAttribute("selected");//$NON-NLS-1$
+					String selected = configElement.getAttribute("selected");//$NON-NLS-1$
 					if (selected != null && selected.equalsIgnoreCase("true")) { //$NON-NLS-1$
 						defaultFilters.add(pattern);
 					}

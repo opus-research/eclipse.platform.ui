@@ -89,8 +89,7 @@ class MarkerResourceUtil {
 			resourceSet.add(root);
 			return resourceSet;
 		}
-		Object[] clones = resourceSet.toArray();
-		for (Object clone : clones) {
+		for (Object clone : resourceSet.toArray()) {
 			IResource resource = (IResource) clone;
 			Iterator<IResource> iterator = resourceSet.iterator();
 			while (iterator.hasNext()) {
@@ -252,16 +251,14 @@ class MarkerResourceUtil {
 			break;
 		}
 		case MarkerFieldFilterGroup.ON_ANY_IN_SAME_CONTAINER: {
-			IResource[] resources = getProjects(selectedResources);
-			for (IResource resource : resources) {
+			for (IResource resource : getProjects(selectedResources)) {
 				resourceSet.add(resource);
 			}
 			break;
 		}
 		case MarkerFieldFilterGroup.ON_WORKING_SET: {
 			group.refresh();
-			IResource[] resources = group.getResourcesInWorkingSet();
-			for (IResource resource : resources) {
+			for (IResource resource : group.getResourcesInWorkingSet()) {
 				resourceSet.add(resource);
 			}
 			break;
@@ -299,8 +296,7 @@ class MarkerResourceUtil {
 			if (element instanceof IResource) {
 				projects.add(((IResource) element).getProject());
 			} else {
-				IProject[] mappingProjects = (((ResourceMapping) element).getProjects());
-				for (IProject mappingProject : mappingProjects) {
+				for (IProject mappingProject : ((ResourceMapping) element).getProjects()) {
 					projects.add(mappingProject);
 				}
 			}
@@ -320,9 +316,8 @@ class MarkerResourceUtil {
 					ResourceMappingContext.LOCAL_CONTEXT,
 					new NullProgressMonitor());
 			for (ResourceTraversal traversal : traversals) {
-				IResource[] result = traversal.getResources();
-				for (IResource element : result) {
-					resourceCollection.add(element);
+				for (IResource resource : traversal.getResources()) {
+					resourceCollection.add(resource);
 				}
 			}
 		} catch (CoreException e) {
@@ -390,8 +385,7 @@ class MarkerResourceUtil {
 		for (String typeId : typeIds) {
 			MarkerType type = typesModel.getType(typeId);
 			set.add(type);
-			MarkerType[] subs = type.getAllSubTypes();
-			for (MarkerType sub : subs) {
+			for (MarkerType sub : type.getAllSubTypes()) {
 				set.add(sub);
 			}
 		}

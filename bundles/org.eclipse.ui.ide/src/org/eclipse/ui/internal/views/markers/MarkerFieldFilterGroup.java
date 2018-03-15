@@ -172,9 +172,8 @@ class MarkerFieldFilterGroup {
 	protected void calculateFilters() {
 		Map<String, String> values = getValues();
 		Collection<MarkerFieldFilter> filters = new ArrayList<>();
-		MarkerField[] fields = generator.getVisibleFields();
-		for (MarkerField field : fields) {
-			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities.generateFilter(field);
+		for (MarkerField visibleField : generator.getVisibleFields()) {
+			MarkerFieldFilter fieldFilter = MarkerSupportInternalUtilities.generateFilter(visibleField);
 			if (fieldFilter != null) {
 				filters.add(fieldFilter);
 
@@ -201,8 +200,7 @@ class MarkerFieldFilterGroup {
 	 * @return MarkerFieldFilter
 	 */
 	public MarkerFieldFilter getFilter(MarkerField field) {
-		MarkerFieldFilter[] filters = getFieldFilters();
-		for (MarkerFieldFilter filter : filters) {
+		for (MarkerFieldFilter filter : getFieldFilters()) {
 			if (filter.getField().equals(field)) {
 				return filter;
 			}
@@ -425,8 +423,7 @@ class MarkerFieldFilterGroup {
 			}
 		}
 
-		MarkerFieldFilter[] filters = getFieldFilters();
-		for (MarkerFieldFilter filter : filters) {
+		for (MarkerFieldFilter filter : getFieldFilters()) {
 			if (filter instanceof CompatibilityFieldFilter) {
 				((CompatibilityFieldFilter) filter).loadLegacySettings(memento, generator);
 			}
@@ -458,13 +455,11 @@ class MarkerFieldFilterGroup {
 		}
 
 		Map<String, MarkerFieldFilter> filterMap = new HashMap<>();
-		MarkerFieldFilter[] filters = getFieldFilters();
-		for (MarkerFieldFilter filter : filters) {
+		for (MarkerFieldFilter filter : getFieldFilters()) {
 			filterMap.put(MarkerSupportInternalUtilities.getId(filter.getField()), filter);
 		}
 
-		IMemento[] children = memento.getChildren(TAG_FIELD_FILTER_ENTRY);
-		for (IMemento childMemento : children) {
+		for (IMemento childMemento : memento.getChildren(TAG_FIELD_FILTER_ENTRY)) {
 			String filterId = childMemento.getID();
 			if (filterMap.containsKey(filterId)) {
 				MarkerFieldFilter filter = filterMap.get(filterId);
@@ -572,9 +567,8 @@ class MarkerFieldFilterGroup {
 			memento.putString(MarkerSupportInternalUtilities.ATTRIBUTE_NAME, getName());
 			memento.putString(IMemento.TAG_ID, getID());
 		}
-		MarkerFieldFilter[] filters = getFieldFilters();
 
-		for (MarkerFieldFilter filter : filters) {
+		for (MarkerFieldFilter filter : getFieldFilters()) {
 			IMemento child = memento.createChild(TAG_FIELD_FILTER_ENTRY,
 					MarkerSupportInternalUtilities.getId(filter.getField()));
 			filter.saveSettings(child);

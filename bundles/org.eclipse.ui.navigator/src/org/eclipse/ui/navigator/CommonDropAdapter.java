@@ -97,8 +97,7 @@ public final class CommonDropAdapter extends PluginDropAdapter {
 			System.out.println("CommonDropAdapter.dragEnter: " + event); //$NON-NLS-1$
 		}
 		for (TransferData dataType : event.dataTypes) {
-			if (LocalSelectionTransfer.getTransfer().isSupportedType(
-					dataType)) {
+			if (LocalSelectionTransfer.getTransfer().isSupportedType(dataType)) {
 				event.currentDataType = dataType;
 				if (Policy.DEBUG_DND) {
 					System.out.println("CommonDropAdapter.dragEnter: local selection: " + event.currentDataType); //$NON-NLS-1$
@@ -121,8 +120,7 @@ public final class CommonDropAdapter extends PluginDropAdapter {
 		}
 
 		for (TransferData dataType : event.dataTypes) {
-			if (PluginTransfer.getInstance()
-					.isSupportedType(dataType)) {
+			if (PluginTransfer.getInstance().isSupportedType(dataType)) {
 				event.currentDataType = dataType;
 				if (Policy.DEBUG_DND) {
 					System.out.println("CommonDropAdapter.dragEnter: plugin: " + event.currentDataType); //$NON-NLS-1$

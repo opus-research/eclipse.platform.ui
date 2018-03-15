@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionDelta;
@@ -74,28 +73,28 @@ class ExtensionEventHandler implements IRegistryChangeListener {
             // push action sets and perspectives to the top because incoming
             // actionSetPartAssociations and perspectiveExtensions may depend upon
             // them for their bindings.
-            for (IExtensionDelta element : delta) {
-                id = element.getExtensionPoint().getSimpleIdentifier();
-                if (element.getKind() == IExtensionDelta.ADDED) {
+            for (IExtensionDelta extensionDelta : delta) {
+                id = extensionDelta.getExtensionPoint().getSimpleIdentifier();
+                if (extensionDelta.getKind() == IExtensionDelta.ADDED) {
                     if (id.equals(IWorkbenchRegistryConstants.PL_ACTION_SETS)) {
-						appearList.add(0, element);
+						appearList.add(0, extensionDelta);
 					} else if (!id.equals(IWorkbenchRegistryConstants.PL_PERSPECTIVES)
                             && !id.equals(IWorkbenchRegistryConstants.PL_VIEWS)
                             && !id.equals(IWorkbenchRegistryConstants.PL_ACTION_SETS)) {
 						appearList.add(appearList.size() - numPerspectives,
-                                element);
+                                extensionDelta);
 					}
                 } else {
-                    if (element.getKind() == IExtensionDelta.REMOVED) {
+                    if (extensionDelta.getKind() == IExtensionDelta.REMOVED) {
                         if (id
                                 .equals(IWorkbenchRegistryConstants.PL_ACTION_SET_PART_ASSOCIATIONS)) {
-                            revokeList.add(0, element);
+                            revokeList.add(0, extensionDelta);
                             numActionSetPartAssoc++;
                         } else if (id
                                 .equals(IWorkbenchRegistryConstants.PL_PERSPECTIVES)) {
-							revokeList.add(numActionSetPartAssoc, element);
+							revokeList.add(numActionSetPartAssoc, extensionDelta);
 						} else {
-							revokeList.add(element);
+							revokeList.add(extensionDelta);
 						}
                     }
                 }
@@ -150,9 +149,8 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         ThemeRegistryReader reader = new ThemeRegistryReader();
         reader.setRegistry((ThemeRegistry) WorkbenchPlugin.getDefault()
                 .getThemeRegistry());
-        IConfigurationElement[] elements = ext.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
-			reader.readElement(element);
+		for (IConfigurationElement configElement : ext.getConfigurationElements()) {
+			reader.readElement(configElement);
 		}
 
         Collection fonts = reader.getFontDefinitions();
@@ -169,9 +167,8 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         ThemeRegistry registry = (ThemeRegistry) WorkbenchPlugin.getDefault()
                 .getThemeRegistry();
         reader.setRegistry(registry);
-        IConfigurationElement[] elements = ext.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
-			reader.readElement(element);
+		for (IConfigurationElement configElement : ext.getConfigurationElements()) {
+			reader.readElement(configElement);
 		}
 
         Collection colors = reader.getColorDefinitions();

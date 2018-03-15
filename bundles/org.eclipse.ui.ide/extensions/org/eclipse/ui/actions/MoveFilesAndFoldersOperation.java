@@ -77,8 +77,9 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	@Override
 	protected void copy(IResource[] resources, IPath destination, IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
-		for (IResource source : resources) {
+		for (int i = 0; i < resources.length; i++) {
 			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
+			IResource source = resources[i];
 			IPath destinationPath = destination.append(source.getName());
 			IWorkspace workspace = source.getWorkspace();
 			IWorkspaceRoot workspaceRoot = workspace.getRoot();
@@ -209,7 +210,9 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 			IResource[] sourceResources) {
 		IPath destinationLocation = destination.getLocation();
 
-		for (IResource sourceResource : sourceResources) {
+		for (int i = 0; i < sourceResources.length; i++) {
+			IResource sourceResource = sourceResources[i];
+
 			// is the source being copied onto itself?
 			if (sourceResource.getParent().equals(destination)) {
 				return NLS

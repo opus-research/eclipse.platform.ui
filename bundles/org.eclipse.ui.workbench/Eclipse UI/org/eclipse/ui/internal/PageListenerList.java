@@ -61,8 +61,8 @@ public class PageListenerList extends EventManager {
      */
     public void firePageActivated(final IWorkbenchPage page) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPageListener l = (IPageListener) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -77,8 +77,8 @@ public class PageListenerList extends EventManager {
      */
     public void firePageClosed(final IWorkbenchPage page) {
         Object[] array = getListeners();
-        for (Object element : array) {
-            final IPageListener l = (IPageListener) element;
+        for (int i = 0; i < array.length; i++) {
+            final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -93,8 +93,8 @@ public class PageListenerList extends EventManager {
      */
     public void firePageOpened(final IWorkbenchPage page) {
         Object[] listeners = getListeners();
-        for (Object listener : listeners) {
-            final IPageListener l = (IPageListener) listener;
+        for (int i = 0; i < listeners.length; i++) {
+            final IPageListener l = (IPageListener) listeners[i];
             fireEvent(new SafeRunnable() {
                 @Override
 				public void run() {
