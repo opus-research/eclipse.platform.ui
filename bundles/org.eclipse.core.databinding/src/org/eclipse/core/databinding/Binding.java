@@ -61,11 +61,10 @@ public abstract class Binding extends ValidationStatusProvider {
 			throw new IllegalArgumentException("Target observable is disposed"); //$NON-NLS-1$
 		if (model.isDisposed())
 			throw new IllegalArgumentException("Model observable is disposed"); //$NON-NLS-1$
-		this.disposeListener = event -> {
-			if (context != null) {
-				context.getValidationRealm().exec(() -> dispose());
-			}
-		};
+		this.disposeListener = staleEvent -> Binding.this.context.getValidationRealm().exec(() -> {
+			if (!isDisposed())
+				dispose();
+		});
 		target.addDisposeListener(disposeListener);
 		model.addDisposeListener(disposeListener);
 		preInit();
