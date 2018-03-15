@@ -13,15 +13,14 @@
 
 package org.eclipse.jface.tests.preferences;
 
-
-import junit.framework.TestCase;
-
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import junit.framework.TestCase;
 
 public class StringFieldEditorTest extends TestCase {
 
@@ -130,6 +129,19 @@ public class StringFieldEditorTest extends TestCase {
 		store.setToDefault("foo");
 		store.removePropertyChangeListener(failingListener);
 		assertEquals("bar", store.getString("foo"));
+	}
+
+	public void testValidator() {
+		assertNull(stringFieldEditor.getValidator());
+		stringFieldEditor.getTextControl(shell);
+		stringFieldEditor.setStringValue("bar");
+		assertEquals(stringFieldEditor.getStringValue(), "bar");
+		assertTrue(stringFieldEditor.isValid());
+
+		stringFieldEditor.setValidator(x -> false);
+		stringFieldEditor.setStringValue("barbar");
+		assertEquals(stringFieldEditor.getStringValue(), "barbar");
+		assertFalse(stringFieldEditor.isValid());
 	}
 
 	@Override
