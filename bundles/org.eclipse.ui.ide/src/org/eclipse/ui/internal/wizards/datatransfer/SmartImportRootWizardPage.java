@@ -11,7 +11,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com>
  *     Rüdiger Herrmann <ruediger.herrmann@gmx.de>
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500836
- *     Lucas Bullen (Red Hat Inc.) - Bug 526490
  ******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -705,7 +704,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		setErrorMessage(null);
 		// order of invocation of setErrorMessage == reverse order of priority
 		// ie: most important one must call setErrorMessage last
-		if (!selectionIsValid()) {
+		if (tree.getCheckedElements().length == 0) {
 			this.proposalSelectionDecorator.show();
 			setErrorMessage(this.proposalSelectionDecorator.getDescriptionText());
 		} else {
@@ -723,31 +722,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	@Override
 	public boolean isPageComplete() {
-		return sourceIsValid() && selectionIsValid() && getWizard().getImportJob() != null
+		return sourceIsValid() && getWizard().getImportJob() != null && getWizard().getImportJob() != null
 				&& (getWizard().getImportJob().getDirectoriesToImport() == null
 						|| !getWizard().getImportJob().getDirectoriesToImport().isEmpty());
-	}
-
-	private boolean selectionIsValid() {
-		if (tree.getCheckedElements().length == 0) {
-			this.proposalSelectionDecorator
-					.setDescriptionText(
-							DataTransferMessages.SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject);
-			return false;
-		}
-		for (Object object : tree.getCheckedElements()) {
-			if (object instanceof File) {
-				File file = (File) object;
-				if (ResourcesPlugin.getWorkspace().getRoot().getProject(file.getName()).exists()) {
-					this.proposalSelectionDecorator
-							.setDescriptionText(
-									NLS.bind(DataTransferMessages.SmartImportWizardPage_selectedProjectNameExists,
-											file.getName()));
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 
 	private boolean sourceIsValid() {
@@ -817,7 +794,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 						potentialProjects.size()));
 			}
 		}
-		validatePage();
+		setPageComplete(isPageComplete());
 	}
 
 	/**

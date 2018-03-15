@@ -179,7 +179,6 @@ public class DataTransferMessages extends NLS {
 	public static String SmartImportWizardPage_incompleteExpand_message;
 	public static String SmartImportWizardPage_scanProjectsFailed;
 	public static String SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject;
-	public static String SmartImportWizardPage_selectedProjectNameExists;
 	public static String SmartImportWizardPage_showOtherSpecializedImportWizard;
 	public static String SmartImportWizardPage_closeProjectsAfterImport;
 
