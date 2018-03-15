@@ -403,7 +403,6 @@ class DnDManager {
 
 		if (overlayFrame == null) {
 			overlayFrame = new Shell(getDragShell(), SWT.NO_TRIM | SWT.ON_TOP);
-			overlayFrame.setData(DragAndDropUtil.IGNORE_AS_DROP_TARGET, Boolean.TRUE);
 			overlayFrame.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
 			overlayFrame.setAlpha(150);
 
