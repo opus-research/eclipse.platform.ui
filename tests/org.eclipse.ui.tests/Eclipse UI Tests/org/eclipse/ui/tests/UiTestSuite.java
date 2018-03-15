@@ -20,6 +20,7 @@ import org.eclipse.ui.tests.concurrency.ConcurrencyTestSuite;
 import org.eclipse.ui.tests.contexts.ContextsTestSuite;
 import org.eclipse.ui.tests.datatransfer.DataTransferTestSuite;
 import org.eclipse.ui.tests.decorators.DecoratorsTestSuite;
+import org.eclipse.ui.tests.dialogs.FilteredResourcesSelectionDialogTestSuite;
 import org.eclipse.ui.tests.dialogs.UIAutomatedSuite;
 import org.eclipse.ui.tests.encoding.EncodingTestSuite;
 import org.eclipse.ui.tests.fieldassist.FieldAssistTestSuite;
@@ -69,7 +70,8 @@ import org.junit.runners.Suite;
 	FilteredTreeTests.class,
 	StatusHandlingTestSuite.class,
 	MenusTestSuite.class,
-	QuickAccessTestSuite.class
+	QuickAccessTestSuite.class,
+	FilteredResourcesSelectionDialogTestSuite.class
 })
 public class UiTestSuite {
 
