@@ -19,7 +19,6 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.tests.fieldassist.AbstractFieldAssistWindow;
-import org.eclipse.swt.SWT;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
@@ -71,68 +70,5 @@ public class TextContentAssistCommandAdapterTest extends
 		} finally {
 			service.deactivateHandler(handlerActivation);
 		}
-	}
-
-	/**
-	 * bug 520372: ContentProposalAdapter with autoActivationDelay pops up although
-	 * control has already lost focus
-	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=520372
-	 *
-	 * Tests whether no proposal popup was opened if TAB was pressed within
-	 * activation delay.
-	 */
-	public void testBug520372AutoActivationDelayTab() throws Exception {
-		AbstractFieldAssistWindow window = getFieldAssistWindow();
-		window.setAutoActivationDelay(1000);
-		window.setAutoActivationCharacters(null);
-		window.setKeyStroke(null);
-		window.open();
-
-		sendKeyDownToControl(SWT.TAB);
-		ensurePopupIsUp();
-
-		assertOneShellUp();
-	}
-
-	/**
-	 * bug 520372: ContentProposalAdapter with autoActivationDelay pops up although
-	 * control has already lost focus
-	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=520372
-	 *
-	 * Tests whether no proposal popup was opened if CR was pressed within
-	 * activation delay.
-	 */
-	public void testBug520372AutoActivationDelayCR() throws Exception {
-		AbstractFieldAssistWindow window = getFieldAssistWindow();
-		window.setAutoActivationDelay(1000);
-		window.setAutoActivationCharacters(null);
-		window.setKeyStroke(null);
-		window.open();
-
-		sendKeyDownToControl(SWT.CR);
-		ensurePopupIsUp();
-
-		assertOneShellUp();
-	}
-
-	/**
-	 * bug 520372: ContentProposalAdapter with autoActivationDelay pops up although
-	 * control has already lost focus
-	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=520372
-	 *
-	 * Tests whether no proposal popup was opened if ESC was pressed within
-	 * activation delay.
-	 */
-	public void testBug520372AutoActivationDelayESC() throws Exception {
-		AbstractFieldAssistWindow window = getFieldAssistWindow();
-		window.setAutoActivationDelay(1000);
-		window.setAutoActivationCharacters(null);
-		window.setKeyStroke(null);
-		window.open();
-
-		sendKeyDownToControl(SWT.ESC);
-		ensurePopupIsUp();
-
-		assertOneShellUp();
 	}
 }
