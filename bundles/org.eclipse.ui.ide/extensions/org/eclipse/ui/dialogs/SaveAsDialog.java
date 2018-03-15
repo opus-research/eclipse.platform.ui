@@ -22,7 +22,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -290,26 +289,24 @@ public class SaveAsDialog extends TitleAreaDialog {
             return false;
         }
 
+        String resourceName = resourceGroup.getResource();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
-		IPath fullPath = resourceGroup.getContainerFullPath().append(resourceGroup.getResource());
-		// Do not allow a closed project to be selected
-		String projectName = fullPath.segment(0);
-		IStatus isValidProjectName = workspace.validateName(projectName, IResource.PROJECT);
-		if (isValidProjectName.isOK()) {
-			IProject project = workspace.getRoot().getProject(projectName);
-			if (!project.isOpen()) {
-				setErrorMessage(IDEWorkbenchMessages.SaveAsDialog_closedProjectMessage);
-				return false;
-			}
-		}
-		IPath relativePath = new Path(resourceGroup.getResource());
-		if (relativePath.segmentCount() == 0 || relativePath.hasTrailingSeparator()) {
-			IStatus result = workspace.validateName("", IResource.FILE); //$NON-NLS-1$
-			setErrorMessage(result.getMessage());
-			return false;
-		}
-		IStatus result = workspace.validatePath(fullPath.toString(), IResource.FILE);
+        // Do not allow a closed project to be selected
+        IPath fullPath = resourceGroup.getContainerFullPath();
+        if (fullPath != null) {
+        	String projectName = fullPath.segment(0);
+	        IStatus isValidProjectName = workspace.validateName(projectName, IResource.PROJECT);
+	        if(isValidProjectName.isOK()) {
+	        	IProject project = workspace.getRoot().getProject(projectName);
+	        	if(!project.isOpen()) {
+	        		setErrorMessage(IDEWorkbenchMessages.SaveAsDialog_closedProjectMessage);
+	        		return false;
+	        	}
+	        }
+        }
+
+        IStatus result = workspace.validateName(resourceName, IResource.FILE);
         if (!result.isOK()){
         	setErrorMessage(result.getMessage());
         	return false;
