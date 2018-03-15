@@ -309,7 +309,7 @@ public class KeyBindingImpl extends ApplicationElementImpl implements MKeyBindin
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (keySequence: "); //$NON-NLS-1$
 		result.append(keySequence);
 		result.append(')');
