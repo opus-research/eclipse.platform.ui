@@ -12,10 +12,15 @@ package org.eclipse.ui.internal;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.internal.part.NullEditorInput;
+import org.eclipse.ui.internal.preferences.PreferencesEditor;
+import org.eclipse.ui.internal.preferences.PreferencesEditor.PreferencesEditorInput;
 
 /**
  * Open the preferences dialog
@@ -59,6 +64,28 @@ public class OpenPreferencesAction extends Action implements ActionFactory.IWork
 			// action has been dispose
 			return;
 		}
+		for (IEditorReference part : workbenchWindow.getActivePage().getEditorReferences()) {
+			try {
+				if (part.getEditorInput() == PreferencesEditorInput.INSTANCE) {
+					part.getPage().bringToTop(part.getPart(true));
+					part.getPart(true).setFocus();
+					return;
+				}
+			} catch (PartInitException e) {
+				WorkbenchPlugin.log(e);
+			}
+		}
+		if (IPreferenceConstants.PREFERENCE_FACADE_MODE
+				.valueOf(WorkbenchPlugin.getDefault().getPreferenceStore().getString(
+						IPreferenceConstants.PREFERENCE_FACADE)) == IPreferenceConstants.PREFERENCE_FACADE_MODE.EDITOR) {
+			try {
+				workbenchWindow.getActivePage().openEditor(new NullEditorInput(), PreferencesEditor.EDITOR_ID);
+				return;
+			} catch (PartInitException e) {
+				WorkbenchPlugin.log(e);
+			}
+		}
+
 		PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(null, null, null, null);
 		dialog.open();
 	}
