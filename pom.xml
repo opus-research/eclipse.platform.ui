@@ -25,18 +25,9 @@
   <version>4.7.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <properties>
+   <properties>
      <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/platform/eclipse.platform.ui.git</tycho.scmUrl>
   </properties>
-
-  <plugin>
-    <groupId>org.eclipse.tycho</groupId>
-    <artifactId>tycho-compiler-plugin</artifactId>
-    <version>${tycho-version}</version>
-    <configuration>
-      <useProjectSettings>true</useProjectSettings>
-    </configuration>
-  </plugin>
 
   <!-- 
     To build individual bundles, we specify a repository where to find parent pom, 
