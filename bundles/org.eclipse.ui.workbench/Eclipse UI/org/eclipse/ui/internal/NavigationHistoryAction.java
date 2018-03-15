@@ -114,7 +114,7 @@ public class NavigationHistoryAction extends PageEventAction {
     			MenuItem item = new MenuItem(menu, SWT.NONE);
     			item.setData(entries[i]);
     			if (entriesCount[i] > 1) {
-    				text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_locations,text, new Integer(entriesCount[i]));
+    				text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_locations,text, Integer.valueOf(entriesCount[i]));
     			}
     			item.setText(text);
     			item.addSelectionListener(new SelectionAdapter() {

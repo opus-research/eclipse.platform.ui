@@ -68,7 +68,7 @@ public final class PreferenceStoreAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Integer.class) {
-            return new Integer(store.getInt(propertyId));
+            return Integer.valueOf(store.getInt(propertyId));
         }
 
         if (propertyType == Long.class) {

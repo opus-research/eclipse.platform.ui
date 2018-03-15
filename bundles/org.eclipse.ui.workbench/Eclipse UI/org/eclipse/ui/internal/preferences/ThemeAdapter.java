@@ -90,7 +90,7 @@ public class ThemeAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Integer.class) {
-            return new Integer(targetTheme.getInt(propertyId));
+            return Integer.valueOf(targetTheme.getInt(propertyId));
         }
 
         if (propertyType == Boolean.class) {

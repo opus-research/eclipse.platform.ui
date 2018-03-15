@@ -205,7 +205,7 @@ public class ScopedPreferenceStore extends EventManager implements
 		if (obj instanceof String) {
 			return defaults.get(key, STRING_DEFAULT_DEFAULT);
 		} else if (obj instanceof Integer) {
-			return new Integer(defaults.getInt(key, INT_DEFAULT_DEFAULT));
+			return Integer.valueOf(defaults.getInt(key, INT_DEFAULT_DEFAULT));
 		} else if (obj instanceof Double) {
 			return new Double(defaults.getDouble(key, DOUBLE_DEFAULT_DEFAULT));
 		} else if (obj instanceof Float) {
@@ -605,7 +605,7 @@ public class ScopedPreferenceStore extends EventManager implements
 				getStorePreferences().putInt(name, value);
 			}
 			dirty = true;
-			firePropertyChangeEvent(name, new Integer(oldValue), new Integer(
+			firePropertyChangeEvent(name, Integer.valueOf(oldValue), Integer.valueOf(
 					value));
 		} finally {
 			silentRunning = false;// Restart listening to preferences

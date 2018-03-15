@@ -133,9 +133,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		Integer refCount = referenceMap.get(key);
 		if (refCount == null) {
 			result = true;
-			refCount = new Integer(0);
+			refCount = Integer.valueOf(0);
 		}
-		referenceMap.put(key, new Integer(refCount.intValue() + 1));
+		referenceMap.put(key, Integer.valueOf(refCount.intValue() + 1));
 		return result;
 	}
 
@@ -155,7 +155,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			referenceMap.remove(key);
 			result = true;
 		} else {
-			referenceMap.put(key, new Integer(refCount.intValue() - 1));
+			referenceMap.put(key, Integer.valueOf(refCount.intValue() - 1));
 		}
 		return result;
 	}

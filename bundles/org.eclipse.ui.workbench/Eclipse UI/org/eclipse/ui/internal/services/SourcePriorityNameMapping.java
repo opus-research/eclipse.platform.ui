@@ -114,7 +114,7 @@ public final class SourcePriorityNameMapping implements ISources {
 		}
 
 		if (!sourcePrioritiesByName.containsKey(sourceName)) {
-			final Integer priority = new Integer(sourcePriority);
+			final Integer priority = Integer.valueOf(sourcePriority);
 
 			sourcePrioritiesByName.put(sourceName, priority);
 		}
