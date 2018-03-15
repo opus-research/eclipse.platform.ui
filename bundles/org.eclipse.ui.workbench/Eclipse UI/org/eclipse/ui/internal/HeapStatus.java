@@ -33,7 +33,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 
@@ -134,64 +133,38 @@ public class HeapStatus extends Composite {
 
 		createContextMenu();
 
-        Listener listener = event -> {
-		    switch (event.type) {
-		    case SWT.Dispose:
-		    	doDispose();
-		        break;
-		    case SWT.Resize:
-		        Rectangle rect = getClientArea();
-		        button.setBounds(rect.width - imgBounds.width - 1, 1, imgBounds.width, rect.height - 2);
-		        break;
-		    case SWT.Paint:
-		        if (event.widget == HeapStatus.this) {
-		        	paintComposite(event.gc);
-		        }
-		        else if (event.widget == button) {
-		            paintButton(event.gc);
-		        }
-		        break;
-		    case SWT.MouseUp:
-		        if (event.button == 1) {
-					if (!isInGC) {
-						arm(false);
-						gc();
-					}
-		        }
-		        break;
-		    case SWT.MouseDown:
-		        if (event.button == 1) {
-		            if (event.widget == HeapStatus.this) {
-						setMark();
-					} else if (event.widget == button) {
-						if (!isInGC)
-							arm(true);
-					}
-		        }
-		        break;
-		    case SWT.MouseEnter:
-		    	HeapStatus.this.updateTooltip = true;
-		    	updateToolTip();
-		    	break;
-		    case SWT.MouseExit:
-		        if (event.widget == HeapStatus.this) {
-		        	HeapStatus.this.updateTooltip = false;
-				} else if (event.widget == button) {
+		addListener(SWT.Dispose, event -> doDispose());
+		addListener(SWT.MouseDown, event -> {
+			if (event.button == 1) {
+				setMark();
+			}
+		});
+		addListener(SWT.Paint, event -> paintComposite(event.gc));
+		addListener(SWT.Resize, event -> {
+			Rectangle rect = getClientArea();
+			button.setBounds(rect.width - imgBounds.width - 1, 1, imgBounds.width, rect.height - 2);
+		});
+		addListener(SWT.MouseEnter, event -> {
+			HeapStatus.this.updateTooltip = true;
+			updateToolTip();
+		});
+		addListener(SWT.MouseExit, event -> {
+			HeapStatus.this.updateTooltip = false;
+		});
+		button.addListener(SWT.MouseDown, event -> {
+			if (!isInGC)
+				arm(true);
+		});
+		button.addListener(SWT.MouseExit, event -> arm(false));
+		button.addListener(SWT.MouseUp, event -> {
+			if (event.button == 1) {
+				if (!isInGC) {
 					arm(false);
+					gc();
 				}
-		        break;
-		    }
-		};
-        addListener(SWT.Dispose, listener);
-        addListener(SWT.MouseDown, listener);
-        addListener(SWT.Paint, listener);
-        addListener(SWT.Resize, listener);
-        addListener(SWT.MouseEnter, listener);
-        addListener(SWT.MouseExit, listener);
-        button.addListener(SWT.MouseDown, listener);
-        button.addListener(SWT.MouseExit, listener);
-        button.addListener(SWT.MouseUp, listener);
-        button.addListener(SWT.Paint, listener);
+			}
+		});
+		button.addListener(SWT.Paint, event -> paintButton(event.gc));
 
 		// make sure stats are updated before first paint
 		updateStats();
