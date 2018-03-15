@@ -34,8 +34,6 @@ import org.eclipse.e4.ui.tests.workbench.MSashTest;
 import org.eclipse.e4.ui.tests.workbench.MSaveablePartTest;
 import org.eclipse.e4.ui.tests.workbench.MToolItemTest;
 import org.eclipse.e4.ui.tests.workbench.MWindowTest;
-import org.eclipse.e4.ui.tests.workbench.ModelAssemblerFragmentOrderingTests;
-import org.eclipse.e4.ui.tests.workbench.ModelAssemblerTests;
 import org.eclipse.e4.ui.tests.workbench.PartFocusTest;
 import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
@@ -82,8 +80,6 @@ import org.junit.runners.Suite;
 		TopoSortTests.class,
 		ExtensionsSortTests.class,
 		HandlerActivationTest.class,
-		ModelAssemblerTests.class, 
-		ModelAssemblerFragmentOrderingTests.class
 		// SWTPartRendererTest.class,
 })
 public class UIAllTests {
