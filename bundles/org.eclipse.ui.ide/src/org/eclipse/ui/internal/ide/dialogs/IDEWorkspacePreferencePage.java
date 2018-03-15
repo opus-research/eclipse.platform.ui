@@ -13,7 +13,6 @@
 *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
 *     Christian Georgi (SAP SE)          -  bug 458811
 *     Mickael Istria (Red Hat Inc.) - Bug 486901
-*     Patrik Suzzi <psuzzi@gmail.com> - Bug 502050
 *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -79,8 +78,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 	private FieldEditor workspaceName;
 	private Button showLocationInWindowTitle;
-
-	private Button showLocationFullPath;
 
 	private Button autoRefreshButton;
 
@@ -227,29 +224,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		showLocationInWindowTitle.setEnabled(!showLocationIsSetOnCommandLine);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(showLocationInWindowTitle);
 
-		// show full path
-		boolean showLocationIsFullPath = getIDEPreferenceStore()
-				.getBoolean(IDEInternalPreferences.SHOW_LOCATION_FULLPATH);
-		showLocationFullPath = new Button(groupComposite, SWT.CHECK);
-		showLocationFullPath.setText(IDEWorkbenchMessages.IDEWorkspacePreference_showFullPathInWindowTitle);
-		showLocationFullPath.setSelection(showLocationIsFullPath);
-		showLocationFullPath
-				.setEnabled(showLocationInWindowTitle.isEnabled() && showLocationInWindowTitle.getSelection());
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(showLocationFullPath);
-
 		if (showLocationIsSetOnCommandLine) {
 			Composite noteComposite = createNoteComposite(composite.getFont(), groupComposite,
 					WorkbenchMessages.Preference_note,
 					IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle_lockedByCommandLine);
 			GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(noteComposite);
 		}
-
-		// listens to change
-		showLocationInWindowTitle.addListener(SWT.Selection, e -> {
-			if (showLocationFullPath != null && showLocationInWindowTitle != null)
-				showLocationFullPath
-						.setEnabled(showLocationInWindowTitle.isEnabled() && showLocationInWindowTitle.getSelection());
-		});
 	}
 
     /**
@@ -490,7 +470,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
 		showLocationInWindowTitle.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION));
-		showLocationFullPath.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION_FULLPATH));
         workspaceName.loadDefault();
 
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
@@ -564,7 +543,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         }
 
 		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationInWindowTitle.getSelection());
-		store.setValue(IDEInternalPreferences.SHOW_LOCATION_FULLPATH, showLocationFullPath.getSelection());
 
         workspaceName.store();
 
