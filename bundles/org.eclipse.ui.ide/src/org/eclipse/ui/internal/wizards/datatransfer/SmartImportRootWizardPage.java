@@ -37,6 +37,7 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -51,6 +52,7 @@ import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -61,7 +63,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -73,6 +74,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
@@ -92,20 +94,25 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 	static final String IMPORTED_SOURCES = SmartImportRootWizardPage.class.getName() + ".knownSources"; //$NON-NLS-1$
 
+	// Root
 	private File selection;
-	private boolean detectNestedProjects = true;
-	private boolean configureProjects = true;
-	private Set<IWorkingSet> workingSets;
-	private ControlDecoration rootDirectoryTextDecorator;
-	private WorkingSetConfigurationBlock workingSetsBlock;
-
 	private Combo rootDirectoryText;
+	private ControlDecoration rootDirectoryTextDecorator;
 	// Proposal part
 	private CheckboxTreeViewer tree;
+	private ControlDecoration proposalSelectionDecorator;
 	private Set<File> alreadyExistingProjects;
 	private Set<File> notAlreadyExistingProjects;
 	private Label selectionSummary;
 	protected Map<File, List<ProjectConfigurator>> potentialProjects = Collections.emptyMap();
+	// Configuration part
+	private boolean detectNestedProjects = true;
+	private boolean configureProjects = true;
+	// Working sets
+	private Set<IWorkingSet> workingSets;
+	private WorkingSetConfigurationBlock workingSetsBlock;
+	// Progress monitor
+	protected ProgressMonitorPart wizardProgressMonitor;
 
 	private class FolderForProjectsLabelProvider extends CellLabelProvider implements IColorProvider {
 		public String getText(Object o) {
@@ -224,11 +231,9 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		createInputSelectionOptions(res);
 
-
-		Composite proposalParent = new Composite(res, SWT.NONE);
-		proposalParent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
-		proposalParent.setLayout(new FillLayout());
-		createProposalsGroup(proposalParent);
+		GridData proposalsGroupLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1);
+		proposalsGroupLayoutData.verticalIndent = 12;
+		createProposalsGroup(res).setLayoutData(proposalsGroupLayoutData);
 
 		createConfigurationOptions(res);
 
@@ -282,6 +287,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 						expandSelectedArchive();
 					}
 				}
+				validatePage();
 				refreshProposals();
 			}
 
@@ -422,7 +428,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	/**
 	 * @param res
 	 */
-	private void createProposalsGroup(Composite parent) {
+	private Composite createProposalsGroup(Composite parent) {
 		Composite res = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(res);
 		PatternFilter patternFilter = new PatternFilter();
@@ -499,6 +505,15 @@ public class SmartImportRootWizardPage extends WizardPage {
 		tree.getTree().getColumn(1).setText(DataTransferMessages.SmartImportProposals_importAs);
 		tree.getTree().getColumn(1).setWidth(250);
 
+		this.proposalSelectionDecorator = new ControlDecoration(tree.getTree(), SWT.TOP | SWT.LEFT);
+		Image errorImage = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
+				.getImage();
+		treeGridData.horizontalIndent += errorImage.getBounds().width;
+		this.proposalSelectionDecorator.setImage(errorImage);
+		this.proposalSelectionDecorator
+				.setDescriptionText(DataTransferMessages.SmartImportWizardPage_selectAtLeastOneFolderToOpenAsProject);
+		this.proposalSelectionDecorator.hide();
+
 		Composite selectionButtonsGroup = new Composite(res, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(selectionButtonsGroup);
 		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
@@ -558,15 +573,26 @@ public class SmartImportRootWizardPage extends WizardPage {
 			}
 		});
 		tree.setInput(Collections.emptyMap());
+		return res;
 	}
 
 	protected void validatePage() {
-		if (!isPageComplete()) {
+		// reset error message
+		setErrorMessage(null);
+		// order of invocation of setErrorMessage == reverse order of priority
+		// ie: most important one must call setErrorMessage last
+		if (tree.getCheckedElements().length == 0) {
+			this.proposalSelectionDecorator.show();
+			setErrorMessage(this.proposalSelectionDecorator.getDescriptionText());
+		} else {
+			this.proposalSelectionDecorator.hide();
+		}
+
+		if (!sourceIsValid()) {
 			this.rootDirectoryTextDecorator.show();
 			setErrorMessage(this.rootDirectoryTextDecorator.getDescriptionText());
 		} else {
 			this.rootDirectoryTextDecorator.hide();
-			setErrorMessage(null);
 		}
 		setPageComplete(isPageComplete());
 	}
@@ -665,16 +691,30 @@ public class SmartImportRootWizardPage extends WizardPage {
 	}
 
 	private void refreshProposals() {
+		if (wizardProgressMonitor != null) {
+			wizardProgressMonitor.setCanceled(true);
+			wizardProgressMonitor.done();
+		}
 		try {
+			// clear current state
+			SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
+			SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
+			SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
+			proposalsUpdated();
 			if (sourceIsValid()) {
+				tree.getControl().setEnabled(false);
+				TreeItem computingItem = new TreeItem(tree.getTree(), SWT.DEFAULT);
+				computingItem
+						.setText(NLS.bind(DataTransferMessages.SmartImportJob_inspecting, selection.getAbsolutePath()));
 				Point initialSelection = rootDirectoryText.getSelection();
-				getContainer().run(true, true, new IRunnableWithProgress() {
+				final SmartImportJob importJob = getWizard().getImportJob();
+				IRunnableWithProgress refreshProposalsRunnable = new IRunnableWithProgress() {
 					@Override
 					public void run(IProgressMonitor monitor) {
-						SmartImportRootWizardPage.this.potentialProjects = getWizard().getImportJob()
+						SmartImportRootWizardPage.this.potentialProjects = importJob
 								.getImportProposals(monitor);
-						if (!potentialProjects.containsKey(getWizard().getImportJob().getRoot())) {
-							potentialProjects.put(getWizard().getImportJob().getRoot(), Collections.emptyList());
+						if (!potentialProjects.containsKey(importJob.getRoot())) {
+							potentialProjects.put(importJob.getRoot(), Collections.emptyList());
 						}
 
 						SmartImportRootWizardPage.this.notAlreadyExistingProjects = new HashSet<>(
@@ -689,16 +729,28 @@ public class SmartImportRootWizardPage extends WizardPage {
 							SmartImportRootWizardPage.this.alreadyExistingProjects.add(location.toFile());
 						}
 					}
-				});
-				// restore selection as getContainer().run(...) looses it
+				};
+				getContainer().run(false, true, monitor -> {
+						if (monitor instanceof ProgressMonitorPart) {
+							wizardProgressMonitor = (ProgressMonitorPart) monitor;
+						}
+					}
+				);
+				wizardProgressMonitor.attachToCancelComponent(null);
+				wizardProgressMonitor.setVisible(true);
 				rootDirectoryText.setSelection(initialSelection);
-			} else {
-				SmartImportRootWizardPage.this.potentialProjects = Collections.emptyMap();
-				SmartImportRootWizardPage.this.notAlreadyExistingProjects = Collections.emptySet();
-				SmartImportRootWizardPage.this.alreadyExistingProjects = Collections.emptySet();
+				rootDirectoryText.setFocus();
+				DelegateProgressMonitorPreservingFocus delegateMonitor = new DelegateProgressMonitorPreservingFocus(
+						wizardProgressMonitor, getShell());
+				ModalContext.run(refreshProposalsRunnable, true,
+						delegateMonitor, getShell().getDisplay());
+				computingItem.dispose();
+				// content still relevant
+				if (sourceIsValid() && getWizard().getImportJob() == importJob) {
+					proposalsUpdated();
+				}
+				tree.getTree().setEnabled(true);
 			}
-			tree.setInput(potentialProjects);
-			tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
 		} catch (InvocationTargetException ite) {
 			this.selection = null;
 			IStatus status = new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, DataTransferMessages.SmartImportWizardPage_scanProjectsFailed,
@@ -706,9 +758,22 @@ public class SmartImportRootWizardPage extends WizardPage {
 			StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.SHOW);
 		} catch (InterruptedException operationCanceled) {
 		}
-		proposalsSelectionChanged();
-		SmartImportRootWizardPage.this.validatePage();
 	}
 
+	private void proposalsUpdated() {
+		tree.setInput(potentialProjects);
+		tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
+		proposalsSelectionChanged();
+		validatePage();
+	}
+
+	@Override
+	public void dispose() {
+		if (wizardProgressMonitor != null) {
+			wizardProgressMonitor.setCanceled(true);
+			wizardProgressMonitor.done();
+		}
+		super.dispose();
+	}
 }
 
