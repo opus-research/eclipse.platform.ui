@@ -261,7 +261,7 @@ public class ImageHyperlink extends Hyperlink {
 	}
 
 	private void createDisabledImage() {
-		if (this.image != null && !this.image.isDisposed())
+		if (this.disabledImage != null && !this.disabledImage.isDisposed())
 			disabledImage = new Image(this.image.getDevice(), this.image, SWT.IMAGE_DISABLE);
 	}
 
