@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  * 	   Chris Tilt (chris@tilts.net) - Bug 38547 - [Preferences] Changing preferences
  * 			ignored after "Restore defaults" pressed.
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 350234
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -230,7 +229,6 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
 		}
 
         initialize();
-        applyFont();
         checkState();
         return fieldEditorParent;
     }
