@@ -1,11 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2017 vogella GmbH and others. All rights reserved. This
+ * Copyright (c) 2008, 2014 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Lars Vogel <Lars.Vogel@vogella.com> - initial API and implementation
+ *     IBM Corporation - initial API and implementation
+ *      Remy Chi Jian Suen <remy.suen@gmail.com> - bug 137650
+ *      Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
