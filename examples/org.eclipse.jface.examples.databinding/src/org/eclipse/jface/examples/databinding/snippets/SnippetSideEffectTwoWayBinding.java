@@ -11,10 +11,10 @@
 
 package org.eclipse.jface.examples.databinding.snippets;
 
-import org.eclipse.core.databinding.observable.ISideEffect;
 import org.eclipse.core.databinding.observable.Realm;
+import org.eclipse.core.databinding.observable.sideeffect.ISideEffect;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.internal.databinding.observable.SideEffect;
+import org.eclipse.core.internal.databinding.observable.sideeffect.SideEffect;
 import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
