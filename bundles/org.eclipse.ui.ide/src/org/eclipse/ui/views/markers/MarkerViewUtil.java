@@ -11,8 +11,6 @@
 
 package org.eclipse.ui.views.markers;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IPageLayout;
@@ -91,9 +89,8 @@ public class MarkerViewUtil {
 	}
 
 	/**
-	 * Shows the given markers in the appropriate view of the first marker
-	 * in the given page. If a marker does not be belongs to this view it
-	 * would not be shown. This must be called from the UI thread.
+	 * Shows the given markers in the appropriate view in the given page. This
+	 * must be called from the UI thread.
 	 *
 	 * @param page
 	 *            the workbench page in which to show the markers
@@ -105,21 +102,20 @@ public class MarkerViewUtil {
 	 *            already showing
 	 * @return <code>true</code> if the markers were successfully shown,
 	 *         <code>false</code> if not
-	 * @since 3.13
+	 * @since 3.12
 	 */
 	public static boolean showMarkers(IWorkbenchPage page, IMarker[] markers, boolean showView) {
 		boolean returnValue = false;
 		IMarker marker = markers[0];
 		try {
 			String viewId = getViewId(marker);
-			IMarker[] markersSameView = getMarkersOfView(viewId, markers);
 			if (viewId == null) // Use the problem view by default
 				viewId = IPageLayout.ID_PROBLEM_VIEW;
 
 			IViewPart view = showView ? page.showView(viewId) : page
 					.findView(viewId);
 			if (view != null)
-				returnValue = MarkerSupportInternalUtilities.showMarkers(view, markersSameView);
+				returnValue = MarkerSupportInternalUtilities.showMarkers(view, markers);
 
 			// If we have already shown the new one do not open another one
 			viewId = getLegacyViewId(marker);
@@ -134,31 +130,6 @@ public class MarkerViewUtil {
 			Policy.handle(e);
 		}
 		return returnValue;
-	}
-
-	/**
-	 * Retrieves all the markers that belongs to the given view.
-	 *
-	 * @param viewId
-	 *            the id of the given view
-	 * @param markers
-	 *            the markers to be inspect
-	 *
-	 * @return markers that belongs to the given view
-	 * @throws CoreException
-	 *             if an exception occurs testing the type of the marker
-	 */
-	private static IMarker[] getMarkersOfView(String viewId, IMarker[] markers)
-			throws CoreException {
-		if (null == viewId) // all markers should be shown
-			return markers;
-
-		ArrayList<IMarker> markersOfView = new ArrayList<>();
-		for (IMarker marker : markers) {
-			if (viewId == getViewId(marker))
-				markersOfView.add(marker);
-		}
-		return markersOfView.toArray(new IMarker[markersOfView.size()]);
 	}
 
 	/**
