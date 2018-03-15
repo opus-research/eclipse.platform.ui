@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483362, 486991
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483362, 486804
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests;
