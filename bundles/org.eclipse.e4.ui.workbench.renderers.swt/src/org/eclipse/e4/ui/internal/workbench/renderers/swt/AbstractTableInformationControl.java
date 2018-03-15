@@ -28,6 +28,7 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -36,6 +37,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -298,6 +300,7 @@ public abstract class AbstractTableInformationControl {
 			}
 		});
 
+		setInfoSystemColor();
 		installFilter();
 	}
 
@@ -375,6 +378,12 @@ public abstract class AbstractTableInformationControl {
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		return fFilterText;
+	}
+
+	private void setInfoSystemColor() {
+		Display display = fShell.getDisplay();
+		setForegroundColor(display.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+		setBackgroundColor(display.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 	}
 
 	private void installFilter() {
@@ -522,6 +531,18 @@ public abstract class AbstractTableInformationControl {
 
 	public Shell getShell() {
 		return fShell;
+	}
+
+	private void setForegroundColor(Color foreground) {
+		fTableViewer.getTable().setForeground(foreground);
+		fFilterText.setForeground(foreground);
+		fComposite.setForeground(foreground);
+	}
+
+	private void setBackgroundColor(Color background) {
+		fTableViewer.getTable().setBackground(background);
+		fFilterText.setBackground(background);
+		fComposite.setBackground(background);
 	}
 
 	public void setFocus() {
