@@ -111,7 +111,7 @@ import org.eclipse.ui.part.ResourceTransfer;
         final int length = resources.length;
         int actualLength = 0;
         String[] fileNames = new String[length];
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         for (int i = 0; i < length; i++) {
             IPath location = resources[i].getLocation();
             // location may be null. See bug 29491.

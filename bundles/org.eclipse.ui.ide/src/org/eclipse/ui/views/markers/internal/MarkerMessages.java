@@ -72,7 +72,6 @@ public class MarkerMessages extends NLS {
 
 	public static String deleteActionConfirmTitle;
 	public static String deleteActionConfirmMessage;
-	public static String deleteActionConfirm_buttonDeleteLabel;
 
 	public static String filtersDialog_title;
 	public static String configureFiltersCommand_title;
@@ -112,11 +111,9 @@ public class MarkerMessages extends NLS {
 	public static String filtersDialog_statusComplete;
 	public static String filtersDialog_statusIncomplete;
 	public static String filtersDialog_conflictingName;
-	public static String filtersDialog_applyAndCloseButton;
 
 	public static String filtersDialog_scopeTitle;
 	public static String filtersDialog_typesTitle;
-	public static String filtersDialog_description;
 	public static String filtersDialog_completionTitle;
 	public static String filtersDialog_priorityTitle;
 

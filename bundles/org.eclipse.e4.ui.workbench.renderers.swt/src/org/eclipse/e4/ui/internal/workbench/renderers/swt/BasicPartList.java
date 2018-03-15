@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *      Robert Roth <robert.roth.off@gmail.com> - Bug 356575
  *******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
@@ -58,7 +57,8 @@ public class BasicPartList extends AbstractTableInformationControl {
 		public Font getFont(Object element) {
 			if (element instanceof MPart) {
 				MPart part = (MPart) element;
-				if (part.equals(partService.getActivePart())) {
+				CTabItem item = renderer.findItemForPart(part);
+				if (item != null && !item.isShowing()) {
 					return boldFont;
 				}
 			}
@@ -179,15 +179,11 @@ public class BasicPartList extends AbstractTableInformationControl {
 	}
 
 	@Override
-	protected boolean deleteSelectedElement(Object selectedElement) {
-		if (selectedElement == null) {
-			selectedElement = getSelectedElement();
-		}
-		if (selectedElement instanceof MPart) {
-			MPart part = (MPart) selectedElement;
-			if (partService.savePart(part, true)) {
-				partService.hidePart(part);
-			}
+	protected boolean deleteSelectedElements() {
+		Object selectedElement = getSelectedElement();
+		if (selectedElement != null) {
+			if (partService.savePart((MPart) selectedElement, true))
+				partService.hidePart((MPart) selectedElement);
 
 			if (getShell() == null) {
 				// Bug 421170: Contract says to return true if there are no
@@ -202,8 +198,11 @@ public class BasicPartList extends AbstractTableInformationControl {
 			}
 
 			// Remove part from viewer model
-			List<?> viewerInput = (List<?>) getTableViewer().getInput();
+			@SuppressWarnings("unchecked")
+			List<Object> viewerInput = (List<Object>) getTableViewer()
+					.getInput();
 			viewerInput.remove(selectedElement);
+
 		}
 		return false;
 

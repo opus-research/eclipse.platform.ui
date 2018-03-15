@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,21 +25,28 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -212,17 +219,20 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		// uncheck any other elements that might be checked and leave only the
 		// element checked to remain checked since one can only chose one
 		// brower at a time to be current.
-		tableViewer.addCheckStateListener(e -> {
-			checkNewDefaultBrowser(e.getElement());
-			checkedBrowser = (IBrowserDescriptor) e.getElement();
+		tableViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent e) {
+				checkNewDefaultBrowser(e.getElement());
+				checkedBrowser = (IBrowserDescriptor) e.getElement();
 
-			// if no other browsers are checked, don't allow the single one
-			// currently checked to become unchecked, and lose a current
-			// browser. That is, don't permit unchecking if no other item
-			// is checked which is supposed to be the case.
-			Object[] obj = tableViewer.getCheckedElements();
-			if (obj.length == 0)
-				tableViewer.setChecked(e.getElement(), true);
+				// if no other browsers are checked, don't allow the single one
+				// currently checked to become unchecked, and lose a current
+				// browser. That is, don't permit unchecking if no other item
+				// is checked which is supposed to be the case.
+				Object[] obj = tableViewer.getCheckedElements();
+				if (obj.length == 0)
+					tableViewer.setChecked(e.getElement(), true);
+			}
 		});
 
 		// set a default, checked browser based on the current browser. If there
@@ -239,36 +249,48 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		}
 
 		tableViewer
-				.addSelectionChangedListener(event -> {
-					IStructuredSelection sele = tableViewer.getStructuredSelection();
-					boolean sel = sele.getFirstElement() != null
-							&& !(sele.getFirstElement() instanceof SystemBrowserDescriptor);
-					remove.setEnabled(sel);
-					edit.setEnabled(sel);
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						IStructuredSelection sele = ((IStructuredSelection) tableViewer
+								.getSelection());
+						boolean sel = sele.getFirstElement() != null &&
+								!(sele.getFirstElement() instanceof SystemBrowserDescriptor);
+						remove.setEnabled(sel);
+						edit.setEnabled(sel);
+					}
 				});
 
-		tableViewer.addDoubleClickListener(event -> {
-			IStructuredSelection sel = tableViewer.getStructuredSelection();
-			Object firstElem = sel.getFirstElement();
-			if (firstElem != null && !(firstElem instanceof SystemBrowserDescriptor)) {
-				IBrowserDescriptor browser2 = (IBrowserDescriptor) sel.getFirstElement();
-				IBrowserDescriptorWorkingCopy wc = browser2.getWorkingCopy();
-				BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(getShell(), wc);
-				if (dialog.open() != Window.CANCEL) {
-					try {
-						tableViewer.refresh(wc.save());
-					} catch (Exception ex) {
-						// ignore
+		tableViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				IStructuredSelection sel = ((IStructuredSelection) tableViewer
+						.getSelection());
+				Object firstElem = sel.getFirstElement();
+				if (firstElem != null && !(firstElem instanceof SystemBrowserDescriptor)) {
+					IBrowserDescriptor browser2 = (IBrowserDescriptor) sel
+							.getFirstElement();
+					IBrowserDescriptorWorkingCopy wc = browser2
+							.getWorkingCopy();
+					BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(
+							getShell(), wc);
+					if (dialog.open() != Window.CANCEL) {
+						try {
+							tableViewer.refresh(wc.save());
+						} catch (Exception ex) {
+							// ignore
+						}
 					}
 				}
 			}
 		});
 
-		table.addKeyListener(new KeyAdapter() {
+		table.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.character == SWT.DEL) {
-					IStructuredSelection sel = tableViewer.getStructuredSelection();
+					IStructuredSelection sel = ((IStructuredSelection) tableViewer
+							.getSelection());
 					if (sel.getFirstElement() != null) {
 						IBrowserDescriptor browser2 = (IBrowserDescriptor) sel
 								.getFirstElement();
@@ -296,6 +318,11 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 					}
 				}
 			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// ignore
+			}
 		});
 
 		Composite buttonComp = new Composite(composite, SWT.NONE);
@@ -311,116 +338,146 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		buttonComp.setLayoutData(data);
 
 		final Button add = SWTUtil.createButton(buttonComp, Messages.add);
-		add.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(getShell());
-			if (dialog.open() == Window.CANCEL)
-				return;
-			tableViewer.refresh();
-			if (checkedBrowser != null)
-				tableViewer.setChecked(checkedBrowser, true);
-		}));
+		add.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(
+						getShell());
+				if (dialog.open() == Window.CANCEL)
+					return;
+				tableViewer.refresh();
+				if (checkedBrowser != null)
+					tableViewer.setChecked(checkedBrowser, true);
+			}
+		});
 
 		edit = SWTUtil.createButton(buttonComp, Messages.edit);
-		edit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			IStructuredSelection sel = tableViewer.getStructuredSelection();
-			IBrowserDescriptor browser2 = (IBrowserDescriptor) sel.getFirstElement();
-			IBrowserDescriptorWorkingCopy wc = browser2.getWorkingCopy();
-			BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(getShell(), wc);
-			if (dialog.open() != Window.CANCEL) {
+		edit.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IStructuredSelection sel = ((IStructuredSelection) tableViewer
+						.getSelection());
+				IBrowserDescriptor browser2 = (IBrowserDescriptor) sel
+						.getFirstElement();
+				IBrowserDescriptorWorkingCopy wc = browser2.getWorkingCopy();
+				BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(
+						getShell(), wc);
+				if (dialog.open() != Window.CANCEL) {
+					try {
+						tableViewer.refresh(wc.save());
+					} catch (Exception ex) {
+						// ignore
+					}
+				}
+			}
+		});
+
+		remove = SWTUtil.createButton(buttonComp, Messages.remove);
+		remove.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				IStructuredSelection sel = ((IStructuredSelection) tableViewer
+						.getSelection());
+				IBrowserDescriptor browser2 = (IBrowserDescriptor) sel
+						.getFirstElement();
 				try {
-					tableViewer.refresh(wc.save());
+					browser2.delete();
+					tableViewer.remove(browser2);
+
+					// need here to ensure that if the item deleted was checked,
+					// ie. was
+					// the current browser, that the new current browser will be
+					// the first in the
+					// list, typically, the internal browser, which cannot be
+					// deleted, and be current
+					BrowserManager manager = BrowserManager.getInstance();
+					if (browser2 == checkedBrowser) {
+						if (manager.browsers.size() > 0) {
+							checkedBrowser = manager.browsers.get(0);
+							tableViewer.setChecked(checkedBrowser, true);
+						}
+					}
 				} catch (Exception ex) {
 					// ignore
 				}
 			}
-		}));
-
-		remove = SWTUtil.createButton(buttonComp, Messages.remove);
-		remove.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			IStructuredSelection sel = tableViewer.getStructuredSelection();
-			IBrowserDescriptor browser2 = (IBrowserDescriptor) sel.getFirstElement();
-			try {
-				browser2.delete();
-				tableViewer.remove(browser2);
-
-				// need here to ensure that if the item deleted was checked,
-				// ie. was the current browser, that the new current browser
-				// will be
-				// the first in the list, typically, the internal browser, which
-				// cannot be
-				// deleted, and be current
-				BrowserManager manager = BrowserManager.getInstance();
-				if (browser2 == checkedBrowser) {
-					if (manager.browsers.size() > 0) {
-						checkedBrowser = manager.browsers.get(0);
-						tableViewer.setChecked(checkedBrowser, true);
-					}
-				}
-			} catch (Exception ex) {
-				// ignore
-			}
-		}));
+		});
 
 		search = SWTUtil.createButton(buttonComp, Messages.search);
 		data = (GridData) search.getLayoutData();
 		data.verticalIndent = 9;
-		search.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			final List<IBrowserDescriptorWorkingCopy> foundBrowsers = new ArrayList<>();
-			final List<String> existingPaths = WebBrowserUtil.getExternalBrowserPaths();
+		search.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final List<IBrowserDescriptorWorkingCopy> foundBrowsers = new ArrayList<>();
+				final List<String> existingPaths = WebBrowserUtil
+						.getExternalBrowserPaths();
 
-			// select a target directory for the search
-			DirectoryDialog dialog = new DirectoryDialog(getShell());
-			dialog.setMessage(Messages.selectDirectory);
-			dialog.setText(Messages.directoryDialogTitle);
+				// select a target directory for the search
+				DirectoryDialog dialog = new DirectoryDialog(getShell());
+				dialog.setMessage(Messages.selectDirectory);
+				dialog.setText(Messages.directoryDialogTitle);
 
-			String path = dialog.open();
-			if (path == null)
-				return;
+				String path = dialog.open();
+				if (path == null)
+					return;
 
-			final File rootDir = new File(path);
-			ProgressMonitorDialog pm = new ProgressMonitorDialog(getShell());
+				final File rootDir = new File(path);
+				ProgressMonitorDialog pm = new ProgressMonitorDialog(getShell());
 
-			IRunnableWithProgress r = monitor -> {
-				monitor.beginTask(Messages.searchingTaskName, IProgressMonitor.UNKNOWN);
-				search(rootDir, existingPaths, foundBrowsers, new HashSet<String>(), monitor);
-				monitor.done();
-			};
+				IRunnableWithProgress r = new IRunnableWithProgress() {
+					@Override
+					public void run(IProgressMonitor monitor) {
+						monitor.beginTask(Messages.searchingTaskName,
+								IProgressMonitor.UNKNOWN);
+						search(rootDir, existingPaths, foundBrowsers, new HashSet<String>(), monitor);
+						monitor.done();
+					}
+				};
 
-			try {
-				pm.run(true, true, r);
-			} catch (InvocationTargetException ex) {
-				Trace.trace(Trace.SEVERE, "Invocation Exception occured running monitor: " //$NON-NLS-1$
-						+ ex);
-			} catch (InterruptedException ex) {
-				Trace.trace(Trace.SEVERE, "Interrupted exception occured running monitor: " //$NON-NLS-1$
-						+ ex);
-				return;
+				try {
+					pm.run(true, true, r);
+				} catch (InvocationTargetException ex) {
+					Trace.trace(Trace.SEVERE,
+							"Invocation Exception occured running monitor: " //$NON-NLS-1$
+									+ ex);
+				} catch (InterruptedException ex) {
+					Trace.trace(Trace.SEVERE,
+							"Interrupted exception occured running monitor: " //$NON-NLS-1$
+									+ ex);
+					return;
+				}
+
+				if (pm.getProgressMonitor().isCanceled())
+					return;
+
+				List<IBrowserDescriptorWorkingCopy> browsersToCreate = foundBrowsers;
+
+				if (browsersToCreate.isEmpty()) { // no browsers found
+					WebBrowserUtil.openMessage(Messages.searchingNoneFound);
+					return;
+				}
+
+				Iterator<IBrowserDescriptorWorkingCopy> iterator = browsersToCreate.iterator();
+				while (iterator.hasNext()) {
+					IBrowserDescriptorWorkingCopy browser2 = iterator
+							.next();
+					browser2.save();
+				}
+				tableViewer.refresh();
+
+				if (checkedBrowser != null)
+					tableViewer.setChecked(checkedBrowser, true);
 			}
+		});
 
-			if (pm.getProgressMonitor().isCanceled())
-				return;
-
-			List<IBrowserDescriptorWorkingCopy> browsersToCreate = foundBrowsers;
-
-			if (browsersToCreate.isEmpty()) { // no browsers found
-				WebBrowserUtil.openMessage(Messages.searchingNoneFound);
-				return;
+		tableViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent e) {
+				checkNewDefaultBrowser(e.getElement());
+				checkedBrowser = (IBrowserDescriptor) e
+						.getElement();
 			}
-
-			Iterator<IBrowserDescriptorWorkingCopy> iterator = browsersToCreate.iterator();
-			while (iterator.hasNext()) {
-				IBrowserDescriptorWorkingCopy browser2 = iterator.next();
-				browser2.save();
-			}
-			tableViewer.refresh();
-
-			if (checkedBrowser != null)
-				tableViewer.setChecked(checkedBrowser, true);
-		}));
-
-		tableViewer.addCheckStateListener(e -> {
-			checkNewDefaultBrowser(e.getElement());
-			checkedBrowser = (IBrowserDescriptor) e.getElement();
 		});
 
 		/*external.addSelectionListener(new SelectionListener() {
@@ -438,7 +495,8 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		external.setSelection(WebBrowserPreference.getBrowserChoice() == WebBrowserPreference.EXTERNAL);
 
 		//boolean sel = !tableViewer.getSelection().isEmpty();
-		IStructuredSelection sele = tableViewer.getStructuredSelection();
+		IStructuredSelection sele = ((IStructuredSelection) tableViewer
+				.getSelection());
 		boolean sel = sele.getFirstElement() != null &&
 				!(sele.getFirstElement() instanceof SystemBrowserDescriptor);
 		edit.setEnabled(sel);
@@ -477,7 +535,10 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 
 	// Uncheck all the items except the current one that was just checked
 	protected void checkNewDefaultBrowser(Object browser) {
-		for (TableItem item : tableViewer.getTable().getItems()) {
+		TableItem[] children = tableViewer.getTable().getItems();
+		for (int i = 0; i < children.length; i++) {
+			TableItem item = children[i];
+
 			if (!(item.getData().equals(browser)))
 				item.setChecked(false);
 		}
@@ -504,11 +565,11 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		String[] names = directory.list();
 		List<File> subDirs = new ArrayList<>();
 
-		for (String name : names) {
+		for (int i = 0; i < names.length; i++) {
 			if (monitor.isCanceled())
 				return;
 
-			File file = new File(directory, name);
+			File file = new File(directory, names[i]);
 
 			if (existingPaths.contains(file.getAbsolutePath().toLowerCase()))
 				continue;

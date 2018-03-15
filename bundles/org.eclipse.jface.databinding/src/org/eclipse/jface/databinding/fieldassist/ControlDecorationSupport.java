@@ -389,8 +389,8 @@ public class ControlDecorationSupport {
 		targets.addDisposeListener(disposeListener);
 		targets.addListChangeListener(targetsChangeListener);
 
-		for (Object name : targets)
-			targetAdded((IObservable) name);
+		for (Iterator<?> it = targets.iterator(); it.hasNext();)
+			targetAdded((IObservable) it.next());
 
 		statusChanged(validationStatus.getValue());
 	}
@@ -442,7 +442,8 @@ public class ControlDecorationSupport {
 	}
 
 	private void statusChanged(IStatus status) {
-		for (TargetDecoration targetDecoration : targetDecorations) {
+		for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
+			TargetDecoration targetDecoration = it.next();
 			ControlDecoration decoration = targetDecoration.decoration;
 			updater.update(decoration, status);
 		}
@@ -480,7 +481,9 @@ public class ControlDecorationSupport {
 		targetsChangeListener = null;
 
 		if (targetDecorations != null) {
-			for (TargetDecoration targetDecoration : targetDecorations) {
+			for (Iterator<TargetDecoration> it = targetDecorations.iterator(); it.hasNext();) {
+				TargetDecoration targetDecoration = it
+						.next();
 				targetDecoration.decoration.dispose();
 			}
 			targetDecorations.clear();

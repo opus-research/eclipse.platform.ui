@@ -155,7 +155,7 @@ public class ReadmeCreationPage extends WizardNewFileCreationPage {
         if (!sectionCheckbox.getSelection())
             return null;
 
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         sb.append(MessageUtil.getString("SAMPLE_README_FILE")); //$NON-NLS-1$
         sb.append(MessageUtil.getString("SECTION_1")); //$NON-NLS-1$
         sb.append(MessageUtil.getString("SECTION_1_BODY_1")); //$NON-NLS-1$

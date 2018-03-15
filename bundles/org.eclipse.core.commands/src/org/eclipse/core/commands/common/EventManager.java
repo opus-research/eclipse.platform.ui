@@ -41,21 +41,16 @@ public abstract class EventManager {
 	 * A collection of objects listening to changes to this manager. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private volatile transient ListenerList<Object> listenerList = null;
+	private transient ListenerList<Object> listenerList = null;
 
 	/**
 	 * Adds a listener to this manager that will be notified when this manager's
-	 * state changes. This method has no effect if the same listener is already
-	 * registered.
+	 * state changes.
 	 *
 	 * @param listener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
 	protected synchronized final void addListenerObject(final Object listener) {
-		if (listener == null) {
-			throw new IllegalArgumentException();
-		}
-
 		if (listenerList == null) {
 			listenerList = new ListenerList<>(ListenerList.IDENTITY);
 		}
@@ -66,17 +61,14 @@ public abstract class EventManager {
 	/**
 	 * Clears all of the listeners from the listener list.
 	 */
-	protected final void clearListeners() {
-		listenerList = null;
+	protected synchronized final void clearListeners() {
+		if (listenerList != null) {
+			listenerList.clear();
+		}
 	}
 
 	/**
-	 * Returns an array containing all the listeners attached to this event
-	 * manager. The resulting array is unaffected by subsequent adds or removes.
-	 * If there are no listeners registered, the result is an empty array. Use
-	 * this method when notifying listeners, so that any modifications to the
-	 * listener list during the notification will have no effect on the
-	 * notification itself.
+	 * Returns the listeners attached to this event manager.
 	 * <p>
 	 * Note: Callers of this method <b>must not</b> modify the returned array.
 	 * </p>
@@ -104,17 +96,12 @@ public abstract class EventManager {
 	}
 
 	/**
-	 * Removes a listener from this manager. Has no effect if the same listener
-	 * was not already registered.
+	 * Removes a listener from this manager.
 	 *
 	 * @param listener
 	 *            The listener to be removed; must not be <code>null</code>.
 	 */
 	protected synchronized final void removeListenerObject(final Object listener) {
-		if (listener == null) {
-			throw new IllegalArgumentException();
-		}
-
 		if (listenerList != null) {
 			listenerList.remove(listener);
 

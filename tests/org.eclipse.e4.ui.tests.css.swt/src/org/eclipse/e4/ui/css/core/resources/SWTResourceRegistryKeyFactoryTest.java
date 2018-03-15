@@ -17,6 +17,7 @@ import org.eclipse.e4.ui.css.core.dom.properties.css2.CSS2FontProperties;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTHelperTestCase;
 import org.eclipse.e4.ui.css.swt.resources.ResourceByDefinitionKey;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourceRegistryKeyFactory;
+import org.eclipse.swt.SWT;
 import org.junit.Test;
 import org.w3c.dom.css.CSSPrimitiveValue;
 
@@ -26,7 +27,7 @@ public class SWTResourceRegistryKeyFactoryTest extends CSSSWTHelperTestCase {
 	@Test
 	public void testCreateKeyWhenFontProperty() {
 		CSS2FontProperties fontProperties = null;
-		fontProperties = fontProperties("Arial", 12, CSS_ITALIC, CSS_BOLD);
+		fontProperties = fontProperties("Arial", 12, SWT.ITALIC);
 
 
 		Object result = factory.createKey(fontProperties);
@@ -49,7 +50,7 @@ public class SWTResourceRegistryKeyFactoryTest extends CSSSWTHelperTestCase {
 	public void testCreateKeyWhenFontByDefinition() {
 		CSS2FontProperties fontProperties = null;
 		try {
-			fontProperties = fontProperties("#font-by-definition", 12, CSS_ITALIC, CSS_BOLD);
+			fontProperties = fontProperties("#font-by-definition", 12, SWT.ITALIC);
 		} catch (Exception e) {
 			fail("FontProperties should not throw exception");
 		}

@@ -8,14 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 485840, 474320, 497634
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440810, 485840
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 380233
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485829
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.perspectiveswitcher;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,17 +45,26 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -70,6 +77,7 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -297,28 +305,61 @@ public class PerspectiveSwitcher {
 		layout.marginTop = 6;
 		comp.setLayout(layout);
 		perspSwitcherToolbar = new ToolBar(comp, SWT.FLAT | SWT.WRAP | SWT.RIGHT + orientation);
-		comp.addPaintListener(e -> paint(e));
+		comp.addPaintListener(new PaintListener() {
+
+			@Override
+			public void paintControl(PaintEvent e) {
+				paint(e);
+			}
+		});
 		toolParent = ((Control) toolControl.getParent().getWidget());
+		toolParent.addPaintListener(new PaintListener() {
 
-		comp.addDisposeListener(e -> dispose());
-
-		perspSwitcherToolbar.addMenuDetectListener(e -> {
-			ToolBar tb = (ToolBar) e.widget;
-			Point p = new Point(e.x, e.y);
-			p = perspSwitcherToolbar.getDisplay().map(null, perspSwitcherToolbar, p);
-			ToolItem item = tb.getItem(p);
-			if (item == null)
-				E4Util.message("  ToolBar menu"); //$NON-NLS-1$
-			else {
-				MPerspective persp = (MPerspective) item.getData();
-				if (persp == null)
-					E4Util.message("  Add button Menu"); //$NON-NLS-1$
-				else
-					openMenuFor(item, persp);
+			@Override
+			public void paintControl(PaintEvent e) {
+				if (borderColor == null || borderColor.isDisposed()) {
+					borderColor = e.display.getSystemColor(SWT.COLOR_GRAY);
+				}
+				e.gc.setForeground(borderColor);
+				Rectangle bounds = ((Control) e.widget).getBounds();
+				e.gc.drawLine(0, bounds.height - 1, bounds.width, bounds.height - 1);
 			}
 		});
 
-		perspSwitcherToolbar.addDisposeListener(e -> disposeTBImages());
+		comp.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				dispose();
+			}
+
+		});
+
+		perspSwitcherToolbar.addMenuDetectListener(new MenuDetectListener() {
+			@Override
+			public void menuDetected(MenuDetectEvent e) {
+				ToolBar tb = (ToolBar) e.widget;
+				Point p = new Point(e.x, e.y);
+				p = perspSwitcherToolbar.getDisplay().map(null, perspSwitcherToolbar, p);
+				ToolItem item = tb.getItem(p);
+				if (item == null)
+					E4Util.message("  ToolBar menu"); //$NON-NLS-1$
+				else {
+					MPerspective persp = (MPerspective) item.getData();
+					if (persp == null)
+						E4Util.message("  Add button Menu"); //$NON-NLS-1$
+					else
+						openMenuFor(item, persp);
+				}
+			}
+		});
+
+		perspSwitcherToolbar.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				disposeTBImages();
+			}
+
+		});
 
 		perspSwitcherToolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
 			@Override
@@ -469,16 +510,22 @@ public class PerspectiveSwitcher {
 			}
 		});
 
-		bar.addDragDetectListener(e -> {
-			if (dragItem != null) {
-				dragging = true;
-				track(e);
+		bar.addDragDetectListener(new DragDetectListener() {
+			@Override
+			public void dragDetected(DragDetectEvent e) {
+				if (dragItem != null) {
+					dragging = true;
+					track(e);
+				}
 			}
 		});
 
-		bar.addMouseMoveListener(e -> {
-			if (dragging) {
-				track(e);
+		bar.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				if (dragging) {
+					track(e);
+				}
 			}
 		});
 	}
@@ -517,10 +564,13 @@ public class PerspectiveSwitcher {
 				if (image != null) {
 					psItem.setImage(image);
 
-					psItem.addListener(SWT.Dispose, event -> {
-						Image currentImage = psItem.getImage();
-						if (currentImage != null)
-							currentImage.dispose();
+					psItem.addListener(SWT.Dispose, new Listener() {
+						@Override
+						public void handleEvent(org.eclipse.swt.widgets.Event event) {
+							Image currentImage = psItem.getImage();
+							if (currentImage != null)
+								currentImage.dispose();
+						}
 					});
 					foundImage = true;
 					psItem.setToolTipText(persp.getLocalizedLabel());
@@ -550,9 +600,12 @@ public class PerspectiveSwitcher {
 			}
 		});
 
-		psItem.addListener(SWT.MenuDetect, event -> {
-			MPerspective persp1 = (MPerspective) event.widget.getData();
-			openMenuFor(psItem, persp1);
+		psItem.addListener(SWT.MenuDetect, new Listener() {
+			@Override
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				MPerspective persp = (MPerspective) event.widget.getData();
+				openMenuFor(psItem, persp);
+			}
 		});
 
 		// update the size
@@ -604,7 +657,14 @@ public class PerspectiveSwitcher {
 
 			@Override
 			public void menuHidden(MenuEvent e) {
-				perspSwitcherToolbar.getDisplay().asyncExec(() -> menu.dispose());
+				perspSwitcherToolbar.getDisplay().asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						menu.dispose();
+					}
+
+				});
 			}
 
 			@Override
@@ -618,11 +678,14 @@ public class PerspectiveSwitcher {
 	private void addCloseItem(final Menu menu) {
 		MenuItem menuItem = new MenuItem(menu, SWT.NONE);
 		menuItem.setText(WorkbenchMessages.WorkbenchWindow_close);
-		menuItem.addSelectionListener(widgetSelectedAdapter(e -> {
-			MPerspective persp = (MPerspective) menu.getData();
-			if (persp != null)
-				closePerspective(persp);
-		}));
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				MPerspective persp = (MPerspective) menu.getData();
+				if (persp != null)
+					closePerspective(persp);
+			}
+		});
 	}
 
 	private void closePerspective(MPerspective persp) {
@@ -638,25 +701,28 @@ public class PerspectiveSwitcher {
 		final IWorkbenchWindow workbenchWindow = window.getContext().get(IWorkbenchWindow.class);
 		workbenchWindow.getWorkbench().getHelpSystem().setHelp(saveAsMenuItem,
 				IWorkbenchHelpContextIds.SAVE_PERSPECTIVE_ACTION);
-		saveAsMenuItem.addSelectionListener(widgetSelectedAdapter(event -> {
-			if (perspSwitcherToolbar.isDisposed())
-				return;
-			IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
-			IStatus status = Status.OK_STATUS;
-			try {
-				handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_SAVE_PERSPECTIVE_AS, null);
-			} catch (ExecutionException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotDefinedException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotEnabledException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotHandledException e) {
+		saveAsMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (perspSwitcherToolbar.isDisposed())
+					return;
+				IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
+				IStatus status = Status.OK_STATUS;
+				try {
+					handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_SAVE_PERSPECTIVE_AS, null);
+				} catch (ExecutionException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotDefinedException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotEnabledException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotHandledException e) {
+				}
+				if (!status.isOK())
+					StatusManager.getManager().handle(status,
+							StatusManager.SHOW | StatusManager.LOG);
 			}
-			if (!status.isOK())
-				StatusManager.getManager().handle(status,
-						StatusManager.SHOW | StatusManager.LOG);
-		}));
+		});
 	}
 
 	private void addResetItem(final Menu menu) {
@@ -665,80 +731,95 @@ public class PerspectiveSwitcher {
 		final IWorkbenchWindow workbenchWindow = window.getContext().get(IWorkbenchWindow.class);
 		workbenchWindow.getWorkbench().getHelpSystem().setHelp(resetMenuItem,
 				IWorkbenchHelpContextIds.RESET_PERSPECTIVE_ACTION);
-		resetMenuItem.addSelectionListener(widgetSelectedAdapter(event -> {
-			if (perspSwitcherToolbar.isDisposed())
-				return;
-			IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
-			IStatus status = Status.OK_STATUS;
-			try {
-				handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_RESET_PERSPECTIVE, null);
-			} catch (ExecutionException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotDefinedException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotEnabledException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotHandledException e) {
+		resetMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (perspSwitcherToolbar.isDisposed())
+					return;
+				IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
+				IStatus status = Status.OK_STATUS;
+				try {
+					handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_RESET_PERSPECTIVE, null);
+				} catch (ExecutionException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotDefinedException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotEnabledException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotHandledException e) {
+				}
+				if (!status.isOK())
+					StatusManager.getManager().handle(status,
+							StatusManager.SHOW | StatusManager.LOG);
 			}
-			if (!status.isOK())
-				StatusManager.getManager().handle(status,
-						StatusManager.SHOW | StatusManager.LOG);
-		}));
+		});
 	}
 
 	private void addCustomizeItem(final Menu menu) {
 		final MenuItem customizeMenuItem = new MenuItem(menu, SWT.Activate);
 		customizeMenuItem.setText(WorkbenchMessages.PerspectiveBar_customize);
 		final IWorkbenchWindow workbenchWindow = window.getContext().get(IWorkbenchWindow.class);
-		customizeMenuItem.addSelectionListener(widgetSelectedAdapter(event -> {
-			if (perspSwitcherToolbar.isDisposed()) {
-				return;
+		customizeMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (perspSwitcherToolbar.isDisposed()) {
+					return;
+				}
+				IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
+				IStatus status = Status.OK_STATUS;
+				try {
+					handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_CUSTOMIZE_PERSPECTIVE, null);
+				} catch (ExecutionException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotDefinedException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotEnabledException e) {
+					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
+				} catch (NotHandledException e) {
+				}
+				if (!status.isOK()) {
+					StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.LOG);
+				}
 			}
-			IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
-			IStatus status = Status.OK_STATUS;
-			try {
-				handlerService.executeCommand(IWorkbenchCommandConstants.WINDOW_CUSTOMIZE_PERSPECTIVE, null);
-			} catch (ExecutionException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotDefinedException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotEnabledException e) {
-				status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, e.getMessage(), e);
-			} catch (NotHandledException e) {
-			}
-			if (!status.isOK()) {
-				StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.LOG);
-			}
-		}));
+		});
 	}
 
 	private void addShowTextItem(final Menu menu) {
 		final MenuItem showtextMenuItem = new MenuItem(menu, SWT.CHECK);
 		showtextMenuItem.setText(WorkbenchMessages.PerspectiveBar_showText);
-		IPreferenceStore apiPreferenceStore = PrefUtil.getAPIPreferenceStore();
-		String showTextOnPerspectiveBarPreference = IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR;
-		showtextMenuItem.addSelectionListener(widgetSelectedAdapter(e -> {
-			boolean preference = showtextMenuItem.getSelection();
-			if (preference != apiPreferenceStore.getDefaultBoolean(showTextOnPerspectiveBarPreference)) {
-				PrefUtil.getInternalPreferenceStore().setValue(IPreferenceConstants.OVERRIDE_PRESENTATION, true);
+		showtextMenuItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				boolean preference = showtextMenuItem.getSelection();
+				if (preference != PrefUtil.getAPIPreferenceStore().getDefaultBoolean(
+						IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR)) {
+					PrefUtil.getInternalPreferenceStore().setValue(
+							IPreferenceConstants.OVERRIDE_PRESENTATION, true);
+				}
+				PrefUtil.getAPIPreferenceStore().setValue(
+						IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR, preference);
+				changeShowText(preference);
 			}
-			apiPreferenceStore.setValue(showTextOnPerspectiveBarPreference, preference);
-			changeShowText(preference);
-		}));
-		showtextMenuItem.setSelection(apiPreferenceStore.getBoolean(showTextOnPerspectiveBarPreference));
+		});
+		showtextMenuItem.setSelection(PrefUtil.getAPIPreferenceStore().getBoolean(
+				IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR));
 	}
 
 	private void setPropertyChangeListener() {
-		propertyChangeListener = propertyChangeEvent -> {
-			if (IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR
-					.equals(propertyChangeEvent.getProperty())) {
-				Object newValue = propertyChangeEvent.getNewValue();
-				boolean showText = true; // default
-				if (newValue instanceof Boolean)
-					showText = ((Boolean) newValue).booleanValue();
-				else if ("false".equals(newValue)) //$NON-NLS-1$
-					showText = false;
-				changeShowText(showText);
+		propertyChangeListener = new IPropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+				if (IWorkbenchPreferenceConstants.SHOW_TEXT_ON_PERSPECTIVE_BAR
+						.equals(propertyChangeEvent.getProperty())) {
+					Object newValue = propertyChangeEvent.getNewValue();
+					boolean showText = true; // default
+					if (newValue instanceof Boolean)
+						showText = ((Boolean) newValue).booleanValue();
+					else if ("false".equals(newValue)) //$NON-NLS-1$
+						showText = false;
+					changeShowText(showText);
+				}
 			}
 		};
 		PrefUtil.getAPIPreferenceStore().addPropertyChangeListener(propertyChangeListener);

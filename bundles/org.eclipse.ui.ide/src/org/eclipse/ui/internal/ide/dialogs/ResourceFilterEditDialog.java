@@ -21,7 +21,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.ide.dialogs.UIResourceFilterDescription;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
-import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 
 /**
@@ -116,7 +115,7 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 			if (resourceFilterGroup.performOk())
 				super.okPressed();
 		} catch (Throwable t) {
-			IDEWorkbenchPlugin.log(t.getMessage(), t);
+			t.printStackTrace();
 		}
 	}
 }
