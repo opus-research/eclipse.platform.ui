@@ -219,7 +219,7 @@ public class RootImpl extends EObjectImpl implements Root {
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
-		StringBuilder result = new StringBuilder(super.toString());
+		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (id: ");
 		result.append(id);
 		result.append(')');

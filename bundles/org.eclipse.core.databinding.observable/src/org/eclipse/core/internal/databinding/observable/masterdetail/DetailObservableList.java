@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2017 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,14 +21,18 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.Diffs;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.IObserving;
 import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.list.IListChangeListener;
 import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ObservableList;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 
 /**
@@ -43,9 +47,12 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 
 	private boolean updating = false;
 
-	private IListChangeListener<E> innerChangeListener = event -> {
-		if (!updating) {
-			fireListChange(Diffs.unmodifiableDiff(event.diff));
+	private IListChangeListener<E> innerChangeListener = new IListChangeListener<E>() {
+		@Override
+		public void handleListChange(ListChangeEvent<? extends E> event) {
+			if (!updating) {
+				fireListChange(Diffs.unmodifiableDiff(event.diff));
+			}
 		}
 	};
 
@@ -75,7 +82,12 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 		this.outerObservableValue = outerObservableValue;
 		this.detailType = detailType;
 
-		outerObservableValue.addDisposeListener(staleEvent -> dispose());
+		outerObservableValue.addDisposeListener(new IDisposeListener() {
+			@Override
+			public void handleDispose(DisposeEvent staleEvent) {
+				dispose();
+			}
+		});
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -86,16 +98,19 @@ public class DetailObservableList<M, E> extends ObservableList<E>implements IObs
 		outerObservableValue.addValueChangeListener(outerChangeListener);
 	}
 
-	IValueChangeListener<M> outerChangeListener = event -> {
-		if (isDisposed())
-			return;
-		ObservableTracker.setIgnore(true);
-		try {
-			List<E> oldList = new ArrayList<E>(wrappedList);
-			updateInnerObservableList();
-			fireListChange(Diffs.computeListDiff(oldList, wrappedList));
-		} finally {
-			ObservableTracker.setIgnore(false);
+	IValueChangeListener<M> outerChangeListener = new IValueChangeListener<M>() {
+		@Override
+		public void handleValueChange(ValueChangeEvent<? extends M> event) {
+			if (isDisposed())
+				return;
+			ObservableTracker.setIgnore(true);
+			try {
+				List<E> oldList = new ArrayList<E>(wrappedList);
+				updateInnerObservableList();
+				fireListChange(Diffs.computeListDiff(oldList, wrappedList));
+			} finally {
+				ObservableTracker.setIgnore(false);
+			}
 		}
 	};
 
