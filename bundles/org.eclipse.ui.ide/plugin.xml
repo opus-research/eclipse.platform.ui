@@ -1780,6 +1780,10 @@
                   label="%command.copyMarkerResourceQualifiedName.label"
                   style="push">
             </command>
+            <dynamic
+                  class="org.eclipse.ui.ExtensionFactory:copyDetailsContribution"
+                  id="org.eclipse.ui.menus.dynamicCopyDetailsMenu">
+            </dynamic>   
          </menu>
          <command
                commandId="org.eclipse.ui.edit.delete">
