@@ -16,6 +16,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/eclipse/jface/dialogs/MessageDialogWithToggle.java" type="org.eclipse.jface.dialogs.MessageDialogWithToggle">
+        <filter comment="Bug 514058 - [API] Fix new MessageDialogWithToggle APIs" id="338722907">
+            <message_arguments>
+                <message_argument value="org.eclipse.jface.dialogs.MessageDialogWithToggle"/>
+                <message_argument value="MessageDialogWithToggle(Shell, String, Image, String, int, Map&lt;String,Integer&gt;, int, String, boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/eclipse/jface/viewers/TableTreeViewer.java" type="org.eclipse.jface.viewers.TableTreeViewer">
         <filter comment="Bug 436505 - Delete TableTreeViewer and related classes / methods" id="338944126">
             <message_arguments>
