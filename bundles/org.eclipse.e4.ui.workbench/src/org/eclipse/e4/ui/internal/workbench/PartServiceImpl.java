@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@vogella.com) - Bug 416082,  472654, 395825
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411, 486876
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
@@ -480,25 +480,13 @@ public class PartServiceImpl implements EPartService {
 				}
 			}
 
-			if (parent instanceof MPartStack && parent.getSelectedElement() != element) {
-				return false;
+			if (parent instanceof MPartStack) {
+				return parent.getSelectedElement() == element;
 			}
-			if (!element.isVisible()) {
-				return false;
-			}
-			if (isMinimized(parent) || isMinimized(element)) {
-				return false;
-			}
-			return true;
+
+			return element.isVisible();
 		}
 		return false;
-	}
-
-	private boolean isMinimized(MUIElement elt) {
-		List<String> tags = elt.getTags();
-		return (tags.contains(IPresentationEngine.MINIMIZED)
-				|| tags.contains(IPresentationEngine.MINIMIZED_BY_ZOOM))
-				&& !tags.contains(IPresentationEngine.ACTIVE);
 	}
 
 	private boolean isInActivePerspective(MUIElement element) {
@@ -655,16 +643,13 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	@Override
-	public java.util.Optional<MPerspective> switchPerspective(String perspectiveId) {
+	public void switchPerspective(String perspectiveId) {
 		List<MPerspective> result = modelService.findElements(getWindow(), perspectiveId, MPerspective.class, null);
 		if (!result.isEmpty()) {
-			MPerspective perspective = result.get(0);
-			switchPerspective(perspective);
-			return java.util.Optional.of(perspective);
+			switchPerspective(result.get(0));
+			return;
 		}
 		logger.error("Perspective with ID " + perspectiveId + " not found in the current window."); //$NON-NLS-1$ //$NON-NLS-2$
-
-		return java.util.Optional.empty();
 	}
 
 	@Override
