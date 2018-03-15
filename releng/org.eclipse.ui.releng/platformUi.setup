@@ -55,29 +55,11 @@
       <sourceLocator
           rootFolder="${git.clone.platform.ui.location}"/>
       <repositoryList
-          name="Photon">
-        <repository
-            url="http://download.eclipse.org/technology/nebula/snapshot"/>
-        <repository
-            url="http://download.eclipse.org/modeling/emf/emf/updates/2.14milestones"/>
-        <repository
-            url="http://download.eclipse.org/tools/gef/updates/releases"/>
-      </repositoryList>
-      <repositoryList
-          name="Oxygen">
-        <repository
-            url="http://download.eclipse.org/technology/nebula/snapshot"/>
-        <repository
-            url="http://download.eclipse.org/modeling/emf/emf/updates/2.13"/>
-        <repository
-            url="http://download.eclipse.org/tools/gef/updates/releases"/>
-      </repositoryList>
-      <repositoryList
           name="Neon">
         <repository
             url="http://download.eclipse.org/technology/nebula/snapshot"/>
         <repository
-            url="http://download.eclipse.org/modeling/emf/emf/updates/2.12"/>
+            url="http://download.eclipse.org/modeling/emf/emf/updates/2.11.x"/>
         <repository
             url="http://download.eclipse.org/tools/gef/updates/releases"/>
       </repositoryList>
@@ -163,7 +145,7 @@
     <setupTask
         xsi:type="setup:VariableTask"
         name="eclipse.target.platform"
-        value="Photon"
+        value="Oxygen"
         storageURI="scope://Workspace"/>
   </stream>
   <logicalProjectContainer
