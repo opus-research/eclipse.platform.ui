@@ -61,7 +61,6 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
         this.overlays = overlaysArray;
 		this.baseImageData = new Supplier<ImageData>() {
 			private ImageData value;
-
 			@Override
 			public ImageData get() {
 				if (value == null) {
@@ -69,7 +68,6 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 				}
 				return value;
 			}
-
 		};
 		this.size = new Supplier<Point>() {
 			@Override
@@ -114,8 +112,8 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 	 *
 	 * @param baseImageDescriptor
 	 *            the base image descriptor
-	 * @param overlayImage
-	 *            the overlay image
+	 * @param overlayImageDescriptor
+	 *            the overlay image descriptor
 	 * @param quadrant
 	 *            the quadrant (one of {@link IDecoration}
 	 *            ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
@@ -124,20 +122,19 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 	 *            {@link IDecoration#UNDERLAY})
 	 * @since 3.13
 	 */
-	public DecorationOverlayIcon(ImageDescriptor baseImageDescriptor, ImageDescriptor overlayImage, int quadrant) {
+	public DecorationOverlayIcon(ImageDescriptor baseImageDescriptor, ImageDescriptor overlayImageDescriptor,
+			int quadrant) {
 		this.referenceImageOrDescriptor = baseImageDescriptor;
-		this.overlays = createArrayFrom(overlayImage, quadrant);
+		this.overlays = createArrayFrom(overlayImageDescriptor, quadrant);
 		this.size = new Supplier<Point>() {
 			@Override
 			public Point get() {
 				ImageData data = baseImageData.get();
 				return new Point(data.width, data.height);
 			}
-
 		};
 		this.baseImageData = new Supplier<ImageData>() {
 			private ImageData value;
-
 			@Override
 			public ImageData get() {
 				if (value == null) {
