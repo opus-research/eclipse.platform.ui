@@ -156,7 +156,7 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 		getTreeViewer().expandToLevel(element_1, AbstractTreeViewer.ALL_LEVELS);
 		getTreeViewer().expandToLevel(element_2, AbstractTreeViewer.ALL_LEVELS);
 		getTreeViewer().setSelection(new StructuredSelection(element_1_3));
-		ISelection selection = getTreeViewer().getSelection();
+		ISelection selection = getTreeViewer().getStructuredSelection();
 		assertTrue(selection instanceof ITreeSelection);
 		ITreeSelection treeSelection = (ITreeSelection) selection;
 		assertEquals(new TreeSelection(new TreePath(new Object[] { element_1,
@@ -169,7 +169,7 @@ public class MultipleEqualElementsTreeViewerTest extends TreeViewerTest {
 			assertNotNull(treeItem);
 		}
 		getTreeViewer().getTree().setSelection(treeItems);
-		treeSelection = (ITreeSelection) getTreeViewer().getSelection();
+		treeSelection = getTreeViewer().getStructuredSelection();
 		List paths = Arrays.asList(treeSelection.getPaths());
 		assertEquals(4, paths.size());
 		assertTrue(paths.contains(treePath_1_2_21_212));
