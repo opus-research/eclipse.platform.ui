@@ -109,6 +109,11 @@ class URLImageDescriptor extends ImageDescriptor {
 		return getImageData(getURL(url));
 	}
 
+	@Override
+	public ImageData getImageData(int zoom) {
+		return new URLImageDataProvider(url).getImageData(zoom);
+	}
+
 	private static ImageData getImageData(URL url) {
 		ImageData result = null;
 		try (InputStream in = getStream(url)) {
