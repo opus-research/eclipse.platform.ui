@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.examples.fieldassist;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.plugin.*;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -20,20 +20,27 @@ public class FieldAssistPlugin extends AbstractUIPlugin {
 
 	//The shared instance.
 	private static FieldAssistPlugin plugin;
-
+	
 	// Our own content assist decorator (which adds the key binding)
 	static String DEC_CONTENTASSIST = "org.eclipse.ui.examples.fieldassist.contentAssistDecoration";
-
+	
+	/**
+	 * The constructor.
+	 */
 	public FieldAssistPlugin() {
 		plugin = this;
 	}
 
-	@Override
+	/**
+	 * This method is called upon plug-in activation
+	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
 
-	@Override
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		plugin = null;
@@ -41,7 +48,7 @@ public class FieldAssistPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance.
-	 *
+	 * 
 	 * @return the shared plugin instance
 	 */
 	public static FieldAssistPlugin getDefault() {

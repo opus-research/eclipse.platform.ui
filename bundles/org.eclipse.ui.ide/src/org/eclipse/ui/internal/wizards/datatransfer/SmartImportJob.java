@@ -34,7 +34,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -72,7 +71,6 @@ public class SmartImportJob extends Job {
 	private boolean discardRootProject;
 	private boolean deepChildrenDetection;
 	private boolean configureProjects;
-	private boolean closeProjectsAfterImport;
 	private boolean reconfigureEclipseProjects;
 	private IWorkingSet[] workingSets;
 
@@ -107,27 +105,16 @@ public class SmartImportJob extends Job {
 		super(rootDirectory.getAbsolutePath());
 		this.workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		this.rootDirectory = rootDirectory;
-		setWorkingSets(workingSets);
-		this.configureProjects = configureProjects;
-		this.deepChildrenDetection = recuriveChildrenDetection;
-		this.report = Collections.synchronizedMap(new HashMap<IProject, List<ProjectConfigurator>>());
-		this.errors = Collections.synchronizedMap(new HashMap<IPath, Exception>());
-		this.crawlerJobGroup = new JobGroup(DataTransferMessages.SmartImportJob_detectAndConfigureProjects, 0, 1);
-	}
-
-	/**
-	 * Sets the working sets to assign to newly imported projects.
-	 *
-	 * @param workingSets
-	 *            to assign to newly imported projects.
-	 * @since 3.13
-	 */
-	public void setWorkingSets(Set<IWorkingSet> workingSets) {
 		if (workingSets != null) {
 			this.workingSets = workingSets.toArray(new IWorkingSet[workingSets.size()]);
 		} else {
 			this.workingSets = new IWorkingSet[0];
 		}
+		this.configureProjects = configureProjects;
+		this.deepChildrenDetection = recuriveChildrenDetection;
+		this.report = Collections.synchronizedMap(new HashMap<IProject, List<ProjectConfigurator>>());
+		this.errors = Collections.synchronizedMap(new HashMap<IPath, Exception>());
+		this.crawlerJobGroup = new JobGroup(DataTransferMessages.SmartImportJob_detectAndConfigureProjects, 0, 1);
 	}
 
 	/**
@@ -272,15 +259,6 @@ public class SmartImportJob extends Job {
 						}
 					}
 				}
-			}
-			if (closeProjectsAfterImport) {
-				this.report.keySet().forEach(project -> {
-					try {
-						project.close(monitor);
-					} catch (CoreException e) {
-						listener.errorHappened(project.getLocation(), e);
-					}
-				});
 			}
 
 			if (isAutoBuilding) {
@@ -729,14 +707,6 @@ public class SmartImportJob extends Job {
 	 */
 	public void setDetectNestedProjects(boolean detectNestedProjects) {
 		this.deepChildrenDetection = detectNestedProjects;
-	}
-
-	/**
-	 * @param closeProjectsAfterImport
-	 *            if true, imported projects are closed in the workspace
-	 */
-	void setCloseProjectsAfterImport(boolean closeProjectsAfterImport) {
-		this.closeProjectsAfterImport = closeProjectsAfterImport;
 	}
 
 	/**

@@ -167,25 +167,25 @@ public class Mocks {
 							: Boolean.FALSE;
 				} else if (returnType == byte.class) {
 					result = (returnValue != null) ? (Byte) returnValue
-							: Byte.valueOf((byte) 0);
+							: new Byte((byte) 0);
 				} else if (returnType == char.class) {
 					result = (returnValue != null) ? (Character) returnValue
-							: Character.valueOf((char) 0);
+							: new Character((char) 0);
 				} else if (returnType == short.class) {
 					result = (returnValue != null) ? (Short) returnValue
-							: Short.valueOf((short) 0);
+							: new Short((short) 0);
 				} else if (returnType == int.class) {
 					result = (returnValue != null) ? (Integer) returnValue
 							: Integer.valueOf(0);
 				} else if (returnType == long.class) {
 					result = (returnValue != null) ? (Long) returnValue
-							: Long.valueOf(0);
+							: new Long(0);
 				} else if (returnType == float.class) {
 					result = (returnValue != null) ? (Float) returnValue
-							: Float.valueOf(0);
+							: new Float(0);
 				} else if (returnType == double.class) {
 					result = (returnValue != null) ? (Double) returnValue
-							: Double.valueOf(0);
+							: new Double(0);
 				}
 
 				return result;
