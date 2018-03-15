@@ -12,7 +12,7 @@
  *     Brian de Alwis - Fix size computation to account for trim
  *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
  *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926, 491278, 491291, 491312
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -39,7 +39,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.util.Geometry;
-import org.eclipse.jface.util.Util;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -55,11 +54,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -91,7 +85,7 @@ public class SearchField {
 	private static final String DIALOG_WIDTH = "dialogWidth"; //$NON-NLS-1$
 
 	Shell shell;
-	private Text txtQuickAcesss;
+	private Text text;
 
 	private QuickAccessContents quickAccessContents;
 
@@ -107,7 +101,6 @@ public class SearchField {
 	private int dialogHeight = -1;
 	private int dialogWidth = -1;
 	private Control previousFocusControl;
-	boolean activated = false;
 
 	@Inject
 	private EPartService partService;
@@ -115,14 +108,13 @@ public class SearchField {
 
 	private String selectedString = ""; //$NON-NLS-1$
 	private AccessibleAdapter accessibleListener;
-	private Font font;
 
 	@PostConstruct
-	void createControls(final Composite parent, MApplication application, MWindow window) {
+	void createWidget(final Composite parent, MApplication application, MWindow window) {
 		this.window = window;
 		final Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout());
-		txtQuickAcesss = createText(comp);
+		text = createText(comp);
 
 		parent.getShell().addControlListener(new ControlListener() {
 			@Override
@@ -136,7 +128,7 @@ public class SearchField {
 			}
 
 			private void closeDropDown() {
-				if (shell == null || shell.isDisposed() || txtQuickAcesss.isDisposed() || !shell.isVisible())
+				if (shell == null || shell.isDisposed() || text.isDisposed() || !shell.isVisible())
 					return;
 				quickAccessContents.doClose();
 			}
@@ -162,7 +154,7 @@ public class SearchField {
 
 			@Override
 			protected void doClose() {
-				txtQuickAcesss.setText(""); //$NON-NLS-1$
+				text.setText(""); //$NON-NLS-1$
 				resetProviders();
 				dialogHeight = shell.getSize().y;
 				dialogWidth = shell.getSize().x;
@@ -180,7 +172,7 @@ public class SearchField {
 				if (selectedElement instanceof QuickAccessElement) {
 					QuickAccessElement element = (QuickAccessElement) selectedElement;
 					addPreviousPick(string, element);
-					txtQuickAcesss.setText(""); //$NON-NLS-1$
+					text.setText(""); //$NON-NLS-1$
 					element.execute();
 
 					/*
@@ -191,7 +183,7 @@ public class SearchField {
 					 * behind in the text field. If this happens then assign
 					 * focus to the active part explicitly.
 					 */
-					if (txtQuickAcesss.isFocusControl()) {
+					if (text.isFocusControl()) {
 						MPart activePart = partService.getActivePart();
 						if (activePart != null) {
 							IPresentationEngine pe = activePart.getContext().get(
@@ -202,41 +194,35 @@ public class SearchField {
 				}
 			}
 		};
-		quickAccessContents.hookFilterText(txtQuickAcesss);
+		quickAccessContents.hookFilterText(text);
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
 		GridLayoutFactory.fillDefaults().applyTo(shell);
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
-		txtQuickAcesss.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseUp(MouseEvent e) {
-				// release mouse button = click = CTRL+3 -> activate QuickAccess
-				showList();
-			}
-		});
-		txtQuickAcesss.addFocusListener(new FocusListener() {
+		text.addFocusListener(new FocusListener() {
 			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
 				table.getDisplay().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						checkFocusLost(table, txtQuickAcesss);
+						checkFocusLost(table, text);
 					}
 				});
-				activated = false;
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				IHandlerService hs = SearchField.this.window.getContext().get(IHandlerService.class);
+				IHandlerService hs = SearchField.this.window.getContext()
+						.get(IHandlerService.class);
 				if (commandProvider.getContextSnapshot() == null) {
 					commandProvider.setSnapshot(hs.createContextSnapshot(true));
 				}
+
 				previousFocusControl = (Control) e.getSource();
-				activated = true;
 			}
+
 		});
 		table.addFocusListener(new FocusAdapter() {
 			@Override
@@ -246,26 +232,36 @@ public class SearchField {
 				table.getDisplay().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						checkFocusLost(table, txtQuickAcesss);
+						checkFocusLost(table, text);
 					}
 				});
 			}
 		});
-		txtQuickAcesss.addModifyListener(new ModifyListener() {
+		text.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-				showList();
+				boolean wasVisible = shell.getVisible();
+				boolean nowVisible = text.getText().length() > 0;
+				if (!wasVisible && nowVisible) {
+					layoutShell();
+					addAccessibleListener();
+					quickAccessContents.preOpen();
+				}
+				if (wasVisible && !nowVisible) {
+					removeAccessibleListener();
+				}
+				if (nowVisible) {
+					notifyAccessibleTextChanged();
+				}
+				shell.setVisible(nowVisible);
 			}
 		});
-		txtQuickAcesss.addKeyListener(new KeyAdapter() {
+		text.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.ESC) {
-					activated = false;
-					txtQuickAcesss.setText(""); //$NON-NLS-1$
-					if (txtQuickAcesss == previousFocusControl) {
-						txtQuickAcesss.getShell().forceFocus();
-					} else if (previousFocusControl != null && !previousFocusControl.isDisposed())
+					text.setText(""); //$NON-NLS-1$
+					if (previousFocusControl != null && !previousFocusControl.isDisposed())
 						previousFocusControl.setFocus();
 				} else if (e.keyCode == SWT.ARROW_UP) {
 					// Windows moves caret left/right when pressing up/down,
@@ -283,61 +279,25 @@ public class SearchField {
 		quickAccessContents.createInfoLabel(shell);
 	}
 
-
-	private void showList() {
-		boolean wasVisible = shell.getVisible();
-		boolean nowVisible = txtQuickAcesss.getText().length() > 0 || activated;
-		if (!wasVisible && nowVisible) {
-			layoutShell();
-			addAccessibleListener();
-			quickAccessContents.preOpen();
-		}
-		if (wasVisible && !nowVisible) {
-			removeAccessibleListener();
-		}
-		if (nowVisible) {
-			notifyAccessibleTextChanged();
-		}
-		shell.setVisible(nowVisible);
-	}
-
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
 		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
-		// FIXME need to access the real shortcut
-		text.setMessage(NLS.bind(QuickAccessMessages.QuickAccess_EnterSearch, "Ctrl+3")); //$NON-NLS-1$
-
-		FontData[] fD = text.getFont().getFontData();
-		int round = (int) Math.round(fD[0].getHeight() * 0.8);
-		fD[0].setHeight(round);
-		font = new Font(text.getDisplay(), fD[0]);
-		text.setFont(font);
+		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		GC gc = new GC(text);
+		Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
+		Rectangle r = text.computeTrim(0, 0, p.x, p.y);
+		gc.dispose();
 
-		// workaround for Bug 491317
-		if (Util.isWin32() || Util.isGtk()) {
-			FontMetrics fm = gc.getFontMetrics();
-			int wHint = QuickAccessMessages.QuickAccess_EnterSearch.length() * fm.getAverageCharWidth();
-			int hHint = fm.getHeight();
-			gc.dispose();
-			text.setSize(text.computeSize(wHint, hHint));
-		} else {
-			Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
-			Rectangle r = text.computeTrim(0, 0, p.x, p.y);
-			gc.dispose();
-
-			// computeTrim() may result in r.x < 0
-			GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
-		}
-
+		// computeTrim() may result in r.x < 0
+		GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
 		return text;
 	}
 
 	private void hookUpSelectAll() {
 		final IEclipseContext windowContext = window.getContext();
 		IFocusService focus = windowContext.get(IFocusService.class);
-		focus.addFocusTracker(txtQuickAcesss, SearchField.class.getName());
+		focus.addFocusTracker(text, SearchField.class.getName());
 
 		Expression focusExpr = new Expression() {
 			@Override
@@ -357,28 +317,28 @@ public class SearchField {
 				new AbstractHandler() {
 					@Override
 					public Object execute(ExecutionEvent event) {
-						txtQuickAcesss.selectAll();
+						text.selectAll();
 						return null;
 					}
 				}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_CUT, new AbstractHandler() {
 			@Override
 			public Object execute(ExecutionEvent event) {
-				txtQuickAcesss.cut();
+				text.cut();
 				return null;
 			}
 		}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_COPY, new AbstractHandler() {
 			@Override
 			public Object execute(ExecutionEvent event) {
-				txtQuickAcesss.copy();
+				text.copy();
 				return null;
 			}
 		}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_PASTE, new AbstractHandler() {
 			@Override
 			public Object execute(ExecutionEvent event) {
-				txtQuickAcesss.paste();
+				text.paste();
 				return null;
 			}
 		}, focusExpr);
@@ -438,16 +398,16 @@ public class SearchField {
 	}
 
 	void layoutShell() {
-		Display display = txtQuickAcesss.getDisplay();
-		Rectangle tempBounds = txtQuickAcesss.getBounds();
-		Rectangle compBounds = display.map(txtQuickAcesss, null, tempBounds);
+		Display display = text.getDisplay();
+		Rectangle tempBounds = text.getBounds();
+		Rectangle compBounds = display.map(text, null, tempBounds);
 		int preferredWidth = dialogWidth == -1 ? 350 : dialogWidth;
 		int width = Math.max(preferredWidth, compBounds.width);
 		int height = dialogHeight == -1 ? 250 : dialogHeight;
 
 		// If size would extend past the right edge of the shell, try to move it
 		// to the left of the text
-		Rectangle shellBounds = txtQuickAcesss.getShell().getBounds();
+		Rectangle shellBounds = text.getShell().getBounds();
 		if (compBounds.x + width > shellBounds.x + shellBounds.width){
 			compBounds.x = Math.max(shellBounds.x, (compBounds.x + compBounds.width - width));
 		}
@@ -464,7 +424,7 @@ public class SearchField {
 			quickAccessContents.preOpen();
 			shell.setVisible(true);
 			addAccessibleListener();
-			quickAccessContents.refresh(txtQuickAcesss.getText().toLowerCase());
+			quickAccessContents.refresh(text.getText().toLowerCase());
 		} else {
 			quickAccessContents.setShowAllMatches(!quickAccessContents.getShowAllMatches());
 		}
@@ -507,7 +467,7 @@ public class SearchField {
 					e.result = selectedString;
 				}
 			};
-			txtQuickAcesss.getAccessible().addAccessibleListener(accessibleListener);
+			text.getAccessible().addAccessibleListener(accessibleListener);
 		}
 	}
 
@@ -518,7 +478,7 @@ public class SearchField {
 	 */
 	private void removeAccessibleListener() {
 		if (accessibleListener != null) {
-			txtQuickAcesss.getAccessible().removeAccessibleListener(accessibleListener);
+			text.getAccessible().removeAccessibleListener(accessibleListener);
 			accessibleListener = null;
 		}
 		selectedString = ""; //$NON-NLS-1$
@@ -535,7 +495,7 @@ public class SearchField {
 		TableItem item = table.getSelection()[0];
 		selectedString = NLS.bind(QuickAccessMessages.QuickAccess_SelectedString, item.getText(0),
 				item.getText(1));
-		txtQuickAcesss.getAccessible().sendEvent(ACC.EVENT_NAME_CHANGED, null);
+		text.getAccessible().sendEvent(ACC.EVENT_NAME_CHANGED, null);
 	}
 
 	private void restoreDialog() {
@@ -703,7 +663,7 @@ public class SearchField {
 	 * @return the search text in the workbench window or <code>null</code>
 	 */
 	public Text getQuickAccessSearchText() {
-		return txtQuickAcesss;
+		return text;
 	}
 
 	/**
