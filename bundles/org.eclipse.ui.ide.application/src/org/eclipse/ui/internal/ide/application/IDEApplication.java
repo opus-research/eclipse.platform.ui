@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -478,9 +479,11 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 		IPersistentPreferenceStore prefStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, IDEWorkbenchPlugin.IDE_WORKBENCH);
 		boolean keepOnWarning = prefStore.getBoolean(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY);
 		if (keepOnWarning) {
+			LinkedHashMap<String, Integer> labelToIdMap = new LinkedHashMap<>();
+			labelToIdMap.put(IDEWorkbenchMessages.IDEApplication_version_continue, IDialogConstants.OK_ID);
+			labelToIdMap.put(IDialogConstants.CANCEL_LABEL, IDialogConstants.CANCEL_ID);
 			MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell, title, null, message, severity,
-					new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0,
-					IDEWorkbenchMessages.IDEApplication_version_doNotWarnAgain, false);
+					labelToIdMap, 0, IDEWorkbenchMessages.IDEApplication_version_doNotWarnAgain, false);
 			if (dialog.open() != Window.OK) {
 				return false;
 			}
