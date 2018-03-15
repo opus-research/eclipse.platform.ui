@@ -12,15 +12,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.test.performance.Dimension;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.IPreferenceConstants;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
  * Verifies the performance of progress reporting APIs in various contexts which
  * offer progress monitoring.
  */
 public class ProgressReportingTest extends BasicPerformanceTest {
-	public static final int ITERATIONS = 1000000;
+	public static final int ITERATIONS = 10000000;
 
 	/**
 	 * Maximum time to run each test. Increase to get better results during
@@ -36,8 +34,6 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	private volatile boolean isDone;
 	private Display display;
 
-	private boolean oldRunInBackgroundSetting;
-
 	/**
 	 * Create a new instance of the receiver.
 	 *
@@ -49,30 +45,13 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 
 	@Override
 	protected void doSetUp() throws Exception {
-		oldRunInBackgroundSetting = WorkbenchPlugin.getDefault().getPreferenceStore()
-				.getBoolean(IPreferenceConstants.RUN_IN_BACKGROUND);
 		this.display = Display.getCurrent();
 		super.doSetUp();
 	}
 
-	@Override
-	protected void doTearDown() throws Exception {
-		boolean newRunInBackgroundSetting = oldRunInBackgroundSetting;
-		setRunInBackground(newRunInBackgroundSetting);
-		super.doTearDown();
-	}
-
 	/**
-	 * @param newRunInBackgroundSetting
-	 */
-	private void setRunInBackground(boolean newRunInBackgroundSetting) {
-		WorkbenchPlugin.getDefault().getPreferenceStore().setValue(IPreferenceConstants.RUN_IN_BACKGROUND,
-				newRunInBackgroundSetting);
-	}
-
-	/**
-	 * Starts an asynchronous performance test. The test ends whenever the
-	 * runnable invokes endAsyncTest
+	 * Starts an asynchronous performance test. The test ends whenever
+	 * the runnable invokes endAsyncTest
 	 */
 	public void runAsyncTest(Runnable testContent) throws Exception {
 		final Display display = Display.getCurrent();
@@ -93,7 +72,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 
 				stopMeasuring();
 			}
-		}, 1, MAX_ITERATIONS, MAX_RUNTIME);
+		}, 3, MAX_ITERATIONS, MAX_RUNTIME);
 
 		commitMeasurements();
 		assertPerformance();
@@ -118,8 +97,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	 * Test the overhead of the test framework itself
 	 */
 	public void testJobNoMonitorUsage() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
+		IWorkbenchWindow window = openTestWindow();
 		runAsyncTest(() -> {
 			Job.create("Test Job", monitor -> {
 				int i = 0;
@@ -138,8 +116,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	 * Test the cost of setTaskName
 	 */
 	public void testJobSetTaskName() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
+		IWorkbenchWindow window = openTestWindow();
 		runAsyncTest(() -> {
 			Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -160,8 +137,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	 * Test the cost of subTask
 	 */
 	public void testJobSubTask() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
+		IWorkbenchWindow window = openTestWindow();
 		runAsyncTest(() -> {
 			Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -182,8 +158,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	 * Test the cost of isCanceled
 	 */
 	public void testJobIsCanceled() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
+		IWorkbenchWindow window = openTestWindow();
 		runAsyncTest(() -> {
 			Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -206,8 +181,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	 * Test the cost of monitor.worked in jobs
 	 */
 	public void testJobWorked() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
+		IWorkbenchWindow window = openTestWindow();
 		runAsyncTest(() -> {
 			Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -228,8 +202,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	 * Test the cost of subMonitor.split()
 	 */
 	public void testJobSubMonitorSplit() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
+		IWorkbenchWindow window = openTestWindow();
 		runAsyncTest(() -> {
 			Job.create("Test Job", monitor -> {
 				SubMonitor subMonitor = SubMonitor.convert(monitor, ITERATIONS);
@@ -250,8 +223,7 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	 * Test the cost of subMonitor.worked()
 	 */
 	public void testJobSubMonitorWorked() throws Exception {
-		openTestWindow();
-		setRunInBackground(true);
+		IWorkbenchWindow window = openTestWindow();
 		runAsyncTest(() -> {
 			Job.create("Test Job", monitor -> {
 				SubMonitor subMonitor = SubMonitor.convert(monitor, ITERATIONS);
@@ -271,9 +243,8 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	/**
 	 * Test the cost of monitor.subTask in the progress service
 	 */
-	public void testRunInForegroundNoMonitorUsage() throws Exception {
+	public void testProgressServiceNoMonitorUsage() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -294,9 +265,8 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	/**
 	 * Test the cost of monitor.worked in the progress service
 	 */
-	public void testRunInForegroundWorked() throws Exception {
+	public void testProgressServiceWorked() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -318,9 +288,8 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	/**
 	 * Test the cost of monitor.setTaskName in the progress service
 	 */
-	public void testRunInForegroundSetTaskName() throws Exception {
+	public void testProgressServiceSetTaskName() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -342,9 +311,8 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	/**
 	 * Test the cost of monitor.subTask in the progress service
 	 */
-	public void testRunInForegroundSubTask() throws Exception {
+	public void testProgressServiceSubTask() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
@@ -366,9 +334,8 @@ public class ProgressReportingTest extends BasicPerformanceTest {
 	/**
 	 * Test the cost of monitor.subTask in the progress service
 	 */
-	public void testRunInForegroundIsCanceled() throws Exception {
+	public void testProgressServiceIsCanceled() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		setRunInBackground(false);
 		runAsyncTest(() -> {
 			Job j = Job.create("Test Job", monitor -> {
 				monitor.beginTask("Test Job", ITERATIONS);
