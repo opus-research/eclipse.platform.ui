@@ -44,6 +44,7 @@ public class ThemeEngineManager implements IThemeManager {
 		cssEngine.setErrorHandler(new CSSErrorHandler() {
 			@Override
 			public void error(Exception e) {
+				// TODO Use the logger
 				e.printStackTrace();
 			}
 		});

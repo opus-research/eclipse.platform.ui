@@ -99,11 +99,6 @@
       <themeid
             refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
    </stylesheet>
-   <theme
-         basestylesheeturi="css/e4-test.css"
-         id="e4-test"
-         label="Minimal test theme">
-   </theme>
 
    </extension>
 
