@@ -97,6 +97,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the unique identifier for the tab.
 	 */
+	@Override
 	public String getId() {
 		return id;
 	}
@@ -106,6 +107,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the text label for the tab.
 	 */
+	@Override
 	public String getLabel() {
 		return label;
 	}
@@ -117,6 +119,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the identifier of the tab.
 	 */
+	@Override
 	public String getAfterTab() {
 		if (afterTab == null) {
 			return super.getAfterTab();
@@ -129,6 +132,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return Get the category this tab belongs to.
 	 */
+	@Override
 	public String getCategory() {
 		return category;
 	}
@@ -181,9 +185,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 		return false;
 	}
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
 	public String toString() {
 		return getId();
 	}
@@ -256,6 +258,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the image for the tab.
 	 */
+	@Override
 	public Image getImage() {
 		return image;
 	}
@@ -265,6 +268,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return <code>true</code> if the tab is selected.
 	 */
+	@Override
 	public boolean isSelected() {
 		return selected;
 	}
@@ -274,6 +278,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return <code>true</code> if the tab should be displayed as indented.
 	 */
+	@Override
 	public boolean isIndented() {
 		return indented;
 	}
@@ -283,6 +288,7 @@ public class TabDescriptor extends AbstractTabDescriptor {
 	 *
 	 * @return the text label for the tab.
 	 */
+	@Override
 	public String getText() {
 		return label;
 	}
