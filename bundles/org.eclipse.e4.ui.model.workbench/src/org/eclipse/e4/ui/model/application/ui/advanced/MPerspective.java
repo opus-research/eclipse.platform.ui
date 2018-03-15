@@ -17,7 +17,6 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 
 /**
@@ -40,7 +39,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getWindows <em>Windows</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getTrimBars <em>Trim Bars</em>}</li>
  * </ul>
  *
  * @model
@@ -65,22 +63,5 @@ public interface MPerspective extends MElementContainer<MPartSashContainerElemen
 	 * @generated
 	 */
 	List<MWindow> getWindows();
-
-	/**
-	 * Returns the value of the '<em><b>Trim Bars</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * The collection of TrimBars associated with this perspective.
-	 * @since 2.0
-	 * </p>
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Trim Bars</em>' containment reference list.
-	 * @model containment="true"
-	 * @generated
-	 */
-	List<MTrimBar> getTrimBars();
 
 } // MPerspective

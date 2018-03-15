@@ -52,7 +52,12 @@ final public class MenuPersistence extends RegistryPersistence {
 	private ArrayList<MToolBarContribution> toolBarContributions = new ArrayList<>();
 	private ArrayList<MTrimContribution> trimContributions = new ArrayList<>();
 
-	private final Comparator<IConfigurationElement> comparer = (c1, c2) -> c1.getContributor().getName().compareToIgnoreCase(c2.getContributor().getName());
+	private final Comparator<IConfigurationElement> comparer = new Comparator<IConfigurationElement>() {
+		@Override
+		public int compare(IConfigurationElement c1, IConfigurationElement c2) {
+			return c1.getContributor().getName().compareToIgnoreCase(c2.getContributor().getName());
+		}
+	};
 	private Pattern contributorFilter;
 
 	/**
@@ -114,13 +119,17 @@ final public class MenuPersistence extends RegistryPersistence {
 	private void readAdditions() {
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		ArrayList<IConfigurationElement> configElements = new ArrayList<>();
+
+		final IConfigurationElement[] menusExtensionPoint = registry
+				.getConfigurationElementsFor(EXTENSION_MENUS);
+
 		// Create a cache entry for every menu addition;
-		for (IConfigurationElement configElement : registry.getConfigurationElementsFor(EXTENSION_MENUS)) {
-			if (PL_MENU_CONTRIBUTION.equals(configElement.getName())) {
+		for (int i = 0; i < menusExtensionPoint.length; i++) {
+			if (PL_MENU_CONTRIBUTION.equals(menusExtensionPoint[i].getName())) {
 				if (contributorFilter == null
 						|| contributorFilter.matcher(
-								configElement.getContributor().getName()).matches()) {
-					configElements.add(configElement);
+								menusExtensionPoint[i].getContributor().getName()).matches()) {
+					configElements.add(menusExtensionPoint[i]);
 				}
 			}
 		}

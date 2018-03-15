@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -364,16 +365,17 @@ public class DialogSettings implements IDialogSettings {
 
 	@Override
 	public void save(Writer writer) throws IOException {
-		final XMLWriter xmlWriter = new XMLWriter(writer);
+    	final XMLWriter xmlWriter = new XMLWriter(writer);
     	save(xmlWriter);
     	xmlWriter.flush();
     }
 
     @Override
 	public void save(String fileName) throws IOException {
-		try (XMLWriter writer = new XMLWriter(new FileOutputStream(fileName))) {
-			save(writer);
-		}
+        FileOutputStream stream = new FileOutputStream(fileName);
+        XMLWriter writer = new XMLWriter(stream);
+        save(writer);
+        writer.close();
     }
 
     private void save(XMLWriter out) throws IOException {
@@ -398,7 +400,8 @@ public class DialogSettings implements IDialogSettings {
 			String[] value = entry.getValue();
             attributes.clear();
             if (value != null) {
-                for (String string : value) {
+                for (int index = 0; index < value.length; index++) {
+                    String string = value[index];
                     attributes.put(TAG_VALUE, string == null ? "" : string); //$NON-NLS-1$
                     out.printTag(TAG_ITEM, attributes, true);
                 }
@@ -406,8 +409,8 @@ public class DialogSettings implements IDialogSettings {
             out.endTag(TAG_LIST);
             attributes.clear();
         }
-        for (IDialogSettings iDialogSettings : sections.values()) {
-            ((DialogSettings) iDialogSettings).save(out);
+        for (Iterator<IDialogSettings> i = sections.values().iterator(); i.hasNext();) {
+            ((DialogSettings) i.next()).save(out);
         }
         out.endTag(TAG_SECTION);
     }

@@ -227,11 +227,11 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 			List<String> checkedExtensions = new ArrayList<String>();
 			TableItem[] tableItems = contentExtensionsTab.getTable().getItems();
 			INavigatorContentDescriptor descriptor;
-			for (TableItem tableItem : tableItems) {
-				descriptor = (INavigatorContentDescriptor) tableItem
+			for (int i = 0; i < tableItems.length; i++) {
+				descriptor = (INavigatorContentDescriptor) tableItems[i]
 						.getData();
 
-				if (tableItem.getChecked()) {
+				if (tableItems[i].getChecked()) {
 					checkedExtensions.add(descriptor.getId());
 				}
 			}
@@ -261,12 +261,5 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 		}
 
 		super.okPressed();
-	}
-
-	protected ICommonFilterDescriptor[] getFilterDescriptorChangeHistory() {
-		if (commonFiltersTab != null) {
-			return commonFiltersTab.getFilterDescriptorChangeHistory();
-		}
-		return new ICommonFilterDescriptor[0];
 	}
 }

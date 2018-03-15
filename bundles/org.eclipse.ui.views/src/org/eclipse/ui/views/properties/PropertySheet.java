@@ -136,14 +136,7 @@ public class PropertySheet extends PageBookView
 	 */
 	private HashSet<String> ignoredViews;
 
-	/** the view was hidden */
 	private boolean wasHidden;
-
-	/**
-	 * the selection update which was made during the view was hidden need to be
-	 * propagated to IPropertySheetPage
-	 */
-	private boolean selectionUpdatePending;
 
 	private final SaveablesTracker saveablesTracker;
 
@@ -352,14 +345,7 @@ public class PropertySheet extends PageBookView
     @Override
 	protected boolean isImportant(IWorkbenchPart part) {
 		// Don't interfere with other property views
-		if (part == null) {
-			return false;
-		}
-    	IWorkbenchPartSite site = part.getSite();
-		if (site == null) {
-			return false;
-		}
-		String partID = site.getId();
+    	String partID = part.getSite().getId();
 		boolean isPropertyView = getSite().getId().equals(partID);
 		return !isPinned() && !isPropertyView && !isViewIgnored(partID);
     }
@@ -377,11 +363,6 @@ public class PropertySheet extends PageBookView
 	@Override
 	protected void partVisible(IWorkbenchPart part) {
 	    super.partVisible(part);
-		if (wasHidden && part == this) {
-			if (selectionUpdatePending) {
-				showSelectionAndDescription();
-			}
-		}
 	}
 
     @Override
@@ -404,8 +385,12 @@ public class PropertySheet extends PageBookView
 		if (wasHidden && part == this) {
 			wasHidden = false;
 			super.partActivated(part);
-			if (selectionUpdatePending) {
-				showSelectionAndDescription();
+			if (currentPart != null) {
+				IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
+				if (page != null) {
+					page.selectionChanged(currentPart, currentSelection);
+				}
+				updateContentDescription();
 			}
 			return;
 		}
@@ -470,12 +455,16 @@ public class PropertySheet extends PageBookView
 
 		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
 		if (!visible) {
-			selectionUpdatePending = true;
 			return;
 		}
 
         // pass the selection to the page
-		showSelectionAndDescription();
+        IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
+        if (page != null) {
+			page.selectionChanged(currentPart, currentSelection);
+		}
+
+        updateContentDescription();
     }
 
 	private void updateContentDescription() {
@@ -486,18 +475,6 @@ public class PropertySheet extends PageBookView
 		}
 		// since our selection changes, our dirty state might change too
 		firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
-	}
-
-	private void showSelectionAndDescription() {
-		selectionUpdatePending = false;
-		if (currentPart == null || currentSelection == null) {
-			return;
-		}
-		IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
-		if (page != null) {
-			page.selectionChanged(currentPart, currentSelection);
-		}
-		updateContentDescription();
 	}
 
 	/**
@@ -593,22 +570,29 @@ public class PropertySheet extends PageBookView
 		return pinPropertySheetAction != null && pinPropertySheetAction.isChecked();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 3.4
+	 */
 	@Override
 	public ShowInContext getShowInContext() {
 		return new PropertyShowInContext(currentPart, currentSelection);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 3.4
+	 */
 	@Override
 	public boolean show(ShowInContext aContext) {
 		if (!isPinned()
 				&& aContext instanceof PropertyShowInContext) {
 			PropertyShowInContext context = (PropertyShowInContext) aContext;
-			IWorkbenchPart part = context.getPart();
-			if (part != null) {
-				partActivated(part);
-				selectionChanged(part, context.getSelection());
-				return true;
-			}
+			partActivated(context.getPart());
+			selectionChanged(context.getPart(), context.getSelection());
+			return true;
 		}
 		return false;
 	}
@@ -648,21 +632,37 @@ public class PropertySheet extends PageBookView
 		return getIgnoredViews().contains(partID);
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtension[])
+	 * @since 3.5
+	 */
 	@Override
 	public void added(IExtension[] extensions) {
 		ignoredViews = null;
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtensionPoint[])
+	 * @since 3.5
+	 */
 	@Override
 	public void added(IExtensionPoint[] extensionPoints) {
 		ignoredViews = null;
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtension[])
+	 * @since 3.5
+	 */
 	@Override
 	public void removed(IExtension[] extensions) {
 		ignoredViews = null;
 	}
 
+	/**
+	 * @see org.eclipse.core.runtime.IRegistryEventListener#removed(org.eclipse.core.runtime.IExtensionPoint[])
+	 * @since 3.5
+	 */
 	@Override
 	public void removed(IExtensionPoint[] extensionPoints) {
 		ignoredViews = null;

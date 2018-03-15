@@ -39,6 +39,7 @@ import org.eclipse.ui.internal.services.IServiceLocatorCreator;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
+import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IServiceScopes;
 
 /**
@@ -97,13 +98,16 @@ public class PageSite implements IPageSite, INestable {
 				.getService(IServiceLocatorCreator.class);
 		e4Context = ((PartSite) parentViewSite).getContext().createChild("PageSite"); //$NON-NLS-1$
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(parentViewSite, null,
-				() -> {
-					// final Control control =
-					// ((PartSite)parentViewSite).getPane().getControl();
-					// if (control != null && !control.isDisposed()) {
-					// ((PartSite)parentViewSite).getPane().doHide();
-					// }
-					// TODO compat: not tsure what this should do
+				new IDisposable() {
+					@Override
+					public void dispose() {
+						// final Control control =
+						// ((PartSite)parentViewSite).getPane().getControl();
+						// if (control != null && !control.isDisposed()) {
+						// ((PartSite)parentViewSite).getPane().doHide();
+						// }
+						// TODO compat: not tsure what this should do
+					}
 				}, e4Context);
 		initializeDefaultServices();
 	}
@@ -117,7 +121,12 @@ public class PageSite implements IPageSite, INestable {
 						getWorkbenchWindow().getWorkbench(),
 						getWorkbenchWindow(), parentSite, null, this, 3));
 		serviceLocator.registerService(IPageSiteHolder.class,
-				(IPageSiteHolder) () -> PageSite.this);
+				new IPageSiteHolder() {
+					@Override
+					public IPageSite getSite() {
+						return PageSite.this;
+					}
+				});
 
 		// create a local handler service so that when this page
 		// activates/deactivates, its handlers will also be taken into/out of

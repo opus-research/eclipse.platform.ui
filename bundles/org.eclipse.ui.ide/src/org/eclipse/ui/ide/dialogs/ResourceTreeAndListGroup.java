@@ -238,7 +238,8 @@ public class ResourceTreeAndListGroup extends EventManager {
      *	time and check each one in the tree viewer as appropriate
      */
     private void checkNewTreeElements(Object[] elements) {
-		for (Object currentElement : elements) {
+        for (int i = 0; i < elements.length; ++i) {
+            Object currentElement = elements[i];
             boolean checked = checkedStateStore.containsKey(currentElement);
             treeViewer.setChecked(currentElement, checked);
             treeViewer.setGrayed(currentElement, checked
@@ -332,8 +333,9 @@ public class ResourceTreeAndListGroup extends EventManager {
         // if any children of treeElement are still gray-checked then treeElement
         // must remain gray-checked as well. Only ask expanded nodes
         if (expandedTreeNodes.contains(treeElement)) {
-			for (Object child : treeContentProvider.getChildren(treeElement)) {
-				if (checkedStateStore.containsKey(child)) {
+            Object[] children = treeContentProvider.getChildren(treeElement);
+            for (int i = 0; i < children.length; ++i) {
+                if (checkedStateStore.containsKey(children[i])) {
 					return true;
 				}
             }
@@ -364,8 +366,9 @@ public class ResourceTreeAndListGroup extends EventManager {
         // always go through all children first since their white-checked
         // statuses will be needed to determine the white-checked status for
         // this tree element
-		for (Object child : treeContentProvider.getElements(treeElement)) {
-			determineWhiteCheckedDescendents(child);
+        Object[] children = treeContentProvider.getElements(treeElement);
+        for (int i = 0; i < children.length; ++i) {
+			determineWhiteCheckedDescendents(children[i]);
 		}
 
         // now determine the white-checked status for this tree element
@@ -456,13 +459,17 @@ public class ResourceTreeAndListGroup extends EventManager {
 			}
         }
 
-		for (Object child : treeContentProvider.getChildren(treeElement)) {
+        Object[] treeChildren = treeContentProvider.getChildren(treeElement);
+        for (int i = 0; i < treeChildren.length; i++) {
+            Object child = treeChildren[i];
             if (addAll) {
-				findAllSelectedListElements(child, fullLabel, true, filter, monitor);
+				findAllSelectedListElements(child, fullLabel, true, filter,
+                        monitor);
 			} else { //Only continue for those with checked state
                 if (checkedStateStore.containsKey(child)) {
 					findAllSelectedListElements(child, fullLabel,
-							whiteCheckedTreeItems.contains(child), filter, monitor);
+                            whiteCheckedTreeItems.contains(child), filter,
+                            monitor);
 				}
             }
 
@@ -487,8 +494,9 @@ public class ResourceTreeAndListGroup extends EventManager {
 				return;
 			}
             result.addAll(listChildren);
-			for (Object child : treeContentProvider.getChildren(treeElement)) {
-				findAllWhiteCheckedItems(child, result);
+            Object[] children = treeContentProvider.getChildren(treeElement);
+            for (int i = 0; i < children.length; ++i) {
+                findAllWhiteCheckedItems(children[i], result);
             }
         }
     }
@@ -507,8 +515,11 @@ public class ResourceTreeAndListGroup extends EventManager {
 	 */
     public void getAllCheckedListItems(IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
         //Iterate through the children of the root as the root is not in the store
-		for (Object child : treeContentProvider.getChildren(root)) {
-			findAllSelectedListElements(child, null, whiteCheckedTreeItems.contains(child), filter, monitor);
+        Object[] children = treeContentProvider.getChildren(root);
+        for (int i = 0; i < children.length; ++i) {
+            findAllSelectedListElements(children[i], null,
+                    whiteCheckedTreeItems.contains(children[i]), filter,
+                    monitor);
         }
     }
 
@@ -578,8 +589,8 @@ public class ResourceTreeAndListGroup extends EventManager {
             @Override
 			public void filterElements(Object[] elements,
                     IProgressMonitor monitor) {
-                for (Object element : elements) {
-                    returnValue.add(element);
+                for (int i = 0; i < elements.length; i++) {
+                    returnValue.add(elements[i]);
                 }
             }
         };
@@ -612,15 +623,17 @@ public class ResourceTreeAndListGroup extends EventManager {
             @Override
 			public void filterElements(Object[] elements,
                     IProgressMonitor monitor) {
-                for (Object element : elements) {
-                    returnValue.add(element);
+                for (int i = 0; i < elements.length; i++) {
+                    returnValue.add(elements[i]);
                 }
             }
         };
 
         try {
-			for (Object child : treeContentProvider.getChildren(root)) {
-				findAllSelectedListElements(child, null, true, passThroughFilter, null);
+            Object[] children = treeContentProvider.getChildren(root);
+            for (int i = 0; i < children.length; ++i) {
+                findAllSelectedListElements(children[i], null, true, passThroughFilter,
+                        null);
             }
         } catch (InterruptedException exception) {
             return Collections.EMPTY_LIST;
@@ -639,8 +652,9 @@ public class ResourceTreeAndListGroup extends EventManager {
     public List getAllWhiteCheckedItems() {
         List result = new ArrayList();
         //Iterate through the children of the root as the root is not in the store
-		for (Object child : treeContentProvider.getChildren(root)) {
-			findAllWhiteCheckedItems(child, result);
+        Object[] children = treeContentProvider.getChildren(root);
+        for (int i = 0; i < children.length; ++i) {
+            findAllWhiteCheckedItems(children[i], result);
         }
         return result;
     }
@@ -757,7 +771,7 @@ public class ResourceTreeAndListGroup extends EventManager {
      */
     private void initialize() {
         treeViewer.setInput(root);
-        this.expandedTreeNodes = new HashSet<>();
+        this.expandedTreeNodes = new ArrayList();
         this.expandedTreeNodes.add(root);
 
     }
@@ -806,12 +820,13 @@ public class ResourceTreeAndListGroup extends EventManager {
      *	its checked state changed to the passed state
      */
     private void notifyCheckStateChangeListeners(final CheckStateChangedEvent event) {
-		for (Object listener : getListeners()) {
-			final ICheckStateListener checkStateListener = (ICheckStateListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
-					checkStateListener.checkStateChanged(event);
+                    l.checkStateChanged(event);
                 }
             });
         }
@@ -903,9 +918,10 @@ public class ResourceTreeAndListGroup extends EventManager {
      * @param treeElement the element being updated
      */
     private void setListForWhiteSelection(Object treeElement) {
+        Object[] listItems = listContentProvider.getElements(treeElement);
         List listItemsChecked = new ArrayList();
-		for (Object listItem : listContentProvider.getElements(treeElement)) {
-            listItemsChecked.add(listItem);
+        for (int i = 0; i < listItems.length; ++i) {
+            listItemsChecked.add(listItems[i]);
         }
         checkedStateStore.put(treeElement, listItemsChecked);
     }
@@ -962,8 +978,9 @@ public class ResourceTreeAndListGroup extends EventManager {
 
         // now logically check/uncheck all children as well if it has been expanded
         if (expandedTreeNodes.contains(treeElement)) {
-			for (Object child : treeContentProvider.getChildren(treeElement)) {
-				setTreeChecked(child, state);
+            Object[] children = treeContentProvider.getChildren(treeElement);
+            for (int i = 0; i < children.length; ++i) {
+                setTreeChecked(children[i], state);
             }
         }
     }

@@ -24,6 +24,7 @@
 
   <properties>
 	<unitTestSuite>org.eclipse.ui.internal.monitoring.MonitoringTestSuite</unitTestSuite>
+ 	<skipTests>false</skipTests>
   </properties>
 
   <build>

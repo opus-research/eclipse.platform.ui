@@ -111,13 +111,14 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      *            the id of the property that changed
      */
     protected void firePropertyChange(final int propertyId) {
-		for (Object listener : getListeners()) {
-			final IPropertyListener propertyListener = (IPropertyListener) listener;
+        Object[] array = getListeners();
+        for (int nX = 0; nX < array.length; nX++) {
+            final IPropertyListener l = (IPropertyListener) array[nX];
             SafeRunner.run(new SafeRunnable() {
 
                 @Override
 				public void run() {
-					propertyListener.propertyChanged(this, propertyId);
+                    l.propertyChanged(this, propertyId);
                 }
             });
         }

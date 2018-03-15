@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.tests.harness.FileSystemHelper;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -179,8 +180,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testFindSingleZip() {
 		try {
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -209,8 +211,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testFindSingleTar() {
 		try {
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".tar"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".tar")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -294,8 +297,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -352,8 +356,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("A");
@@ -408,8 +413,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".tar"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".tar")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -465,8 +471,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".tar"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".tar")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("A");
@@ -736,8 +743,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject workspaceProject : workspaceProjects) {
 				FileUtil.deleteProject(workspaceProject);
 			}
-			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip = getNewWizard();
 			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
@@ -789,8 +797,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			for (IProject element : workspaceProjects2) {
 				FileUtil.deleteProject(element);
 			}
-			URL archiveFile2 = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
+			URL archiveFile2 = Platform.asLocalURL(Platform.find(TestPlugin
+					.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+					+ ARCHIVE_HELLOWORLD + ".zip")));
 			WizardProjectsImportPage wpip2 = getNewWizard();
 			HashSet projects2 = new HashSet();
 			projects2.add("HelloWorld");
@@ -1154,8 +1163,9 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		expectedNames.add("Project4");
 		expectedNames.add("Project5");
 
-		URL projectsArchive = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-				new Path(DATA_PATH_PREFIX + PROJECTS_ARCHIVE + ".zip"), null));
+		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin
+				.getDefault().getBundle(), new Path(DATA_PATH_PREFIX
+				+ PROJECTS_ARCHIVE + ".zip")));
 
 		List projectNames = getNonConflictingProjectsFromArchive(projectsArchive);
 
@@ -1186,8 +1196,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testGetProjectRecordsShouldHandleCorruptProjects() throws Exception {
 
-		URL projectsArchive = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-				new Path(DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip"), null));
+		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin.getDefault().getBundle(), new Path(
+				DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip")));
 
 		WizardProjectsImportPage newWizard = spy(getNewWizard());
 		ProjectRecord[] projectRecords = getProjectsFromArchive(newWizard, projectsArchive);
@@ -1208,8 +1218,8 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testGetProjectRecordsShouldHandleCorruptAndConflictingProjects() throws Exception {
 
-		URL projectsArchive = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
-				new Path(DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip"), null));
+		URL projectsArchive = Platform.asLocalURL(Platform.find(TestPlugin.getDefault().getBundle(), new Path(
+				DATA_PATH_PREFIX + CORRUPT_PROJECTS_ARCHIVE + ".zip")));
 
 		WizardProjectsImportPage newWizard = spy(getNewWizard());
 		FileUtil.createProject("Project1");

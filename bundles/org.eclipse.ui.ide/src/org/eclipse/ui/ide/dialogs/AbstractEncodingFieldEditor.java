@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -199,7 +200,6 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 			Group top = new Group(parent, SWT.NONE);
 			top.setText(groupTitle);
 			topControl = top;
-			top.setFont(parent.getFont());
 		}
 
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
