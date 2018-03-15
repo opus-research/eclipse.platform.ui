@@ -14,7 +14,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Scrollable;
@@ -24,10 +23,6 @@ import org.eclipse.swt.widgets.Scrollable;
  */
 /* default */ abstract class AbstractScrollHandler {
 
-	/**
-	 * Set to true to show native scrollbar along with the themed one.
-	 */
-	private static final boolean DEBUG_KEEP_NATIVE = false;
 
 	/**
 	 * When a drag starts, it should be set to the initial drag pixel position
@@ -98,9 +93,7 @@ import org.eclipse.swt.widgets.Scrollable;
 
 	public void install(AbstractThemedScrollBarAdapter abstractThemedScrollBarAdapter) {
 		if (this.fScrollBar != null) {
-			if (!DEBUG_KEEP_NATIVE) {
-				fScrollBar.setVisible(false);
-			}
+			fScrollBar.setVisible(false);
 			this.fScrollBar.addSelectionListener(abstractThemedScrollBarAdapter);
 		}
 	}
@@ -111,12 +104,10 @@ import org.eclipse.swt.widgets.Scrollable;
 		fHandleDrawnRect = null;
 		if (this.fScrollBar != null && !this.fScrollBar.isDisposed() && !disposing) {
 			this.fScrollBar.removeSelectionListener(abstractThemedScrollBarAdapter);
-			if (!DEBUG_KEEP_NATIVE) {
-				// Restore its initial visibility state.
-				// Note: don't do this if we're disposing at this moment as
-				// StyledText will throw a NPE.
-				this.fScrollBar.setVisible(fInitialVisible);
-			}
+			// Restore its initial visibility state.
+			// Note: don't do this if we're disposing at this moment as
+			// StyledText will throw a NPE.
+			this.fScrollBar.setVisible(fInitialVisible);
 		}
 	}
 
@@ -147,23 +138,10 @@ import org.eclipse.swt.widgets.Scrollable;
 
 	/**
 	 * If the native scrollbar is made visible, asynchronously hides it.
+	 * (subclasses must override -- this should not be needed when SWT provides
+	 * an API to actually replace the scrollbar).
 	 */
 	protected void checkScrollbarInvisible() {
-		if (this.fScrollBar == null || !this.fScrollBarSettings.getScrollBarThemed()) {
-			return;
-		}
-		if (!DEBUG_KEEP_NATIVE) {
-			if (this.fScrollBar.isVisible()) {
-				Display.getDefault().asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						if (fScrollBar != null && !fScrollBar.isDisposed()) {
-							fScrollBar.setVisible(false);
-						}
-					}
-				});
-			}
-		}
 	}
 
 	/**
@@ -218,12 +196,30 @@ import org.eclipse.swt.widgets.Scrollable;
 				int pageIncrement = this.fScrollBar.getPageIncrement();
 				if (pos > selection) {
 					this.fScrollBar.setSelection(selection + pageIncrement);
+					notifyScrollbarSelectionChanged(scrollable, SWT.PAGE_DOWN);
 				} else {
 					this.fScrollBar.setSelection(selection - pageIncrement);
+					notifyScrollbarSelectionChanged(scrollable, SWT.PAGE_UP);
 				}
-				notifyScrollbarSelectionChanged(scrollable);
 				return true;
 			}
+		}
+		return false;
+	}
+
+	/**
+	 * @return whether the mouse is currently over the scroll bar.
+	 */
+	public boolean mousePosOverScroll(Scrollable scrollable, Point controlPos) {
+		if (this.fScrollBar == null || !this.fVisible || fScrollBarPositions == null
+				|| !this.fScrollBarSettings.getScrollBarThemed()) {
+			return false;
+		}
+		Rectangle currClientArea = scrollable.getClientArea();
+		Rectangle fullRect = this.getFullBackgroundRect(scrollable, currClientArea, true);
+		if (fullRect != null) {
+			boolean ret = fullRect.contains(controlPos.x, controlPos.y);
+			return ret;
 		}
 		return false;
 	}
@@ -234,10 +230,12 @@ import org.eclipse.swt.widgets.Scrollable;
 		return fInitialDragPosition != null;
 	}
 
-	public void stopDragOnMouseUp(Scrollable scrollable) {
+	public boolean stopDragOnMouseUp(Scrollable scrollable) {
 		if (fInitialDragPosition != null) {
 			fInitialDragPosition = null;
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -271,7 +269,7 @@ import org.eclipse.swt.widgets.Scrollable;
 			int delta = (currentMousePos - initialMousePos);
 			delta /= this.fScrollBarPositions.fPercentageOfClientAreaFromTotalArea;
 			setPixel(scrollable, fInitialDragPixel + delta);
-			notifyScrollbarSelectionChanged(scrollable);
+			notifyScrollbarSelectionChanged(scrollable, SWT.DRAG);
 			return true;
 		}
 		return false;
@@ -282,8 +280,11 @@ import org.eclipse.swt.widgets.Scrollable;
 	 *
 	 * @param scrollable
 	 *            The current scrollable control.
+	 * @param detail
+	 *            The detail for the scroll (see
+	 *            #org.eclipse.swt.widgets.ScrollBar.wmScrollChild(long, long)).
 	 */
-	protected void notifyScrollbarSelectionChanged(Scrollable scrollable) {
+	protected void notifyScrollbarSelectionChanged(Scrollable scrollable, int detail) {
 		Event e = new Event();
 		e.type = SWT.Selection;
 		e.x = 0;
@@ -297,6 +298,7 @@ import org.eclipse.swt.widgets.Scrollable;
 		e.time = 0;
 		e.data = null;
 		e.character = '\0';
+		e.detail = detail;
 
 		e.doit = true;
 
