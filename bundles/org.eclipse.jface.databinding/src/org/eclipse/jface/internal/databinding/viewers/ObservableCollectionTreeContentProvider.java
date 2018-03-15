@@ -146,11 +146,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		knownElements.clear();
 		if (realizedElements != null)
 			realizedElements.clear();
-
-		if (newInput != null) {
-			getElements(newInput);
-		}
-
 	}
 
 	private void setViewer(Viewer viewer) {
@@ -204,6 +199,7 @@ public abstract class ObservableCollectionTreeContentProvider implements
 		Object[] children = node.getChildren().toArray();
 		for (int i = 0; i < children.length; i++)
 			getOrCreateNode(children[i], false).addParent(element);
+		knownElements.addAll(node.getChildren());
 		asyncUpdateRealizedElements();
 		return children;
 	}
@@ -488,7 +484,6 @@ public abstract class ObservableCollectionTreeContentProvider implements
 									"Children observable collection must be on the Display realm"); //$NON-NLS-1$
 					listener = createCollectionChangeListener(element);
 					addCollectionChangeListener(children, listener);
-					knownElements.addAll(children);
 				}
 			}
 		}
