@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,9 +35,6 @@ import org.eclipse.ui.IActionBars;
  * <ul>
  *   <li><code>dispose</code> - extend to provide additional cleanup</li>
  *   <li><code>setFocus</code> - reimplement to accept focus</li>
- *   <li><code>setActionBars</code> - reimplement to make contributions</li>
- *   <li><code>makeContributions</code> - this method exists to support previous versions</li>
- *   <li><code>setActionBars</code> - this method exists to support previous versions</li>
  *   <li><code>init</code> - extend to provide additional setup</li>
  * </ul>
  * </p>
@@ -80,17 +77,21 @@ public abstract class Page implements IPageBookViewPage {
     public abstract Control getControl();
 
     /**
-	 * This method exists for backward compatibility. Subclasses should
-	 * reimplement <code>init</code>.
+	 * Subclasses should reimplement <code>init</code>.
+	 *
+	 * @deprecated Please use the <code>init</code> method instead.
 	 */
-    public void makeContributions(IMenuManager menuManager,
-            IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
+    @Deprecated
+	public void makeContributions(IMenuManager menuManager, IToolBarManager toolBarManager,
+			IStatusLineManager statusLineManager) {
     }
 
     /**
-	 * This method exists for backward compatibility. Subclasses should
-	 * reimplement <code>init</code>.
+	 * Subclasses should reimplement <code>init</code>.
+	 *
+	 * @deprecated Please use the <code>init</code> method instead.
 	 */
+	@Deprecated
     @Override
     public void setActionBars(IActionBars actionBars) {
         makeContributions(actionBars.getMenuManager(), actionBars
