@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla -	Bug 29633 [EditorMgmt] "Open" menu should
  *     						have Open With-->Other
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 378485, 486635
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 378485
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -329,9 +328,7 @@ public class OpenWithMenu extends ContributionItem {
             DialogUtil.openError(page.getWorkbenchWindow().getShell(),
                     IDEWorkbenchMessages.OpenWithMenu_dialogTitle,
                     e.getMessage(), e);
-		} catch (OperationCanceledException e) {
-			// ignore: user cancel, see bug 485201.
-		}
+        }
     }
 
     /**
@@ -357,7 +354,7 @@ public class OpenWithMenu extends ContributionItem {
 		                DialogUtil.openError(page.getWorkbenchWindow()
 		                        .getShell(), IDEWorkbenchMessages.OpenWithMenu_dialogTitle,
 		                        e.getMessage(), e);
-					}
+		            }
 		        }
 		        break;
 		    }
