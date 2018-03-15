@@ -290,8 +290,8 @@ public class LineDelimiterEditor {
 	public void setEnabled(boolean enabled) {
 		group.setEnabled(enabled);
 		Control[] children = group.getChildren();
-		for (Control element : children) {
-			element.setEnabled(enabled);
+		for (int i = 0; i < children.length; i++) {
+			children[i].setEnabled(enabled);
 		}
 	}
 }

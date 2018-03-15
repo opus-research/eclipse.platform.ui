@@ -178,11 +178,12 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 				.getDefault().getDialogSettings()
 				.getSection(WORKBENCH_SETTINGS));
 
-		for (final IConfigurationElement settingsTransfer : settings) {
+		for (int i = 0; i < settings.length; i++) {
+			final IConfigurationElement settingsTransfer = settings[i];
 			final Button button = toolkit.createButton(sectionClient,
-					settingsTransfer.getAttribute(ATT_NAME), SWT.CHECK);
+					settings[i].getAttribute(ATT_NAME), SWT.CHECK);
 
-			String helpId = settingsTransfer.getAttribute(ATT_HELP_CONTEXT);
+			String helpId = settings[i].getAttribute(ATT_HELP_CONTEXT);
 
 			if (helpId != null)
 				PlatformUI.getWorkbench().getHelpSystem().setHelp(button,
@@ -190,9 +191,9 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 			if (enabledSettings != null && enabledSettings.length > 0) {
 
-				String id = settingsTransfer.getAttribute(ATT_ID);
-				for (String enabledSetting : enabledSettings) {
-					if (enabledSetting.equals(id)) {
+				String id = settings[i].getAttribute(ATT_ID);
+				for (int j = 0; j < enabledSettings.length; j++) {
+					if (enabledSettings[j].equals(id)) {
 						button.setSelection(true);
 						selectedSettings.add(settingsTransfer);
 						break;

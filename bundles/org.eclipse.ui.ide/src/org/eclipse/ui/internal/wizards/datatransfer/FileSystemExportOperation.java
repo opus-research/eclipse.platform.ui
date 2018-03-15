@@ -105,8 +105,8 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
         int count = 0;
         if (parentResource.isAccessible()) {
             IResource[] children = ((IContainer) parentResource).members();
-            for (IResource element : children) {
-				count += countChildrenOf(element);
+            for (int i = 0; i < children.length; i++) {
+				count += countChildrenOf(children[i]);
 			}
         }
 
@@ -171,8 +171,8 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
      */
     protected void exportChildren(IResource[] children, IPath currentPath)
             throws InterruptedException {
-        for (IResource element : children) {
-            IResource child = element;
+        for (int i = 0; i < children.length; i++) {
+            IResource child = children[i];
 			if (!child.isAccessible() || (!resolveLinks && child.isLinked())) {
 				continue;
 			}
