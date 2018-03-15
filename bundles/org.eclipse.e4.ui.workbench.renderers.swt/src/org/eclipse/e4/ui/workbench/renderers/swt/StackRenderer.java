@@ -620,26 +620,26 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 
 		int styleOverride = getStyleOverride(pStack);
-		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
-		final CTabFolder tabFolder = new CTabFolder(parentComposite, style);
-		tabFolder.setMRUVisible(getMRUValue(tabFolder));
+		int style = styleOverride == -1 ? (SWT.BORDER) : styleOverride;
+		final CTabFolder tabFolde = new CTabFolder(parentComposite, style);
+		tabFolde.setMRUVisible(getMRUValue(tabFolde));
 
 		// Adjust the minimum chars based on the location
 		int location = modelService.getElementLocation(element);
 		if ((location & EModelService.IN_SHARED_AREA) != 0) {
-			tabFolder.setMinimumCharacters(MIN_EDITOR_CHARS);
-			tabFolder.setUnselectedCloseVisible(true);
+			tabFolde.setMinimumCharacters(MIN_EDITOR_CHARS);
+			tabFolde.setUnselectedCloseVisible(true);
 		} else {
-			tabFolder.setMinimumCharacters(MIN_VIEW_CHARS);
-			tabFolder.setUnselectedCloseVisible(false);
+			tabFolde.setMinimumCharacters(MIN_VIEW_CHARS);
+			tabFolde.setUnselectedCloseVisible(false);
 		}
 
-		bindWidget(element, tabFolder); // ?? Do we need this ?
+		bindWidget(element, tabFolde); // ?? Do we need this ?
 
 		// Add a composite to manage the view's TB and Menu
-		addTopRight(tabFolder);
+		addTopRight(tabFolde);
 
-		return tabFolder;
+		return tabFolde;
 	}
 
 	private boolean getInitialMRUValue(Control control) {
