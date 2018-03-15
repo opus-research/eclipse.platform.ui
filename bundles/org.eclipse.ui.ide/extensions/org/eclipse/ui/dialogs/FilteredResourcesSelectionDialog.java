@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000 - 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     James Blackburn (Broadcom Corp.) Bug 86973 Allow path pattern matching
  *     Anton Leherbauer (Wind River Systems, Inc.) - Bug 415099 Terminating with "<" or " " (space) does not work for extensions
  *     Mickael Istria (Red Hat Inc.) - Bug 460749: filter resources with same location
+ *     Lucas Bullen (Red Hat Inc.) - Bug 520250/520251 highlight matches by CamelCase and pattern
+ *                                 - Bug 525974: Open Resource sorting doesn't show perfect match first
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -112,6 +114,8 @@ public class FilteredResourcesSelectionDialog extends
 	private GroupResourcesByLocationAction groupResourcesByLocationAction;
 
 	private String title;
+
+	private ItemsFilter latestFilter;
 
 	/**
 	 * The base outer-container which will be used to search for resources. This
@@ -405,7 +409,8 @@ public class FilteredResourcesSelectionDialog extends
 
 	@Override
 	protected ItemsFilter createFilter() {
-		return new ResourceFilter(container, searchContainer, isDerived, typeMask);
+		latestFilter = new ResourceFilter(container, searchContainer, isDerived, typeMask);
+		return latestFilter;
 	}
 
 	@Override
@@ -422,6 +427,18 @@ public class FilteredResourcesSelectionDialog extends
 			String s1 = resource1.getName();
 			String s2 = resource2.getName();
 
+			if (latestFilter != null) {
+				String filterPattern = latestFilter.getPattern();
+				// See if any are exact matches
+				boolean m1 = filterPattern.equals(s1);
+				boolean m2 = filterPattern.equals(s2);
+				if (m1 && m2)
+					return 0;
+				if (m1)
+					return -1;
+				if (m2)
+					return 1;
+			}
 			// Compare names without extension first
 			int s1Dot = s1.lastIndexOf('.');
 			int s2Dot = s2.lastIndexOf('.');
@@ -636,19 +653,23 @@ public class FilteredResourcesSelectionDialog extends
 
 			IResource res = (IResource) element;
 			StyledString str = new StyledString(res.getName().trim());
-
 			String searchFieldString = ((Text) getPatternControl()).getText();
-			searchFieldString = searchFieldString.replaceAll("\\*", ""); //$NON-NLS-1$//$NON-NLS-2$
-			searchFieldString = searchFieldString.replaceAll("\\?", ""); //$NON-NLS-1$//$NON-NLS-2$
-			Pattern p = Pattern.compile(searchFieldString, Pattern.CASE_INSENSITIVE); // $NON-NLS-1$
-			Matcher m = p.matcher(str);
-			if (m.find()) {
-				str.setStyle(m.start(), m.end() - m.start(), new Styler() {
-					@Override
-					public void applyStyles(TextStyle textStyle) {
-						textStyle.font = JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);
-					}
-				});
+			Styler boldStyler = new Styler() {
+				@Override
+				public void applyStyles(TextStyle textStyle) {
+					textStyle.font = JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);
+				}
+			};
+
+			int potentialIndex = str.getString().toLowerCase().indexOf(searchFieldString.toLowerCase());
+			final String wildcard = "*"; //$NON-NLS-1$
+			if (potentialIndex != -1) {
+				str.setStyle(potentialIndex, searchFieldString.length(), boldStyler);
+			} else if (searchFieldString.indexOf('?') != -1 || searchFieldString.indexOf('*') != -1) {
+				str = markRegions(str, String.join(wildcard, searchFieldString.split("(?=[\\.])")), boldStyler); //$NON-NLS-1$
+			} else {
+				String matchingString = String.join(wildcard, searchFieldString.split("(?=[A-Z\\.])")) + wildcard; //$NON-NLS-1$
+				str = markRegions(str, matchingString, boldStyler);
 			}
 
 			// extra info for duplicates
@@ -657,17 +678,45 @@ public class FilteredResourcesSelectionDialog extends
 				str.append(res.getParent().getFullPath().makeRelative().toString(), StyledString.QUALIFIER_STYLER);
 			}
 
-
-//Debugging:
-//			int pathDistance = pathDistance(res.getParent());
-//			if (pathDistance != Integer.MAX_VALUE / 2) {
-//				if (pathDistance > Integer.MAX_VALUE / 4)
-//					str.append(" (" + (pathDistance - Integer.MAX_VALUE / 4) + " folders up from current selection)", StyledString.QUALIFIER_STYLER);
-//				else
-//					str.append(" (" + pathDistance + " folders down from current selection)", StyledString.QUALIFIER_STYLER);
-//			}
-
 			return str;
+		}
+
+		private StyledString markRegions(StyledString styledString, String matchingString, Styler styler) {
+			String text = styledString.getString().toLowerCase();
+			matchingString = matchingString.toLowerCase();
+			StyledString updatedText = styledString;
+			int startingIndex = 0;
+			int currentIndex = 0;
+			String[] regions = matchingString.replaceAll("\\.", "\\\\.").split("(\\?)|\\*"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			boolean restart = false;
+
+			do {
+				for (String region : regions) {
+					if (region == null || region.isEmpty()) {
+						continue;
+					} else if (region.equals("?")) { //$NON-NLS-1$
+						currentIndex++;
+					} else {
+						int startlocation = indexOf(Pattern.compile(region), text.substring(currentIndex));
+						int length = region.replace("\\", "").length(); //$NON-NLS-1$ //$NON-NLS-2$
+						if (startlocation == -1) {
+							currentIndex = ++startingIndex;
+							updatedText = styledString;
+							restart = true;
+							break;
+						}
+						updatedText.setStyle(startlocation + currentIndex, length, styler);
+						currentIndex += startlocation + length;
+					}
+				}
+			} while (restart && currentIndex < text.length());
+
+			return updatedText;
+		}
+
+		private int indexOf(Pattern pattern, String s) {
+			Matcher matcher = pattern.matcher(s);
+			return matcher.find() ? matcher.start() : -1;
 		}
 
 		@Override

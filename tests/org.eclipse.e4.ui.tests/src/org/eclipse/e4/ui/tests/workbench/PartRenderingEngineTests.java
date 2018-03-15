@@ -45,6 +45,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.addons.cleanupaddon.CleanupAddon;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -102,7 +103,7 @@ public class PartRenderingEngineTests {
 	public void setUp() throws Exception {
 		logged = false;
 		appContext = E4Application.createDefaultContext();
-		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
+		appContext.set(IWorkbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 
 		final Display d = Display.getDefault();
@@ -212,8 +213,7 @@ public class PartRenderingEngineTests {
 		MPartStack stack = (MPartStack) container.getChildren().get(0);
 		MPart part = (MPart) stack.getChildren().get(0);
 
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.removeGui(part);
 		renderer.removeGui(window);
 
@@ -643,8 +643,7 @@ public class PartRenderingEngineTests {
 
 		wb = new E4Workbench(application, appContext);
 		wb.createAndRunUI(window);
-		IPresentationEngine engine = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine engine = appContext.get(IPresentationEngine.class);
 
 		CTabFolder folder = (CTabFolder) stack.getWidget();
 		CTabItem itemA = folder.getItem(0);
@@ -886,8 +885,7 @@ public class PartRenderingEngineTests {
 		part.setContributionURI("bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.workbench.SampleView");
 		window.getChildren().add(part);
 
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.createGui(part);
 		renderer.removeGui(part);
 
@@ -935,8 +933,7 @@ public class PartRenderingEngineTests {
 		assertNull(partB.getWidget());
 
 		// try to remove the tab
-		IPresentationEngine renderer = (IPresentationEngine) appContext
-				.get(IPresentationEngine.class.getName());
+		IPresentationEngine renderer = appContext.get(IPresentationEngine.class);
 		renderer.removeGui(partB);
 
 		// item removed, one item
