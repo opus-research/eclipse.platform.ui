@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Steven Spungin <steven@spungin.tv> - Bug 436908
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799, 446864
  *     Snjezana Peco <snjezana.peco@redhat.com> - Bug 414888
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 503379
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -127,7 +126,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent e) {
-			ESelectionService selectionService = part.getContext().get(ESelectionService.class);
+			ESelectionService selectionService = (ESelectionService) part.getContext().get(
+					ESelectionService.class.getName());
 			selectionService.setPostSelection(e.getSelection());
 		}
 	};
@@ -189,7 +189,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				} else {
 					selectionProvider.addSelectionChangedListener(postListener);
 				}
-				ESelectionService selectionService = part.getContext().get(ESelectionService.class);
+				ESelectionService selectionService = (ESelectionService) part.getContext().get(
+						ESelectionService.class.getName());
 				selectionService.setSelection(selectionProvider.getSelection());
 			}
 		}
@@ -343,8 +344,10 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		// Only update 'valid' parts
 		if (!(wrapped instanceof ErrorEditorPart) && !(wrapped instanceof ErrorViewPart)) {
 			part.setLabel(computeLabel());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY, wrapped.getTitleToolTip());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY, wrapped.getTitleImage());
+			part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
+					wrapped.getTitleToolTip());
+			part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
+					wrapped.getTitleImage());
 		}
 
 		ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
@@ -442,7 +445,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
-		ESelectionService selectionService = part.getContext().get(ESelectionService.class);
+		ESelectionService selectionService = (ESelectionService) part.getContext().get(
+				ESelectionService.class.getName());
 		selectionService.setSelection(e.getSelection());
 	}
 
