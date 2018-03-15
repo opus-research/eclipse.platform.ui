@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Mohamed Tarief , IBM - Bug 139211
- *     Lucas Bullen (Red Hat Inc.) - Bug 522096 - "Close Projects" on working set
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -114,8 +113,6 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 
 	@Override
 	protected String getOperationMessage() {
-		if (getActionResources().size() > 1)
-			return IDEWorkbenchMessages.OpenResourceAction_operationMessage_plural;
 		return IDEWorkbenchMessages.OpenResourceAction_operationMessage;
 	}
 
