@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 485201
- *     Mickael Istria (Red Hat Inc.) - Bug 90292 (default editor) and family
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -75,7 +74,7 @@ import org.eclipse.ui.internal.ide.EditorAssociationOverrideDescriptor;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy;
-import org.eclipse.ui.internal.ide.UnknownEditorStrategyRegistry;
+import org.eclipse.ui.internal.ide.UnassociatedEditorStrategyRegistry;
 import org.eclipse.ui.internal.ide.model.StandardPropertiesAdapterFactory;
 import org.eclipse.ui.internal.ide.model.WorkbenchAdapterFactory;
 import org.eclipse.ui.internal.ide.registry.MarkerHelpRegistry;
@@ -140,12 +139,12 @@ public final class IDE {
 	public static final String RESOURCE_PERSPECTIVE_ID = "org.eclipse.ui.resourcePerspective"; //$NON-NLS-1$
 
 	/**
-	 * A preference key to decide which {@link IUnknownEditorStrategy} to use
+	 * A preference key to decide which {@link IUnassociatedEditorStrategy} to use
 	 * when trying to open files without associated editors.
 	 *
 	 * @since 3.12
 	 */
-	public static final String UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY = "unknownEditorStrategy";//$NON-NLS-1$
+	public static final String UNASSOCIATED_EDITOR_STRATEGY_PREFERENCE_KEY = "unassociatedEditorStrategy";//$NON-NLS-1$
 
 	/**
 	 * Marker help registry mapping markers to help context ids and resolutions;
@@ -556,7 +555,7 @@ public final class IDE {
 		// open the editor on the file
 		IEditorDescriptor editorDesc;
 		try {
-			editorDesc = getEditorDescriptor(input, determineContentType, true);
+			editorDesc = getEditorDescriptor(input, determineContentType);
 		} catch (OperationCanceledException ex) {
 			return null;
 		}
@@ -593,7 +592,7 @@ public final class IDE {
 		// open the editor on the file
 		IEditorDescriptor editorDesc;
 		try {
-			editorDesc = getEditorDescriptor(input, true, true);
+			editorDesc = getEditorDescriptor(input);
 		} catch (OperationCanceledException ex) {
 			return null;
 		}
@@ -673,24 +672,19 @@ public final class IDE {
 	 * as well as traditional name/extension bindings.
 	 * </p>
 	 * <ol>
-	 * <li>The <code>IResource</code> is consulted for a persistent property
-	 * named <code>IDE.EDITOR_KEY</code> containing the preferred editor id to
-	 * be used.</li>
+	 * <li>The <code>IResource</code> is consulted for a persistent property named
+	 * <code>IDE.EDITOR_KEY</code> containing the preferred editor id to be
+	 * used.</li>
 	 * <li>The workbench editor registry is consulted to determine if an editor
 	 * extension has been registered for the file type. If so, an instance of
 	 * the editor extension is opened on the file. See
 	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
-	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
-	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
-	 * behavior is
-	 * <ol>
 	 * <li>The operating system is consulted to determine if an in-place
 	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
 	 * <li>The operating system is consulted to determine if an external editor
 	 * is available.</li>
 	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li></li>
-	 * </ol>
+	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
 	 *
@@ -701,13 +695,10 @@ public final class IDE {
 	 *             if no editor can be found
 	 * @throws OperationCanceledException
 	 *             in case descriptor lookup was canceled by the user
-	 * @deprecated Since 3.12, use
-	 *             {@link IDE#getEditorDescriptor(IFile, boolean, boolean)}
 	 */
-	@Deprecated
 	public static IEditorDescriptor getEditorDescriptor(IFile file)
 			throws PartInitException, OperationCanceledException {
-		return getEditorDescriptor(file, true, false);
+		return getEditorDescriptor(file, true);
 	}
 
 	/**
@@ -720,24 +711,19 @@ public final class IDE {
 	 * <code>determineContentType</code>is <code>true</code>.
 	 * </p>
 	 * <ol>
-	 * <li>The <code>IResource</code> is consulted for a persistent property
-	 * named <code>IDE.EDITOR_KEY</code> containing the preferred editor id to
-	 * be used.</li>
+	 * <li>The <code>IResource</code> is consulted for a persistent property named
+	 * <code>IDE.EDITOR_KEY</code> containing the preferred editor id to be
+	 * used.</li>
 	 * <li>The workbench editor registry is consulted to determine if an editor
 	 * extension has been registered for the file type. If so, an instance of
 	 * the editor extension is opened on the file. See
 	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
-	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
-	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
-	 * behavior is
-	 * <ol>
 	 * <li>The operating system is consulted to determine if an in-place
 	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
 	 * <li>The operating system is consulted to determine if an external editor
 	 * is available.</li>
 	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li></li>
-	 * </ol>
+	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
 	 *
@@ -751,79 +737,22 @@ public final class IDE {
 	 * @throws OperationCanceledException
 	 *             in case descriptor lookup was canceled by the user
 	 * @since 3.1
-	 * @deprecated Since 3.12, use
-	 *             {@link IDE#getEditorDescriptor(IFile, boolean, boolean)}
-	 *             instead.
 	 */
-	@Deprecated
-	public static IEditorDescriptor getEditorDescriptor(IFile file, boolean determineContentType)
-			throws PartInitException, OperationCanceledException {
+	public static IEditorDescriptor getEditorDescriptor(IFile file,
+			boolean determineContentType) throws PartInitException, OperationCanceledException {
 
 		if (file == null) {
 			throw new IllegalArgumentException();
 		}
 
-		return getEditorDescriptor(file.getName(), PlatformUI.getWorkbench().getEditorRegistry(),
-				getDefaultEditor(file, determineContentType), false);
+		return getEditorDescriptor(file.getName(), PlatformUI.getWorkbench()
+				.getEditorRegistry(), getDefaultEditor(file,
+				determineContentType));
 	}
 
 	/**
-	 * Returns an editor descriptor appropriate for opening the given file
-	 * resource.
-	 * <p>
-	 * The editor descriptor is determined using a multi-step process. This
-	 * method will attempt to resolve the editor based on content-type bindings
-	 * as well as traditional name/extension bindings if
-	 * <code>determineContentType</code>is <code>true</code>.
-	 * </p>
-	 * <ol>
-	 * <li>The <code>IResource</code> is consulted for a persistent property
-	 * named <code>IDE.EDITOR_KEY</code> containing the preferred editor id to
-	 * be used.</li>
-	 * <li>The workbench editor registry is consulted to determine if an editor
-	 * extension has been registered for the file type. If so, an instance of
-	 * the editor extension is opened on the file. See
-	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
-	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
-	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
-	 * behavior is
-	 * <ol>
-	 * <li>The operating system is consulted to determine if an in-place
-	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
-	 * <li>The operating system is consulted to determine if an external editor
-	 * is available.</li>
-	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li></li>
-	 * </ol>
-	 * </ol>
-	 * </p>
-	 *
-	 * @param file
-	 *            the file
-	 * @param determineContentType
-	 *            query the content type system for the content type of the file
-	 * @param allowInteractive
-	 *            whether we allow user interactions
-	 * @return an editor descriptor, appropriate for opening the file
-	 * @throws PartInitException
-	 *             if no editor can be found
-	 * @throws OperationCanceledException
-	 *             in case descriptor lookup was canceled by the user
-	 * @since 3.12
-	 */
-	public static IEditorDescriptor getEditorDescriptor(IFile file, boolean determineContentType, boolean allowInteractive)
-			throws PartInitException, OperationCanceledException {
-
-		if (file == null) {
-			throw new IllegalArgumentException();
-		}
-
-		return getEditorDescriptor(file.getName(), PlatformUI.getWorkbench().getEditorRegistry(),
-				getDefaultEditor(file, determineContentType), allowInteractive);
-	}
-
-	/**
-	 * Returns an editor id appropriate for opening the given file store.
+	 * Returns an editor id appropriate for opening the given file
+	 * store.
 	 * <p>
 	 * The editor descriptor is determined using a multi-step process. This
 	 * method will attempt to resolve the editor based on content-type bindings
@@ -834,29 +763,22 @@ public final class IDE {
 	 * extension has been registered for the file type. If so, an instance of
 	 * the editor extension is opened on the file. See
 	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
-	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
-	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
-	 * behavior is
-	 * <ol>
 	 * <li>The operating system is consulted to determine if an in-place
 	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
 	 * <li>The operating system is consulted to determine if an external editor
 	 * is available.</li>
 	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li></li>
-	 * </ol>
+	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
 	 *
 	 * @param fileStore
 	 *            the file store
-	 * @param allowInteractive
-	 *            Whether user interactions are allowed
 	 * @return the id of an editor, appropriate for opening the file
 	 * @throws PartInitException
 	 *             if no editor can be found
 	 */
-	private static String getEditorId(IFileStore fileStore, boolean allowInteractive) throws PartInitException {
+	private static String getEditorId(IFileStore fileStore) throws PartInitException {
 		String name = fileStore.fetchInfo().getName();
 		if (name == null) {
 			throw new IllegalArgumentException();
@@ -882,9 +804,8 @@ public final class IDE {
 		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
 
 		IEditorDescriptor defaultEditor = editorReg.getDefaultEditor(name, contentType);
-		defaultEditor = overrideDefaultEditorAssociation(new FileStoreEditorInput(fileStore), contentType,
-				defaultEditor);
-		return getEditorDescriptor(name, editorReg, defaultEditor, allowInteractive).getId();
+		defaultEditor = overrideDefaultEditorAssociation(new FileStoreEditorInput(fileStore), contentType, defaultEditor);
+		return getEditorDescriptor(name, editorReg, defaultEditor).getId();
 	}
 
 	/**
@@ -1010,17 +931,12 @@ public final class IDE {
 	 * extension has been registered for the file type. If so, an instance of
 	 * the editor extension is opened on the file. See
 	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
-	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
-	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
-	 * behavior is
-	 * <ol>
 	 * <li>The operating system is consulted to determine if an in-place
 	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
 	 * <li>The operating system is consulted to determine if an external editor
 	 * is available.</li>
 	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li></li>
-	 * </ol>
+	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
 	 *
@@ -1032,14 +948,10 @@ public final class IDE {
 	 * @throws OperationCanceledException
 	 *             in case descriptor lookup was canceled by the user
 	 * @since 3.1
-	 * @deprecated Since 3.12, use
-	 *             {@link IDE#getEditorDescriptor(String, boolean, boolean)}
-	 *             instead.
 	 */
-	@Deprecated
 	public static IEditorDescriptor getEditorDescriptor(String name)
 			throws PartInitException, OperationCanceledException {
-		return getEditorDescriptor(name, true, false);
+		return getEditorDescriptor(name, true);
 	}
 
 	/**
@@ -1055,17 +967,12 @@ public final class IDE {
 	 * extension has been registered for the file type. If so, an instance of
 	 * the editor extension is opened on the file. See
 	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
-	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
-	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
-	 * behavior is
-	 * <ol>
 	 * <li>The operating system is consulted to determine if an in-place
 	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
 	 * <li>The operating system is consulted to determine if an external editor
 	 * is available.</li>
 	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li></li>
-	 * </ol>
+	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
 	 *
@@ -1080,59 +987,9 @@ public final class IDE {
 	 * @throws OperationCanceledException
 	 *             in case descriptor lookup was canceled by the user
 	 * @since 3.1
-	 * @deprecated Since 3.12, use
-	 *             {@link IDE#getEditorDescriptor(String, boolean, boolean)}
-	 *             instead.
 	 */
-	@Deprecated
-	public static IEditorDescriptor getEditorDescriptor(String name, boolean inferContentType)
-			throws PartInitException, OperationCanceledException {
-		return getEditorDescriptor(name, inferContentType, false);
-	}
-
-	/**
-	 * Returns an editor descriptor appropriate for opening a file resource with
-	 * the given name.
-	 * <p>
-	 * The editor descriptor is determined using a multi-step process. This
-	 * method will attempt to infer the content type of the file if
-	 * <code>inferContentType</code> is <code>true</code>.
-	 * </p>
-	 * <ol>
-	 * <li>The workbench editor registry is consulted to determine if an editor
-	 * extension has been registered for the file type. If so, an instance of
-	 * the editor extension is opened on the file. See
-	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
-	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
-	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
-	 * behavior is
-	 * <ol>
-	 * <li>The operating system is consulted to determine if an in-place
-	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
-	 * <li>The operating system is consulted to determine if an external editor
-	 * is available.</li>
-	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li></li>
-	 * </ol>
-	 * </ol>
-	 * </p>
-	 *
-	 * @param name
-	 *            the file name
-	 * @param inferContentType
-	 *            attempt to infer the content type from the file name if this
-	 *            is <code>true</code>
-	 * @param allowInteractive
-	 *            whether we allow user interactions.
-	 * @return an editor descriptor, appropriate for opening the file
-	 * @throws PartInitException
-	 *             if no editor can be found
-	 * @throws OperationCanceledException
-	 *             in case descriptor lookup was canceled by the user
-	 * @since 3.12
-	 */
-	public static IEditorDescriptor getEditorDescriptor(String name, boolean inferContentType, boolean allowInteractive)
-			throws PartInitException, OperationCanceledException {
+	public static IEditorDescriptor getEditorDescriptor(String name,
+			boolean inferContentType) throws PartInitException, OperationCanceledException {
 
 		if (name == null) {
 			throw new IllegalArgumentException();
@@ -1144,14 +1001,13 @@ public final class IDE {
 				.getEditorRegistry();
 
 		IEditorDescriptor defaultEditor = editorReg.getDefaultEditor(name, contentType);
-		defaultEditor = getEditorDescriptor(name, editorReg, defaultEditor, allowInteractive);
+		defaultEditor = getEditorDescriptor(name, editorReg, defaultEditor);
 		return overrideDefaultEditorAssociation(name, contentType, defaultEditor);
 	}
 
 	/**
 	 * Get the editor descriptor for a given name using the editorDescriptor
-	 * passed in as a default as a starting point. It may delegate computation
-	 * to the active {@link IUnknownEditorStrategy}.
+	 * passed in as a default as a starting point.
 	 *
 	 * @param name
 	 *            The name of the element to open.
@@ -1159,26 +1015,23 @@ public final class IDE {
 	 *            The editor registry to do the lookups from.
 	 * @param defaultDescriptor
 	 *            IEditorDescriptor or <code>null</code>
-	 * @param allowInteractive
-	 *            Whether we ask selected {@link IUnknownEditorStrategy}, that
-	 *            can be interactive.
 	 * @return IEditorDescriptor
 	 * @throws PartInitException
 	 *             if no valid editor can be found
 	 * @throws OperationCanceledException
 	 *             in case descriptor lookup was canceled by the user
 	 *
-	 * @since 3.12
+	 * @since 3.1
 	 */
-	private static IEditorDescriptor getEditorDescriptor(String name, IEditorRegistry editorReg,
-			IEditorDescriptor defaultDescriptor, boolean allowInteractive)
-					throws PartInitException, OperationCanceledException {
+	private static IEditorDescriptor getEditorDescriptor(String name,
+			IEditorRegistry editorReg, IEditorDescriptor defaultDescriptor)
+			throws PartInitException, OperationCanceledException {
 
 		if (defaultDescriptor != null) {
 			return defaultDescriptor;
 		}
 
-		IUnknownEditorStrategy strategy = getUnknowEditorStrategy(allowInteractive);
+		IUnassociatedEditorStrategy strategy = getUnknowEditorStrategy();
 		IEditorDescriptor editorDesc;
 		try {
 			editorDesc = strategy.getEditorDescriptor(name, editorReg);
@@ -1196,19 +1049,14 @@ public final class IDE {
 	}
 
 	/**
-	 * @param allowInteractive
-	 *            Whether interactive strategies are considered
-	 * @return The strategy to use in order to open unknown file. Either as set
-	 *         by preference, or a {@link SystemEditorOrTextEditorStrategy} if
-	 *         none is explicitly configured. Never returns {@code null}.
+	 * @return The strategy to use in order to open unassociated file. Either as
+	 *         set by preference, or a {@link SystemEditorOrTextEditorStrategy}
+	 *         if none is explicitly configured.
 	 */
-	private static IUnknownEditorStrategy getUnknowEditorStrategy(boolean allowInteractive) {
+	private static IUnassociatedEditorStrategy getUnknowEditorStrategy() {
 		String preferedStrategy = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
-				.getString(UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY);
-		IUnknownEditorStrategy res = null;
-		if (allowInteractive || !UnknownEditorStrategyRegistry.isInteractive(preferedStrategy)) {
-			res = UnknownEditorStrategyRegistry.getStrategy(preferedStrategy);
-		}
+				.getString(UNASSOCIATED_EDITOR_STRATEGY_PREFERENCE_KEY);
+		IUnassociatedEditorStrategy res = UnassociatedEditorStrategyRegistry.getStrategy(preferedStrategy);
 		if (res == null) {
 			res = new SystemEditorOrTextEditorStrategy();
 		}
@@ -1347,7 +1195,7 @@ public final class IDE {
         IEditorInput input = getEditorInput(fileStore);
 		String editorId;
 		try {
-			editorId = getEditorId(fileStore, true);
+			editorId = getEditorId(fileStore);
 		} catch (OperationCanceledException ex) {
 			return null;
 		}
