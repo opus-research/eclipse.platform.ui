@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,10 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
 
-import com.ibm.icu.text.Collator;
-import com.ibm.icu.text.MessageFormat;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
@@ -100,6 +98,9 @@ import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.statushandlers.StatusManager;
+
+import com.ibm.icu.text.Collator;
+import com.ibm.icu.text.MessageFormat;
 
 /**
  * The preference page for defining keyboard shortcuts. While some of its
@@ -1762,8 +1763,9 @@ public final class KeysPreferencePage extends PreferencePage implements
 					while (iterator2.hasNext()) {
 						Context context = (Context) iterator2.next();
 						String uniqueName = MessageFormat.format(
-								Util.translateString(RESOURCE_BUNDLE, "uniqueName"), //$NON-NLS-1$
-								name, context.getId());
+								Util.translateString(RESOURCE_BUNDLE,
+										"uniqueName"), new Object[] { name, //$NON-NLS-1$
+										context.getId() });
 						contextIdsByUniqueName.put(uniqueName, context.getId());
 						contextUniqueNamesById.put(context.getId(), uniqueName);
 					}
@@ -2106,8 +2108,9 @@ public final class KeysPreferencePage extends PreferencePage implements
 								.get(parentId);
 						if (name != null) {
 							labelContextExtends.setText(MessageFormat.format(
-									Util.translateString(RESOURCE_BUNDLE, "extends"), //$NON-NLS-1$
-									name));
+									Util.translateString(RESOURCE_BUNDLE,
+											"extends"), //$NON-NLS-1$
+									new Object[] { name }));
 							return;
 						}
 					}
@@ -2136,7 +2139,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 				if (name != null) {
 					labelSchemeExtends.setText(MessageFormat.format(Util
 							.translateString(RESOURCE_BUNDLE, "extends"), //$NON-NLS-1$
-							name));
+							new Object[] { name }));
 					return;
 				}
 			} catch (final NotDefinedException e) {
