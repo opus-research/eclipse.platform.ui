@@ -35,9 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * The Heap Status control, which shows the heap usage statistics in the window trim.
@@ -533,7 +531,7 @@ public class HeapStatus extends Composite {
      * Converts the given number of bytes to a printable number of megabytes (rounded up).
      */
     private String convertToMegString(long numBytes) {
-		return NLS.bind(WorkbenchMessages.HeapStatus_meg, Long.valueOf(convertToMeg(numBytes)));
+        return NLS.bind(WorkbenchMessages.HeapStatus_meg, new Long(convertToMeg(numBytes)));
     }
 
     /**
@@ -592,7 +590,6 @@ public class HeapStatus extends Composite {
 					.getActiveWorkbenchWindow();
 			if (wbw != null) {
 				wbw.showHeapStatus(false);
-				PrefUtil.getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR, false);
 			}
     	}
     }
