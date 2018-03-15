@@ -1577,7 +1577,6 @@
       <fontDefinition
             label="%FontsPreference.TextFontLabel"
             categoryId="org.eclipse.ui.workbenchMisc"
-            isEditable="false"
             id="org.eclipse.jface.textfont">
          <description>
             %FontsPreference.TextFontDescription
@@ -1904,7 +1903,6 @@
       <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
             id="org.eclipse.ui.workbench.HOVER_BACKGROUND"
-            isEditable="false"
             label="%Color.infoBackground">
             <colorFactory
                class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
@@ -1918,7 +1916,6 @@
       <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
             id="org.eclipse.ui.workbench.HOVER_FOREGROUND"
-            isEditable="false"
             label="%Color.infoForeground">
             <colorFactory
                class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
