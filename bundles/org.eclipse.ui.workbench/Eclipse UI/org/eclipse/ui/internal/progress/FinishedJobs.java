@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
@@ -176,19 +177,21 @@ public class FinishedJobs extends EventManager {
 	private void add(JobInfo info) {
 		boolean fire = false;
 
-		if (!keptjobinfos.contains(info)) {
-			keptjobinfos.add(info);
+		synchronized (keptjobinfos) {
+			if (!keptjobinfos.contains(info)) {
+				keptjobinfos.add(info);
 
-			long now = System.currentTimeMillis();
-			finishedTime.put(info, new Long(now));
+				long now = System.currentTimeMillis();
+				finishedTime.put(info, new Long(now));
 
-			Object parent = info.getParent();
-			if (!(parent == null || keptjobinfos.contains(parent))) {
-				keptjobinfos.add(parent);
-				finishedTime.put(parent, new Long(now));
+				Object parent = info.getParent();
+				if (!(parent == null || keptjobinfos.contains(parent))) {
+					keptjobinfos.add(parent);
+					finishedTime.put(parent, new Long(now));
+				}
+
+				fire = true;
 			}
-
-			fire = true;
 		}
 
 		if (fire) {
@@ -226,7 +229,10 @@ public class FinishedJobs extends EventManager {
 				if (prop instanceof Boolean && ((Boolean) prop).booleanValue()) {
 					ArrayList found = null;
 					JobTreeElement[] all;
-					all = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
+					synchronized (keptjobinfos) {
+						all = (JobTreeElement[]) keptjobinfos
+								.toArray(new JobTreeElement[keptjobinfos.size()]);
+					}
 					for (int i = 0; i < all.length; i++) {
 						JobTreeElement jte = all[i];
 						if (jte != info && jte.isJobInfo()) {
@@ -257,10 +263,13 @@ public class FinishedJobs extends EventManager {
 				JobTreeElement[] toBeRemoved = null;
 				boolean fire = false;
 				JobTreeElement element = (JobTreeElement) tinfo.getParent();
-				if (element == info && !keptjobinfos.contains(tinfo)) {
-					toBeRemoved = findJobsToRemove(element);
-					keptjobinfos.add(tinfo);
-					finishedTime.put(tinfo, new Long(System.currentTimeMillis()));
+				synchronized (keptjobinfos) {
+					if (element == info && !keptjobinfos.contains(tinfo)) {
+						toBeRemoved = findJobsToRemove(element);
+						keptjobinfos.add(tinfo);
+						finishedTime.put(tinfo, new Long(System
+								.currentTimeMillis()));
+					}
 				}
 
 				if (toBeRemoved != null) {
@@ -305,26 +314,30 @@ public class FinishedJobs extends EventManager {
 		boolean fire = false;
 		boolean removed = false;
 
-		if (keptjobinfos.remove(jte)) {
-			removed = true;
-			finishedTime.remove(jte);
-			disposeAction(jte);
+		synchronized (keptjobinfos) {
+			if (keptjobinfos.remove(jte)) {
+				removed = true;
+				finishedTime.remove(jte);
+				disposeAction(jte);
 
-			// delete all elements that have jte as their direct or indirect
-			// parent
-			JobTreeElement jtes[] = (JobTreeElement[]) keptjobinfos.toArray(new JobTreeElement[keptjobinfos.size()]);
-			for (int i = 0; i < jtes.length; i++) {
-				JobTreeElement parent = (JobTreeElement) jtes[i].getParent();
-				if (parent != null) {
-					if (parent == jte || parent.getParent() == jte) {
-						if (keptjobinfos.remove(jtes[i])) {
-							disposeAction(jtes[i]);
+				// delete all elements that have jte as their direct or indirect
+				// parent
+				JobTreeElement jtes[] = (JobTreeElement[]) keptjobinfos
+						.toArray(new JobTreeElement[keptjobinfos.size()]);
+				for (int i = 0; i < jtes.length; i++) {
+					JobTreeElement parent = (JobTreeElement) jtes[i]
+							.getParent();
+					if (parent != null) {
+						if (parent == jte || parent.getParent() == jte) {
+							if (keptjobinfos.remove(jtes[i])) {
+								disposeAction(jtes[i]);
+							}
+							finishedTime.remove(jtes[i]);
 						}
-						finishedTime.remove(jtes[i]);
 					}
 				}
+				fire = true;
 			}
-			fire = true;
 		}
 
 		if (fire) {
