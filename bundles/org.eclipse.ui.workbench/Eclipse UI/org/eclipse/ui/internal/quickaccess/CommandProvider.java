@@ -49,8 +49,14 @@ public class CommandProvider extends QuickAccessProvider {
 	private ICommandService commandService;
 	private EHandlerService ehandlerService;
 	private ICommandImageService commandImageService;
+	private IEclipseContext context = null;
 
-	public CommandProvider() {
+	/**
+	 * Construct a CommandProvider passing an instance of
+	 * {@code IEclipseContext}.
+	 */
+	public CommandProvider(IEclipseContext context) {
+		this.context = context;
 	}
 
 	@Override
@@ -148,14 +154,12 @@ public class CommandProvider extends QuickAccessProvider {
 		return handlerService;
 	}
 
+	/**
+	 * @return Returns the commandImageService.
+	 */
 	public ICommandImageService getCommandImageService() {
 		if (commandImageService == null) {
-			if (currentSnapshot instanceof ExpressionContext) {
-				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
-				commandImageService = ctx.get(ICommandImageService.class);
-			} else {
-				commandImageService = PlatformUI.getWorkbench().getService(ICommandImageService.class);
-			}
+			commandImageService = context.get(ICommandImageService.class);
 		}
 		return commandImageService;
 	}
