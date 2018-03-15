@@ -1124,7 +1124,7 @@ public class ExtendedMarkersView extends ViewPart {
 	/**
 	 * Open the filters dialog for the receiver.
 	 */
-	void openFiltersDialog() {
+	protected void openFiltersDialog() {
 		FiltersConfigurationDialog dialog = new FiltersConfigurationDialog(
 				getSite().getWorkbenchWindow().getShell(), generator);
 		if (dialog.open() == Window.OK) {
@@ -1538,7 +1538,7 @@ public class ExtendedMarkersView extends ViewPart {
 	/**
 	 * @return the viewer
 	 */
-	TreeViewer getViewer() {
+	protected TreeViewer getViewer() {
 		return viewer;
 	}
 
