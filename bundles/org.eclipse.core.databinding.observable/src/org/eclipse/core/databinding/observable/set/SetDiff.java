@@ -156,7 +156,7 @@ public abstract class SetDiff<E> implements IDiff {
 
 	@Override
 	public String toString() {
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		buffer.append(getClass().getName())
 				.append("{additions [") //$NON-NLS-1$
 				.append(getAdditions() != null ? getAdditions().toString() : "null") //$NON-NLS-1$

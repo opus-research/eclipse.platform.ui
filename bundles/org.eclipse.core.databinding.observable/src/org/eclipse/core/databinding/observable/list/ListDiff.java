@@ -297,7 +297,7 @@ public abstract class ListDiff<E> implements IDiff {
 	@Override
 	public String toString() {
 		ListDiffEntry<E>[] differences = getDifferences();
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		buffer.append(getClass().getName());
 
 		if (differences == null || differences.length == 0) {
