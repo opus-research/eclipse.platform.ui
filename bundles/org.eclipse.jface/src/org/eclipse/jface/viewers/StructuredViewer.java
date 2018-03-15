@@ -712,8 +712,9 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	protected boolean equals(Object elementA, Object elementB) {
 		if (comparer == null) {
 			return elementA == null ? elementB == null : elementA.equals(elementB);
+		} else {
+			return elementA == null ? elementB == null : comparer.equals(elementA, elementB);
 		}
-		return elementA == null ? elementB == null : comparer.equals(elementA, elementB);
 	}
 
 	/**
@@ -1620,7 +1621,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			resetFilters();
 		} else {
 			this.filters = new ArrayList<>(Arrays.asList(filters));
-			refresh(false);
+			refresh();
 		}
 	}
 
@@ -1631,7 +1632,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	public void resetFilters() {
 		if (filters != null) {
 			filters = null;
-			refresh(false);
+			refresh();
 		}
 	}
 

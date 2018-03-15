@@ -97,6 +97,7 @@ public class APITestUtils {
 		saveableHelperSetAutomatedResponse(response, context);
 
 		while (workbench.getDisplay().readAndDispatch()) {
+			;
 		}
 
 		for (MWindow window : application.getChildren()) {
@@ -104,12 +105,13 @@ public class APITestUtils {
 		}
 
 		while (workbench.getDisplay().readAndDispatch()) {
+			;
 		}
 	}
 
 	private static void saveableHelperSetAutomatedResponse(final int response,
 			IEclipseContext context) {
-		ISaveHandler saveHandler = context.get(ISaveHandler.class);
+		ISaveHandler saveHandler = (ISaveHandler) context.get(ISaveHandler.class.getName());
 		if (response == -1) {
 			context.set(ISaveHandler.class.getName(), originalHandlers.remove(context));
 		} else {

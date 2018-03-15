@@ -109,8 +109,7 @@ public class Form extends Composite {
 		@Override
 		public int computeMinimumWidth(Composite composite, boolean flushCache) {
 			initCaches(flushCache);
-			boolean ignoreBody = Form.this.getData(FormUtil.IGNORE_BODY) != null;
-			return Math.max(headCache.computeMinimumWidth(), ignoreBody ? 0 : bodyCache.computeMinimumWidth());
+			return Math.max(headCache.computeMinimumWidth(), bodyCache.computeMinimumWidth());
 		}
 
 		@Override

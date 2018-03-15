@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2017 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -375,7 +375,7 @@ public class LinkedResourceEditor {
 		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof LinkedResourceEditor) {
-				ArrayList<Object> list = new ArrayList<>();
+				ArrayList list = new ArrayList();
 				Object[] objs = { BROKEN, ABSOLUTE, FIXED };
 				for (Object obj : objs) {
 					Object[] children = getChildren(obj);
@@ -431,28 +431,31 @@ public class LinkedResourceEditor {
 	void refreshContent() {
 		IResource[] projectFiles;
 		if (!initialized) {
-			final LinkedList<IResource> resources = new LinkedList<>();
+			final LinkedList/* <IResource> */resources = new LinkedList/*
+																		 * <IResource
+																		 * >
+																		 */();
 			try {
 				fProject.accept(resource -> {
-					if (resource.isLinked() && !resource.isVirtual())
-						resources.add(resource);
-					return true;
-				});
+if (resource.isLinked() && !resource.isVirtual())
+				resources.add(resource);
+return true;
+});
 			} catch (CoreException e) {
 			}
-			projectFiles = resources.toArray(new IResource[0]);
+			projectFiles = (IResource[]) resources.toArray(new IResource[0]);
 			initialized = true;
 		}
 		else {
-			ArrayList<IResource> list = new ArrayList<>();
+			ArrayList/*<IResource>*/ list = new ArrayList();
 			list.addAll(fBrokenResources.values());
 			list.addAll(fFixedResources.values());
 			list.addAll(fAbsoluteResources.values());
-			projectFiles = list.toArray(new IResource[0]);
+			projectFiles = (IResource[]) list.toArray(new IResource[0]);
 		}
-		fBrokenResources = new TreeMap<>();
-		fFixedResources = new TreeMap<>();
-		fAbsoluteResources = new TreeMap<>();
+		fBrokenResources = new TreeMap/* <String, IResource> */();
+		fFixedResources = new TreeMap/* <String, IResource> */();
+		fAbsoluteResources = new TreeMap/* <String, IResource> */();
 		for (IResource resource : projectFiles) {
 			String fullPath = resource.getFullPath().toPortableString();
 			try {
@@ -528,7 +531,7 @@ public class LinkedResourceEditor {
 		if (MessageDialog.openConfirm(fConvertAbsoluteButton.getShell(),
 				IDEWorkbenchMessages.LinkedResourceEditor_convertTitle,
 				IDEWorkbenchMessages.LinkedResourceEditor_convertMessage)) {
-			ArrayList<IResource> resources = new ArrayList<>();
+			ArrayList/* <IResource> */resources = new ArrayList/* <IResource> */();
 			IResource[] selectedResources = getSelectedResource();
 			resources.addAll(Arrays.asList(selectedResources));
 			if (areFixed(selectedResources))
@@ -573,23 +576,34 @@ public class LinkedResourceEditor {
 		}
 	}
 
-	private void convertToAbsolute(ArrayList<IResource> resources,
+	private void convertToAbsolute(ArrayList/* <IResource> */resources,
 			IResource[] selectedResources) {
-		ArrayList<String> report = new ArrayList<>();
+		ArrayList/* <String> */report = new ArrayList/* <String> */();
 
-		Iterator<IResource> it = resources.iterator();
+		Iterator/* <IResource> */it = resources.iterator();
 		while (it.hasNext()) {
-			IResource res = it.next();
+			IResource res = (IResource) it.next();
 			IPath location = res.getLocation();
 
 			try {
 				setLinkLocation(res, location);
-				report.add(NLS.bind(IDEWorkbenchMessages.LinkedResourceEditor_changedTo,
-						new Object[] { res.getProjectRelativePath().toPortableString(),
-								res.getRawLocation().toOSString(), location.toOSString() }));
+				report
+						.add(NLS
+								.bind(
+										IDEWorkbenchMessages.LinkedResourceEditor_changedTo,
+										new Object[] {
+												res.getProjectRelativePath()
+														.toPortableString(),
+												res.getRawLocation()
+														.toOSString(),
+												location.toOSString() }));
 			} catch (CoreException e) {
-				report.add(NLS.bind(IDEWorkbenchMessages.LinkedResourceEditor_unableToSetLinkLocationForResource,
-						res.getProjectRelativePath().toPortableString()));
+				report
+						.add(NLS
+								.bind(
+										IDEWorkbenchMessages.LinkedResourceEditor_unableToSetLinkLocationForResource,
+										res.getProjectRelativePath()
+												.toPortableString()));
 			}
 		}
 
@@ -618,9 +632,9 @@ public class LinkedResourceEditor {
 	 * @param report
 	 */
 	private void reportResult(IResource[] selectedResources,
-			ArrayList<String> report, String title) {
-		StringBuilder message = new StringBuilder();
-		Iterator<String> stringIt = report.iterator();
+			ArrayList/* <String> */report, String title) {
+		StringBuffer message = new StringBuffer();
+		Iterator/* <String> */stringIt = report.iterator();
 		while (stringIt.hasNext()) {
 			message.append(stringIt.next());
 			if (stringIt.hasNext())
@@ -673,15 +687,15 @@ public class LinkedResourceEditor {
 	 * @param resources
 	 * @param selectedResources
 	 */
-	private void convertToRelative(ArrayList<IResource> resources,
+	private void convertToRelative(ArrayList/* <IResource> */resources,
 			IResource[] selectedResources) {
-		ArrayList<String> report = new ArrayList<>();
+		ArrayList/* <String> */report = new ArrayList/* <String> */();
 
 		// first, try to use the automatic converter
-		ArrayList<IResource> remaining = new ArrayList<>();
-		Iterator<IResource> it = resources.iterator();
+		ArrayList/* <IResource> */remaining = new ArrayList/* <IResource> */();
+		Iterator/* <IResource> */it = resources.iterator();
 		while (it.hasNext()) {
-			IResource res = it.next();
+			IResource res = (IResource) it.next();
 			IPath location = res.getLocation();
 			try {
 				IPath newLocation = URIUtil.toPath(res.getPathVariableManager().convertToRelative(URIUtil.toURI(location), true, null));
@@ -689,16 +703,24 @@ public class LinkedResourceEditor {
 					remaining.add(res);
 				else {
 					setLinkLocation(res, newLocation);
-					report.add(NLS.bind(IDEWorkbenchMessages.LinkedResourceEditor_changedTo,
-							new Object[] { res.getProjectRelativePath().toPortableString(), location.toOSString(),
-									newLocation.toOSString() }));
+					report
+							.add(NLS
+									.bind(
+											IDEWorkbenchMessages.LinkedResourceEditor_changedTo,
+											new Object[] {
+													res
+															.getProjectRelativePath()
+															.toPortableString(),
+													location.toOSString(),
+													newLocation
+															.toOSString() }));
 				}
 			} catch (CoreException e) {
 				remaining.add(res);
 			}
 		}
 		resources = remaining;
-		remaining = new ArrayList<>();
+		remaining = new ArrayList();
 		// try for each to match with an existing variable
 		String[] variables = fProject.getPathVariableManager()
 				.getPathVariableNames();
@@ -706,7 +728,7 @@ public class LinkedResourceEditor {
 		it = resources.iterator();
 		int amountLeft = 0;
 		while (it.hasNext()) {
-			IResource res = it.next();
+			IResource res = (IResource) it.next();
 			IPath location = res.getLocation();
 
 			int maxCount = 0;
@@ -757,7 +779,7 @@ public class LinkedResourceEditor {
 			it = resources.iterator();
 			IPath commonPath = null;
 			while (it.hasNext()) {
-				IResource res = it.next();
+				IResource res = (IResource) it.next();
 				IPath location = res.getLocation();
 
 				if (commonPath == null)
@@ -787,7 +809,7 @@ public class LinkedResourceEditor {
 				}
 				it = resources.iterator();
 				while (it.hasNext()) {
-					IResource res = it.next();
+					IResource res = (IResource) it.next();
 					IPath location = res.getLocation();
 					int commonCount = location
 							.matchingFirstSegments(commonPath);
@@ -821,12 +843,12 @@ public class LinkedResourceEditor {
 						.add(IDEWorkbenchMessages.LinkedResourceEditor_unableToFindCommonPathSegments);
 				it = resources.iterator();
 				while (it.hasNext()) {
-					IResource res = it.next();
+					IResource res = (IResource) it.next();
 					report.add(res.getProjectRelativePath().toPortableString());
 				}
 			}
 		} else if (!resources.isEmpty()) {
-			IResource res = resources.get(0);
+			IResource res = (IResource) resources.get(0);
 			IPath resLocation = res.getLocation();
 			IPath commonPath = resLocation.removeLastSegments(1);
 			String variableName = getSuitablePathVariable(commonPath);
@@ -880,7 +902,7 @@ public class LinkedResourceEditor {
 			else
 				variableName = variableName.substring(0, variableName.length() -1); // remove the tailing ':'
 		}
-		StringBuilder buf = new StringBuilder();
+		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < variableName.length(); i++) {
 			char c = variableName.charAt(i);
 			if (Character.isLetterOrDigit(c) || (c == '_'))
@@ -932,7 +954,7 @@ public class LinkedResourceEditor {
 			} catch (CoreException e) {
 				isBroken = true;
 			}
-			TreeMap<String, IResource> container = null;
+			TreeMap/* <String, IResource> */container = null;
 			if (isBroken)
 				container = fBrokenResources;
 			else {
@@ -957,9 +979,20 @@ public class LinkedResourceEditor {
 	}
 
 	boolean initialized = false;
-	TreeMap<String, IResource> fBrokenResources = new TreeMap<>();
-	TreeMap<String, IResource> fAbsoluteResources = new TreeMap<>();
-	TreeMap<String, IResource> fFixedResources = new TreeMap<>();
+	TreeMap/* <String, IResource> */fBrokenResources = new TreeMap/*
+																	 * <String,
+																	 * IResource
+																	 * >
+																	 */();
+	TreeMap/* <String, IResource> */fAbsoluteResources = new TreeMap/*
+																	 * <String,
+																	 * IResource
+																	 * >
+																	 */();
+	TreeMap/* <String, IResource> */fFixedResources = new TreeMap/*
+																 * <String,
+																 * IResource>
+																 */();
 
 	IProject fProject;
 	TreeViewer fTree;

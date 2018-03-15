@@ -210,7 +210,7 @@ public class DialogSettings implements IDialogSettings {
                     "There is no setting associated with the key \"" + key + "\"");//$NON-NLS-1$ //$NON-NLS-2$
         }
 
-		return Long.valueOf(setting).longValue();
+        return new Long(setting).longValue();
     }
 
     @Override
@@ -477,7 +477,7 @@ public class DialogSettings implements IDialogSettings {
     	}
 
     	private void printTag(String name, HashMap<String, String> parameters, boolean shouldTab, boolean newLine, boolean close) throws IOException {
-    		StringBuilder sb = new StringBuilder();
+    		StringBuffer sb = new StringBuffer();
     		sb.append('<');
     		sb.append(name);
     		if (parameters != null) {
@@ -519,7 +519,7 @@ public class DialogSettings implements IDialogSettings {
     		printTag(name, parameters, true, newLine, false);
     	}
 
-    	private static void appendEscapedChar(StringBuilder buffer, char c) {
+    	private static void appendEscapedChar(StringBuffer buffer, char c) {
     		String replacement = getReplacement(c);
     		if (replacement != null) {
     			buffer.append('&');
@@ -531,7 +531,7 @@ public class DialogSettings implements IDialogSettings {
     	}
 
     	private static String getEscaped(String s) {
-    		StringBuilder result = new StringBuilder(s.length() + 10);
+    		StringBuffer result = new StringBuffer(s.length() + 10);
     		for (int i = 0; i < s.length(); ++i) {
 				appendEscapedChar(result, s.charAt(i));
 			}

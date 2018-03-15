@@ -13,7 +13,6 @@
 package org.eclipse.ui.preferences;
 
 import java.io.IOException;
-import java.util.Objects;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
@@ -207,7 +206,7 @@ public class ScopedPreferenceStore extends EventManager implements
 		} else if (obj instanceof Float) {
 			return new Float(defaults.getFloat(key, FLOAT_DEFAULT_DEFAULT));
 		} else if (obj instanceof Long) {
-			return Long.valueOf(defaults.getLong(key, LONG_DEFAULT_DEFAULT));
+			return new Long(defaults.getLong(key, LONG_DEFAULT_DEFAULT));
 		} else if (obj instanceof Boolean) {
 			return defaults.getBoolean(key, BOOLEAN_DEFAULT_DEFAULT) ? Boolean.TRUE
 					: Boolean.FALSE;
@@ -533,7 +532,7 @@ public class ScopedPreferenceStore extends EventManager implements
 			// removing a non-existing preference is a no-op so call the Core
 			// API directly
 			getStorePreferences().remove(name);
-			if (!Objects.equals(oldValue, defaultValue)) {
+			if (oldValue != defaultValue){
 				dirty = true;
 				firePropertyChangeEvent(name, oldValue, defaultValue);
 			}
@@ -619,7 +618,7 @@ public class ScopedPreferenceStore extends EventManager implements
 				getStorePreferences().putLong(name, value);
 			}
 			dirty = true;
-			firePropertyChangeEvent(name, Long.valueOf(oldValue), Long.valueOf(value));
+			firePropertyChangeEvent(name, new Long(oldValue), new Long(value));
 		} finally {
 			silentRunning = false;// Restart listening to preferences
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.ui.actions;
 
 import java.util.Iterator;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -117,9 +116,9 @@ public class CreateFileAction extends SelectionListenerAction {
         if (!super.updateSelection(s)) {
             return false;
         }
-		Iterator<? extends IResource> resources = getSelectedResources().iterator();
+        Iterator resources = getSelectedResources().iterator();
         while (resources.hasNext()) {
-            IResource resource = resources.next();
+            IResource resource = (IResource) resources.next();
             if (!resourceIsType(resource, IResource.PROJECT | IResource.FOLDER)
                     || !resource.isAccessible()) {
                 return false;
