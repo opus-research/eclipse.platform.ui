@@ -17,13 +17,13 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
-import org.eclipse.ui.ide.IUnassociatedEditorStrategy;
+import org.eclipse.ui.ide.IUnknownEditorStrategy;
 
 /**
  * @since 3.12
  *
  */
-public class AskUserViaPopupUnassociatedEditorStrategy implements IUnassociatedEditorStrategy {
+public class AskUserViaPopupUnknownEditorStrategy implements IUnknownEditorStrategy {
 
 	@Override
 	public IEditorDescriptor getEditorDescriptor(String fileName, IEditorRegistry editorRegistry) {
