@@ -534,7 +534,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         IFile file = ResourceUtil.getFile(editor.getEditorInput());
         if (file != null) {
             ISelection newSelection = new StructuredSelection(file);
-			if (getTreeViewer().getStructuredSelection().equals(newSelection)) {
+            if (getTreeViewer().getSelection().equals(newSelection)) {
                 getTreeViewer().getTree().showSelection();
             } else {
                 getTreeViewer().setSelection(newSelection, true);
@@ -1339,7 +1339,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 	public void setWorkingSet(IWorkingSet workingSet) {
         TreeViewer treeViewer = getTreeViewer();
         Object[] expanded = treeViewer.getExpandedElements();
-		ISelection selection = treeViewer.getStructuredSelection();
+        ISelection selection = treeViewer.getSelection();
 
         boolean refreshNeeded = internalSetWorkingSet(workingSet);
 
