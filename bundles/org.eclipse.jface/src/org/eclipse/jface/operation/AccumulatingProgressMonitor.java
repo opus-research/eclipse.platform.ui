@@ -34,12 +34,27 @@ import org.eclipse.swt.widgets.Display;
  * event queue for its execution. If no runnable exists, a new one is created
  * and posted into the event queue.
  * </ul>
- * <p>
- * This class is internal to the framework; clients outside JFace should not use
- * this class.
- * </p>
+ * @since 3.12
  */
-/* package */class AccumulatingProgressMonitor extends ProgressMonitorWrapper {
+public class AccumulatingProgressMonitor extends ProgressMonitorWrapper {
+
+	/**
+	 * Create a ProgressMonitorWrapper which can accumulate progress events 
+	 * from a non-UI thread and send those events to a wrapped project 
+	 * monitor which must have all events occur on the UI thread. 
+	 * 
+	 * @param monitor   a progress monitor that should only be 
+	 *                  updated on the UI thread
+	 * 
+	 * @param display   the display on which to execute the swt events
+	 * 
+	 * @return          a progress monitor wrapper that can accumulate 
+	 *                  progress events from a non-ui thread, and send 
+	 *                  them to the wrapped monitor on the UI thread
+	 */
+	public static ProgressMonitorWrapper createAccumulatingProgressMonitor(IProgressMonitor monitor, Display display) {
+		return new AccumulatingProgressMonitor(monitor, display);
+	}
 
     /**
      * The display.
@@ -129,7 +144,7 @@ import org.eclipse.swt.widgets.Display;
      * @param display the SWT display used to forward the calls
      *  to the wrapped progress monitor
      */
-    public AccumulatingProgressMonitor(IProgressMonitor monitor, Display display) {
+	/* package */ AccumulatingProgressMonitor(IProgressMonitor monitor, Display display) {
         super(monitor);
         Assert.isNotNull(display);
         this.display = display;
