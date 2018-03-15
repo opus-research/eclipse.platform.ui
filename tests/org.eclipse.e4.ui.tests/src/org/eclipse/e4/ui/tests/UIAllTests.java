@@ -37,7 +37,6 @@ import org.eclipse.e4.ui.tests.workbench.MWindowTest;
 import org.eclipse.e4.ui.tests.workbench.ModelAssemblerFragmentOrderingTests;
 import org.eclipse.e4.ui.tests.workbench.ModelAssemblerTests;
 import org.eclipse.e4.ui.tests.workbench.PartFocusTest;
-import org.eclipse.e4.ui.tests.workbench.PartOnTopManagerTest;
 import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
 import org.eclipse.e4.ui.tests.workbench.TopoSortTests;
@@ -60,7 +59,6 @@ import org.junit.runners.Suite;
 		Bug299755Test.class,
 		Bug308220Test.class,
 		Bug320857Test.class,
-		PartOnTopManagerTest.class,
 		PartRenderingEngineTests.class,
 		SashRendererTest.class,
 		MApplicationCommandAccessTest.class,
