@@ -480,6 +480,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private String id;
 	private ServiceRegistration<?> e4WorkbenchService;
 
+	// flag used to identify if the application model needs to be saved
+	private boolean applicationModelChanged = false;
 
 	/**
 	 * Creates a new workbench.
@@ -1981,6 +1983,11 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 		});
 
+		eventBroker.subscribe(UIEvents.UIModelTopicBase + "/*", event -> { // //$NON-NLS-1$
+			applicationModelChanged = true;
+			System.out.println("Model changed event triggered " + applicationModelChanged); //$NON-NLS-1$
+		});
+
 		boolean found = false;
 		List<MPartDescriptor> currentDescriptors = application.getDescriptors();
 		for (MPartDescriptor desc : currentDescriptors) {
@@ -2888,7 +2895,12 @@ UIEvents.Context.TOPIC_CONTEXT,
 							}
 							final int nextDelay = getAutoSaveJobTime();
 							try {
-								persist(false);
+								if (applicationModelChanged) {
+									System.out.println("persisting"); //$NON-NLS-1$
+									applicationModelChanged = false;
+									persist(false);
+
+								}
 								monitor.done();
 							} finally {
 								// repeat
