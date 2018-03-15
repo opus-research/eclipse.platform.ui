@@ -176,10 +176,24 @@ public class ProgressServiceImpl implements IProgressService {
 
 	@Override
 	public void showInDialog(Shell shell, Job job) {
-		throw new RuntimeException("Not supported anymore to run jobs with dialogs"); //$NON-NLS-1$
+		if (shouldRunInBackground()) {
+			return;
+		}
+
+		final ProgressMonitorFocusJobDialog dialog = new ProgressMonitorFocusJobDialog(
+		        shell, this, progressManager, contentProviderFactory,
+		        finishedJobs);
+		dialog.show(job, shell);
 	}
 
-
+	/**
+	 * Return whether or not dialogs should be run in the background
+	 *
+	 * @return <code>true</code> if the dialog should not be shown.
+	 */
+	protected boolean shouldRunInBackground() {
+		return Preferences.getBoolean(IProgressConstants.RUN_IN_BACKGROUND);
+	}
 
 	private class RunnableWithStatus implements Runnable {
 

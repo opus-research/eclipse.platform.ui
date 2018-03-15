@@ -442,7 +442,7 @@ public class ProgressManager extends ProgressProvider {
 				updateFor(event);
 				if (event.getJob().isUser()) {
 					boolean noDialog = true;
-					if (!true) {
+					if (!noDialog) {
 						final IJobChangeEvent finalEvent = event;
 						Job showJob = new UIJob(
 								ProgressMessages.ProgressManager_showInDialogName) {
