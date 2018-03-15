@@ -856,7 +856,7 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
      *   export" field with (element type: <code>String</code>)
      */
     protected void setTypesToExport(List typeStrings) {
-        StringBuilder result = new StringBuilder();
+        StringBuffer result = new StringBuffer();
         Iterator typesEnum = typeStrings.iterator();
 
         while (typesEnum.hasNext()) {

@@ -103,8 +103,7 @@ public final class TabContents {
 
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.createControls(sectionComposite, page);
                 }
@@ -121,8 +120,7 @@ public final class TabContents {
         for (final ISection section : sections) {
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.dispose();
                 }
@@ -138,8 +136,7 @@ public final class TabContents {
         for (final ISection section : sections) {
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.aboutToBeShown();
                 }
@@ -155,8 +152,7 @@ public final class TabContents {
         for (final ISection section : sections) {
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.aboutToBeHidden();
                 }
@@ -175,8 +171,7 @@ public final class TabContents {
         for (final ISection section : sections) {
             ISafeRunnable runnable = new SafeRunnable() {
 
-                @Override
-				public void run()
+                public void run()
                     throws Exception {
                     section.setInput(part, selection);
                 }
@@ -211,8 +206,7 @@ public final class TabContents {
             for (final ISection section : sections) {
                 ISafeRunnable runnable = new SafeRunnable() {
 
-                    @Override
-					public void run()
+                    public void run()
                         throws Exception {
                         section.refresh();
                     }

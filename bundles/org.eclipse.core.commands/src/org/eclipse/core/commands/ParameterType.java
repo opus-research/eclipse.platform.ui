@@ -269,7 +269,8 @@ public final class ParameterType extends HandleObject implements Comparable {
 	@Override
 	public final String toString() {
 		if (string == null) {
-			final StringBuilder stringBuffer = new StringBuilder("ParameterType("); //$NON-NLS-1$
+			final StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append("ParameterType("); //$NON-NLS-1$
 			stringBuffer.append(id);
 			stringBuffer.append(',');
 			stringBuffer.append(defined);

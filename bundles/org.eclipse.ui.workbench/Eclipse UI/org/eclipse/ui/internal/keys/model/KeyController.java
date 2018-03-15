@@ -515,7 +515,7 @@ public class KeyController {
 								|| be.getTrigger().isEmpty()) {
 							continue;
 						}
-						StringBuilder buffer = new StringBuilder();
+						StringBuffer buffer = new StringBuffer();
 						buffer.append(ESCAPED_QUOTE
 								+ Util.replaceAll(be.getCategory(),
 										ESCAPED_QUOTE, REPLACEMENT)

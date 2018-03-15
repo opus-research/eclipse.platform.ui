@@ -688,7 +688,6 @@
             name="%PreferencePages.ContentTypes">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.encoding"/>
-         <keywordReference id="org.eclipse.ui.ide.editors"/>
       </page>
    </extension>
    <extension
@@ -1201,14 +1200,14 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            contextId="org.eclipse.ui.contexts.window"
             platform="win32"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
       </key>
       <key
             commandId="org.eclipse.ui.window.fullscreenmode"
-            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            contextId="org.eclipse.ui.contexts.window"
             platform="gtk"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">

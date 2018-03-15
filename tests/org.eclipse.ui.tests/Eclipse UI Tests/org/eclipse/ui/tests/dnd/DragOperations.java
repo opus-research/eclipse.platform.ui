@@ -67,7 +67,7 @@ public class DragOperations {
         return ref.getPartName();
     }
 
-	public static PartPane getPane(IEditorPart editor) {
+    public static PartPane getPane(IEditorPart editor) {
         return null;
     }
 
@@ -145,7 +145,7 @@ public class DragOperations {
      * @return
      */
     public static String getLayoutDescription(WorkbenchPage page) {
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
 
         //page.getActivePerspective().describeLayout(buf);
         buf.append("this layout still not quite described - TODO");

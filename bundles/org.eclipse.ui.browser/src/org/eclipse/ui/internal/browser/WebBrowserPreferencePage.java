@@ -240,7 +240,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 
 		tableViewer
 				.addSelectionChangedListener(event -> {
-					IStructuredSelection sele = tableViewer.getStructuredSelection();
+					IStructuredSelection sele = ((IStructuredSelection) tableViewer.getSelection());
 					boolean sel = sele.getFirstElement() != null
 							&& !(sele.getFirstElement() instanceof SystemBrowserDescriptor);
 					remove.setEnabled(sel);
@@ -248,7 +248,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 				});
 
 		tableViewer.addDoubleClickListener(event -> {
-			IStructuredSelection sel = tableViewer.getStructuredSelection();
+			IStructuredSelection sel = ((IStructuredSelection) tableViewer.getSelection());
 			Object firstElem = sel.getFirstElement();
 			if (firstElem != null && !(firstElem instanceof SystemBrowserDescriptor)) {
 				IBrowserDescriptor browser2 = (IBrowserDescriptor) sel.getFirstElement();
@@ -268,7 +268,8 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.character == SWT.DEL) {
-					IStructuredSelection sel = tableViewer.getStructuredSelection();
+					IStructuredSelection sel = ((IStructuredSelection) tableViewer
+							.getSelection());
 					if (sel.getFirstElement() != null) {
 						IBrowserDescriptor browser2 = (IBrowserDescriptor) sel
 								.getFirstElement();
@@ -322,7 +323,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 
 		edit = SWTUtil.createButton(buttonComp, Messages.edit);
 		edit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			IStructuredSelection sel = tableViewer.getStructuredSelection();
+			IStructuredSelection sel = ((IStructuredSelection) tableViewer.getSelection());
 			IBrowserDescriptor browser2 = (IBrowserDescriptor) sel.getFirstElement();
 			IBrowserDescriptorWorkingCopy wc = browser2.getWorkingCopy();
 			BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(getShell(), wc);
@@ -337,7 +338,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 
 		remove = SWTUtil.createButton(buttonComp, Messages.remove);
 		remove.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
-			IStructuredSelection sel = tableViewer.getStructuredSelection();
+			IStructuredSelection sel = ((IStructuredSelection) tableViewer.getSelection());
 			IBrowserDescriptor browser2 = (IBrowserDescriptor) sel.getFirstElement();
 			try {
 				browser2.delete();
@@ -369,7 +370,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 			final List<String> existingPaths = WebBrowserUtil.getExternalBrowserPaths();
 
 			// select a target directory for the search
-			DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.SHEET);
+			DirectoryDialog dialog = new DirectoryDialog(getShell());
 			dialog.setMessage(Messages.selectDirectory);
 			dialog.setText(Messages.directoryDialogTitle);
 
@@ -438,7 +439,8 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		external.setSelection(WebBrowserPreference.getBrowserChoice() == WebBrowserPreference.EXTERNAL);
 
 		//boolean sel = !tableViewer.getSelection().isEmpty();
-		IStructuredSelection sele = tableViewer.getStructuredSelection();
+		IStructuredSelection sele = ((IStructuredSelection) tableViewer
+				.getSelection());
 		boolean sel = sele.getFirstElement() != null &&
 				!(sele.getFirstElement() instanceof SystemBrowserDescriptor);
 		edit.setEnabled(sel);

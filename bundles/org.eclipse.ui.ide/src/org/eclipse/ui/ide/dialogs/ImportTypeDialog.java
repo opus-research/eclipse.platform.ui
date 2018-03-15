@@ -216,7 +216,7 @@ public class ImportTypeDialog extends TrayDialog {
 
 	private void writeContextPreference(String key, String value) {
 		String oldValue = IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(key);
-		StringBuilder buffer = new StringBuilder();
+		StringBuffer buffer = new StringBuffer();
 		String [] keyPairs = oldValue.split(":"); //$NON-NLS-1$
 		boolean found = false;
 		for (int i = 0; i < keyPairs.length; i++) {

@@ -126,7 +126,7 @@ public final class IDEEncoding {
 	private static void writeEncodingsPreference(String value, Collection encodings) {
 		boolean addValue = (value != null);
 
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 
 		Iterator currentEncodings = encodings.iterator();
 

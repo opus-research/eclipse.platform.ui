@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -467,7 +466,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		removeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeFilters(configsTable.getStructuredSelection());
+				removeFilters(configsTable.getSelection());
 			}
 		});
 		removeButton.setEnabled(false);
@@ -561,14 +560,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		MarkerFieldFilterGroup config = new MarkerFieldFilterGroup(null, generator);
 		config.setName(newName);
 		return config;
-	}
-
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-		super.createButtonsForButtonBar(parent);
-		Button okButton = getButton(IDialogConstants.OK_ID);
-		okButton.setText(MarkerMessages.filtersDialog_applyAndCloseButton);
-		setButtonLayoutData(okButton);
 	}
 
 	/**

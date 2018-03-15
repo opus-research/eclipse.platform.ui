@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -82,13 +81,7 @@ public class ToolBarContributionRecord {
 		}
 
 		if (changed) {
-			ToolBarManager managerForModel = getManagerForModel();
-			managerForModel.markDirty();
-			// Make sure the MToolBar model is visible because
-			// TrimBarLayout.hideManagedTB hides and IPresentationEngine moves
-			// it to the Limbo-Shell
-			Stream.of(managerForModel.getItems()).filter(i -> i.isVisible()).findFirst()
-					.ifPresent((i) -> toolbarModel.setVisible(true));
+			getManagerForModel().markDirty();
 		}
 	}
 

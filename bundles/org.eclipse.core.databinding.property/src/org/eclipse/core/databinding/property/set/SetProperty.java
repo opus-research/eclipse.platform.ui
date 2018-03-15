@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -140,12 +140,22 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 
 	@Override
 	public IObservableFactory<S, IObservableSet<E>> setFactory() {
-		return target -> observe(target);
+		return new IObservableFactory<S, IObservableSet<E>>() {
+			@Override
+			public IObservableSet<E> createObservable(S target) {
+				return observe(target);
+			}
+		};
 	}
 
 	@Override
 	public IObservableFactory<S, IObservableSet<E>> setFactory(final Realm realm) {
-		return target -> observe(realm, target);
+		return new IObservableFactory<S, IObservableSet<E>>() {
+			@Override
+			public IObservableSet<E> createObservable(S target) {
+				return observe(realm, target);
+			}
+		};
 	}
 
 	@Override

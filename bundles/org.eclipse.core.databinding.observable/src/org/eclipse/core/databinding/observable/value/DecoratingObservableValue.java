@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2017 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,7 +70,12 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	@Override
 	protected void firstListenerAdded() {
 		if (valueChangeListener == null) {
-			valueChangeListener = event -> DecoratingObservableValue.this.handleValueChange(event);
+			valueChangeListener = new IValueChangeListener<T>() {
+				@Override
+				public void handleValueChange(ValueChangeEvent<? extends T> event) {
+					DecoratingObservableValue.this.handleValueChange(event);
+				}
+			};
 		}
 		decorated.addValueChangeListener(valueChangeListener);
 		super.firstListenerAdded();

@@ -3060,7 +3060,7 @@ class MultiMatcherCustomFilterArgumentUI implements ICustomFilterArgumentUI {
 		String argumentString = (String) filter.getArguments();
 		FileInfoAttributesMatcher.Argument argument = FileInfoAttributesMatcher.decodeArguments(argumentString);
 
-		StringBuilder builder = new StringBuilder();
+		StringBuffer builder = new StringBuffer();
 		builder.append(MultiMatcherLocalization.getLocalMultiMatcherKey(argument.key));
 		builder.append(' ');
 		builder.append(MultiMatcherLocalization.getLocalMultiMatcherKey(argument.operator));

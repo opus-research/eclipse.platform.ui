@@ -37,7 +37,6 @@ public class AdvancedPropertySection
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#createControls(org.eclipse.swt.widgets.Composite,
 	 *      org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
 	 */
-	@Override
 	public void createControls(Composite parent,
 			final TabbedPropertySheetPage atabbedPropertySheetPage) {
 		super.createControls(parent, atabbedPropertySheetPage);
@@ -55,7 +54,6 @@ public class AdvancedPropertySection
 
 		page.getControl().addControlListener(new ControlAdapter() {
 
-			@Override
 			public void controlResized(ControlEvent e) {
 				atabbedPropertySheetPage.resizeScrolledComposite();
 			}
@@ -66,7 +64,6 @@ public class AdvancedPropertySection
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#setInput(org.eclipse.ui.IWorkbenchPart,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void setInput(IWorkbenchPart part, ISelection selection) {
 		super.setInput(part, selection);
 		page.selectionChanged(part, selection);
@@ -75,7 +72,6 @@ public class AdvancedPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#dispose()
 	 */
-	@Override
 	public void dispose() {
 		super.dispose();
 
@@ -89,7 +85,6 @@ public class AdvancedPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#refresh()
 	 */
-	@Override
 	public void refresh() {
 		page.refresh();
 	}
@@ -97,7 +92,6 @@ public class AdvancedPropertySection
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.ISection#shouldUseExtraSpace()
 	 */
-	@Override
 	public boolean shouldUseExtraSpace() {
 		return true;
 	}

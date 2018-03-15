@@ -103,7 +103,7 @@ public class DecorationResult {
 			return text;
 		}
 
-		StringBuilder result = new StringBuilder();
+		StringBuffer result = new StringBuffer();
 
 		ListIterator prefixIterator = prefixes.listIterator();
 

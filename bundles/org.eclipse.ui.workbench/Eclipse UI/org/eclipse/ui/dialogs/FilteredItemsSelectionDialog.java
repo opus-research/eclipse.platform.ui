@@ -987,7 +987,8 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 	@Override
 	protected void computeResult() {
 
-		List selectedElements = list.getStructuredSelection().toList();
+		List selectedElements = ((StructuredSelection) list.getSelection())
+				.toList();
 
 		List objectsToReturn = new ArrayList();
 
@@ -1657,13 +1658,13 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 
 			gc.dispose();
 
-			StringBuilder dashes = new StringBuilder();
+			StringBuffer dashes = new StringBuffer();
 			int chars = (((width - fMessageLength) / fSeparatorWidth) / 2) - 2;
 			for (int i = 0; i < chars; i++) {
 				dashes.append('-');
 			}
 
-			StringBuilder result = new StringBuilder();
+			StringBuffer result = new StringBuffer();
 			result.append(dashes);
 			result.append(" " + separatorLabel + " "); //$NON-NLS-1$//$NON-NLS-2$
 			result.append(dashes);
