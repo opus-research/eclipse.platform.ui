@@ -64,7 +64,7 @@ import org.junit.runners.Suite;
 	ConcurrencyTestSuite.class,
 	FilteredTreeTests.class,
 	StatusHandlingTestSuite.class,
-	MenusTestSuite.class
+		MenusTestSuite.class
 })
 public class UiTestSuite {
 
