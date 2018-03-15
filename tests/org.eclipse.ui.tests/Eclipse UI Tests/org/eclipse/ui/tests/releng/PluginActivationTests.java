@@ -68,6 +68,7 @@ public class PluginActivationTests {
 			"org.eclipse.test.performance.win32",
 			"org.eclipse.text",
 			"org.eclipse.text.tests",
+			"org.eclipse.ui.cheatsheets",
 			"org.eclipse.ui.console",
 			"org.eclipse.ui.editors.tests",
 			"org.eclipse.ui.views.properties.tabbed",
