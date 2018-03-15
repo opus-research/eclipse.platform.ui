@@ -45,7 +45,7 @@ public class UIPreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 
 
-		IScopeContext context = DefaultScope.INSTANCE;
+		IScopeContext context = new DefaultScope();
 		IEclipsePreferences node = context.getNode(UIPlugin.getDefault()
 				.getBundle().getSymbolicName());
 		node.put(IWorkbenchPreferenceConstants.OPEN_NEW_PERSPECTIVE,
