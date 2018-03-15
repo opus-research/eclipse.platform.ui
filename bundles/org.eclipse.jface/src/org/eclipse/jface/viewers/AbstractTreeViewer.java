@@ -781,9 +781,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
-			final Item[] tis = getChildren(widget);
-			if (tis != null && tis.length > 0) {
-				Object data = tis[0].getData();
+			final Item[] items = getChildren(widget);
+			if (items != null && items.length > 0) {
+				Object data = items[0].getData();
 				if (data != null) {
 					return; // children already there!
 				}
@@ -792,15 +792,15 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 			BusyIndicator.showWhile(widget.getDisplay(), () -> {
 				// fix for PR 1FW89L7:
 				// don't complain and remove all "dummies" ...
-				if (tis != null) {
-					for (Item ti : tis) {
-						if (ti.getData() != null) {
-							disassociate(ti);
-							Assert.isTrue(ti.getData() == null,
+				if (items != null) {
+					for (Item item : items) {
+						if (item.getData() != null) {
+							disassociate(item);
+							Assert.isTrue(item.getData() == null,
 									"Second or later child is non -null");//$NON-NLS-1$
 
 						}
-						ti.dispose();
+						item.dispose();
 					}
 				}
 				Object d = widget.getData();
@@ -865,9 +865,9 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 */
 	private void disassociateChildren(Item item) {
 		Item[] items = getChildren(item);
-		for (Item item2 : items) {
-			if (item2.getData() != null) {
-				disassociate(item2);
+		for (Item child : items) {
+			if (child.getData() != null) {
+				disassociate(child);
 			}
 		}
 	}
@@ -1708,13 +1708,11 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 				return getControl();
 			}
 			Widget[] candidates = findItems(treePath.getLastSegment());
-			for (Widget candidate2 : candidates) {
-				Widget candidate = candidate2;
+			for (Widget candidate : candidates) {
 				if (!(candidate instanceof Item)) {
 					continue;
 				}
-				if (treePath.equals(getTreePathFromItem((Item) candidate),
-						getComparer())) {
+				if (treePath.equals(getTreePathFromItem((Item) candidate), getComparer())) {
 					return candidate;
 				}
 			}
@@ -2771,15 +2769,15 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		boolean haveDummy = false;
 		// remove all children
 		Item[] items = getItems(item);
-		for (Item item2 : items) {
-			if (item2.getData() != null) {
-				disassociate(item2);
-				item2.dispose();
+		for (Item child : items) {
+			if (child.getData() != null) {
+				disassociate(child);
+				child.dispose();
 			} else {
 				if (needDummy && !haveDummy) {
 					haveDummy = true;
 				} else {
-					item2.dispose();
+					child.dispose();
 				}
 			}
 		}
