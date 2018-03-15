@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -86,10 +87,12 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.dialogs.WorkingSetGroup;
 import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.dialogs.ImportExportWizard;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.progress.ProgressManager;
 import org.eclipse.ui.internal.progress.ProgressManager.JobMonitor;
@@ -285,12 +288,36 @@ public class SmartImportRootWizardPage extends WizardPage {
 
 		createWorkingSetsGroup(res);
 
+		createLink(res);
+
 		if (this.selection != null) {
 			rootDirectoryText.setText(this.selection.getAbsolutePath());
 			validatePage();
 		}
 
 		setControl(res);
+	}
+
+	private void createLink(Composite res) {
+		Link showOtherImportWizards = new Link(res, SWT.NONE);
+		showOtherImportWizards
+				.setText("<A>" + DataTransferMessages.SmartImportWizardPage_showOtherSpecializedImportWizard + "</A>"); //$NON-NLS-1$ //$NON-NLS-2$
+		showOtherImportWizards.setLayoutData(new GridData(SWT.END, SWT.END, true, true, 4, 1));
+		showOtherImportWizards.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ImportExportWizard importWizard = new ImportExportWizard(ImportExportWizard.IMPORT);
+				importWizard.init(PlatformUI.getWorkbench(), new StructuredSelection(selection));
+				IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
+				IDialogSettings wizardSettings = workbenchSettings.getSection("ImportExportAction"); //$NON-NLS-1$
+				if (wizardSettings == null) {
+					wizardSettings = workbenchSettings.addNewSection("ImportExportAction"); //$NON-NLS-1$
+				}
+				importWizard.setDialogSettings(wizardSettings);
+				importWizard.addPages();
+				getWizard().getContainer().showPage(importWizard.getPages()[0]);
+			}
+		});
 	}
 
 	private void createWorkingSetsGroup(Composite parent) {
