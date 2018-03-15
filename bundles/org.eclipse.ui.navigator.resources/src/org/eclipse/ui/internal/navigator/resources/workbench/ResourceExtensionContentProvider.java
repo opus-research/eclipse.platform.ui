@@ -169,8 +169,8 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 		// overwrite B.
 		IResourceDelta[] affectedChildren = delta
 				.getAffectedChildren(IResourceDelta.CHANGED);
-		for (IResourceDelta element : affectedChildren) {
-			if ((element.getFlags() & IResourceDelta.TYPE) != 0) {
+		for (int i = 0; i < affectedChildren.length; i++) {
+			if ((affectedChildren[i].getFlags() & IResourceDelta.TYPE) != 0) {
 				toRefresh.add(resource);
 				return;
 			}
@@ -205,8 +205,8 @@ public class ResourceExtensionContentProvider extends WorkbenchContentProvider {
 
 
 		// Handle changed children .
-		for (IResourceDelta element : affectedChildren) {
-			processDelta(element, addAndRemoveRunnables, toRefresh);
+		for (int i = 0; i < affectedChildren.length; i++) {
+			processDelta(affectedChildren[i], addAndRemoveRunnables, toRefresh);
 		}
 
 		// @issue several problems here:
