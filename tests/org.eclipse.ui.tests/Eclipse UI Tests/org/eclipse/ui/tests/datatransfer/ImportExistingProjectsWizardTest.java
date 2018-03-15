@@ -1038,7 +1038,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 						+ rootLocation.toOSString());
 			}
 		}
-		StringBuilder filesNotImported = new StringBuilder();
+		StringBuffer filesNotImported = new StringBuffer();
 		// make sure the files in the project were imported
 		for (String element : fileList) {
 			IResource res = isListFiles ? (IResource) project

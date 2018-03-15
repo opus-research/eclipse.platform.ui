@@ -288,7 +288,7 @@ public class VerifyDialog extends TitleAreaDialog {
      */
     private void handleFailure() {
         IDialogTestPass test = _dialogTests[TEST_TYPE];
-        StringBuilder text = new StringBuilder();
+        StringBuffer text = new StringBuffer();
         String label = test.label();
         label = label.substring(0, label.indexOf("&"))
                 + label.substring(label.indexOf("&") + 1);
