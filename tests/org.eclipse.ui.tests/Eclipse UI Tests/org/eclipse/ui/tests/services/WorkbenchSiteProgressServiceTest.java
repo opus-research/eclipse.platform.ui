@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.progress.WorkbenchSiteProgressService;
 import org.eclipse.ui.internal.progress.WorkbenchSiteProgressService.SiteUpdateJob;
@@ -48,6 +49,8 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 	private IWorkbenchPartSite site;
 
 	private SimpleDateFormat dateFormat;
+	private volatile long startTime;
+	private volatile boolean teardownCalled;
 
 	@Override
 	protected void doSetUp() throws Exception {
@@ -61,6 +64,14 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 		updateJob = progressService.getUpdateJob();
 
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
+		startTime = System.currentTimeMillis();
+		new TimeoutReportJob(getName(), 60 * 1000).schedule();
+	}
+
+	@Override
+	protected void doTearDown() throws Exception {
+		teardownCalled = true;
+		super.doTearDown();
 	}
 
 	public void forceUpdate() {
@@ -215,17 +226,59 @@ public class WorkbenchSiteProgressServiceTest extends UITestCase{
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-
+			logTime("job starts");
 			monitor.beginTask("job starts", 1000);
 			for (int i = 0; i < 1000; i++) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
+					if (monitor.isCanceled()) {
+						break;
+					}
 				}
 				if(monitor.isCanceled()) {
 					break;
 				}
 				monitor.worked(1);
+			}
+			return Status.OK_STATUS;
+		}
+	}
+
+	class TimeoutReportJob extends Job {
+		private long maxTimeoutInMilis;
+		int runs = 1;
+
+		public TimeoutReportJob(String name, long maxTimeoutInMilis) {
+			super(name);
+			this.maxTimeoutInMilis = maxTimeoutInMilis;
+		}
+
+		@Override
+		protected IStatus run(IProgressMonitor monitor) {
+			while (!teardownCalled && System.currentTimeMillis() - startTime < maxTimeoutInMilis) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					break;
+				}
+			}
+			if (!teardownCalled) {
+				System.out.println("Test seem to hang: " + getName());
+				System.out.println("\nFULL THREAD DUMP #" + runs + " START");
+				System.out.println(dumpThreads());
+				System.out.println("FULL THREAD DUMP #" + runs + " END\n");
+				if (runs <= 3) {
+					runs++;
+					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							System.out.println("UI thread seem to work, starting the job again");
+							// restart to get next dumps, if hanging
+							schedule(5000);
+						}
+					});
+				}
 			}
 			return Status.OK_STATUS;
 		}
