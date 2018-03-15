@@ -33,26 +33,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.accessibility.ACC;
-import org.eclipse.swt.accessibility.AccessibleAdapter;
-import org.eclipse.swt.accessibility.AccessibleControlAdapter;
-import org.eclipse.swt.accessibility.AccessibleControlEvent;
-import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -63,16 +49,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.BuildAction;
 import org.eclipse.ui.actions.GlobalBuildAction;
-import org.eclipse.ui.dialogs.SearchPattern;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.actions.BuildUtilities;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.IProgressConstants2;
 
 /**
@@ -108,7 +91,7 @@ public class CleanDialog extends MessageDialog {
     private static final String BUILD_NOW = "BUILD_NOW"; //$NON-NLS-1$
     private static final String BUILD_ALL = "BUILD_ALL"; //$NON-NLS-1$
 
-	private Button alwaysCleanButton, buildNowButton, globalBuildButton,
+	private Button selectAllButton, deselectAllButton, alwaysCleanButton, buildNowButton, globalBuildButton,
 			projectBuildButton;
 
     private CheckboxTableViewer projectNames;
@@ -118,34 +101,7 @@ public class CleanDialog extends MessageDialog {
     private IWorkbenchWindow window;
 
 	private Text filterText;
-	private SearchPattern searchPattern = new SearchPattern();
-	private Control clearButtonControl;
-
-	/**
-	 * Image descriptor for enabled clear button.
-	 */
-	private static final String CLEAR_ICON = "org.eclipse.ui.internal.dialogs.CLEANDIALOG_CLEAR_ICON"; //$NON-NLS-1$
-
-	/**
-	 * Image descriptor for disabled clear button.
-	 */
-	private static final String DISABLED_CLEAR_ICON = "org.eclipse.ui.internal.dialogs.CLEANDIALOG_DCLEAR_ICON"; //$NON-NLS-1$
-
-	/**
-	 * Get image descriptors for the clear button.
-	 */
-	static {
-		ImageDescriptor descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PlatformUI.PLUGIN_ID,
-				"$nl$/icons/full/etool16/clear_co.png"); //$NON-NLS-1$
-		if (descriptor != null) {
-			JFaceResources.getImageRegistry().put(CLEAR_ICON, descriptor);
-		}
-		descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(PlatformUI.PLUGIN_ID,
-				"$nl$/icons/full/dtool16/clear_co.png"); //$NON-NLS-1$
-		if (descriptor != null) {
-			JFaceResources.getImageRegistry().put(DISABLED_CLEAR_ICON, descriptor);
-		}
-	}
+	private String filterRegexPattern = ".*"; //$NON-NLS-1$
 
     /**
      * Gets the text of the clean dialog, depending on whether the
@@ -174,7 +130,6 @@ public class CleanDialog extends MessageDialog {
         if (this.selection == null) {
             this.selection = new Object[0];
         }
-		searchPattern.setPattern(""); //$NON-NLS-1$
     }
 
     @Override
@@ -236,87 +191,55 @@ public class CleanDialog extends MessageDialog {
         Composite area = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginWidth = layout.marginHeight = 0;
-		layout.numColumns = 1;
+        layout.numColumns = 2;
 		layout.makeColumnsEqualWidth = false;
         area.setLayout(layout);
         area.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		IDialogSettings settings = getDialogSettings(DIALOG_SETTINGS_SECTION);
 
-		alwaysCleanButton = new Button(area, SWT.CHECK);
-		alwaysCleanButton.setText(IDEWorkbenchMessages.CleanDialog_alwaysCleanAllButton);
-		alwaysCleanButton.setSelection(!settings.getBoolean(TOGGLE_SELECTED));
-		alwaysCleanButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			updateEnablement();
-			if (!alwaysCleanButton.getSelection()) {
-				setInitialFilterText();
-			} else {
-				filterText.setText(""); //$NON-NLS-1$
-			}
-		}));
-
-		Composite filterTextArea = null;
-		if (useNativeSearchField(area)) {
-			filterTextArea = new Composite(area, SWT.NONE);
-			filterText = new Text(filterTextArea, SWT.BORDER | SWT.SINGLE | SWT.SEARCH | SWT.ICON_CANCEL);
-		} else {
-			filterTextArea = new Composite(area, SWT.BORDER);
-			filterTextArea.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-			filterText = new Text(filterTextArea, SWT.SINGLE);
-		}
-
-		layout = new GridLayout();
-		layout.marginWidth = layout.marginHeight = 0;
-		layout.numColumns = 1;
-		layout.makeColumnsEqualWidth = false;
-		filterTextArea.setLayout(layout);
-		filterTextArea.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-		filterText.setMessage(IDEWorkbenchMessages.CleanDialog_typeFilterText);
+        //first row
+		filterText = new Text(area, SWT.SEARCH | SWT.ICON_CANCEL);
 		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		filterText.setLayoutData(gd);
+		filterText.setFocus();
 		filterText.addModifyListener(e -> {
-			String filter = filterText.getText();
-			if (filter.startsWith("*") || filter.startsWith("?")) { //$NON-NLS-1$ //$NON-NLS-2$
-				searchPattern.setPattern(filter);
-			} else {
-				searchPattern.setPattern("*" + filter); //$NON-NLS-1$
-			}
-
-			if (filter.isEmpty()) {
-				filterText.setMessage(IDEWorkbenchMessages.CleanDialog_typeFilterText);
-			}
-
-			updateClearButton(!filter.isEmpty() && !filter.equals(IDEWorkbenchMessages.CleanDialog_typeFilterText));
-
-
+			filterRegexPattern = ".*" + filterText.getText() + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
 			projectNames.refresh();
 		});
 
-		filterText.addFocusListener(new FocusListener() {
-			@Override
-			public void focusLost(FocusEvent e) {
-				if (filterText.getText().equals(IDEWorkbenchMessages.CleanDialog_typeFilterText)) {
-					filterText.setText(""); //$NON-NLS-1$
-				}
-			}
+		selectAllButton = new Button(area, SWT.PUSH);
+		gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		selectAllButton.setLayoutData(gd);
+		selectAllButton.setText(IDEWorkbenchMessages.CleanDialog_selectAllButton);
+		selectAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
+			projectNames.setAllChecked(true);
+			selection = projectNames.getCheckedElements();
+			updateEnablement();
+		}));
 
-			@Override
-			public void focusGained(FocusEvent e) {
-			}
-		});
-
-		createClearTextNew(filterTextArea);
-		if (clearButtonControl != null) {
-			// initially there is no text to clear
-			clearButtonControl.setVisible(false);
-		}
-
+		// third row
 		createProjectSelectionTable(area);
-		if (!alwaysCleanButton.getSelection()) {
-			setInitialFilterText();
-		}
 
+		deselectAllButton = new Button(area, SWT.PUSH);
+		gd = new GridData(SWT.FILL, SWT.TOP, false, false);
+		deselectAllButton.setLayoutData(gd);
+		deselectAllButton.setText(IDEWorkbenchMessages.CleanDialog_deselectedAllButton);
+		deselectAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
+			projectNames.setAllChecked(false);
+			selection = projectNames.getCheckedElements();
+			updateEnablement();
+		}));
+
+		// fourth row
+		alwaysCleanButton = new Button(area, SWT.CHECK);
+		alwaysCleanButton.setText(IDEWorkbenchMessages.CleanDialog_alwaysCleanAllButton);
+		alwaysCleanButton.setSelection(settings.getBoolean(TOGGLE_SELECTED));
+		alwaysCleanButton.addSelectionListener(widgetSelectedAdapter(e -> updateEnablement()));
+
+		new Label(area, SWT.NONE);
+
+		// fifth row
         //only prompt for immediate build if autobuild is off
         if (!ResourcesPlugin.getWorkspace().isAutoBuilding()) {
 			SelectionListener updateEnablement = widgetSelectedAdapter(e -> updateEnablement());
@@ -354,32 +277,6 @@ public class CleanDialog extends MessageDialog {
         return area;
     }
 
-	private static boolean useNativeSearchField(Composite composite) {
-		boolean useNativeSearchField = true;
-		Text testText = null;
-		try {
-			testText = new Text(composite, SWT.SEARCH | SWT.ICON_CANCEL);
-			useNativeSearchField = Boolean.valueOf((testText.getStyle() & SWT.ICON_CANCEL) != 0);
-		} finally {
-			if (testText != null) {
-				testText.dispose();
-			}
-		}
-		return useNativeSearchField;
-	}
-
-	private void setInitialFilterText() {
-		filterText.setText(IDEWorkbenchMessages.CleanDialog_typeFilterText);
-		filterText.selectAll();
-		filterText.setFocus();
-	}
-
-	protected void updateClearButton(boolean visible) {
-		if (clearButtonControl != null) {
-			clearButtonControl.setVisible(visible);
-		}
-	}
-
     @Override
 	protected Control createContents(Composite parent) {
     	Control contents= super.createContents(parent);
@@ -400,11 +297,9 @@ public class CleanDialog extends MessageDialog {
                     return false;
                 }
                 IProject project = (IProject) element;
-				boolean isProjectNameMatchingPattern = searchPattern.matches(project.getName());
+				boolean isProjectNameMatchingPattern = project.getName().matches(filterRegexPattern);
 				if (!project.isAccessible() || !isProjectNameMatchingPattern) {
-					if (!filterText.getText().equals(IDEWorkbenchMessages.CleanDialog_typeFilterText)) {
-						return false;
-					}
+                    return false;
                 }
                 projectHolder[0] = project;
                 return BuildUtilities.isEnabled(projectHolder, IncrementalProjectBuilder.CLEAN_BUILD);
@@ -454,6 +349,8 @@ public class CleanDialog extends MessageDialog {
 	 */
     protected void updateEnablement() {
 		projectNames.getTable().setEnabled(!alwaysCleanButton.getSelection());
+		selectAllButton.setEnabled(!alwaysCleanButton.getSelection());
+		deselectAllButton.setEnabled(!alwaysCleanButton.getSelection());
 		filterText.setEnabled(!alwaysCleanButton.getSelection());
 
 		boolean enabled = selection.length > 0 || alwaysCleanButton.getSelection();
@@ -543,7 +440,7 @@ public class CleanDialog extends MessageDialog {
             settings.put(BUILD_ALL, globalBuildButton.getSelection());
         }
 
-		settings.put(TOGGLE_SELECTED, !alwaysCleanButton.getSelection());
+		settings.put(TOGGLE_SELECTED, alwaysCleanButton.getSelection());
     }
 
     /**
@@ -571,105 +468,4 @@ public class CleanDialog extends MessageDialog {
 	protected boolean isResizable() {
         return true;
     }
-
-	/**
-	 * Create the button that clears the text.
-	 *
-	 * @param parent
-	 *            parent <code>Composite</code> of button
-	 */
-	private void createClearTextNew(Composite parent) {
-		// only create the button if the text widget doesn't support one
-		// natively
-		if ((filterText.getStyle() & SWT.ICON_CANCEL) == 0) {
-			// add one additional column to the parent view to add space for the clear
-			// button
-			((GridLayout) parent.getLayout()).numColumns = 2;
-
-			final Image inactiveImage = JFaceResources.getImageRegistry()
-					.getDescriptor(DISABLED_CLEAR_ICON).createImage();
-			final Image activeImage = JFaceResources.getImageRegistry()
-					.getDescriptor(CLEAR_ICON).createImage();
-			final Image pressedImage = new Image(parent.getDisplay(), activeImage, SWT.IMAGE_GRAY);
-
-			final Label clearButton = new Label(parent, SWT.NONE);
-			clearButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-			clearButton.setImage(inactiveImage);
-			clearButton.setToolTipText(IDEWorkbenchMessages.CleanDialog_clearToolTip);
-			clearButton.addMouseListener(new MouseAdapter() {
-				private MouseMoveListener fMoveListener;
-
-				@Override
-				public void mouseDown(MouseEvent e) {
-					clearButton.setImage(pressedImage);
-					fMoveListener = new MouseMoveListener() {
-						private boolean fMouseInButton = true;
-
-						@Override
-						public void mouseMove(MouseEvent event) {
-							boolean mouseInButton = isMouseInButton(event);
-							if (mouseInButton != fMouseInButton) {
-								fMouseInButton = mouseInButton;
-								clearButton.setImage(mouseInButton ? pressedImage : inactiveImage);
-							}
-						}
-					};
-					clearButton.addMouseMoveListener(fMoveListener);
-				}
-
-				@Override
-				public void mouseUp(MouseEvent e) {
-					if (fMoveListener != null) {
-						clearButton.removeMouseMoveListener(fMoveListener);
-						fMoveListener = null;
-						boolean mouseInButton = isMouseInButton(e);
-						clearButton.setImage(mouseInButton ? activeImage : inactiveImage);
-						if (mouseInButton) {
-							filterText.setText(""); //$NON-NLS-1$
-							filterText.selectAll();
-							filterText.setFocus();
-						}
-					}
-				}
-
-				private boolean isMouseInButton(MouseEvent e) {
-					Point buttonSize = clearButton.getSize();
-					return 0 <= e.x && e.x < buttonSize.x && 0 <= e.y && e.y < buttonSize.y;
-				}
-			});
-			clearButton.addMouseTrackListener(new MouseTrackListener() {
-				@Override
-				public void mouseEnter(MouseEvent e) {
-					clearButton.setImage(activeImage);
-				}
-
-				@Override
-				public void mouseExit(MouseEvent e) {
-					clearButton.setImage(inactiveImage);
-				}
-
-				@Override
-				public void mouseHover(MouseEvent e) {
-				}
-			});
-			clearButton.addDisposeListener(e -> {
-				inactiveImage.dispose();
-				activeImage.dispose();
-				pressedImage.dispose();
-			});
-			clearButton.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-				@Override
-				public void getName(AccessibleEvent e) {
-					e.result = IDEWorkbenchMessages.CleanDialog_AccessibleListenerClearButton;
-				}
-			});
-			clearButton.getAccessible().addAccessibleControlListener(new AccessibleControlAdapter() {
-				@Override
-				public void getRole(AccessibleControlEvent e) {
-					e.detail = ACC.ROLE_PUSHBUTTON;
-				}
-			});
-			this.clearButtonControl = clearButton;
-		}
-	}
 }
