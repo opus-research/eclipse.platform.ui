@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.core.internal.databinding.observable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -50,6 +52,21 @@ public final class SideEffect implements ISideEffect {
 		@Override
 		public void runIfDirty() {
 		}
+
+		@Override
+		public boolean isDisposed() {
+			// This side-effect never executes nor retains any references and
+			// callers may rely upon this, so we should return true.
+			return true;
+		}
+
+		@Override
+		public void addDisposeListener(Consumer<ISideEffect> disposalConsumer) {
+		}
+
+		@Override
+		public void removeDisposeListener(Consumer<ISideEffect> disposalConsumer) {
+		}
 	};
 
 	/**
@@ -63,11 +80,11 @@ public final class SideEffect implements ISideEffect {
 	 */
 	private boolean dirty;
 	/**
-	 * True iff PrivateInterface is currently enqueued in a call to
+	 * True if PrivateInterface is currently enqueued in a call to
 	 * realm.asyncExec
 	 */
 	private boolean asyncScheduled;
-	private boolean resumed;
+	private int pauseDepth;
 	private Runnable runnable;
 	/**
 	 * Dependencies which we are currently listening for change events from
@@ -76,6 +93,11 @@ public final class SideEffect implements ISideEffect {
 	private Realm realm;
 
 	private PrivateInterface privateInterface = new PrivateInterface();
+
+	/**
+	 * List of dispose listeners. Null if empty
+	 */
+	private List<Consumer<ISideEffect>> disposeListeners;
 
 	/**
 	 * Creates a SideEffect in the paused state that wraps the given runnable on
@@ -100,6 +122,7 @@ public final class SideEffect implements ISideEffect {
 		this.runnable = runnable;
 		this.realm = realm;
 		this.dirty = true;
+		this.pauseDepth = 1;
 	}
 
 	/**
@@ -115,7 +138,7 @@ public final class SideEffect implements ISideEffect {
 		this.dependencies = dependencies;
 		this.runnable = runnable;
 		this.dirty = false;
-		this.resumed = true;
+		this.pauseDepth = 0;
 		this.realm = Realm.getDefault();
 
 		for (IObservable next : dependencies) {
@@ -125,22 +148,18 @@ public final class SideEffect implements ISideEffect {
 
 	@Override
 	public void resume() {
-		checkState();
-		if (resumed) {
-			return;
-		}
-		resumed = true;
-		if (dirty) {
+		checkRealm();
+		pauseDepth--;
+		if (dirty && pauseDepth == 0) {
 			scheduleUpdate();
 		}
 	}
 
-
 	@Override
 	public void pause() {
-		checkState();
-		resumed = false;
-		if (dirty) {
+		checkRealm();
+		pauseDepth++;
+		if (dirty && pauseDepth == 1) {
 			// No need to continue listening if we're already dirtied, since
 			// we'll just end up running again after we're resumed
 			stopListening();
@@ -150,13 +169,13 @@ public final class SideEffect implements ISideEffect {
 
 	@Override
 	public void resumeAndRunIfDirty() {
-		checkState();
-		resumed = true;
+		checkRealm();
+		pauseDepth--;
 		update();
 	}
 
 	private void update() {
-		if (dirty && resumed) {
+		if (dirty && pauseDepth <= 0) {
 			dirty = false;
 			// Hold a reference to the old dependencies to prevent them from
 			// being garbage collected until we've computed the new set. In the
@@ -189,19 +208,63 @@ public final class SideEffect implements ISideEffect {
 	@Override
 	public void dispose() {
 		checkRealm();
-		resumed = false;
+		if (isDisposed()) {
+			return;
+		}
+		pauseDepth = 0;
 		stopListening();
 		dependencies = null;
 		runnable = null;
+		if (disposeListeners != null) {
+			List<Consumer<ISideEffect>> oldListeners = disposeListeners;
+			disposeListeners = null;
+			oldListeners.forEach(dc -> dc.accept(SideEffect.this));
+		}
 	}
 
-	private boolean isDisposed() {
+	@Override
+	public boolean isDisposed() {
 		return runnable == null;
+	}
+
+	/**
+	 * Add an disposal consumer for this {@link ISideEffect} instance.
+	 *
+	 * @param disposalConsumer
+	 *            a consumer which will be notified once this
+	 *            {@link ISideEffect} is disposed.
+	 */
+	@Override
+	public void addDisposeListener(Consumer<ISideEffect> disposalConsumer) {
+		checkRealm();
+		if (isDisposed()) {
+			return;
+		}
+		if (this.disposeListeners == null) {
+			this.disposeListeners = new ArrayList<>();
+		}
+		this.disposeListeners.add(disposalConsumer);
+	}
+
+	/**
+	 * Remove an disposal consumer for this {@link ISideEffect} instance.
+	 *
+	 * @param disposalConsumer
+	 *            a consumer which is supposed to be removed from the dispose
+	 *            listener list.
+	 */
+	@Override
+	public void removeDisposeListener(Consumer<ISideEffect> disposalConsumer) {
+		checkRealm();
+		if (this.disposeListeners == null) {
+			return;
+		}
+		this.disposeListeners.remove(disposalConsumer);
 	}
 
 	@Override
 	public void runIfDirty() {
-		checkState();
+		checkRealm();
 		update();
 	}
 
@@ -217,7 +280,7 @@ public final class SideEffect implements ISideEffect {
 		if (!dirty) {
 			dirty = true;
 
-			if (resumed) {
+			if (pauseDepth <= 0) {
 				scheduleUpdate();
 			} else {
 				stopListening();
@@ -233,13 +296,6 @@ public final class SideEffect implements ISideEffect {
 
 		this.asyncScheduled = true;
 		realm.asyncExec(privateInterface);
-	}
-
-	private void checkState() {
-		if (isDisposed()) {
-			throw new IllegalStateException("This SideEffect has been disposed!"); //$NON-NLS-1$
-		}
-		checkRealm();
 	}
 
 	private void checkRealm() {
