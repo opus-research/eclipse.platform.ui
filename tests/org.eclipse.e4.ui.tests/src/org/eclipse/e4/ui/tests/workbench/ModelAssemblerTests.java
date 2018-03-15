@@ -42,8 +42,10 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MAdvancedFactory;
+import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.fragment.MFragmentFactory;
@@ -295,6 +297,52 @@ public class ModelAssemblerTests {
 		assertEquals(null, placeholder.getRef());
 		verify(logger).warn("Could not resolve an import element for 'null'");
 		verify(logger).warn("Could not resolve import for null");
+		verifyZeroInteractions(logger);
+	}
+
+	/**
+	 * Make sure that all fragments and imports are resolved before the
+	 * post-processors are run. For reference, see
+	 * <a href="https://bugs.eclipse.org/475934">bug 475934</a>.
+	 *
+	 * @throws Exception
+	 *             if anything went wrong during the test
+	 *
+	 */
+	@Test
+	public void testModelProcessingOrder() throws Exception {
+
+		/* setup application model */
+		/* this creates a window, containing a part and an area */
+		MTrimmedWindow trimmedWindow = MBasicFactory.INSTANCE.createTrimmedWindow();
+		trimmedWindow.setElementId("testModelProcessingOrder-trimmedWindow");
+		application.getChildren().add(trimmedWindow);
+		MPart part = MBasicFactory.INSTANCE.createPart();
+		part.setElementId("testModelProcessingOrder-part");
+		trimmedWindow.getChildren().add(part);
+		MArea area = MAdvancedFactory.INSTANCE.createArea();
+		area.setElementId("testModelProcessingOrder-area");
+		trimmedWindow.getChildren().add(area);
+
+		/* contribute fragment with imports and post-processor */
+		IContributor contributor = ContributorFactorySimple.createContributor(bundleSymbolicName);
+		IExtensionRegistry registry = createTestExtensionRegistry();
+		assertEquals(0, registry.getConfigurationElementsFor(extensionPointID).length);
+		// The fragment contributes a Placeholder to the application's Area. The
+		// Placeholder references the Part that we created above.
+		// Besides the Placeholder, the xml also contributes a
+		// post-processor(org.eclipse.e4.ui.tests.workbench.ModelAssemblerProcessingOrderPostProcessor).
+		// It will iterate over the elements of the application model and will
+		// make sure that no imports are left unresolved. The post-processor
+		// will throw an error if such elements are found and this test will
+		// fail.
+		String dataFilePath = "org.eclipse.e4.ui.tests/data/ModelAssembler/modelProcessingOrder.xml";// FIXME
+		registry.addContribution(getContentsAsInputStream(dataFilePath), contributor, false, null, null, null);
+
+		assembler.processModel(true);
+
+		// the testing was done in the post-processor; if we didn't fail there,
+		// everything went fine.
 		verifyZeroInteractions(logger);
 	}
 
