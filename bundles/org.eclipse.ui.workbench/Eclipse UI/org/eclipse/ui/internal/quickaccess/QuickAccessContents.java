@@ -10,7 +10,7 @@
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 491272, 491398
  *     Leung Wang Hei <gemaspecial@yahoo.com.hk> - Bug 483343
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291, Bug 491529
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 491291
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -104,7 +104,6 @@ public abstract class QuickAccessContents {
 
 	public QuickAccessContents(QuickAccessProvider[] providers) {
 		this.providers = providers;
-		setFixedCountPerProvider(5);
 	}
 
 	/**
@@ -295,19 +294,6 @@ public abstract class QuickAccessContents {
 		return numberOfFilteredResults;
 	}
 
-	private int fixedCountPerProvider = 0;
-
-	/**
-	 * Sets the number of quick search results per provider (AKA category). When
-	 * {@code nResults>0}, the number of results is fixed to the given number,
-	 * otherwise is dynamic
-	 *
-	 * @param nResults
-	 */
-	protected void setFixedCountPerProvider(int nResults) {
-		this.fixedCountPerProvider = nResults;
-	}
-
 	/**
 	 * Returns a list per provider containing matching {@link QuickAccessEntry}
 	 * that should be displayed in the table given a text filter and a perfect
@@ -331,9 +317,8 @@ public abstract class QuickAccessContents {
 
 		int maxCount = computeNumberOfItems();
 		int[] indexPerProvider = new int[providers.length];
-		// count per provider fixed when specified.
-		int countPerProvider = (fixedCountPerProvider > 0) ? fixedCountPerProvider
-				: (Math.min(maxCount / 4, INITIAL_COUNT_PER_PROVIDER));
+		int countPerProvider = Math.min(maxCount / 4,
+				INITIAL_COUNT_PER_PROVIDER);
 		int prevPick = 0;
 		int countTotal = 0;
 		boolean perfectMatchAdded = true;
