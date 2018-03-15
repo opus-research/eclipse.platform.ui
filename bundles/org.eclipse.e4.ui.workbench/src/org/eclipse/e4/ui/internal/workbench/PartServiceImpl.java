@@ -10,6 +10,7 @@
  *     Lars Vogel (Lars.Vogel@vogella.com) - Bug 416082,  472654, 395825
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411, 486876, 461063
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 501849
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -491,12 +492,21 @@ public class PartServiceImpl implements EPartService {
 			if (!element.isVisible()) {
 				return false;
 			}
-			if (isMinimized(parent) || isMinimized(element)) {
+			if (isMinimized(element) || isMinimized(parent) && !isFastViewVisible(parent, element)) {
 				return false;
 			}
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * In a fast view, the parent is minimized by zoom. When the fast view is
+	 * hidden, parent.isVisible() returns false. When visible, returns true.
+	 */
+	private boolean isFastViewVisible(MElementContainer<?> parent, MUIElement element) {
+		return parent.getTags().contains(IPresentationEngine.MINIMIZED_BY_ZOOM)
+				&& parent.getSelectedElement().equals(element) && parent.isVisible();
 	}
 
 	private boolean isMinimized(MUIElement elt) {
