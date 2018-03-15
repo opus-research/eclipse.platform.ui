@@ -14,7 +14,7 @@
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
  * Andrey Loskutov <loskutov@gmx.de> - Bug 388476, 445538, 463262
  * Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 491785, 368977
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -168,6 +168,8 @@ public class WorkbenchMessages extends NLS {
 	// --- Window Menu ---
 	public static String PerspectiveMenu_otherItem;
 	public static String SelectPerspective_shellTitle;
+	public static String SelectPerspective_selectPerspectiveHelp;
+	public static String SelectPerspective_noDesc;
 	public static String Workbench_showPerspectiveError;
 	public static String ChangeToPerspectiveMenu_errorTitle;
     public static String OpenPerspectiveDialogAction_text;
@@ -285,6 +287,9 @@ public class WorkbenchMessages extends NLS {
 	public static String ActivateEditorAction_toolTip;
 	public static String MaximizePartAction_toolTip;
 	public static String MinimizePartAction_toolTip;
+
+	// --- Filtered Table Base ---
+	public static String FilteredTableBase_Filter;
 
 
 
@@ -894,6 +899,16 @@ public class WorkbenchMessages extends NLS {
     public static String ContentTypes_editDialog_messageHeader;
     public static String ContentTypes_editDialog_message;
     public static String ContentTypes_editDialog_label;
+	public static String ContentTypes_addRootContentTypeButton;
+	public static String ContentTypes_addChildContentTypeButton;
+	public static String ContentTypes_removeContentTypeButton;
+	public static String ContentTypes_newContentTypeDialog_title;
+	public static String ContentTypes_newContentTypeDialog_descritption;
+	public static String ContentTypes_newContentTypeDialog_nameLabel;
+	public static String ContentTypes_newContentTypeDialog_defaultNameNoParent;
+	public static String ContentTypes_newContentTypeDialog_defaultNameWithParent;
+	public static String ContentTypes_newContentTypeDialog_invalidContentTypeName;
+	public static String ContentTypes_failedAtEditingContentTypes;
     public static String Edit;
 
     // =========================================================================

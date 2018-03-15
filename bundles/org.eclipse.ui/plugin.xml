@@ -98,12 +98,6 @@
             id="org.eclipse.ui.contexts.workbenchMenu"
             name="%context.workbenchMenu.name">
       </context>
-      <context
-            description="%context.about.dialog.description"
-            id="org.eclipse.ui.contexts.aboutDialog"
-            name="%context.about.dialog.name"
-            parentId="org.eclipse.ui.contexts.dialog">
-      </context>
    </extension>
    
    <extension point="org.eclipse.ui.bindings">
@@ -799,12 +793,6 @@
                id="Splitter.isHorizontal"
                value="false">
          </parameter>
-      </key>
-      <key
-            commandId="org.eclipse.ui.ide.copyBuildIdCommand"
-            contextId="org.eclipse.ui.contexts.aboutDialog"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+C">
       </key>
 
    </extension>
@@ -1907,6 +1895,32 @@
       		name="org.eclipse.ui.workbench.ACTIVE_TAB_HIGHLIGHT" value="false">
 		 </data>
       </theme>
+      <colorDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            id="org.eclipse.ui.workbench.HOVER_BACKGROUND"
+            label="%Color.infoBackground">
+            <colorFactory
+               class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
+               plugin="org.eclipse.ui">
+               <parameter
+                      name="color"
+                      value="background">
+                </parameter>
+            </colorFactory>
+      </colorDefinition>
+      <colorDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            id="org.eclipse.ui.workbench.HOVER_FOREGROUND"
+            label="%Color.infoForeground">
+            <colorFactory
+               class="org.eclipse.ui.internal.themes.RGBInfoColorFactory"
+               plugin="org.eclipse.ui">
+               <parameter
+                      name="color"
+                      value="foreground">
+                </parameter>
+            </colorFactory>
+      </colorDefinition>
       <theme
             id="org.eclipse.ui.r30"
             name="%ThemeName.R30">
@@ -2260,9 +2274,9 @@
             commandId="org.eclipse.ui.window.openEditorDropDown">
          <enabledWhen>
             <with
-                  variable="activeEditor">
+                  variable="activePart">
                <instanceof
-                     value="org.eclipse.ui.IEditorPart">
+                     value="org.eclipse.ui.IWorkbenchPart">
                </instanceof>
             </with>
          </enabledWhen>

@@ -14,6 +14,7 @@
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
  *     Sopot Cela <scela@redhat.com> - Bug 472761
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -59,7 +60,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -70,8 +70,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
@@ -84,13 +82,7 @@ import org.osgi.service.event.Event;
  */
 public class ToolBarManagerRenderer extends SWTPartRenderer {
 
-	private static final Selector ALL_SELECTOR = new Selector() {
-
-		@Override
-		public boolean select(MApplicationElement element) {
-			return true;
-		}
-	};
+	private static final Selector ALL_SELECTOR = element -> true;
 
 	/**	 */
 	public static final String POST_PROCESSING_FUNCTION = "ToolBarManagerRenderer.postProcess.func"; //$NON-NLS-1$
@@ -283,12 +275,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
 				s = ALL_SELECTOR;
 			} else {
-				s = new Selector() {
-					@Override
-					public boolean select(MApplicationElement element) {
-						return v.equals(element.getElementId());
-					}
-				};
+				s = element -> v.equals(element.getElementId());
 			}
 		}
 
@@ -418,17 +405,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		final Map<String, Object> transientData = toolbarModel.getTransientData();
 		if (!transientData.containsKey(DISPOSE_ADDED)) {
 			transientData.put(DISPOSE_ADDED, Boolean.TRUE);
-			control.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					cleanUp(toolbarModel);
-					Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
-					if (dispose instanceof Runnable) {
-						((Runnable) dispose).run();
-					}
-					transientData.remove(POST_PROCESSING_DISPOSE);
-					transientData.remove(DISPOSE_ADDED);
+			control.addDisposeListener(e -> {
+				cleanUp(toolbarModel);
+				Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
+				if (dispose instanceof Runnable) {
+					((Runnable) dispose).run();
 				}
+				transientData.remove(POST_PROCESSING_DISPOSE);
+				transientData.remove(DISPOSE_ADDED);
 			});
 		}
 
@@ -477,13 +461,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					}
 
 					record.updateVisibility(parentContext.getActiveLeaf());
-					runExternalCode(new Runnable() {
-
-						@Override
-						public void run() {
-							manager.update(false);
-							getUpdater().updateContributionItems(ALL_SELECTOR);
-						}
+					runExternalCode(() -> {
+						manager.update(false);
+						getUpdater().updateContributionItems(ALL_SELECTOR);
 					});
 					return true;
 				}
@@ -502,7 +482,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IContributionManagerOverrides overrides = null;
 			MApplicationElement parentElement = element.getParent();
 			if (parentElement == null) {
-				parentElement = (MApplicationElement) ((EObject) element).eContainer();
+				parentElement = modelService.getContainer(element);
 			}
 
 			if (parentElement != null) {
