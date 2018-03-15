@@ -118,12 +118,19 @@ public interface ISideEffect {
 	/**
 	 * Disposes the side-effect, detaching all listeners and deallocating all
 	 * memory used by the side-effect. The side-effect will not execute again
-	 * after this method is invoked, and no other public methods may be invoked
-	 * on the side-effect after invoking this one.
+	 * after this method is invoked.
 	 * <p>
 	 * This method may be invoked more than once.
 	 */
 	void dispose();
+
+	/**
+	 * Returns true if this side-effect has been disposed. A disposed
+	 * side-effect will never execute again.
+	 *
+	 * @return true if this side-effect has been disposed.
+	 */
+	boolean isDisposed();
 
 	/**
 	 * Pauses an {@link ISideEffect}, preventing it from running again until it
@@ -168,6 +175,24 @@ public interface ISideEffect {
 	 * currently paused.
 	 */
 	void runIfDirty();
+
+	/**
+	 * Add an disposal consumer for this {@link ISideEffect} instance.
+	 *
+	 * @param disposalConsumer
+	 *            a consumer which will be notified once this
+	 *            {@link ISideEffect} is disposed.
+	 */
+	void addDisposeListener(Consumer<ISideEffect> disposalConsumer);
+
+	/**
+	 * Remove an disposal consumer for this {@link ISideEffect} instance.
+	 *
+	 * @param disposalConsumer
+	 *            a consumer which is supposed to be removed from the dispose
+	 *            listener list.
+	 */
+	void removeDisposeListener(Consumer<ISideEffect> disposalConsumer);
 
 	/**
 	 * Creates a new {@link ISideEffect} on the default {@link Realm} but does
