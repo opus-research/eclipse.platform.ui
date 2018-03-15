@@ -135,7 +135,7 @@ public class StackTraceSupportArea extends AbstractStatusAreaProvider {
 		if (list == null || list.isDisposed()) {
 			return ""; //$NON-NLS-1$
 		}
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		String newLine = System.getProperty("line.separator"); //$NON-NLS-1$
 		for (int i = 0; i < list.getItemCount(); i++) {
 			sb.append(list.getItem(i));

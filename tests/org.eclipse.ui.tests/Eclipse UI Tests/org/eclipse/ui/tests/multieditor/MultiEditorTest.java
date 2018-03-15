@@ -448,6 +448,7 @@ public class MultiEditorTest extends UITestCase {
 		Thread.sleep(500);
 		Display display = Display.getCurrent();
 		while (display.readAndDispatch()) {
+			;
 		}
 	}
 
@@ -477,7 +478,7 @@ public class MultiEditorTest extends UITestCase {
 			// editorPart instanceof ErrorEditorPart);
 
 			if (fErrorListener.messages.size() > 0) {
-				String[] msgs = fErrorListener.messages
+				String[] msgs = (String[]) fErrorListener.messages
 						.toArray(new String[fErrorListener.messages.size()]);
 				for (String msg : msgs) {
 					if (msg.indexOf("The proxied handler for") == -1
@@ -576,7 +577,7 @@ public class MultiEditorTest extends UITestCase {
 	 */
 	public static class EditorErrorListener implements ILogListener {
 
-		public ArrayList<String> messages = new ArrayList<>();
+		public ArrayList messages = new ArrayList();
 
 		@Override
 		public void logging(IStatus status, String plugin) {

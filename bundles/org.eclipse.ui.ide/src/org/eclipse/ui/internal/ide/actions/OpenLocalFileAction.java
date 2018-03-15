@@ -76,7 +76,7 @@ public class OpenLocalFileAction extends Action implements IWorkbenchWindowActio
 
 	@Override
 	public void run() {
-		FileDialog dialog =  new FileDialog(window.getShell(), SWT.OPEN | SWT.MULTI | SWT.SHEET);
+		FileDialog dialog =  new FileDialog(window.getShell(), SWT.OPEN | SWT.MULTI);
 		dialog.setText(IDEWorkbenchMessages.OpenLocalFileAction_title);
 		dialog.setFilterPath(filterPath);
 		dialog.open();
@@ -86,7 +86,7 @@ public class OpenLocalFileAction extends Action implements IWorkbenchWindowActio
 			filterPath =  dialog.getFilterPath();
 
 			int numberOfFilesNotFound =  0;
-			StringBuilder notFound =  new StringBuilder();
+			StringBuffer notFound =  new StringBuffer();
 			for (String name : names) {
 				IFileStore fileStore =  EFS.getLocalFileSystem().getStore(new Path(filterPath));
 				fileStore =  fileStore.getChild(name);

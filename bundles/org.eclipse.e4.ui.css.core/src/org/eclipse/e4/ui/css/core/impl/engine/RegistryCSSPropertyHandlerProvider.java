@@ -159,7 +159,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null)
 			return stylableElement.getDefaultStyleDeclaration(pseudoE);
 		if (newStyle != null) {
-			StringBuilder style = null;
+			StringBuffer style = null;
 			int length = newStyle.getLength();
 			for (int i = 0; i < length; i++) {
 				String propertyName = newStyle.item(i);
@@ -172,7 +172,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 								propertyName, pseudoE);
 						if (s != null) {
 							if (style == null)
-								style = new StringBuilder();
+								style = new StringBuffer();
 							style.append(s);
 						}
 					}
@@ -181,7 +181,7 @@ public class RegistryCSSPropertyHandlerProvider extends
 							propertyName, pseudoE);
 					if (s != null) {
 						if (style == null)
-							style = new StringBuilder();
+							style = new StringBuffer();
 						style.append(s);
 					}
 				}

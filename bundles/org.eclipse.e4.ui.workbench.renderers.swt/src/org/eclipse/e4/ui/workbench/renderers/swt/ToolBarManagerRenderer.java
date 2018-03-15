@@ -478,14 +478,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					record.updateVisibility(parentContext.getActiveLeaf());
 					runExternalCode(() -> {
 						manager.update(false);
-						getUpdater().updateContributionItems(e -> {
-							if (e instanceof MToolBarElement) {
-								if (((MUIElement) ((MToolBarElement) e).getParent()) == toolbarModel) {
-									return true;
-								}
-							}
-							return false;
-						});
+						getUpdater().updateContributionItems(ALL_SELECTOR);
 					});
 					return true;
 				}
@@ -845,7 +838,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			clearModelToContribution(element, ici);
 		}
 		modelToManager.remove(model);
-			managerToModel.remove(manager);
+		managerToModel.remove(manager);
 		if (Policy.DEBUG_RENDERER) {
 			logger.debug("\nTBMR:clearModelToManager: modelToManager size = {0}, managerToModel size = {1}", //$NON-NLS-1$
 					modelToManager.size(), managerToModel.size());

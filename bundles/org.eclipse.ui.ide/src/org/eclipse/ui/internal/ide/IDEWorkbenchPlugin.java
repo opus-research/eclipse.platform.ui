@@ -387,7 +387,7 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
 			Job job = new Job("Initializing Problems view") { //$NON-NLS-1$
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					IWorkbench workbench = PlatformUI.isWorkbenchRunning() ? PlatformUI.getWorkbench() : null;
+					IWorkbench workbench = PlatformUI.getWorkbench();
 					if (workbench == null) {
 						// Workbench not created yet, so avoid using display to
 						// avoid crash like in bug 513901

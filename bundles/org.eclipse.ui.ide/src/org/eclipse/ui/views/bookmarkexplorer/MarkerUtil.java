@@ -60,7 +60,7 @@ class MarkerUtil {
         if (n > 1) {
 			len += n - 1;
 		}
-        StringBuilder sb = new StringBuilder(len);
+        StringBuffer sb = new StringBuffer(len);
         for (int i = 0; i < n; ++i) {
             if (i != 0) {
 				sb.append('/');

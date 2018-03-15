@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.e4.rcp"
       label="%featureName"
-      version="1.6.100.qualifier"
+      version="1.6.0.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -382,6 +382,16 @@
          fragment="true"/>
 
    <plugin
+         id="org.eclipse.equinox.launcher.gtk.linux.ppc"
+         os="linux"
+         ws="gtk"
+         arch="ppc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+   <plugin
          id="org.eclipse.equinox.launcher.gtk.linux.ppc64"
          os="linux"
          ws="gtk"
@@ -475,6 +485,17 @@
          os="linux"
          ws="gtk"
          arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.swt.gtk.linux.ppc"
+         os="linux"
+         ws="gtk"
+         arch="ppc"
          download-size="0"
          install-size="0"
          version="0.0.0"

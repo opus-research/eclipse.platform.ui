@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
@@ -297,7 +298,11 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      */
     @Override
 	protected List getSelectedWorkingSets() {
-		return listViewer.getStructuredSelection().toList();
+		IStructuredSelection selection = listViewer.getStructuredSelection();
+		if (selection != null) {
+			return selection.toList();
+		}
+        return null;
     }
 
     /**
@@ -361,7 +366,7 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 	 * @return the name
 	 */
     private String getAggregateIdForSets(IWorkingSet[] typedResult) {
-    		StringBuilder buffer = new StringBuilder();
+    		StringBuffer buffer = new StringBuffer();
     		buffer.append("Aggregate:"); //$NON-NLS-1$
     		for (IWorkingSet element : typedResult) {
 			buffer.append(element.getName()).append(':');

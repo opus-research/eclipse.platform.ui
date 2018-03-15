@@ -286,7 +286,9 @@ public class WorkingSetActionProvider extends CommonActionProvider {
 				new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.PLUGIN_ID, ""));  //$NON-NLS-1$
 			return;
 		}
-		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)) {
+		if (extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_TOP_LEVEL_WORKING_SETS)
+		    && extensionStateModel.getBooleanProperty(WorkingSetsContentProvider.SHOW_OTHERS_WORKING_SET)) {
+			// do not need filter when working sets are used for grouping
 			// a filter would hide the "Others" working set content
 			workingSetFilter.setWorkingSet(null);
 		} else {

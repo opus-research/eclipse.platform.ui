@@ -302,7 +302,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		// Show dynamic menu item info
 		if (item instanceof DynamicContributionItem) {
 			DynamicContributionItem dynamic = ((DynamicContributionItem) item);
-			StringBuilder text = new StringBuilder();
+			StringBuffer text = new StringBuffer();
 			final List<MenuItem> currentItems = dynamic.getCurrentItems();
 
 			if (currentItems.size() > 0) {

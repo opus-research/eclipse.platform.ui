@@ -182,7 +182,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -194,7 +194,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(archiveFile.getPath());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				assertFalse(selectedProject.hasConflicts());
 				projectNames.add(selectedProject.getProjectName());
@@ -212,7 +212,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".tar"), null));
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -224,7 +224,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(archiveFile.getPath());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				assertFalse(selectedProject.hasConflicts());
 				projectNames.add(selectedProject.getProjectName());
@@ -242,14 +242,14 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			dataLocation = copyDataLocation(WS_DATA_LOCATION);
 			IPath wsPath = new Path(dataLocation).append("HelloWorld");
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 			// We're importing a directory
 			wpip.getProjectFromDirectoryRadio().setSelection((true));
 			wpip.updateProjectsList(wsPath.toOSString());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				assertFalse(selectedProject.hasConflicts());
 				projectNames.add(selectedProject.getProjectName());
@@ -297,7 +297,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -309,7 +309,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(archiveFile.getPath());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				assertFalse(selectedProject.hasConflicts());
 				projectNames.add(selectedProject.getProjectName());
@@ -355,7 +355,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".zip"), null));
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("A");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -367,7 +367,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(archiveFile.getPath());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -411,7 +411,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".tar"), null));
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -423,7 +423,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(archiveFile.getPath());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -468,7 +468,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_FILE_WITH_EMPTY_FOLDER + ".tar"), null));
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("A");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -480,7 +480,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(archiveFile.getPath());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -528,13 +528,13 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			dataLocation = copyDataLocation(WS_DATA_LOCATION);
 			wsPath = new Path(dataLocation).append("HelloWorld");
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((true));
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -580,7 +580,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			dataLocation = copyDataLocation(WS_DATA_LOCATION);
 			wsPath = new Path(dataLocation).append("HelloWorld");
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((true));
@@ -590,7 +590,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -636,7 +636,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			dataLocation = copyDataLocation(WS_DATA_LOCATION);
 			wsPath = new Path(dataLocation).append("HelloWorld");
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((true));
@@ -646,7 +646,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -682,7 +682,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			// perform same test again, but this time import from this workspace
 			final WizardProjectsImportPage wpip2 = getNewWizard();
-			HashSet<String> projects2 = new HashSet<>();
+			HashSet projects2 = new HashSet();
 			projects2.add("HelloWorld");
 
 			wpip2.getProjectFromDirectoryRadio().setSelection((true));
@@ -695,7 +695,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			assertTrue("Not all projects were found correctly in zip (2).",
 					selectedProjects2.length == 1);
 
-			ArrayList<String> projectNames2 = new ArrayList<>();
+			ArrayList projectNames2 = new ArrayList();
 			for (ProjectRecord element : selectedProjects2) {
 				projectNames2.add(element.getProjectName());
 			}
@@ -739,7 +739,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 
 			wpip.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -751,7 +751,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(archiveFile.getPath());
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -792,7 +792,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			URL archiveFile2 = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 					new Path(DATA_PATH_PREFIX + ARCHIVE_HELLOWORLD + ".zip"), null));
 			WizardProjectsImportPage wpip2 = getNewWizard();
-			HashSet<String> projects2 = new HashSet<>();
+			HashSet projects2 = new HashSet();
 			projects2.add("HelloWorld");
 
 			wpip2.getProjectFromDirectoryRadio().setSelection((false)); // We
@@ -804,7 +804,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip2.updateProjectsList(archiveFile2.getPath());
 
 			ProjectRecord[] selectedProjects2 = wpip2.getProjectRecords();
-			ArrayList<String> projectNames2 = new ArrayList<>();
+			ArrayList projectNames2 = new ArrayList();
 			for (ProjectRecord element : selectedProjects2) {
 				projectNames2.add(element.getProjectName());
 			}
@@ -852,7 +852,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			dataLocation = copyDataLocation(WS_NESTED_DATA_LOCATION);
 			wsPath = new Path(dataLocation).append("A");
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("A");
 			projects.add("B");
 			projects.add("C");
@@ -865,7 +865,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			wpip.updateProjectsList(wsPath.toOSString());
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -923,12 +923,12 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 			WizardProjectsImportPage wpip = getExternalImportWizard(zipLocation);
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
 
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 			projects.add("WorldHello");
 			assertTrue("Not all projects were found correctly in zip",
@@ -958,7 +958,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			}
 
 			WizardProjectsImportPage wpip = getNewWizard();
-			HashSet<String> projects = new HashSet<>();
+			HashSet projects = new HashSet();
 			projects.add("HelloWorld");
 			projects.add("WorldHello");
 
@@ -971,7 +971,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 			wpip.updateProjectsList(zipLocation);
 
 			ProjectRecord[] selectedProjects = wpip.getProjectRecords();
-			ArrayList<String> projectNames = new ArrayList<>();
+			ArrayList projectNames = new ArrayList();
 			for (ProjectRecord selectedProject : selectedProjects) {
 				projectNames.add(selectedProject.getProjectName());
 			}
@@ -1038,7 +1038,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 						+ rootLocation.toOSString());
 			}
 		}
-		StringBuilder filesNotImported = new StringBuilder();
+		StringBuffer filesNotImported = new StringBuffer();
 		// make sure the files in the project were imported
 		for (String element : fileList) {
 			IResource res = isListFiles ? (IResource) project
@@ -1147,7 +1147,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	public void testGetProjectRecords() throws Exception {
 
-		HashSet<String> expectedNames = new HashSet<>();
+		HashSet expectedNames = new HashSet();
 		expectedNames.add("Project1");
 		expectedNames.add("Project2");
 		expectedNames.add("Project3");
@@ -1157,7 +1157,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 		URL projectsArchive = FileLocator.toFileURL(FileLocator.find(TestPlugin.getDefault().getBundle(),
 				new Path(DATA_PATH_PREFIX + PROJECTS_ARCHIVE + ".zip"), null));
 
-		List<String> projectNames = getNonConflictingProjectsFromArchive(projectsArchive);
+		List projectNames = getNonConflictingProjectsFromArchive(projectsArchive);
 
 		assertTrue("Not all projects were found correctly in zip", projectNames.containsAll(expectedNames));
 
@@ -1168,14 +1168,14 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 
 	}
 
-	private List<String> getNonConflictingProjectsFromArchive(URL projectsArchive) {
+	private List getNonConflictingProjectsFromArchive(URL projectsArchive) {
 		WizardProjectsImportPage newWizard = getNewWizard();
 		newWizard.getProjectFromDirectoryRadio().setSelection(false);
 		newWizard.updateProjectsList(projectsArchive.getPath());
 
 		ProjectRecord[] projectRecords = newWizard.getProjectRecords();
 
-		List<String> projectNames = new ArrayList<>();
+		List projectNames = new ArrayList();
 		for (int i = 0; i < projectRecords.length; i++) {
 			if(!projectRecords[i].hasConflicts()) {
 				projectNames.add(projectRecords[i].getProjectName());
@@ -1239,7 +1239,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private List<String> getValidProjects(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<>();
+		List<String> projectNames = new ArrayList<String>();
 		for (int i = 0; i < projectRecords.length; i++) {
 			if (!projectRecords[i].isInvalidProject()) {
 				projectNames.add(projectRecords[i].getProjectName());
@@ -1249,7 +1249,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private List<String> getInvalidProjects(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<>();
+		List<String> projectNames = new ArrayList<String>();
 		for (ProjectRecord projectRecord : projectRecords) {
 			if (projectRecord.isInvalidProject()) {
 				projectNames.add(projectRecord.getProjectName());
@@ -1259,7 +1259,7 @@ public class ImportExistingProjectsWizardTest extends UITestCase {
 	}
 
 	private List<String> getProjectsWithConflicts(ProjectRecord[] projectRecords) {
-		List<String> projectNames = new ArrayList<>();
+		List<String> projectNames = new ArrayList<String>();
 		for (ProjectRecord projectRecord : projectRecords) {
 			if (projectRecord.hasConflicts()) {
 				projectNames.add(projectRecord.getProjectName());

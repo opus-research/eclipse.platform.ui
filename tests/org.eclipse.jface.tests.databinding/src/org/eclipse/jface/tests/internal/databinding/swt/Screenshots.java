@@ -65,7 +65,7 @@ public class Screenshots {
 		if (focusControl == null) {
 			System.out.println("  null!");
 		} else {
-			StringBuilder indent = new StringBuilder("  ");
+			StringBuffer indent = new StringBuffer("  ");
 			do {
 				out.println(indent.toString() + focusControl);
 				focusControl = focusControl.getParent();

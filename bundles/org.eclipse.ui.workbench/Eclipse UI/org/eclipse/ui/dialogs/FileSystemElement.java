@@ -249,7 +249,7 @@ public class FileSystemElement implements IAdaptable {
      */
     @Override
 	public String toString() {
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         if (isDirectory()) {
             buf.append("Folder(");//$NON-NLS-1$
         } else {

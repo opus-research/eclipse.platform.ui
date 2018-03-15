@@ -464,7 +464,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 		boolean incrementNesting = false;
 
 		if (includeStatus) {
-			StringBuilder sb = new StringBuilder();
+			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < nesting; i++) {
 				sb.append(NESTING_INDENT);
 			}
@@ -479,7 +479,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 
 		if (!(t instanceof CoreException) && t != null) {
 			// Include low-level exception message
-			StringBuilder sb = new StringBuilder();
+			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < nesting; i++) {
 				sb.append(NESTING_INDENT);
 			}
@@ -639,7 +639,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 	 * @param nesting
 	 */
 	private void populateCopyBuffer(IStatus buildingStatus,
-			StringBuilder buffer, int nesting) {
+			StringBuffer buffer, int nesting) {
 		if (!buildingStatus.matches(displayMask)) {
 			return;
 		}
@@ -680,7 +680,7 @@ public class ErrorDialog extends IconAndMessageDialog {
 		if (clipboard != null) {
 			clipboard.dispose();
 		}
-		StringBuilder statusBuffer = new StringBuilder();
+		StringBuffer statusBuffer = new StringBuffer();
 		populateCopyBuffer(status, statusBuffer, 0);
 		clipboard = new Clipboard(list.getDisplay());
 		clipboard.setContents(new Object[] { statusBuffer.toString() },
