@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lucas Bullen (Red Hat Inc.) - Bug 522096 - "Close Projects" on working set
  *******************************************************************************/
 
 package org.eclipse.ui.internal.navigator.resources.actions;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -25,7 +21,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -39,7 +34,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchCommandConstants;
-import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.BuildAction;
 import org.eclipse.ui.actions.CloseResourceAction;
@@ -48,7 +42,6 @@ import org.eclipse.ui.actions.OpenResourceAction;
 import org.eclipse.ui.actions.RefreshAction;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.ide.IDEActionFactory;
-import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.navigator.NavigatorPlugin;
 import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
@@ -114,98 +107,52 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		IStructuredSelection selection = (IStructuredSelection) getContext().getSelection();
-		List<IProject> openProjects = new ArrayList<>();
-		List<IProject> closedProjects = new ArrayList<>();
-		List<IProject> buildableProjects = new ArrayList<>();
-		boolean containsNonproject = false;
+		boolean isProjectSelection = true;
+		boolean hasOpenProjects = false;
+		boolean hasClosedProjects = false;
+		boolean hasBuilder = true; // false if any project is closed or does not
+									// have builder
+		Iterator<?> resources = selection.iterator();
 
-		List<IProject> projects = selectionToResources(selection);
-		Iterator<IProject> projectsIterator = projects.iterator();
-
-		while (projectsIterator.hasNext()) {
-			Object next = projectsIterator.next();
+		while (resources.hasNext() && (!hasOpenProjects || !hasClosedProjects || hasBuilder || isProjectSelection)) {
+			Object next = resources.next();
 			IProject project = Adapters.adapt(next, IProject.class);
 
 			if (project == null) {
-				containsNonproject = true;
+				isProjectSelection = false;
 				continue;
 			}
 			if (project.isOpen()) {
-				openProjects.add(project);
-				if (hasBuilder(project)) {
-					buildableProjects.add(project);
+				hasOpenProjects = true;
+				if (hasBuilder && !hasBuilder(project)) {
+					hasBuilder = false;
 				}
 			} else {
-				closedProjects.add(project);
+				hasClosedProjects = true;
+				hasBuilder = false;
 			}
 		}
-		if (!ResourcesPlugin.getWorkspace().isAutoBuilding() && !buildableProjects.isEmpty()) {
+		if (!selection.isEmpty() && isProjectSelection && !ResourcesPlugin.getWorkspace().isAutoBuilding() && hasBuilder) {
+			// Allow manual incremental build only if auto build is off.
 			buildAction.selectionChanged(selection);
-			if (buildableProjects.size() > 1) {
-				buildAction.setText(IDEWorkbenchMessages.BuildAction_text_plural);
-			} else {
-				buildAction.setText(IDEWorkbenchMessages.BuildAction_text);
-			}
 			menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, buildAction);
 		}
-		if (closedProjects.isEmpty()) {
+		if (!hasClosedProjects) {
 			refreshAction.selectionChanged(selection);
 			menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, refreshAction);
 		}
-		if (!containsNonproject && !closedProjects.isEmpty()) {
-			if (closedProjects.size() > 1) {
-				openProjectAction.setText(IDEWorkbenchMessages.OpenResourceAction_text_plural);
-				openProjectAction.setToolTipText(IDEWorkbenchMessages.OpenResourceAction_toolTip_plural);
-			} else {
-				openProjectAction.setText(IDEWorkbenchMessages.OpenResourceAction_text);
-				openProjectAction.setToolTipText(IDEWorkbenchMessages.OpenResourceAction_toolTip);
+		if (isProjectSelection) {
+			if (hasClosedProjects) {
+				openProjectAction.selectionChanged(selection);
+				menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, openProjectAction);
 			}
-			openProjectAction.selectionChanged(selection);
-			menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, openProjectAction);
-		}
-		if (!containsNonproject && !openProjects.isEmpty()) {
-			if (openProjects.size() > 1) {
-				closeProjectAction.setText(IDEWorkbenchMessages.CloseResourceAction_text_plural);
-				closeProjectAction.setToolTipText(IDEWorkbenchMessages.CloseResourceAction_toolTip_plural);
-			} else {
-				closeProjectAction.setText(IDEWorkbenchMessages.CloseResourceAction_text);
-				closeProjectAction.setToolTipText(IDEWorkbenchMessages.CloseResourceAction_toolTip);
-			}
-			closeProjectAction.selectionChanged(selection);
-			menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, closeProjectAction);
-			closeUnrelatedProjectsAction.selectionChanged(selection);
-			menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, closeUnrelatedProjectsAction);
-		}
-	}
-
-	public static List<IProject> selectionToResources(IStructuredSelection selection) {
-		if (selection == null) {
-			return Collections.emptyList();
-		}
-		List<IProject> resources = new ArrayList<>();
-		Iterator<?> iter = selection.iterator();
-		while (iter.hasNext()) {
-			Object curr = iter.next();
-			if (curr instanceof IWorkingSet) {
-				IWorkingSet workingSet = (IWorkingSet) curr;
-				if (workingSet.isAggregateWorkingSet() && workingSet.isEmpty()) {
-					continue;
-				}
-				IAdaptable[] elements = workingSet.getElements();
-				for (IAdaptable element : elements) {
-					IProject project = element.getAdapter(IProject.class);
-					if (project != null) {
-						resources.add(project);
-					}
-				}
-			} else if (curr instanceof IAdaptable) {
-				IProject resource = ((IAdaptable) curr).getAdapter(IProject.class);
-				if (resource != null) {
-					resources.add(resource);
-				}
+			if (hasOpenProjects) {
+				closeProjectAction.selectionChanged(selection);
+				menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, closeProjectAction);
+				closeUnrelatedProjectsAction.selectionChanged(selection);
+				menu.appendToGroup(ICommonMenuConstants.GROUP_BUILD, closeUnrelatedProjectsAction);
 			}
 		}
-		return resources;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2017 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Anton Leherbauer (Wind River) -  [296800] UI build actions should not lock the workspace
  *     Broadcom Corporation - [335960]  Update BuildAction to use new Workspace Build Configurations API
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
- *     Lucas Bullen (Red Hat Inc.) - Bug 522096
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -141,8 +140,6 @@ public class BuildAction extends WorkspaceAction {
 
     @Override
 	protected String getOperationMessage() {
-		if (getProjectsToBuild().size() > 1)
-			return IDEWorkbenchMessages.BuildAction_operationMessage_plural;
         return IDEWorkbenchMessages.BuildAction_operationMessage;
     }
 
