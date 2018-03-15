@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,14 @@
  *     Matthew Hall - bug 274081
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 488145
+ *     Conrad Groth <info@conrad-groth.de> - Bug 502084
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.value;
 
 import java.util.function.Supplier;
 
 import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.IStaleListener;
@@ -234,26 +236,10 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 
 			// copy the old value
 			final T oldValue = cachedValue;
-			// Fire the "dirty" event. This implementation recomputes the new
-			// value lazily.
-			fireValueChange(new ValueDiff<T>() {
-
-				@Override
-				public T getOldValue() {
-					return oldValue;
-				}
-
-				@Override
-				public T getNewValue() {
-					return getValue();
-				}
-			});
+			fireValueChange(Diffs.createValueDiff(oldValue, getValue()));
 		}
 	}
 
-	/**
-	 *
-	 */
 	private void stopListening() {
 		// Stop listening for dependency changes.
 		if (dependencies != null) {
