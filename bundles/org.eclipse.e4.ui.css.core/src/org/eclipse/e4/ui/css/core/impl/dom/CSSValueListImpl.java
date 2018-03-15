@@ -64,7 +64,7 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		for (CSSValue cssValue : values) {
 			sb.append(cssValue.getCssText() + "\n");
 		}

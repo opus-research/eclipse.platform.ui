@@ -109,7 +109,7 @@ public final class LegacyViewContributionExpression extends
 
 	@Override
 	public final String toString() {
-		final StringBuilder buffer = new StringBuilder();
+		final StringBuffer buffer = new StringBuffer();
 		buffer.append("LegacyViewContributionExpression("); //$NON-NLS-1$
 		buffer.append(activePartId);
 		buffer.append(',');

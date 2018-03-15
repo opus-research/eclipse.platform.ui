@@ -16,6 +16,8 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.junit.Assert;
 
+import junit.framework.TestCase;
+
 /**
  * This view is used to test the creation and restoration of
  * view state between sessions.
@@ -75,7 +77,7 @@ public class SessionView extends MockViewPart {
     /**
      * Restore an IMemento.
      */
-	public void testMementoState() {
+    public void testMementoState(TestCase testCase) {
         // Verify that the memento was passed to us in
         // constructor.
         Assert.assertNotNull(memento);
