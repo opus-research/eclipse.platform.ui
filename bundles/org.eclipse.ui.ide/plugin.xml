@@ -1222,6 +1222,12 @@
             platform="gtk"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F11">
+      <key
+            commandId="org.eclipse.ui.window.fullscreenmode"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="cocoa"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+F">
       </key>
    </extension>
 
